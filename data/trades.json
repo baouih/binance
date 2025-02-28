@@ -37,5 +37,14 @@
     "status": "FILLED",
     "position_id": "BTCUSDT-position",
     "timestamp": "2025-02-28T13:20:39.119409"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "BUY",
+    "type": "MARKET",
+    "quantity": 0.0012172506325138599,
+    "price": "0",
+    "status": "FILLED",
+    "timestamp": "2025-02-28T14:11:00.775042"
   }
 ]

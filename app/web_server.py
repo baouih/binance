@@ -430,15 +430,24 @@ def get_strategies():
 @app.route('/api/historical_data', methods=['GET'])
 def get_historical_data():
     """Get historical price data."""
-    symbol = request.args.get('symbol', 'BTCUSDT')
-    interval = request.args.get('interval', '1h')
-    limit = int(request.args.get('limit', 500))
+    try:
+        symbol = request.args.get('symbol', 'BTCUSDT')
+        interval = request.args.get('interval', '1h')
+        limit = int(request.args.get('limit', 500))
+        
+        logger.info(f"API historical_data được gọi: symbol={symbol}, interval={interval}, limit={limit}")
     
-    # Get data using the data processor
-    df = data_processor.get_historical_data(symbol, interval, lookback_days=30)
-    
-    if df is None or df.empty:
-        return jsonify({'error': 'No data available'}), 404
+        # Get data using the data processor
+        df = data_processor.get_historical_data(symbol, interval, lookback_days=30)
+        
+        if df is None or df.empty:
+            logger.error(f"API historical_data lỗi: Không có dữ liệu cho {symbol}, {interval}")
+            return jsonify({'error': 'No data available'}), 404
+            
+        logger.info(f"API historical_data thành công: Lấy {len(df)} mẫu dữ liệu cho {symbol}")
+    except Exception as e:
+        logger.error(f"API historical_data lỗi: {str(e)}")
+        return jsonify({'error': f'Error retrieving data: {str(e)}'}), 500
         
     # Convert to list of dictionaries for JSON
     data = []
@@ -495,6 +504,8 @@ def create_bot():
     try:
         data = request.json
         
+        logger.info(f"API create_bot được gọi với dữ liệu: {data}")
+        
         symbol = data.get('symbol', 'BTCUSDT')
         interval = data.get('interval', '1h')
         strategy_type = data.get('strategy', 'rsi')
@@ -502,11 +513,13 @@ def create_bot():
         
         # Kiểm tra và xác thực tham số đầu vào
         if not symbol or not interval:
+            logger.error(f"Tạo bot lỗi: Thiếu thông tin cặp giao dịch hoặc khung thời gian")
             return jsonify({'error': 'Thiếu thông tin cặp giao dịch hoặc khung thời gian (Missing symbol or interval)'}), 400
             
         # Xử lý strategy_type để hỗ trợ giá trị trống từ form
         if not strategy_type or strategy_type == "null" or strategy_type == "undefined":
             strategy_type = 'rsi'  # Mặc định dùng RSI nếu không chọn
+            logger.info(f"Sử dụng chiến lược mặc định: {strategy_type}")
         
         logger.info(f"Creating bot for {symbol} with {strategy_type} strategy, interval: {interval}")
         
