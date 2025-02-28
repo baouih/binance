@@ -22,8 +22,13 @@ class SocketClient {
         return false;
       }
       
-      // Create socket connection
-      this.socket = io();
+      // Create socket connection with transport options
+      this.socket = io({
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 20000
+      });
       
       // Setup event handlers
       this.socket.on('connect', () => this.onConnect());

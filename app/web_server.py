@@ -388,5 +388,5 @@ if __name__ == '__main__':
     logger.info("Starting data generation thread")
     start_data_generation()
     
-    # Start the server
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # Start the server with proper parameters
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, log_output=True)
