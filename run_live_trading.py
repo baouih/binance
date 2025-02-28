@@ -24,7 +24,11 @@ from app.data_processor import DataProcessor
 from app.advanced_ml_optimizer import AdvancedMLOptimizer
 from app.market_regime_detector import MarketRegimeDetector
 from app.advanced_ml_strategy import AdvancedMLStrategy
-from app.composite_indicator import CompositeIndicator
+try:
+    from app.composite_indicator import CompositeIndicator
+except ImportError:
+    # Sử dụng phiên bản từ thư mục gốc nếu không tìm thấy trong app/
+    from composite_indicator import CompositeIndicator
 
 # Thiết lập logging
 logging.basicConfig(
@@ -78,7 +82,7 @@ class LiveTradingBot:
         )
         
         # Khởi tạo bộ xử lý dữ liệu
-        self.data_processor = DataProcessor(self.api, use_advanced_features=True)
+        self.data_processor = DataProcessor(self.api)
         
         # Khởi tạo các bộ phân tích
         self.market_regime_detector = MarketRegimeDetector()
@@ -140,6 +144,13 @@ class LiveTradingBot:
             # Chuẩn bị dữ liệu
             X = self.ml_optimizer.prepare_features_for_prediction(df)
             y = self.ml_optimizer.prepare_target_for_training(df, lookahead=1, threshold=0.001)
+            
+            # Đảm bảo X và y có cùng kích thước
+            if len(X) != len(y):
+                min_len = min(len(X), len(y))
+                X = X.iloc[:min_len]
+                y = y[:min_len]
+                logger.info(f"Điều chỉnh kích thước: X = {len(X)}, y = {len(y)}")
             
             logger.info(f"Huấn luyện mô hình cho {symbol} với {len(X)} mẫu, phân phối lớp: {np.unique(y, return_counts=True)}")
             
