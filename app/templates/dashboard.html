@@ -183,27 +183,27 @@
       
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Account Summary</h5>
+          <h5 class="mb-0">Tổng Quan Tài Khoản <small class="text-secondary">(Account Summary)</small></h5>
         </div>
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-6">
               <div class="mb-2">
-                <span class="text-muted">Total Balance:</span>
+                <span class="text-muted">Tổng Số Dư: <small class="text-secondary">(Total Balance)</small></span>
                 <div id="total-balance" class="fs-5">$100,000.00</div>
               </div>
               <div>
-                <span class="text-muted">Available:</span>
+                <span class="text-muted">Số Dư Khả Dụng: <small class="text-secondary">(Available)</small></span>
                 <div id="available-balance">$80,000.00</div>
               </div>
             </div>
             <div class="col-6">
               <div class="mb-2">
-                <span class="text-muted">Unrealized P&L:</span>
+                <span class="text-muted">Lãi/Lỗ Chưa Thực Hiện: <small class="text-secondary">(Unrealized P&L)</small></span>
                 <div id="unrealized-pnl" class="fs-5 text-success">$0.00</div>
               </div>
               <div>
-                <span class="text-muted">Equity:</span>
+                <span class="text-muted">Vốn Chủ Sở Hữu: <small class="text-secondary">(Equity)</small></span>
                 <div id="equity">$100,000.00</div>
               </div>
             </div>
@@ -213,12 +213,12 @@
       
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Open Positions</h5>
+          <h5 class="mb-0">Vị Thế Mở <small class="text-secondary">(Open Positions)</small></h5>
         </div>
         <div class="card-body">
           <div id="positions-container">
             <div class="alert alert-info">
-              <p class="mb-0">No open positions</p>
+              <p class="mb-0">Chưa có vị thế mở nào <small class="text-secondary">(No open positions)</small></p>
             </div>
           </div>
         </div>
@@ -274,32 +274,32 @@
     <div class="col-lg-4">
       <div class="card">
         <div class="card-header">
-          <h5 class="mb-0">Performance Metrics</h5>
+          <h5 class="mb-0">Số Liệu Hiệu Suất <small class="text-secondary">(Performance Metrics)</small></h5>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-6 mb-3">
-              <div class="metric-label">Win Rate</div>
+              <div class="metric-label">Tỉ Lệ Thắng <small class="text-secondary">(Win Rate)</small></div>
               <div id="win-rate" class="metric-value">0.0%</div>
             </div>
             <div class="col-6 mb-3">
-              <div class="metric-label">Total Trades</div>
+              <div class="metric-label">Tổng Giao Dịch <small class="text-secondary">(Total Trades)</small></div>
               <div id="total-trades" class="metric-value">0</div>
             </div>
             <div class="col-6 mb-3">
-              <div class="metric-label">Profit/Loss</div>
+              <div class="metric-label">Lợi Nhuận/Lỗ <small class="text-secondary">(P/L)</small></div>
               <div id="total-pnl" class="metric-value">0.0%</div>
             </div>
             <div class="col-6 mb-3">
-              <div class="metric-label">Max Drawdown</div>
+              <div class="metric-label">Rút Vốn Tối Đa <small class="text-secondary">(Max Drawdown)</small></div>
               <div id="max-drawdown" class="metric-value">0.0%</div>
             </div>
           </div>
           
-          <h6 class="mt-3">Trade History</h6>
+          <h6 class="mt-3">Lịch Sử Giao Dịch <small class="text-secondary">(Trade History)</small></h6>
           <div id="trade-history-container">
             <div class="alert alert-info">
-              <p class="mb-0">No trading history available.</p>
+              <p class="mb-0">Chưa có lịch sử giao dịch nào <small class="text-secondary">(No trading history)</small></p>
             </div>
           </div>
         </div>
@@ -363,11 +363,12 @@
       toast.setAttribute('aria-atomic', 'true');
       toast.innerHTML = `
         <div class="toast-header bg-warning text-dark">
-          <strong class="me-auto">Simulation Mode</strong>
+          <strong class="me-auto">Chế Độ Mô Phỏng <small class="text-secondary">(Simulation Mode)</small></strong>
           <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
-          The trading bot is running in simulation mode. No real trades will be executed.
+          Bot giao dịch đang chạy ở chế độ mô phỏng. Không có giao dịch thực nào được thực hiện.
+          <small class="text-secondary d-block mt-1">(The trading bot is running in simulation mode. No real trades will be executed.)</small>
         </div>
       `;
       toastContainer.appendChild(toast);
