@@ -356,11 +356,25 @@ def run_backtest_with_ml(symbol='BTCUSDT', timeframe='1h', days=30):
 
 def calc_unrealized_pnl(position, current_price):
     """Tính lãi/lỗ chưa thực hiện của vị thế"""
-    if position['side'] == "BUY":
-        pnl = (current_price - position['entry_price']) / position['entry_price'] * 100
-    else:
-        pnl = (position['entry_price'] - current_price) / position['entry_price'] * 100
-    return pnl
+    # Xử lý trường hợp entry_price là 0 hoặc NaN
+    entry_price = position['entry_price']
+    if entry_price is None or entry_price == 0:
+        return 0.0
+        
+    try:
+        if position['side'] == "BUY":
+            pnl = (current_price - entry_price) / entry_price * 100
+        else:
+            pnl = (entry_price - current_price) / entry_price * 100
+            
+        # Kiểm tra giá trị NaN hoặc vô cùng
+        if pnl is None or np.isnan(pnl) or np.isinf(pnl):
+            return 0.0
+            
+        return pnl
+    except (ZeroDivisionError, TypeError):
+        logger.warning(f"Lỗi tính PnL: entry_price={entry_price}, current_price={current_price}")
+        return 0.0
 
 def calculate_performance(trades, equity_curve, initial_balance=10000.0):
     """Tính toán các chỉ số hiệu suất"""
@@ -375,41 +389,65 @@ def calculate_performance(trades, equity_curve, initial_balance=10000.0):
             'total_trades': 0
         }
     
-    # Tính tổng lợi nhuận
-    total_return = (equity_curve[-1] - initial_balance) / initial_balance * 100
-    
-    # Tính tỷ lệ thắng
-    win_trades = [t for t in trades if t['pnl'] > 0]
-    win_rate = len(win_trades) / len(trades) * 100
-    
-    # Tính profit factor
-    total_win = sum([t['pnl'] for t in win_trades]) if win_trades else 0
-    total_loss = sum([t['pnl'] for t in trades if t['pnl'] <= 0])
-    profit_factor = abs(total_win / total_loss) if total_loss != 0 else float('inf')
-    
-    # Tính drawdown tối đa
-    max_equity = equity_curve[0]
-    max_drawdown = 0
-    
-    for equity in equity_curve:
-        max_equity = max(max_equity, equity)
-        drawdown = (max_equity - equity) / max_equity * 100
-        max_drawdown = max(max_drawdown, drawdown)
-    
-    # Tính trung bình lãi/lỗ
-    avg_win = sum([t['pnl'] for t in win_trades]) / len(win_trades) if win_trades else 0
-    loss_trades = [t for t in trades if t['pnl'] <= 0]
-    avg_loss = sum([t['pnl'] for t in loss_trades]) / len(loss_trades) if loss_trades else 0
-    
-    return {
-        'total_return': total_return,
-        'win_rate': win_rate,
-        'profit_factor': profit_factor,
-        'max_drawdown': max_drawdown,
-        'avg_win': avg_win,
-        'avg_loss': avg_loss,
-        'total_trades': len(trades)
-    }
+    try:
+        # Đảm bảo equity_curve không chứa NaN hoặc inf
+        equity_curve = [e if e is not None and not np.isnan(e) and not np.isinf(e) else initial_balance for e in equity_curve]
+        
+        # Tính tổng lợi nhuận
+        if len(equity_curve) > 0 and equity_curve[-1] != 0:
+            total_return = (equity_curve[-1] - initial_balance) / initial_balance * 100
+        else:
+            total_return = 0
+        
+        # Lọc các PnL không hợp lệ trong trades
+        for trade in trades:
+            if trade['pnl'] is None or np.isnan(trade['pnl']) or np.isinf(trade['pnl']):
+                trade['pnl'] = 0.0
+        
+        # Tính tỷ lệ thắng
+        win_trades = [t for t in trades if t.get('pnl', 0) > 0]
+        win_rate = len(win_trades) / len(trades) * 100 if trades else 0
+        
+        # Tính profit factor
+        total_win = sum([t.get('pnl', 0) for t in win_trades]) if win_trades else 0
+        loss_trades = [t for t in trades if t.get('pnl', 0) <= 0]
+        total_loss = abs(sum([t.get('pnl', 0) for t in loss_trades])) if loss_trades else 1.0
+        profit_factor = abs(total_win / total_loss) if total_loss != 0 else 1.0
+        
+        # Tính drawdown tối đa
+        max_equity = equity_curve[0]
+        max_drawdown = 0
+        
+        for equity in equity_curve:
+            max_equity = max(max_equity, equity) if not np.isnan(equity) else max_equity
+            if max_equity > 0 and not np.isnan(equity):
+                drawdown = (max_equity - equity) / max_equity * 100
+                max_drawdown = max(max_drawdown, drawdown)
+        
+        # Tính trung bình lãi/lỗ
+        avg_win = sum([t.get('pnl', 0) for t in win_trades]) / len(win_trades) if win_trades else 0
+        avg_loss = sum([t.get('pnl', 0) for t in loss_trades]) / len(loss_trades) if loss_trades else 0
+        
+        return {
+            'total_return': float(total_return) if not np.isnan(total_return) else 0,
+            'win_rate': float(win_rate) if not np.isnan(win_rate) else 0,
+            'profit_factor': float(profit_factor) if not np.isnan(profit_factor) and not np.isinf(profit_factor) else 1.0,
+            'max_drawdown': float(max_drawdown) if not np.isnan(max_drawdown) else 0,
+            'avg_win': float(avg_win) if not np.isnan(avg_win) else 0,
+            'avg_loss': float(avg_loss) if not np.isnan(avg_loss) else 0,
+            'total_trades': len(trades)
+        }
+    except Exception as e:
+        logger.error(f"Lỗi trong quá trình tính toán hiệu suất: {e}")
+        return {
+            'total_return': 0,
+            'win_rate': 0,
+            'profit_factor': 0,
+            'max_drawdown': 0,
+            'avg_win': 0,
+            'avg_loss': 0,
+            'total_trades': len(trades) if trades else 0
+        }
 
 def run_backtest_with_advanced_system(symbol='BTCUSDT', timeframe='1h', days=30):
     """

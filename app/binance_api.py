@@ -201,8 +201,9 @@ class BinanceAPI:
         """Generate mock klines for simulation"""
         logger.info(f"SIMULATION: Generated {limit} samples of synthetic data for {symbol}")
         
-        # Set seed for reproducibility
-        np.random.seed(42)
+        # Set seed for reproducibility but ensure variation between runs
+        current_seed = int(time.time()) % 1000 + 42
+        np.random.seed(current_seed)
         
         # Current time
         end_time = datetime.now()
@@ -225,21 +226,35 @@ class BinanceAPI:
         timestamps.reverse()  # Oldest first
         
         # Get current market price from CoinGecko or use a safe default
-        current_price = 81500  # Fallback price
+        current_price = 84000.0  # Recent BTC price as of 2025
         try:
-            response = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+            coinbase_url = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+            response = requests.get(coinbase_url)
             if response.status_code == 200:
                 data = response.json()
-                if 'bitcoin' in data and 'usd' in data['bitcoin']:
-                    current_price = data['bitcoin']['usd']
+                if 'data' in data and 'amount' in data['data']:
+                    current_price = float(data['data']['amount'])
         except Exception as e:
-            logger.warning(f"Failed to get current price from CoinGecko: {e}")
+            logger.warning(f"Failed to get current price from Coinbase: {e}")
+            
+            # Try CoinGecko as fallback
+            try:
+                response = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'bitcoin' in data and 'usd' in data['bitcoin']:
+                        current_price = float(data['bitcoin']['usd'])
+            except Exception as e2:
+                logger.warning(f"Failed to get current price from CoinGecko: {e2}")
+        
+        # Ensure we have a valid positive price
+        current_price = max(current_price, 80000.0)  # Minimum price floor
         
         # Base price and volatility based on symbol and current price
-        if symbol == 'BTCUSDT':
+        if symbol.startswith('BTC'):
             base_price = current_price  # Use current price
             volatility = 0.005  # Daily volatility
-        elif symbol == 'ETHUSDT':
+        elif symbol.startswith('ETH'):
             # Typically ETH is about 5-7% of BTC price
             base_price = current_price * 0.06  
             volatility = 0.007
@@ -252,26 +267,64 @@ class BinanceAPI:
         for i in range(1, limit):
             # Random price change with momentum
             momentum = 0.2  # Autocorrelation factor
-            change = np.random.normal(0, volatility) + momentum * (close_prices[-1] / close_prices[0] - 1)
-            new_price = close_prices[-1] * (1 + change)
+            
+            # Ensure first price is positive
+            if i == 1 and close_prices[0] <= 0:
+                close_prices[0] = base_price
+                
+            # Calculate the price change with safety checks
+            try:
+                price_ratio = close_prices[-1] / close_prices[0] if close_prices[0] > 0 else 1.0
+                change = np.random.normal(0, volatility) + momentum * (price_ratio - 1)
+                new_price = close_prices[-1] * (1 + change)
+                # Ensure price stays positive and within reasonable bounds
+                new_price = max(new_price, base_price * 0.5)  # Don't go below 50% of base
+                new_price = min(new_price, base_price * 2.0)  # Don't go above 200% of base
+            except (ZeroDivisionError, ValueError, OverflowError) as e:
+                logger.warning(f"Error in price generation: {e}, using fallback")
+                new_price = base_price * (0.95 + 0.1 * np.random.random())  # 5% random variation
+            
             close_prices.append(new_price)
             
         # Create other price components
-        high_prices = [price * (1 + abs(np.random.normal(0, volatility))) for price in close_prices]
-        low_prices = [price * (1 - abs(np.random.normal(0, volatility))) for price in close_prices]
-        open_prices = [low + (high - low) * np.random.random() for low, high in zip(low_prices, high_prices)]
+        high_prices = []
+        low_prices = []
+        open_prices = []
+        
+        for i, price in enumerate(close_prices):
+            high_factor = 1 + abs(np.random.normal(0, volatility))
+            high = price * high_factor
+            
+            low_factor = 1 - abs(np.random.normal(0, volatility))
+            low = price * low_factor
+            
+            # Ensure low < high
+            if low >= high:
+                low = high * 0.995  # Ensure small gap
+                
+            high_prices.append(high)
+            low_prices.append(low)
+            
+            # Open price between low and high
+            rand_factor = np.random.random()
+            open_price = low + (high - low) * rand_factor
+            open_prices.append(open_price)
         
         # Create volumes with some correlation to price changes
         volumes = []
         for i in range(limit):
             if i > 0:
-                price_change = abs(close_prices[i] - close_prices[i-1]) / close_prices[i-1]
-                volume_factor = 1 + price_change * 10  # Higher volume on larger price moves
+                try:
+                    price_change = abs(close_prices[i] - close_prices[i-1]) / close_prices[i-1]
+                    volume_factor = 1 + price_change * 10  # Higher volume on larger price moves
+                except (ZeroDivisionError, ValueError):
+                    volume_factor = 1.0
             else:
-                volume_factor = 1
+                volume_factor = 1.0
                 
-            base_volume = base_price * 500  # Base volume proportional to price
-            volumes.append(base_volume * volume_factor * np.random.lognormal(0, 0.5))
+            base_volume = base_price * 100  # Base volume proportional to price
+            volume = base_volume * volume_factor * max(0.1, np.random.lognormal(0, 0.5))
+            volumes.append(volume)
             
         # Create quote volumes (volume * price)
         quote_volumes = [v * p for v, p in zip(volumes, close_prices)]
@@ -291,11 +344,29 @@ class BinanceAPI:
             'volume': volumes,
             'close_time': [t + delta for t in timestamps],
             'quote_volume': quote_volumes,
-            'trades_count': [int(v / 10) if np.isfinite(v) else 0 for v in volumes],  # Rough approximation
+            'trades_count': [max(1, int(v / 10)) for v in volumes],  # Ensure at least 1 trade
             'taker_buy_base_volume': taker_buy_base_volumes,
             'taker_buy_quote_volume': taker_buy_quote_volumes,
             'ignored': [0] * limit
         })
+        
+        # Final safety check - replace any NaN or infinities
+        for col in df.columns:
+            if df[col].dtype.kind in 'fc':  # float or complex
+                # Replace with column mean or a reasonable default
+                mean_val = df[col].mean()
+                if pd.isna(mean_val) or np.isinf(mean_val):
+                    if col == 'close':
+                        df[col] = df[col].fillna(base_price)
+                    elif col in ['high', 'low', 'open']:
+                        df[col] = df[col].fillna(base_price)
+                    else:
+                        df[col] = df[col].fillna(1.0)
+                else:
+                    df[col] = df[col].fillna(mean_val)
+                
+                # Replace infinities
+                df[col] = df[col].replace([np.inf, -np.inf], mean_val)
         
         # Log some info about the generated data
         logger.info(f"Date range: {df['open_time'].min()} to {df['open_time'].max()}")

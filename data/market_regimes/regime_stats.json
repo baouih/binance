@@ -1,11 +1,16 @@
 {
   "trending_up": {
-    "count": 11,
+    "count": 13,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "neutral": {
-    "count": 11,
+    "count": 12,
+    "total_duration": 0,
+    "avg_duration": 0.0
+  },
+  "ranging": {
+    "count": 1,
     "total_duration": 0,
     "avg_duration": 0.0
   }

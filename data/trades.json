@@ -79,5 +79,15 @@
     "exit_time": "2025-02-28T15:51:35.191299",
     "status": "CLOSED",
     "final_pnl": -1.0
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "SELL",
+    "type": "MARKET",
+    "quantity": 0.001,
+    "price": "0",
+    "status": "FILLED",
+    "position_id": "BTCUSDT-position",
+    "timestamp": "2025-02-28T16:58:40.329560"
   }
 ]

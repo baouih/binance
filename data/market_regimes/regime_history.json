@@ -128,6 +128,30 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T16:56:01.180918",
+    "end_time": "2025-02-28T17:00:11.594147",
+    "duration": 4.173553933333333
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T17:00:11.594163",
+    "end_time": "2025-02-28T17:00:13.423014",
+    "duration": 0.030480966666666668
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T17:00:13.423030",
+    "end_time": "2025-02-28T17:00:15.513819",
+    "duration": 0.03484656666666666
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T17:00:15.513831",
+    "end_time": "2025-02-28T17:01:51.410220",
+    "duration": 1.5982732333333334
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T17:01:51.410231",
     "end_time": null,
     "duration": 0
   }
