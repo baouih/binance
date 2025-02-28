@@ -431,6 +431,27 @@ class StrategyFactory:
             strategies = kwargs.get('strategies', [])
             weights = kwargs.get('weights')
             return CombinedStrategy(strategies, weights)
+        elif strategy_type.lower() == 'auto':
+            # Auto strategy selects the best strategy based on market conditions
+            market_regime = kwargs.get('market_regime', 'neutral')
+            
+            # Define strategy based on market regime
+            if market_regime == 'trending_up':
+                return EMACrossStrategy(9, 21)  # EMA Cross good for trending markets
+            elif market_regime == 'trending_down':
+                return EMACrossStrategy(9, 21)  # EMA Cross good for trending markets
+            elif market_regime == 'volatile':
+                return BBandsStrategy(2.5)  # BBands good for volatile markets
+            elif market_regime == 'ranging':
+                return RSIStrategy(75, 25)  # RSI good for ranging markets
+            else:  # Default to combined strategy for neutral markets
+                strategies = [
+                    RSIStrategy(70, 30),
+                    MACDStrategy(),
+                    EMACrossStrategy(9, 21)
+                ]
+                weights = [0.4, 0.3, 0.3]
+                return CombinedStrategy(strategies, weights, name="Auto Strategy")
         else:
             logger.warning(f"Unknown strategy type: {strategy_type}")
             return Strategy()
@@ -441,6 +462,14 @@ class StrategyFactory:
         Get list of available strategy types.
         
         Returns:
-            list: Available strategy types
+            list: Available strategy types with labels
         """
-        return ['rsi', 'macd', 'ema_cross', 'bbands', 'ml', 'combined']
+        return [
+            {'id': 'rsi', 'name': 'RSI (Chỉ Báo Sức Mạnh Tương Đối)', 'description': 'Chiến lược dựa trên chỉ báo RSI để xác định vùng quá mua và quá bán.'},
+            {'id': 'macd', 'name': 'MACD (Phân Kỳ Trung Bình Động)', 'description': 'Chiến lược dựa trên chỉ báo MACD để xác định xu hướng thị trường.'},
+            {'id': 'ema_cross', 'name': 'EMA Cross (Cắt Nhau EMA)', 'description': 'Chiến lược dựa trên sự cắt nhau của đường EMA ngắn và dài hạn.'},
+            {'id': 'bbands', 'name': 'Bollinger Bands (Dải Bollinger)', 'description': 'Chiến lược giao dịch dựa trên dải giá Bollinger phân tích biến động.'},
+            {'id': 'ml', 'name': 'Machine Learning (Học Máy)', 'description': 'Chiến lược dựa trên mô hình học máy để dự đoán xu hướng giá.'},
+            {'id': 'combined', 'name': 'Combined (Kết Hợp)', 'description': 'Chiến lược kết hợp nhiều chỉ báo để đưa ra tín hiệu giao dịch chính xác hơn.'},
+            {'id': 'auto', 'name': 'Auto Strategy (Tự Động)', 'description': 'Tự động chọn chiến lược tốt nhất dựa trên điều kiện thị trường hiện tại.'}
+        ]

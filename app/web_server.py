@@ -83,7 +83,15 @@ def get_symbols():
 @app.route('/api/intervals', methods=['GET'])
 def get_intervals():
     """Get available time intervals."""
-    intervals = ['1m', '5m', '15m', '30m', '1h', '4h', '1d']
+    intervals = [
+        {'id': '1m', 'name': '1 Phút', 'description': 'Phân tích ngắn hạn, thích hợp cho scalping'},
+        {'id': '5m', 'name': '5 Phút', 'description': 'Phân tích ngắn hạn, thích hợp cho giao dịch trong ngày'},
+        {'id': '15m', 'name': '15 Phút', 'description': 'Phân tích trung hạn, thích hợp cho giao dịch trong ngày'},
+        {'id': '30m', 'name': '30 Phút', 'description': 'Phân tích trung hạn, thích hợp cho giao dịch trong ngày'},
+        {'id': '1h', 'name': '1 Giờ', 'description': 'Phân tích trung hạn, thích hợp cho swing trading'},
+        {'id': '4h', 'name': '4 Giờ', 'description': 'Phân tích dài hạn, thích hợp cho swing trading'},
+        {'id': '1d', 'name': '1 Ngày', 'description': 'Phân tích dài hạn, thích hợp cho đầu tư'}
+    ]
     return jsonify(intervals)
 
 @app.route('/api/strategies', methods=['GET'])
