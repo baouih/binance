@@ -639,7 +639,14 @@ class TradingBot:
         # Add cumulative returns
         results['returns'] = results['equity'] / initial_balance - 1
         
-        return results, metrics, trades
+        # Tạo một bản sao kết quả để tránh thay đổi DataFrame gốc
+        results_dict = {
+            'dataframe': results,
+            'trades': trades,
+            'equity_curve': results['equity'].values.tolist()
+        }
+        
+        return results_dict, metrics
         
     def _calculate_backtest_metrics(self, trades, initial_balance, final_balance):
         """
@@ -701,10 +708,23 @@ class TradingBot:
         # Group trades by day and calculate daily returns
         trades_by_day = {}
         for trade in trades:
-            day = trade['exit_time'].date()
-            if day not in trades_by_day:
-                trades_by_day[day] = []
-            trades_by_day[day].append(trade)
+            try:
+                # Handle different exit_time formats (datetime or timestamp)
+                if isinstance(trade['exit_time'], datetime):
+                    day = trade['exit_time'].date()
+                elif isinstance(trade['exit_time'], (int, float)):
+                    # Convert to string for grouping
+                    day = str(trade['exit_time'])
+                else:
+                    # Any other format, use string representation
+                    day = str(trade['exit_time'])
+                    
+                if day not in trades_by_day:
+                    trades_by_day[day] = []
+                trades_by_day[day].append(trade)
+            except (TypeError, AttributeError, KeyError) as e:
+                logger.warning(f"Không thể phân nhóm giao dịch theo ngày: {e}")
+                continue
             
         for day, day_trades in trades_by_day.items():
             daily_return = sum(t['pnl_pct'] for t in day_trades)
