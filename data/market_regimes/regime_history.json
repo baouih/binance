@@ -260,6 +260,18 @@
   {
     "regime": "ranging",
     "start_time": "2025-02-28T17:26:52.771869",
+    "end_time": "2025-02-28T17:27:59.203298",
+    "duration": 1.1071906
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T17:27:59.203313",
+    "end_time": "2025-02-28T17:28:00.440430",
+    "duration": 0.0206187
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T17:28:00.440440",
     "end_time": null,
     "duration": 0
   }

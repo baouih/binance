@@ -71,8 +71,22 @@ def main():
         elif len(y) > len(X):
             logger.info(f"Cắt y từ {len(y)} xuống {len(X)} để khớp với X")
             y = y[-len(X):].copy()
-            
-        logger.info(f"Dữ liệu huấn luyện: X={X.shape}, y={y.shape}")
+        
+        # Đảm bảo mỗi lớp có ít nhất 2 mẫu cho train_test_split với stratify
+        import numpy as np
+        unique_classes, class_counts = np.unique(y, return_counts=True)
+        logger.info(f"Phân phối lớp: {dict(zip(unique_classes, class_counts))}")
+        
+        # Nếu có lớp nào chỉ có 1 mẫu, tạo thêm một mẫu nữa
+        for i, count in enumerate(class_counts):
+            if count < 2:
+                logger.warning(f"Lớp {unique_classes[i]} chỉ có {count} mẫu, không đủ để tách tập dữ liệu")
+                # Đặt tất cả các mẫu thuộc lớp này thành lớp phổ biến nhất
+                most_common_class = unique_classes[np.argmax(class_counts)]
+                logger.info(f"Thay đổi lớp {unique_classes[i]} thành lớp phổ biến nhất {most_common_class}")
+                y[y == unique_classes[i]] = most_common_class
+        
+        logger.info(f"Dữ liệu huấn luyện sau khi xử lý: X={X.shape}, y={y.shape}")
         
         # Huấn luyện mô hình
         logger.info("Bắt đầu huấn luyện mô hình...")
@@ -92,9 +106,25 @@ def main():
             if results:
                 logger.info(f"Kết quả backtest: {results}")
                 
-                # Lưu kết quả
+                # Lưu kết quả - chuyển đổi các kiểu dữ liệu NumPy sang Python native
+                # trước khi lưu vào JSON
+                def convert_to_json_serializable(obj):
+                    if isinstance(obj, (np.integer, np.int64)):
+                        return int(obj)
+                    elif isinstance(obj, (np.floating, np.float64)):
+                        return float(obj)
+                    elif isinstance(obj, (np.ndarray,)):
+                        return obj.tolist()
+                    elif isinstance(obj, (dict,)):
+                        return {k: convert_to_json_serializable(v) for k, v in obj.items()}
+                    elif isinstance(obj, (list, tuple)):
+                        return [convert_to_json_serializable(i) for i in obj]
+                    else:
+                        return obj
+                
+                json_serializable_results = convert_to_json_serializable(results)
                 with open('models/backtest_results.json', 'w') as f:
-                    json.dump(results, f, indent=2)
+                    json.dump(json_serializable_results, f, indent=2)
                 
                 logger.info("Đã lưu kết quả backtest vào models/backtest_results.json")
         else:

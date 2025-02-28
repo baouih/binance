@@ -311,9 +311,14 @@ class AdvancedMLOptimizer:
         """
         Đào tạo mô hình tổng hợp bằng cách kết hợp các dự đoán từ các mô hình cơ sở
         """
+        # Đảm bảo y_train và y_test chỉ chứa các giá trị nguyên (0, 1, 2, ...)
+        y_train_classes = np.unique(y_train)
+        y_test_classes = np.unique(y_test)
+        num_classes = max(len(y_train_classes), len(y_test_classes))
+        
         # Tạo đặc trưng mới bằng dự đoán xác suất từ các mô hình cơ sở
-        ensemble_features_train = np.zeros((X_train.shape[0], len(self.base_models) * (np.max(y_train) + 1)))
-        ensemble_features_test = np.zeros((X_test.shape[0], len(self.base_models) * (np.max(y_test) + 1)))
+        ensemble_features_train = np.zeros((X_train.shape[0], len(self.base_models) * num_classes))
+        ensemble_features_test = np.zeros((X_test.shape[0], len(self.base_models) * num_classes))
         
         col_idx = 0
         for model_type in self.base_models:
@@ -381,8 +386,11 @@ class AdvancedMLOptimizer:
         if self.use_ensemble:
             ensemble_key = f"ensemble_{regime}" if regime and self.use_model_per_regime else "ensemble"
             if ensemble_key in self.models:
+                # Xác định số lượng lớp dự kiến dựa vào mô hình đã đào tạo
+                num_classes = 2  # Giá trị mặc định (binary classification)
+                
                 # Tạo đặc trưng tổng hợp
-                ensemble_features = np.zeros((X_processed.shape[0], len(self.base_models) * 3))  # Giả sử 3 lớp
+                ensemble_features = np.zeros((X_processed.shape[0], len(self.base_models) * num_classes))
                 
                 col_idx = 0
                 for model_type in self.base_models:

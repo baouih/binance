@@ -1,0 +1,14 @@
+{
+  "initial_balance": 10000,
+  "final_balance": 19865.733419453216,
+  "total_return": 98.65733419453215,
+  "max_drawdown": 0.4421201251843959,
+  "sharpe_ratio": 1.604721132849063,
+  "n_trades": 2,
+  "win_trades": 2,
+  "loss_trades": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "type": "buy",
+      "entry_time": 
