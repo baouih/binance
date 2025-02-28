@@ -1,0 +1,788 @@
+{% extends "layout.html" %}
+
+{% block title %}Vị thế đang mở - Trading Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-lg-12">
+      <h2 class="mb-4">Vị thế đang mở</h2>
+      
+      <!-- Account Summary -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <h4 class="card-title mb-0">Thông tin tài khoản</h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="mb-3">
+                <h6 class="text-muted">Tổng tài sản</h6>
+                <h3 id="total-balance">$10,000.00</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <h6 class="text-muted">Tiền khả dụng</h6>
+                <h3 id="available-balance">$8,500.00</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <h6 class="text-muted">Margin sử dụng</h6>
+                <h3 id="margin-used">$1,500.00</h3>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <h6 class="text-muted">Tài sản Unrealized P/L</h6>
+                <h3 id="unrealized-pnl" class="text-success">+$125.50</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <div class="alert alert-warning">
+                <div class="d-flex">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
+                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                  </svg>
+                  <div>
+                    <h6 class="alert-heading">Chế độ mô phỏng</h6>
+                    <p class="mb-0 small">Dữ liệu hiển thị đang ở chế độ mô phỏng. Không có giao dịch thật nào được thực hiện.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <h6 class="text-muted">Đòn bẩy</h6>
+                    <h4 id="current-leverage">5x</h4>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <h6 class="text-muted">Margin Ratio</h6>
+                    <h4 id="margin-ratio">15%</h4>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <h6 class="text-muted">Risk Level</h6>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="small">An toàn</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Open Positions -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Vị thế đang mở</h4>
+            <button class="btn btn-sm btn-outline-primary refresh-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+              </svg>
+              Làm mới
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="positions-table">
+              <thead>
+                <tr>
+                  <th>Biểu tượng</th>
+                  <th>Hướng</th>
+                  <th>Giá vào lệnh</th>
+                  <th>Giá thanh lý</th>
+                  <th>Giá hiện tại</th>
+                  <th>Khối lượng</th>
+                  <th>Giá trị</th>
+                  <th>ROE%</th>
+                  <th>PnL</th>
+                  <th>Thời gian</th>
+                  <th>Tác vụ</th>
+                </tr>
+              </thead>
+              <tbody id="positions-body">
+                <!-- Positions will be populated here -->
+                <tr class="position-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="me-2">BTC/USDT</span>
+                      <span class="badge bg-warning">Perp</span>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-success">LONG</span></td>
+                  <td>$79,250.00</td>
+                  <td>$77,500.00</td>
+                  <td>$80,100.00</td>
+                  <td>0.1 BTC</td>
+                  <td>$8,010.00</td>
+                  <td class="text-success">+1.07%</td>
+                  <td class="text-success">+$85.00</td>
+                  <td>10:42:15</td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-danger" data-position-id="1">Đóng</button>
+                      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-position-id="1" data-action="tp">Thêm Take Profit</a></li>
+                        <li><a class="dropdown-item" href="#" data-position-id="1" data-action="sl">Sửa Stop Loss</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-position-id="1" data-action="details">Chi tiết</a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="position-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="me-2">ETH/USDT</span>
+                      <span class="badge bg-warning">Perp</span>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-danger">SHORT</span></td>
+                  <td>$4,200.00</td>
+                  <td>$4,350.00</td>
+                  <td>$4,150.00</td>
+                  <td>1.5 ETH</td>
+                  <td>$6,225.00</td>
+                  <td class="text-success">+1.19%</td>
+                  <td class="text-success">+$75.00</td>
+                  <td>09:35:22</td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-danger" data-position-id="2">Đóng</button>
+                      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-position-id="2" data-action="tp">Thêm Take Profit</a></li>
+                        <li><a class="dropdown-item" href="#" data-position-id="2" data-action="sl">Sửa Stop Loss</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" data-position-id="2" data-action="details">Chi tiết</a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div id="no-positions" class="text-center py-5" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-clipboard-x text-muted mb-3" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708z"/>
+              <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+              <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+            </svg>
+            <h5 class="text-muted">Không có vị thế nào đang mở</h5>
+            <p class="text-muted">Bạn chưa có vị thế nào đang mở. Tạo bot giao dịch mới hoặc thực hiện giao dịch thủ công.</p>
+            <div class="mt-3">
+              <button class="btn btn-primary me-2">Tạo bot giao dịch</button>
+              <button class="btn btn-outline-secondary">Giao dịch thủ công</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pending Orders -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Lệnh đang chờ</h4>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-2 refresh-orders-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                Làm mới
+              </button>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                </svg>
+                Đặt lệnh
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="orders-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Biểu tượng</th>
+                  <th>Loại</th>
+                  <th>Hướng</th>
+                  <th>Giá</th>
+                  <th>Khối lượng</th>
+                  <th>Giá trị</th>
+                  <th>Giá kích hoạt</th>
+                  <th>Thời gian</th>
+                  <th>Tác vụ</th>
+                </tr>
+              </thead>
+              <tbody id="orders-body">
+                <!-- Orders will be populated here -->
+                <tr class="order-row">
+                  <td><span class="small">123456789</span></td>
+                  <td>BTC/USDT</td>
+                  <td><span class="badge bg-info">Limit</span></td>
+                  <td><span class="badge bg-success">BUY</span></td>
+                  <td>$78,500.00</td>
+                  <td>0.05 BTC</td>
+                  <td>$3,925.00</td>
+                  <td>N/A</td>
+                  <td>10:55:32</td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-order-id="1">Hủy</button>
+                  </td>
+                </tr>
+                <tr class="order-row">
+                  <td><span class="small">987654321</span></td>
+                  <td>ETH/USDT</td>
+                  <td><span class="badge bg-warning text-dark">Stop</span></td>
+                  <td><span class="badge bg-danger">SELL</span></td>
+                  <td>$4,100.00</td>
+                  <td>1.0 ETH</td>
+                  <td>$4,100.00</td>
+                  <td>$4,100.00</td>
+                  <td>11:02:15</td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-order-id="2">Hủy</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div id="no-orders" class="text-center py-5" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-hourglass text-muted mb-3" viewBox="0 0 16 16">
+              <path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5zm2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702c0 .7-.478 1.235-1.011 1.491A3.5 3.5 0 0 0 4.5 13v1h7v-1a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351v-.702c0-.7.478-1.235 1.011-1.491A3.5 3.5 0 0 0 11.5 3V2h-7z"/>
+            </svg>
+            <h5 class="text-muted">Không có lệnh nào đang chờ</h5>
+            <p class="text-muted">Bạn chưa có lệnh nào đang chờ thực hiện.</p>
+            <div class="mt-3">
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                </svg>
+                Đặt lệnh mới
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Order Modal -->
+<div class="modal fade" id="newOrderModal" tabindex="-1" aria-labelledby="newOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newOrderModalLabel">Đặt lệnh mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-order-form">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="order-symbol" class="form-label">Biểu tượng</label>
+              <select class="form-select" id="order-symbol" required>
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+                <option value="DOGEUSDT">DOGE/USDT</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="order-type" class="form-label">Loại lệnh</label>
+              <select class="form-select" id="order-type" required>
+                <option value="LIMIT">Limit</option>
+                <option value="MARKET">Market</option>
+                <option value="STOP">Stop</option>
+                <option value="TAKE_PROFIT">Take Profit</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Phía</label>
+              <div class="d-flex">
+                <div class="form-check form-check-inline flex-fill">
+                  <input class="form-check-input" type="radio" name="orderSide" id="orderSideBuy" value="BUY" checked>
+                  <label class="form-check-label w-100 text-center py-2 rounded bg-success bg-opacity-10 text-success" for="orderSideBuy">MUA</label>
+                </div>
+                <div class="form-check form-check-inline flex-fill">
+                  <input class="form-check-input" type="radio" name="orderSide" id="orderSideSell" value="SELL">
+                  <label class="form-check-label w-100 text-center py-2 rounded bg-danger bg-opacity-10 text-danger" for="orderSideSell">BÁN</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="order-quantity" class="form-label">Khối lượng</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="order-quantity" step="0.001" min="0.001" required>
+                <span class="input-group-text" id="quantity-currency">BTC</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mb-3" id="price-row">
+            <div class="col-md-6">
+              <label for="order-price" class="form-label">Giá</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="order-price" step="0.01" min="0">
+              </div>
+            </div>
+            <div class="col-md-6" id="trigger-price-container">
+              <label for="trigger-price" class="form-label">Giá kích hoạt</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="trigger-price" step="0.01" min="0">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="reduce-only-switch">
+                <label class="form-check-label" for="reduce-only-switch">Chỉ giảm vị thế (Reduce Only)</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="border-top my-4 pt-3">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Chi tiết lệnh</h6>
+                <div class="small text-muted mb-2">Giá hiện tại: <span id="current-market-price">$80,000.00</span></div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Cặp giao dịch</span>
+                    <span class="fw-bold" id="summary-symbol">BTC/USDT</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Loại lệnh</span>
+                    <span class="fw-bold" id="summary-type">Limit</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Phía</span>
+                    <span class="fw-bold text-success" id="summary-side">MUA</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Khối lượng</span>
+                    <span class="fw-bold" id="summary-quantity">0.001 BTC</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted mb-4">Thông tin bổ sung</h6>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Giá lệnh</span>
+                    <span class="fw-bold" id="summary-price">$80,000.00</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Giá trị lệnh</span>
+                    <span class="fw-bold" id="summary-value">$80.00</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0" id="summary-trigger-row">
+                    <span>Giá kích hoạt</span>
+                    <span class="fw-bold" id="summary-trigger">$79,500.00</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>Phí giao dịch (ước tính)</span>
+                    <span class="fw-bold" id="summary-fee">$0.08</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex justify-content-between w-100">
+          <div>
+            <span class="text-warning">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+              Chế độ mô phỏng
+            </span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="place-order-btn">Đặt lệnh</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Close Position Modal -->
+<div class="modal fade" id="closePositionModal" tabindex="-1" aria-labelledby="closePositionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="closePositionModalLabel">Đóng vị thế</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn đóng vị thế này?</p>
+        <div class="mb-3">
+          <label for="close-price-type" class="form-label">Loại lệnh đóng</label>
+          <select class="form-select" id="close-price-type">
+            <option value="MARKET">Thị trường (Market)</option>
+            <option value="LIMIT">Giới hạn (Limit)</option>
+          </select>
+        </div>
+        <div class="mb-3" id="close-limit-price-container" style="display: none;">
+          <label for="close-limit-price" class="form-label">Giá đóng vị thế</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="close-limit-price" step="0.01" min="0">
+          </div>
+        </div>
+        <input type="hidden" id="position-id-to-close">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-danger" id="confirm-close-position">Đóng vị thế</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    let positions = [];
+    let orders = [];
+    
+    // DOM elements
+    const positionsBody = document.getElementById('positions-body');
+    const ordersBody = document.getElementById('orders-body');
+    const noPositions = document.getElementById('no-positions');
+    const noOrders = document.getElementById('no-orders');
+    
+    // Event listeners
+    document.querySelector('.refresh-btn').addEventListener('click', fetchPositions);
+    document.querySelector('.refresh-orders-btn').addEventListener('click', fetchOrders);
+    
+    // Setup position close buttons
+    document.querySelectorAll('button[data-position-id]').forEach(button => {
+      button.addEventListener('click', function() {
+        const positionId = this.getAttribute('data-position-id');
+        showClosePositionModal(positionId);
+      });
+    });
+    
+    // Setup order cancel buttons
+    document.querySelectorAll('button[data-order-id]').forEach(button => {
+      button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        cancelOrder(orderId);
+      });
+    });
+    
+    // Close position modal logic
+    const closePositionModal = new bootstrap.Modal(document.getElementById('closePositionModal'));
+    
+    document.getElementById('close-price-type').addEventListener('change', function() {
+      const container = document.getElementById('close-limit-price-container');
+      if (this.value === 'LIMIT') {
+        container.style.display = 'block';
+      } else {
+        container.style.display = 'none';
+      }
+    });
+    
+    document.getElementById('confirm-close-position').addEventListener('click', function() {
+      const positionId = document.getElementById('position-id-to-close').value;
+      const priceType = document.getElementById('close-price-type').value;
+      const limitPrice = document.getElementById('close-limit-price').value;
+      
+      closePosition(positionId, priceType, limitPrice);
+      closePositionModal.hide();
+    });
+    
+    // New order form logic
+    const orderSymbolSelect = document.getElementById('order-symbol');
+    const orderTypeSelect = document.getElementById('order-type');
+    const quantityCurrency = document.getElementById('quantity-currency');
+    const triggerPriceContainer = document.getElementById('trigger-price-container');
+    const summaryTriggerRow = document.getElementById('summary-trigger-row');
+    
+    orderSymbolSelect.addEventListener('change', function() {
+      const symbol = this.value;
+      const currency = symbol.substring(0, 3); // Extract currency from symbol
+      quantityCurrency.textContent = currency;
+      document.getElementById('summary-symbol').textContent = `${currency}/USDT`;
+    });
+    
+    orderTypeSelect.addEventListener('change', function() {
+      const orderType = this.value;
+      document.getElementById('summary-type').textContent = orderType;
+      
+      // Show/hide trigger price based on order type
+      if (orderType === 'STOP' || orderType === 'TAKE_PROFIT') {
+        triggerPriceContainer.style.display = 'block';
+        summaryTriggerRow.style.display = '';
+      } else {
+        triggerPriceContainer.style.display = 'none';
+        summaryTriggerRow.style.display = 'none';
+      }
+      
+      // Hide price input for market orders
+      const priceRow = document.getElementById('price-row');
+      if (orderType === 'MARKET') {
+        document.getElementById('order-price').parentElement.parentElement.style.display = 'none';
+      } else {
+        document.getElementById('order-price').parentElement.parentElement.style.display = 'block';
+      }
+    });
+    
+    // Order side radio buttons
+    document.querySelectorAll('input[name="orderSide"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const side = this.value;
+        const summaryElement = document.getElementById('summary-side');
+        
+        if (side === 'BUY') {
+          summaryElement.textContent = 'MUA';
+          summaryElement.className = 'fw-bold text-success';
+        } else {
+          summaryElement.textContent = 'BÁN';
+          summaryElement.className = 'fw-bold text-danger';
+        }
+      });
+    });
+    
+    // Update order summary when inputs change
+    const orderQuantity = document.getElementById('order-quantity');
+    const orderPrice = document.getElementById('order-price');
+    const triggerPrice = document.getElementById('trigger-price');
+    
+    [orderQuantity, orderPrice, triggerPrice].forEach(input => {
+      input.addEventListener('input', updateOrderSummary);
+    });
+    
+    function updateOrderSummary() {
+      const quantity = parseFloat(orderQuantity.value) || 0;
+      const price = parseFloat(orderPrice.value) || 0;
+      const trigger = parseFloat(triggerPrice.value) || 0;
+      
+      document.getElementById('summary-quantity').textContent = `${quantity} ${quantityCurrency.textContent}`;
+      document.getElementById('summary-price').textContent = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      document.getElementById('summary-trigger').textContent = `$${trigger.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      
+      const value = quantity * price;
+      document.getElementById('summary-value').textContent = `$${value.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      
+      // Estimated fee (0.1%)
+      const fee = value * 0.001;
+      document.getElementById('summary-fee').textContent = `$${fee.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    }
+    
+    document.getElementById('place-order-btn').addEventListener('click', function() {
+      const form = document.getElementById('new-order-form');
+      if (form.checkValidity()) {
+        placeOrder();
+      } else {
+        form.reportValidity();
+      }
+    });
+    
+    // Functions to interact with the API
+    function fetchPositions() {
+      // In a real app, this would fetch from the API
+      // For this demo, we just show the demo positions
+      // Toggle positions display based on whether there are positions
+      if (document.querySelectorAll('.position-row').length > 0) {
+        positionsBody.style.display = '';
+        noPositions.style.display = 'none';
+      } else {
+        positionsBody.style.display = 'none';
+        noPositions.style.display = 'block';
+      }
+    }
+    
+    function fetchOrders() {
+      // In a real app, this would fetch from the API
+      // For this demo, we just show the demo orders
+      // Toggle orders display based on whether there are orders
+      if (document.querySelectorAll('.order-row').length > 0) {
+        ordersBody.style.display = '';
+        noOrders.style.display = 'none';
+      } else {
+        ordersBody.style.display = 'none';
+        noOrders.style.display = 'block';
+      }
+    }
+    
+    function showClosePositionModal(positionId) {
+      document.getElementById('position-id-to-close').value = positionId;
+      document.getElementById('close-price-type').value = 'MARKET';
+      document.getElementById('close-limit-price-container').style.display = 'none';
+      closePositionModal.show();
+    }
+    
+    function closePosition(positionId, priceType, limitPrice) {
+      // In a real app, this would close the position via the API
+      console.log(`Closing position ${positionId} with ${priceType} order`, limitPrice ? `at price ${limitPrice}` : '');
+      
+      // For demo, show success message
+      showToast('Đã đóng vị thế thành công', 'success');
+      
+      // Optionally remove the position from the table
+      // const row = document.querySelector(`button[data-position-id="${positionId}"]`).closest('tr');
+      // row.remove();
+      
+      // Update displays
+      fetchPositions();
+    }
+    
+    function cancelOrder(orderId) {
+      // In a real app, this would cancel the order via the API
+      console.log(`Cancelling order ${orderId}`);
+      
+      // For demo, show success message
+      showToast('Đã hủy lệnh thành công', 'success');
+      
+      // Optionally remove the order from the table
+      // const row = document.querySelector(`button[data-order-id="${orderId}"]`).closest('tr');
+      // row.remove();
+      
+      // Update displays
+      fetchOrders();
+    }
+    
+    function placeOrder() {
+      // In a real app, this would place the order via the API
+      const symbol = orderSymbolSelect.value;
+      const orderType = orderTypeSelect.value;
+      const side = document.querySelector('input[name="orderSide"]:checked').value;
+      const quantity = orderQuantity.value;
+      const price = orderPrice.value;
+      const triggerPriceValue = triggerPrice.value;
+      
+      console.log('Placing order', {
+        symbol,
+        orderType,
+        side,
+        quantity,
+        price,
+        triggerPrice: triggerPriceValue
+      });
+      
+      // For demo, show success message
+      showToast('Đã đặt lệnh thành công', 'success');
+      
+      // Hide modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('newOrderModal'));
+      modal.hide();
+      
+      // Update displays
+      fetchOrders();
+    }
+    
+    // Helper function to show toast notifications
+    function showToast(message, type = 'primary') {
+      const toastContainer = document.getElementById('toast-container');
+      const toastId = 'toast-' + Date.now();
+      
+      const toastHtml = `
+        <div id="${toastId}" class="toast bg-${type} text-white" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      `;
+      
+      toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+      const toastElement = document.getElementById(toastId);
+      const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
+      toast.show();
+      
+      // Remove toast from DOM after it's hidden
+      toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+      });
+    }
+    
+    // Get socket updates for account data if available
+    if (window.socketClient) {
+      window.socketClient.subscribe('account_update', function(data) {
+        // Update account balance
+        if (data.balance) {
+          document.getElementById('total-balance').textContent = '$' + parseFloat(data.balance.total).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+          
+          document.getElementById('available-balance').textContent = '$' + parseFloat(data.balance.available).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+          
+          document.getElementById('margin-used').textContent = '$' + parseFloat(data.balance.margin_used || 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        }
+        
+        // Update positions
+        if (data.positions && data.positions.length > 0) {
+          positionsBody.style.display = '';
+          noPositions.style.display = 'none';
+        } else {
+          positionsBody.style.display = 'none';
+          noPositions.style.display = 'block';
+        }
+        
+        // Update orders
+        if (data.orders && data.orders.length > 0) {
+          ordersBody.style.display = '';
+          noOrders.style.display = 'none';
+        } else {
+          ordersBody.style.display = 'none';
+          noOrders.style.display = 'block';
+        }
+      });
+    }
+    
+    // Initialize the page
+    fetchPositions();
+    fetchOrders();
+  });
+</script>
+{% endblock %}

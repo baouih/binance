@@ -1,0 +1,1018 @@
+{% extends "layout.html" %}
+
+{% block title %}Chiến lược giao dịch - Trading Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-lg-12">
+      <h2 class="mb-4">Chiến lược giao dịch</h2>
+      
+      <!-- Active Strategies Card -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Chiến lược đang hoạt động</h4>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newStrategyModal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+              </svg>
+              Tạo chiến lược mới
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="active-strategies-table">
+              <thead>
+                <tr>
+                  <th>Tên</th>
+                  <th>Biểu tượng</th>
+                  <th>Loại</th>
+                  <th>Thời gian</th>
+                  <th>Giao dịch</th>
+                  <th>Thắng/Thua</th>
+                  <th>PnL</th>
+                  <th>Tỉ lệ thắng</th>
+                  <th>Trạng thái</th>
+                  <th>Tác vụ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="fw-bold">BTC RSI Strategy</span><br>
+                    <small class="text-muted">Mua khi RSI < 30, bán khi RSI > 70</small>
+                  </td>
+                  <td>BTC/USDT</td>
+                  <td><span class="badge bg-info">RSI</span></td>
+                  <td>1h</td>
+                  <td>12</td>
+                  <td>9/3</td>
+                  <td class="text-success">+$450.25</td>
+                  <td class="text-success">75%</td>
+                  <td><span class="badge bg-success">Hoạt động</span></td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-primary" data-strategy-id="1" data-bs-toggle="modal" data-bs-target="#editStrategyModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="btn btn-outline-danger" data-strategy-id="1" data-bs-toggle="modal" data-bs-target="#pauseStrategyModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16">
+                          <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="fw-bold">ETH MACD Crossover</span><br>
+                    <small class="text-muted">Mua khi MACD cross trên Signal, bán khi cross dưới</small>
+                  </td>
+                  <td>ETH/USDT</td>
+                  <td><span class="badge bg-info">MACD</span></td>
+                  <td>4h</td>
+                  <td>8</td>
+                  <td>5/3</td>
+                  <td class="text-success">+$320.80</td>
+                  <td class="text-success">62.5%</td>
+                  <td><span class="badge bg-success">Hoạt động</span></td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-primary" data-strategy-id="2" data-bs-toggle="modal" data-bs-target="#editStrategyModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="btn btn-outline-danger" data-strategy-id="2" data-bs-toggle="modal" data-bs-target="#pauseStrategyModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16">
+                          <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="fw-bold">SOL Bollinger Bands</span><br>
+                    <small class="text-muted">Mua khi giá chạm BB dưới, bán khi giá chạm BB trên</small>
+                  </td>
+                  <td>SOL/USDT</td>
+                  <td><span class="badge bg-info">BB</span></td>
+                  <td>1d</td>
+                  <td>5</td>
+                  <td>3/2</td>
+                  <td class="text-success">+$105.50</td>
+                  <td class="text-success">60%</td>
+                  <td><span class="badge bg-secondary">Tạm dừng</span></td>
+                  <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-outline-primary" data-strategy-id="3" data-bs-toggle="modal" data-bs-target="#editStrategyModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="btn btn-outline-success" data-strategy-id="3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                          <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="no-strategies" class="text-center py-5" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-bar-chart-line text-muted mb-3" viewBox="0 0 16 16">
+              <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
+            </svg>
+            <h5 class="text-muted">Không có chiến lược nào đang hoạt động</h5>
+            <p class="text-muted">Bạn chưa có chiến lược giao dịch nào. Tạo chiến lược mới để bắt đầu giao dịch tự động.</p>
+            <div class="mt-3">
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newStrategyModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                </svg>
+                Tạo chiến lược
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Strategy Templates Card -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <h4 class="card-title mb-0">Mẫu chiến lược</h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">RSI Oversold/Overbought</h5>
+                  <p class="card-text">Mua khi RSI < 30 (oversold), bán khi RSI > 70 (overbought).</p>
+                  <div class="mb-3">
+                    <span class="badge bg-success me-1">Win Rate: ~65%</span>
+                    <span class="badge bg-info">Phổ biến</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Phù hợp với thị trường sideway
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Dễ sử dụng cho người mới
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Cần thêm bộ lọc trong xu hướng mạnh
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="rsi" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">MACD Crossover</h5>
+                  <p class="card-text">Mua khi MACD cross trên Signal line, bán khi cross xuống dưới.</p>
+                  <div class="mb-3">
+                    <span class="badge bg-warning me-1">Win Rate: ~58%</span>
+                    <span class="badge bg-info">Phổ biến</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Phù hợp với thị trường có trend
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Có thể kết hợp với xác nhận khối lượng
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Nhiều tín hiệu giả trong thị trường sideway
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="macd" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Bollinger Bands Bounce</h5>
+                  <p class="card-text">Mua khi giá chạm Bollinger Bands dưới, bán khi chạm BB trên.</p>
+                  <div class="mb-3">
+                    <span class="badge bg-success me-1">Win Rate: ~62%</span>
+                    <span class="badge bg-info">Phổ biến</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Hiệu quả trong thị trường sideway
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Có thể tùy chỉnh độ rộng của bands
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Kém hiệu quả trong thị trường có trend mạnh
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="bb" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-2">
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">EMA Crossover</h5>
+                  <p class="card-text">Mua khi EMA ngắn hạn cắt lên trên EMA dài hạn, bán khi cắt xuống dưới.</p>
+                  <div class="mb-3">
+                    <span class="badge bg-warning me-1">Win Rate: ~55%</span>
+                    <span class="badge bg-info">Phổ biến</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Tốt cho giao dịch theo trend
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Dễ hiểu và thực hiện
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Tín hiệu trễ, có thể bỏ lỡ điểm vào tốt
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="ema" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">ML Strategy</h5>
+                  <p class="card-text">Sử dụng mô hình máy học để dự đoán hướng thị trường dựa trên nhiều chỉ báo kỹ thuật.</p>
+                  <div class="mb-3">
+                    <span class="badge bg-success me-1">Win Rate: ~70%</span>
+                    <span class="badge bg-danger">Nâng cao</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Tự động học từ dữ liệu lịch sử
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Kết hợp nhiều chỉ báo kỹ thuật
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Phức tạp, yêu cầu kiến thức ML
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="ml" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Combined Strategy</h5>
+                  <p class="card-text">Kết hợp nhiều chiến lược khác nhau với trọng số để tối ưu hóa tỉ lệ thắng.</p>
+                  <div class="mb-3">
+                    <span class="badge bg-success me-1">Win Rate: ~75%</span>
+                    <span class="badge bg-danger">Nâng cao</span>
+                  </div>
+                  <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Giảm thiểu rủi ro với sự đa dạng
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                      Thích ứng với nhiều điều kiện thị trường
+                    </li>
+                    <li class="list-group-item px-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill text-warning me-2" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      Phức tạp trong cấu hình và tối ưu hóa
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" data-template="combined" data-bs-toggle="modal" data-bs-target="#newStrategyModal">Sử dụng mẫu này</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Strategy Modal -->
+<div class="modal fade" id="newStrategyModal" tabindex="-1" aria-labelledby="newStrategyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newStrategyModalLabel">Tạo chiến lược mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-strategy-form">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="strategy-name" class="form-label">Tên chiến lược</label>
+              <input type="text" class="form-control" id="strategy-name" placeholder="Nhập tên chiến lược" required>
+            </div>
+            <div class="col-md-6">
+              <label for="strategy-symbol" class="form-label">Biểu tượng</label>
+              <select class="form-select" id="strategy-symbol" required>
+                <option value="">Chọn biểu tượng</option>
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="strategy-type" class="form-label">Loại chiến lược</label>
+              <select class="form-select" id="strategy-type" required>
+                <option value="">Chọn loại chiến lược</option>
+                <option value="RSI">RSI</option>
+                <option value="MACD">MACD</option>
+                <option value="BB">Bollinger Bands</option>
+                <option value="EMA">EMA Cross</option>
+                <option value="ML">Machine Learning</option>
+                <option value="COMBINED">Combined</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="strategy-timeframe" class="form-label">Khung thời gian</label>
+              <select class="form-select" id="strategy-timeframe" required>
+                <option value="1m">1 phút</option>
+                <option value="5m">5 phút</option>
+                <option value="15m">15 phút</option>
+                <option value="30m">30 phút</option>
+                <option value="1h" selected>1 giờ</option>
+                <option value="4h">4 giờ</option>
+                <option value="1d">1 ngày</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- RSI Parameters -->
+          <div id="rsi-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số RSI</h6>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="rsi-period" class="form-label">Chu kỳ RSI</label>
+                <input type="number" class="form-control" id="rsi-period" value="14" min="1" max="50">
+              </div>
+              <div class="col-md-4">
+                <label for="rsi-oversold" class="form-label">Giá trị Oversold</label>
+                <input type="number" class="form-control" id="rsi-oversold" value="30" min="1" max="100">
+              </div>
+              <div class="col-md-4">
+                <label for="rsi-overbought" class="form-label">Giá trị Overbought</label>
+                <input type="number" class="form-control" id="rsi-overbought" value="70" min="1" max="100">
+              </div>
+            </div>
+          </div>
+          
+          <!-- MACD Parameters -->
+          <div id="macd-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số MACD</h6>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="macd-fast" class="form-label">Chu kỳ nhanh</label>
+                <input type="number" class="form-control" id="macd-fast" value="12" min="1" max="50">
+              </div>
+              <div class="col-md-4">
+                <label for="macd-slow" class="form-label">Chu kỳ chậm</label>
+                <input type="number" class="form-control" id="macd-slow" value="26" min="1" max="100">
+              </div>
+              <div class="col-md-4">
+                <label for="macd-signal" class="form-label">Chu kỳ Signal</label>
+                <input type="number" class="form-control" id="macd-signal" value="9" min="1" max="50">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bollinger Bands Parameters -->
+          <div id="bb-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số Bollinger Bands</h6>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="bb-period" class="form-label">Chu kỳ</label>
+                <input type="number" class="form-control" id="bb-period" value="20" min="1" max="50">
+              </div>
+              <div class="col-md-6">
+                <label for="bb-stddev" class="form-label">Độ lệch chuẩn</label>
+                <input type="number" class="form-control" id="bb-stddev" value="2" min="0.1" max="5" step="0.1">
+              </div>
+            </div>
+          </div>
+          
+          <!-- EMA Parameters -->
+          <div id="ema-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số EMA Crossover</h6>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="ema-fast" class="form-label">EMA nhanh</label>
+                <input type="number" class="form-control" id="ema-fast" value="9" min="1" max="50">
+              </div>
+              <div class="col-md-6">
+                <label for="ema-slow" class="form-label">EMA chậm</label>
+                <input type="number" class="form-control" id="ema-slow" value="21" min="1" max="200">
+              </div>
+            </div>
+          </div>
+          
+          <!-- ML Parameters -->
+          <div id="ml-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số Machine Learning</h6>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="ml-confidence" class="form-label">Ngưỡng tự tin</label>
+                <input type="number" class="form-control" id="ml-confidence" value="0.65" min="0.5" max="0.95" step="0.01">
+                <div class="form-text">Mức tự tin tối thiểu để thực hiện giao dịch (0.5 - 0.95)</div>
+              </div>
+              <div class="col-md-6">
+                <label for="ml-lookback" class="form-label">Số ngày dữ liệu huấn luyện</label>
+                <input type="number" class="form-control" id="ml-lookback" value="60" min="30" max="365">
+                <div class="form-text">Số ngày dữ liệu dùng để huấn luyện mô hình</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Combined Strategy Parameters -->
+          <div id="combined-params" class="strategy-params mb-3" style="display: none;">
+            <h6>Tham số Combined Strategy</h6>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="use-rsi" checked>
+                  <label class="form-check-label" for="use-rsi">RSI</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="use-macd" checked>
+                  <label class="form-check-label" for="use-macd">MACD</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="use-bb">
+                  <label class="form-check-label" for="use-bb">Bollinger Bands</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="use-ema">
+                  <label class="form-check-label" for="use-ema">EMA Cross</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="use-ml" checked>
+                  <label class="form-check-label" for="use-ml">Machine Learning</label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label for="consensus-threshold" class="form-label">Ngưỡng đồng thuận (2-5)</label>
+                <input type="number" class="form-control" id="consensus-threshold" value="2" min="2" max="5">
+                <div class="form-text">Số lượng tín hiệu tối thiểu cần đồng thuận để thực hiện giao dịch</div>
+              </div>
+            </div>
+          </div>
+          
+          <h6>Cài đặt quản lý vốn</h6>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="position-size" class="form-label">Kích thước vị thế (%)</label>
+              <input type="number" class="form-control" id="position-size" value="5" min="1" max="100">
+              <div class="form-text">% tài sản cho mỗi giao dịch</div>
+            </div>
+            <div class="col-md-4">
+              <label for="take-profit" class="form-label">Take Profit (%)</label>
+              <input type="number" class="form-control" id="take-profit" value="2.5" min="0.1" max="50" step="0.1">
+            </div>
+            <div class="col-md-4">
+              <label for="stop-loss" class="form-label">Stop Loss (%)</label>
+              <input type="number" class="form-control" id="stop-loss" value="1.5" min="0.1" max="50" step="0.1">
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="strategy-active" checked>
+                <label class="form-check-label" for="strategy-active">Kích hoạt chiến lược ngay</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex justify-content-between w-100">
+          <div>
+            <span class="text-warning">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+              Chế độ mô phỏng
+            </span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="save-strategy-btn">Tạo chiến lược</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Strategy Modal -->
+<div class="modal fade" id="editStrategyModal" tabindex="-1" aria-labelledby="editStrategyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editStrategyModalLabel">Chỉnh sửa chiến lược</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Same form as new strategy, but with values pre-filled -->
+        <form id="edit-strategy-form">
+          <input type="hidden" id="edit-strategy-id">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="edit-strategy-name" class="form-label">Tên chiến lược</label>
+              <input type="text" class="form-control" id="edit-strategy-name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="edit-strategy-symbol" class="form-label">Biểu tượng</label>
+              <select class="form-select" id="edit-strategy-symbol" required>
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Other form fields would go here, similar to the new strategy form -->
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="edit-position-size" class="form-label">Kích thước vị thế (%)</label>
+              <input type="number" class="form-control" id="edit-position-size" min="1" max="100">
+            </div>
+            <div class="col-md-4">
+              <label for="edit-take-profit" class="form-label">Take Profit (%)</label>
+              <input type="number" class="form-control" id="edit-take-profit" min="0.1" max="50" step="0.1">
+            </div>
+            <div class="col-md-4">
+              <label for="edit-stop-loss" class="form-label">Stop Loss (%)</label>
+              <input type="number" class="form-control" id="edit-stop-loss" min="0.1" max="50" step="0.1">
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="edit-strategy-active">
+                <label class="form-check-label" for="edit-strategy-active">Chiến lược đang hoạt động</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="update-strategy-btn">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pause Strategy Modal -->
+<div class="modal fade" id="pauseStrategyModal" tabindex="-1" aria-labelledby="pauseStrategyModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pauseStrategyModalLabel">Tạm dừng chiến lược</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn tạm dừng chiến lược này?</p>
+        <p class="text-muted">Các vị thế đang mở sẽ không bị đóng, nhưng chiến lược sẽ không thực hiện giao dịch mới cho đến khi được kích hoạt lại.</p>
+        <input type="hidden" id="pause-strategy-id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="confirm-pause-btn">Tạm dừng</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Strategy type change handler
+    const strategyType = document.getElementById('strategy-type');
+    const strategyParams = document.querySelectorAll('.strategy-params');
+    
+    strategyType.addEventListener('change', function() {
+      // Hide all parameter sections
+      strategyParams.forEach(param => {
+        param.style.display = 'none';
+      });
+      
+      // Show the selected strategy's parameters
+      const selectedType = this.value;
+      if (selectedType) {
+        const paramSection = document.getElementById(`${selectedType.toLowerCase()}-params`);
+        if (paramSection) {
+          paramSection.style.display = 'block';
+        }
+      }
+    });
+    
+    // Template buttons
+    document.querySelectorAll('[data-template]').forEach(button => {
+      button.addEventListener('click', function() {
+        const template = this.getAttribute('data-template');
+        
+        // Set strategy type based on template
+        strategyType.value = template.toUpperCase();
+        
+        // Trigger change event to show the correct parameters
+        const changeEvent = new Event('change');
+        strategyType.dispatchEvent(changeEvent);
+        
+        // Pre-fill strategy name
+        const nameInput = document.getElementById('strategy-name');
+        switch (template) {
+          case 'rsi':
+            nameInput.value = 'RSI Strategy';
+            break;
+          case 'macd':
+            nameInput.value = 'MACD Crossover Strategy';
+            break;
+          case 'bb':
+            nameInput.value = 'Bollinger Bands Strategy';
+            break;
+          case 'ema':
+            nameInput.value = 'EMA Crossover Strategy';
+            break;
+          case 'ml':
+            nameInput.value = 'Machine Learning Strategy';
+            break;
+          case 'combined':
+            nameInput.value = 'Combined Strategy';
+            break;
+        }
+      });
+    });
+    
+    // Save strategy button
+    document.getElementById('save-strategy-btn').addEventListener('click', function() {
+      const form = document.getElementById('new-strategy-form');
+      if (form.checkValidity()) {
+        saveStrategy();
+      } else {
+        form.reportValidity();
+      }
+    });
+    
+    // Update strategy button
+    document.getElementById('update-strategy-btn').addEventListener('click', function() {
+      const form = document.getElementById('edit-strategy-form');
+      if (form.checkValidity()) {
+        updateStrategy();
+      } else {
+        form.reportValidity();
+      }
+    });
+    
+    // Pause strategy button
+    document.getElementById('confirm-pause-btn').addEventListener('click', function() {
+      const strategyId = document.getElementById('pause-strategy-id').value;
+      pauseStrategy(strategyId);
+    });
+    
+    // Edit strategy buttons
+    document.querySelectorAll('button[data-strategy-id][data-bs-toggle="modal"][data-bs-target="#editStrategyModal"]').forEach(button => {
+      button.addEventListener('click', function() {
+        const strategyId = this.getAttribute('data-strategy-id');
+        loadStrategyForEdit(strategyId);
+      });
+    });
+    
+    // Pause strategy buttons
+    document.querySelectorAll('button[data-strategy-id][data-bs-toggle="modal"][data-bs-target="#pauseStrategyModal"]').forEach(button => {
+      button.addEventListener('click', function() {
+        const strategyId = this.getAttribute('data-strategy-id');
+        document.getElementById('pause-strategy-id').value = strategyId;
+      });
+    });
+    
+    // Play strategy buttons
+    document.querySelectorAll('button[data-strategy-id]:not([data-bs-toggle])').forEach(button => {
+      button.addEventListener('click', function() {
+        const strategyId = this.getAttribute('data-strategy-id');
+        resumeStrategy(strategyId);
+      });
+    });
+    
+    // Functions to interact with the API
+    
+    function saveStrategy() {
+      // Get strategy details
+      const name = document.getElementById('strategy-name').value;
+      const symbol = document.getElementById('strategy-symbol').value;
+      const type = document.getElementById('strategy-type').value;
+      const timeframe = document.getElementById('strategy-timeframe').value;
+      const positionSize = document.getElementById('position-size').value;
+      const takeProfit = document.getElementById('take-profit').value;
+      const stopLoss = document.getElementById('stop-loss').value;
+      const active = document.getElementById('strategy-active').checked;
+      
+      // Get strategy-specific parameters
+      let parameters = {};
+      
+      switch (type) {
+        case 'RSI':
+          parameters = {
+            period: document.getElementById('rsi-period').value,
+            oversold: document.getElementById('rsi-oversold').value,
+            overbought: document.getElementById('rsi-overbought').value
+          };
+          break;
+        case 'MACD':
+          parameters = {
+            fast: document.getElementById('macd-fast').value,
+            slow: document.getElementById('macd-slow').value,
+            signal: document.getElementById('macd-signal').value
+          };
+          break;
+        case 'BB':
+          parameters = {
+            period: document.getElementById('bb-period').value,
+            stddev: document.getElementById('bb-stddev').value
+          };
+          break;
+        case 'EMA':
+          parameters = {
+            fast: document.getElementById('ema-fast').value,
+            slow: document.getElementById('ema-slow').value
+          };
+          break;
+        case 'ML':
+          parameters = {
+            confidence: document.getElementById('ml-confidence').value,
+            lookback: document.getElementById('ml-lookback').value
+          };
+          break;
+        case 'COMBINED':
+          parameters = {
+            useRSI: document.getElementById('use-rsi').checked,
+            useMACD: document.getElementById('use-macd').checked,
+            useBB: document.getElementById('use-bb').checked,
+            useEMA: document.getElementById('use-ema').checked,
+            useML: document.getElementById('use-ml').checked,
+            consensusThreshold: document.getElementById('consensus-threshold').value
+          };
+          break;
+      }
+      
+      // In a real app, this would send the data to the API
+      console.log('Creating strategy:', {
+        name,
+        symbol,
+        type,
+        timeframe,
+        positionSize,
+        takeProfit,
+        stopLoss,
+        active,
+        parameters
+      });
+      
+      // For demo, show success message
+      showToast('Đã tạo chiến lược mới thành công', 'success');
+      
+      // Hide modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('newStrategyModal'));
+      modal.hide();
+      
+      // Reload the page to see the new strategy
+      // In a real app, you would just update the UI
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    }
+    
+    function loadStrategyForEdit(strategyId) {
+      // In a real app, this would fetch the strategy details from the API
+      
+      // For demo, we'll just pre-fill with dummy data based on the strategy ID
+      let strategyName, strategySymbol, positionSize, takeProfit, stopLoss, active;
+      
+      switch (strategyId) {
+        case '1':
+          strategyName = 'BTC RSI Strategy';
+          strategySymbol = 'BTCUSDT';
+          positionSize = 5;
+          takeProfit = 2.5;
+          stopLoss = 1.5;
+          active = true;
+          break;
+        case '2':
+          strategyName = 'ETH MACD Crossover';
+          strategySymbol = 'ETHUSDT';
+          positionSize = 3;
+          takeProfit = 3.0;
+          stopLoss = 2.0;
+          active = true;
+          break;
+        case '3':
+          strategyName = 'SOL Bollinger Bands';
+          strategySymbol = 'SOLUSDT';
+          positionSize = 2;
+          takeProfit = 4.0;
+          stopLoss = 2.5;
+          active = false;
+          break;
+      }
+      
+      // Fill in the edit form
+      document.getElementById('edit-strategy-id').value = strategyId;
+      document.getElementById('edit-strategy-name').value = strategyName;
+      document.getElementById('edit-strategy-symbol').value = strategySymbol;
+      document.getElementById('edit-position-size').value = positionSize;
+      document.getElementById('edit-take-profit').value = takeProfit;
+      document.getElementById('edit-stop-loss').value = stopLoss;
+      document.getElementById('edit-strategy-active').checked = active;
+    }
+    
+    function updateStrategy() {
+      // Get strategy details
+      const id = document.getElementById('edit-strategy-id').value;
+      const name = document.getElementById('edit-strategy-name').value;
+      const symbol = document.getElementById('edit-strategy-symbol').value;
+      const positionSize = document.getElementById('edit-position-size').value;
+      const takeProfit = document.getElementById('edit-take-profit').value;
+      const stopLoss = document.getElementById('edit-stop-loss').value;
+      const active = document.getElementById('edit-strategy-active').checked;
+      
+      // In a real app, this would send the data to the API
+      console.log('Updating strategy:', {
+        id,
+        name,
+        symbol,
+        positionSize,
+        takeProfit,
+        stopLoss,
+        active
+      });
+      
+      // For demo, show success message
+      showToast('Đã cập nhật chiến lược thành công', 'success');
+      
+      // Hide modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editStrategyModal'));
+      modal.hide();
+      
+      // Reload the page to see the changes
+      // In a real app, you would just update the UI
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    }
+    
+    function pauseStrategy(strategyId) {
+      // In a real app, this would send a request to the API to pause the strategy
+      console.log('Pausing strategy:', strategyId);
+      
+      // For demo, show success message
+      showToast('Đã tạm dừng chiến lược thành công', 'success');
+      
+      // Hide modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('pauseStrategyModal'));
+      modal.hide();
+      
+      // Reload the page to see the changes
+      // In a real app, you would just update the UI
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    }
+    
+    function resumeStrategy(strategyId) {
+      // In a real app, this would send a request to the API to resume the strategy
+      console.log('Resuming strategy:', strategyId);
+      
+      // For demo, show success message
+      showToast('Đã kích hoạt lại chiến lược thành công', 'success');
+      
+      // Reload the page to see the changes
+      // In a real app, you would just update the UI
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    }
+    
+    // Check if there are any strategies
+    const noStrategies = document.getElementById('no-strategies');
+    const strategiesTable = document.getElementById('active-strategies-table');
+    
+    if (strategiesTable.querySelector('tbody').children.length === 0) {
+      strategiesTable.style.display = 'none';
+      noStrategies.style.display = 'block';
+    }
+    
+    // Helper function to show toast notifications
+    function showToast(message, type = 'primary') {
+      const toastContainer = document.getElementById('toast-container');
+      const toastId = 'toast-' + Date.now();
+      
+      const toastHtml = `
+        <div id="${toastId}" class="toast bg-${type} text-white" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      `;
+      
+      toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+      const toastElement = document.getElementById(toastId);
+      const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
+      toast.show();
+      
+      // Remove toast from DOM after it's hidden
+      toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+      });
+    }
+  });
+</script>
+{% endblock %}
