@@ -1,0 +1,28 @@
+{
+  "strategies": [
+    "Advanced_1h",
+    "Advanced_4h"
+  ],
+  "comparison": {
+    "total_return": [
+      NaN,
+      NaN
+    ],
+    "win_rate": [
+      0.2061855670103093,
+      0.2061855670103093
+    ],
+    "profit_factor": [
+      1.6985590094592977e-75,
+      1.6985590094592977e-75
+    ],
+    "max_drawdown": [
+      4.925834772505126e+20,
+      4.925834772505126e+20
+    ],
+    "total_trades": [
+      485,
+      485
+    ]
+  }
+}

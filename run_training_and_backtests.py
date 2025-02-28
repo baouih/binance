@@ -628,8 +628,17 @@ def run_backtest_with_advanced_system(symbol='BTCUSDT', timeframe='1h', days=30)
         # Chuyển đổi datetime thành string
         results_clean = results.copy()
         for trade in results_clean['trades']:
-            trade['entry_time'] = trade['entry_time'].strftime('%Y-%m-%d %H:%M:%S')
-            trade['exit_time'] = trade['exit_time'].strftime('%Y-%m-%d %H:%M:%S')
+            # Xử lý entry_time
+            if hasattr(trade['entry_time'], 'strftime'):
+                trade['entry_time'] = trade['entry_time'].strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                trade['entry_time'] = str(trade['entry_time'])
+                
+            # Xử lý exit_time
+            if hasattr(trade['exit_time'], 'strftime'):
+                trade['exit_time'] = trade['exit_time'].strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                trade['exit_time'] = str(trade['exit_time'])
         json.dump(results_clean, f, indent=2)
     
     return results

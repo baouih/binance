@@ -92,6 +92,42 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T16:51:52.339001",
+    "end_time": "2025-02-28T16:54:07.602283",
+    "duration": 2.2543881666666667
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:54:07.602299",
+    "end_time": "2025-02-28T16:54:09.020517",
+    "duration": 0.023637083333333333
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:54:09.020529",
+    "end_time": "2025-02-28T16:55:18.474068",
+    "duration": 1.1575591
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:55:18.474083",
+    "end_time": "2025-02-28T16:55:20.411382",
+    "duration": 0.03228838333333333
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:55:20.411391",
+    "end_time": "2025-02-28T16:55:22.104734",
+    "duration": 0.02822245
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:55:22.104744",
+    "end_time": "2025-02-28T16:56:01.180907",
+    "duration": 0.6512694666666667
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:56:01.180918",
     "end_time": null,
     "duration": 0
   }
