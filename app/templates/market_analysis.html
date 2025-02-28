@@ -271,13 +271,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Price chart
-    const priceChart = document.getElementById('price-chart');
-    const priceCtx = priceChart ? priceChart.getContext('2d') : null;
-    
-    if (!priceCtx) {
-      console.log("Cannot get context for price-chart - element may not be loaded yet");
-      return; // Exit early if element doesn't exist
-    }
+    const priceCtx = document.getElementById('price-chart').getContext('2d');
     
     // Sample data
     const dates = [];
@@ -295,7 +289,7 @@
       prices.push(basePrice + randomFactor);
     }
     
-    const priceChartObj = new Chart(priceCtx, {
+    const priceChart = new Chart(priceCtx, {
       type: 'line',
       data: {
         labels: dates,
@@ -347,13 +341,7 @@
     });
     
     // Sentiment chart
-    const sentimentChart = document.getElementById('sentiment-chart');
-    const sentimentCtx = sentimentChart ? sentimentChart.getContext('2d') : null;
-    
-    if (!sentimentCtx) {
-      console.log("Cannot get context for sentiment-chart - element may not be loaded yet");
-      return; // Exit early if element doesn't exist
-    }
+    const sentimentCtx = document.getElementById('sentiment-chart').getContext('2d');
     
     // Sample sentiment data
     const sentimentDates = [];
