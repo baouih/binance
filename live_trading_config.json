@@ -1,0 +1,23 @@
+{
+    "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"],
+    "timeframes": ["5m", "15m", "1h", "4h", "1d"],
+    "primary_timeframe": "1h",
+    "trade_mode": "test",
+    "risk_per_trade": 1.0,
+    "max_positions": 3,
+    "leverage": 2,
+    "training_interval_hours": 4,
+    "use_trailing_stop": true,
+    "trailing_stop_activation": 1.0,
+    "trailing_stop_callback": 0.5,
+    "take_profit": 5.0,
+    "stop_loss": 2.0,
+    "active_strategies": ["ml_composite", "multi_timeframe", "market_regime"],
+    "notification_settings": {
+        "telegram_enabled": false,
+        "notify_on_trade": true,
+        "notify_on_signal": true,
+        "daily_report": true,
+        "performance_threshold_alert": 5.0
+    }
+}
