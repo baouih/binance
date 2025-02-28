@@ -270,6 +270,8 @@ def get_account_api():
 def index():
     """Render the main dashboard."""
     return render_template('index.html')
+    
+# Trading dashboard now accessible at /trading_dashboard
 
 @app.route('/market_analysis')
 def market_analysis():
