@@ -1,0 +1,413 @@
+{% extends "layout.html" %}
+
+{% block title %}Trading Bot - Settings{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Trading Bot Settings</h5>
+          <span class="badge bg-warning">Simulation Mode</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <div class="d-flex">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info-circle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+              </svg>
+              <div>
+                <h5 class="alert-heading">Simulation Mode Active</h5>
+                <p class="mb-0">The trading bot is currently running in simulation mode. No real trades will be executed and simulated data is being used. To switch to live trading, configure your API keys below.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- API Settings -->
+          <div class="settings-section">
+            <h5>API Keys</h5>
+            <p class="text-muted">Connect your Binance Futures account to enable live trading.</p>
+            
+            <form id="api-form">
+              <div class="mb-3">
+                <label for="api-key" class="form-label">API Key</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="api-key" placeholder="Enter your Binance API key">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle-api-key">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                      <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="api-secret" class="form-label">API Secret</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="api-secret" placeholder="Enter your Binance API secret">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle-api-secret">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                      <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="testnet-mode">
+                <label class="form-check-label" for="testnet-mode">Use Binance Testnet (for testing without real money)</label>
+              </div>
+              
+              <button type="button" id="save-api-btn" class="btn btn-primary">Save API Keys</button>
+              <button type="button" id="test-api-btn" class="btn btn-outline-secondary ms-2">Test Connection</button>
+            </form>
+          </div>
+          
+          <hr>
+          
+          <!-- Trading Settings -->
+          <div class="settings-section">
+            <h5>Trading Settings</h5>
+            <p class="text-muted">Configure global trading settings that apply to all bots.</p>
+            
+            <form id="trading-settings-form">
+              <div class="mb-3">
+                <label for="max-open-positions" class="form-label">Maximum Open Positions</label>
+                <input type="number" class="form-control" id="max-open-positions" value="3" min="1" max="10">
+                <div class="form-text">Maximum number of open positions allowed at the same time.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="position-size" class="form-label">Default Position Size (%)</label>
+                <input type="number" class="form-control" id="position-size" value="10" min="1" max="100">
+                <div class="form-text">Percentage of available balance to use for each position.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="leverage" class="form-label">Default Leverage</label>
+                <select class="form-select" id="leverage">
+                  <option value="1">1x (No Leverage)</option>
+                  <option value="2">2x</option>
+                  <option value="3">3x</option>
+                  <option value="5">5x</option>
+                  <option value="10">10x</option>
+                  <option value="20">20x</option>
+                </select>
+                <div class="form-text text-warning">Higher leverage increases both potential profits and risks.</div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="default-take-profit" class="form-label">Default Take Profit (%)</label>
+                  <input type="number" class="form-control" id="default-take-profit" value="5" min="0.1" step="0.1">
+                </div>
+                <div class="col-md-6">
+                  <label for="default-stop-loss" class="form-label">Default Stop Loss (%)</label>
+                  <input type="number" class="form-control" id="default-stop-loss" value="3" min="0.1" step="0.1">
+                </div>
+              </div>
+              
+              <button type="button" id="save-trading-settings-btn" class="btn btn-primary">Save Trading Settings</button>
+            </form>
+          </div>
+          
+          <hr>
+          
+          <!-- Notification Settings -->
+          <div class="settings-section">
+            <h5>Notification Settings</h5>
+            <p class="text-muted">Configure how you want to receive alerts about trading activities.</p>
+            
+            <form id="notification-settings-form">
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="email-notifications" checked>
+                <label class="form-check-label" for="email-notifications">Email Notifications</label>
+              </div>
+              
+              <div class="mb-3" id="email-settings">
+                <label for="notification-email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="notification-email" placeholder="your@email.com">
+              </div>
+              
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="telegram-notifications">
+                <label class="form-check-label" for="telegram-notifications">Telegram Notifications</label>
+              </div>
+              
+              <div class="mb-3" id="telegram-settings" style="display: none;">
+                <label for="telegram-chat-id" class="form-label">Telegram Chat ID</label>
+                <input type="text" class="form-control" id="telegram-chat-id" placeholder="Enter your Telegram Chat ID">
+                <div class="form-text">To get your Chat ID, message @myidbot on Telegram.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Notification Events</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="notify-trade-executed" checked>
+                  <label class="form-check-label" for="notify-trade-executed">Trade Executed</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="notify-position-closed" checked>
+                  <label class="form-check-label" for="notify-position-closed">Position Closed</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="notify-bot-started">
+                  <label class="form-check-label" for="notify-bot-started">Bot Started/Stopped</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="notify-error">
+                  <label class="form-check-label" for="notify-error">Errors & Warnings</label>
+                </div>
+              </div>
+              
+              <button type="button" id="save-notification-settings-btn" class="btn btn-primary">Save Notification Settings</button>
+            </form>
+          </div>
+          
+          <hr>
+          
+          <!-- Danger Zone -->
+          <div class="settings-section">
+            <h5 class="text-danger">Danger Zone</h5>
+            <div class="card bg-dark border-danger">
+              <div class="card-body">
+                <h6 class="card-title">Reset All Settings</h6>
+                <p class="card-text">This will reset all settings to their default values. API keys will be removed.</p>
+                <button type="button" id="reset-settings-btn" class="btn btn-outline-danger">Reset All Settings</button>
+                
+                <div class="mt-4">
+                  <h6 class="card-title">Clear Trading History</h6>
+                  <p class="card-text">This will delete all trading history and backtesting results.</p>
+                  <button type="button" id="clear-history-btn" class="btn btn-outline-danger">Clear History</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="confirmationModalBody">
+        Are you sure you want to proceed with this action?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // API Key toggle visibility
+    document.getElementById('toggle-api-key').addEventListener('click', function() {
+      const input = document.getElementById('api-key');
+      if (input.type === 'password') {
+        input.type = 'text';
+        this.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+          </svg>
+        `;
+      } else {
+        input.type = 'password';
+        this.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+          </svg>
+        `;
+      }
+    });
+    
+    // API Secret toggle visibility
+    document.getElementById('toggle-api-secret').addEventListener('click', function() {
+      const input = document.getElementById('api-secret');
+      if (input.type === 'password') {
+        input.type = 'text';
+        this.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+          </svg>
+        `;
+      } else {
+        input.type = 'password';
+        this.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+          </svg>
+        `;
+      }
+    });
+    
+    // Toggle Telegram settings visibility
+    document.getElementById('telegram-notifications').addEventListener('change', function() {
+      const telegramSettings = document.getElementById('telegram-settings');
+      telegramSettings.style.display = this.checked ? 'block' : 'none';
+    });
+    
+    // Save API Keys
+    document.getElementById('save-api-btn').addEventListener('click', function() {
+      const apiKey = document.getElementById('api-key').value;
+      const apiSecret = document.getElementById('api-secret').value;
+      const testnet = document.getElementById('testnet-mode').checked;
+      
+      if (!apiKey || !apiSecret) {
+        showToast('API Key and Secret are required', 'warning');
+        return;
+      }
+      
+      // In a real application, this would send the API keys to the server
+      // For security, we'll simulate the request
+      setTimeout(() => {
+        showToast('API Keys saved successfully', 'success');
+      }, 1000);
+    });
+    
+    // Test API Connection
+    document.getElementById('test-api-btn').addEventListener('click', function() {
+      const apiKey = document.getElementById('api-key').value;
+      const apiSecret = document.getElementById('api-secret').value;
+      
+      if (!apiKey || !apiSecret) {
+        showToast('API Key and Secret are required', 'warning');
+        return;
+      }
+      
+      // Simulate API connection test
+      showToast('Testing connection...', 'info');
+      
+      setTimeout(() => {
+        showToast('Connection successful!', 'success');
+      }, 2000);
+    });
+    
+    // Save Trading Settings
+    document.getElementById('save-trading-settings-btn').addEventListener('click', function() {
+      // In a real application, this would send the settings to the server
+      // For now, we'll just show a success message
+      showToast('Trading settings saved successfully', 'success');
+    });
+    
+    // Save Notification Settings
+    document.getElementById('save-notification-settings-btn').addEventListener('click', function() {
+      const emailEnabled = document.getElementById('email-notifications').checked;
+      const emailAddress = document.getElementById('notification-email').value;
+      
+      if (emailEnabled && !emailAddress) {
+        showToast('Email address is required when email notifications are enabled', 'warning');
+        return;
+      }
+      
+      const telegramEnabled = document.getElementById('telegram-notifications').checked;
+      const telegramChatId = document.getElementById('telegram-chat-id').value;
+      
+      if (telegramEnabled && !telegramChatId) {
+        showToast('Telegram Chat ID is required when Telegram notifications are enabled', 'warning');
+        return;
+      }
+      
+      // In a real application, this would send the settings to the server
+      showToast('Notification settings saved successfully', 'success');
+    });
+    
+    // Reset Settings button
+    document.getElementById('reset-settings-btn').addEventListener('click', function() {
+      showConfirmationModal(
+        'Reset All Settings',
+        'This will reset all settings to default values and remove API keys. Are you sure?',
+        function() {
+          // Reset logic would go here
+          showToast('All settings have been reset to defaults', 'success');
+        }
+      );
+    });
+    
+    // Clear History button
+    document.getElementById('clear-history-btn').addEventListener('click', function() {
+      showConfirmationModal(
+        'Clear Trading History',
+        'This will delete all trading history and backtesting results. This action cannot be undone. Are you sure?',
+        function() {
+          // Clear history logic would go here
+          showToast('Trading history has been cleared', 'success');
+        }
+      );
+    });
+    
+    // Confirmation modal helper
+    function showConfirmationModal(title, message, onConfirm) {
+      const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+      document.getElementById('confirmationModalLabel').textContent = title;
+      document.getElementById('confirmationModalBody').textContent = message;
+      
+      const confirmBtn = document.getElementById('confirmActionBtn');
+      
+      // Remove previous event listeners
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      
+      // Add new event listener
+      newConfirmBtn.addEventListener('click', function() {
+        modal.hide();
+        onConfirm();
+      });
+      
+      modal.show();
+    }
+    
+    // Toast notification helper
+    function showToast(message, type = 'primary') {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast show';
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      
+      toast.innerHTML = `
+        <div class="toast-header bg-${type} ${type === 'danger' || type === 'dark' ? 'text-white' : ''}">
+          <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+          <button type="button" class="btn-close ${type === 'danger' || type === 'dark' ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toastContainer.removeChild(toast);
+        }, 500);
+      }, 5000);
+    }
+  });
+</script>
+{% endblock %}

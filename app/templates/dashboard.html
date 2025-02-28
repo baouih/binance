@@ -1,0 +1,363 @@
+{% extends "layout.html" %}
+
+{% block title %}Trading Bot - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Market Overview</h5>
+          </div>
+          <div class="d-flex">
+            <select id="symbol-selector" class="form-select form-select-sm me-2" style="width: auto;">
+              <option value="BTCUSDT">BTCUSDT</option>
+              <option value="ETHUSDT">ETHUSDT</option>
+              <option value="BNBUSDT">BNBUSDT</option>
+              <option value="ADAUSDT">ADAUSDT</option>
+            </select>
+            <select id="interval-selector" class="form-select form-select-sm" style="width: auto;">
+              <option value="1m">1m</option>
+              <option value="5m">5m</option>
+              <option value="15m">15m</option>
+              <option value="1h" selected>1h</option>
+              <option value="4h">4h</option>
+              <option value="1d">1d</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="d-flex flex-column">
+                <span class="small text-secondary">Current Price</span>
+                <div class="d-flex align-items-baseline">
+                  <span id="current-price" class="price-display">45,000.00</span>
+                  <span id="price-change-24h" class="ms-2 badge bg-success">+1.2%</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-6">
+                  <div class="d-flex flex-column">
+                    <span class="small text-secondary">24h High</span>
+                    <span id="price-high-24h" class="fs-5">47,500.00</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex flex-column">
+                    <span class="small text-secondary">24h Low</span>
+                    <span id="price-low-24h" class="fs-5">43,200.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="price-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="row h-100">
+        <div class="col-12 mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Technical Indicators</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <div class="card bg-secondary">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-title">RSI</h6>
+                      <div id="rsi-value" class="fs-4">50.00</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="card bg-secondary">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-title">MACD</h6>
+                      <div id="macd-value" class="fs-4">0.00</div>
+                      <div id="macd-signal-value" class="small text-secondary">0.00</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="card bg-secondary">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-title">EMA Cross</h6>
+                      <div id="ema-cross-value" class="fs-4">Neutral</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mini-chart chart-container">
+                    <canvas id="rsi-chart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mini-chart chart-container">
+                    <canvas id="macd-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Trading Signal</h5>
+              <span id="connection-status" class="badge bg-secondary">Connecting...</span>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="d-flex flex-column align-items-center">
+                    <span class="small text-secondary mb-2">Current Signal</span>
+                    <span id="current-signal" class="signal-neutral fs-4">NEUTRAL</span>
+                    <span id="signal-probability" class="small mt-1">50.0%</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex flex-column">
+                    <label class="form-label small text-secondary">Volume</label>
+                    <div class="d-flex justify-content-between">
+                      <span id="volume-24h">125,432,100</span>
+                      <span id="volume-ratio-value" class="badge bg-secondary">0.95x</span>
+                    </div>
+                    <label class="form-label small text-secondary mt-2">BB Width</label>
+                    <span id="bb-width-value">2.15%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="order-form mt-4">
+                <h6>Place Order</h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="order-quantity" class="form-label small">Quantity</label>
+                    <input type="number" class="form-control" id="order-quantity" placeholder="0.001" step="0.001" min="0.001">
+                  </div>
+                  <div class="col-md-6 d-flex align-items-end">
+                    <button type="button" id="buy-btn" class="btn btn-buy me-2 flex-grow-1">BUY</button>
+                    <button type="button" id="sell-btn" class="btn btn-sell flex-grow-1">SELL</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5 class="mb-0">Open Positions</h5>
+        </div>
+        <div class="card-body">
+          <div id="positions-container">
+            <div class="alert alert-info">No open positions</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Recent Trades</h5>
+        </div>
+        <div class="card-body">
+          <div id="trade-history-container">
+            <div class="alert alert-info">No trade history</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5 class="mb-0">Active Trading Bots</h5>
+        </div>
+        <div class="card-body">
+          <div id="active-bots-container">
+            <div class="alert alert-info">No active bots. Create a bot to start trading.</div>
+          </div>
+          
+          <div class="mt-4">
+            <h6>Create New Bot</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="strategy-selector" class="form-label small">Strategy</label>
+                <select id="strategy-selector" class="form-select">
+                  <option value="rsi">RSI Strategy</option>
+                  <option value="macd">MACD Strategy</option>
+                  <option value="ema_cross">EMA Cross Strategy</option>
+                  <option value="bbands">Bollinger Bands Strategy</option>
+                  <option value="ml">ML Strategy</option>
+                </select>
+              </div>
+              
+              <!-- Strategy Parameters (shown/hidden based on selection) -->
+              <div class="col-md-6">
+                <!-- RSI Strategy Params -->
+                <div id="rsi-params" class="strategy-params">
+                  <label class="form-label small">RSI Parameters</label>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">Overbought</span>
+                        <input type="number" id="rsi-overbought" class="form-control" value="70" min="50" max="90">
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">Oversold</span>
+                        <input type="number" id="rsi-oversold" class="form-control" value="30" min="10" max="50">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- MACD Strategy Params -->
+                <div id="macd-params" class="strategy-params" style="display: none;">
+                  <label class="form-label small">MACD Parameters</label>
+                  <p class="small text-secondary">Using default settings (12, 26, 9)</p>
+                </div>
+                
+                <!-- EMA Cross Strategy Params -->
+                <div id="ema_cross-params" class="strategy-params" style="display: none;">
+                  <label class="form-label small">EMA Cross Parameters</label>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">Short</span>
+                        <input type="number" id="ema-short-period" class="form-control" value="9" min="5" max="50">
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">Long</span>
+                        <input type="number" id="ema-long-period" class="form-control" value="21" min="10" max="200">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Bollinger Bands Strategy Params -->
+                <div id="bbands-params" class="strategy-params" style="display: none;">
+                  <label class="form-label small">Bollinger Bands Parameters</label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text">Multiplier</span>
+                    <input type="number" id="bb-multiplier" class="form-control" value="2.0" min="1.0" max="3.0" step="0.1">
+                  </div>
+                </div>
+                
+                <!-- ML Strategy Params -->
+                <div id="ml-params" class="strategy-params" style="display: none;">
+                  <label class="form-label small">ML Parameters</label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text">Threshold</span>
+                    <input type="number" id="ml-threshold" class="form-control" value="0.65" min="0.5" max="0.9" step="0.05">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <button type="button" id="create-bot-btn" class="btn btn-primary">Create Bot</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Performance Metrics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Win Rate</div>
+                <div id="win-rate" class="metric-value">0.00%</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Profit Factor</div>
+                <div id="profit-factor" class="metric-value">0.00</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Total Trades</div>
+                <div id="total-trades" class="metric-value">0</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Total P&L</div>
+                <div id="total-profit" class="metric-value">0.00%</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Max Drawdown</div>
+                <div id="max-drawdown" class="metric-value">0.00%</div>
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="metric-card">
+                <div class="metric-title">Account Balance</div>
+                <div id="account-balance" class="metric-value">10,000.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="page-loader" class="spinner-container" style="display: none;">
+  <div class="spinner-border text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+<script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+<script src="{{ url_for('static', filename='js/trader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

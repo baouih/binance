@@ -1,0 +1,392 @@
+import os
+import json
+import logging
+import pandas as pd
+import numpy as np
+from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO, emit
+import threading
+import time
+import random
+from datetime import datetime, timedelta
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Import trading components
+try:
+    from app.binance_api import BinanceAPI
+    from app.data_processor import DataProcessor
+    from app.strategy import StrategyFactory
+    from app.trading_bot import TradingBot
+    from app.ml_optimizer import MLOptimizer
+    logger.info("Successfully imported all required packages")
+except ImportError as e:
+    logger.error(f"Error importing required packages: {str(e)}")
+    raise
+
+# Initialize Flask app
+app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
+
+# Configure template directory
+app.template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+logger.info(f"Template directory: {app.template_folder}")
+
+# Initialize SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Global objects
+binance_api = BinanceAPI(simulation_mode=True)
+data_processor = DataProcessor(binance_api, simulation_mode=True)
+ml_optimizer = MLOptimizer()
+trading_bots = {}
+
+# Data generation thread (for simulating real-time price updates)
+data_thread = None
+should_run = False
+current_price = 45000.0  # Starting price for BTC
+
+# Store backtesting results
+backtest_results = {}
+
+@app.route('/')
+def index():
+    """Render the main dashboard."""
+    return render_template('index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """Render the trading dashboard."""
+    return render_template('dashboard.html')
+
+@app.route('/backtesting')
+def backtesting():
+    """Render the backtesting page."""
+    return render_template('backtesting.html')
+
+@app.route('/settings')
+def settings():
+    """Render the settings page."""
+    return render_template('settings.html')
+
+@app.route('/api/symbols', methods=['GET'])
+def get_symbols():
+    """Get available trading symbols."""
+    # In simulation mode, just return a fixed list
+    symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT']
+    return jsonify(symbols)
+
+@app.route('/api/intervals', methods=['GET'])
+def get_intervals():
+    """Get available time intervals."""
+    intervals = ['1m', '5m', '15m', '30m', '1h', '4h', '1d']
+    return jsonify(intervals)
+
+@app.route('/api/strategies', methods=['GET'])
+def get_strategies():
+    """Get available trading strategies."""
+    strategies = StrategyFactory.get_available_strategies()
+    return jsonify(strategies)
+
+@app.route('/api/historical_data', methods=['GET'])
+def get_historical_data():
+    """Get historical price data."""
+    symbol = request.args.get('symbol', 'BTCUSDT')
+    interval = request.args.get('interval', '1h')
+    limit = int(request.args.get('limit', 500))
+    
+    # Get data using the data processor
+    df = data_processor.get_historical_data(symbol, interval, lookback_days=30)
+    
+    if df is None or df.empty:
+        return jsonify({'error': 'No data available'}), 404
+        
+    # Convert to list of dictionaries for JSON
+    data = []
+    for _, row in df.iterrows():
+        data.append({
+            'time': row.name.isoformat() if isinstance(row.name, datetime) else row.name,
+            'open': float(row['open']),
+            'high': float(row['high']),
+            'low': float(row['low']),
+            'close': float(row['close']),
+            'volume': float(row['volume'])
+        })
+        
+    return jsonify(data)
+
+@app.route('/api/indicators', methods=['GET'])
+def get_indicators():
+    """Get technical indicators for a symbol."""
+    symbol = request.args.get('symbol', 'BTCUSDT')
+    interval = request.args.get('interval', '1h')
+    
+    # Get data with indicators
+    df = data_processor.get_historical_data(symbol, interval, lookback_days=30)
+    
+    if df is None or df.empty:
+        return jsonify({'error': 'No data available'}), 404
+        
+    # Extract the latest indicators
+    latest = df.iloc[-1].to_dict()
+    
+    # Format indicators for display
+    indicators = {
+        'price': latest.get('close', 0),
+        'rsi': latest.get('RSI', 0),
+        'macd': latest.get('MACD', 0),
+        'macd_signal': latest.get('MACD_Signal', 0),
+        'macd_hist': latest.get('MACD_Hist', 0),
+        'ema9': latest.get('EMA_9', 0),
+        'ema21': latest.get('EMA_21', 0),
+        'sma20': latest.get('SMA_20', 0),
+        'sma50': latest.get('SMA_50', 0),
+        'bb_upper': latest.get('BB_upper', 0),
+        'bb_middle': latest.get('BB_middle', 0),
+        'bb_lower': latest.get('BB_lower', 0),
+        'volume': latest.get('volume', 0),
+        'volume_ratio': latest.get('Volume_Ratio', 0)
+    }
+    
+    return jsonify(indicators)
+
+@app.route('/api/create_bot', methods=['POST'])
+def create_bot():
+    """Create a new trading bot."""
+    data = request.json
+    
+    symbol = data.get('symbol', 'BTCUSDT')
+    interval = data.get('interval', '1h')
+    strategy_type = data.get('strategy', 'rsi')
+    strategy_params = data.get('params', {})
+    
+    # Create the strategy
+    strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
+    
+    # Create a unique bot ID
+    bot_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
+    
+    # Create the bot
+    bot = TradingBot(
+        binance_api=binance_api,
+        data_processor=data_processor,
+        strategy=strategy,
+        symbol=symbol,
+        interval=interval,
+        test_mode=True
+    )
+    
+    # Store the bot
+    trading_bots[bot_id] = bot
+    
+    # Start the bot
+    bot.start()
+    
+    return jsonify({'bot_id': bot_id, 'status': 'started'})
+
+@app.route('/api/stop_bot', methods=['POST'])
+def stop_bot():
+    """Stop a trading bot."""
+    data = request.json
+    bot_id = data.get('bot_id')
+    
+    if bot_id not in trading_bots:
+        return jsonify({'error': 'Bot not found'}), 404
+        
+    # Stop the bot
+    bot = trading_bots[bot_id]
+    bot.stop()
+    
+    return jsonify({'bot_id': bot_id, 'status': 'stopped'})
+
+@app.route('/api/bot_status', methods=['GET'])
+def get_bot_status():
+    """Get status of all trading bots."""
+    bots_status = []
+    
+    for bot_id, bot in trading_bots.items():
+        # Get bot metrics
+        metrics = bot.get_current_metrics()
+        
+        # Add bot info
+        status = {
+            'bot_id': bot_id,
+            'symbol': bot.symbol,
+            'interval': bot.interval,
+            'strategy': bot.strategy.name,
+            'running': bot.is_running,
+            'metrics': metrics
+        }
+        
+        bots_status.append(status)
+        
+    return jsonify(bots_status)
+
+@app.route('/api/run_backtest', methods=['POST'])
+def run_backtest():
+    """Run a backtesting simulation."""
+    data = request.json
+    
+    symbol = data.get('symbol', 'BTCUSDT')
+    interval = data.get('interval', '1h')
+    strategy_type = data.get('strategy', 'rsi')
+    strategy_params = data.get('params', {})
+    lookback_days = int(data.get('lookback_days', 30))
+    initial_balance = float(data.get('initial_balance', 10000.0))
+    
+    # Get historical data
+    df = data_processor.get_historical_data(symbol, interval, lookback_days=lookback_days)
+    
+    if df is None or df.empty:
+        return jsonify({'error': 'No data available for backtesting'}), 404
+        
+    # Create the strategy
+    strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
+    
+    # Create a bot for backtesting
+    bot = TradingBot(
+        binance_api=binance_api,
+        data_processor=data_processor,
+        strategy=strategy,
+        symbol=symbol,
+        interval=interval,
+        test_mode=True
+    )
+    
+    # Run the backtest
+    results_df, metrics, trades = bot.backtest(df, initial_balance=initial_balance)
+    
+    # Generate a unique ID for the backtest
+    backtest_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
+    
+    # Store the results
+    backtest_results[backtest_id] = {
+        'id': backtest_id,
+        'symbol': symbol,
+        'interval': interval,
+        'strategy': strategy_type,
+        'metrics': metrics,
+        'trades': [t.copy() for t in trades],
+        'timestamp': datetime.now().isoformat()
+    }
+    
+    # Convert results for JSON
+    results = []
+    for date, row in results_df.iterrows():
+        results.append({
+            'date': date.isoformat() if isinstance(date, datetime) else date,
+            'close': float(row['close']),
+            'equity': float(row['equity']),
+            'returns': float(row['returns']),
+            'signal': int(row['signal'])
+        })
+        
+    # Convert trades for JSON
+    trades_json = []
+    for trade in trades:
+        trades_json.append({
+            'entry_time': trade['entry_time'].isoformat() if isinstance(trade['entry_time'], datetime) else trade['entry_time'],
+            'exit_time': trade['exit_time'].isoformat() if isinstance(trade['exit_time'], datetime) else trade['exit_time'],
+            'entry_price': float(trade['entry_price']),
+            'exit_price': float(trade['exit_price']),
+            'side': trade['side'],
+            'amount': float(trade['amount']),
+            'pnl_amount': float(trade['pnl_amount']),
+            'pnl_pct': float(trade['pnl_pct'])
+        })
+        
+    return jsonify({
+        'backtest_id': backtest_id,
+        'metrics': metrics,
+        'results': results,
+        'trades': trades_json
+    })
+
+@app.route('/api/backtest_results', methods=['GET'])
+def get_backtest_results():
+    """Get all backtest results."""
+    results = list(backtest_results.values())
+    return jsonify(results)
+
+@app.route('/api/market_data', methods=['GET'])
+def get_market_data():
+    """Get current market data."""
+    symbol = request.args.get('symbol', 'BTCUSDT')
+    
+    # In simulation mode, use the current price
+    price = current_price
+    
+    # Generate some simulated metrics
+    market_data = {
+        'symbol': symbol,
+        'price': price,
+        'change_24h': random.uniform(-5.0, 5.0),
+        'volume_24h': price * random.uniform(5000, 20000),
+        'high_24h': price * (1 + random.uniform(0.01, 0.05)),
+        'low_24h': price * (1 - random.uniform(0.01, 0.05)),
+        'timestamp': datetime.now().isoformat()
+    }
+    
+    return jsonify(market_data)
+
+# SocketIO event handlers
+@socketio.on('connect')
+def on_connect():
+    """Handle client connection."""
+    logger.info("Client connected")
+
+@socketio.on('disconnect')
+def on_disconnect():
+    """Handle client disconnection."""
+    logger.info("Client disconnected")
+
+# Real-time data simulation
+def generate_price_data():
+    """Generate simulated price data."""
+    global current_price, should_run
+    
+    while should_run:
+        # Simulate random price movement
+        change_pct = random.normalvariate(0, 0.002)  # Mean 0, std dev 0.2%
+        current_price = current_price * (1 + change_pct)
+        
+        # Emit the new price to all connected clients
+        logger.debug(f"Emitting price update: {current_price}")
+        socketio.emit('price_update', {
+            'symbol': 'BTCUSDT',
+            'price': current_price,
+            'time': datetime.now().isoformat()
+        })
+        
+        # Sleep for 1 second
+        time.sleep(1)
+
+def start_data_generation():
+    """Start the data generation thread."""
+    global data_thread, should_run
+    
+    if data_thread is None or not data_thread.is_alive():
+        should_run = True
+        data_thread = threading.Thread(target=generate_price_data)
+        data_thread.daemon = True
+        data_thread.start()
+        logger.info("Data generation thread started")
+
+def stop_data_generation():
+    """Stop the data generation thread."""
+    global should_run
+    should_run = False
+    logger.info("Data generation thread stopped")
+
+# Start the server
+if __name__ == '__main__':
+    logger.info("Starting trading bot server...")
+    
+    # Start data generation
+    logger.info("Starting data generation thread")
+    start_data_generation()
+    
+    # Start the server
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
