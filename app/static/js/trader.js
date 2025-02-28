@@ -160,10 +160,10 @@ class TradingController {
       tr.innerHTML = `
         <td>${position.symbol}</td>
         <td>${position.side}</td>
-        <td>${position.quantity.toFixed(5)}</td>
-        <td>${position.entry_price.toFixed(2)}</td>
-        <td>${position.current_price.toFixed(2)}</td>
-        <td class="${pnlClass}">${pnlPercent.toFixed(2)}%</td>
+        <td>${position.quantity ? position.quantity.toFixed(5) : '0.00000'}</td>
+        <td>${position.entry_price ? position.entry_price.toFixed(2) : '0.00'}</td>
+        <td>${position.current_price ? position.current_price.toFixed(2) : '0.00'}</td>
+        <td class="${pnlClass}">${pnlPercent ? pnlPercent.toFixed(2) : '0.00'}%</td>
         <td>
           <button class="btn btn-danger btn-sm close-position-btn" data-position-id="${position.id}">
             Close
@@ -236,11 +236,11 @@ class TradingController {
       tr.innerHTML = `
         <td>${trade.symbol}</td>
         <td>${trade.side}</td>
-        <td>${trade.quantity.toFixed(5)}</td>
-        <td>${trade.entry_price.toFixed(2)}</td>
-        <td>${trade.exit_price.toFixed(2)}</td>
-        <td class="${pnlClass}">${pnlPercent.toFixed(2)}%</td>
-        <td>${this.formatDate(trade.timestamp)}</td>
+        <td>${trade.quantity ? trade.quantity.toFixed(5) : '0.00000'}</td>
+        <td>${trade.entry_price ? trade.entry_price.toFixed(2) : '0.00'}</td>
+        <td>${trade.exit_price ? trade.exit_price.toFixed(2) : '0.00'}</td>
+        <td class="${pnlClass}">${pnlPercent ? pnlPercent.toFixed(2) : '0.00'}%</td>
+        <td>${trade.timestamp ? this.formatDate(trade.timestamp) : 'N/A'}</td>
       `;
       
       tbody.appendChild(tr);

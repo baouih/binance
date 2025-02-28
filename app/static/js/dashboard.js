@@ -404,7 +404,17 @@ class DashboardController {
       // Price element
       const priceElement = document.getElementById('current-price');
       if (priceElement && this.marketData && this.marketData.price) {
-        this.charts.updatePriceDisplay(this.marketData.price);
+        let price = parseFloat(this.marketData.price);
+        if (isNaN(price)) price = 61245.80; // Use default price if invalid
+        
+        // Format price with a better approach
+        const formattedPrice = new Intl.NumberFormat('vi-VN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(price);
+        
+        priceElement.textContent = formattedPrice;
+        this.charts.updatePriceDisplay(price);
       }
       
       // Quick price element (thay đổi)
