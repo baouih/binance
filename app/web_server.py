@@ -572,6 +572,67 @@ def get_backtest_results():
     results = list(backtest_results.values())
     return jsonify(results)
 
+@app.route('/api/positions', methods=['GET'])
+def get_positions_api():
+    """Lấy danh sách vị thế đang mở từ Binance API."""
+    try:
+        # Lấy danh sách vị thế đang mở (không bằng 0)
+        positions = binance_api.get_positions()
+        
+        # Tính toán tổng giá trị tài sản
+        total_value = 0
+        total_pnl = 0
+        for pos in positions:
+            pos_amt = float(pos.get('positionAmt', 0))
+            mark_price = float(pos.get('markPrice', 0))
+            notional = abs(pos_amt * mark_price)
+            total_value += notional
+            total_pnl += float(pos.get('unRealizedProfit', 0))
+        
+        response_data = {
+            'status': 'success',
+            'positions': positions,
+            'statistics': {
+                'total_positions': len(positions),
+                'total_value': total_value,
+                'total_pnl': total_pnl
+            }
+        }
+        
+        logger.info(f"API: Đã lấy thông tin vị thế: {len(positions)} vị thế, tổng giá trị: {total_value:.2f} USDT")
+        return jsonify(response_data)
+    
+    except Exception as e:
+        logger.error(f"API: Lỗi khi lấy thông tin vị thế: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Lỗi khi lấy thông tin vị thế: {str(e)}'
+        }), 500
+
+@app.route('/api/orders', methods=['GET'])
+def get_orders_api():
+    """Lấy danh sách lệnh đang mở từ Binance API."""
+    try:
+        # Lấy danh sách lệnh đang mở
+        symbol = request.args.get('symbol', None)  # Nếu có symbol, chỉ lấy lệnh của symbol đó
+        orders = binance_api.get_open_orders(symbol)
+        
+        response_data = {
+            'status': 'success',
+            'orders': orders,
+            'count': len(orders)
+        }
+        
+        logger.info(f"API: Đã lấy thông tin lệnh đang mở: {len(orders)} lệnh")
+        return jsonify(response_data)
+    
+    except Exception as e:
+        logger.error(f"API: Lỗi khi lấy thông tin lệnh đang mở: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Lỗi khi lấy thông tin lệnh đang mở: {str(e)}'
+        }), 500
+
 @app.route('/api/market_data', methods=['GET'])
 def get_market_data():
     """Get current market data."""
