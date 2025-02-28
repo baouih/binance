@@ -454,18 +454,18 @@
                     </div>
                     
                     <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Open Positions</h5>
+                        <h5 class="card-title mb-3">Vị Thế Đang Mở</h5>
                         <div class="table-responsive">
                             <table class="market-data-table">
                                 <thead>
                                     <tr>
-                                        <th>Symbol</th>
-                                        <th>Type</th>
-                                        <th>Entry Price</th>
-                                        <th>Current Price</th>
-                                        <th>Size</th>
-                                        <th>PNL</th>
-                                        <th>Actions</th>
+                                        <th>Cặp Giao Dịch</th>
+                                        <th>Loại</th>
+                                        <th>Giá Vào Lệnh</th>
+                                        <th>Giá Hiện Tại</th>
+                                        <th>Khối Lượng</th>
+                                        <th>Lãi/Lỗ</th>
+                                        <th>Tác Vụ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="positions-table-body">
@@ -477,7 +477,7 @@
                                         <td>0.5 BTC</td>
                                         <td id="position-pnl">Loading...</td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" id="closePositionBtn">Close</button>
+                                            <button class="btn btn-sm btn-danger" id="closePositionBtn">Đóng</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -488,7 +488,7 @@
                 
                 <div class="col-md-4">
                     <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Market Overview</h5>
+                        <h5 class="card-title mb-3">Tổng Quan Thị Trường</h5>
                         <div class="price-card up">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -530,9 +530,9 @@
                     </div>
                     
                     <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Quick Trade</h5>
+                        <h5 class="card-title mb-3">Giao Dịch Nhanh</h5>
                         <div class="form-group mb-3">
-                            <label for="tradeSymbol" class="form-label">Symbol</label>
+                            <label for="tradeSymbol" class="form-label">Cặp Giao Dịch</label>
                             <select class="form-select" id="tradeSymbol">
                                 <option value="BTCUSDT" selected>BTC/USDT</option>
                                 <option value="ETHUSDT">ETH/USDT</option>
@@ -541,12 +541,12 @@
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label for="tradeAmount" class="form-label">Amount (USDT)</label>
+                            <label for="tradeAmount" class="form-label">Số Tiền (USDT)</label>
                             <input type="number" class="form-control" id="tradeAmount" placeholder="0.00" value="100">
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label for="tradeLeverage" class="form-label">Leverage</label>
+                            <label for="tradeLeverage" class="form-label">Đòn Bẩy</label>
                             <select class="form-select" id="tradeLeverage">
                                 <option value="1">1x</option>
                                 <option value="5">5x</option>
@@ -561,12 +561,12 @@
                             <div class="row">
                                 <div class="col-6">
                                     <button class="buy-btn w-100" id="buyBtn">
-                                        <i class="fas fa-arrow-up me-1"></i> BUY/LONG
+                                        <i class="fas fa-arrow-up me-1"></i> MUA/LONG
                                     </button>
                                 </div>
                                 <div class="col-6">
                                     <button class="sell-btn w-100" id="sellBtn">
-                                        <i class="fas fa-arrow-down me-1"></i> SELL/SHORT
+                                        <i class="fas fa-arrow-down me-1"></i> BÁN/SHORT
                                     </button>
                                 </div>
                             </div>
@@ -574,20 +574,20 @@
                     </div>
                     
                     <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Market Sentiment</h5>
+                        <h5 class="card-title mb-3">Tâm Lý Thị Trường</h5>
                         <div class="progress mb-2" style="height: 5px;">
                             <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
                             <div class="progress-bar bg-warning" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
                             <div class="progress-bar bg-success" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <div class="text-danger">Bearish 30%</div>
-                            <div class="text-warning">Neutral 15%</div>
-                            <div class="text-success">Bullish 55%</div>
+                            <div class="text-danger">Giảm 30%</div>
+                            <div class="text-warning">Trung lập 15%</div>
+                            <div class="text-success">Tăng 55%</div>
                         </div>
                         <div class="text-center mt-3">
-                            <h4 id="market-prediction">BULLISH</h4>
-                            <p class="text-muted small">Updated: <span id="sentiment-update-time">Loading...</span></p>
+                            <h4 id="market-prediction">TĂNG GIÁ</h4>
+                            <p class="text-muted small">Cập nhật: <span id="sentiment-update-time">Đang tải...</span></p>
                         </div>
                     </div>
                 </div>
@@ -596,47 +596,47 @@
             <div class="row">
                 <div class="col-12">
                     <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Recent Trades</h5>
+                        <h5 class="card-title mb-3">Lịch Sử Giao Dịch Gần Đây</h5>
                         <div class="table-responsive">
                             <table class="market-data-table">
                                 <thead>
                                     <tr>
-                                        <th>Time</th>
-                                        <th>Symbol</th>
-                                        <th>Side</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Value</th>
-                                        <th>Strategy</th>
+                                        <th>Thời Gian</th>
+                                        <th>Cặp Giao Dịch</th>
+                                        <th>Hướng</th>
+                                        <th>Giá</th>
+                                        <th>Khối Lượng</th>
+                                        <th>Giá Trị</th>
+                                        <th>Chiến Lược</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>15:45:22</td>
                                         <td>BTC/USDT</td>
-                                        <td><span class="tag tag-green">BUY</span></td>
+                                        <td><span class="tag tag-green">MUA</span></td>
                                         <td>78,250.00</td>
                                         <td>0.5 BTC</td>
                                         <td>39,125.00 USDT</td>
-                                        <td><span class="tag tag-blue">RSI Strategy</span></td>
+                                        <td><span class="tag tag-blue">Chiến lược RSI</span></td>
                                     </tr>
                                     <tr>
                                         <td>14:30:15</td>
                                         <td>ETH/USDT</td>
-                                        <td><span class="tag tag-red">SELL</span></td>
+                                        <td><span class="tag tag-red">BÁN</span></td>
                                         <td>3,780.50</td>
                                         <td>2.0 ETH</td>
                                         <td>7,561.00 USDT</td>
-                                        <td><span class="tag tag-blue">MACD Strategy</span></td>
+                                        <td><span class="tag tag-blue">Chiến lược MACD</span></td>
                                     </tr>
                                     <tr>
                                         <td>12:15:33</td>
                                         <td>BNB/USDT</td>
-                                        <td><span class="tag tag-green">BUY</span></td>
+                                        <td><span class="tag tag-green">MUA</span></td>
                                         <td>578.25</td>
                                         <td>5.0 BNB</td>
                                         <td>2,891.25 USDT</td>
-                                        <td><span class="tag tag-yellow">Manual</span></td>
+                                        <td><span class="tag tag-yellow">Thủ công</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -655,22 +655,67 @@
             document.getElementById('content').classList.toggle('active');
         });
         
-        // Add click event to all nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Remove active class from all links
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                
-                // Add active class to the clicked link
-                this.classList.add('active');
-                
-                // For now just show an alert with the page name (since we don't have the actual pages yet)
-                const pageName = this.textContent.trim();
-                alert(`Trang "${pageName}" đang được phát triển. Chức năng sẽ sớm được hoàn thiện.`);
-                
-                e.preventDefault(); // Prevent default link behavior
-            });
-        });
+        // Xử lý menu click với hiệu ứng tốt hơn
+        function handleMenuClick(link, e) {
+            // Ngăn chặn hành vi mặc định của link
+            e.preventDefault();
+            
+            // Xóa active class khỏi tất cả các link
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            // Thêm active class vào link được click
+            link.classList.add('active');
+            
+            // Lấy tên trang từ nội dung text
+            const pageName = link.textContent.trim();
+            
+            // Hiển thị thông báo với giao diện đẹp hơn
+            const notificationContainer = document.getElementById('notification-container') || 
+                (() => {
+                    const container = document.createElement('div');
+                    container.id = 'notification-container';
+                    container.style.position = 'fixed';
+                    container.style.top = '20px';
+                    container.style.right = '20px';
+                    container.style.zIndex = '9999';
+                    document.body.appendChild(container);
+                    return container;
+                })();
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.backgroundColor = '#3498db';
+            notification.style.color = 'white';
+            notification.style.padding = '15px 20px';
+            notification.style.marginBottom = '10px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            notification.style.minWidth = '250px';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(50px)';
+            notification.style.transition = 'all 0.3s ease-in-out';
+            
+            notification.innerHTML = `<strong>${pageName}</strong>: Chức năng đang được phát triển và sẽ sớm hoàn thiện.`;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Hiển thị thông báo với hiệu ứng
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Tự động đóng thông báo sau 5 giây
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(50px)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+            
+            return false;
+        }
         
         // Price chart setup
         const ctx = document.getElementById('priceChart').getContext('2d');
@@ -993,11 +1038,21 @@
         
         async function closePosition(symbol) {
             try {
+                if (!confirm('Bạn có chắc chắn muốn đóng vị thế này không?')) {
+                    return; // Người dùng đã hủy
+                }
+                
                 // Hiển thị thông báo đang xử lý
                 const closeBtn = document.getElementById('closePositionBtn');
                 const originalText = closeBtn.innerText;
-                closeBtn.innerText = 'Đang xử lý...';
+                closeBtn.innerText = 'Đang đóng...';
                 closeBtn.disabled = true;
+                
+                // Thêm hiệu ứng mờ dần cho hàng trong bảng
+                const positionRow = closeBtn.closest('tr');
+                if (positionRow) {
+                    positionRow.style.transition = 'opacity 0.5s';
+                }
                 
                 const response = await fetch('/api/close_position', {
                     method: 'POST',
