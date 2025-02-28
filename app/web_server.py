@@ -271,6 +271,26 @@ def index():
     """Render the main dashboard."""
     return render_template('index.html')
 
+@app.route('/market-analysis')
+def market_analysis():
+    """Trang phân tích thị trường."""
+    return render_template('market_analysis.html')
+    
+@app.route('/positions')
+def positions():
+    """Trang vị thế đang mở."""
+    return render_template('positions.html')
+    
+@app.route('/trade-history')
+def trade_history():
+    """Trang lịch sử giao dịch."""
+    return render_template('trade_history.html')
+    
+@app.route('/strategy')
+def strategy():
+    """Trang chiến lược giao dịch."""
+    return render_template('strategy.html')
+
 @app.route('/trading_dashboard')
 def trading_dashboard():
     """Render the trading dashboard."""
