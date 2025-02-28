@@ -477,7 +477,7 @@
                                         <td>0.5 BTC</td>
                                         <td id="position-pnl">Loading...</td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger">Close</button>
+                                            <button class="btn btn-sm btn-danger" id="closePositionBtn">Close</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -853,6 +853,15 @@
         }
         
         function updatePositionPNL(currentPrice) {
+            // Cập nhật biến global giá hiện tại
+            window.current_price = currentPrice;
+            
+            // Cập nhật giá trong bảng vị thế
+            const priceTableElement = document.getElementById('btc-current-price-table');
+            if (priceTableElement) {
+                priceTableElement.textContent = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            
             // Lấy từ API Binance giá BTC thực tế là khoảng 82.9k USDT theo ảnh người dùng cung cấp
             const entryPrice = 82902.00; // Cập nhật giá dựa trên ảnh được cung cấp (82902.0 USDT)
             const quantity = 0.5;
@@ -890,7 +899,8 @@
             const amount = document.getElementById('tradeAmount').value;
             const leverage = document.getElementById('tradeLeverage').value;
             
-            alert(`Đặt lệnh BUY/LONG ${symbol} với số tiền ${amount} USDT, leverage ${leverage}x. Chức năng này đang được phát triển.`);
+            // Gửi lệnh đặt mua lên server
+            placeOrder(symbol, 'BUY', amount, leverage);
         });
         
         document.getElementById('sellBtn').addEventListener('click', function() {
@@ -898,8 +908,76 @@
             const amount = document.getElementById('tradeAmount').value;
             const leverage = document.getElementById('tradeLeverage').value;
             
-            alert(`Đặt lệnh SELL/SHORT ${symbol} với số tiền ${amount} USDT, leverage ${leverage}x. Chức năng này đang được phát triển.`);
+            // Gửi lệnh đặt bán lên server
+            placeOrder(symbol, 'SELL', amount, leverage);
         });
+        
+        // Biến global để lưu giá hiện tại
+        window.current_price = 0;
+        
+        // Xử lý đặt lệnh
+        async function placeOrder(symbol, side, amount, leverage) {
+            try {
+                // Lấy giá hiện tại từ API thay vì dùng biến local
+                const priceResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+                const priceData = await priceResponse.json();
+                const price = parseFloat(priceData.price);
+                
+                // Đặt lệnh qua API
+                const response = await fetch('/api/place_order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symbol: symbol,
+                        side: side,
+                        quantity: parseFloat(amount) / price, // Tính số lượng từ số tiền
+                        leverage: parseInt(leverage)
+                    }),
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert(`Đặt lệnh ${side} ${symbol} thành công!`);
+                } else {
+                    alert(`Lỗi: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`Lỗi khi đặt lệnh: ${error.message}`);
+                console.error('Error placing order:', error);
+            }
+        }
+        
+        // Xử lý đóng lệnh
+        document.getElementById('closePositionBtn').addEventListener('click', function() {
+            closePosition('BTCUSDT');
+        });
+        
+        async function closePosition(symbol) {
+            try {
+                const response = await fetch('/api/close_position', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        position_id: 'BTCUSDT-position'
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert(`Đóng vị thế ${symbol} thành công!`);
+                } else {
+                    alert(`Lỗi: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`Lỗi khi đóng vị thế: ${error.message}`);
+                console.error('Error closing position:', error);
+            }
+        }
         
         // Initial price fetch
         fetchRealTimePrices();
