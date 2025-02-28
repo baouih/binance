@@ -30,6 +30,13 @@ class BinanceAPI:
         self.testnet = testnet
         self.simulation_mode = simulation_mode
         
+        # Kiểm tra keys
+        if self.api_key and self.api_secret:
+            logger.info("Khóa API Binance đã được cấu hình")
+        else:
+            logger.warning("Khóa API Binance chưa được cấu hình! Sẽ sử dụng chế độ mô phỏng.")
+            self.simulation_mode = True
+        
         if self.simulation_mode:
             logger.info("Initializing BinanceAPI in simulation mode")
             self.client = None
