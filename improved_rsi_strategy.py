@@ -156,9 +156,10 @@ def generate_sample_data(days=90, interval='1h'):
 
 def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0, 
                           leverage=5, risk_percentage=2.0, overbought=70, oversold=30,
-                          use_sample_data=True):
+                          use_sample_data=True, use_trend_filter=True, use_volume_filter=True,
+                          trailing_stop=True, take_profit_pct=15.0, stop_loss_pct=7.0):
     """
-    Thực hiện backtest với chiến lược RSI
+    Thực hiện backtest với chiến lược RSI cải tiến
     
     Args:
         days (int): Số ngày dữ liệu lịch sử
@@ -169,6 +170,11 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
         overbought (int): Ngưỡng quá mua
         oversold (int): Ngưỡng quá bán
         use_sample_data (bool): Sử dụng dữ liệu mẫu thay vì dữ liệu API
+        use_trend_filter (bool): Sử dụng bộ lọc xu hướng
+        use_volume_filter (bool): Sử dụng bộ lọc khối lượng
+        trailing_stop (bool): Sử dụng trailing stop
+        take_profit_pct (float): Phần trăm chốt lời
+        stop_loss_pct (float): Phần trăm cắt lỗ
     """
     logger.info(f"=== BACKTEST RSI STRATEGY ===")
     logger.info(f"Interval: {interval}")
@@ -231,14 +237,66 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
         # Tạo tín hiệu dựa trên RSI
         signal = 0
         
+        # Tính toán các chỉ báo bổ sung cho bộ lọc
+        if use_trend_filter or use_volume_filter:
+            # Tính EMA để xác định xu hướng
+            if 'ema20' not in current_data.columns:
+                current_data['ema20'] = current_data['close'].ewm(span=20, adjust=False).mean()
+                current_data['ema50'] = current_data['close'].ewm(span=50, adjust=False).mean()
+            
+            # Tính trung bình khối lượng
+            if 'volume_sma20' not in current_data.columns:
+                current_data['volume_sma20'] = current_data['volume'].rolling(window=20).mean()
+    
         # Chỉ tạo tín hiệu mới nếu hết thời gian đệm
         if signal_buffer_count <= 0:
+            # Tín hiệu cơ bản dựa trên RSI
             if current_rsi <= oversold:
-                signal = 1  # Mua khi RSI dưới ngưỡng oversold
-                signal_buffer_count = 5  # Đặt thời gian đệm
+                base_signal = 1  # Mua khi RSI dưới ngưỡng oversold
             elif current_rsi >= overbought:
-                signal = -1  # Bán khi RSI trên ngưỡng overbought
-                signal_buffer_count = 5  # Đặt thời gian đệm
+                base_signal = -1  # Bán khi RSI trên ngưỡng overbought
+            else:
+                base_signal = 0
+            
+            # Áp dụng các bộ lọc
+            if base_signal != 0:
+                signal = base_signal
+                
+                # Bộ lọc xu hướng - EMA
+                if use_trend_filter:
+                    current_ema20 = current_data['ema20'].iloc[-1]
+                    current_ema50 = current_data['ema50'].iloc[-1]
+                    price = current_data['close'].iloc[-1]
+                    
+                    # Xác định xu hướng
+                    if base_signal == 1:  # Tín hiệu MUA
+                        # Trong xu hướng tăng, EMA ngắn hạn trên EMA dài hạn
+                        trend_ok = current_ema20 >= current_ema50 and price > current_ema20
+                        if not trend_ok:
+                            signal = 0  # Hủy tín hiệu nếu điều kiện xu hướng không tốt
+                            logger.info(f"Candle {i}: Tín hiệu MUA bị hủy do điều kiện xu hướng")
+                    
+                    elif base_signal == -1:  # Tín hiệu BÁN
+                        # Trong xu hướng giảm, EMA ngắn hạn dưới EMA dài hạn
+                        trend_ok = current_ema20 <= current_ema50 and price < current_ema20
+                        if not trend_ok:
+                            signal = 0  # Hủy tín hiệu nếu điều kiện xu hướng không tốt
+                            logger.info(f"Candle {i}: Tín hiệu BÁN bị hủy do điều kiện xu hướng")
+                
+                # Bộ lọc khối lượng
+                if use_volume_filter and signal != 0:
+                    current_volume = current_data['volume'].iloc[-1]
+                    avg_volume = current_data['volume_sma20'].iloc[-1]
+                    
+                    # Khối lượng nên cao hơn trung bình
+                    volume_ok = current_volume >= avg_volume * 1.2  # Yêu cầu khối lượng cao hơn 20%
+                    if not volume_ok:
+                        signal = 0  # Hủy tín hiệu nếu khối lượng thấp
+                        logger.info(f"Candle {i}: Tín hiệu bị hủy do khối lượng thấp")
+                
+                # Đặt đệm thời gian nếu có tín hiệu
+                if signal != 0:
+                    signal_buffer_count = 5  # Đặt thời gian đệm
         else:
             signal_buffer_count -= 1
             
@@ -264,12 +322,26 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
                 entry_price = current_price
                 entry_date = current_date
                 
+                # Tính toán take profit và stop loss
+                if trailing_stop:
+                    tp_level = entry_price * (1 + take_profit_pct/100)
+                    sl_level = entry_price * (1 - stop_loss_pct/100)
+                    highest_price = entry_price  # Theo dõi giá cao nhất cho trailing stop
+                else:
+                    tp_level = entry_price * (1 + take_profit_pct/100)
+                    sl_level = entry_price * (1 - stop_loss_pct/100)
+                
                 current_position = {
                     'side': 'BUY',
                     'entry_price': entry_price,
                     'quantity': order_qty,
                     'entry_date': entry_date,
-                    'leverage': leverage
+                    'leverage': leverage,
+                    'take_profit': tp_level,
+                    'stop_loss': sl_level,
+                    'highest_price': highest_price,
+                    'trailing_active': False,  # Trailing stop chưa kích hoạt
+                    'trailing_stop': trailing_stop
                 }
                 
                 logger.info(f"Mở vị thế MUA tại {entry_date}: {entry_price:.2f}, Số lượng: {order_qty:.5f}")
