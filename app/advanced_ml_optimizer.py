@@ -171,12 +171,13 @@ class AdvancedMLOptimizer:
         
         return base_params
     
-    def _preprocess_features(self, X, regime=None, is_training=False):
+    def _preprocess_features(self, X, y=None, regime=None, is_training=False):
         """
         Tiền xử lý tính năng bao gồm chuẩn hóa và lựa chọn tính năng
         
         Args:
             X: Dữ liệu tính năng đầu vào
+            y: Nhãn đích (cần thiết nếu is_training=True và feature_selection=True)
             regime: Chế độ thị trường hiện tại
             is_training: Nếu đây là dữ liệu đào tạo
             
@@ -203,6 +204,10 @@ class AdvancedMLOptimizer:
         # Lựa chọn tính năng
         if self.feature_selection:
             if is_training:
+                if y is None:
+                    logger.warning("Biến y không được cung cấp cho lựa chọn tính năng, đang bỏ qua bước này")
+                    return X_scaled
+                
                 # Sử dụng SelectKBest để chọn các tính năng tốt nhất
                 n_features = min(20, X.shape[1])  # Chọn tối đa 20 tính năng hoặc tất cả nếu ít hơn
                 self.feature_selectors[key] = SelectKBest(f_classif, k=n_features)

@@ -7,7 +7,6 @@ và sau đó tải lại để kiểm tra tính năng hoạt động đúng.
 
 import os
 import logging
-import pandas as pd
 import numpy as np
 from datetime import datetime
 
@@ -17,11 +16,12 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 try:
+    import pandas as pd
     from app.advanced_ml_optimizer import AdvancedMLOptimizer
     from app.binance_api import BinanceAPI
     from app.data_processor import DataProcessor
-except ImportError:
-    logger.error("Không thể import các module cần thiết")
+except ImportError as e:
+    logger.error(f"Không thể import các module cần thiết: {e}")
     raise
 
 def generate_sample_data(size=1000):
@@ -61,7 +61,7 @@ def calculate_rsi(prices, window=14):
     seed = deltas[:window+1]
     up = seed[seed >= 0].sum()/window
     down = -seed[seed < 0].sum()/window
-    rs = up/down
+    rs = up/down if down != 0 else float('inf')
     rsi = np.zeros_like(prices)
     rsi[:window] = 100. - 100./(1. + rs)
     
@@ -76,7 +76,7 @@ def calculate_rsi(prices, window=14):
             
         up = (up * (window - 1) + upval) / window
         down = (down * (window - 1) + downval) / window
-        rs = up/down
+        rs = up/down if down != 0 else float('inf')
         rsi[i] = 100. - 100./(1. + rs)
     
     return rsi
