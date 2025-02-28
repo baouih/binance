@@ -1184,9 +1184,14 @@ def generate_price_data():
                     }
                 }
                 
+                # Nếu đang ở chế độ mô phỏng, không hiển thị lệnh và vị thế giả
+                if binance_api.simulation_mode:
+                    account_data['positions'] = []
+                    account_data['orders'] = []
+                    
                 # Emit the account update
                 socketio.emit('account_update', account_data)
-                logger.info(f"Đã gửi cập nhật tài khoản: {len(positions)} vị thế, {len(open_orders)} lệnh đang mở")
+                logger.info(f"Đã gửi cập nhật tài khoản: {len(account_data['positions'])} vị thế, {len(account_data['orders'])} lệnh đang mở")
             except Exception as e:
                 # Backup plan: gửi dữ liệu mô phỏng nếu có lỗi
                 pnl_value = (current_price - entry_price) * quantity
@@ -1198,15 +1203,7 @@ def generate_price_data():
                     'unrealized_pnl': pnl_value,
                     'margin_balance': account_balance + pnl_value,
                     'available_balance': account_balance * 0.8,
-                    'positions': [{
-                        'symbol': 'BTCUSDT',
-                        'positionAmt': str(quantity),
-                        'entryPrice': str(entry_price),
-                        'markPrice': str(current_price),
-                        'unRealizedProfit': str(pnl_value),
-                        'leverage': '10',
-                        'marginType': 'isolated'
-                    }],
+                    'positions': [],  # Không hiển thị vị thế trong chế độ mô phỏng
                     'orders': []
                 }
                 
