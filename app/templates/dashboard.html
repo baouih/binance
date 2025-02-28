@@ -1,645 +1,335 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Bot - Bảng điều khiển</title>
-    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Crypto Trading Bot Dashboard</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0a0a0e;
-            color: #e1e1e6;
+            padding-top: 20px;
         }
-        
-        .navbar {
-            background-color: #1a1a20 !important;
-            border-bottom: 1px solid #2a2a35;
-        }
-        
-        .sidebar {
-            background-color: #13131a;
-            border-right: 1px solid #2a2a35;
-            height: calc(100vh - 56px);
-            position: fixed;
-            width: 250px;
-            z-index: 1000;
-            transition: all 0.3s;
-        }
-        
-        .sidebar-sticky {
-            position: sticky;
-            top: 0;
-            height: calc(100vh - 56px);
-            padding-top: 1rem;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-        
-        .nav-link {
-            color: #8f9ba6;
-            padding: 0.75rem 1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            color: #e1e1e6;
-            background-color: #252530;
-        }
-        
-        .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        
-        .dashboard-card {
-            background-color: #1a1a20;
-            border-radius: 8px;
-            border: 1px solid #2a2a35;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .price-card {
-            background-color: #1a1a20;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .price-card.up {
-            border-left-color: #2ecc71;
-        }
-        
-        .price-card.down {
-            border-left-color: #e74c3c;
-        }
-        
-        .price-value {
+        .price-container {
             font-size: 1.8rem;
             font-weight: bold;
-            margin: 5px 0;
         }
-        
         .price-change {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: bold;
+            font-size: 1rem;
         }
-        
-        .price-change.up {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
+        .price-change-positive {
+            color: #28a745;
         }
-        
-        .price-change.down {
-            background-color: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
+        .price-change-negative {
+            color: #dc3545;
         }
-        
-        .chart-container {
-            width: 100%;
-            height: 350px;
+        .indicator-container {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .gauge-container {
             position: relative;
+            height: 150px;
         }
-        
-        .data-table {
-            width: 100%;
-            margin-top: 1rem;
-        }
-        
-        .data-table th {
-            background-color: #252530;
-            padding: 10px;
-            text-align: left;
-            font-weight: 500;
-        }
-        
-        .data-table td {
-            padding: 10px;
-            border-bottom: 1px solid #2a2a35;
-        }
-        
-        .order-btn {
-            display: inline-block;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-weight: 500;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-        
-        .buy-btn {
-            background-color: #2ecc71;
-            color: #fff;
-        }
-        
-        .sell-btn {
-            background-color: #e74c3c;
-            color: #fff;
-        }
-        
-        .buy-btn:hover {
-            background-color: #27ae60;
-        }
-        
-        .sell-btn:hover {
-            background-color: #c0392b;
-        }
-        
-        .toggle-sidebar {
-            display: none;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        
-        .logo-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #e1e1e6;
-            margin-left: 10px;
-        }
-        
-        .logo-icon {
-            color: #3498db;
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 1.5rem;
+            font-weight: bold;
         }
-        
-        .market-data-table {
-            width: 100%;
-            border-collapse: collapse;
+        .bot-status {
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
         }
-        
-        .market-data-table th, .market-data-table td {
-            padding: 10px;
-            text-align: left;
+        .status-running {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
         }
-        
-        .market-data-table th {
-            background-color: #252530;
-            color: #e1e1e6;
-            font-weight: 500;
+        .status-stopped {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
         }
-        
-        .market-data-table tr:nth-child(even) {
-            background-color: #1e1e25;
+        .status-paused {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
         }
-        
-        .market-data-table tr:hover {
-            background-color: #252535;
-        }
-        
-        .loader {
-            border: 4px solid #1a1a20;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .account-info {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background-color: #252530;
-            border-radius: 4px;
+        .card {
+            height: 100%;
             margin-bottom: 20px;
         }
-        
-        .account-info .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #3498db;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .card-header {
             font-weight: bold;
-            margin-right: 15px;
         }
-        
-        .account-info .user-details {
-            flex: 1;
-        }
-        
-        .account-info .user-details .username {
-            font-weight: bold;
-            color: #e1e1e6;
-        }
-        
-        .account-info .user-details .account-balance {
-            font-size: 0.85rem;
-            color: #8f9ba6;
-        }
-        
-        .tag {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 5px;
-            text-transform: uppercase;
-        }
-        
-        .tag-blue {
-            background-color: rgba(52, 152, 219, 0.2);
-            color: #3498db;
-        }
-        
-        .tag-green {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-        }
-        
-        .tag-red {
-            background-color: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-        }
-        
-        .tag-yellow {
-            background-color: rgba(241, 196, 15, 0.2);
-            color: #f1c40f;
-        }
-        
-        .symbol-select {
-            margin-bottom: 20px;
-        }
-        
-        .system-status {
-            font-size: 0.85rem;
-            color: #8f9ba6;
-            margin-left: auto;
-        }
-        
-        .system-status .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 5px;
-            background-color: #2ecc71;
-        }
-        
-        .system-status.offline .status-indicator {
-            background-color: #e74c3c;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                margin-left: -250px;
-            }
-            
-            .content {
-                margin-left: 0;
-            }
-            
-            .sidebar.active {
-                margin-left: 0;
-            }
-            
-            .content.active {
-                margin-left: 250px;
-            }
-            
-            .toggle-sidebar {
-                display: block;
-            }
+        .time-display {
+            font-size: 0.9rem;
+            color: #6c757d;
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <button class="toggle-sidebar me-2" id="toggle-sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <i class="fas fa-chart-line logo-icon"></i>
-                <span class="logo-text">Binance Futures Bot</span>
-            </a>
-            <div class="system-status">
-                <span class="status-indicator"></span> Hệ thống hoạt động
-            </div>
-            <div class="d-flex">
-                <div class="dropdown">
-                    <button class="btn btn-dark dropdown-toggle" type="button" id="settingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="settingsDropdown">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
-                    </ul>
+<body data-bs-theme="dark">
+    <div class="container">
+        <header class="mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1>Crypto Trading Bot Dashboard</h1>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="time-display">
+                        <div id="current-date"></div>
+                        <div id="current-time"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <div class="d-flex">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-sticky">
-                <div class="account-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="user-details">
-                        <div class="username">Demo User</div>
-                        <div class="account-balance">Balance: 10,000 USDT</div>
-                    </div>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/dashboard">
-                            <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bot_management" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-robot"></i> Quản lý bot
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/market_analysis" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-chart-bar"></i> Phân tích thị trường
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/positions" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-exchange-alt"></i> Vị thế đang mở
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/history" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-history"></i> Lịch sử giao dịch
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/strategy" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-brain"></i> Chiến lược giao dịch
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/backtesting" onclick="handleMenuClick(this, event)">
-                            <i class="fas fa-flask"></i> Kiểm thử chiến lược
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="settings-link" href="{{ url_for('settings') }}">
-                            <i class="fas fa-cog"></i> Cài đặt
-                        </a>
-                    </li>
-                </ul>
-                
-                <div class="mt-auto p-3">
-                    <div class="small text-muted">System Version: 1.0.0</div>
-                    <div class="small text-muted">Last Update: 28/02/2025</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="content" id="content">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h1 class="h3 mb-0">Bảng Điều Khiển Giao Dịch</h1>
-                    <p class="text-muted">Tổng quan thị trường và quản lý giao dịch</p>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <div class="dashboard-card mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">BTC/USDT Price Chart</h5>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-secondary active">1m</button>
-                                <button class="btn btn-sm btn-outline-secondary">5m</button>
-                                <button class="btn btn-sm btn-outline-secondary">15m</button>
-                                <button class="btn btn-sm btn-outline-secondary">1h</button>
-                                <button class="btn btn-sm btn-outline-secondary">4h</button>
-                                <button class="btn btn-sm btn-outline-secondary">1d</button>
-                            </div>
+        <div class="row mb-4">
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-header">Bot Status</div>
+                    <div class="card-body text-center">
+                        <div id="bot-status" class="bot-status status-running mb-3">
+                            Running
                         </div>
-                        <div class="chart-container">
-                            <canvas id="priceChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Vị Thế Đang Mở</h5>
-                        <div class="table-responsive">
-                            <table class="market-data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Cặp Giao Dịch</th>
-                                        <th>Loại</th>
-                                        <th>Giá Vào Lệnh</th>
-                                        <th>Giá Hiện Tại</th>
-                                        <th>Khối Lượng</th>
-                                        <th>Lãi/Lỗ</th>
-                                        <th>Tác Vụ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="positions-table-body">
-                                    <tr>
-                                        <td>BTC/USDT</td>
-                                        <td><span class="tag tag-green">LONG</span></td>
-                                        <td>82,902.00</td>
-                                        <td id="btc-current-price-table">Loading...</td>
-                                        <td>0.5 BTC</td>
-                                        <td id="position-pnl">Loading...</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger" id="closePositionBtn">Đóng</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Tổng Quan Thị Trường</h5>
-                        <div class="price-card up">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="small text-muted">BTC/USDT</div>
-                                    <div class="price-value" id="btc-price">Loading...</div>
-                                    <div class="price-change up" id="btc-change">+0.00%</div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-bitcoin fa-2x text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="price-card up">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="small text-muted">ETH/USDT</div>
-                                    <div class="price-value" id="eth-price">Loading...</div>
-                                    <div class="price-change up" id="eth-change">+0.00%</div>
-                                </div>
-                                <div>
-                                    <i class="fab fa-ethereum fa-2x text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="price-card up">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="small text-muted">BNB/USDT</div>
-                                    <div class="price-value" id="bnb-price">Loading...</div>
-                                    <div class="price-change up" id="bnb-change">+0.00%</div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-coins fa-2x text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Giao Dịch Nhanh</h5>
-                        <div class="form-group mb-3">
-                            <label for="tradeSymbol" class="form-label">Cặp Giao Dịch</label>
-                            <select class="form-select" id="tradeSymbol">
-                                <option value="BTCUSDT" selected>BTC/USDT</option>
-                                <option value="ETHUSDT">ETH/USDT</option>
-                                <option value="BNBUSDT">BNB/USDT</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="tradeAmount" class="form-label">Số Tiền (USDT)</label>
-                            <input type="number" class="form-control" id="tradeAmount" placeholder="0.00" value="100">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="tradeLeverage" class="form-label">Đòn Bẩy</label>
-                            <select class="form-select" id="tradeLeverage">
-                                <option value="1">1x</option>
-                                <option value="5">5x</option>
-                                <option value="10" selected>10x</option>
-                                <option value="20">20x</option>
-                                <option value="50">50x</option>
-                                <option value="100">100x</option>
-                            </select>
-                        </div>
-                        
                         <div class="d-grid gap-2">
-                            <div class="row">
-                                <div class="col-6">
-                                    <button class="buy-btn w-100" id="buyBtn">
-                                        <i class="fas fa-arrow-up me-1"></i> MUA/LONG
-                                    </button>
-                                </div>
-                                <div class="col-6">
-                                    <button class="sell-btn w-100" id="sellBtn">
-                                        <i class="fas fa-arrow-down me-1"></i> BÁN/SHORT
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Tâm Lý Thị Trường</h5>
-                        <div class="progress mb-2" style="height: 5px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <div class="text-danger">Giảm 30%</div>
-                            <div class="text-warning">Trung lập 15%</div>
-                            <div class="text-success">Tăng 55%</div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <h4 id="market-prediction">TĂNG GIÁ</h4>
-                            <p class="text-muted small">Cập nhật: <span id="sentiment-update-time">Đang tải...</span></p>
+                            <button id="start-stop-btn" class="btn btn-danger">Stop Bot</button>
+                            <button id="restart-btn" class="btn btn-warning">Restart Bot</button>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="row">
-                <div class="col-12">
-                    <div class="dashboard-card">
-                        <h5 class="card-title mb-3">Lịch Sử Giao Dịch Gần Đây</h5>
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header">Account Balance</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="text-center mb-3">
+                                    <div class="text-muted">Current Balance</div>
+                                    <div class="price-container">$10,125.75</div>
+                                    <div class="price-change price-change-positive">
+                                        <i class="bi bi-arrow-up"></i> +$125.75 (+1.25%)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="text-muted">Open Positions</div>
+                                    <div class="price-container">3</div>
+                                    <div class="text-muted">Total: $3,450.50</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">Market Sentiment</div>
+                    <div class="card-body">
+                        <div class="gauge-container">
+                            <canvas id="sentiment-gauge"></canvas>
+                            <div class="gauge-value">65</div>
+                        </div>
+                        <div class="text-center text-muted">Greed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">BTC/USDT Price Chart</div>
+                    <div class="card-body">
+                        <canvas id="price-chart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">Current Prices</div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>BTC/USDT</strong>
+                                </div>
+                                <div>
+                                    <div class="text-end">$83,245.50</div>
+                                    <div class="price-change-positive text-end">+0.8%</div>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>ETH/USDT</strong>
+                                </div>
+                                <div>
+                                    <div class="text-end">$2,345.25</div>
+                                    <div class="price-change-positive text-end">+1.2%</div>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>BNB/USDT</strong>
+                                </div>
+                                <div>
+                                    <div class="text-end">$382.75</div>
+                                    <div class="price-change-negative text-end">-0.3%</div>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>SOL/USDT</strong>
+                                </div>
+                                <div>
+                                    <div class="text-end">$142.30</div>
+                                    <div class="price-change-positive text-end">+2.5%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">Open Positions</div>
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="market-data-table">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Thời Gian</th>
-                                        <th>Cặp Giao Dịch</th>
-                                        <th>Hướng</th>
-                                        <th>Giá</th>
-                                        <th>Khối Lượng</th>
-                                        <th>Giá Trị</th>
-                                        <th>Chiến Lược</th>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Entry Price</th>
+                                        <th>Current</th>
+                                        <th>Size</th>
+                                        <th>P/L</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>15:45:22</td>
                                         <td>BTC/USDT</td>
-                                        <td><span class="tag tag-green">MUA</span></td>
-                                        <td>78,250.00</td>
-                                        <td>0.5 BTC</td>
-                                        <td>39,125.00 USDT</td>
-                                        <td><span class="tag tag-blue">Chiến lược RSI</span></td>
+                                        <td>BUY</td>
+                                        <td>$82,150.50</td>
+                                        <td>$83,245.50</td>
+                                        <td>0.012</td>
+                                        <td class="price-change-positive">+$13.14 (+1.3%)</td>
+                                        <td><button class="btn btn-sm btn-danger">Close</button></td>
                                     </tr>
                                     <tr>
-                                        <td>14:30:15</td>
                                         <td>ETH/USDT</td>
-                                        <td><span class="tag tag-red">BÁN</span></td>
-                                        <td>3,780.50</td>
-                                        <td>2.0 ETH</td>
-                                        <td>7,561.00 USDT</td>
-                                        <td><span class="tag tag-blue">Chiến lược MACD</span></td>
+                                        <td>BUY</td>
+                                        <td>$2,305.75</td>
+                                        <td>$2,345.25</td>
+                                        <td>0.45</td>
+                                        <td class="price-change-positive">+$17.78 (+1.7%)</td>
+                                        <td><button class="btn btn-sm btn-danger">Close</button></td>
                                     </tr>
                                     <tr>
-                                        <td>12:15:33</td>
-                                        <td>BNB/USDT</td>
-                                        <td><span class="tag tag-green">MUA</span></td>
-                                        <td>578.25</td>
-                                        <td>5.0 BNB</td>
-                                        <td>2,891.25 USDT</td>
-                                        <td><span class="tag tag-yellow">Thủ công</span></td>
+                                        <td>SOL/USDT</td>
+                                        <td>SELL</td>
+                                        <td>$145.80</td>
+                                        <td>$142.30</td>
+                                        <td>0.75</td>
+                                        <td class="price-change-positive">+$2.63 (+2.4%)</td>
+                                        <td><button class="btn btn-sm btn-danger">Close</button></td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">Trading Signals</div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>BTC/USDT</strong>
+                                    <span class="badge bg-success">BUY</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">10:15:24</small>
+                                    <small>Confidence: 85%</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>SOL/USDT</strong>
+                                    <span class="badge bg-danger">SELL</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">09:42:15</small>
+                                    <small>Confidence: 78%</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>ETH/USDT</strong>
+                                    <span class="badge bg-success">BUY</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">09:05:32</small>
+                                    <small>Confidence: 72%</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>BNB/USDT</strong>
+                                    <span class="badge bg-danger">SELL</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted">08:30:47</small>
+                                    <small>Confidence: 65%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Performance Metrics</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center mb-3">
+                                    <div class="text-muted">Win Rate</div>
+                                    <div class="fs-4">68.5%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center mb-3">
+                                    <div class="text-muted">Profit Factor</div>
+                                    <div class="fs-4">2.35</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center mb-3">
+                                    <div class="text-muted">Avg Trade</div>
+                                    <div class="fs-4 price-change-positive">+$12.45</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center mb-3">
+                                    <div class="text-muted">Max Drawdown</div>
+                                    <div class="fs-4">4.2%</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -647,105 +337,100 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle sidebar
-        document.getElementById('toggle-sidebar').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('content').classList.toggle('active');
-        });
-        
-        // Xử lý menu click với hiệu ứng tốt hơn
-        function handleMenuClick(link, e) {
-            // Kiểm tra nếu đây là link settings, cho phép điều hướng trực tiếp
-            if (link.id === 'settings-link') {
-                return true;
-            }
-            
-            // Với các trang khác, lấy URL và điều hướng đến đó
-            const url = link.getAttribute('href');
-            window.location.href = url;
-            
-            // Ngăn chặn hành vi mặc định để tránh điều hướng trùng lặp
-            e.preventDefault();
-            
-            // Xóa active class khỏi tất cả các link
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            
-            // Thêm active class vào link được click
-            link.classList.add('active');
-            
-            // Lấy tên trang từ nội dung text
-            const pageName = link.textContent.trim();
-            
-            // Hiển thị thông báo với giao diện đẹp hơn
-            const notificationContainer = document.getElementById('notification-container') || 
-                (() => {
-                    const container = document.createElement('div');
-                    container.id = 'notification-container';
-                    container.style.position = 'fixed';
-                    container.style.top = '20px';
-                    container.style.right = '20px';
-                    container.style.zIndex = '9999';
-                    document.body.appendChild(container);
-                    return container;
-                })();
-            
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.backgroundColor = '#3498db';
-            notification.style.color = 'white';
-            notification.style.padding = '15px 20px';
-            notification.style.marginBottom = '10px';
-            notification.style.borderRadius = '5px';
-            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-            notification.style.minWidth = '250px';
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(50px)';
-            notification.style.transition = 'all 0.3s ease-in-out';
-            
-            notification.innerHTML = `<strong>${pageName}</strong>: Chức năng đang được phát triển và sẽ sớm hoàn thiện.`;
-            
-            notificationContainer.appendChild(notification);
-            
-            // Hiển thị thông báo với hiệu ứng
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Tự động đóng thông báo sau 5 giây
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(50px)';
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
-            }, 5000);
-            
-            return false;
+        // Initialize date and time display
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
         }
         
-        // Price chart setup
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        const priceData = {
-            labels: [],
-            datasets: [{
-                label: 'BTC/USDT',
-                data: [],
-                borderColor: '#3498db',
-                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: true,
-                tension: 0.1
-            }]
-        };
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Initialize price chart
+        const priceCtx = document.getElementById('price-chart').getContext('2d');
         
-        const priceChart = new Chart(ctx, {
+        // Generate random price data
+        const timestamps = [];
+        const prices = [];
+        const now = new Date();
+        
+        for (let i = 30; i >= 0; i--) {
+            const time = new Date(now - i * 15 * 60000); // 15-minute intervals
+            timestamps.push(time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+            
+            if (i === 30) {
+                prices.push(82000);
+            } else {
+                const lastPrice = prices[prices.length - 1];
+                const change = (Math.random() - 0.5) * 200;
+                prices.push(lastPrice + change);
+            }
+        }
+        
+        const priceChart = new Chart(priceCtx, {
             type: 'line',
-            data: priceData,
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: 'BTC/USDT',
+                    data: prices,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Initialize sentiment gauge
+        const sentimentCtx = document.getElementById('sentiment-gauge').getContext('2d');
+        const sentimentGauge = new Chart(sentimentCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [65, 35],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(33, 37, 41, 0.1)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '80%',
+                circumference: 180,
+                rotation: 270,
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -753,423 +438,51 @@
                         display: false
                     },
                     tooltip: {
-                        mode: 'index',
-                        intersect: false,
+                        enabled: false
                     }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 8,
-                            maxRotation: 0
-                        }
-                    },
-                    y: {
-                        position: 'right',
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.05)'
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
                 }
             }
         });
-        
-        // Initialize time for chart
-        function initializeChartData() {
-            const now = new Date();
-            for (let i = 60; i >= 0; i--) {
-                const time = new Date(now.getTime() - i * 60000);
-                priceData.labels.push(time.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}));
-                priceData.datasets[0].data.push(null);
-            }
-            priceChart.update();
-        }
-        
-        initializeChartData();
-        
-        // Fetch price data from Binance API
-        async function fetchRealTimePrices() {
-            try {
-                // BTC price
-                const btcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                const btcData = await btcResponse.json();
-                if (btcData && btcData.price) {
-                    const btcPrice = parseFloat(btcData.price);
-                    updateCryptoPrice('btc', btcPrice);
-                    updateChart(btcPrice);
-                    
-                    // Update open position PNL
-                    updatePositionPNL(btcPrice);
-                    
-                    // Get 24h change
-                    fetchPriceChange('BTCUSDT', 'btc-change');
-                }
-                
-                // ETH price
-                const ethResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT');
-                const ethData = await ethResponse.json();
-                if (ethData && ethData.price) {
-                    const ethPrice = parseFloat(ethData.price);
-                    updateCryptoPrice('eth', ethPrice);
-                    
-                    // Get 24h change
-                    fetchPriceChange('ETHUSDT', 'eth-change');
-                }
-                
-                // BNB price
-                const bnbResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
-                const bnbData = await bnbResponse.json();
-                if (bnbData && bnbData.price) {
-                    const bnbPrice = parseFloat(bnbData.price);
-                    updateCryptoPrice('bnb', bnbPrice);
-                    
-                    // Get 24h change
-                    fetchPriceChange('BNBUSDT', 'bnb-change');
-                }
-                
-                // Update sentiment data
-                updateSentiment();
-                
-                console.log("Prices updated successfully");
-            } catch (error) {
-                console.error('Error fetching prices:', error);
-            }
-        }
-        
-        function updateCryptoPrice(crypto, price) {
-            const priceElement = document.getElementById(`${crypto}-price`);
-            if (priceElement) {
-                priceElement.textContent = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USDT';
-            }
+
+        // Handle button clicks
+        document.getElementById('start-stop-btn').addEventListener('click', function() {
+            const botStatus = document.getElementById('bot-status');
             
-            // Update BTC price in table if available
-            if (crypto === 'btc') {
-                const tablePriceElement = document.getElementById('btc-current-price-table');
-                if (tablePriceElement) {
-                    tablePriceElement.textContent = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                }
+            if (botStatus.classList.contains('status-running')) {
+                botStatus.classList.remove('status-running');
+                botStatus.classList.add('status-stopped');
+                botStatus.textContent = 'Stopped';
+                this.classList.remove('btn-danger');
+                this.classList.add('btn-success');
+                this.textContent = 'Start Bot';
+            } else {
+                botStatus.classList.remove('status-stopped');
+                botStatus.classList.add('status-running');
+                botStatus.textContent = 'Running';
+                this.classList.remove('btn-success');
+                this.classList.add('btn-danger');
+                this.textContent = 'Stop Bot';
             }
-        }
-        
-        function updateChart(price) {
-            // Add new price data point
-            const now = new Date();
-            const timeLabel = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-            
-            // Remove first data point and add new one
-            priceData.labels.shift();
-            priceData.labels.push(timeLabel);
-            priceData.datasets[0].data.shift();
-            priceData.datasets[0].data.push(price);
-            
-            // Update chart
-            priceChart.update();
-        }
-        
-        async function fetchPriceChange(symbol, elementId) {
-            try {
-                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-                const data = await response.json();
-                
-                if (data && data.priceChangePercent) {
-                    const changePercent = parseFloat(data.priceChangePercent);
-                    const changeElement = document.getElementById(elementId);
-                    
-                    if (changeElement) {
-                        const sign = changePercent >= 0 ? '+' : '';
-                        changeElement.textContent = sign + changePercent.toFixed(2) + '%';
-                        
-                        // Update class based on price change
-                        if (changePercent > 0) {
-                            changeElement.className = 'price-change up';
-                            changeElement.closest('.price-card').className = 'price-card up';
-                        } else if (changePercent < 0) {
-                            changeElement.className = 'price-change down';
-                            changeElement.closest('.price-card').className = 'price-card down';
-                        } else {
-                            changeElement.className = 'price-change';
-                            changeElement.closest('.price-card').className = 'price-card';
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching price change:', error);
-            }
-        }
-        
-        function updatePositionPNL(currentPrice) {
-            // Cập nhật biến global giá hiện tại
-            window.current_price = currentPrice;
-            
-            // Cập nhật giá trong bảng vị thế
-            const priceTableElement = document.getElementById('btc-current-price-table');
-            if (priceTableElement) {
-                priceTableElement.textContent = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-            
-            // Lấy từ API Binance giá BTC thực tế là khoảng 82.9k USDT theo ảnh người dùng cung cấp
-            const entryPrice = 82902.00; // Cập nhật giá dựa trên ảnh được cung cấp (82902.0 USDT)
-            const quantity = 0.5;
-            const pnlValue = (currentPrice - entryPrice) * quantity;
-            const pnlPercent = (pnlValue / (entryPrice * quantity)) * 100;
-            
-            const pnlElement = document.getElementById('position-pnl');
-            if (pnlElement) {
-                const sign = pnlValue >= 0 ? '+' : '';
-                pnlElement.textContent = `${sign}${pnlValue.toFixed(2)} (${sign}${pnlPercent.toFixed(2)}%)`;
-                
-                // Update color based on PNL
-                if (pnlValue > 0) {
-                    pnlElement.style.color = '#2ecc71';
-                } else if (pnlValue < 0) {
-                    pnlElement.style.color = '#e74c3c';
-                } else {
-                    pnlElement.style.color = '#8f9ba6';
-                }
-            }
-        }
-        
-        function updateSentiment() {
-            // Update sentiment timestamp
-            const now = new Date();
-            const sentimentTimeElement = document.getElementById('sentiment-update-time');
-            if (sentimentTimeElement) {
-                sentimentTimeElement.textContent = now.toLocaleTimeString('vi-VN');
-            }
-        }
-        
-        // Buy/Sell button event listeners
-        document.getElementById('buyBtn').addEventListener('click', function() {
-            const symbol = document.getElementById('tradeSymbol').value;
-            const amount = document.getElementById('tradeAmount').value;
-            const leverage = document.getElementById('tradeLeverage').value;
-            
-            // Gửi lệnh đặt mua lên server
-            placeOrder(symbol, 'BUY', amount, leverage);
         });
-        
-        document.getElementById('sellBtn').addEventListener('click', function() {
-            const symbol = document.getElementById('tradeSymbol').value;
-            const amount = document.getElementById('tradeAmount').value;
-            const leverage = document.getElementById('tradeLeverage').value;
+
+        document.getElementById('restart-btn').addEventListener('click', function() {
+            const botStatus = document.getElementById('bot-status');
             
-            // Gửi lệnh đặt bán lên server
-            placeOrder(symbol, 'SELL', amount, leverage);
-        });
-        
-        // Biến global để lưu giá hiện tại
-        window.current_price = 0;
-        
-        // Xử lý đặt lệnh
-        async function placeOrder(symbol, side, amount, leverage) {
-            try {
-                // Hiển thị nút đang xử lý
-                const actionButton = side === 'BUY' ? document.getElementById('buyBtn') : document.getElementById('sellBtn');
-                const originalText = actionButton.innerText;
-                actionButton.innerText = 'Đang xử lý...';
-                actionButton.disabled = true;
-                
-                // Sử dụng giá hiện tại từ biến global để tránh gọi API Binance bị chặn
-                const price = window.current_price;
-                
-                // Đặt lệnh qua API
-                const response = await fetch('/api/place_order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        symbol: symbol,
-                        side: side,
-                        quantity: parseFloat(amount) / price, // Tính số lượng từ số tiền
-                        leverage: parseInt(leverage)
-                    }),
-                });
-                const data = await response.json();
-                
-                // Khôi phục nút
-                actionButton.innerText = originalText;
-                actionButton.disabled = false;
-                
-                if (data.status === 'success') {
-                    // Thêm lệnh vào lịch sử giao dịch
-                    const tradeHistory = document.getElementById('trade-history');
-                    if (tradeHistory) {
-                        const now = new Date();
-                        const timeStr = now.toLocaleTimeString('vi-VN');
-                        const newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <td>${timeStr}</td>
-                            <td>${symbol}</td>
-                            <td><span class="badge bg-${side === 'BUY' ? 'success' : 'danger'}">${side === 'BUY' ? 'MUA' : 'BÁN'}</span></td>
-                            <td>${price.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                            <td>${(parseFloat(amount) / price).toFixed(4)} ${symbol.replace('USDT', '')}</td>
-                            <td>${parseFloat(amount).toLocaleString('en-US', {minimumFractionDigits: 2})} USDT</td>
-                            <td><span class="badge bg-primary">${side === 'BUY' ? 'VÀO LỆNH' : 'RA LỆNH'}</span></td>
-                        `;
-                        
-                        if (tradeHistory.querySelector('tbody')) {
-                            tradeHistory.querySelector('tbody').prepend(newRow);
-                        }
-                    }
-                    
-                    // Hiển thị thông báo thành công
-                    showNotification(`Đặt lệnh ${side === 'BUY' ? 'MUA' : 'BÁN'} ${symbol} thành công!`, 'success');
-                } else {
-                    showNotification(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                // Khôi phục nút nếu có lỗi
-                const actionButton = side === 'BUY' ? document.getElementById('buyBtn') : document.getElementById('sellBtn');
-                if (actionButton) {
-                    actionButton.innerText = side === 'BUY' ? 'Mua' : 'Bán';
-                    actionButton.disabled = false;
-                }
-                
-                showNotification(`Lỗi khi đặt lệnh: ${error.message}`, 'error');
-                console.error('Error placing order:', error);
-            }
-        }
-        
-        // Xử lý đóng lệnh
-        document.getElementById('closePositionBtn').addEventListener('click', function() {
-            closePosition('BTCUSDT');
-        });
-        
-        async function closePosition(symbol) {
-            try {
-                if (!confirm('Bạn có chắc chắn muốn đóng vị thế này không?')) {
-                    return; // Người dùng đã hủy
-                }
-                
-                // Hiển thị thông báo đang xử lý
-                const closeBtn = document.getElementById('closePositionBtn');
-                const originalText = closeBtn.innerText;
-                closeBtn.innerText = 'Đang đóng...';
-                closeBtn.disabled = true;
-                
-                // Thêm hiệu ứng mờ dần cho hàng trong bảng
-                const positionRow = closeBtn.closest('tr');
-                if (positionRow) {
-                    positionRow.style.transition = 'opacity 0.5s';
-                }
-                
-                const response = await fetch('/api/close_position', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        position_id: `${symbol}-position`,
-                        symbol: symbol
-                    }),
-                });
-                
-                const data = await response.json();
-                
-                // Khôi phục nút đóng vị thế
-                closeBtn.innerText = originalText;
-                closeBtn.disabled = false;
-                
-                if (data.status === 'success') {
-                    // Cập nhật trạng thái vị thế trên UI
-                    document.getElementById('position-pnl').textContent = '0.00 (0.00%)';
-                    document.getElementById('position-pnl').style.color = '#8f9ba6';
-                    
-                    // Thêm lệnh vào lịch sử giao dịch
-                    const tradeHistory = document.getElementById('trade-history');
-                    if (tradeHistory) {
-                        const now = new Date();
-                        const timeStr = now.toLocaleTimeString('vi-VN');
-                        const newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <td>${timeStr}</td>
-                            <td>${symbol}</td>
-                            <td><span class="badge bg-danger">SELL (ĐÓNG)</span></td>
-                            <td>${current_price.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                            <td>0.5 BTC</td>
-                            <td>${(current_price * 0.5).toLocaleString('en-US', {minimumFractionDigits: 2})} USDT</td>
-                            <td><span class="badge bg-info">ĐÓNG VỊ THẾ</span></td>
-                        `;
-                        
-                        if (tradeHistory.querySelector('tbody')) {
-                            tradeHistory.querySelector('tbody').prepend(newRow);
-                        }
-                    }
-                    
-                    // Hiển thị thông báo thành công
-                    showNotification(`Đóng vị thế ${symbol} thành công!`, 'success');
-                } else {
-                    showNotification(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                document.getElementById('closePositionBtn').disabled = false;
-                showNotification(`Lỗi khi đóng vị thế: ${error.message}`, 'error');
-                console.error('Error closing position:', error);
-            }
-        }
-        
-        // Hiển thị thông báo tốt hơn thay vì dùng alert
-        function showNotification(message, type = 'info') {
-            const notifContainer = document.getElementById('notification-container');
-            if (!notifContainer) {
-                // Tạo container thông báo nếu chưa tồn tại
-                const container = document.createElement('div');
-                container.id = 'notification-container';
-                container.style.position = 'fixed';
-                container.style.top = '20px';
-                container.style.right = '20px';
-                container.style.zIndex = '9999';
-                document.body.appendChild(container);
-            }
+            botStatus.classList.remove('status-stopped', 'status-running');
+            botStatus.classList.add('status-paused');
+            botStatus.textContent = 'Restarting...';
             
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.backgroundColor = type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db';
-            notification.style.color = 'white';
-            notification.style.padding = '15px 20px';
-            notification.style.marginBottom = '10px';
-            notification.style.borderRadius = '5px';
-            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-            notification.style.minWidth = '250px';
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(50px)';
-            notification.style.transition = 'all 0.3s ease-in-out';
-            
-            notification.innerHTML = message;
-            
-            document.getElementById('notification-container').appendChild(notification);
-            
-            // Hiển thị thông báo với hiệu ứng
             setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Tự động đóng thông báo sau 5 giây
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(50px)';
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
-            }, 5000);
-        }
-        
-        // Initial price fetch
-        fetchRealTimePrices();
-        
-        // Update prices every 10 seconds
-        setInterval(fetchRealTimePrices, 10000);
+                botStatus.classList.remove('status-paused');
+                botStatus.classList.add('status-running');
+                botStatus.textContent = 'Running';
+                
+                const startStopBtn = document.getElementById('start-stop-btn');
+                startStopBtn.classList.remove('btn-success');
+                startStopBtn.classList.add('btn-danger');
+                startStopBtn.textContent = 'Stop Bot';
+            }, 2000);
+        });
     </script>
 </body>
 </html>

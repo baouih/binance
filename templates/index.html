@@ -1,238 +1,231 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Trading Bot Dashboard</title>
-    <!-- Bootstrap Dark Theme CSS -->
+    <title>CryptoBot - Trading Bot Dashboard</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/strategies">Strategies</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/backtest">Backtest</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/trades">Trade History</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings">Settings</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
-                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
+<body data-bs-theme="dark">
+    <div class="container py-4">
+        <header class="mb-4 pb-3 border-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="fs-4 fw-bold">CryptoBot Trading Dashboard</h1>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="/dashboard" class="btn btn-primary">Launch Dashboard</a>
                 </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <div class="container mt-4">
-        <div class="row">
-            <!-- Account Overview -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Account Overview</h5>
+        <main>
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Automated Trading Bot</h5>
+                            <p class="card-text">24/7 cryptocurrency trading with machine learning algorithms for maximum profit potential. Our bot automatically adjusts to market conditions and makes trades in real-time.</p>
+                            <div class="d-grid gap-2">
+                                <a href="/dashboard" class="btn btn-success">View Live Dashboard</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <h2 class="balance-display">$<span id="account-balance">10,253.42</span></h2>
-                        <p class="text-muted">24h Change: <span id="account-change" class="text-success">+2.3%</span></p>
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary" type="button">Deposit</button>
-                            <button class="btn btn-secondary" type="button">Withdraw</button>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Performance Metrics</h5>
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="text-muted small">Win Rate</div>
+                                    <div class="fs-4 fw-bold text-success">68.5%</div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-muted small">Profit Factor</div>
+                                    <div class="fs-4 fw-bold">2.35</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small">Daily ROI</div>
+                                    <div class="fs-4 fw-bold text-success">+0.74%</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small">Max Drawdown</div>
+                                    <div class="fs-4 fw-bold text-danger">4.2%</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Market Overview -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Overview</h5>
-                    </div>
-                    <div class="card-body">
-                        <h4>BTC/USDT: $<span id="btc-price">83,768.54</span></h4>
-                        <p class="text-muted">24h Change: <span id="btc-change" class="text-success">+1.5%</span></p>
-                        <div>
-                            <canvas id="price-chart" height="120"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Market Sentiment -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Sentiment</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="sentiment-gauge-container">
-                            <canvas id="sentiment-gauge" height="120"></canvas>
-                        </div>
-                        <h5 id="sentiment-label" class="mt-2 text-danger">Extreme Fear</h5>
-                        <p class="text-muted">Market sentiment based on multiple indicators</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row">
-            <!-- Active Positions -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Active Positions</h5>
-                        <button class="btn btn-sm btn-outline-primary">New Position</button>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Supported Cryptocurrencies</h5>
+                            <div class="row">
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16" fill="currentColor" class="text-warning">
+                                                <path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.084c1.992 0 3.416-1.033 3.416-2.82 0-1.502-1.007-2.323-2.186-2.44v-.088c.97-.242 1.683-.974 1.683-2.19C11.997 3.93 10.847 3 9.092 3H9V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3h-.573V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3H4.5v1.25c0 .138.112.25.25.25h.5a.25.25 0 0 1 .25.25v3.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 0-.25.25V10h.75v2.75a.25.25 0 0 0 .25.25h.5a.25.25 0 0 1 .25.25m2.427-4.817h1.209c.88 0 1.293.468 1.293 1.052 0 .562-.452 1.076-1.293 1.076h-1.21z"/>
+                                                <path d="M5.5 4.25v3.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-.5a.25.25 0 0 0-.25.25"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Bitcoin</div>
+                                            <div class="small text-muted">BTC/USDT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16" fill="currentColor" class="text-info">
+                                                <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8m0 14.5c-3.59 0-6.5-2.91-6.5-6.5S4.41 1.5 8 1.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5"/>
+                                                <path d="M8.94 7.82h-1.6v3.69h1.6c1.14 0 1.81-.76 1.81-1.81s-.72-1.88-1.81-1.88M8.93 6.5c1.51 0 3.28 1.12 3.28 3.2 0 1.89-1.33 3.31-3.28 3.31H5.84V6.5z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Ethereum</div>
+                                            <div class="small text-muted">ETH/USDT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16" fill="currentColor" class="text-warning">
+                                                <path d="M9.933 8.812v3.06h-3.61c-1.14 0-1.48-.642-1.48-1.427 0-.899.058-1.599 1.366-1.633zm0-5.295v2.93H6.313c-1.14 0-1.424-.55-1.424-1.394 0-.783.283-1.536 1.424-1.536z"/>
+                                                <path d="M11.267 2.966H6.313c-2.12 0-3.57 1.422-3.57 3.568 0 1.798.843 2.63 2.16 2.925v.079c-1.772.228-2.952 1.267-2.952 3.331C1.95 15.015 3.895 16 5.853 16h5.414V9.451h1.158V6.008h-1.158V2.966z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Binance Coin</div>
+                                            <div class="small text-muted">BNB/USDT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16" fill="currentColor" class="text-primary">
+                                                <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8m1.24 11.51h-1.06v1.31h-1.44v-1.31h-2.8v-1.35l2.51-3.91h1.73v3.87h.78v1.39h-.78v1.35h1.06zM8.7 5.34h-.09l-1.35 2.4H8.7z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Solana</div>
+                                            <div class="small text-muted">SOL/USDT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Type</th>
-                                        <th>Entry</th>
-                                        <th>Current</th>
-                                        <th>PnL</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="positions-table">
-                                    <!-- Positions will be loaded here -->
-                                </tbody>
-                            </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">Advanced Features</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Multi-timeframe Analysis</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Market Regime Detection</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Composite Indicators</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Liquidity Analysis</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Auto Strategy Optimization</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">Risk Management</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Dynamic Position Sizing</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Trailing Stop Loss</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Risk-per-Trade Limits</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Volatility Adjustments</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Correlation-based Portfolio</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">ML & Smart Features</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Continuous Model Training</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Ensemble ML Predictions</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Feature Engineering</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Regime-specific Models</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">✓</span>
+                                    <span>Adaptive Strategy Selection</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Recent Signals -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Recent Signals</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Time</th>
-                                        <th>Symbol</th>
-                                        <th>Signal</th>
-                                        <th>Price</th>
-                                        <th>Confidence</th>
-                                        <th>Regime</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="signals-table">
-                                    <!-- Signals will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        </main>
+
+        <footer class="pt-3 mt-4 text-muted border-top">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>© 2025 CryptoBot Trading</div>
+                <div class="text-end">
+                    <a href="/dashboard" class="btn btn-sm btn-outline-primary">Dashboard</a>
+                    <a href="/settings" class="btn btn-sm btn-outline-secondary ms-2">Settings</a>
                 </div>
             </div>
-        </div>
-        
-        <div class="row">
-            <!-- Market Regimes -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Regimes</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>BTC</h6>
-                                    <span id="regime-btc" class="badge bg-warning">VOLATILE</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>ETH</h6>
-                                    <span id="regime-eth" class="badge bg-warning">VOLATILE</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>BNB</h6>
-                                    <span id="regime-bnb" class="badge bg-info">NEUTRAL</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>SOL</h6>
-                                    <span id="regime-sol" class="badge bg-primary">RANGING</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-muted">Market regimes determine the optimal strategy to use</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Bot Status -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Bot Status</h5>
-                        <button class="btn btn-sm btn-outline-secondary" id="restart-bot">Restart</button>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-sm">
-                            <tbody>
-                                <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td id="status-value">Running</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Uptime:</strong></td>
-                                    <td id="uptime-value">12 hours</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Version:</strong></td>
-                                    <td id="version-value">1.0.0</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Active Strategies:</strong></td>
-                                    <td id="strategies-value">Composite ML Strategy, Multi-timeframe analyzer, Sentiment-based counter</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </footer>
     </div>
-
-    <!-- Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
