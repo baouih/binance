@@ -142,8 +142,8 @@ def index():
     """Render the main dashboard."""
     return render_template('index.html')
 
-@app.route('/dashboard')
-def dashboard():
+@app.route('/trading_dashboard')
+def trading_dashboard():
     """Render the trading dashboard."""
     return render_template('dashboard.html')
 

@@ -25,4 +25,5 @@ dependencies = [
     "twilio>=9.4.6",
     "werkzeug==2.3.7",
     "numpy>=2.2.3",
+    "requests>=2.32.3",
 ]

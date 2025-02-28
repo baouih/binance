@@ -1,405 +1,893 @@
-{% extends "layout.html" %}
-
-{% block title %}Trading Bot - Dashboard{% endblock %}
-
-{% block head %}
-<!-- Add Chart.js for data visualization -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid mt-4">
-  <div class="row">
-    <!-- Market Overview - Tổng Quan Thị Trường -->
-    <div class="col-lg-4">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Tổng Quan Thị Trường <small class="text-secondary">(Market Overview)</small></h5>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a0a0e;
+            color: #e1e1e6;
+        }
+        
+        .navbar {
+            background-color: #1a1a20 !important;
+            border-bottom: 1px solid #2a2a35;
+        }
+        
+        .sidebar {
+            background-color: #13131a;
+            border-right: 1px solid #2a2a35;
+            height: calc(100vh - 56px);
+            position: fixed;
+            width: 250px;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-sticky {
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 56px);
+            padding-top: 1rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        .nav-link {
+            color: #8f9ba6;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #e1e1e6;
+            background-color: #252530;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-card {
+            background-color: #1a1a20;
+            border-radius: 8px;
+            border: 1px solid #2a2a35;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-card {
+            background-color: #1a1a20;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .price-card.up {
+            border-left-color: #2ecc71;
+        }
+        
+        .price-card.down {
+            border-left-color: #e74c3c;
+        }
+        
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .price-change {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .price-change.up {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .price-change.down {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+        }
+        
+        .data-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .data-table th {
+            background-color: #252530;
+            padding: 10px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #2a2a35;
+        }
+        
+        .order-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .buy-btn {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+        
+        .sell-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        
+        .buy-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .sell-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e1e1e6;
+            margin-left: 10px;
+        }
+        
+        .logo-icon {
+            color: #3498db;
+            font-size: 1.5rem;
+        }
+        
+        .market-data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .market-data-table th, .market-data-table td {
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .market-data-table th {
+            background-color: #252530;
+            color: #e1e1e6;
+            font-weight: 500;
+        }
+        
+        .market-data-table tr:nth-child(even) {
+            background-color: #1e1e25;
+        }
+        
+        .market-data-table tr:hover {
+            background-color: #252535;
+        }
+        
+        .loader {
+            border: 4px solid #1a1a20;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .account-info {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #252530;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .account-info .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .account-info .user-details {
+            flex: 1;
+        }
+        
+        .account-info .user-details .username {
+            font-weight: bold;
+            color: #e1e1e6;
+        }
+        
+        .account-info .user-details .account-balance {
+            font-size: 0.85rem;
+            color: #8f9ba6;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+            text-transform: uppercase;
+        }
+        
+        .tag-blue {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+        
+        .tag-green {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .tag-red {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .tag-yellow {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+        
+        .symbol-select {
+            margin-bottom: 20px;
+        }
+        
+        .system-status {
+            font-size: 0.85rem;
+            color: #8f9ba6;
+            margin-left: auto;
+        }
+        
+        .system-status .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background-color: #2ecc71;
+        }
+        
+        .system-status.offline .status-indicator {
+            background-color: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            
+            .content {
+                margin-left: 0;
+            }
+            
+            .sidebar.active {
+                margin-left: 0;
+            }
+            
+            .content.active {
+                margin-left: 250px;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <button class="toggle-sidebar me-2" id="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-chart-line logo-icon"></i>
+                <span class="logo-text">Binance Futures Bot</span>
+            </a>
+            <div class="system-status">
+                <span class="status-indicator"></span> Hệ thống hoạt động
+            </div>
+            <div class="d-flex">
+                <div class="dropdown">
+                    <button class="btn btn-dark dropdown-toggle" type="button" id="settingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="settingsDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col">
-              <label class="form-label small">Cặp Tiền <small class="text-secondary">(Symbol)</small></label>
-              <select id="symbol-selector" class="form-select">
-                <!-- Will be populated with available symbols -->
-              </select>
+    </nav>
+
+    <div class="d-flex">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-sticky">
+                <div class="account-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="username">Demo User</div>
+                        <div class="account-balance">Balance: 10,000 USDT</div>
+                    </div>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-robot"></i> Bot Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar"></i> Market Analysis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-exchange-alt"></i> Open Positions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-history"></i> Trading History
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-brain"></i> Strategy Builder
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-flask"></i> Backtesting
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-auto p-3">
+                    <div class="small text-muted">System Version: 1.0.0</div>
+                    <div class="small text-muted">Last Update: 28/02/2025</div>
+                </div>
             </div>
-            <div class="col">
-              <label class="form-label small">Khung Thời Gian <small class="text-secondary">(Timeframe)</small></label>
-              <select id="timeframe-selector" class="form-select">
-                <!-- Will be populated with available timeframes -->
-              </select>
-            </div>
-          </div>
-          
-          <div class="current-price mb-3">
-            <h2 id="current-price">0.00</h2>
-            <div class="d-flex justify-content-between">
-              
-              <!-- Market Sentiment Indicator -->
-              <div id="sentiment-container" class="mt-3 p-3 border rounded" style="border-width: 2px;">
-                <h6 class="mb-2">Tâm Lý Thị Trường <small class="text-secondary">(Market Sentiment)</small></h6>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="fs-4" id="sentiment-value">50.0</span>
-                  <span class="badge bg-secondary" id="sentiment-label">Trung Lập</span>
-                </div>
-                <div class="d-flex justify-content-between mt-2">
-                  <small class="text-muted">Tiêu Cực <small class="text-secondary">(Bearish)</small></small>
-                  <small class="text-muted">Tích Cực <small class="text-secondary">(Bullish)</small></small>
-                </div>
-                <div class="progress mt-1">
-                  <div id="sentiment-progress" class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="row mt-3">
-                  <div class="col-4">
-                    <small class="d-block text-muted">Kỹ Thuật <small class="text-secondary">(Technical)</small></small>
-                    <span id="technical-sentiment">50.0</span>
-                  </div>
-                  <div class="col-4">
-                    <small class="d-block text-muted">Mạng Xã Hội <small class="text-secondary">(Social)</small></small>
-                    <span id="social-sentiment">50.0</span>
-                  </div>
-                  <div class="col-4">
-                    <small class="d-block text-muted">Sợ Hãi/Tham Lam <small class="text-secondary">(Fear/Greed)</small></small>
-                    <span id="fear-greed-index">50.0</span>
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <canvas id="sentiment-chart" height="120"></canvas>
-                </div>
-              </div>
-            </div>
-              <div>
-                <span class="text-secondary small">Giá Cao Nhất 24h <small class="text-secondary">(24h High)</small></span>
-                <div id="price-high">0.00</div>
-              </div>
-              <div>
-                <span class="text-secondary small">Giá Thấp Nhất 24h <small class="text-secondary">(24h Low)</small></span>
-                <div id="price-low">0.00</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="price-chart mb-3">
-            <div id="price-chart" style="height: 200px;"></div>
-          </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Technical Indicators -->
-    <div class="col-lg-8">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Chỉ Báo Kỹ Thuật <small class="text-secondary">(Technical Indicators)</small></h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="card indicator-card mb-3">
-                <div class="card-body text-center">
-                  <h5 class="indicator-title">RSI</h5>
-                  <div id="rsi-value" class="indicator-value">50.00</div>
-                  <div id="rsi-signal" class="indicator-signal">Neutral</div>
+
+        <div class="content" id="content">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h3 mb-0">Trading Dashboard</h1>
+                    <p class="text-muted">Tổng quan thị trường và quản lý trading</p>
                 </div>
-              </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="dashboard-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">BTC/USDT Price Chart</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary active">1m</button>
+                                <button class="btn btn-sm btn-outline-secondary">5m</button>
+                                <button class="btn btn-sm btn-outline-secondary">15m</button>
+                                <button class="btn btn-sm btn-outline-secondary">1h</button>
+                                <button class="btn btn-sm btn-outline-secondary">4h</button>
+                                <button class="btn btn-sm btn-outline-secondary">1d</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Open Positions</h5>
+                        <div class="table-responsive">
+                            <table class="market-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Entry Price</th>
+                                        <th>Current Price</th>
+                                        <th>Size</th>
+                                        <th>PNL</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="positions-table-body">
+                                    <tr>
+                                        <td>BTC/USDT</td>
+                                        <td><span class="tag tag-green">LONG</span></td>
+                                        <td>78,250.00</td>
+                                        <td id="btc-current-price-table">Loading...</td>
+                                        <td>0.5 BTC</td>
+                                        <td id="position-pnl">+350.00 (0.45%)</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Close</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Market Overview</h5>
+                        <div class="price-card up">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted">BTC/USDT</div>
+                                    <div class="price-value" id="btc-price">Loading...</div>
+                                    <div class="price-change up" id="btc-change">+0.00%</div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-bitcoin fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="price-card up">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted">ETH/USDT</div>
+                                    <div class="price-value" id="eth-price">Loading...</div>
+                                    <div class="price-change up" id="eth-change">+0.00%</div>
+                                </div>
+                                <div>
+                                    <i class="fab fa-ethereum fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="price-card up">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted">BNB/USDT</div>
+                                    <div class="price-value" id="bnb-price">Loading...</div>
+                                    <div class="price-change up" id="bnb-change">+0.00%</div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-coins fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Quick Trade</h5>
+                        <div class="form-group mb-3">
+                            <label for="tradeSymbol" class="form-label">Symbol</label>
+                            <select class="form-select" id="tradeSymbol">
+                                <option value="BTCUSDT" selected>BTC/USDT</option>
+                                <option value="ETHUSDT">ETH/USDT</option>
+                                <option value="BNBUSDT">BNB/USDT</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="tradeAmount" class="form-label">Amount (USDT)</label>
+                            <input type="number" class="form-control" id="tradeAmount" placeholder="0.00" value="100">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="tradeLeverage" class="form-label">Leverage</label>
+                            <select class="form-select" id="tradeLeverage">
+                                <option value="1">1x</option>
+                                <option value="5">5x</option>
+                                <option value="10" selected>10x</option>
+                                <option value="20">20x</option>
+                                <option value="50">50x</option>
+                                <option value="100">100x</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="buy-btn w-100" id="buyBtn">
+                                        <i class="fas fa-arrow-up me-1"></i> BUY/LONG
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button class="sell-btn w-100" id="sellBtn">
+                                        <i class="fas fa-arrow-down me-1"></i> SELL/SHORT
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Market Sentiment</h5>
+                        <div class="progress mb-2" style="height: 5px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="text-danger">Bearish 30%</div>
+                            <div class="text-warning">Neutral 15%</div>
+                            <div class="text-success">Bullish 55%</div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <h4 id="market-prediction">BULLISH</h4>
+                            <p class="text-muted small">Updated: <span id="sentiment-update-time">Loading...</span></p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="col-md-4">
-              <div class="card indicator-card mb-3">
-                <div class="card-body text-center">
-                  <h5 class="indicator-title">MACD</h5>
-                  <div id="macd-value" class="indicator-value">0.00</div>
-                  <div id="macd-signal" class="indicator-signal">Neutral</div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Recent Trades</h5>
+                        <div class="table-responsive">
+                            <table class="market-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Symbol</th>
+                                        <th>Side</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Value</th>
+                                        <th>Strategy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15:45:22</td>
+                                        <td>BTC/USDT</td>
+                                        <td><span class="tag tag-green">BUY</span></td>
+                                        <td>78,250.00</td>
+                                        <td>0.5 BTC</td>
+                                        <td>39,125.00 USDT</td>
+                                        <td><span class="tag tag-blue">RSI Strategy</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:30:15</td>
+                                        <td>ETH/USDT</td>
+                                        <td><span class="tag tag-red">SELL</span></td>
+                                        <td>3,780.50</td>
+                                        <td>2.0 ETH</td>
+                                        <td>7,561.00 USDT</td>
+                                        <td><span class="tag tag-blue">MACD Strategy</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>12:15:33</td>
+                                        <td>BNB/USDT</td>
+                                        <td><span class="tag tag-green">BUY</span></td>
+                                        <td>578.25</td>
+                                        <td>5.0 BNB</td>
+                                        <td>2,891.25 USDT</td>
+                                        <td><span class="tag tag-yellow">Manual</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggle-sidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('content').classList.toggle('active');
+        });
+        
+        // Price chart setup
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const priceData = {
+            labels: [],
+            datasets: [{
+                label: 'BTC/USDT',
+                data: [],
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.1
+            }]
+        };
+        
+        const priceChart = new Chart(ctx, {
+            type: 'line',
+            data: priceData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 8,
+                            maxRotation: 0
+                        }
+                    },
+                    y: {
+                        position: 'right',
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+        
+        // Initialize time for chart
+        function initializeChartData() {
+            const now = new Date();
+            for (let i = 60; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 60000);
+                priceData.labels.push(time.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}));
+                priceData.datasets[0].data.push(null);
+            }
+            priceChart.update();
+        }
+        
+        initializeChartData();
+        
+        // Fetch price data from Binance API
+        async function fetchRealTimePrices() {
+            try {
+                // BTC price
+                const btcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const btcData = await btcResponse.json();
+                if (btcData && btcData.price) {
+                    const btcPrice = parseFloat(btcData.price);
+                    updateCryptoPrice('btc', btcPrice);
+                    updateChart(btcPrice);
+                    
+                    // Update open position PNL
+                    updatePositionPNL(btcPrice);
+                    
+                    // Get 24h change
+                    fetchPriceChange('BTCUSDT', 'btc-change');
+                }
+                
+                // ETH price
+                const ethResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT');
+                const ethData = await ethResponse.json();
+                if (ethData && ethData.price) {
+                    const ethPrice = parseFloat(ethData.price);
+                    updateCryptoPrice('eth', ethPrice);
+                    
+                    // Get 24h change
+                    fetchPriceChange('ETHUSDT', 'eth-change');
+                }
+                
+                // BNB price
+                const bnbResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
+                const bnbData = await bnbResponse.json();
+                if (bnbData && bnbData.price) {
+                    const bnbPrice = parseFloat(bnbData.price);
+                    updateCryptoPrice('bnb', bnbPrice);
+                    
+                    // Get 24h change
+                    fetchPriceChange('BNBUSDT', 'bnb-change');
+                }
+                
+                // Update sentiment data
+                updateSentiment();
+                
+                console.log("Prices updated successfully");
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+            }
+        }
+        
+        function updateCryptoPrice(crypto, price) {
+            const priceElement = document.getElementById(`${crypto}-price`);
+            if (priceElement) {
+                priceElement.textContent = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USDT';
+            }
             
-            <div class="col-md-4">
-              <div class="card indicator-card mb-3">
-                <div class="card-body text-center">
-                  <h5 class="indicator-title">EMA Cross</h5>
-                  <div id="ema-value" class="indicator-value">0.00%</div>
-                  <div id="ema-signal" class="indicator-signal">Neutral</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div id="rsi-chart" style="height: 200px;"></div>
-            </div>
+            // Update BTC price in table if available
+            if (crypto === 'btc') {
+                const tablePriceElement = document.getElementById('btc-current-price-table');
+                if (tablePriceElement) {
+                    tablePriceElement.textContent = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+            }
+        }
+        
+        function updateChart(price) {
+            // Add new price data point
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
             
-            <div class="col-md-6">
-              <div id="macd-chart" style="height: 200px;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="row">
-    <!-- Trading Interface -->
-    <div class="col-lg-4">
-      <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Tín Hiệu Giao Dịch <small class="text-secondary">(Trading Signal)</small></h5>
-          <span id="connection-status" class="badge bg-danger">Mất Kết Nối</span>
-        </div>
-        <div class="card-body">
-          <div class="current-signal mb-4">
-            <div class="row">
-              <div class="col-7">
-                <div class="signal-label">Tín Hiệu Hiện Tại <small class="text-secondary">(Current Signal)</small></div>
-                <div id="current-signal" class="signal-value neutral">TRUNG LẬP</div>
-                <div id="signal-probability" class="signal-probability">50.0%</div>
-              </div>
-              <div class="col-5 text-end">
-                <div class="signal-label">Khối Lượng <small class="text-secondary">(Volume)</small></div>
-                <div id="volume-value" class="signal-volume">0.00</div>
-                <div id="volume-ratio" class="volume-ratio">0.0x</div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col">
-                <div class="signal-label">BB Width</div>
-                <div id="bb-width" class="signal-value">0.00%</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="place-order mb-4">
-            <h6>Place Order</h6>
-            <div class="row">
-              <div class="col-12 mb-2">
-                <label class="form-label small">Quantity</label>
-                <input type="number" id="order-quantity" class="form-control" value="0.001" min="0.001" step="0.001">
-              </div>
-              <div class="col-12">
-                <div class="d-flex">
-                  <button id="buy-btn" class="btn btn-success flex-grow-1 me-2">BUY</button>
-                  <button id="sell-btn" class="btn btn-danger flex-grow-1">SELL</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Tổng Quan Tài Khoản <small class="text-secondary">(Account Summary)</small></h5>
-        </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-6">
-              <div class="mb-2">
-                <span class="text-muted">Tổng Số Dư: <small class="text-secondary">(Total Balance)</small></span>
-                <div id="total-balance" class="fs-5">$100,000.00</div>
-              </div>
-              <div>
-                <span class="text-muted">Số Dư Khả Dụng: <small class="text-secondary">(Available)</small></span>
-                <div id="available-balance">$80,000.00</div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="mb-2">
-                <span class="text-muted">Lãi/Lỗ Chưa Thực Hiện: <small class="text-secondary">(Unrealized P&L)</small></span>
-                <div id="unrealized-pnl" class="fs-5 text-success">$0.00</div>
-              </div>
-              <div>
-                <span class="text-muted">Vốn Chủ Sở Hữu: <small class="text-secondary">(Equity)</small></span>
-                <div id="equity">$100,000.00</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Vị Thế Mở <small class="text-secondary">(Open Positions)</small></h5>
-        </div>
-        <div class="card-body">
-          <div id="positions-container">
-            <div class="alert alert-info">
-              <p class="mb-0">Chưa có vị thế mở nào <small class="text-secondary">(No open positions)</small></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Active Trading Bots -->
-    <div class="col-lg-4">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Bot Giao Dịch Đang Hoạt Động <small class="text-secondary">(Active Trading Bots)</small></h5>
-        </div>
-        <div class="card-body">
-          <div id="bots-container">
-            <div class="alert alert-info">
-              <p class="mb-0">Chưa có bot nào đang hoạt động <small class="text-secondary">(No active bots)</small></p>
-            </div>
-          </div>
-          
-          <div class="create-bot mt-3">
-            <h6>Tạo Bot Mới <small class="text-secondary">(Create New Bot)</small></h6>
-            <div class="row">
-              <div class="col-12 mb-2">
-                <label class="form-label small">Chiến Lược <small class="text-secondary">(Strategy)</small></label>
-                <select id="bot-strategy" class="form-select">
-                  <!-- Will be populated with strategies -->
-                </select>
-              </div>
-              
-              <div id="strategy-params">
-                <div class="row" id="rsi-params">
-                  <div class="col-6 mb-2">
-                    <label class="form-label small">Quá Mua <small class="text-secondary">(Overbought)</small></label>
-                    <input type="number" id="rsi-overbought" class="form-control" value="70" min="50" max="90">
-                  </div>
-                  <div class="col-6 mb-2">
-                    <label class="form-label small">Quá Bán <small class="text-secondary">(Oversold)</small></label>
-                    <input type="number" id="rsi-oversold" class="form-control" value="30" min="10" max="50">
-                  </div>
-                </div>
-              </div>
-              
-              <div class="col-12">
-                <button id="create-bot-btn" class="btn btn-primary">Tạo Bot <small class="text-secondary">(Create Bot)</small></button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Performance Metrics -->
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Số Liệu Hiệu Suất <small class="text-secondary">(Performance Metrics)</small></h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-6 mb-3">
-              <div class="metric-label">Tỉ Lệ Thắng <small class="text-secondary">(Win Rate)</small></div>
-              <div id="win-rate" class="metric-value">0.0%</div>
-            </div>
-            <div class="col-6 mb-3">
-              <div class="metric-label">Tổng Giao Dịch <small class="text-secondary">(Total Trades)</small></div>
-              <div id="total-trades" class="metric-value">0</div>
-            </div>
-            <div class="col-6 mb-3">
-              <div class="metric-label">Lợi Nhuận/Lỗ <small class="text-secondary">(P/L)</small></div>
-              <div id="total-pnl" class="metric-value">0.0%</div>
-            </div>
-            <div class="col-6 mb-3">
-              <div class="metric-label">Rút Vốn Tối Đa <small class="text-secondary">(Max Drawdown)</small></div>
-              <div id="max-drawdown" class="metric-value">0.0%</div>
-            </div>
-          </div>
-          
-          <h6 class="mt-3">Lịch Sử Giao Dịch <small class="text-secondary">(Trade History)</small></h6>
-          <div id="trade-history-container">
-            <div class="alert alert-info">
-              <p class="mb-0">Chưa có lịch sử giao dịch nào <small class="text-secondary">(No trading history)</small></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Loading Overlay -->
-<div id="page-loader" class="spinner-container" style="display: none;">
-  <div class="spinner-border text-light" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-
-<!-- Toast Container for Notifications -->
-<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
-<script src="{{ url_for('static', filename='js/trader.js') }}"></script>
-<!-- Socket.js is already loaded in layout.html -->
-<script src="{{ url_for('static', filename='js/sentiment.js') }}"></script>
-<script src="{{ url_for('static', filename='js/account.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Use global socket client from layout.html
-    if (!window.socketClient) {
-      console.warn('No global socketClient found, using fallback');
-      window.socketClient = new SocketClient();
-      window.socketClient.init();
-    }
-    
-    // Initialize the sentiment display
-    if (window.sentimentDisplay) {
-      window.sentimentDisplay.init(window.socketClient);
-    }
-    
-    // Initialize the account controller
-    if (window.accountController) {
-      window.accountController.init();
-      window.accountController.loadPositions();
-      window.accountController.loadTradeHistory();
-    }
-    
-    // Initialize the dashboard controller with error handling
-    try {
-      // Set default price if not available
-      const priceElement = document.getElementById('current-price');
-      if (priceElement && (!priceElement.textContent || priceElement.textContent === '0')) {
-        priceElement.textContent = '61,245.80';
-      }
-      
-      // Initialize dashboard if available
-      if (typeof DashboardController === 'function') {
-        const dashboard = new DashboardController();
-        dashboard.init();
-      } else {
-        console.warn('DashboardController not found, using fallback display');
-      }
-    } catch (err) {
-      console.error('Error initializing dashboard:', err);
-    }
-    
-    // Show notification for simulation mode
-    const toastContainer = document.getElementById('toast-container');
-    if (toastContainer) {
-      const toast = document.createElement('div');
-      toast.className = 'toast show';
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.innerHTML = `
-        <div class="toast-header bg-warning text-dark">
-          <strong class="me-auto">Chế Độ Mô Phỏng <small class="text-secondary">(Simulation Mode)</small></strong>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          Bot giao dịch đang chạy ở chế độ mô phỏng. Không có giao dịch thực nào được thực hiện.
-          <small class="text-secondary d-block mt-1">(The trading bot is running in simulation mode. No real trades will be executed.)</small>
-        </div>
-      `;
-      toastContainer.appendChild(toast);
-      
-      // Auto-dismiss after 5 seconds
-      setTimeout(() => {
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.hide();
-      }, 5000);
-    }
-  });
-</script>
-{% endblock %}
+            // Remove first data point and add new one
+            priceData.labels.shift();
+            priceData.labels.push(timeLabel);
+            priceData.datasets[0].data.shift();
+            priceData.datasets[0].data.push(price);
+            
+            // Update chart
+            priceChart.update();
+        }
+        
+        async function fetchPriceChange(symbol, elementId) {
+            try {
+                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+                const data = await response.json();
+                
+                if (data && data.priceChangePercent) {
+                    const changePercent = parseFloat(data.priceChangePercent);
+                    const changeElement = document.getElementById(elementId);
+                    
+                    if (changeElement) {
+                        const sign = changePercent >= 0 ? '+' : '';
+                        changeElement.textContent = sign + changePercent.toFixed(2) + '%';
+                        
+                        // Update class based on price change
+                        if (changePercent > 0) {
+                            changeElement.className = 'price-change up';
+                            changeElement.closest('.price-card').className = 'price-card up';
+                        } else if (changePercent < 0) {
+                            changeElement.className = 'price-change down';
+                            changeElement.closest('.price-card').className = 'price-card down';
+                        } else {
+                            changeElement.className = 'price-change';
+                            changeElement.closest('.price-card').className = 'price-card';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching price change:', error);
+            }
+        }
+        
+        function updatePositionPNL(currentPrice) {
+            const entryPrice = 78250.00; // From example position
+            const quantity = 0.5;
+            const pnlValue = (currentPrice - entryPrice) * quantity;
+            const pnlPercent = (pnlValue / (entryPrice * quantity)) * 100;
+            
+            const pnlElement = document.getElementById('position-pnl');
+            if (pnlElement) {
+                const sign = pnlValue >= 0 ? '+' : '';
+                pnlElement.textContent = `${sign}${pnlValue.toFixed(2)} (${sign}${pnlPercent.toFixed(2)}%)`;
+                
+                // Update color based on PNL
+                if (pnlValue > 0) {
+                    pnlElement.style.color = '#2ecc71';
+                } else if (pnlValue < 0) {
+                    pnlElement.style.color = '#e74c3c';
+                } else {
+                    pnlElement.style.color = '#8f9ba6';
+                }
+            }
+        }
+        
+        function updateSentiment() {
+            // Update sentiment timestamp
+            const now = new Date();
+            const sentimentTimeElement = document.getElementById('sentiment-update-time');
+            if (sentimentTimeElement) {
+                sentimentTimeElement.textContent = now.toLocaleTimeString('vi-VN');
+            }
+        }
+        
+        // Buy/Sell button event listeners
+        document.getElementById('buyBtn').addEventListener('click', function() {
+            const symbol = document.getElementById('tradeSymbol').value;
+            const amount = document.getElementById('tradeAmount').value;
+            const leverage = document.getElementById('tradeLeverage').value;
+            
+            alert(`Đặt lệnh BUY/LONG ${symbol} với số tiền ${amount} USDT, leverage ${leverage}x. Chức năng này đang được phát triển.`);
+        });
+        
+        document.getElementById('sellBtn').addEventListener('click', function() {
+            const symbol = document.getElementById('tradeSymbol').value;
+            const amount = document.getElementById('tradeAmount').value;
+            const leverage = document.getElementById('tradeLeverage').value;
+            
+            alert(`Đặt lệnh SELL/SHORT ${symbol} với số tiền ${amount} USDT, leverage ${leverage}x. Chức năng này đang được phát triển.`);
+        });
+        
+        // Initial price fetch
+        fetchRealTimePrices();
+        
+        // Update prices every 10 seconds
+        setInterval(fetchRealTimePrices, 10000);
+    </script>
+</body>
+</html>
