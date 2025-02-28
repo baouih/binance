@@ -295,9 +295,9 @@ def settings():
                           testnet_mode=testnet_status,
                           simulation_mode=simulation_mode)
 
-@app.route('/api/settings/network', methods=['POST'])
-def update_network_settings():
-    """Cập nhật cấu hình network (mainnet/testnet)."""
+@app.route('/api/settings/network_original', methods=['POST'])
+def update_network_settings_original():
+    """Cập nhật cấu hình network (mainnet/testnet). - Phiên bản gốc"""
     try:
         data = request.json
         use_testnet = data.get('testnet', True)
@@ -325,9 +325,9 @@ def update_network_settings():
             'message': f'Lỗi khi cập nhật cấu hình: {str(e)}'
         }), 500
 
-@app.route('/api/settings/simulation', methods=['POST'])
-def update_simulation_settings():
-    """Cập nhật trạng thái simulation mode."""
+@app.route('/api/settings/simulation_original', methods=['POST'])
+def update_simulation_settings_original():
+    """Cập nhật trạng thái simulation mode. - Phiên bản gốc"""
     try:
         data = request.json
         use_simulation = data.get('simulation', True)
@@ -349,9 +349,9 @@ def update_simulation_settings():
             'message': f'Lỗi khi cập nhật chế độ mô phỏng: {str(e)}'
         }), 500
 
-@app.route('/api/settings/status', methods=['GET'])
-def get_settings_status():
-    """Lấy trạng thái cấu hình hiện tại."""
+@app.route('/api/settings/status_original', methods=['GET'])
+def get_settings_status_original():
+    """Lấy trạng thái cấu hình hiện tại (phiên bản gốc)."""
     try:
         # Kiểm tra kết nối API
         connection_ok = binance_api.test_connection()
@@ -572,6 +572,109 @@ def get_bot_status():
         bots_status.append(status)
         
     return jsonify(bots_status)
+
+@app.route('/api/settings/status_config', methods=['GET'])
+def get_settings_status_config():
+    """Lấy trạng thái cấu hình hiện tại."""
+    try:
+        # Lấy trạng thái từ storage hoặc các biến môi trường toàn cục
+        storage = Storage()
+        settings = storage.get_settings()
+        
+        # Nếu không có settings, tạo default
+        if not settings:
+            settings = {
+                'network': 'testnet',
+                'simulation_mode': True,
+                'api_key_configured': bool(binance_api.api_key and binance_api.api_secret)
+            }
+        
+        return jsonify({
+            'status': 'success',
+            'network': settings.get('network', 'testnet'),
+            'simulation_mode': settings.get('simulation_mode', True),
+            'api_key_configured': bool(binance_api.api_key and binance_api.api_secret)
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy trạng thái cấu hình: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f"Không thể tải thông tin cài đặt: {str(e)}"
+        })
+
+@app.route('/api/settings/network', methods=['POST'])
+def update_network_settings():
+    """Cập nhật cấu hình network (mainnet/testnet)."""
+    try:
+        data = request.json
+        use_testnet = data.get('testnet', True)
+        
+        # Xác nhận người dùng nếu chuyển sang mainnet
+        if not use_testnet:
+            logger.warning("Đang chuyển sang MAINNET - tiền thật sẽ được sử dụng!")
+        
+        # Lưu cài đặt vào storage
+        storage = Storage()
+        settings = storage.get_settings() or {}
+        settings['network'] = 'testnet' if use_testnet else 'mainnet'
+        storage.save_settings(settings)
+        
+        # Khởi động lại API client với cấu hình mới
+        global binance_api, data_processor
+        binance_api = BinanceAPI(
+            api_key=binance_api.api_key, 
+            api_secret=binance_api.api_secret, 
+            testnet=use_testnet,
+            simulation_mode=binance_api.simulation_mode
+        )
+        data_processor = DataProcessor(binance_api, simulation_mode=binance_api.simulation_mode)
+        
+        return jsonify({
+            'status': 'success',
+            'message': f"Đã chuyển sang chế độ {'TESTNET' if use_testnet else 'MAINNET'}",
+            'network': 'testnet' if use_testnet else 'mainnet'
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật cấu hình network: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f"Không thể cập nhật cài đặt network: {str(e)}"
+        })
+
+@app.route('/api/settings/simulation', methods=['POST'])
+def update_simulation_settings():
+    """Cập nhật trạng thái simulation mode."""
+    try:
+        data = request.json
+        use_simulation = data.get('simulation', True)
+        
+        # Lưu cài đặt vào storage
+        storage = Storage()
+        settings = storage.get_settings() or {}
+        settings['simulation_mode'] = use_simulation
+        storage.save_settings(settings)
+        
+        # Khởi động lại API client với cấu hình mới
+        global binance_api, data_processor
+        binance_api = BinanceAPI(
+            api_key=binance_api.api_key, 
+            api_secret=binance_api.api_secret, 
+            testnet=(settings.get('network', 'testnet') == 'testnet'),
+            simulation_mode=use_simulation
+        )
+        data_processor = DataProcessor(binance_api, simulation_mode=use_simulation)
+        
+        return jsonify({
+            'status': 'success',
+            'message': f"Đã {'BẬT' if use_simulation else 'TẮT'} chế độ mô phỏng",
+            'simulation_mode': use_simulation
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật chế độ mô phỏng: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f"Không thể cập nhật chế độ mô phỏng: {str(e)}"
+        })
 
 @app.route('/api/run_backtest', methods=['POST'])
 def run_backtest():

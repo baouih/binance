@@ -1,25 +1,87 @@
 {% extends "layout.html" %}
 
-{% block title %}Trading Bot - Settings{% endblock %}
+{% block title %}Settings - Trading Bot{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
   <div class="row">
-    <div class="col-lg-8 mx-auto">
+    <div class="col-lg-9">
+      <h2 class="mb-4">Settings</h2>
+      
+      <!-- Network Settings -->
       <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Trading Bot Settings</h5>
-          <span class="badge bg-warning">Simulation Mode</span>
+        <div class="card-header bg-primary bg-opacity-10">
+          <h4 class="card-title mb-0">Network Configuration</h4>
         </div>
         <div class="card-body">
-          <div class="alert alert-info">
-            <div class="d-flex">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info-circle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
-                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-              </svg>
-              <div>
-                <h5 class="alert-heading">Simulation Mode Active</h5>
-                <p class="mb-0">The trading bot is currently running in simulation mode. No real trades will be executed and simulated data is being used. To switch to live trading, configure your API keys below.</p>
+          <!-- Network Switch -->
+          <div class="settings-section mb-5">
+            <h5>Network Configuration</h5>
+            <p class="text-muted">Choose between testnet (for testing) and mainnet (real trading)</p>
+            
+            <div class="network-switch-container mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                      <h6 class="mb-1">Network Mode</h6>
+                      <span id="network-status-text" class="badge bg-info">Loading...</span>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="testnet-switch" checked>
+                      <label class="form-check-label" for="testnet-switch">Testnet</label>
+                    </div>
+                  </div>
+                  
+                  <div class="network-details">
+                    <div id="testnet-details" class="py-2">
+                      <div class="alert alert-info">
+                        <div class="d-flex">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info-circle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                          </svg>
+                          <div>
+                            <p class="mb-0">Testnet là môi trường thử nghiệm của Binance. <strong>Không cần tiền thật</strong>, thích hợp để kiểm thử chiến lược giao dịch.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div id="mainnet-details" class="py-2" style="display:none;">
+                      <div class="alert alert-warning">
+                        <div class="d-flex">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
+                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                          </svg>
+                          <div>
+                            <h5 class="alert-heading">Mainnet - Giao dịch thật</h5>
+                            <p class="mb-0">Mainnet là môi trường giao dịch thật của Binance. <strong>Cảnh báo: Sẽ dùng tiền thật trong tài khoản của bạn.</strong> Chỉ sử dụng khi đã kiểm thử kỹ.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Simulation Mode Switch -->
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Simulation Mode</h6>
+                    <span id="simulation-status-text" class="badge bg-secondary">Loading...</span>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="simulation-switch" checked>
+                    <label class="form-check-label" for="simulation-switch">Simulation</label>
+                  </div>
+                </div>
+                
+                <div class="alert alert-secondary">
+                  <p class="mb-0">Chế độ mô phỏng sẽ không thực hiện lệnh giao dịch thật, phù hợp để kiểm tra giao diện và cài đặt hệ thống.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -56,144 +118,143 @@
                 </div>
               </div>
               
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="testnet-mode">
-                <label class="form-check-label" for="testnet-mode">Use Binance Testnet (for testing without real money)</label>
-              </div>
-              
-              <button type="button" id="save-api-btn" class="btn btn-primary">Save API Keys</button>
-              <button type="button" id="test-api-btn" class="btn btn-outline-secondary ms-2">Test Connection</button>
+              <button type="submit" class="btn btn-primary">Save API Settings</button>
             </form>
           </div>
-          
-          <hr>
-          
-          <!-- Trading Settings -->
-          <div class="settings-section">
-            <h5>Trading Settings</h5>
-            <p class="text-muted">Configure global trading settings that apply to all bots.</p>
+        </div>
+      </div>
+      
+      <!-- Strategy Settings -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <h4 class="card-title mb-0">Trading Strategy</h4>
+        </div>
+        <div class="card-body">
+          <form id="strategy-form">
+            <div class="mb-3">
+              <label for="default-strategy" class="form-label">Default Trading Strategy</label>
+              <select class="form-select" id="default-strategy">
+                <option value="combined">Combined (Best Performance)</option>
+                <option value="rsi">RSI</option>
+                <option value="macd">MACD</option>
+                <option value="ema">EMA Crossover</option>
+                <option value="bband">Bollinger Bands</option>
+                <option value="ml">Machine Learning</option>
+              </select>
+              <div class="form-text">This strategy will be used when creating new trading bots.</div>
+            </div>
             
-            <form id="trading-settings-form">
-              <div class="mb-3">
-                <label for="max-open-positions" class="form-label">Maximum Open Positions</label>
-                <input type="number" class="form-control" id="max-open-positions" value="3" min="1" max="10">
-                <div class="form-text">Maximum number of open positions allowed at the same time.</div>
-              </div>
-              
-              <div class="mb-3">
-                <label for="position-size" class="form-label">Default Position Size (%)</label>
-                <input type="number" class="form-control" id="position-size" value="10" min="1" max="100">
-                <div class="form-text">Percentage of available balance to use for each position.</div>
-              </div>
-              
-              <div class="mb-3">
-                <label for="leverage" class="form-label">Default Leverage</label>
-                <select class="form-select" id="leverage">
-                  <option value="1">1x (No Leverage)</option>
-                  <option value="2">2x</option>
-                  <option value="3">3x</option>
-                  <option value="5">5x</option>
-                  <option value="10">10x</option>
-                  <option value="20">20x</option>
-                </select>
-                <div class="form-text text-warning">Higher leverage increases both potential profits and risks.</div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="default-take-profit" class="form-label">Default Take Profit (%)</label>
-                  <input type="number" class="form-control" id="default-take-profit" value="5" min="0.1" step="0.1">
-                </div>
-                <div class="col-md-6">
-                  <label for="default-stop-loss" class="form-label">Default Stop Loss (%)</label>
-                  <input type="number" class="form-control" id="default-stop-loss" value="3" min="0.1" step="0.1">
-                </div>
-              </div>
-              
-              <button type="button" id="save-trading-settings-btn" class="btn btn-primary">Save Trading Settings</button>
-            </form>
-          </div>
-          
-          <hr>
-          
-          <!-- Notification Settings -->
-          <div class="settings-section">
-            <h5>Notification Settings</h5>
-            <p class="text-muted">Configure how you want to receive alerts about trading activities.</p>
+            <div class="mb-3">
+              <label for="risk-level" class="form-label">Risk Level</label>
+              <select class="form-select" id="risk-level">
+                <option value="conservative">Conservative (1% per trade)</option>
+                <option value="moderate" selected>Moderate (2% per trade)</option>
+                <option value="aggressive">Aggressive (3% per trade)</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
             
-            <form id="notification-settings-form">
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="email-notifications" checked>
+            <div class="mb-3">
+              <label for="custom-risk" class="form-label">Custom Risk Per Trade (%)</label>
+              <input type="number" class="form-control" id="custom-risk" value="2.0" min="0.1" max="10" step="0.1" disabled>
+              <div class="form-text">Maximum percentage of your account to risk per trade.</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="take-profit" class="form-label">Take Profit (%)</label>
+              <input type="number" class="form-control" id="take-profit" value="3.0" min="0.5" max="20" step="0.5">
+            </div>
+            
+            <div class="mb-3">
+              <label for="stop-loss" class="form-label">Stop Loss (%)</label>
+              <input type="number" class="form-control" id="stop-loss" value="2.0" min="0.5" max="20" step="0.5">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save Strategy Settings</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Notification Settings -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+          <h4 class="card-title mb-0">Notifications</h4>
+        </div>
+        <div class="card-body">
+          <form id="notification-form">
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="email-notifications" checked>
                 <label class="form-check-label" for="email-notifications">Email Notifications</label>
               </div>
-              
-              <div class="mb-3" id="email-settings">
-                <label for="notification-email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="notification-email" placeholder="your@email.com">
-              </div>
-              
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="telegram-notifications">
+              <div class="form-text">Receive important alerts via email.</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="email-address" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email-address" placeholder="your@email.com">
+            </div>
+            
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="telegram-notifications" checked>
                 <label class="form-check-label" for="telegram-notifications">Telegram Notifications</label>
               </div>
-              
-              <div class="mb-3" id="telegram-settings" style="display: none;">
-                <label for="telegram-chat-id" class="form-label">Telegram Chat ID</label>
-                <input type="text" class="form-control" id="telegram-chat-id" placeholder="Enter your Telegram Chat ID">
-                <div class="form-text">To get your Chat ID, message @myidbot on Telegram.</div>
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Notification Events</label>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="notify-trade-executed" checked>
-                  <label class="form-check-label" for="notify-trade-executed">Trade Executed</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="notify-position-closed" checked>
-                  <label class="form-check-label" for="notify-position-closed">Position Closed</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="notify-bot-started">
-                  <label class="form-check-label" for="notify-bot-started">Bot Started/Stopped</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="notify-error">
-                  <label class="form-check-label" for="notify-error">Errors & Warnings</label>
-                </div>
-              </div>
-              
-              <button type="button" id="save-notification-settings-btn" class="btn btn-primary">Save Notification Settings</button>
-              
-              <!-- Success message that will display when settings are saved (initially hidden) -->
-              <div id="notification-settings-saved" class="alert alert-success mt-3" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">
-                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                </svg>
-                Notification settings saved successfully.
-                <span id="telegram-status-message"></span>
-              </div>
-            </form>
-          </div>
-          
-          <hr>
-          
-          <!-- Danger Zone -->
-          <div class="settings-section">
-            <h5 class="text-danger">Danger Zone</h5>
-            <div class="card bg-dark border-danger">
-              <div class="card-body">
-                <h6 class="card-title">Reset All Settings</h6>
-                <p class="card-text">This will reset all settings to their default values. API keys will be removed.</p>
-                <button type="button" id="reset-settings-btn" class="btn btn-outline-danger">Reset All Settings</button>
-                
-                <div class="mt-4">
-                  <h6 class="card-title">Clear Trading History</h6>
-                  <p class="card-text">This will delete all trading history and backtesting results.</p>
-                  <button type="button" id="clear-history-btn" class="btn btn-outline-danger">Clear History</button>
-                </div>
-              </div>
+              <div class="form-text">Receive real-time alerts via Telegram.</div>
             </div>
+            
+            <div class="mb-3">
+              <label for="telegram-chat-id" class="form-label">Telegram Chat ID</label>
+              <input type="text" class="form-control" id="telegram-chat-id" placeholder="Your Telegram Chat ID">
+              <div class="form-text">You can get this from our Telegram bot by sending /start.</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-3">
+      <div class="card sticky-top" style="top: 80px;">
+        <div class="card-header bg-primary bg-opacity-10">
+          <h5 class="card-title mb-0">Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" id="backup-settings-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download me-2" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+              </svg>
+              Backup Settings
+            </button>
+            
+            <button class="btn btn-outline-primary" id="restore-settings-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload me-2" viewBox="0 0 16 16">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+              </svg>
+              Restore Settings
+            </button>
+            
+            <hr>
+            
+            <button class="btn btn-outline-warning" id="clear-history-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash me-2" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+              Clear Trading History
+            </button>
+            
+            <button class="btn btn-outline-danger" id="reset-all-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise me-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+              </svg>
+              Reset All Settings
+            </button>
           </div>
         </div>
       </div>
@@ -206,11 +267,11 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="confirmationModalBody">
-        Are you sure you want to proceed with this action?
+        Are you sure you want to proceed?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -227,26 +288,153 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Network configuration settings
+    const testnetSwitch = document.getElementById('testnet-switch');
+    const simulationSwitch = document.getElementById('simulation-switch');
+    const networkStatusText = document.getElementById('network-status-text');
+    const simulationStatusText = document.getElementById('simulation-status-text');
+    const testnetDetails = document.getElementById('testnet-details');
+    const mainnetDetails = document.getElementById('mainnet-details');
+    
+    // Fetch initial settings status
+    fetchSettingsStatus();
+    
+    // Set up event listeners for network switches
+    testnetSwitch.addEventListener('change', function() {
+      // Show confirmation if switching to mainnet
+      if (!this.checked) {
+        showConfirmationModal(
+          'Chuyển sang Mainnet',
+          'Cảnh báo: Chuyển sang Mainnet sẽ sử dụng tiền thật trong tài khoản Binance của bạn. Bạn có chắc chắn muốn tiếp tục?',
+          function() {
+            updateNetworkSettings(false);
+          },
+          function() {
+            // If user cancels, revert switch state
+            testnetSwitch.checked = true;
+          }
+        );
+      } else {
+        updateNetworkSettings(true);
+      }
+    });
+    
+    simulationSwitch.addEventListener('change', function() {
+      updateSimulationSettings(this.checked);
+    });
+    
+    // Network settings update function
+    function updateNetworkSettings(useTestnet) {
+      fetch('/api/settings/network', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          testnet: useTestnet
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          updateNetworkDisplay(useTestnet);
+          showToast(`Đã chuyển sang chế độ ${useTestnet ? 'TESTNET' : 'MAINNET'}`, 'success');
+        } else {
+          showToast(`Lỗi: ${data.message}`, 'danger');
+          // Revert switch if there was an error
+          testnetSwitch.checked = !useTestnet;
+        }
+      })
+      .catch(error => {
+        console.error('Error updating network settings:', error);
+        showToast('Lỗi kết nối đến máy chủ', 'danger');
+        testnetSwitch.checked = !useTestnet;
+      });
+    }
+    
+    // Simulation settings update function
+    function updateSimulationSettings(useSimulation) {
+      fetch('/api/settings/simulation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          simulation: useSimulation
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          updateSimulationDisplay(useSimulation);
+          showToast(`Đã ${useSimulation ? 'BẬT' : 'TẮT'} chế độ mô phỏng`, 'success');
+        } else {
+          showToast(`Lỗi: ${data.message}`, 'danger');
+          simulationSwitch.checked = !useSimulation;
+        }
+      })
+      .catch(error => {
+        console.error('Error updating simulation settings:', error);
+        showToast('Lỗi kết nối đến máy chủ', 'danger');
+        simulationSwitch.checked = !useSimulation;
+      });
+    }
+    
+    // Fetch current settings status
+    function fetchSettingsStatus() {
+      fetch('/api/settings/status_config')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Update switches based on current settings
+          testnetSwitch.checked = data.network === 'testnet';
+          simulationSwitch.checked = data.simulation_mode;
+          
+          // Update display
+          updateNetworkDisplay(data.network === 'testnet');
+          updateSimulationDisplay(data.simulation_mode);
+        } else {
+          showToast(`Không thể tải thông tin cài đặt: ${data.message}`, 'warning');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching settings status:', error);
+        showToast('Lỗi kết nối đến máy chủ', 'danger');
+      });
+    }
+    
+    // Update network display
+    function updateNetworkDisplay(isTestnet) {
+      networkStatusText.textContent = isTestnet ? 'Testnet' : 'Mainnet';
+      networkStatusText.className = isTestnet ? 'badge bg-info' : 'badge bg-danger';
+      
+      // Toggle details visibility
+      testnetDetails.style.display = isTestnet ? 'block' : 'none';
+      mainnetDetails.style.display = isTestnet ? 'none' : 'block';
+    }
+    
+    // Update simulation mode display
+    function updateSimulationDisplay(isSimulation) {
+      simulationStatusText.textContent = isSimulation ? 'Enabled' : 'Disabled';
+      simulationStatusText.className = isSimulation ? 'badge bg-secondary' : 'badge bg-success';
+    }
+    
     // API Key toggle visibility
     document.getElementById('toggle-api-key').addEventListener('click', function() {
       const input = document.getElementById('api-key');
       if (input.type === 'password') {
         input.type = 'text';
-        this.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
-            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-          </svg>
-        `;
+        this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+          <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+          <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+          <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+        </svg>`;
       } else {
         input.type = 'password';
-        this.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-          </svg>
-        `;
+        this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+          <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+          <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+        </svg>`;
       }
     });
     
@@ -255,147 +443,152 @@
       const input = document.getElementById('api-secret');
       if (input.type === 'password') {
         input.type = 'text';
-        this.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
-            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-          </svg>
-        `;
+        this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+          <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+          <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+          <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+        </svg>`;
       } else {
         input.type = 'password';
-        this.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-          </svg>
-        `;
+        this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+          <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+          <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+        </svg>`;
       }
     });
     
-    // Toggle Telegram settings visibility
-    document.getElementById('telegram-notifications').addEventListener('change', function() {
-      const telegramSettings = document.getElementById('telegram-settings');
-      telegramSettings.style.display = this.checked ? 'block' : 'none';
+    // Risk level change
+    document.getElementById('risk-level').addEventListener('change', function() {
+      const customRiskInput = document.getElementById('custom-risk');
+      if (this.value === 'custom') {
+        customRiskInput.disabled = false;
+      } else {
+        customRiskInput.disabled = true;
+        // Set risk value based on selection
+        switch(this.value) {
+          case 'conservative':
+            customRiskInput.value = '1.0';
+            break;
+          case 'moderate':
+            customRiskInput.value = '2.0';
+            break;
+          case 'aggressive':
+            customRiskInput.value = '3.0';
+            break;
+        }
+      }
     });
     
-    // Save API Keys
-    document.getElementById('save-api-btn').addEventListener('click', function() {
-      const apiKey = document.getElementById('api-key').value;
-      const apiSecret = document.getElementById('api-secret').value;
-      const testnet = document.getElementById('testnet-mode').checked;
+    // Strategy form submit
+    document.getElementById('strategy-form').addEventListener('submit', function(e) {
+      e.preventDefault();
       
-      if (!apiKey || !apiSecret) {
-        showToast('API Key and Secret are required', 'warning');
+      // Get form values
+      const strategy = document.getElementById('default-strategy').value;
+      const riskLevel = document.getElementById('risk-level').value;
+      const customRisk = parseFloat(document.getElementById('custom-risk').value);
+      const takeProfit = parseFloat(document.getElementById('take-profit').value);
+      const stopLoss = parseFloat(document.getElementById('stop-loss').value);
+      
+      // Validate form
+      if (riskLevel === 'custom' && (isNaN(customRisk) || customRisk < 0.1 || customRisk > 10)) {
+        showToast('Custom risk must be between 0.1% and 10%', 'danger');
         return;
       }
       
-      // In a real application, this would send the API keys to the server
-      // For security, we'll simulate the request
-      setTimeout(() => {
-        showToast('API Keys saved successfully', 'success');
-      }, 1000);
-    });
-    
-    // Test API Connection
-    document.getElementById('test-api-btn').addEventListener('click', function() {
-      const apiKey = document.getElementById('api-key').value;
-      const apiSecret = document.getElementById('api-secret').value;
-      
-      if (!apiKey || !apiSecret) {
-        showToast('API Key and Secret are required', 'warning');
+      if (isNaN(takeProfit) || takeProfit < 0.5 || takeProfit > 20) {
+        showToast('Take profit must be between 0.5% and 20%', 'danger');
         return;
       }
       
-      // Simulate API connection test
-      showToast('Testing connection...', 'info');
+      if (isNaN(stopLoss) || stopLoss < 0.5 || stopLoss > 20) {
+        showToast('Stop loss must be between 0.5% and 20%', 'danger');
+        return;
+      }
       
-      setTimeout(() => {
-        showToast('Connection successful!', 'success');
-      }, 2000);
+      // Mock save for demo
+      showToast('Strategy settings saved successfully', 'success');
     });
     
-    // Save Trading Settings
-    document.getElementById('save-trading-settings-btn').addEventListener('click', function() {
-      // In a real application, this would send the settings to the server
-      // For now, we'll just show a success message
-      showToast('Trading settings saved successfully', 'success');
+    // API form submit
+    document.getElementById('api-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get API keys
+      const apiKey = document.getElementById('api-key').value.trim();
+      const apiSecret = document.getElementById('api-secret').value.trim();
+      
+      // Validate form
+      if (!apiKey || !apiSecret) {
+        showToast('Please enter both API key and secret', 'danger');
+        return;
+      }
+      
+      // Mock save for demo
+      // In a real application, you would send this to the server securely
+      showToast('API keys saved successfully', 'success');
     });
     
-    // Save Notification Settings
-    document.getElementById('save-notification-settings-btn').addEventListener('click', function() {
+    // Notification form submit
+    document.getElementById('notification-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
       const emailEnabled = document.getElementById('email-notifications').checked;
-      const emailAddress = document.getElementById('notification-email').value;
+      const emailAddress = document.getElementById('email-address').value.trim();
+      const telegramEnabled = document.getElementById('telegram-notifications').checked;
+      const telegramChatId = document.getElementById('telegram-chat-id').value.trim();
       
+      // Validate form
       if (emailEnabled && !emailAddress) {
-        showToast('Email address is required when email notifications are enabled', 'warning');
+        showToast('Please enter an email address', 'danger');
         return;
       }
-      
-      const telegramEnabled = document.getElementById('telegram-notifications').checked;
-      const telegramChatId = document.getElementById('telegram-chat-id').value;
       
       if (telegramEnabled && !telegramChatId) {
-        showToast('Telegram Chat ID is required when Telegram notifications are enabled', 'warning');
+        showToast('Please enter a Telegram chat ID', 'danger');
         return;
       }
       
-      // Prepare notification settings data
-      const notificationData = {
-        email_enabled: emailEnabled,
-        email_address: emailAddress,
-        telegram_enabled: telegramEnabled,
-        telegram_chat_id: telegramChatId,
-        notify_trade_executed: document.getElementById('notify-trade-executed').checked,
-        notify_position_closed: document.getElementById('notify-position-closed').checked,
-        notify_bot_started: document.getElementById('notify-bot-started').checked,
-        notify_errors: document.getElementById('notify-error').checked
-      };
-      
-      // Send settings to server via API
-      fetch('/api/save_settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(notificationData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          // Show success message
-          showToast('Notification settings saved successfully', 'success');
-          
-          // Show the success message with Telegram status if applicable
-          const successMsg = document.getElementById('notification-settings-saved');
-          const telegramStatusMsg = document.getElementById('telegram-status-message');
-          
-          if (telegramEnabled && data.telegram_enabled) {
-            telegramStatusMsg.textContent = ' Telegram notifications are now active.';
-          } else if (telegramEnabled && !data.telegram_enabled) {
-            telegramStatusMsg.textContent = ' Telegram configuration saved but not active yet.';
-          } else {
-            telegramStatusMsg.textContent = '';
-          }
-          
-          successMsg.style.display = 'block';
-          
-          // Hide the success message after 5 seconds
-          setTimeout(() => {
-            successMsg.style.display = 'none';
-          }, 5000);
-        } else {
-          showToast(data.error || 'Failed to save notification settings', 'danger');
-        }
-      })
-      .catch(error => {
-        console.error('Error saving notification settings:', error);
-        showToast('An error occurred while saving settings', 'danger');
-      });
+      // Mock save for demo
+      showToast('Notification settings saved successfully', 'success');
     });
     
-    // Reset Settings button
-    document.getElementById('reset-settings-btn').addEventListener('click', function() {
+    // Backup settings
+    document.getElementById('backup-settings-btn').addEventListener('click', function() {
+      // In a real app, this would gather all settings and create a downloadable file
+      const mockSettings = {
+        strategy: document.getElementById('default-strategy').value,
+        risk_level: document.getElementById('risk-level').value,
+        take_profit: document.getElementById('take-profit').value,
+        stop_loss: document.getElementById('stop-loss').value,
+        email_notifications: document.getElementById('email-notifications').checked,
+        email: document.getElementById('email-address').value,
+        telegram_notifications: document.getElementById('telegram-notifications').checked,
+        telegram_chat_id: document.getElementById('telegram-chat-id').value,
+        network: testnetSwitch.checked ? 'testnet' : 'mainnet',
+        simulation_mode: simulationSwitch.checked
+      };
+      
+      // Convert to JSON and create download link
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockSettings, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "trading_bot_settings.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      
+      showToast('Settings backed up successfully', 'success');
+    });
+    
+    // Restore settings
+    document.getElementById('restore-settings-btn').addEventListener('click', function() {
+      // In a real app, this would create a file input to upload a settings file
+      showToast('This feature is not implemented in the demo', 'info');
+    });
+    
+    // Reset all settings
+    document.getElementById('reset-all-btn').addEventListener('click', function() {
       showConfirmationModal(
         'Reset All Settings',
         'This will reset all settings to default values and remove API keys. Are you sure?',
@@ -419,7 +612,7 @@
     });
     
     // Confirmation modal helper
-    function showConfirmationModal(title, message, onConfirm) {
+    function showConfirmationModal(title, message, onConfirm, onCancel) {
       const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
       document.getElementById('confirmationModalLabel').textContent = title;
       document.getElementById('confirmationModalBody').textContent = message;
@@ -436,6 +629,30 @@
         onConfirm();
       });
       
+      // Add cancel listener if provided
+      if (onCancel) {
+        const closeBtn = document.querySelector('#confirmationModal .btn-close');
+        const cancelBtn = document.querySelector('#confirmationModal .btn-secondary');
+        
+        const handleCancel = function() {
+          onCancel();
+        };
+        
+        // Clone and replace to remove old listeners
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        // Add new cancel listeners
+        newCloseBtn.addEventListener('click', handleCancel);
+        newCancelBtn.addEventListener('click', handleCancel);
+        
+        // Also handle modal dismiss
+        modal._element.addEventListener('hidden.bs.modal', handleCancel, { once: true });
+      }
+      
       modal.show();
     }
     
@@ -449,9 +666,10 @@
       toast.setAttribute('aria-atomic', 'true');
       
       toast.innerHTML = `
-        <div class="toast-header bg-${type} ${type === 'danger' || type === 'dark' ? 'text-white' : ''}">
-          <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
-          <button type="button" class="btn-close ${type === 'danger' || type === 'dark' ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="toast-header bg-${type} bg-opacity-25">
+          <strong class="me-auto">Trading Bot</strong>
+          <small>Just now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
           ${message}
@@ -460,10 +678,11 @@
       
       toastContainer.appendChild(toast);
       
+      // Auto-remove after 5 seconds
       setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => {
-          toastContainer.removeChild(toast);
+          toast.remove();
         }, 500);
       }, 5000);
     }
