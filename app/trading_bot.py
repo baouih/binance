@@ -4,10 +4,17 @@ import time
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('trading_bot')
+
+# Create data directory if it doesn't exist
+os.makedirs('data', exist_ok=True)
+
+# Import the storage module
+from app.storage import Storage
 
 class TradingBot:
     def __init__(self, binance_api, data_processor, strategy, symbol='BTCUSDT', 
@@ -34,6 +41,9 @@ class TradingBot:
         self.leverage = leverage
         self.max_positions = max_positions
         
+        # Initialize storage
+        self.storage = Storage()
+        
         # Trading state
         self.is_running = False
         self.thread = None
@@ -41,17 +51,34 @@ class TradingBot:
         self.trade_history = []
         self.last_check_time = None
         
+        # Load positions and trades from storage
+        self._load_from_storage()
+        
         # Performance metrics
         self.metrics = {
-            'total_trades': 0,
-            'winning_trades': 0,
-            'losing_trades': 0,
-            'profit_pct': 0.0,
+            'total_trades': len(self.trade_history),
+            'winning_trades': len([t for t in self.trade_history if t.get('final_pnl', 0) > 0]),
+            'losing_trades': len([t for t in self.trade_history if t.get('final_pnl', 0) <= 0]),
+            'profit_pct': sum([t.get('final_pnl', 0) for t in self.trade_history]),
             'win_rate': 0.0,
             'max_drawdown': 0.0
         }
         
+        # Calculate win rate
+        if self.metrics['total_trades'] > 0:
+            self.metrics['win_rate'] = self.metrics['winning_trades'] / self.metrics['total_trades']
+        
         logger.info(f"Trading bot initialized for {symbol} on {interval} interval")
+        
+    def _load_from_storage(self):
+        """Load positions and trades from storage"""
+        # Load open positions
+        self.positions = self.storage.get_positions(status='OPEN')
+        logger.info(f"Loaded {len(self.positions)} open positions from storage")
+        
+        # Load trade history
+        self.trade_history = self.storage.get_trades(symbol=self.symbol)
+        logger.info(f"Loaded {len(self.trade_history)} historical trades from storage")
         
     def start(self, check_interval=60):
         """
@@ -236,6 +263,9 @@ class TradingBot:
                 'status': 'OPEN'
             }
             
+            # Save position to storage
+            self.storage.save_position(position)
+            
             self.positions.append(position)
             logger.info(f"Position opened: {position['id']}")
             
@@ -336,6 +366,12 @@ class TradingBot:
                 position['final_pnl'] = (price - position['entry_price']) / position['entry_price']
             else:  # SELL
                 position['final_pnl'] = (position['entry_price'] - price) / position['entry_price']
+            
+            # Save updated position to storage
+            self.storage.save_position(position)
+            
+            # Save trade to history storage
+            self.storage.save_trade(position)
                 
             # Add to trade history
             self.trade_history.append(position.copy())

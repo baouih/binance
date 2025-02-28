@@ -266,7 +266,7 @@ class BinanceAPI:
             'volume': volumes,
             'close_time': [t + delta for t in timestamps],
             'quote_volume': quote_volumes,
-            'trades_count': [int(v / 10) for v in volumes],  # Rough approximation
+            'trades_count': [int(v / 10) if np.isfinite(v) else 0 for v in volumes],  # Rough approximation
             'taker_buy_base_volume': taker_buy_base_volumes,
             'taker_buy_quote_volume': taker_buy_quote_volumes,
             'ignored': [0] * limit
