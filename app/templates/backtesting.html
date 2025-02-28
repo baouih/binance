@@ -1,528 +1,688 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
-{% block title %}Trading Bot - Backtesting{% endblock %}
+{% block title %}Kiểm thử chiến lược{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-lg-4">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Backtest Configuration</h5>
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded mb-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i> Kiểm Thử Chiến Lược
+                    </h5>
+                    <button type="button" class="btn btn-success btn-sm" id="run-backtest-btn">
+                        <i class="fas fa-play me-1"></i> Chạy Kiểm Thử
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Cặp Giao Dịch</label>
+                                <select class="form-select" id="backtest-symbol">
+                                    <option value="BTCUSDT">BTC/USDT</option>
+                                    <option value="ETHUSDT">ETH/USDT</option>
+                                    <option value="BNBUSDT">BNB/USDT</option>
+                                    <option value="ADAUSDT">ADA/USDT</option>
+                                    <option value="DOGEUSDT">DOGE/USDT</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Chiến Lược</label>
+                                <select class="form-select" id="backtest-strategy">
+                                    <option value="rsi">RSI Reversion</option>
+                                    <option value="macd">MACD Crossover</option>
+                                    <option value="ema">EMA Crossover</option>
+                                    <option value="bollinger">Bollinger Bands</option>
+                                    <option value="ml">Machine Learning</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Khung Thời Gian</label>
+                                <select class="form-select" id="backtest-timeframe">
+                                    <option value="1h">1 Giờ</option>
+                                    <option value="4h">4 Giờ</option>
+                                    <option value="1d">1 Ngày</option>
+                                    <option value="1w">1 Tuần</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Khoảng Thời Gian</label>
+                                <select class="form-select" id="backtest-period">
+                                    <option value="30">1 Tháng</option>
+                                    <option value="90">3 Tháng</option>
+                                    <option value="180">6 Tháng</option>
+                                    <option value="365">1 Năm</option>
+                                    <option value="730">2 Năm</option>
+                                    <option value="1095">3 Năm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Vốn Ban Đầu (USDT)</label>
+                                <input type="number" class="form-control" id="backtest-initial-capital" value="10000">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Phí Giao Dịch (%)</label>
+                                <input type="number" class="form-control" id="backtest-fee" value="0.1" step="0.01" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Vốn/Giao Dịch (%)</label>
+                                <input type="number" class="form-control" id="backtest-position-size" value="10" min="1" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Đòn Bẩy</label>
+                                <select class="form-select" id="backtest-leverage">
+                                    <option value="1">1x</option>
+                                    <option value="2">2x</option>
+                                    <option value="3">3x</option>
+                                    <option value="5">5x</option>
+                                    <option value="10">10x</option>
+                                    <option value="20">20x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Tham Số Chiến Lược</h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- RSI Parameters (Default) -->
+                                    <div id="rsi-params" class="strategy-params">
+                                        <div class="mb-3">
+                                            <label class="form-label">Chu Kỳ RSI</label>
+                                            <input type="number" class="form-control" value="14" min="1" max="50">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mức Quá Mua</label>
+                                            <input type="number" class="form-control" value="70" min="50" max="90">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mức Quá Bán</label>
+                                            <input type="number" class="form-control" value="30" min="10" max="50">
+                                        </div>
+                                    </div>
+
+                                    <!-- Other strategy params will be dynamically loaded -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Quản Lý Rủi Ro</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Stop Loss (%)</label>
+                                        <input type="number" class="form-control" id="backtest-stop-loss" value="2" min="0.1" step="0.1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Take Profit (%)</label>
+                                        <input type="number" class="form-control" id="backtest-take-profit" value="5" min="0.1" step="0.1">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Trailing Stop (%)</label>
+                                        <input type="number" class="form-control" id="backtest-trailing-stop" value="1" min="0" step="0.1">
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="backtest-trailing-stop-switch" checked>
+                                        <label class="form-check-label" for="backtest-trailing-stop-switch">Dùng Trailing Stop</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Tùy Chọn Nâng Cao</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Lọc Thị Trường</label>
+                                        <select class="form-select" id="backtest-market-filter">
+                                            <option value="none">Không Lọc</option>
+                                            <option value="trend">Lọc Theo Xu Hướng</option>
+                                            <option value="volatility">Lọc Theo Biến Động</option>
+                                            <option value="volume">Lọc Theo Khối Lượng</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Quản Lý Vốn</label>
+                                        <select class="form-select" id="backtest-money-management">
+                                            <option value="fixed">Cố Định</option>
+                                            <option value="kelly">Kelly Criterion</option>
+                                            <option value="martingale">Martingale</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="backtest-ml-filter" checked>
+                                        <label class="form-check-label" for="backtest-ml-filter">Lọc ML</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="backtest-use-sentiment">
+                                        <label class="form-check-label" for="backtest-use-sentiment">Dùng Sentiment</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backtest Results -->
+                    <div id="backtest-results" class="d-none">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">Biểu Đồ Giá & Giao Dịch</h6>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary active" data-chart="price">Giá</button>
+                                            <button type="button" class="btn btn-outline-primary" data-chart="equity">Vốn</button>
+                                            <button type="button" class="btn btn-outline-primary" data-chart="drawdown">Drawdown</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="backtest-chart" height="350"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Tóm Tắt Kết Quả</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Vốn Cuối:</div>
+                                            <div class="text-success fw-bold">12,563.45 USDT</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Lợi Nhuận:</div>
+                                            <div class="text-success fw-bold">+2,563.45 USDT (+25.63%)</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Lợi Nhuận Hàng Năm:</div>
+                                            <div>+38.45%</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Tổng Giao Dịch:</div>
+                                            <div>78</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Tỷ Lệ Thắng:</div>
+                                            <div>63.2%</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Tỷ Số Lợi Nhuận:</div>
+                                            <div>1.85</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Drawdown Tối Đa:</div>
+                                            <div class="text-danger">-18.3%</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Sharpe Ratio:</div>
+                                            <div>1.37</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div>Sortino Ratio:</div>
+                                            <div>1.92</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <div>Calmar Ratio:</div>
+                                            <div>2.10</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">Lịch Sử Giao Dịch</h6>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download me-1"></i> Xuất CSV
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover m-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Thời Gian</th>
+                                                        <th>Loại</th>
+                                                        <th>Giá Vào</th>
+                                                        <th>Giá Ra</th>
+                                                        <th>Số Lượng</th>
+                                                        <th>P/L (USDT)</th>
+                                                        <th>P/L (%)</th>
+                                                        <th>Vốn</th>
+                                                        <th>Drawdown</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Sample data - would be filled dynamically -->
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>2023-01-05 08:45:12</td>
+                                                        <td><span class="badge bg-success">LONG</span></td>
+                                                        <td>16,785.35</td>
+                                                        <td>17,245.82</td>
+                                                        <td>0.0595 BTC</td>
+                                                        <td class="text-success">+273.69</td>
+                                                        <td class="text-success">+2.74%</td>
+                                                        <td>10,273.69</td>
+                                                        <td class="text-success">0.00%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>2023-01-12 14:22:05</td>
+                                                        <td><span class="badge bg-danger">SHORT</span></td>
+                                                        <td>17,895.12</td>
+                                                        <td>18,245.45</td>
+                                                        <td>0.0574 BTC</td>
+                                                        <td class="text-danger">-201.38</td>
+                                                        <td class="text-danger">-1.96%</td>
+                                                        <td>10,072.31</td>
+                                                        <td class="text-danger">-1.96%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>2023-01-18 10:15:45</td>
+                                                        <td><span class="badge bg-success">LONG</span></td>
+                                                        <td>18,125.75</td>
+                                                        <td>19,240.30</td>
+                                                        <td>0.0556 BTC</td>
+                                                        <td class="text-success">+619.19</td>
+                                                        <td class="text-success">+6.15%</td>
+                                                        <td>10,691.50</td>
+                                                        <td class="text-success">0.00%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Thống Kê Theo Tháng</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="monthly-returns-chart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Thống Kê Theo Thời Gian</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Khoảng Thời Gian</th>
+                                                        <th>P/L (%)</th>
+                                                        <th>Giao Dịch</th>
+                                                        <th>Tỷ Lệ Thắng</th>
+                                                        <th>Avg. Win</th>
+                                                        <th>Avg. Loss</th>
+                                                        <th>Max Drawdown</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Tháng 1, 2023</td>
+                                                        <td class="text-success">+8.45%</td>
+                                                        <td>12</td>
+                                                        <td>66.7%</td>
+                                                        <td>+2.87%</td>
+                                                        <td>-1.42%</td>
+                                                        <td>-3.8%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tháng 2, 2023</td>
+                                                        <td class="text-success">+5.23%</td>
+                                                        <td>15</td>
+                                                        <td>60.0%</td>
+                                                        <td>+2.52%</td>
+                                                        <td>-1.65%</td>
+                                                        <td>-4.2%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tháng 3, 2023</td>
+                                                        <td class="text-danger">-2.16%</td>
+                                                        <td>14</td>
+                                                        <td>42.9%</td>
+                                                        <td>+2.11%</td>
+                                                        <td>-2.05%</td>
+                                                        <td>-5.3%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tháng 4, 2023</td>
+                                                        <td class="text-success">+7.82%</td>
+                                                        <td>18</td>
+                                                        <td>72.2%</td>
+                                                        <td>+2.63%</td>
+                                                        <td>-1.78%</td>
+                                                        <td>-2.5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tháng 5, 2023</td>
+                                                        <td class="text-success">+4.15%</td>
+                                                        <td>19</td>
+                                                        <td>68.4%</td>
+                                                        <td>+2.33%</td>
+                                                        <td>-1.95%</td>
+                                                        <td>-3.1%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Tối Ưu Hóa Tham Số</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <button class="btn btn-primary w-100" id="run-optimization-btn">
+                                                    <i class="fas fa-cogs me-2"></i> Chạy Tối Ưu Hóa
+                                                </button>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="form-select" id="optimization-target">
+                                                    <option value="net_profit">Lợi Nhuận Ròng</option>
+                                                    <option value="profit_factor">Tỷ Số Lợi Nhuận</option>
+                                                    <option value="sharpe">Sharpe Ratio</option>
+                                                    <option value="sortino">Sortino Ratio</option>
+                                                    <option value="risk_adjusted">Risk-Adjusted Return</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="form-select" id="optimization-method">
+                                                    <option value="grid">Grid Search</option>
+                                                    <option value="random">Random Search</option>
+                                                    <option value="bayesian">Bayesian Optimization</option>
+                                                    <option value="genetic">Genetic Algorithm</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Xếp Hạng</th>
+                                                        <th>RSI Period</th>
+                                                        <th>Overbought</th>
+                                                        <th>Oversold</th>
+                                                        <th>Stop Loss</th>
+                                                        <th>Take Profit</th>
+                                                        <th>P/L (%)</th>
+                                                        <th>Win Rate</th>
+                                                        <th>Profit Factor</th>
+                                                        <th>Sharpe</th>
+                                                        <th>Max DD</th>
+                                                        <th>Thao Tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>12</td>
+                                                        <td>72</td>
+                                                        <td>28</td>
+                                                        <td>2.5%</td>
+                                                        <td>5.8%</td>
+                                                        <td class="text-success">+32.5%</td>
+                                                        <td>68.5%</td>
+                                                        <td>2.25</td>
+                                                        <td>1.75</td>
+                                                        <td>-15.2%</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">Áp Dụng</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>14</td>
+                                                        <td>74</td>
+                                                        <td>26</td>
+                                                        <td>2.3%</td>
+                                                        <td>6.2%</td>
+                                                        <td class="text-success">+29.8%</td>
+                                                        <td>65.2%</td>
+                                                        <td>2.18</td>
+                                                        <td>1.67</td>
+                                                        <td>-16.8%</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">Áp Dụng</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>11</td>
+                                                        <td>70</td>
+                                                        <td>29</td>
+                                                        <td>2.7%</td>
+                                                        <td>5.5%</td>
+                                                        <td class="text-success">+28.2%</td>
+                                                        <td>70.1%</td>
+                                                        <td>2.02</td>
+                                                        <td>1.60</td>
+                                                        <td>-17.5%</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">Áp Dụng</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Backtest Progress Display -->
+                    <div id="backtest-progress" class="text-center d-none p-5">
+                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h4 class="mb-3">Đang Chạy Kiểm Thử...</h4>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-muted" id="backtest-status">Đang xử lý dữ liệu...</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <form id="backtest-form">
-            <div class="mb-3">
-              <label for="backtest-symbol" class="form-label">Symbol</label>
-              <select id="backtest-symbol" class="form-select">
-                <option value="BTCUSDT" selected>BTCUSDT</option>
-                <option value="ETHUSDT">ETHUSDT</option>
-                <option value="BNBUSDT">BNBUSDT</option>
-                <option value="ADAUSDT">ADAUSDT</option>
-                <option value="DOGEUSDT">DOGEUSDT</option>
-                <option value="XRPUSDT">XRPUSDT</option>
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <label for="backtest-interval" class="form-label">Timeframe</label>
-              <select id="backtest-interval" class="form-select">
-                <option value="1m">1 minute</option>
-                <option value="5m">5 minutes</option>
-                <option value="15m">15 minutes</option>
-                <option value="1h" selected>1 hour</option>
-                <option value="4h">4 hours</option>
-                <option value="1d">1 day</option>
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <label for="backtest-strategy" class="form-label">Strategy</label>
-              <select id="backtest-strategy" class="form-select">
-                <option value="rsi" selected>RSI Strategy</option>
-                <option value="macd">MACD Strategy</option>
-                <option value="ema_cross">EMA Cross Strategy</option>
-                <option value="bbands">Bollinger Bands Strategy</option>
-                <option value="ml">ML Strategy</option>
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <label for="backtest-lookback" class="form-label">Lookback Period (days)</label>
-              <input type="number" id="backtest-lookback" class="form-control" value="30" min="1" max="365">
-            </div>
-            
-            <div class="mb-3">
-              <label for="backtest-initial-balance" class="form-label">Initial Balance (USDT)</label>
-              <input type="number" id="backtest-initial-balance" class="form-control" value="10000" min="100">
-            </div>
-            
-            <!-- Strategy Specific Parameters -->
-            <div id="backtest-strategy-params">
-              <!-- RSI Strategy Parameters -->
-              <div id="backtest-rsi-params" class="strategy-params mb-3">
-                <h6 class="form-label">RSI Parameters</h6>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label for="backtest-rsi-overbought" class="form-label small">Overbought</label>
-                    <input type="number" id="backtest-rsi-overbought" class="form-control" value="70" min="50" max="90">
-                  </div>
-                  <div class="col-6">
-                    <label for="backtest-rsi-oversold" class="form-label small">Oversold</label>
-                    <input type="number" id="backtest-rsi-oversold" class="form-control" value="30" min="10" max="50">
-                  </div>
-                </div>
-              </div>
-              
-              <!-- MACD Strategy Parameters -->
-              <div id="backtest-macd-params" class="strategy-params mb-3" style="display: none;">
-                <h6 class="form-label">MACD Parameters</h6>
-                <p class="small text-secondary">Using default settings (12, 26, 9)</p>
-              </div>
-              
-              <!-- EMA Cross Strategy Parameters -->
-              <div id="backtest-ema-params" class="strategy-params mb-3" style="display: none;">
-                <h6 class="form-label">EMA Cross Parameters</h6>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label for="backtest-ema-short" class="form-label small">Short EMA</label>
-                    <input type="number" id="backtest-ema-short" class="form-control" value="9" min="5" max="50">
-                  </div>
-                  <div class="col-6">
-                    <label for="backtest-ema-long" class="form-label small">Long EMA</label>
-                    <input type="number" id="backtest-ema-long" class="form-control" value="21" min="10" max="200">
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Bollinger Bands Strategy Parameters -->
-              <div id="backtest-bb-params" class="strategy-params mb-3" style="display: none;">
-                <h6 class="form-label">Bollinger Bands Parameters</h6>
-                <div class="row g-2">
-                  <div class="col-12">
-                    <label for="backtest-bb-std" class="form-label small">Standard Deviation</label>
-                    <input type="number" id="backtest-bb-std" class="form-control" value="2.0" min="1.0" max="3.0" step="0.1">
-                  </div>
-                </div>
-              </div>
-              
-              <!-- ML Strategy Parameters -->
-              <div id="backtest-ml-params" class="strategy-params mb-3" style="display: none;">
-                <h6 class="form-label">ML Strategy Parameters</h6>
-                <div class="row g-2">
-                  <div class="col-12">
-                    <label for="backtest-ml-threshold" class="form-label small">Probability Threshold</label>
-                    <input type="number" id="backtest-ml-threshold" class="form-control" value="0.65" min="0.5" max="0.9" step="0.05">
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Risk Management</label>
-              <div class="row g-2">
-                <div class="col-6">
-                  <div class="input-group">
-                    <span class="input-group-text">Take Profit</span>
-                    <input type="number" id="backtest-take-profit" class="form-control" value="5" min="1" max="100">
-                    <span class="input-group-text">%</span>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="input-group">
-                    <span class="input-group-text">Stop Loss</span>
-                    <input type="number" id="backtest-stop-loss" class="form-control" value="3" min="1" max="50">
-                    <span class="input-group-text">%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="d-grid">
-              <button type="button" id="run-backtest-btn" class="btn btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill me-2" viewBox="0 0 16 16">
-                  <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                </svg>
-                Run Backtest
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-    
-    <div class="col-lg-8">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Backtest Results</h5>
-        </div>
-        <div class="card-body p-0">
-          <div id="backtest-results-container" class="p-3">
-            <div class="alert alert-info">
-              <p>Run a backtest to see results here.</p>
-              <p class="mb-0 small">Backtesting allows you to evaluate trading strategies on historical market data without risking real capital.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Previous Backtests</h5>
-        </div>
-        <div class="card-body">
-          <div id="previous-backtests-container">
-            <div class="alert alert-secondary">
-              <p class="mb-0">No backtest history available.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- Loading Overlay -->
-<div id="page-loader" class="spinner-container" style="display: none;">
-  <div class="spinner-border text-light" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-
-<!-- Toast Container for Notifications -->
-<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<!-- JavaScript for Backtesting -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Strategy selector change event
-    const strategySelector = document.getElementById('backtest-strategy');
-    strategySelector.addEventListener('change', function() {
-      // Hide all strategy parameters
-      document.querySelectorAll('.strategy-params').forEach(el => {
-        el.style.display = 'none';
-      });
-      
-      // Show selected strategy parameters
-      const selectedStrategy = strategySelector.value;
-      const paramsDiv = document.getElementById(`backtest-${selectedStrategy}-params`);
-      if (paramsDiv) {
-        paramsDiv.style.display = 'block';
-      }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Strategy parameter toggle
+        const strategySelect = document.getElementById('backtest-strategy');
+        if (strategySelect) {
+            strategySelect.addEventListener('change', function() {
+                // This would switch parameter sections in production
+                console.log("Selected strategy: " + this.value);
+            });
+        }
+        
+        // Run backtest button
+        const runBacktestBtn = document.getElementById('run-backtest-btn');
+        if (runBacktestBtn) {
+            runBacktestBtn.addEventListener('click', function() {
+                // Show loading
+                document.getElementById('backtest-progress').classList.remove('d-none');
+                
+                // Simulate backtest running
+                setTimeout(function() {
+                    document.getElementById('backtest-status').innerText = "Đang chạy mô phỏng giao dịch...";
+                }, 1500);
+                
+                setTimeout(function() {
+                    document.getElementById('backtest-status').innerText = "Đang phân tích kết quả...";
+                }, 3000);
+                
+                // Complete and show results
+                setTimeout(function() {
+                    document.getElementById('backtest-progress').classList.add('d-none');
+                    document.getElementById('backtest-results').classList.remove('d-none');
+                    
+                    // Initialize charts
+                    initializeBacktestCharts();
+                }, 4500);
+            });
+        }
+        
+        function initializeBacktestCharts() {
+            // Price chart
+            if (document.getElementById('backtest-chart')) {
+                const ctx = document.getElementById('backtest-chart').getContext('2d');
+                
+                // Sample data
+                const dates = ['Jan 1', 'Jan 8', 'Jan 15', 'Jan 22', 'Jan 29', 'Feb 5', 'Feb 12', 'Feb 19', 'Feb 26', 'Mar 5', 'Mar 12', 'Mar 19', 'Mar 26', 'Apr 2', 'Apr 9', 'Apr 16', 'Apr 23', 'Apr 30'];
+                const prices = [16785, 17245, 17895, 18245, 18125, 19240, 18920, 19750, 20150, 19850, 20450, 21020, 20750, 22150, 21850, 22450, 23180, 22750];
+                
+                // Buy and sell points (index, price)
+                const buyPoints = [{x: 0, y: 16785}, {x: 4, y: 18125}, {x: 9, y: 19850}, {x: 13, y: 22150}];
+                const sellPoints = [{x: 1, y: 17245}, {x: 5, y: 19240}, {x: 10, y: 20450}, {x: 14, y: 21850}];
+                
+                const backtestChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'BTC/USDT',
+                                data: prices,
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Mua',
+                                data: buyPoints,
+                                backgroundColor: '#2ecc71',
+                                borderColor: '#2ecc71',
+                                pointRadius: 6,
+                                pointStyle: 'triangle',
+                                showLine: false
+                            },
+                            {
+                                label: 'Bán',
+                                data: sellPoints,
+                                backgroundColor: '#e74c3c',
+                                borderColor: '#e74c3c',
+                                pointRadius: 6,
+                                pointStyle: 'triangle',
+                                rotation: 180,
+                                showLine: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    filter: function(item, chart) {
+                                        // Show only the price label
+                                        return item.text === 'BTC/USDT';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Monthly returns chart
+            if (document.getElementById('monthly-returns-chart')) {
+                const ctx = document.getElementById('monthly-returns-chart').getContext('2d');
+                
+                // Sample monthly returns data
+                const monthlyChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Lợi Nhuận Hàng Tháng (%)',
+                            data: [8.45, 5.23, -2.16, 7.82, 4.15, 3.58],
+                            backgroundColor: function(context) {
+                                const value = context.dataset.data[context.dataIndex];
+                                return value >= 0 ? 'rgba(46, 204, 113, 0.7)' : 'rgba(231, 76, 60, 0.7)';
+                            },
+                            borderColor: function(context) {
+                                const value = context.dataset.data[context.dataIndex];
+                                return value >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)';
+                            },
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
     });
-    
-    // Run Backtest button click event
-    const runBacktestBtn = document.getElementById('run-backtest-btn');
-    runBacktestBtn.addEventListener('click', async function() {
-      // Show loading spinner
-      const loader = document.getElementById('page-loader');
-      if (loader) {
-        loader.style.display = 'flex';
-      }
-      
-      try {
-        // Get backtest parameters
-        const symbol = document.getElementById('backtest-symbol').value;
-        const interval = document.getElementById('backtest-interval').value;
-        const strategy = document.getElementById('backtest-strategy').value;
-        const lookbackDays = parseInt(document.getElementById('backtest-lookback').value || 30);
-        const initialBalance = parseFloat(document.getElementById('backtest-initial-balance').value || 10000);
-        const takeProfit = parseFloat(document.getElementById('backtest-take-profit').value || 5) / 100;
-        const stopLoss = parseFloat(document.getElementById('backtest-stop-loss').value || 3) / 100;
-        
-        // Get strategy-specific parameters
-        let params = {};
-        
-        if (strategy === 'rsi') {
-          params = {
-            overbought: parseFloat(document.getElementById('backtest-rsi-overbought').value || 70),
-            oversold: parseFloat(document.getElementById('backtest-rsi-oversold').value || 30)
-          };
-        } else if (strategy === 'ema_cross') {
-          params = {
-            short_period: parseInt(document.getElementById('backtest-ema-short').value || 9),
-            long_period: parseInt(document.getElementById('backtest-ema-long').value || 21)
-          };
-        } else if (strategy === 'bbands') {
-          params = {
-            deviation_multiplier: parseFloat(document.getElementById('backtest-bb-std').value || 2.0)
-          };
-        } else if (strategy === 'ml') {
-          params = {
-            probability_threshold: parseFloat(document.getElementById('backtest-ml-threshold').value || 0.65)
-          };
-        }
-        
-        // Create backtest request
-        const backtestData = {
-          symbol: symbol,
-          interval: interval,
-          strategy: strategy,
-          params: params,
-          lookback_days: lookbackDays,
-          initial_balance: initialBalance,
-          take_profit: takeProfit,
-          stop_loss: stopLoss
-        };
-        
-        const response = await fetch('/api/run_backtest', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(backtestData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.backtest_id) {
-          // Show success message
-          showToast('Backtest completed successfully', 'success');
-          
-          // Display backtest results
-          displayBacktestResults(result);
-          
-          // Update backtest history
-          loadBacktestHistory();
-        } else {
-          showToast(result.error || 'Failed to run backtest', 'danger');
-        }
-      } catch (error) {
-        console.error('Error running backtest:', error);
-        showToast('Failed to run backtest', 'danger');
-      } finally {
-        // Hide loading spinner
-        if (loader) {
-          loader.style.display = 'none';
-        }
-      }
-    });
-    
-    // Load backtest history on page load
-    loadBacktestHistory();
-    
-    // Function to load backtest history
-    async function loadBacktestHistory() {
-      try {
-        const response = await fetch('/api/backtest_results');
-        const results = await response.json();
-        
-        const container = document.getElementById('previous-backtests-container');
-        if (!container) return;
-        
-        if (results.length === 0) {
-          container.innerHTML = `
-            <div class="alert alert-secondary">
-              <p class="mb-0">No backtest history available.</p>
-            </div>
-          `;
-          return;
-        }
-        
-        // Create a list of backtest results
-        const list = document.createElement('div');
-        list.className = 'list-group';
-        
-        results.slice(0, 5).forEach(result => {
-          const item = document.createElement('button');
-          item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
-          item.setAttribute('data-backtest-id', result.id);
-          
-          const profitPct = result.metrics.profit_pct * 100;
-          const profitClass = profitPct >= 0 ? 'text-success' : 'text-danger';
-          
-          item.innerHTML = `
-            <div>
-              <h6 class="mb-1">${result.symbol} (${result.strategy})</h6>
-              <small>Created: ${new Date(result.timestamp).toLocaleString()}</small>
-            </div>
-            <div class="text-end">
-              <span class="badge ${profitPct >= 0 ? 'bg-success' : 'bg-danger'}">${profitPct.toFixed(2)}%</span>
-              <div><small>${result.metrics.total_trades} trades</small></div>
-            </div>
-          `;
-          
-          item.addEventListener('click', () => {
-            displayBacktestResults(result);
-          });
-          
-          list.appendChild(item);
-        });
-        
-        container.innerHTML = '';
-        container.appendChild(list);
-        
-        if (results.length > 5) {
-          const moreText = document.createElement('p');
-          moreText.className = 'mt-2 text-center text-secondary small';
-          moreText.textContent = `Showing 5 of ${results.length} backtest results`;
-          container.appendChild(moreText);
-        }
-      } catch (error) {
-        console.error('Error loading backtest history:', error);
-      }
-    }
-    
-    // Function to display backtest results
-    function displayBacktestResults(results) {
-      // Get the container
-      const resultsContainer = document.getElementById('backtest-results-container');
-      if (!resultsContainer) return;
-      
-      // Clear the container
-      resultsContainer.innerHTML = '';
-      
-      // Create results card
-      const card = document.createElement('div');
-      card.className = 'backtest-result';
-      
-      // Format metrics
-      const metrics = results.metrics;
-      const totalTrades = metrics.total_trades;
-      const winRate = (metrics.win_rate * 100).toFixed(2) + '%';
-      const profitPercent = (metrics.profit_pct * 100).toFixed(2) + '%';
-      const profitAmount = metrics.profit_amount.toFixed(2);
-      const maxDrawdown = (metrics.max_drawdown * 100).toFixed(2) + '%';
-      const sharpeRatio = metrics.sharpe_ratio ? metrics.sharpe_ratio.toFixed(2) : 'N/A';
-      
-      card.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            <h5 class="mb-0">Results: ${results.symbol} (${results.strategy})</h5>
-            <small class="text-secondary">Period: ${new Date(results.results[0].date).toLocaleDateString()} to ${new Date(results.results[results.results.length-1].date).toLocaleDateString()}</small>
-          </div>
-          <span class="badge ${metrics.profit_pct >= 0 ? 'bg-success' : 'bg-danger'} fs-5">
-            ${profitPercent}
-          </span>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card bg-secondary">
-              <div class="card-body text-center p-3">
-                <h6 class="card-title">Total Trades</h6>
-                <p class="metric-value">${totalTrades}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card bg-secondary">
-              <div class="card-body text-center p-3">
-                <h6 class="card-title">Win Rate</h6>
-                <p class="metric-value">${winRate}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card bg-secondary">
-              <div class="card-body text-center p-3">
-                <h6 class="card-title">Profit</h6>
-                <p class="metric-value ${metrics.profit_pct >= 0 ? 'metric-positive' : 'metric-negative'}">
-                  ${profitAmount}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card bg-secondary">
-              <div class="card-body text-center p-3">
-                <h6 class="card-title">Max Drawdown</h6>
-                <p class="metric-value metric-negative">${maxDrawdown}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="chart-container mb-4">
-          <canvas id="backtest-chart-${results.backtest_id}"></canvas>
-        </div>
-        
-        <h6 class="mt-3 mb-2">Trade History</h6>
-        <div class="table-responsive">
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Side</th>
-                <th>Entry Price</th>
-                <th>Exit Price</th>
-                <th>Amount</th>
-                <th>P&L</th>
-                <th>P&L %</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${results.trades.slice(0, 10).map(trade => `
-                <tr>
-                  <td>${trade.side}</td>
-                  <td>${parseFloat(trade.entry_price).toFixed(2)}</td>
-                  <td>${parseFloat(trade.exit_price).toFixed(2)}</td>
-                  <td>${parseFloat(trade.amount).toFixed(2)}</td>
-                  <td class="${trade.pnl_amount >= 0 ? 'text-success' : 'text-danger'}">
-                    ${parseFloat(trade.pnl_amount).toFixed(2)}
-                  </td>
-                  <td class="${trade.pnl_pct >= 0 ? 'text-success' : 'text-danger'}">
-                    ${(trade.pnl_pct * 100).toFixed(2)}%
-                  </td>
-                </tr>
-              `).join('')}
-              ${results.trades.length > 10 ? `
-                <tr>
-                  <td colspan="6" class="text-center">
-                    <em>Showing 10 of ${results.trades.length} trades</em>
-                  </td>
-                </tr>
-              ` : ''}
-            </tbody>
-          </table>
-        </div>
-      `;
-      
-      // Append to container
-      resultsContainer.appendChild(card);
-      
-      // Initialize backtest chart
-      setTimeout(() => {
-        const charts = new TradingCharts();
-        charts.initBacktestChart(`backtest-chart-${results.backtest_id}`, results);
-      }, 100);
-    }
-    
-    // Function to show toast notifications
-    function showToast(message, type = 'primary') {
-      const toastContainer = document.getElementById('toast-container');
-      if (!toastContainer) return;
-      
-      const toast = document.createElement('div');
-      toast.className = 'toast show';
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      
-      toast.innerHTML = `
-        <div class="toast-header bg-${type} ${type === 'danger' || type === 'dark' ? 'text-white' : ''}">
-          <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
-          <button type="button" class="btn-close ${type === 'danger' || type === 'dark' ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          ${message}
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-          toast.remove();
-        }, 500);
-      }, 5000);
-    }
-  });
 </script>
 {% endblock %}

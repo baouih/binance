@@ -294,7 +294,7 @@ def strategy():
 @app.route('/bot_management')
 def bot_management():
     """Trang quản lý bot."""
-    return render_template('under_development.html', title="Quản lý bot")
+    return render_template('bot_management.html')
 
 @app.route('/trading_dashboard')
 def trading_dashboard():
@@ -304,7 +304,7 @@ def trading_dashboard():
 @app.route('/backtesting')
 def backtesting_page():
     """Render the backtesting page."""
-    return render_template('under_development.html', title="Kiểm thử chiến lược")
+    return render_template('backtesting.html')
 
 @app.route('/settings')
 def settings():
