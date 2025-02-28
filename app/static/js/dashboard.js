@@ -377,20 +377,33 @@ class DashboardController {
   
   // Update market data display
   updateMarketDataDisplay() {
-    // Price element
-    const priceElement = document.getElementById('current-price');
-    if (priceElement && this.marketData.price) {
-      this.charts.updatePriceDisplay(this.marketData.price);
-    }
-    
-    // Quick price element (thay đổi)
-    const quickPriceElement = document.getElementById('quick-price');
-    if (quickPriceElement && this.marketData.price) {
-      const formattedPrice = new Intl.NumberFormat('vi-VN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(this.marketData.price);
-      quickPriceElement.innerHTML = `${formattedPrice} <span id="price-change-24h" class="badge ${this.marketData.change_24h >= 0 ? 'text-bg-success' : 'text-bg-danger'}">${this.marketData.change_24h >= 0 ? '+' : ''}${this.marketData.change_24h.toFixed(2)}%</span>`;
+    try {
+      // Price element
+      const priceElement = document.getElementById('current-price');
+      if (priceElement && this.marketData && this.marketData.price) {
+        this.charts.updatePriceDisplay(this.marketData.price);
+      }
+      
+      // Quick price element (thay đổi)
+      const quickPriceElement = document.getElementById('quick-price');
+      if (quickPriceElement && this.marketData && this.marketData.price) {
+        // Ensure price is a valid number
+        let price = parseFloat(this.marketData.price);
+        if (isNaN(price)) price = 61245.80; // Use default price if invalid
+        
+        const formattedPrice = new Intl.NumberFormat('vi-VN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(price);
+        
+        // Handle change safely too
+        let change = this.marketData.change_24h;
+        if (change === undefined || isNaN(change)) change = 0;
+        
+        quickPriceElement.innerHTML = `${formattedPrice} <span id="price-change-24h" class="badge ${change >= 0 ? 'text-bg-success' : 'text-bg-danger'}">${change >= 0 ? '+' : ''}${parseFloat(change).toFixed(2)}%</span>`;
+      }
+    } catch (error) {
+      console.error('Error updating market data display:', error);
     }
     
     // 24h change

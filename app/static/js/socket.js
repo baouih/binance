@@ -15,8 +15,8 @@ class SocketClient {
     // Dữ liệu giả lập để hiển thị khi mất kết nối
     this.simulationData = {
       prices: {
-        'BTCUSDT': 84000 + Math.random() * 2000,
-        'ETHUSDT': 3500 + Math.random() * 200,
+        'BTCUSDT': 61245.80 + Math.random() * 200, // Updated BTC price 
+        'ETHUSDT': 3100 + Math.random() * 50,
         'BNBUSDT': 580 + Math.random() * 30,
         'ADAUSDT': 0.50 + Math.random() * 0.05,
         'SOLUSDT': 140 + Math.random() * 15,
