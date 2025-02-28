@@ -170,11 +170,11 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
         overbought (int): Ngưỡng quá mua
         oversold (int): Ngưỡng quá bán
         use_sample_data (bool): Sử dụng dữ liệu mẫu thay vì dữ liệu API
-        use_trend_filter (bool): Sử dụng bộ lọc xu hướng
-        use_volume_filter (bool): Sử dụng bộ lọc khối lượng
-        trailing_stop (bool): Sử dụng trailing stop
-        take_profit_pct (float): Phần trăm chốt lời
-        stop_loss_pct (float): Phần trăm cắt lỗ
+        use_trend_filter (bool): Sử dụng bộ lọc xu hướng - chỉ vào lệnh khi có xu hướng rõ ràng
+        use_volume_filter (bool): Sử dụng bộ lọc khối lượng - chỉ vào lệnh khi khối lượng đủ lớn
+        trailing_stop (bool): Sử dụng trailing stop - tự động điều chỉnh điểm dừng lỗ theo giá
+        take_profit_pct (float): Phần trăm chốt lời - mức lợi nhuận để đóng vị thế
+        stop_loss_pct (float): Phần trăm cắt lỗ - mức thua lỗ để đóng vị thế
     """
     logger.info(f"=== BACKTEST RSI STRATEGY ===")
     logger.info(f"Interval: {interval}")
@@ -184,6 +184,11 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
     logger.info(f"Risk: {risk_percentage}%")
     logger.info(f"RSI Overbought: {overbought}")
     logger.info(f"RSI Oversold: {oversold}")
+    logger.info(f"Take Profit: {take_profit_pct}%")
+    logger.info(f"Stop Loss: {stop_loss_pct}%")
+    logger.info(f"Trailing Stop: {'Enabled' if trailing_stop else 'Disabled'}")
+    logger.info(f"Trend Filter: {'Enabled' if use_trend_filter else 'Disabled'}")
+    logger.info(f"Volume Filter: {'Enabled' if use_volume_filter else 'Disabled'}")
     
     # Lấy dữ liệu
     if use_sample_data:
@@ -352,61 +357,147 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
                 entry_price = current_price
                 entry_date = current_date
                 
+                # Tính toán take profit và stop loss cho vị thế bán
+                if trailing_stop:
+                    tp_level = entry_price * (1 - take_profit_pct/100)
+                    sl_level = entry_price * (1 + stop_loss_pct/100)
+                    lowest_price = entry_price  # Theo dõi giá thấp nhất cho trailing stop
+                else:
+                    tp_level = entry_price * (1 - take_profit_pct/100)
+                    sl_level = entry_price * (1 + stop_loss_pct/100)
+                
                 current_position = {
                     'side': 'SELL',
                     'entry_price': entry_price,
                     'quantity': order_qty,
                     'entry_date': entry_date,
-                    'leverage': leverage
+                    'leverage': leverage,
+                    'take_profit': tp_level,
+                    'stop_loss': sl_level,
+                    'lowest_price': lowest_price,
+                    'trailing_active': False,  # Trailing stop chưa kích hoạt
+                    'trailing_stop': trailing_stop
                 }
                 
                 logger.info(f"Mở vị thế BÁN tại {entry_date}: {entry_price:.2f}, Số lượng: {order_qty:.5f}")
         
-        # Đóng vị thế hiện tại
-        elif ((current_position['side'] == 'BUY' and signal == -1) or 
-              (current_position['side'] == 'SELL' and signal == 1) or
-              (i == len(df) - 2)):  # Đóng vị thế ở candlestick cuối cùng
+        # Cập nhật trailing stop nếu có vị thế đang mở
+        elif current_position is not None:
+            close_position = False
+            exit_reason = "Tín hiệu đảo chiều"
             
-            exit_price = current_price
-            exit_date = current_date
-            
-            # Tính lợi nhuận
+            # Kiểm tra take profit và stop loss
             if current_position['side'] == 'BUY':
-                pnl = (exit_price - current_position['entry_price']) / current_position['entry_price']
-            else:  # SELL
-                pnl = (current_position['entry_price'] - exit_price) / current_position['entry_price']
+                # Vị thế mua - cập nhật giá cao nhất
+                if current_price > current_position['highest_price']:
+                    current_position['highest_price'] = current_price
+                
+                # Kiểm tra take profit
+                if current_price >= current_position['take_profit']:
+                    if not current_position['trailing_active'] and trailing_stop:
+                        # Kích hoạt trailing stop
+                        current_position['trailing_active'] = True
+                        logger.info(f"Kích hoạt trailing stop tại {current_date}: {current_price:.2f}")
+                    else:
+                        # Chốt lời
+                        close_position = True
+                        exit_reason = "Take profit"
+                
+                # Kiểm tra trailing stop
+                elif current_position['trailing_active'] and trailing_stop:
+                    # Tính toán giá trailing stop: Giá cao nhất - % trailing
+                    trailing_level = current_position['highest_price'] * (1 - stop_loss_pct/200)  # Một nửa stop loss
+                    if current_price < trailing_level:
+                        close_position = True
+                        exit_reason = "Trailing stop"
+                
+                # Kiểm tra stop loss
+                elif current_price <= current_position['stop_loss']:
+                    close_position = True
+                    exit_reason = "Stop loss"
+                
+                # Kiểm tra tín hiệu đảo chiều
+                elif signal == -1:
+                    close_position = True
+                    exit_reason = "Tín hiệu đảo chiều"
             
-            # Áp dụng đòn bẩy
-            pnl = pnl * leverage
+            elif current_position['side'] == 'SELL':
+                # Vị thế bán - cập nhật giá thấp nhất
+                if current_price < current_position['lowest_price']:
+                    current_position['lowest_price'] = current_price
+                
+                # Kiểm tra take profit
+                if current_price <= current_position['take_profit']:
+                    if not current_position['trailing_active'] and trailing_stop:
+                        # Kích hoạt trailing stop
+                        current_position['trailing_active'] = True
+                        logger.info(f"Kích hoạt trailing stop tại {current_date}: {current_price:.2f}")
+                    else:
+                        # Chốt lời
+                        close_position = True
+                        exit_reason = "Take profit"
+                
+                # Kiểm tra trailing stop
+                elif current_position['trailing_active'] and trailing_stop:
+                    # Tính toán giá trailing stop: Giá thấp nhất + % trailing
+                    trailing_level = current_position['lowest_price'] * (1 + stop_loss_pct/200)  # Một nửa stop loss
+                    if current_price > trailing_level:
+                        close_position = True
+                        exit_reason = "Trailing stop"
+                
+                # Kiểm tra stop loss
+                elif current_price >= current_position['stop_loss']:
+                    close_position = True
+                    exit_reason = "Stop loss"
+                
+                # Kiểm tra tín hiệu đảo chiều
+                elif signal == 1:
+                    close_position = True
+                    exit_reason = "Tín hiệu đảo chiều"
             
-            # Trừ phí giao dịch (giả sử 0.075% mỗi lần vào/ra)
-            fee_rate = 0.00075  # 0.075%
-            fees = (current_position['quantity'] * current_position['entry_price'] * fee_rate) + \
-                   (current_position['quantity'] * exit_price * fee_rate)
-            
-            pnl_amount = pnl * risk_amount - fees
-            
-            # Cập nhật số dư
-            balance += pnl_amount
-            
-            # Lưu giao dịch
-            trade = {
-                'entry_date': current_position['entry_date'],
-                'exit_date': exit_date,
-                'side': current_position['side'],
-                'entry_price': current_position['entry_price'],
-                'exit_price': exit_price,
-                'quantity': current_position['quantity'],
-                'pnl_percent': pnl * 100,
-                'pnl_amount': pnl_amount,
-                'balance': balance
-            }
-            trades.append(trade)
-            
-            logger.info(f"Đóng vị thế {current_position['side']} tại {exit_date}: {exit_price:.2f}, PnL: {pnl*100:.2f}%, ${pnl_amount:.2f}")
-            
-            # Reset vị thế
-            current_position = None
+            # Đóng vị thế nếu cần
+            if close_position or i == len(df) - 2:  # Đóng vị thế ở candlestick cuối cùng
+                exit_price = current_price
+                exit_date = current_date
+                
+                # Tính lợi nhuận
+                if current_position['side'] == 'BUY':
+                    pnl = (exit_price - current_position['entry_price']) / current_position['entry_price']
+                else:  # SELL
+                    pnl = (current_position['entry_price'] - exit_price) / current_position['entry_price']
+                
+                # Áp dụng đòn bẩy
+                pnl = pnl * leverage
+                
+                # Trừ phí giao dịch (giả sử 0.075% mỗi lần vào/ra)
+                fee_rate = 0.00075  # 0.075%
+                fees = (current_position['quantity'] * current_position['entry_price'] * fee_rate) + \
+                       (current_position['quantity'] * exit_price * fee_rate)
+                
+                pnl_amount = pnl * risk_amount - fees
+                
+                # Cập nhật số dư
+                balance += pnl_amount
+                
+                # Lưu giao dịch
+                trade = {
+                    'entry_date': current_position['entry_date'],
+                    'exit_date': exit_date,
+                    'side': current_position['side'],
+                    'entry_price': current_position['entry_price'],
+                    'exit_price': exit_price,
+                    'quantity': current_position['quantity'],
+                    'pnl_percent': pnl * 100,
+                    'pnl_amount': pnl_amount,
+                    'balance': balance,
+                    'exit_reason': exit_reason
+                }
+                trades.append(trade)
+                
+                logger.info(f"Đóng vị thế {current_position['side']} tại {exit_date}: {exit_price:.2f}, PnL: {pnl*100:.2f}%, ${pnl_amount:.2f} ({exit_reason})")
+                
+                # Reset vị thế
+                current_position = None
         
         # Cập nhật đường cong vốn
         if i % 24 == 0 or i == len(df) - 2:  # Cập nhật hàng ngày hoặc ở candle cuối cùng
@@ -482,6 +573,15 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
                 'overbought': overbought,
                 'oversold': oversold
             },
+            'risk_management': {
+                'trailing_stop': trailing_stop,
+                'take_profit_pct': take_profit_pct,
+                'stop_loss_pct': stop_loss_pct
+            },
+            'filters': {
+                'trend_filter': use_trend_filter,
+                'volume_filter': use_volume_filter
+            },
             'initial_balance': initial_balance,
             'final_balance': final_balance,
             'profit': final_balance - initial_balance,
@@ -518,6 +618,11 @@ def main():
     parser.add_argument('--overbought', type=int, default=70, help='Ngưỡng quá mua (mặc định: 70)')
     parser.add_argument('--oversold', type=int, default=30, help='Ngưỡng quá bán (mặc định: 30)')
     parser.add_argument('--use-api-data', action='store_true', help='Sử dụng dữ liệu API thay vì dữ liệu mẫu')
+    parser.add_argument('--use-trend-filter', action='store_true', help='Sử dụng bộ lọc xu hướng (mặc định: False)')
+    parser.add_argument('--use-volume-filter', action='store_true', help='Sử dụng bộ lọc khối lượng (mặc định: False)')
+    parser.add_argument('--trailing-stop', action='store_true', help='Sử dụng trailing stop (mặc định: False)')
+    parser.add_argument('--take-profit', type=float, default=15.0, help='Phần trăm chốt lời (mặc định: 15%)')
+    parser.add_argument('--stop-loss', type=float, default=7.0, help='Phần trăm cắt lỗ (mặc định: 7%)')
     
     args = parser.parse_args()
     
@@ -529,7 +634,12 @@ def main():
         risk_percentage=args.risk,
         overbought=args.overbought,
         oversold=args.oversold,
-        use_sample_data=not args.use_api_data
+        use_sample_data=not args.use_api_data,
+        use_trend_filter=args.use_trend_filter,
+        use_volume_filter=args.use_volume_filter,
+        trailing_stop=args.trailing_stop,
+        take_profit_pct=args.take_profit,
+        stop_loss_pct=args.stop_loss
     )
 
 if __name__ == "__main__":
