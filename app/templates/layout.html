@@ -73,29 +73,21 @@
     
     <!-- Sử dụng mô phỏng đơn giản thay vì Socket.IO -->
     <script>
-        // Tạo giá Bitcoin mô phỏng
-        function simulatePrice() {
-            const basePrice = 79500;
-            const variance = 500;
-            return basePrice + Math.random() * variance;
-        }
-        
-        // Cập nhật giá hiển thị nếu có element phù hợp
-        function updatePriceDisplay() {
-            const priceElement = document.getElementById('current-price');
-            if (priceElement) {
-                const price = simulatePrice();
-                priceElement.textContent = price.toFixed(2);
-            }
-        }
-        
         document.addEventListener("DOMContentLoaded", function() {
             // Cập nhật trạng thái
             document.getElementById('connection-status-container').innerHTML = 
                 '<span id="connection-status" class="badge bg-warning" title="Đang sử dụng dữ liệu mô phỏng">Chế Độ Mô Phỏng</span>';
             
-            // Cập nhật giá mỗi 3 giây
-            setInterval(updatePriceDisplay, 3000);
+            // Fix lỗi người dùng không thể di chuyển qua lại bằng cách thêm sự kiện xử lý trực tiếp
+            const navLinks = document.querySelectorAll('.navbar-nav a.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
         });
     </script>
     
@@ -106,6 +98,9 @@
     <div id="connection-status-container" class="position-fixed bottom-0 start-0 p-2">
         <span id="connection-status" class="badge bg-secondary">Đang kết nối...</span>
     </div>
+    
+    <!-- Include simple dashboard script -->
+    <script src="{{ url_for('static', filename='js/simple-dashboard.js') }}"></script>
     
     {% block scripts %}{% endblock %}
     
