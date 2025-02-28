@@ -1,3 +1,5 @@
 {
-  "simulation_mode": false
+  "simulation_mode": false,
+  "api_key": "3d53f46cd9e83920b8104fc1106a12ceed12fae904b2299068a586a10ed34c30",
+  "api_secret": "289fb54917bee9d5dd43a14dd2ed62716c66a6f7b60c283cb15867abc7d2bb8b"
 }
