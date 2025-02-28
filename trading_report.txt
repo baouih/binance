@@ -1,52 +1,20 @@
 === BÁO CÁO HIỆU SUẤT GIAO DỊCH ===
 
-Thời gian: 2025-02-28 15:02:00.000000
+Thời gian: 2025-02-28 15:52:55.833404
 
-=== HIỆU SUẤT TRƯỚC KHI CẢI TIẾN ===
+=== CHIẾN LƯỢC TỐT NHẤT ===
 Symbol: BTCUSDT
 Interval: 1h
-Strategy: RSI (Cơ bản)
-Profit: -119.46%
+Strategy: Bollinger Bands
+Profit: -119.77%
 Win Rate: 0.00%
-Sharpe Ratio: -6.31
+Sharpe Ratio: -7.13
 
-Tổng số giao dịch: 15
+=== THÔNG TIN GIAO DỊCH ===
+Tổng số giao dịch: 12
 Số giao dịch thắng: 0
-Số giao dịch thua: 15
-Thua lỗ trung bình giao dịch thua: -138.92%
+Số giao dịch thua: 12
+Thua lỗ trung bình giao dịch thua: -172.34%
 
-=== CẢI TIẾN ĐÃ THỰC HIỆN ===
-1. Chiến lược RSI nâng cao:
-   - Thêm bộ lọc xu hướng (trend filter) sử dụng EMA 50/200
-   - Thêm bộ lọc khối lượng giao dịch (volume filter)
-   - Phát hiện đảo chiều RSI để tăng cường chính xác của tín hiệu
-   - Hạn chế giao dịch khi xu hướng đối nghịch với tín hiệu
-
-2. Chiến lược kết hợp (Combined Strategy) nâng cao:
-   - Thêm phát hiện xu hướng thị trường
-   - Tự động điều chỉnh ngưỡng tín hiệu dựa trên xu hướng
-   - Tăng độ nhạy mua trong xu hướng tăng và độ nhạy bán trong xu hướng giảm
-   - Cải thiện cơ chế đồng thuận tín hiệu giữa các chiến lược thành phần
-
-3. Tối ưu hóa tham số:
-   - Đã điều chỉnh các ngưỡng RSI (overbought/oversold)
-   - Đã điều chỉnh trọng số chiến lược trong Combined Strategy
-   - Tăng cường khả năng thích ứng với các giai đoạn thị trường khác nhau
-
-=== DỰ KIẾN CẢI THIỆN HIỆU SUẤT ===
-Symbol: BTCUSDT
-Interval: 1h
-Strategy: RSI Enhanced + Combined
-Dự kiến Profit: +10% đến +25%
-Dự kiến Win Rate: 45% đến 60%
-Dự kiến Sharpe Ratio: 1.2 đến 1.8
-
-=== HƯỚNG CẢI TIẾN TIẾP THEO ===
-1. Triển khai đầy đủ bộ phát hiện giai đoạn thị trường
-2. Tích hợp chiến lược cắt lỗ thông minh hơn
-3. Tối ưu hóa thêm chiến lược Bollinger Bands
-4. Cải thiện ML Strategy với các đặc trưng mới
-5. Tiếp tục tối ưu hóa tham số và trọng số cho chiến lược kết hợp
-
-=== LƯU Ý ===
-Cần thực hiện thêm các bài kiểm tra backtesting và forward testing để xác nhận hiệu suất thực tế của các cải tiến.
+=== KẾT LUẬN ===
+Chiến lược Bollinger Bands trên BTCUSDT với khung thời gian 1h cho hiệu suất tốt nhất trong quá trình backtest.

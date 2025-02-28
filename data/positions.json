@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": 1740757895189,
+    "symbol": "BTCUSDT",
+    "side": "BUY",
+    "quantity": 0.012,
+    "entry_price": 84052.005,
+    "entry_time": "2025-02-28T15:51:35.190080",
+    "current_price": 0.0,
+    "current_pnl": -1.0,
+    "exit_price": 0.0,
+    "exit_time": "2025-02-28T15:51:35.191299",
+    "status": "CLOSED",
+    "final_pnl": -1.0
+  }
+]

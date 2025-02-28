@@ -1,0 +1,12 @@
+{
+  "trending_up": {
+    "count": 3,
+    "total_duration": 0,
+    "avg_duration": 0.0
+  },
+  "neutral": {
+    "count": 3,
+    "total_duration": 0,
+    "avg_duration": 0.0
+  }
+}

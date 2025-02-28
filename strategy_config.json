@@ -1,0 +1,60 @@
+{
+  "btcusdt": {
+    "rsi": {
+      "overbought": 75,
+      "oversold": 25,
+      "period": 14
+    },
+    "ema_cross": {
+      "short_period": 9,
+      "long_period": 21
+    },
+    "macd": {
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9
+    },
+    "bbands": {
+      "period": 20,
+      "deviation": 2.0
+    },
+    "regime_weights": {
+      "trending_up": [0.4, 0.3, 0.2, 0.1, 0.0],
+      "trending_down": [0.4, 0.3, 0.2, 0.1, 0.0],
+      "volatile": [0.1, 0.2, 0.3, 0.1, 0.3],
+      "ranging": [0.0, 0.1, 0.3, 0.3, 0.3],
+      "breakout": [0.1, 0.3, 0.3, 0.0, 0.3],
+      "neutral": [0.2, 0.2, 0.4, 0.1, 0.1]
+    },
+    "ml_threshold": 0.75
+  },
+  "ethusdt": {
+    "rsi": {
+      "overbought": 70,
+      "oversold": 30,
+      "period": 14
+    },
+    "ema_cross": {
+      "short_period": 8,
+      "long_period": 21
+    },
+    "macd": {
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9
+    },
+    "bbands": {
+      "period": 20,
+      "deviation": 2.5
+    },
+    "regime_weights": {
+      "trending_up": [0.35, 0.35, 0.2, 0.1, 0.0],
+      "trending_down": [0.35, 0.35, 0.2, 0.1, 0.0],
+      "volatile": [0.1, 0.2, 0.3, 0.1, 0.3],
+      "ranging": [0.0, 0.1, 0.3, 0.3, 0.3],
+      "breakout": [0.1, 0.3, 0.3, 0.0, 0.3],
+      "neutral": [0.2, 0.2, 0.4, 0.1, 0.1]
+    },
+    "ml_threshold": 0.7
+  }
+}

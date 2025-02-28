@@ -1,0 +1,38 @@
+[
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T15:50:25.892188",
+    "end_time": "2025-02-28T15:50:51.719484",
+    "duration": 0.4304550666666667
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T15:50:51.719501",
+    "end_time": "2025-02-28T15:51:23.364139",
+    "duration": 0.52741075
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T15:51:23.364154",
+    "end_time": "2025-02-28T15:51:34.923429",
+    "duration": 0.19265469999999998
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T15:51:34.923443",
+    "end_time": "2025-02-28T15:52:18.526083",
+    "duration": 0.7267107666666667
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T15:52:18.526097",
+    "end_time": "2025-02-28T15:52:48.050791",
+    "duration": 0.49207835
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T15:52:48.050805",
+    "end_time": null,
+    "duration": 0
+  }
+]
