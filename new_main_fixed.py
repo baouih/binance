@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Main entry point for the Crypto Trading Bot Dashboard
+With fixed gunicorn worker handling
 """
 
 import os
