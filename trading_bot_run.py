@@ -26,14 +26,17 @@ logger = logging.getLogger('trading_bot_runner')
 # Import các module từ ứng dụng
 from app.binance_api import BinanceAPI
 from app.data_processor import DataProcessor
-from app.strategy import (RSIStrategy, MACDStrategy, EMACrossStrategy, 
-                         BBandsStrategy, CombinedStrategy)
+from app.strategy import (RSIStrategy, MACDStrategy, EMACrossStrategy,
+                         BBandsStrategy, CombinedStrategy, MLStrategy, AutoStrategy,
+                         StrategyFactory)
 from app.trading_bot import TradingBot
+from app.ml_optimizer import MLOptimizer
+from app.market_regime_detector import MarketRegimeDetector
 
 class TradingBotRunner:
     def __init__(self, config_file=None, symbol='BTCUSDT', interval='1h', 
                  test_mode=True, leverage=1, risk_percentage=1.0,
-                 use_optimized=True):
+                 use_optimized=True, strategy_type=None, use_ml=True):
         """
         Khởi tạo runner cho bot giao dịch
         
@@ -45,6 +48,8 @@ class TradingBotRunner:
             leverage (int): Đòn bẩy (1-50)
             risk_percentage (float): Phần trăm rủi ro (0.1-10.0)
             use_optimized (bool): Sử dụng chiến lược tối ưu từ file cấu hình
+            strategy_type (str): Loại chiến lược cụ thể để sử dụng
+            use_ml (bool): Sử dụng học máy trong dự đoán
         """
         self.symbol = symbol
         self.interval = interval
@@ -52,18 +57,25 @@ class TradingBotRunner:
         self.leverage = leverage
         self.risk_percentage = risk_percentage
         self.use_optimized = use_optimized
+        self.strategy_type = strategy_type
+        self.use_ml = use_ml
         
         # Khởi tạo API và Data Processor
         simulation = True if test_mode else False
         self.binance_api = BinanceAPI(simulation_mode=simulation)
         self.data_processor = DataProcessor(self.binance_api, simulation_mode=simulation)
         
-        # Khởi tạo bot giao dịch với chiến lược mặc định
-        self.strategy = self._create_default_strategy()
-        
-        # Nếu sử dụng cấu hình tối ưu
-        if use_optimized and config_file:
+        # Khởi tạo bot giao dịch với chiến lược theo cài đặt
+        if self.use_optimized and config_file:
+            # Nếu sử dụng cấu hình tối ưu
+            self.strategy = self._create_default_strategy()
             self._load_optimized_strategy(config_file)
+        elif self.strategy_type:
+            # Nếu chỉ định chiến lược cụ thể
+            self.strategy = self._create_strategy_by_type(self.strategy_type)
+        else:
+            # Sử dụng chiến lược mặc định (AutoStrategy)
+            self.strategy = self._create_default_strategy()
         
         # Khởi tạo bot giao dịch
         self.bot = TradingBot(
@@ -85,16 +97,35 @@ class TradingBotRunner:
         logger.info("Đã khởi tạo bot giao dịch: "
                    f"Symbol={self.symbol}, Interval={self.interval}, "
                    f"Test Mode={self.test_mode}, Leverage={self.leverage}x, "
-                   f"Risk={self.risk_percentage}%, Strategy={type(self.strategy).__name__}")
+                   f"Risk={self.risk_percentage}%, Strategy={type(self.strategy).__name__}, "
+                   f"Use ML={self.use_ml}")
     
     def _create_default_strategy(self):
-        """Tạo chiến lược mặc định"""
-        # Chiến lược kết hợp
-        return CombinedStrategy([
-            RSIStrategy(overbought=70, oversold=30),
-            MACDStrategy(),
-            EMACrossStrategy(short_period=9, long_period=21)
-        ], weights=[0.4, 0.3, 0.3])
+        """Tạo chiến lược mặc định với khả năng thích ứng theo chế độ thị trường"""
+        # Khởi tạo Market Regime Detector
+        market_regime_detector = MarketRegimeDetector()
+        
+        # Chuẩn bị dữ liệu để có thể phát hiện chế độ thị trường ban đầu
+        df = self.data_processor.get_historical_data(self.symbol, self.interval, lookback_days=30)
+        if df is not None and not df.empty:
+            initial_regime = market_regime_detector.detect_regime(df)
+            logger.info(f"Chế độ thị trường khởi tạo: {initial_regime}")
+        
+        # Khởi tạo ML Optimizer
+        ml_optimizer = MLOptimizer()
+        
+        try:
+            # Thử tải mô hình đã huấn luyện sẵn nếu có
+            if os.path.exists('models/ensemble_model.joblib'):
+                logger.info("Đang tải mô hình ML đã huấn luyện...")
+                ml_optimizer.load_models('models')
+                logger.info("Đã tải xong mô hình ML")
+        except Exception as e:
+            logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+            
+        # Tạo chiến lược tự động
+        logger.info("Tạo chiến lược AutoStrategy với khả năng thích ứng theo chế độ thị trường")
+        return AutoStrategy(market_regime_detector, ml_optimizer)
     
     def _load_optimized_strategy(self, config_file):
         """
@@ -107,6 +138,62 @@ class TradingBotRunner:
             with open(config_file, 'r') as f:
                 config = json.load(f)
                 
+            # Kiểm tra nếu có cấu hình cho AutoStrategy
+            if 'AutoStrategy' in config:
+                logger.info("Tìm thấy cấu hình AutoStrategy, sử dụng chiến lược tự động thích ứng")
+                
+                # Khởi tạo Market Regime Detector
+                market_regime_detector = MarketRegimeDetector()
+                
+                # Khởi tạo ML Optimizer
+                ml_optimizer = MLOptimizer()
+                
+                # Tải mô hình ML nếu có
+                try:
+                    if os.path.exists('models/ensemble_model.joblib'):
+                        logger.info("Đang tải mô hình ML đã huấn luyện...")
+                        ml_optimizer.load_models('models')
+                        logger.info("Đã tải xong mô hình ML")
+                except Exception as e:
+                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+                
+                # Tạo chiến lược AutoStrategy
+                self.strategy = AutoStrategy(market_regime_detector, ml_optimizer)
+                logger.info("Đã tạo chiến lược AutoStrategy tối ưu")
+                return
+                
+            # Kiểm tra nếu có cấu hình cho MLStrategy 
+            if 'MLStrategy' in config:
+                logger.info("Tìm thấy cấu hình MLStrategy, sử dụng chiến lược học máy")
+                
+                # Lấy thông số từ cấu hình
+                ml_params = config['MLStrategy'].get('best_params', {})
+                probability_threshold = ml_params.get('probability_threshold', 0.65)
+                
+                # Khởi tạo ML Optimizer
+                ml_optimizer = MLOptimizer()
+                
+                # Tải mô hình ML nếu có
+                try:
+                    if os.path.exists('models/ensemble_model.joblib'):
+                        logger.info("Đang tải mô hình ML đã huấn luyện...")
+                        ml_optimizer.load_models('models')
+                        logger.info("Đã tải xong mô hình ML")
+                except Exception as e:
+                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+                
+                # Khởi tạo Market Regime Detector cho MLStrategy
+                market_regime_detector = MarketRegimeDetector()
+                
+                # Tạo chiến lược MLStrategy
+                self.strategy = MLStrategy(
+                    ml_optimizer=ml_optimizer,
+                    market_regime_detector=market_regime_detector,
+                    probability_threshold=probability_threshold
+                )
+                logger.info(f"Đã tạo chiến lược MLStrategy với probability_threshold={probability_threshold}")
+                return
+            
             # Tìm kết quả của cặp giao dịch và khung thời gian phù hợp
             strategy_key = None
             for key in config.keys():
@@ -146,6 +233,23 @@ class TradingBotRunner:
                         bb_params = config.get('Bollinger_Bands', {}).get('best_params', {})
                         strategies_to_combine.append(BBandsStrategy(
                             deviation_multiplier=bb_params.get('num_std_dev', 2.0)
+                        ))
+                    elif strategy_name == 'MLStrategy':
+                        # Thêm MLStrategy vào chiến lược kết hợp
+                        ml_optimizer = MLOptimizer()
+                        try:
+                            ml_optimizer.load_models('models')
+                        except Exception as e:
+                            logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+                        
+                        market_regime_detector = MarketRegimeDetector()
+                        ml_params = config.get('MLStrategy', {}).get('best_params', {})
+                        probability_threshold = ml_params.get('probability_threshold', 0.65)
+                        
+                        strategies_to_combine.append(MLStrategy(
+                            ml_optimizer=ml_optimizer,
+                            market_regime_detector=market_regime_detector,
+                            probability_threshold=probability_threshold
                         ))
                 
                 # Tạo chiến lược kết hợp
@@ -204,6 +308,124 @@ class TradingBotRunner:
             # Báo cáo kết quả cuối cùng
             self._final_report()
     
+    def _create_strategy_by_type(self, strategy_type):
+        """
+        Tạo chiến lược dựa trên loại chiến lược được chỉ định
+        
+        Args:
+            strategy_type (str): Loại chiến lược ('auto', 'ml', 'rsi', 'macd', 'ema', 'bbands')
+            
+        Returns:
+            Strategy: Chiến lược đã tạo
+        """
+        logger.info(f"Tạo chiến lược theo yêu cầu: {strategy_type}")
+        
+        if strategy_type == 'auto':
+            # Tạo AutoStrategy (tương tự như _create_default_strategy)
+            market_regime_detector = MarketRegimeDetector()
+            
+            # Phát hiện chế độ thị trường ban đầu
+            df = self.data_processor.get_historical_data(self.symbol, self.interval, lookback_days=30)
+            if df is not None and not df.empty:
+                initial_regime = market_regime_detector.detect_regime(df)
+                logger.info(f"Chế độ thị trường khởi tạo: {initial_regime}")
+            
+            # Khởi tạo ML Optimizer nếu sử dụng ML
+            ml_optimizer = None
+            if self.use_ml:
+                ml_optimizer = MLOptimizer()
+                try:
+                    if os.path.exists('models/ensemble_model.joblib'):
+                        logger.info("Đang tải mô hình ML đã huấn luyện...")
+                        ml_optimizer.load_models('models')
+                        logger.info("Đã tải xong mô hình ML")
+                except Exception as e:
+                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+            
+            logger.info("Tạo chiến lược AutoStrategy với khả năng thích ứng theo chế độ thị trường")
+            return AutoStrategy(market_regime_detector, ml_optimizer)
+            
+        elif strategy_type == 'ml':
+            # Tạo MLStrategy
+            if not self.use_ml:
+                logger.warning("Đã yêu cầu chiến lược ML nhưng tùy chọn --no-ml được bật. Sẽ sử dụng ML ở độ tin cậy thấp.")
+            
+            ml_optimizer = MLOptimizer()
+            try:
+                if os.path.exists('models/ensemble_model.joblib'):
+                    logger.info("Đang tải mô hình ML đã huấn luyện...")
+                    ml_optimizer.load_models('models')
+                    logger.info("Đã tải xong mô hình ML")
+            except Exception as e:
+                logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+            
+            market_regime_detector = MarketRegimeDetector()
+            # Đặt ngưỡng tin cậy thấp hơn nếu --no-ml được bật
+            probability_threshold = 0.65 if self.use_ml else 0.80
+            
+            logger.info(f"Tạo chiến lược MLStrategy với probability_threshold={probability_threshold}")
+            return MLStrategy(
+                ml_optimizer=ml_optimizer,
+                market_regime_detector=market_regime_detector,
+                probability_threshold=probability_threshold
+            )
+            
+        elif strategy_type == 'combined':
+            # Tạo CombinedStrategy với các chiến lược cơ bản
+            strategies = [
+                RSIStrategy(overbought=70, oversold=30),
+                MACDStrategy(),
+                EMACrossStrategy(short_period=9, long_period=21),
+                BBandsStrategy(deviation_multiplier=2.0)
+            ]
+            
+            # Thêm MLStrategy nếu sử dụng ML
+            if self.use_ml:
+                ml_optimizer = MLOptimizer()
+                try:
+                    if os.path.exists('models/ensemble_model.joblib'):
+                        ml_optimizer.load_models('models')
+                except Exception as e:
+                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+                
+                market_regime_detector = MarketRegimeDetector()
+                strategies.append(MLStrategy(
+                    ml_optimizer=ml_optimizer,
+                    market_regime_detector=market_regime_detector,
+                    probability_threshold=0.65
+                ))
+                weights = [0.2, 0.2, 0.2, 0.2, 0.2]  # Trọng số bằng nhau cho tất cả chiến lược
+            else:
+                weights = [0.25, 0.25, 0.25, 0.25]  # Trọng số bằng nhau cho các chiến lược không ML
+            
+            logger.info(f"Tạo chiến lược CombinedStrategy với {len(strategies)} chiến lược con")
+            return CombinedStrategy(strategies=strategies, weights=weights)
+            
+        elif strategy_type == 'rsi':
+            # Tạo RSIStrategy
+            logger.info("Tạo chiến lược RSIStrategy với các thông số tiêu chuẩn")
+            return RSIStrategy(overbought=70, oversold=30)
+            
+        elif strategy_type == 'macd':
+            # Tạo MACDStrategy
+            logger.info("Tạo chiến lược MACDStrategy với các thông số tiêu chuẩn")
+            return MACDStrategy()
+            
+        elif strategy_type == 'ema':
+            # Tạo EMACrossStrategy
+            logger.info("Tạo chiến lược EMACrossStrategy với các thông số tiêu chuẩn")
+            return EMACrossStrategy(short_period=9, long_period=21)
+            
+        elif strategy_type == 'bbands':
+            # Tạo BBandsStrategy
+            logger.info("Tạo chiến lược BBandsStrategy với các thông số tiêu chuẩn")
+            return BBandsStrategy(deviation_multiplier=2.0)
+        
+        else:
+            # Mặc định sử dụng AutoStrategy
+            logger.warning(f"Không nhận dạng được loại chiến lược: {strategy_type}. Sử dụng chiến lược AutoStrategy mặc định.")
+            return self._create_default_strategy()
+            
     def _report_status(self):
         """Báo cáo trạng thái hoạt động của bot"""
         if not self.bot:
@@ -290,8 +512,18 @@ def main():
     parser.add_argument('--risk', type=float, default=1.0, help='Phần trăm rủi ro (0.1-10.0)')
     parser.add_argument('--config', type=str, help='File cấu hình tối ưu')
     parser.add_argument('--check-interval', type=int, default=60, help='Khoảng thời gian kiểm tra (giây)')
+    parser.add_argument('--strategy', type=str, choices=['auto', 'ml', 'combined', 'rsi', 'macd', 'ema', 'bbands'], 
+                       help='Loại chiến lược giao dịch (mặc định: auto)')
+    parser.add_argument('--no-ml', action='store_true', help='Không sử dụng học máy trong các dự đoán')
     
     args = parser.parse_args()
+    
+    # Xác định việc sử dụng tệp cấu hình
+    use_optimized = args.config is not None
+    
+    # Xử lý tình huống khi cả --strategy và --config được chỉ định
+    if args.strategy and args.config:
+        logger.warning("Cả tham số --strategy và --config đều được chỉ định. Chiến lược từ file cấu hình sẽ được ưu tiên.")
     
     # Khởi tạo runner
     runner = TradingBotRunner(
@@ -301,7 +533,9 @@ def main():
         test_mode=not args.live,
         leverage=args.leverage,
         risk_percentage=args.risk,
-        use_optimized=args.config is not None
+        use_optimized=use_optimized,
+        strategy_type=args.strategy,
+        use_ml=not args.no_ml
     )
     
     # Bắt đầu chạy bot
