@@ -354,6 +354,19 @@
         if (data.status === 'success') {
           updateNetworkDisplay(useTestnet);
           showToast(`Đã chuyển sang chế độ ${useTestnet ? 'TESTNET' : 'MAINNET'}`, 'success');
+          
+          // Update navigation bar without page refresh
+          const simulationBadge = document.querySelector('.navbar-nav .badge');
+          if (simulationBadge) {
+            simulationBadge.textContent = useTestnet ? 'Testnet Mode' : 'MAINNET';
+            simulationBadge.className = useTestnet ? 'badge bg-info' : 'badge bg-danger';
+          }
+          
+          // Update footer status
+          const footerStatus = document.querySelector('footer .text-warning');
+          if (footerStatus) {
+            footerStatus.textContent = `${useTestnet ? 'Testnet' : 'MAINNET'} Mode: ${useTestnet ? 'Using test network' : 'USING REAL MONEY'}`;
+          }
         } else {
           showToast(`Lỗi: ${data.message}`, 'danger');
           // Revert switch if there was an error
@@ -383,6 +396,31 @@
         if (data.status === 'success') {
           updateSimulationDisplay(useSimulation);
           showToast(`Đã ${useSimulation ? 'BẬT' : 'TẮT'} chế độ mô phỏng`, 'success');
+          
+          // Update navigation bar badge without page refresh
+          const navbarBadge = document.querySelector('.navbar-nav .badge');
+          if (navbarBadge) {
+            if (useSimulation) {
+              navbarBadge.textContent = 'Simulation Mode';
+              navbarBadge.className = 'badge bg-warning';
+            } else {
+              // Keep the current network status badge (could be testnet or mainnet)
+              const isTestnet = testnetSwitch.checked;
+              navbarBadge.textContent = isTestnet ? 'Testnet Mode' : 'MAINNET';
+              navbarBadge.className = isTestnet ? 'badge bg-info' : 'badge bg-danger';
+            }
+          }
+          
+          // Update footer status too
+          const footerStatus = document.querySelector('footer .text-warning');
+          if (footerStatus) {
+            if (useSimulation) {
+              footerStatus.textContent = 'Simulation Mode: No real trades are executed';
+            } else {
+              const isTestnet = testnetSwitch.checked;
+              footerStatus.textContent = `${isTestnet ? 'Testnet' : 'MAINNET'} Mode: ${isTestnet ? 'Using test network' : 'USING REAL MONEY'}`;
+            }
+          }
         } else {
           showToast(`Lỗi: ${data.message}`, 'danger');
           simulationSwitch.checked = !useSimulation;

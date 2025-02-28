@@ -17,8 +17,7 @@ except ImportError as e:
 logger.info("Initializing data generation thread")
 start_data_generation()
 
-# This is used by gunicorn for production
-# The app object is imported by gunicorn as specified in the .replit file
+# For running locally - not used with gunicorn
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     logger.info(f"Starting app on port {port}")
