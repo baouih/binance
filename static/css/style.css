@@ -1,104 +1,108 @@
-/* Custom styles for CryptoBot Dashboard */
+/* Crypto Trading Bot Dashboard Custom Styles */
 
-/* General styles */
+/* General Styles */
 body {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    background-color: var(--bs-dark);
 }
 
-.footer {
-    margin-top: auto;
-}
-
-/* Icons */
-.icon-lg {
-    width: 2rem;
-    height: 2rem;
-    stroke-width: 1.5;
-}
-
-.icon-sm {
-    width: 0.875rem;
-    height: 0.875rem;
-}
-
-/* Card customization */
+/* Dashboard Cards */
 .card {
-    border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+    transition: all 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
-/* Theme switcher */
-.theme-switch {
-    position: relative;
+.card-header {
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
-.theme-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-}
-
-#lightIcon {
-    display: none;
-}
-
-[data-bs-theme="light"] #lightIcon {
-    display: inline-block;
-}
-
-[data-bs-theme="light"] #darkIcon {
-    display: none;
-}
-
-/* Progress bars */
-.progress {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 1rem;
+/* Balance Display */
+.balance-display {
+    font-weight: 700;
+    color: var(--bs-light);
 }
 
 /* Tables */
-.table th {
-    font-weight: 500;
-    border-top: none;
+.table-responsive {
+    overflow-x: auto;
+    min-height: 200px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 767.98px) {
-    .card-title {
-        font-size: 1.25rem;
-    }
-    
-    .table {
-        font-size: 0.875rem;
-    }
+/* Market Regime Cards */
+.regime-card {
+    transition: all 0.3s ease;
 }
 
-/* Custom component styles */
-.market-regime-gauge {
+.regime-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Sentiment Gauge */
+.sentiment-gauge-container {
     position: relative;
-    width: 100%;
-    max-width: 300px;
+    height: 150px;
 }
 
-/* Chart container */
-.chart-container {
-    position: relative;
-    height: 300px;
-    width: 100%;
+/* Position and Signal Highlights */
+.position-long {
+    background-color: rgba(25, 135, 84, 0.1);
 }
 
-/* Custom badges */
+.position-short {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.signal-buy {
+    color: var(--bs-success);
+}
+
+.signal-sell {
+    color: var(--bs-danger);
+}
+
+/* Button Styles */
+.btn-action {
+    padding: .25rem .5rem;
+    font-size: 0.8rem;
+}
+
+/* Status Badges */
 .badge {
+    text-transform: uppercase;
     font-weight: 500;
-    padding: 0.35em 0.65em;
-    border-radius: 0.25rem;
+}
+
+/* Custom Colors for Sentiment */
+.extreme-fear {
+    color: var(--bs-danger);
+}
+
+.fear {
+    color: var(--bs-warning);
+}
+
+.neutral {
+    color: var(--bs-light);
+}
+
+.greed {
+    color: var(--bs-success);
+}
+
+.extreme-greed {
+    color: var(--bs-primary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .regime-card {
+        margin-bottom: 1rem;
+    }
 }
 
 /* Animations */
@@ -114,55 +118,30 @@ body {
     }
 }
 
-.live-indicator {
-    animation: pulse 2s infinite;
+.animate-pulse {
+    animation: pulse 1.5s infinite;
 }
 
-/* Dark mode specific styles */
-[data-bs-theme="dark"] .card {
-    background-color: rgba(45, 55, 72, 0.9);
+/* Price/Value Changes Highlight */
+.value-change {
+    transition: background-color 1s ease;
 }
 
-[data-bs-theme="dark"] .list-group-item {
-    background-color: rgba(45, 55, 72, 0.3);
+.value-increase {
+    background-color: rgba(25, 135, 84, 0.2);
 }
 
-/* Utility classes */
-.cursor-pointer {
-    cursor: pointer;
+.value-decrease {
+    background-color: rgba(220, 53, 69, 0.2);
 }
 
-.border-dashed {
-    border-style: dashed !important;
+/* Loading Indicator */
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
 }
 
-/* Strategy item styles */
-.strategy-item {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.strategy-item:last-child {
-    border-bottom: none;
-}
-
-/* Sentiment colors */
-.sentiment-extreme-fear {
-    color: #e74c3c;
-}
-
-.sentiment-fear {
-    color: #e67e22;
-}
-
-.sentiment-neutral {
-    color: #3498db;
-}
-
-.sentiment-greed {
-    color: #2980b9;
-}
-
-.sentiment-extreme-greed {
-    color: #27ae60;
+/* Charts */
+canvas {
+    width: 100% !important;
 }

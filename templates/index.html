@@ -1,573 +1,238 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Bot Giao Dịch</title>
+    <title>Crypto Trading Bot Dashboard</title>
+    <!-- Bootstrap Dark Theme CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Socket.IO -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <i data-feather="activity" class="text-primary"></i> CryptoBot Dashboard
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/"><i data-feather="home"></i> Dashboard</a>
+                        <a class="nav-link active" href="/">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/strategies"><i data-feather="sliders"></i> Chiến lược</a>
+                        <a class="nav-link" href="/strategies">Strategies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/backtest"><i data-feather="bar-chart-2"></i> Backtest</a>
+                        <a class="nav-link" href="/backtest">Backtest</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/trades"><i data-feather="repeat"></i> Giao dịch</a>
+                        <a class="nav-link" href="/trades">Trade History</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/settings"><i data-feather="settings"></i> Cài đặt</a>
+                        <a class="nav-link" href="/settings">Settings</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <div class="theme-switch me-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="themeSwitch">
-                            <label class="form-check-label" for="themeSwitch">
-                                <i data-feather="sun" class="theme-icon" id="lightIcon"></i>
-                                <i data-feather="moon" class="theme-icon" id="darkIcon"></i>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i data-feather="user"></i> <span class="ms-1">Admin</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="/profile"><i data-feather="user"></i> Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="/activity-log"><i data-feather="activity"></i> Hoạt động</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout"><i data-feather="log-out"></i> Đăng xuất</a></li>
-                        </ul>
-                    </div>
+                <div class="d-flex">
+                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
+                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container-fluid mt-4">
-        <!-- Status Row -->
-        <div class="row mb-4">
-            <div class="col-12 col-md-6 col-xl-3 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle text-muted">Bot Status</h6>
-                                <h4 class="card-title mb-0 text-success" id="botStatus">Running</h4>
-                            </div>
-                            <i data-feather="cpu" class="text-success icon-lg"></i>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-sm btn-primary" onclick="controlBot('start')">Start</button>
-                            <button class="btn btn-sm btn-danger" onclick="controlBot('stop')">Stop</button>
-                            <button class="btn btn-sm btn-warning" onclick="controlBot('restart')">Restart</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle text-muted">Tài khoản</h6>
-                                <h4 class="card-title mb-0" id="accountBalance">$10,253.42</h4>
-                            </div>
-                            <i data-feather="dollar-sign" class="text-primary icon-lg"></i>
-                        </div>
-                        <p class="card-text mt-2">
-                            <span class="badge bg-success"><i data-feather="trending-up" class="icon-sm"></i> +2.3%</span>
-                            <span class="text-muted ms-2">24h</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle text-muted">Thị trường</h6>
-                                <h4 class="card-title mb-0" id="btcPrice">$83,768.54</h4>
-                            </div>
-                            <i data-feather="trending-up" class="text-info icon-lg"></i>
-                        </div>
-                        <p class="card-text mt-2">
-                            <span class="badge bg-success" id="btcPriceChange"><i data-feather="trending-up" class="icon-sm"></i> +1.5%</span>
-                            <span class="text-muted ms-2">24h</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle text-muted">Tâm lý thị trường</h6>
-                                <h4 class="card-title mb-0" id="marketSentiment">Extreme Fear</h4>
-                            </div>
-                            <i data-feather="thermometer" class="text-warning icon-lg"></i>
-                        </div>
-                        <div class="progress mt-3" style="height: 10px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" id="sentimentProgressBar"></div>
-                        </div>
-                        <div class="d-flex justify-content-between mt-1">
-                            <small class="text-muted">Extreme Fear</small>
-                            <small class="text-muted">Extreme Greed</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row mb-4">
-            <div class="col-12 col-lg-8 mb-3">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Biểu đồ giá & Giao dịch</h5>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm btn-outline-primary active" data-timeframe="1h">1H</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-timeframe="4h">4H</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-timeframe="1d">1D</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-timeframe="1w">1W</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="priceChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-4 mb-3">
-                <div class="card">
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Account Overview -->
+            <div class="col-md-4">
+                <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Hiệu suất Bot</h5>
+                        <h5 class="card-title">Account Overview</h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="performanceChart" height="250"></canvas>
+                        <h2 class="balance-display">$<span id="account-balance">10,253.42</span></h2>
+                        <p class="text-muted">24h Change: <span id="account-change" class="text-success">+2.3%</span></p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" type="button">Deposit</button>
+                            <button class="btn btn-secondary" type="button">Withdraw</button>
+                        </div>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">ROI</div>
-                                <small class="text-muted">Return on Investment</small>
-                            </div>
-                            <span class="badge bg-success">+18.65%</span>
+                </div>
+            </div>
+            
+            <!-- Market Overview -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">Market Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>BTC/USDT: $<span id="btc-price">83,768.54</span></h4>
+                        <p class="text-muted">24h Change: <span id="btc-change" class="text-success">+1.5%</span></p>
+                        <div>
+                            <canvas id="price-chart" height="120"></canvas>
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Sharpe Ratio</div>
-                                <small class="text-muted">Risk-adjusted return</small>
-                            </div>
-                            <span class="badge bg-primary">2.34</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Market Sentiment -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">Market Sentiment</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="sentiment-gauge-container">
+                            <canvas id="sentiment-gauge" height="120"></canvas>
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Win Rate</div>
-                                <small class="text-muted">Successful trades ratio</small>
-                            </div>
-                            <span class="badge bg-info">68.75%</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Max Drawdown</div>
-                                <small class="text-muted">Largest drop from peak</small>
-                            </div>
-                            <span class="badge bg-warning">-9.21%</span>
-                        </div>
+                        <h5 id="sentiment-label" class="mt-2 text-danger">Extreme Fear</h5>
+                        <p class="text-muted">Market sentiment based on multiple indicators</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Active Trades and Signals Row -->
-        <div class="row mb-4">
-            <div class="col-12 col-lg-6 mb-3">
-                <div class="card">
+        <div class="row">
+            <!-- Active Positions -->
+            <div class="col-md-6">
+                <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Vị thế đang mở</h5>
-                        <button class="btn btn-sm btn-outline-primary" id="refreshPositions">
-                            <i data-feather="refresh-cw" class="icon-sm"></i>
-                        </button>
+                        <h5 class="card-title mb-0">Active Positions</h5>
+                        <button class="btn btn-sm btn-outline-primary">New Position</button>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped" id="activePositionsTable">
-                            <thead>
-                                <tr>
-                                    <th>Cặp</th>
-                                    <th>Loại</th>
-                                    <th>Giá vào</th>
-                                    <th>Giá hiện tại</th>
-                                    <th>Khối lượng</th>
-                                    <th>Lãi/Lỗ</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Entry</th>
+                                        <th>Current</th>
+                                        <th>PnL</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="positions-table">
+                                    <!-- Positions will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Signals -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">Recent Signals</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Symbol</th>
+                                        <th>Signal</th>
+                                        <th>Price</th>
+                                        <th>Confidence</th>
+                                        <th>Regime</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="signals-table">
+                                    <!-- Signals will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Market Regimes -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">Market Regimes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="regime-card bg-secondary p-2 rounded text-center">
+                                    <h6>BTC</h6>
+                                    <span id="regime-btc" class="badge bg-warning">VOLATILE</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="regime-card bg-secondary p-2 rounded text-center">
+                                    <h6>ETH</h6>
+                                    <span id="regime-eth" class="badge bg-warning">VOLATILE</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="regime-card bg-secondary p-2 rounded text-center">
+                                    <h6>BNB</h6>
+                                    <span id="regime-bnb" class="badge bg-info">NEUTRAL</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="regime-card bg-secondary p-2 rounded text-center">
+                                    <h6>SOL</h6>
+                                    <span id="regime-sol" class="badge bg-primary">RANGING</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted">Market regimes determine the optimal strategy to use</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot Status -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Bot Status</h5>
+                        <button class="btn btn-sm btn-outline-secondary" id="restart-bot">Restart</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
                             <tbody>
                                 <tr>
-                                    <td>BTCUSDT</td>
-                                    <td><span class="badge bg-success">LONG</span></td>
-                                    <td>$82,458.15</td>
-                                    <td>$83,768.54</td>
-                                    <td>0.025 BTC</td>
-                                    <td class="text-success">+$32.61 (+1.59%)</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger" onclick="closePosition('BTCUSDT_1')">Đóng</button>
-                                    </td>
+                                    <td><strong>Status:</strong></td>
+                                    <td id="status-value">Running</td>
                                 </tr>
                                 <tr>
-                                    <td>ETHUSDT</td>
-                                    <td><span class="badge bg-danger">SHORT</span></td>
-                                    <td>$2,285.36</td>
-                                    <td>$2,212.85</td>
-                                    <td>0.35 ETH</td>
-                                    <td class="text-success">+$25.38 (+3.18%)</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger" onclick="closePosition('ETHUSDT_1')">Đóng</button>
-                                    </td>
+                                    <td><strong>Uptime:</strong></td>
+                                    <td id="uptime-value">12 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Version:</strong></td>
+                                    <td id="version-value">1.0.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Active Strategies:</strong></td>
+                                    <td id="strategies-value">Composite ML Strategy, Multi-timeframe analyzer, Sentiment-based counter</td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Tín hiệu giao dịch gần đây</h5>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="recentSignalsTable">
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Cặp</th>
-                                    <th>Tín hiệu</th>
-                                    <th>Độ tin cậy</th>
-                                    <th>Giá</th>
-                                    <th>Chế độ thị trường</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>12:35:18</td>
-                                    <td>BTCUSDT</td>
-                                    <td><span class="badge bg-success">BUY</span></td>
-                                    <td>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar bg-success" style="width: 78%"></div>
-                                        </div>
-                                        <small>78%</small>
-                                    </td>
-                                    <td>$83,518.75</td>
-                                    <td><span class="badge bg-secondary">NEUTRAL</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-success">Thực thi</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>11:42:06</td>
-                                    <td>SOLUSDT</td>
-                                    <td><span class="badge bg-danger">SELL</span></td>
-                                    <td>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar bg-danger" style="width: 82%"></div>
-                                        </div>
-                                        <small>82%</small>
-                                    </td>
-                                    <td>$126.48</td>
-                                    <td><span class="badge bg-warning">VOLATILE</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-success">Thực thi</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>10:18:32</td>
-                                    <td>ETHUSDT</td>
-                                    <td><span class="badge bg-danger">SELL</span></td>
-                                    <td>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar bg-danger" style="width: 75%"></div>
-                                        </div>
-                                        <small>75%</small>
-                                    </td>
-                                    <td>$2,248.36</td>
-                                    <td><span class="badge bg-warning">VOLATILE</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-secondary" disabled>Đã thực thi</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Market Insights Row -->
-        <div class="row mb-4">
-            <div class="col-12 col-lg-4 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Chế độ thị trường</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center">
-                            <div class="market-regime-gauge">
-                                <canvas id="marketRegimeGauge" height="220"></canvas>
-                            </div>
-                        </div>
-                        <div class="list-group list-group-flush mt-3">
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>BTC</div>
-                                <span class="badge bg-warning">VOLATILE</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>ETH</div>
-                                <span class="badge bg-warning">VOLATILE</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>BNB</div>
-                                <span class="badge bg-secondary">NEUTRAL</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>SOL</div>
-                                <span class="badge bg-primary">RANGING</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-4 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Phân tích tâm lý gần đây</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="sentimentChart" height="220"></canvas>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">BTC</div>
-                                <small class="text-muted">Last 6 hours</small>
-                            </div>
-                            <span class="badge bg-info">Trend: Improving</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">ETH</div>
-                                <small class="text-muted">Last 6 hours</small>
-                            </div>
-                            <span class="badge bg-secondary">Trend: Stable</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-4 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Chiến lược đang hoạt động</h5>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <div class="fw-bold">Composite ML Strategy</div>
-                                <small class="text-muted">BTC, ETH</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="strategy1" checked>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <div class="fw-bold">Multi-timeframe analyzer</div>
-                                <small class="text-muted">BTC, ETH, SOL</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="strategy2" checked>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <div class="fw-bold">Sentiment-based counter</div>
-                                <small class="text-muted">BTC</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="strategy3" checked>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <div class="fw-bold">Liquidity Analyzer</div>
-                                <small class="text-muted">BTC, ETH</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="strategy4">
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-center py-3">
-                            <a href="/strategies" class="btn btn-sm btn-outline-primary">Quản lý chiến lược</a>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-dark text-light">
-        <div class="container">
-            <div class="d-flex justify-content-between">
-                <span>&copy; 2025 CryptoBot Dashboard</span>
-                <span>Server Status: <span class="text-success">Online</span></span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script>
-        // Initialize feather icons
-        document.addEventListener('DOMContentLoaded', function() {
-            feather.replace();
-        });
-
-        // Socket.io connection
-        const socket = io();
-        
-        // Update price in real-time
-        socket.on('price_update', function(data) {
-            if (data.symbol === 'BTCUSDT') {
-                document.getElementById('btcPrice').textContent = '$' + numberWithCommas(data.price);
-            }
-        });
-
-        // Update sentiment in real-time
-        socket.on('sentiment_update', function(data) {
-            updateSentimentUI(data.value, data.state);
-        });
-
-        // Update positions in real-time
-        socket.on('account_update', function(data) {
-            // Update position table logic here
-            console.log('Received account update:', data);
-        });
-
-        function updateSentimentUI(value, state) {
-            const progressBar = document.getElementById('sentimentProgressBar');
-            const sentimentText = document.getElementById('marketSentiment');
-            
-            // Update progress bar
-            progressBar.style.width = value + '%';
-            
-            // Update color based on sentiment
-            if (value < 25) {
-                progressBar.className = 'progress-bar bg-danger';
-                sentimentText.textContent = 'Extreme Fear';
-                sentimentText.className = 'card-title mb-0 text-danger';
-            } else if (value < 40) {
-                progressBar.className = 'progress-bar bg-warning';
-                sentimentText.textContent = 'Fear';
-                sentimentText.className = 'card-title mb-0 text-warning';
-            } else if (value < 60) {
-                progressBar.className = 'progress-bar bg-info';
-                sentimentText.textContent = 'Neutral';
-                sentimentText.className = 'card-title mb-0 text-info';
-            } else if (value < 75) {
-                progressBar.className = 'progress-bar bg-primary';
-                sentimentText.textContent = 'Greed';
-                sentimentText.className = 'card-title mb-0 text-primary';
-            } else {
-                progressBar.className = 'progress-bar bg-success';
-                sentimentText.textContent = 'Extreme Greed';
-                sentimentText.className = 'card-title mb-0 text-success';
-            }
-        }
-
-        function numberWithCommas(x) {
-            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        function controlBot(action) {
-            console.log('Bot control:', action);
-            fetch('/api/bot/control', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: action })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Update UI based on response
-                if (data.status === 'success') {
-                    if (action === 'start' || action === 'restart') {
-                        document.getElementById('botStatus').textContent = 'Running';
-                        document.getElementById('botStatus').className = 'card-title mb-0 text-success';
-                    } else if (action === 'stop') {
-                        document.getElementById('botStatus').textContent = 'Stopped';
-                        document.getElementById('botStatus').className = 'card-title mb-0 text-danger';
-                    }
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        function closePosition(positionId) {
-            console.log('Closing position:', positionId);
-            fetch('/api/positions/close', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ position_id: positionId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Update UI based on response
-                if (data.status === 'success') {
-                    // Remove the row from the table
-                    // This is a simple approach - in a real app you'd probably refresh the entire table
-                    const row = document.querySelector(`tr[data-position-id="${positionId}"]`);
-                    if (row) {
-                        row.remove();
-                    }
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/static/js/dashboard.js"></script>
 </body>
 </html>

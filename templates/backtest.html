@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtest - Crypto Trading Bot</title>
+    <!-- Bootstrap Dark Theme CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/strategies">Strategies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/backtest">Backtest</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trades">Trade History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings">Settings</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
+                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Backtest Strategies</h2>
+                    <button class="btn btn-primary" id="runBacktestBtn">
+                        <i class="bi bi-play-fill"></i> Run Backtest
+                    </button>
+                </div>
+                <p class="text-muted">Test your strategies on historical data to evaluate performance before live trading</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Backtest Configuration -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title">Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="backtestForm">
+                            <div class="mb-3">
+                                <label for="strategySelect" class="form-label">Strategy</label>
+                                <select class="form-select" id="strategySelect" required>
+                                    <option value="">Select a strategy</option>
+                                    <option value="rsi_strategy">RSI Strategy</option>
+                                    <option value="macd_strategy">MACD Strategy</option>
+                                    <option value="bollinger_strategy">Bollinger Bands Strategy</option>
+                                    <option value="ml_strategy">ML Strategy</option>
+                                    <option value="composite_strategy">Composite Strategy</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="symbolSelect" class="form-label">Symbol</label>
+                                <select class="form-select" id="symbolSelect" required>
+                                    <option value="BTCUSDT">BTC/USDT</option>
+                                    <option value="ETHUSDT">ETH/USDT</option>
+                                    <option value="BNBUSDT">BNB/USDT</option>
+                                    <option value="SOLUSDT">SOL/USDT</option>
+                                    <option value="ADAUSDT">ADA/USDT</option>
+                                    <option value="DOGEUSDT">DOGE/USDT</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="timeframeSelect" class="form-label">Timeframe</label>
+                                <select class="form-select" id="timeframeSelect" required>
+                                    <option value="5m">5 minutes</option>
+                                    <option value="15m">15 minutes</option>
+                                    <option value="30m">30 minutes</option>
+                                    <option value="1h" selected>1 hour</option>
+                                    <option value="4h">4 hours</option>
+                                    <option value="1d">1 day</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="initialBalance" class="form-label">Initial Balance (USDT)</label>
+                                <input type="number" class="form-control" id="initialBalance" value="10000" min="100" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="riskPerTrade" class="form-label">Risk Per Trade (%)</label>
+                                <input type="number" class="form-control" id="riskPerTrade" value="1" min="0.1" max="10" step="0.1" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="leverage" class="form-label">Leverage</label>
+                                <select class="form-select" id="leverage" required>
+                                    <option value="1">1x (No leverage)</option>
+                                    <option value="2">2x</option>
+                                    <option value="3" selected>3x</option>
+                                    <option value="5">5x</option>
+                                    <option value="10">10x</option>
+                                    <option value="20">20x</option>
+                                </select>
+                            </div>
+                            
+                            <div id="strategyParams" class="mb-3">
+                                <!-- Strategy-specific parameters will be loaded here -->
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="optimizeParams" checked>
+                                <label class="form-check-label" for="optimizeParams">Optimize parameters</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Backtest Results -->
+            <div class="col-lg-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title">Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultsSection" class="d-none">
+                            <div class="row mb-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Final Balance</h6>
+                                            <h3 id="finalBalance" class="card-title mb-0">$12,345.67</h3>
+                                            <p id="totalProfit" class="text-success mb-0">+23.45%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Win Rate</h6>
+                                            <h3 id="winRate" class="card-title mb-0">68.5%</h3>
+                                            <p class="text-muted mb-0">24/35 trades</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Max Drawdown</h6>
+                                            <h3 id="maxDrawdown" class="card-title mb-0">12.3%</h3>
+                                            <p class="text-muted mb-0">$1,230.45</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card bg-dark">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Sharpe Ratio</h6>
+                                            <h3 id="sharpeRatio" class="card-title mb-0">1.85</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card bg-dark">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Profit Factor</h6>
+                                            <h3 id="profitFactor" class="card-title mb-0">2.14</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6>Equity Curve</h6>
+                                <div class="chart-container" style="position: relative; height: 250px;">
+                                    <canvas id="equityCurveChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6>Trade History</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Entry</th>
+                                                <th>Exit</th>
+                                                <th>PnL</th>
+                                                <th>PnL %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tradesTable">
+                                            <!-- Trade rows will be inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-6 mb-2">
+                                    <button id="downloadReportBtn" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-download"></i> Download Report
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button id="saveStrategyBtn" class="btn btn-outline-success w-100">
+                                        <i class="bi bi-save"></i> Save Optimized Strategy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="noResultsSection" class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-bar-chart-line fs-1 text-muted"></i>
+                            </div>
+                            <h5>No Backtest Results Yet</h5>
+                            <p class="text-muted">Configure your backtest parameters and click "Run Backtest" to see results</p>
+                        </div>
+                        
+                        <div id="loadingSection" class="text-center py-5 d-none">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h5>Running Backtest...</h5>
+                            <p class="text-muted">This may take a few moments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced Metrics -->
+        <div class="row">
+            <div class="col">
+                <div class="card mb-4 d-none" id="advancedMetricsCard">
+                    <div class="card-header">
+                        <h5 class="card-title">Advanced Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <h6>Monthly Returns</h6>
+                                <div class="chart-container" style="position: relative; height: 250px;">
+                                    <canvas id="monthlyReturnsChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <h6>Drawdown Analysis</h6>
+                                <div class="chart-container" style="position: relative; height: 250px;">
+                                    <canvas id="drawdownChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-dark">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Average Win</h6>
+                                        <h3 id="avgWin" class="card-title mb-0">2.8%</h3>
+                                        <p class="text-muted mb-0">$280.42</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-dark">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Average Loss</h6>
+                                        <h3 id="avgLoss" class="card-title mb-0">-1.2%</h3>
+                                        <p class="text-muted mb-0">-$120.18</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-dark">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Risk-Reward Ratio</h6>
+                                        <h3 id="riskReward" class="card-title mb-0">2.33</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive mt-3">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Total Trades</td>
+                                        <td id="totalTrades">35</td>
+                                        <td>Winning Trades</td>
+                                        <td id="winningTrades">24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Losing Trades</td>
+                                        <td id="losingTrades">11</td>
+                                        <td>Win Rate</td>
+                                        <td id="winRateDetail">68.5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Best Trade</td>
+                                        <td id="bestTrade">7.2% ($720.34)</td>
+                                        <td>Worst Trade</td>
+                                        <td id="worstTrade">-2.8% (-$280.15)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Trade</td>
+                                        <td id="avgTrade">1.5% ($150.25)</td>
+                                        <td>Expectancy</td>
+                                        <td id="expectancy">$152.33</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Annualized Return</td>
+                                        <td id="annualizedReturn">28.75%</td>
+                                        <td>Recovery Factor</td>
+                                        <td id="recoveryFactor">1.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Calmar Ratio</td>
+                                        <td id="calmarRatio">2.34</td>
+                                        <td>Sortino Ratio</td>
+                                        <td id="sortinoRatio">2.56</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Max Consecutive Wins</td>
+                                        <td id="maxConsecWins">8</td>
+                                        <td>Max Consecutive Losses</td>
+                                        <td id="maxConsecLosses">3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Avg Hold Time (Winners)</td>
+                                        <td id="avgHoldTimeWin">18.5 hrs</td>
+                                        <td>Avg Hold Time (Losers)</td>
+                                        <td id="avgHoldTimeLoss">12.3 hrs</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/static/js/backtest.js"></script>
+</body>
+</html>

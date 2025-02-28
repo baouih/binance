@@ -6,6 +6,7 @@ Web Dashboard cho bot giao dịch tiền điện tử
 import os
 import json
 import logging
+import random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_socketio import SocketIO
