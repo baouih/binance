@@ -4,6 +4,11 @@ def register_routes(app):
     """
     Đăng ký các tuyến đường bổ sung cho ứng dụng.
     """
+    # Ghi đè route chính để sử dụng trang đơn giản
+    @app.route('/')
+    def index_basic():
+        """Trang chính đơn giản."""
+        return render_template('index_basic.html')
     
     @app.route('/test')
     def test_page():
@@ -24,6 +29,11 @@ def register_routes(app):
     def simple_page():
         """Trang siêu đơn giản."""
         return render_template('simple.html')
+    
+    @app.route('/basic')
+    def basic_page():
+        """Trang cơ bản không có Socket.IO."""
+        return render_template('basic.html')
         
     # API đơn giản cho kiểm tra
     @app.route('/api/test', methods=['GET'])
