@@ -225,12 +225,24 @@ class BinanceAPI:
         timestamps = [end_time - delta * i for i in range(limit)]
         timestamps.reverse()  # Oldest first
         
-        # Base price and volatility based on symbol
+        # Get current market price from CoinGecko or use a safe default
+        current_price = 81500  # Fallback price
+        try:
+            response = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+            if response.status_code == 200:
+                data = response.json()
+                if 'bitcoin' in data and 'usd' in data['bitcoin']:
+                    current_price = data['bitcoin']['usd']
+        except Exception as e:
+            logger.warning(f"Failed to get current price from CoinGecko: {e}")
+        
+        # Base price and volatility based on symbol and current price
         if symbol == 'BTCUSDT':
-            base_price = 65000  # Approximate BTC price
+            base_price = current_price  # Use current price
             volatility = 0.005  # Daily volatility
         elif symbol == 'ETHUSDT':
-            base_price = 3500  # Approximate ETH price
+            # Typically ETH is about 5-7% of BTC price
+            base_price = current_price * 0.06  
             volatility = 0.007
         else:
             base_price = 100
@@ -295,30 +307,13 @@ class BinanceAPI:
     def get_account_info(self):
         """Get account information"""
         if self.simulation_mode:
+            # In simulation mode, don't show any active positions
             return {
                 'totalWalletBalance': '50000.00',
-                'totalUnrealizedProfit': '500.00',
-                'totalMarginBalance': '50500.00',
-                'availableBalance': '45000.00',
-                'positions': [
-                    {
-                        'symbol': 'BTCUSDT',
-                        'positionAmt': '0.5',
-                        'entryPrice': '64000.00',
-                        'markPrice': '65000.00',
-                        'unRealizedProfit': '500.00',
-                        'liquidationPrice': '58000.00',
-                        'leverage': '10',
-                        'maxNotionalValue': '1000000',
-                        'marginType': 'isolated',
-                        'isolatedMargin': '3200.00',
-                        'isAutoAddMargin': 'false',
-                        'positionSide': 'BOTH',
-                        'notional': '32500.00',
-                        'isolatedWallet': '3200.00',
-                        'updateTime': int(time.time() * 1000)
-                    }
-                ]
+                'totalUnrealizedProfit': '0.00',
+                'totalMarginBalance': '50000.00',
+                'availableBalance': '50000.00',
+                'positions': []
             }
         
         try:
@@ -341,30 +336,8 @@ class BinanceAPI:
     def get_open_orders(self, symbol=None):
         """Get all open orders on a symbol or all symbols"""
         if self.simulation_mode:
-            return [
-                {
-                    "orderId": 1917641,
-                    "symbol": "BTCUSDT",
-                    "status": "NEW",
-                    "clientOrderId": "web_6gCrw2kF8MCDF1EjKxHn",
-                    "price": "23416.10",
-                    "avgPrice": "0.00",
-                    "origQty": "0.001",
-                    "executedQty": "0",
-                    "cumQuote": "0",
-                    "timeInForce": "GTC",
-                    "type": "LIMIT",
-                    "reduceOnly": False,
-                    "closePosition": False,
-                    "side": "BUY",
-                    "positionSide": "BOTH",
-                    "stopPrice": "0",
-                    "workingType": "CONTRACT_PRICE",
-                    "priceProtect": False,
-                    "origType": "LIMIT",
-                    "updateTime": int(time.time() * 1000)
-                }
-            ]
+            # Return empty list in simulation mode to not display any mock orders
+            return []
             
         try:
             timestamp = self.get_server_time()
