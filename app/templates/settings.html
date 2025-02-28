@@ -320,7 +320,22 @@
     });
     
     simulationSwitch.addEventListener('change', function() {
-      updateSimulationSettings(this.checked);
+      // Show confirmation if disabling simulation mode
+      if (!this.checked) {
+        showConfirmationModal(
+          'Tắt Chế Độ Mô Phỏng',
+          'Cảnh báo: Tắt chế độ mô phỏng sẽ cho phép thực hiện giao dịch thật. Bạn có chắc chắn muốn tiếp tục?',
+          function() {
+            updateSimulationSettings(false);
+          },
+          function() {
+            // If user cancels, revert switch state
+            simulationSwitch.checked = true;
+          }
+        );
+      } else {
+        updateSimulationSettings(true);
+      }
     });
     
     // Network settings update function
@@ -520,13 +535,33 @@
       
       // Validate form
       if (!apiKey || !apiSecret) {
-        showToast('Please enter both API key and secret', 'danger');
+        showToast('Vui lòng nhập cả API key và API secret', 'danger');
         return;
       }
       
-      // Mock save for demo
-      // In a real application, you would send this to the server securely
-      showToast('API keys saved successfully', 'success');
+      // Gửi API keys lên server
+      fetch('/api/settings/api_keys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          api_key: apiKey,
+          api_secret: apiSecret
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showToast('Đã lưu API keys thành công', 'success');
+        } else {
+          showToast(`Lỗi: ${data.message}`, 'danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving API keys:', error);
+        showToast('Lỗi kết nối đến máy chủ', 'danger');
+      });
     });
     
     // Notification form submit

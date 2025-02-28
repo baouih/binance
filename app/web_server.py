@@ -675,6 +675,49 @@ def update_simulation_settings():
             'status': 'error',
             'message': f"Không thể cập nhật chế độ mô phỏng: {str(e)}"
         })
+        
+@app.route('/api/settings/api_keys', methods=['POST'])
+def update_api_keys():
+    """Cập nhật API keys cho Binance."""
+    try:
+        data = request.json
+        api_key = data.get('api_key', '')
+        api_secret = data.get('api_secret', '')
+        
+        if not api_key or not api_secret:
+            return jsonify({
+                'status': 'error',
+                'message': "API key và API secret không được để trống"
+            })
+        
+        # Lưu cài đặt vào storage
+        storage = Storage()
+        settings = storage.get_settings() or {}
+        settings['api_key'] = api_key
+        settings['api_secret'] = api_secret
+        storage.save_settings(settings)
+        
+        # Cập nhật API client với khóa mới
+        global binance_api, data_processor
+        binance_api = BinanceAPI(
+            api_key=api_key, 
+            api_secret=api_secret, 
+            testnet=(settings.get('network', 'testnet') == 'testnet'),
+            simulation_mode=settings.get('simulation_mode', True)
+        )
+        data_processor = DataProcessor(binance_api, simulation_mode=settings.get('simulation_mode', True))
+        
+        return jsonify({
+            'status': 'success',
+            'message': "Đã lưu API keys thành công",
+            'api_key_configured': True
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật API keys: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f"Không thể cập nhật API keys: {str(e)}"
+        })
 
 @app.route('/api/run_backtest', methods=['POST'])
 def run_backtest():
