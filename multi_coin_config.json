@@ -1,83 +1,121 @@
 {
-    "trading_pairs": [
-        {
-            "symbol": "BTCUSDT",
-            "enabled": true,
-            "timeframes": ["1h", "4h"],
-            "risk_percentage": 1.0,
-            "strategy": "ml_adaptive",
-            "max_position_size": 0.01,
-            "take_profit": 3.0,
-            "stop_loss": 2.0,
-            "entry_threshold": 0.65
-        },
-        {
-            "symbol": "ETHUSDT",
-            "enabled": true,
-            "timeframes": ["1h", "4h"],
-            "risk_percentage": 0.8,
-            "strategy": "ml_adaptive",
-            "max_position_size": 0.05,
-            "take_profit": 3.5,
-            "stop_loss": 2.5,
-            "entry_threshold": 0.7
-        },
-        {
-            "symbol": "SOLUSDT",
-            "enabled": false,
-            "timeframes": ["1h"],
-            "risk_percentage": 0.5,
-            "strategy": "ml_adaptive",
-            "max_position_size": 0.1,
-            "take_profit": 5.0,
-            "stop_loss": 3.0,
-            "entry_threshold": 0.75
-        },
-        {
-            "symbol": "BNBUSDT",
-            "enabled": false,
-            "timeframes": ["1h"],
-            "risk_percentage": 0.7,
-            "strategy": "ml_adaptive",
-            "max_position_size": 0.02,
-            "take_profit": 4.0,
-            "stop_loss": 2.5,
-            "entry_threshold": 0.68
-        }
-    ],
-    "general_settings": {
-        "initial_balance": 1000.0,
-        "max_concurrent_positions": 3,
-        "check_interval_seconds": 300,
-        "telegram_notifications": true,
-        "notification_level": "trades_and_signals",
-        "save_ml_models": true,
-        "ml_model_save_interval_hours": 24,
-        "continuous_learning": true,
-        "training_lookback_days": 30,
-        "use_testnet": true
+  "trading_pairs": [
+    {
+      "symbol": "BTCUSDT",
+      "enabled": true,
+      "timeframes": ["1h", "4h", "1d"],
+      "primary_timeframe": "1h",
+      "entry_threshold": 0.65,
+      "risk_percentage": 1.0,
+      "leverage": 3,
+      "take_profit_pct": 2.5,
+      "stop_loss_pct": 1.5,
+      "trailing_stop_enabled": true,
+      "trailing_stop_activation_pct": 1.0,
+      "trailing_stop_callback_pct": 0.5,
+      "strategies": ["composite", "ml"]
     },
-    "risk_management": {
-        "max_drawdown_percentage": 15,
-        "daily_loss_limit_percentage": 5,
-        "risk_multiplier_trending": 1.2,
-        "risk_multiplier_ranging": 0.8,
-        "risk_multiplier_volatile": 0.5,
-        "auto_adjust_position_size": true
+    {
+      "symbol": "ETHUSDT",
+      "enabled": true,
+      "timeframes": ["1h", "4h", "1d"],
+      "primary_timeframe": "1h",
+      "entry_threshold": 0.70,
+      "risk_percentage": 1.0,
+      "leverage": 3,
+      "take_profit_pct": 3.0,
+      "stop_loss_pct": 2.0,
+      "trailing_stop_enabled": true,
+      "trailing_stop_activation_pct": 1.2,
+      "trailing_stop_callback_pct": 0.6,
+      "strategies": ["composite", "ml"]
     },
-    "performance_monitoring": {
-        "min_win_rate": 45,
-        "min_profit_factor": 1.5,
-        "daily_report_time": "23:00",
-        "weekly_report_day": "Friday",
-        "weekly_report_time": "20:00",
-        "health_check_interval_minutes": 60
+    {
+      "symbol": "BNBUSDT",
+      "enabled": false,
+      "timeframes": ["1h", "4h", "1d"],
+      "primary_timeframe": "1h",
+      "entry_threshold": 0.65,
+      "risk_percentage": 1.0,
+      "leverage": 2,
+      "take_profit_pct": 2.5,
+      "stop_loss_pct": 1.5,
+      "trailing_stop_enabled": true,
+      "trailing_stop_activation_pct": 1.0,
+      "trailing_stop_callback_pct": 0.5,
+      "strategies": ["composite", "ml"]
     },
-    "advanced_features": {
-        "volatility_adjustment": true,
-        "regime_based_strategies": true,
-        "multi_timeframe_confirmation": true,
-        "dynamic_indicators": true,
-        "adaptive_machine_learning": true
+    {
+      "symbol": "SOLUSDT",
+      "enabled": false,
+      "timeframes": ["1h", "4h", "1d"],
+      "primary_timeframe": "1h",
+      "entry_threshold": 0.70,
+      "risk_percentage": 1.0,
+      "leverage": 2,
+      "take_profit_pct": 3.5,
+      "stop_loss_pct": 2.5,
+      "trailing_stop_enabled": true,
+      "trailing_stop_activation_pct": 1.5,
+      "trailing_stop_callback_pct": 0.8,
+      "strategies": ["composite", "ml"]
     }
+  ],
+  "general_settings": {
+    "initial_balance": 10000.0,
+    "max_positions": 3,
+    "data_lookback_days": 60,
+    "check_interval_seconds": 60,
+    "ml_features_enabled": true,
+    "dynamic_risk_management": true,
+    "market_regime_adaptation": true,
+    "telegram_notifications": true,
+    "notification_level": "all",
+    "save_trading_data": true,
+    "data_directory": "data",
+    "log_level": "INFO"
+  },
+  "composite_indicator_settings": {
+    "indicators": [
+      "rsi",
+      "macd",
+      "ema_cross",
+      "bbands",
+      "volume_trend",
+      "adx",
+      "stochastic",
+      "obv",
+      "atr"
+    ],
+    "dynamic_weights": true,
+    "lookback_period": 20
+  },
+  "ml_settings": {
+    "enabled": true,
+    "model_type": "ensemble",
+    "base_models": [
+      "random_forest",
+      "gradient_boosting",
+      "neural_network"
+    ],
+    "feature_selection": true,
+    "use_model_per_regime": true,
+    "retraining_interval_days": 7,
+    "prediction_threshold": 0.6,
+    "min_prediction_confidence": 0.65
+  },
+  "risk_management_settings": {
+    "market_regime_risk_multipliers": {
+      "trending_up": 1.2,
+      "trending_down": 0.8,
+      "ranging": 1.0,
+      "volatile": 0.6,
+      "breakout": 1.0,
+      "neutral": 0.8
+    },
+    "max_risk_per_trade_pct": 2.0,
+    "max_open_trades": 3,
+    "correlation_based_sizing": true,
+    "auto_adjust_tp_sl": true
+  }
 }
