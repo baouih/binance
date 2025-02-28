@@ -1,0 +1,20 @@
+=== BÁO CÁO HIỆU SUẤT GIAO DỊCH ===
+
+Thời gian: 2025-02-28 14:58:37.305790
+
+=== CHIẾN LƯỢC TỐT NHẤT ===
+Symbol: BTCUSDT
+Interval: 1h
+Strategy: RSI
+Profit: -119.46%
+Win Rate: 0.00%
+Sharpe Ratio: -6.31
+
+=== THÔNG TIN GIAO DỊCH ===
+Tổng số giao dịch: 15
+Số giao dịch thắng: 0
+Số giao dịch thua: 15
+Thua lỗ trung bình giao dịch thua: -138.92%
+
+=== KẾT LUẬN ===
+Chiến lược RSI trên BTCUSDT với khung thời gian 1h cho hiệu suất tốt nhất trong quá trình backtest.
