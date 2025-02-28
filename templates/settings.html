@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Crypto Trading Bot</title>
+    <!-- Bootstrap Dark Theme CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/strategies">Strategies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/backtest">Backtest</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trades">Trade History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/settings">Settings</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
+                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h2>Bot Settings</h2>
+                <p class="text-muted">Configure your trading bot parameters and API connections</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Settings Navigation -->
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Settings Menu</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="#api-settings" class="list-group-item list-group-item-action active" data-bs-toggle="list">API Connections</a>
+                        <a href="#trading-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Trading Parameters</a>
+                        <a href="#risk-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Risk Management</a>
+                        <a href="#notification-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Notifications</a>
+                        <a href="#system-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">System Settings</a>
+                        <a href="#backup-restore" class="list-group-item list-group-item-action" data-bs-toggle="list">Backup & Restore</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Content -->
+            <div class="col-md-9 mb-4">
+                <div class="tab-content">
+                    <!-- API Connections -->
+                    <div class="tab-pane fade show active" id="api-settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">API Connections</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="api-form">
+                                    <div class="mb-4">
+                                        <h6>Binance API</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="binance-api-key" class="form-label">API Key</label>
+                                                    <input type="password" class="form-control" id="binance-api-key" placeholder="Enter Binance API Key">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="binance-api-secret" class="form-label">API Secret</label>
+                                                    <input type="password" class="form-control" id="binance-api-secret" placeholder="Enter Binance API Secret">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="use-testnet" checked>
+                                                    <label class="form-check-label" for="use-testnet">
+                                                        Use Binance Testnet (recommended for testing)
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-end">
+                                                <button type="button" class="btn btn-outline-primary" id="test-binance-api">Test Connection</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Telegram Notifications</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="telegram-bot-token" class="form-label">Bot Token</label>
+                                                    <input type="password" class="form-control" id="telegram-bot-token" placeholder="Enter Telegram Bot Token">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="telegram-chat-id" class="form-label">Chat ID</label>
+                                                    <input type="text" class="form-control" id="telegram-chat-id" placeholder="Enter Telegram Chat ID">
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-end">
+                                                <button type="button" class="btn btn-outline-primary" id="test-telegram-api">Test Notification</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary" id="save-api-settings">Save API Settings</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trading Parameters -->
+                    <div class="tab-pane fade" id="trading-settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Trading Parameters</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="trading-form">
+                                    <div class="mb-4">
+                                        <h6>Trading Pairs</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <label for="trading-pairs" class="form-label">Trading Pairs</label>
+                                                <select class="form-select" id="trading-pairs" multiple>
+                                                    <option value="BTCUSDT" selected>BTC/USDT</option>
+                                                    <option value="ETHUSDT" selected>ETH/USDT</option>
+                                                    <option value="BNBUSDT">BNB/USDT</option>
+                                                    <option value="SOLUSDT">SOL/USDT</option>
+                                                    <option value="ADAUSDT">ADA/USDT</option>
+                                                    <option value="DOGEUSDT">DOGE/USDT</option>
+                                                    <option value="XRPUSDT">XRP/USDT</option>
+                                                    <option value="DOTUSDT">DOT/USDT</option>
+                                                </select>
+                                                <div class="form-text">Hold Ctrl or Cmd to select multiple pairs</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" id="add-pair-btn">Add Custom Pair</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Timeframes</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Timeframes to Analyze</label>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-1m">
+                                                            <label class="form-check-label" for="timeframe-1m">1 minute</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-5m">
+                                                            <label class="form-check-label" for="timeframe-5m">5 minutes</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-15m" checked>
+                                                            <label class="form-check-label" for="timeframe-15m">15 minutes</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-30m">
+                                                            <label class="form-check-label" for="timeframe-30m">30 minutes</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-1h" checked>
+                                                            <label class="form-check-label" for="timeframe-1h">1 hour</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-4h" checked>
+                                                            <label class="form-check-label" for="timeframe-4h">4 hours</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-1d" checked>
+                                                            <label class="form-check-label" for="timeframe-1d">1 day</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="timeframe-1w">
+                                                            <label class="form-check-label" for="timeframe-1w">1 week</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="primary-timeframe" class="form-label">Primary Timeframe</label>
+                                                <select class="form-select" id="primary-timeframe">
+                                                    <option value="15m">15 minutes</option>
+                                                    <option value="1h" selected>1 hour</option>
+                                                    <option value="4h">4 hours</option>
+                                                    <option value="1d">1 day</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Advanced Settings</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="order-update-interval" class="form-label">Order Update Interval (sec)</label>
+                                                    <input type="number" class="form-control" id="order-update-interval" value="5" min="1" max="60">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="market-scan-interval" class="form-label">Market Scan Interval (min)</label>
+                                                    <input type="number" class="form-control" id="market-scan-interval" value="15" min="1" max="60">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="auto-restart" checked>
+                                                    <label class="form-check-label" for="auto-restart">
+                                                        Auto-restart bot on critical errors
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="log-debug-info">
+                                                    <label class="form-check-label" for="log-debug-info">
+                                                        Log detailed debug information
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-secondary me-2" id="reset-trading-settings">Reset to Defaults</button>
+                                        <button type="button" class="btn btn-primary" id="save-trading-settings">Save Trading Settings</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Risk Management -->
+                    <div class="tab-pane fade" id="risk-settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Risk Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="risk-form">
+                                    <div class="mb-4">
+                                        <h6>Position Sizing</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="risk-per-trade" class="form-label">Risk Per Trade (%)</label>
+                                                    <input type="number" class="form-control" id="risk-per-trade" value="1.0" min="0.1" max="10" step="0.1">
+                                                    <div class="form-text">Percentage of account balance risked per trade</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="max-open-positions" class="form-label">Max Open Positions</label>
+                                                    <input type="number" class="form-control" id="max-open-positions" value="3" min="1" max="10">
+                                                    <div class="form-text">Maximum number of open positions allowed</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="leverage" class="form-label">Default Leverage</label>
+                                                    <select class="form-select" id="leverage">
+                                                        <option value="1">1x (No leverage)</option>
+                                                        <option value="2">2x</option>
+                                                        <option value="3" selected>3x</option>
+                                                        <option value="5">5x</option>
+                                                        <option value="10">10x</option>
+                                                        <option value="20">20x</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="margin-type" class="form-label">Margin Type</label>
+                                                    <select class="form-select" id="margin-type">
+                                                        <option value="isolated" selected>Isolated</option>
+                                                        <option value="cross">Cross</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="automatic-position-sizing" checked>
+                                                    <label class="form-check-label" for="automatic-position-sizing">
+                                                        Use automatic position sizing
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Take Profit & Stop Loss</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="take-profit" class="form-label">Take Profit (%)</label>
+                                                    <input type="number" class="form-control" id="take-profit" value="2.5" min="0.5" max="100" step="0.5">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="stop-loss" class="form-label">Stop Loss (%)</label>
+                                                    <input type="number" class="form-control" id="stop-loss" value="1.5" min="0.5" max="50" step="0.5">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="use-trailing-stop" checked>
+                                                    <label class="form-check-label" for="use-trailing-stop">
+                                                        Use trailing stop
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3" id="trailing-stop-params">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label for="trailing-start" class="form-label">Activation Threshold (%)</label>
+                                                        <input type="number" class="form-control" id="trailing-start" value="1.0" min="0.1" max="10" step="0.1">
+                                                        <div class="form-text">Profit % to activate trailing stop</div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="trailing-distance" class="form-label">Trailing Distance (%)</label>
+                                                        <input type="number" class="form-control" id="trailing-distance" value="0.5" min="0.1" max="5" step="0.1">
+                                                        <div class="form-text">Distance to maintain from price</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Risk Limits</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="daily-loss-limit" class="form-label">Daily Loss Limit (%)</label>
+                                                    <input type="number" class="form-control" id="daily-loss-limit" value="5" min="1" max="50">
+                                                    <div class="form-text">Stop trading when daily loss exceeds this %</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="weekly-loss-limit" class="form-label">Weekly Loss Limit (%)</label>
+                                                    <input type="number" class="form-control" id="weekly-loss-limit" value="10" min="1" max="50">
+                                                    <div class="form-text">Stop trading when weekly loss exceeds this %</div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="reset-limits-after-profit" checked>
+                                                    <label class="form-check-label" for="reset-limits-after-profit">
+                                                        Reset loss limits after profitable day/week
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-secondary me-2" id="reset-risk-settings">Reset to Defaults</button>
+                                        <button type="button" class="btn btn-primary" id="save-risk-settings">Save Risk Settings</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="tab-pane fade" id="notification-settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Notification Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="notification-form">
+                                    <div class="mb-4">
+                                        <h6>Telegram Notifications</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Notification Events</label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-trades" checked>
+                                                            <label class="form-check-label" for="notify-trades">
+                                                                Trade Executions
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-signals" checked>
+                                                            <label class="form-check-label" for="notify-signals">
+                                                                Trading Signals
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-errors" checked>
+                                                            <label class="form-check-label" for="notify-errors">
+                                                                Error Alerts
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-daily-summary" checked>
+                                                            <label class="form-check-label" for="notify-daily-summary">
+                                                                Daily Performance Summary
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="minimal-notifications">
+                                                    <label class="form-check-label" for="minimal-notifications">
+                                                        Use minimal notifications (reduce frequency)
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Email Notifications</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="enable-email">
+                                                    <label class="form-check-label" for="enable-email">
+                                                        Enable email notifications
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="email-address" class="form-label">Email Address</label>
+                                                    <input type="email" class="form-control" id="email-address" placeholder="Enter your email address">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="email-frequency" class="form-label">Email Frequency</label>
+                                                    <select class="form-select" id="email-frequency">
+                                                        <option value="realtime">Real-time</option>
+                                                        <option value="hourly">Hourly Digest</option>
+                                                        <option value="daily" selected>Daily Digest</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary" id="save-notification-settings">Save Notification Settings</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Settings -->
+                    <div class="tab-pane fade" id="system-settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">System Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="system-form">
+                                    <div class="mb-4">
+                                        <h6>User Interface</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <label for="refresh-interval" class="form-label">UI Refresh Interval (seconds)</label>
+                                                <input type="number" class="form-control" id="refresh-interval" value="5" min="1" max="60">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="language" class="form-label">Language</label>
+                                                <select class="form-select" id="language">
+                                                    <option value="en">English</option>
+                                                    <option value="vi">Vietnamese (Tiếng Việt)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>System Resources</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="mb-3">
+                                                <label for="log-level" class="form-label">Log Level</label>
+                                                <select class="form-select" id="log-level">
+                                                    <option value="error">Error</option>
+                                                    <option value="warning">Warning</option>
+                                                    <option value="info" selected>Info</option>
+                                                    <option value="debug">Debug</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="log-retention" class="form-label">Log Retention (days)</label>
+                                                <input type="number" class="form-control" id="log-retention" value="7" min="1" max="30">
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="optimize-memory" checked>
+                                                    <label class="form-check-label" for="optimize-memory">
+                                                        Optimize memory usage
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h6>Maintenance</h6>
+                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-6">
+                                                    <button type="button" class="btn btn-outline-warning w-100" id="clear-cache-btn">
+                                                        Clear Cache
+                                                    </button>
+                                                </div>
+                                                <div class="col-6">
+                                                    <button type="button" class="btn btn-outline-danger w-100" id="reset-system-btn">
+                                                        Reset System
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary" id="save-system-settings">Save System Settings</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Backup & Restore -->
+                    <div class="tab-pane fade" id="backup-restore">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Backup & Restore</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <h6>Backup Settings</h6>
+                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                        <p class="mb-3">Backup all your bot settings, strategies, and configurations to a file.</p>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="include-trade-history" checked>
+                                                <label class="form-check-label" for="include-trade-history">
+                                                    Include trade history
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="include-api-keys">
+                                                <label class="form-check-label" for="include-api-keys">
+                                                    Include API keys (not recommended)
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-primary" id="create-backup-btn">
+                                                Create Backup
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h6>Auto Backup</h6>
+                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="enable-auto-backup" checked>
+                                                <label class="form-check-label" for="enable-auto-backup">
+                                                    Enable automatic backups
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="backup-frequency" class="form-label">Backup Frequency</label>
+                                            <select class="form-select" id="backup-frequency">
+                                                <option value="daily" selected>Daily</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="max-backups" class="form-label">Maximum Backups to Keep</label>
+                                            <input type="number" class="form-control" id="max-backups" value="7" min="1" max="30">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h6>Restore from Backup</h6>
+                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                        <p class="mb-3">Restore your bot settings from a previous backup file.</p>
+                                        <div class="mb-3">
+                                            <label for="backup-file" class="form-label">Select Backup File</label>
+                                            <input class="form-control" type="file" id="backup-file">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="overwrite-existing" checked>
+                                                <label class="form-check-label" for="overwrite-existing">
+                                                    Overwrite existing settings
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-warning" id="restore-backup-btn" disabled>
+                                                Restore from Backup
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

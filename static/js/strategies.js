@@ -1,902 +1,984 @@
-// Strategies.js - JavaScript for the Trading Strategies page
+// Strategies.js - JavaScript for the Strategies page
 
-// Strategy parameters templates
+// Strategy parameter templates
 const strategyParameters = {
-    rsi: `
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="rsiPeriod" class="form-label">RSI Period</label>
-                <input type="number" class="form-control" id="rsiPeriod" value="14" min="2" max="50" required>
+    technical: `
+        <h6>Technical Parameters</h6>
+        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="indicator-type" class="form-label">Primary Indicator</label>
+                    <select class="form-select" id="indicator-type" required>
+                        <option value="rsi">RSI</option>
+                        <option value="macd">MACD</option>
+                        <option value="bollinger">Bollinger Bands</option>
+                        <option value="ema">EMA Crossover</option>
+                        <option value="ichimoku">Ichimoku Cloud</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="confirmation-indicator" class="form-label">Confirmation Indicator</label>
+                    <select class="form-select" id="confirmation-indicator">
+                        <option value="">None</option>
+                        <option value="volume">Volume</option>
+                        <option value="adx">ADX</option>
+                        <option value="stochastic">Stochastic</option>
+                    </select>
+                </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="rsiOverbought" class="form-label">Overbought Level</label>
-                <input type="number" class="form-control" id="rsiOverbought" value="70" min="50" max="90" required>
+            
+            <div id="indicator-params" class="mb-3">
+                <!-- RSI Parameters (default) -->
+                <div class="row" id="rsi-params">
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-period" class="form-label">RSI Period</label>
+                        <input type="number" class="form-control" id="rsi-period" value="14" min="2" max="50">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-overbought" class="form-label">Overbought Level</label>
+                        <input type="number" class="form-control" id="rsi-overbought" value="70" min="50" max="90">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-oversold" class="form-label">Oversold Level</label>
+                        <input type="number" class="form-control" id="rsi-oversold" value="30" min="10" max="50">
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="rsiOversold" class="form-label">Oversold Level</label>
-                <input type="number" class="form-control" id="rsiOversold" value="30" min="10" max="50" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="rsiTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="rsiTakeProfit" value="2.5" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="rsiStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="rsiStopLoss" value="1.5" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="rsiUseVolume" checked>
-            <label class="form-check-label" for="rsiUseVolume">Use volume confirmation</label>
-        </div>
-    `,
-    macd: `
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="macdFast" class="form-label">Fast Period</label>
-                <input type="number" class="form-control" id="macdFast" value="12" min="2" max="50" required>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="macdSlow" class="form-label">Slow Period</label>
-                <input type="number" class="form-control" id="macdSlow" value="26" min="5" max="100" required>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="macdSignal" class="form-label">Signal Period</label>
-                <input type="number" class="form-control" id="macdSignal" value="9" min="2" max="50" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="macdTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="macdTakeProfit" value="3.0" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="macdStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="macdStopLoss" value="1.8" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="macdUseHistogram" checked>
-            <label class="form-check-label" for="macdUseHistogram">Use histogram for confirmation</label>
-        </div>
-    `,
-    bbands: `
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="bbandsPeriod" class="form-label">Period</label>
-                <input type="number" class="form-control" id="bbandsPeriod" value="20" min="5" max="100" required>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="bbandsStdDev" class="form-label">Standard Deviations</label>
-                <input type="number" class="form-control" id="bbandsStdDev" value="2" min="1" max="4" step="0.1" required>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="bbandsSignalStrength" class="form-label">Signal Strength (%)</label>
-                <input type="number" class="form-control" id="bbandsSignalStrength" value="90" min="50" max="100" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="bbandsTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="bbandsTakeProfit" value="2.0" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="bbandsStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="bbandsStopLoss" value="1.5" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="bbandsUseMidExit" checked>
-            <label class="form-check-label" for="bbandsUseMidExit">Use middle band for exit signal</label>
-        </div>
-    `,
-    ema_cross: `
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="emaFast" class="form-label">Fast EMA Period</label>
-                <input type="number" class="form-control" id="emaFast" value="9" min="3" max="50" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="emaSlow" class="form-label">Slow EMA Period</label>
-                <input type="number" class="form-control" id="emaSlow" value="21" min="5" max="200" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="emaTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="emaTakeProfit" value="3.5" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="emaStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="emaStopLoss" value="2.0" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="emaUseVolume" checked>
-            <label class="form-check-label" for="emaUseVolume">Use volume confirmation</label>
         </div>
     `,
     ml: `
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="mlTrainingPeriod" class="form-label">Training Period (days)</label>
-                <input type="number" class="form-control" id="mlTrainingPeriod" value="60" min="15" max="365" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="mlPredictionThreshold" class="form-label">Prediction Threshold (%)</label>
-                <input type="number" class="form-control" id="mlPredictionThreshold" value="65" min="50" max="95" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="mlTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="mlTakeProfit" value="4.0" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="mlStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="mlStopLoss" value="2.5" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="mlUseEnsemble" checked>
-            <label class="form-check-label" for="mlUseEnsemble">Use ensemble of models</label>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Models to Use</label>
+        <h6>Machine Learning Parameters</h6>
+        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
             <div class="row">
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mlUseRandomForest" checked>
-                        <label class="form-check-label" for="mlUseRandomForest">Random Forest</label>
+                <div class="col-md-6 mb-3">
+                    <label for="ml-type" class="form-label">ML Model Type</label>
+                    <select class="form-select" id="ml-type" required>
+                        <option value="random_forest">Random Forest</option>
+                        <option value="gradient_boosting">Gradient Boosting</option>
+                        <option value="neural_network">Neural Network</option>
+                        <option value="ensemble">Ensemble (All Models)</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="feature-selection" class="form-label">Feature Selection</label>
+                    <select class="form-select" id="feature-selection">
+                        <option value="auto">Automatic</option>
+                        <option value="manual">Manual</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="prediction-threshold" class="form-label">Prediction Threshold (%)</label>
+                    <input type="number" class="form-control" id="prediction-threshold" value="65" min="50" max="95" step="1">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="training-frequency" class="form-label">Training Frequency</label>
+                    <select class="form-select" id="training-frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly" selected>Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="regime_change">On Market Regime Change</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Features to Include</label>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-price" checked>
+                            <label class="form-check-label" for="include-price">Price Action</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-volume" checked>
+                            <label class="form-check-label" for="include-volume">Volume Metrics</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-indicators" checked>
+                            <label class="form-check-label" for="include-indicators">Technical Indicators</label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mlUseGradientBoosting" checked>
-                        <label class="form-check-label" for="mlUseGradientBoosting">Gradient Boosting</label>
+                <div class="row mt-2">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-sentiment">
+                            <label class="form-check-label" for="include-sentiment">Sentiment Data</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-onchain">
+                            <label class="form-check-label" for="include-onchain">On-chain Metrics</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="include-market-regime" checked>
+                            <label class="form-check-label" for="include-market-regime">Market Regime</label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mlUseSVM" checked>
-                        <label class="form-check-label" for="mlUseSVM">SVM</label>
-                    </div>
+            </div>
+        </div>
+    `,
+    sentiment: `
+        <h6>Sentiment Analysis Parameters</h6>
+        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="sentiment-source" class="form-label">Sentiment Sources</label>
+                    <select class="form-select" id="sentiment-source" multiple>
+                        <option value="fear_greed_index" selected>Fear & Greed Index</option>
+                        <option value="social_media">Social Media</option>
+                        <option value="news_analysis">News Analysis</option>
+                        <option value="order_book">Order Book Imbalance</option>
+                        <option value="funding_rate">Funding Rate</option>
+                    </select>
+                    <div class="form-text">Hold Ctrl or Cmd to select multiple sources</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="sentiment-signal-threshold" class="form-label">Signal Threshold</label>
+                    <input type="number" class="form-control" id="sentiment-signal-threshold" value="70" min="50" max="95" step="1">
+                    <div class="form-text">Minimum confidence level to generate a signal</div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="contrarian-mode" class="form-label">Strategy Mode</label>
+                    <select class="form-select" id="contrarian-mode">
+                        <option value="contrarian" selected>Contrarian</option>
+                        <option value="follow">Follow Trend</option>
+                        <option value="adaptive">Adaptive (Regime-based)</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="sentiment-lookback" class="form-label">Lookback Period</label>
+                    <input type="number" class="form-control" id="sentiment-lookback" value="7" min="1" max="30">
+                    <div class="form-text">Days to analyze for sentiment trends</div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="require-confirmation" checked>
+                    <label class="form-check-label" for="require-confirmation">
+                        Require technical confirmation
+                    </label>
+                    <div class="form-text">Only generate signals when confirmed by technical indicators</div>
                 </div>
             </div>
         </div>
     `,
     composite: `
-        <div class="mb-3">
-            <label class="form-label">Indicators to Include</label>
+        <h6>Composite Strategy Parameters</h6>
+        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+            <div class="mb-3">
+                <label class="form-label">Component Strategies</label>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="use-technical" checked>
+                            <label class="form-check-label" for="use-technical">Technical Analysis</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="use-ml" checked>
+                            <label class="form-check-label" for="use-ml">Machine Learning</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="use-sentiment" checked>
+                            <label class="form-check-label" for="use-sentiment">Sentiment Analysis</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row">
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseRSI" checked>
-                        <label class="form-check-label" for="compUseRSI">RSI</label>
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="composite-signal-threshold" class="form-label">Signal Threshold</label>
+                    <input type="number" class="form-control" id="composite-signal-threshold" value="0.6" min="0.1" max="1.0" step="0.1">
+                    <div class="form-text">Minimum combined score (-1 to 1) to generate a signal</div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseMACD" checked>
-                        <label class="form-check-label" for="compUseMACD">MACD</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseEMA" checked>
-                        <label class="form-check-label" for="compUseEMA">EMA Cross</label>
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="weightings-method" class="form-label">Strategy Weightings</label>
+                    <select class="form-select" id="weightings-method">
+                        <option value="equal">Equal Weights</option>
+                        <option value="dynamic" selected>Dynamic (Performance-based)</option>
+                        <option value="regime">Regime-dependent</option>
+                        <option value="custom">Custom</option>
+                    </select>
                 </div>
             </div>
-            <div class="row mt-2">
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseBB" checked>
-                        <label class="form-check-label" for="compUseBB">Bollinger Bands</label>
+            
+            <div id="custom-weights" style="display: none;">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="technical-weight" class="form-label">Technical Weight</label>
+                        <input type="number" class="form-control" id="technical-weight" value="0.3" min="0" max="1" step="0.1">
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseVol" checked>
-                        <label class="form-check-label" for="compUseVol">Volume Analysis</label>
+                    <div class="col-md-4 mb-3">
+                        <label for="ml-weight" class="form-label">ML Weight</label>
+                        <input type="number" class="form-control" id="ml-weight" value="0.4" min="0" max="1" step="0.1">
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="compUseADX">
-                        <label class="form-check-label" for="compUseADX">ADX</label>
+                    <div class="col-md-4 mb-3">
+                        <label for="sentiment-weight" class="form-label">Sentiment Weight</label>
+                        <input type="number" class="form-control" id="sentiment-weight" value="0.3" min="0" max="1" step="0.1">
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="compSignalThreshold" class="form-label">Signal Threshold</label>
-                <input type="number" class="form-control" id="compSignalThreshold" value="0.6" min="0.1" max="1.0" step="0.1" required>
-                <div class="form-text">Minimum score (-1 to 1) to generate a signal</div>
+            
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="use-market-regime-filter" checked>
+                    <label class="form-check-label" for="use-market-regime-filter">
+                        Use market regime filter
+                    </label>
+                    <div class="form-text">Adjust strategy parameters based on current market regime</div>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="compLookback" class="form-label">Lookback Period</label>
-                <input type="number" class="form-control" id="compLookback" value="5" min="1" max="20" required>
-                <div class="form-text">Periods to analyze for trend</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="compTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="compTakeProfit" value="3.5" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="compStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="compStopLoss" value="2.0" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="compDynamicWeights" checked>
-            <label class="form-check-label" for="compDynamicWeights">Use dynamic weights based on performance</label>
         </div>
     `,
-    mtf: `
-        <div class="mb-3">
-            <label class="form-label">Timeframes to Include</label>
+    orderflow: `
+        <h6>Order Flow Analysis Parameters</h6>
+        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
             <div class="row">
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mtfUse15m">
-                        <label class="form-check-label" for="mtfUse15m">15m</label>
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="liquidity-source" class="form-label">Liquidity Data Source</label>
+                    <select class="form-select" id="liquidity-source" required>
+                        <option value="order_book" selected>Order Book</option>
+                        <option value="vwap">VWAP</option>
+                        <option value="cumulative_delta">Cumulative Delta</option>
+                        <option value="composite">Composite (All Sources)</option>
+                    </select>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mtfUse1h" checked>
-                        <label class="form-check-label" for="mtfUse1h">1h</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mtfUse4h" checked>
-                        <label class="form-check-label" for="mtfUse4h">4h</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="mtfUse1d" checked>
-                        <label class="form-check-label" for="mtfUse1d">1d</label>
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="order-book-depth" class="form-label">Order Book Depth</label>
+                    <input type="number" class="form-control" id="order-book-depth" value="20" min="5" max="50">
+                    <div class="form-text">Number of price levels to analyze</div>
                 </div>
             </div>
-        </div>
-        <div class="mb-3">
-            <label for="mtfPrimaryIndicator" class="form-label">Primary Indicator</label>
-            <select class="form-select" id="mtfPrimaryIndicator" required>
-                <option value="rsi" selected>RSI</option>
-                <option value="macd">MACD</option>
-                <option value="bbands">Bollinger Bands</option>
-                <option value="ema_cross">EMA Crossover</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="mtfConfirmationTF" class="form-label">Confirmation Timeframe</label>
-            <select class="form-select" id="mtfConfirmationTF" required>
-                <option value="15m">15 minutes</option>
-                <option value="1h">1 hour</option>
-                <option value="4h" selected>4 hours</option>
-                <option value="1d">1 day</option>
-            </select>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="mtfTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="mtfTakeProfit" value="3.2" min="0.5" max="20" step="0.1" required>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="liquidity-threshold" class="form-label">Liquidity Threshold</label>
+                    <input type="number" class="form-control" id="liquidity-threshold" value="2.0" min="0.5" max="10" step="0.1">
+                    <div class="form-text">Minimum liquidity ratio to identify a significant zone</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="update-frequency" class="form-label">Update Frequency (sec)</label>
+                    <input type="number" class="form-control" id="update-frequency" value="30" min="5" max="300" step="5">
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="mtfStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="mtfStopLoss" value="1.8" min="0.5" max="10" step="0.1" required>
+            
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="detect-liquidity-sweeps" checked>
+                    <label class="form-check-label" for="detect-liquidity-sweeps">
+                        Detect liquidity sweeps
+                    </label>
+                    <div class="form-text">Generate signals on liquidity sweeps and order book imbalances</div>
+                </div>
             </div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="mtfDynamicWeights" checked>
-            <label class="form-check-label" for="mtfDynamicWeights">Use dynamic timeframe weights</label>
-        </div>
-    `,
-    liquidity: `
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="liqOrderbookDepth" class="form-label">Orderbook Depth</label>
-                <input type="number" class="form-control" id="liqOrderbookDepth" value="500" min="100" max="2000" step="100" required>
+            
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="require-technical-confirmation">
+                    <label class="form-check-label" for="require-technical-confirmation">
+                        Require technical confirmation
+                    </label>
+                    <div class="form-text">Only generate signals when confirmed by technical indicators</div>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="liqRefreshRate" class="form-label">Refresh Rate (sec)</label>
-                <input type="number" class="form-control" id="liqRefreshRate" value="30" min="5" max="60" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="liqMinimumStrength" class="form-label">Minimum Zone Strength</label>
-                <input type="number" class="form-control" id="liqMinimumStrength" value="70" min="50" max="95" required>
-                <div class="form-text">Minimum strength (0-100) for liquidity zones</div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="liqPriceRange" class="form-label">Price Range (%)</label>
-                <input type="number" class="form-control" id="liqPriceRange" value="2.0" min="0.5" max="10" step="0.1" required>
-                <div class="form-text">Price range around current price to analyze</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="liqTakeProfit" class="form-label">Take Profit (%)</label>
-                <input type="number" class="form-control" id="liqTakeProfit" value="2.8" min="0.5" max="20" step="0.1" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="liqStopLoss" class="form-label">Stop Loss (%)</label>
-                <input type="number" class="form-control" id="liqStopLoss" value="1.5" min="0.5" max="10" step="0.1" required>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="liqTradeType" class="form-label">Trade Type</label>
-            <select class="form-select" id="liqTradeType" required>
-                <option value="both" selected>Both Long and Short</option>
-                <option value="long">Long Only</option>
-                <option value="short">Short Only</option>
-            </select>
         </div>
     `
 };
 
-// Socket.IO instance
-let socket;
-
-// Strategy Manager
-const strategyManager = {
-    activeStrategies: [],
-    savedStrategies: [],
-    
+// Strategies manager
+const strategiesManager = {
     // Initialize the component
     init: function() {
-        // Load strategies from API
-        this.loadStrategies();
-        
         // Add event listeners
-        document.getElementById('strategyType').addEventListener('change', this.updateStrategyParameters);
-        document.getElementById('saveStrategy').addEventListener('click', this.saveStrategy.bind(this));
+        document.getElementById('create-strategy-btn').addEventListener('click', this.showCreateStrategyModal);
+        document.getElementById('save-strategy-btn').addEventListener('click', this.saveStrategy);
+        document.getElementById('activate-all-btn').addEventListener('click', this.activateAll);
+        document.getElementById('deactivate-all-btn').addEventListener('click', this.deactivateAll);
         
-        // Template buttons
-        document.querySelectorAll('[data-template]').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const templateName = e.target.getAttribute('data-template');
-                this.loadTemplate(templateName);
-            });
+        // Strategy type change event
+        document.getElementById('strategy-type-select').addEventListener('change', this.updateStrategyParameters);
+        
+        // Add event listeners for view, edit, activate, and deactivate buttons
+        document.querySelectorAll('.view-strategy').forEach(button => {
+            button.addEventListener('click', this.viewStrategy.bind(this));
         });
-    },
-    
-    // Load strategies from API
-    loadStrategies: function() {
-        // Simulate loading active strategies
-        // In a real implementation, this would fetch from the server
-        this.activeStrategies = [
-            {
-                id: 'strategy-1',
-                name: 'Composite ML Strategy',
-                symbol: 'BTCUSDT',
-                timeframe: '1h',
-                type: 'ml',
-                active: true,
-                parameters: {
-                    risk: 2.0,
-                    leverage: 3,
-                    takeProfit: 3.5,
-                    stopLoss: 1.8,
-                    // ML specific parameters
-                    trainingPeriod: 60,
-                    predictionThreshold: 65,
-                    useEnsemble: true,
-                    models: ['randomForest', 'gradientBoosting', 'svm']
+        
+        document.querySelectorAll('.edit-strategy').forEach(button => {
+            button.addEventListener('click', this.editStrategy.bind(this));
+        });
+        
+        document.querySelectorAll('.activate-strategy').forEach(button => {
+            button.addEventListener('click', this.activateStrategy.bind(this));
+        });
+        
+        document.querySelectorAll('.deactivate-strategy').forEach(button => {
+            button.addEventListener('click', this.deactivateStrategy.bind(this));
+        });
+        
+        // Add event listener for indicator type change
+        const indicatorTypeSelect = document.getElementById('indicator-type');
+        if (indicatorTypeSelect) {
+            indicatorTypeSelect.addEventListener('change', this.updateIndicatorParameters);
+        }
+        
+        // Setup toggle bot button
+        document.getElementById('toggle-bot').addEventListener('click', this.toggleBot);
+        
+        // Update bot status badge and toggle button
+        this.updateBotStatus();
+        
+        // Create charts
+        this.createPerformanceChart();
+        this.createMarketRegimeChart();
+        
+        // Initialize custom weights toggle
+        const weightingsMethod = document.getElementById('weightings-method');
+        if (weightingsMethod) {
+            weightingsMethod.addEventListener('change', function() {
+                const customWeights = document.getElementById('custom-weights');
+                if (this.value === 'custom') {
+                    customWeights.style.display = 'block';
+                } else {
+                    customWeights.style.display = 'none';
                 }
-            },
-            {
-                id: 'strategy-2',
-                name: 'Multi-Timeframe RSI',
-                symbol: 'ETHUSDT',
-                timeframe: '4h',
-                type: 'mtf',
-                active: true,
-                parameters: {
-                    risk: 1.5,
-                    leverage: 2,
-                    takeProfit: 3.2,
-                    stopLoss: 1.8,
-                    // MTF specific parameters
-                    timeframes: ['1h', '4h', '1d'],
-                    primaryIndicator: 'rsi',
-                    confirmationTimeframe: '4h',
-                    rsiPeriod: 14,
-                    rsiOverbought: 70,
-                    rsiOversold: 30
-                }
-            }
-        ];
-        
-        // Simulate loading saved strategies
-        this.savedStrategies = [];
-        
-        // Render strategies
-        this.renderStrategies();
-    },
-    
-    // Render strategies to DOM
-    renderStrategies: function() {
-        // Render active strategies
-        const activeContainer = document.getElementById('active-strategies-container');
-        // Clear active strategies container (except template cards)
-        activeContainer.innerHTML = '';
-        
-        // Add active strategies
-        this.activeStrategies.forEach(strategy => {
-            const card = this.createStrategyCard(strategy);
-            activeContainer.appendChild(card);
-        });
-        
-        // If no active strategies, show message
-        if (this.activeStrategies.length === 0) {
-            const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'col-12';
-            emptyMessage.innerHTML = `
-                <div class="alert alert-info">
-                    No active strategies yet. Create a new strategy or activate a saved one.
-                </div>
-            `;
-            activeContainer.appendChild(emptyMessage);
-        }
-        
-        // Render saved strategies
-        const savedContainer = document.getElementById('saved-strategies-container');
-        // Clear saved strategies container
-        savedContainer.innerHTML = '';
-        
-        // Add saved strategies
-        this.savedStrategies.forEach(strategy => {
-            const card = this.createStrategyCard(strategy);
-            savedContainer.appendChild(card);
-        });
-        
-        // If no saved strategies, show message
-        if (this.savedStrategies.length === 0) {
-            const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'col-12';
-            emptyMessage.innerHTML = `
-                <div class="alert alert-info">
-                    No saved strategies yet. Create new strategies to save them here.
-                </div>
-            `;
-            savedContainer.appendChild(emptyMessage);
-        }
-    },
-    
-    // Create a strategy card
-    createStrategyCard: function(strategy) {
-        const col = document.createElement('div');
-        col.className = 'col-md-6 col-lg-4 mb-4';
-        
-        // Create parameter list
-        let parametersList = '';
-        if (strategy.parameters) {
-            parametersList += `<li>Risk per trade: ${strategy.parameters.risk}%</li>`;
-            parametersList += `<li>Leverage: ${strategy.parameters.leverage}x</li>`;
-            
-            if (strategy.parameters.takeProfit) {
-                parametersList += `<li>Take profit: ${strategy.parameters.takeProfit}%</li>`;
-            }
-            
-            if (strategy.parameters.stopLoss) {
-                parametersList += `<li>Stop loss: ${strategy.parameters.stopLoss}%</li>`;
-            }
-            
-            // Type-specific parameters
-            switch (strategy.type) {
-                case 'rsi':
-                    if (strategy.parameters.rsiPeriod) {
-                        parametersList += `<li>RSI period: ${strategy.parameters.rsiPeriod}</li>`;
-                    }
-                    if (strategy.parameters.rsiOverbought && strategy.parameters.rsiOversold) {
-                        parametersList += `<li>Levels: ${strategy.parameters.rsiOversold}/${strategy.parameters.rsiOverbought}</li>`;
-                    }
-                    break;
-                    
-                case 'ml':
-                    if (strategy.parameters.trainingPeriod) {
-                        parametersList += `<li>Training period: ${strategy.parameters.trainingPeriod} days</li>`;
-                    }
-                    if (strategy.parameters.predictionThreshold) {
-                        parametersList += `<li>Prediction threshold: ${strategy.parameters.predictionThreshold}%</li>`;
-                    }
-                    break;
-                    
-                case 'mtf':
-                    if (strategy.parameters.timeframes) {
-                        parametersList += `<li>Timeframes: ${strategy.parameters.timeframes.join(', ')}</li>`;
-                    }
-                    if (strategy.parameters.primaryIndicator) {
-                        parametersList += `<li>Primary indicator: ${strategy.parameters.primaryIndicator}</li>`;
-                    }
-                    break;
-            }
-        }
-        
-        // Get strategy description
-        let strategyDescription = this.getStrategyDescription(strategy.type);
-        
-        // Create card HTML
-        col.innerHTML = `
-            <div class="card h-100" data-strategy-id="${strategy.id}">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">${strategy.name}</h5>
-                    <span class="badge ${strategy.active ? 'bg-success' : 'bg-secondary'}">${strategy.active ? 'Active' : 'Inactive'}</span>
-                </div>
-                <div class="card-body">
-                    <p class="mb-2"><strong>Symbol:</strong> ${strategy.symbol}</p>
-                    <p class="mb-2"><strong>Timeframe:</strong> ${strategy.timeframe}</p>
-                    <p class="mb-2"><strong>Type:</strong> ${this.formatStrategyType(strategy.type)}</p>
-                    <p class="mb-2"><strong>Parameters:</strong></p>
-                    <ul class="small">
-                        ${parametersList}
-                    </ul>
-                    <p class="small text-muted">${strategyDescription}</p>
-                </div>
-                <div class="card-footer d-flex justify-content-between">
-                    ${strategy.active ? 
-                      '<button class="btn btn-sm btn-outline-danger btn-deactivate">Deactivate</button>' : 
-                      '<button class="btn btn-sm btn-outline-success btn-activate">Activate</button>'}
-                    <button class="btn btn-sm btn-outline-secondary btn-edit">Edit</button>
-                </div>
-            </div>
-        `;
-        
-        // Add event listeners
-        const card = col.querySelector('.card');
-        
-        // Activate/Deactivate button
-        if (strategy.active) {
-            card.querySelector('.btn-deactivate').addEventListener('click', () => {
-                this.deactivateStrategy(strategy.id);
-            });
-        } else {
-            card.querySelector('.btn-activate').addEventListener('click', () => {
-                this.activateStrategy(strategy.id);
             });
         }
-        
-        // Edit button
-        card.querySelector('.btn-edit').addEventListener('click', () => {
-            this.editStrategy(strategy.id);
-        });
-        
-        return col;
     },
     
-    // Format strategy type for display
-    formatStrategyType: function(type) {
-        const typeMap = {
-            'rsi': 'RSI',
-            'macd': 'MACD',
-            'bbands': 'Bollinger Bands',
-            'ema_cross': 'EMA Crossover',
-            'ml': 'Machine Learning',
-            'composite': 'Composite Indicator',
-            'mtf': 'Multi-Timeframe',
-            'liquidity': 'Liquidity Analysis'
-        };
+    // Show create strategy modal
+    showCreateStrategyModal: function() {
+        // Reset form
+        document.getElementById('strategy-form').reset();
         
-        return typeMap[type] || type;
-    },
-    
-    // Get description for a strategy type
-    getStrategyDescription: function(type) {
-        const descriptions = {
-            'rsi': 'Strategy uses Relative Strength Index to identify overbought and oversold conditions.',
-            'macd': 'Strategy uses MACD crossover signals for trend detection and entry/exit points.',
-            'bbands': 'Strategy uses Bollinger Bands to identify price extremes and mean reversion opportunities.',
-            'ema_cross': 'Strategy uses EMA crossovers to identify trend changes and entry signals.',
-            'ml': 'Strategy uses machine learning models with dynamic adjustments for market regimes.',
-            'composite': 'Strategy combines multiple technical indicators for improved signal accuracy.',
-            'mtf': 'Strategy analyzes multiple timeframes for confirmed signals and trend alignment.',
-            'liquidity': 'Strategy identifies liquidity zones from order book data for precise entries and exits.'
-        };
+        // Set modal title
+        document.getElementById('editStrategyModalLabel').textContent = 'Create New Strategy';
         
-        return descriptions[type] || 'Custom trading strategy';
-    },
-    
-    // Update strategy parameters based on selected type
-    updateStrategyParameters: function() {
-        const strategyType = document.getElementById('strategyType').value;
-        const parametersContainer = document.getElementById('strategyParameters');
+        // Clear strategy-specific parameters
+        document.getElementById('strategy-specific-params').innerHTML = '';
         
-        // Update parameters HTML based on strategy type
-        if (strategyParameters[strategyType]) {
-            parametersContainer.innerHTML = `
-                <h6>Strategy Parameters</h6>
-                <div class="p-3 border rounded bg-secondary bg-opacity-10">
-                    ${strategyParameters[strategyType]}
-                </div>
-            `;
-        } else {
-            parametersContainer.innerHTML = `
-                <h6>Strategy Parameters</h6>
-                <div class="p-3 border rounded bg-secondary bg-opacity-10">
-                    <p class="text-muted small mb-0">
-                        No specific parameters for this strategy type.
-                    </p>
-                </div>
-            `;
-        }
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editStrategyModal'));
+        modal.show();
     },
     
     // Save strategy
     saveStrategy: function() {
         // Get form values
-        const strategyName = document.getElementById('strategyName').value;
-        const strategySymbol = document.getElementById('strategySymbol').value;
-        const strategyTimeframe = document.getElementById('strategyTimeframe').value;
-        const strategyType = document.getElementById('strategyType').value;
-        const strategyRisk = parseFloat(document.getElementById('strategyRisk').value);
-        const strategyLeverage = parseInt(document.getElementById('strategyLeverage').value);
-        const activateStrategy = document.getElementById('activateStrategy').checked;
+        const strategyName = document.getElementById('strategy-name-input').value;
+        const strategyType = document.getElementById('strategy-type-select').value;
         
-        // Validate inputs
-        if (!strategyName || !strategySymbol || !strategyTimeframe || !strategyType) {
-            alert('Please fill in all required fields');
+        if (!strategyName || !strategyType) {
+            alert('Please enter a strategy name and select a strategy type.');
             return;
         }
         
-        // Get strategy-specific parameters
-        const parameters = {
-            risk: strategyRisk,
-            leverage: strategyLeverage
-        };
-        
-        // Add type-specific parameters
-        switch (strategyType) {
-            case 'rsi':
-                parameters.rsiPeriod = parseInt(document.getElementById('rsiPeriod').value);
-                parameters.rsiOverbought = parseInt(document.getElementById('rsiOverbought').value);
-                parameters.rsiOversold = parseInt(document.getElementById('rsiOversold').value);
-                parameters.takeProfit = parseFloat(document.getElementById('rsiTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('rsiStopLoss').value);
-                parameters.useVolume = document.getElementById('rsiUseVolume').checked;
-                break;
-                
-            case 'macd':
-                parameters.macdFast = parseInt(document.getElementById('macdFast').value);
-                parameters.macdSlow = parseInt(document.getElementById('macdSlow').value);
-                parameters.macdSignal = parseInt(document.getElementById('macdSignal').value);
-                parameters.takeProfit = parseFloat(document.getElementById('macdTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('macdStopLoss').value);
-                parameters.useHistogram = document.getElementById('macdUseHistogram').checked;
-                break;
-                
-            case 'bbands':
-                parameters.bbandsPeriod = parseInt(document.getElementById('bbandsPeriod').value);
-                parameters.bbandsStdDev = parseFloat(document.getElementById('bbandsStdDev').value);
-                parameters.bbandsSignalStrength = parseInt(document.getElementById('bbandsSignalStrength').value);
-                parameters.takeProfit = parseFloat(document.getElementById('bbandsTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('bbandsStopLoss').value);
-                parameters.useMidExit = document.getElementById('bbandsUseMidExit').checked;
-                break;
-                
-            case 'ema_cross':
-                parameters.emaFast = parseInt(document.getElementById('emaFast').value);
-                parameters.emaSlow = parseInt(document.getElementById('emaSlow').value);
-                parameters.takeProfit = parseFloat(document.getElementById('emaTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('emaStopLoss').value);
-                parameters.useVolume = document.getElementById('emaUseVolume').checked;
-                break;
-                
-            case 'ml':
-                parameters.trainingPeriod = parseInt(document.getElementById('mlTrainingPeriod').value);
-                parameters.predictionThreshold = parseInt(document.getElementById('mlPredictionThreshold').value);
-                parameters.takeProfit = parseFloat(document.getElementById('mlTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('mlStopLoss').value);
-                parameters.useEnsemble = document.getElementById('mlUseEnsemble').checked;
-                parameters.models = [];
-                if (document.getElementById('mlUseRandomForest').checked) parameters.models.push('randomForest');
-                if (document.getElementById('mlUseGradientBoosting').checked) parameters.models.push('gradientBoosting');
-                if (document.getElementById('mlUseSVM').checked) parameters.models.push('svm');
-                break;
-                
-            case 'composite':
-                parameters.indicators = [];
-                if (document.getElementById('compUseRSI').checked) parameters.indicators.push('rsi');
-                if (document.getElementById('compUseMACD').checked) parameters.indicators.push('macd');
-                if (document.getElementById('compUseEMA').checked) parameters.indicators.push('ema_cross');
-                if (document.getElementById('compUseBB').checked) parameters.indicators.push('bbands');
-                if (document.getElementById('compUseVol').checked) parameters.indicators.push('volume_trend');
-                if (document.getElementById('compUseADX').checked) parameters.indicators.push('adx');
-                parameters.signalThreshold = parseFloat(document.getElementById('compSignalThreshold').value);
-                parameters.lookback = parseInt(document.getElementById('compLookback').value);
-                parameters.takeProfit = parseFloat(document.getElementById('compTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('compStopLoss').value);
-                parameters.dynamicWeights = document.getElementById('compDynamicWeights').checked;
-                break;
-                
-            case 'mtf':
-                parameters.timeframes = [];
-                if (document.getElementById('mtfUse15m').checked) parameters.timeframes.push('15m');
-                if (document.getElementById('mtfUse1h').checked) parameters.timeframes.push('1h');
-                if (document.getElementById('mtfUse4h').checked) parameters.timeframes.push('4h');
-                if (document.getElementById('mtfUse1d').checked) parameters.timeframes.push('1d');
-                parameters.primaryIndicator = document.getElementById('mtfPrimaryIndicator').value;
-                parameters.confirmationTimeframe = document.getElementById('mtfConfirmationTF').value;
-                parameters.takeProfit = parseFloat(document.getElementById('mtfTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('mtfStopLoss').value);
-                parameters.dynamicWeights = document.getElementById('mtfDynamicWeights').checked;
-                break;
-                
-            case 'liquidity':
-                parameters.orderbookDepth = parseInt(document.getElementById('liqOrderbookDepth').value);
-                parameters.refreshRate = parseInt(document.getElementById('liqRefreshRate').value);
-                parameters.minimumStrength = parseInt(document.getElementById('liqMinimumStrength').value);
-                parameters.priceRange = parseFloat(document.getElementById('liqPriceRange').value);
-                parameters.takeProfit = parseFloat(document.getElementById('liqTakeProfit').value);
-                parameters.stopLoss = parseFloat(document.getElementById('liqStopLoss').value);
-                parameters.tradeType = document.getElementById('liqTradeType').value;
-                break;
-        }
-        
-        // Create strategy object
-        const strategy = {
-            id: 'strategy-' + Date.now(), // Generate a unique ID
-            name: strategyName,
-            symbol: strategySymbol,
-            timeframe: strategyTimeframe,
-            type: strategyType,
-            active: activateStrategy,
-            parameters: parameters
-        };
-        
-        // In a real implementation, this would send data to the server
-        console.log('Saving strategy:', strategy);
-        
-        // Add to appropriate list
-        if (activateStrategy) {
-            this.activeStrategies.push(strategy);
-        } else {
-            this.savedStrategies.push(strategy);
-        }
-        
-        // Render strategies
-        this.renderStrategies();
+        // In a real implementation, this would send the data to the server
+        console.log('Saving strategy:', strategyName, strategyType);
         
         // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addStrategyModal'));
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editStrategyModal'));
         modal.hide();
-        
-        // Reset form
-        document.getElementById('newStrategyForm').reset();
         
         // Show success message
         alert('Strategy saved successfully!');
     },
     
-    // Activate a strategy
-    activateStrategy: function(strategyId) {
-        // Find the strategy
-        const strategyIndex = this.savedStrategies.findIndex(s => s.id === strategyId);
-        if (strategyIndex === -1) return;
+    // Update strategy parameters based on selected strategy type
+    updateStrategyParameters: function() {
+        const strategyType = document.getElementById('strategy-type-select').value;
+        const parametersContainer = document.getElementById('strategy-specific-params');
         
-        // Get the strategy
-        const strategy = this.savedStrategies[strategyIndex];
-        
-        // Update strategy status
-        strategy.active = true;
-        
-        // Move to active strategies
-        this.activeStrategies.push(strategy);
-        this.savedStrategies.splice(strategyIndex, 1);
-        
-        // Render strategies
-        this.renderStrategies();
-        
-        // In a real implementation, this would update the server
-        console.log('Activated strategy:', strategy);
-    },
-    
-    // Deactivate a strategy
-    deactivateStrategy: function(strategyId) {
-        // Find the strategy
-        const strategyIndex = this.activeStrategies.findIndex(s => s.id === strategyId);
-        if (strategyIndex === -1) return;
-        
-        // Get the strategy
-        const strategy = this.activeStrategies[strategyIndex];
-        
-        // Update strategy status
-        strategy.active = false;
-        
-        // Move to saved strategies
-        this.savedStrategies.push(strategy);
-        this.activeStrategies.splice(strategyIndex, 1);
-        
-        // Render strategies
-        this.renderStrategies();
-        
-        // In a real implementation, this would update the server
-        console.log('Deactivated strategy:', strategy);
-    },
-    
-    // Edit a strategy
-    editStrategy: function(strategyId) {
-        // Find the strategy in active strategies
-        let strategy = this.activeStrategies.find(s => s.id === strategyId);
-        let isActive = true;
-        
-        // If not found in active strategies, check saved strategies
-        if (!strategy) {
-            strategy = this.savedStrategies.find(s => s.id === strategyId);
-            isActive = false;
+        // Update parameters HTML based on strategy type
+        if (strategyParameters[strategyType]) {
+            parametersContainer.innerHTML = strategyParameters[strategyType];
+            
+            // Initialize any sub-components
+            if (strategyType === 'technical') {
+                // Add event listener for indicator type change
+                const indicatorTypeSelect = document.getElementById('indicator-type');
+                if (indicatorTypeSelect) {
+                    indicatorTypeSelect.addEventListener('change', strategiesManager.updateIndicatorParameters);
+                }
+            } else if (strategyType === 'composite') {
+                // Initialize custom weights toggle
+                const weightingsMethod = document.getElementById('weightings-method');
+                if (weightingsMethod) {
+                    weightingsMethod.addEventListener('change', function() {
+                        const customWeights = document.getElementById('custom-weights');
+                        if (this.value === 'custom') {
+                            customWeights.style.display = 'block';
+                        } else {
+                            customWeights.style.display = 'none';
+                        }
+                    });
+                }
+            }
+        } else {
+            parametersContainer.innerHTML = '';
         }
-        
-        if (!strategy) return;
-        
-        // TODO: Implement strategy editing functionality
-        alert('Strategy editing will be implemented in a future update.');
     },
     
-    // Load a strategy template
-    loadTemplate: function(templateName) {
-        // Set strategy type in form
-        document.getElementById('strategyType').value = templateName;
+    // Update indicator parameters based on selected indicator type
+    updateIndicatorParameters: function() {
+        const indicatorType = document.getElementById('indicator-type').value;
+        const indicatorParamsContainer = document.getElementById('indicator-params');
         
-        // Update parameters form
-        this.updateStrategyParameters();
-        
-        // Set default strategy name based on template
-        const nameMap = {
-            'rsi': 'RSI Strategy',
-            'macd': 'MACD Strategy',
-            'bbands': 'Bollinger Bands Strategy',
-            'ema_cross': 'EMA Crossover Strategy',
-            'ml': 'ML Strategy',
-            'composite': 'Composite Indicator Strategy',
-            'mtf': 'Multi-Timeframe Strategy',
-            'liquidity': 'Liquidity Analysis Strategy'
+        // Define parameter templates for each indicator type
+        const indicatorParams = {
+            rsi: `
+                <div class="row" id="rsi-params">
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-period" class="form-label">RSI Period</label>
+                        <input type="number" class="form-control" id="rsi-period" value="14" min="2" max="50">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-overbought" class="form-label">Overbought Level</label>
+                        <input type="number" class="form-control" id="rsi-overbought" value="70" min="50" max="90">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="rsi-oversold" class="form-label">Oversold Level</label>
+                        <input type="number" class="form-control" id="rsi-oversold" value="30" min="10" max="50">
+                    </div>
+                </div>
+            `,
+            macd: `
+                <div class="row" id="macd-params">
+                    <div class="col-md-4 mb-3">
+                        <label for="macd-fast" class="form-label">Fast Period</label>
+                        <input type="number" class="form-control" id="macd-fast" value="12" min="5" max="30">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="macd-slow" class="form-label">Slow Period</label>
+                        <input type="number" class="form-control" id="macd-slow" value="26" min="10" max="50">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="macd-signal" class="form-label">Signal Period</label>
+                        <input type="number" class="form-control" id="macd-signal" value="9" min="5" max="20">
+                    </div>
+                </div>
+            `,
+            bollinger: `
+                <div class="row" id="bollinger-params">
+                    <div class="col-md-4 mb-3">
+                        <label for="bb-period" class="form-label">BB Period</label>
+                        <input type="number" class="form-control" id="bb-period" value="20" min="10" max="50">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="bb-std-dev" class="form-label">Standard Deviations</label>
+                        <input type="number" class="form-control" id="bb-std-dev" value="2" min="1" max="4" step="0.1">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="bb-signal-pct" class="form-label">Signal Strength (%)</label>
+                        <input type="number" class="form-control" id="bb-signal-pct" value="90" min="50" max="100">
+                    </div>
+                </div>
+            `,
+            ema: `
+                <div class="row" id="ema-params">
+                    <div class="col-md-4 mb-3">
+                        <label for="ema-short" class="form-label">Short EMA Period</label>
+                        <input type="number" class="form-control" id="ema-short" value="9" min="5" max="50">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="ema-long" class="form-label">Long EMA Period</label>
+                        <input type="number" class="form-control" id="ema-long" value="21" min="10" max="100">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="ema-signal-length" class="form-label">Signal Length</label>
+                        <input type="number" class="form-control" id="ema-signal-length" value="3" min="1" max="10">
+                    </div>
+                </div>
+            `,
+            ichimoku: `
+                <div class="row" id="ichimoku-params">
+                    <div class="col-md-3 mb-3">
+                        <label for="tenkan-period" class="form-label">Tenkan Period</label>
+                        <input type="number" class="form-control" id="tenkan-period" value="9" min="5" max="30">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="kijun-period" class="form-label">Kijun Period</label>
+                        <input type="number" class="form-control" id="kijun-period" value="26" min="10" max="60">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="senkou-b-period" class="form-label">Senkou B Period</label>
+                        <input type="number" class="form-control" id="senkou-b-period" value="52" min="30" max="120">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="displacement" class="form-label">Displacement</label>
+                        <input type="number" class="form-control" id="displacement" value="26" min="10" max="60">
+                    </div>
+                </div>
+            `
         };
         
-        document.getElementById('strategyName').value = nameMap[templateName] || 'New Strategy';
-        
-        // Open add strategy modal
-        const modal = new bootstrap.Modal(document.getElementById('addStrategyModal'));
-        modal.show();
-    }
-};
-
-// Initialize when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize strategies
-    strategyManager.init();
-    
-    // Setup Socket.IO for bot status updates
-    socket = io();
-    
-    // Update bot status badge
-    socket.on('bot_status', function(data) {
-        const statusBadge = document.getElementById('bot-status-badge');
-        statusBadge.textContent = data.running ? 'Running' : 'Stopped';
-        statusBadge.className = data.running ? 'badge bg-success me-2' : 'badge bg-danger me-2';
-        
-        // Update button
-        const button = document.getElementById('toggle-bot');
-        if (data.running) {
-            button.textContent = 'Stop Bot';
-            button.className = 'btn btn-sm btn-outline-danger';
+        // Update parameters HTML based on indicator type
+        if (indicatorParams[indicatorType]) {
+            indicatorParamsContainer.innerHTML = indicatorParams[indicatorType];
         } else {
-            button.textContent = 'Start Bot';
-            button.className = 'btn btn-sm btn-outline-success';
+            indicatorParamsContainer.innerHTML = '';
         }
-    });
+    },
     
-    // Toggle bot on/off
-    document.getElementById('toggle-bot').addEventListener('click', function() {
+    // View strategy details
+    viewStrategy: function(event) {
+        const strategyId = event.target.getAttribute('data-strategy-id');
+        
+        // In a real implementation, this would fetch strategy details from the server
+        console.log('Viewing strategy ID:', strategyId);
+        
+        // For demonstration purposes, we'll show the modal with sample data
+        const strategyModal = new bootstrap.Modal(document.getElementById('strategyDetailsModal'));
+        
+        // Change modal title based on strategy ID
+        document.getElementById('strategyDetailsModalLabel').textContent = 'Strategy Details';
+        
+        // Sample data for different strategies
+        const strategyData = {
+            '1': {
+                name: 'Composite ML Strategy',
+                type: 'Machine Learning',
+                created: '2025-02-15',
+                status: 'Active',
+                winRate: '72%',
+                avgReturn: '+2.8%',
+                profitFactor: '2.4',
+                totalTrades: '62',
+                description: 'Composite ML Strategy combines multiple machine learning models trained on different market regimes to predict price movements. The strategy uses random forest, gradient boosting, and neural networks with dynamic feature selection based on current market conditions. It adapts to changing market regimes and adjusts its position sizing accordingly.',
+                symbols: 'BTC/USDT, ETH/USDT',
+                timeframes: '1h, 4h, 1d',
+                risk: '1.5%',
+                maxPositions: '2',
+                threshold: '65%',
+                models: 'Random Forest, GBM, Neural Net',
+                featureSelection: 'Dynamic',
+                trainingFreq: 'Weekly'
+            },
+            '2': {
+                name: 'Multi-timeframe Analyzer',
+                type: 'Technical',
+                created: '2025-01-28',
+                status: 'Active',
+                winRate: '68%',
+                avgReturn: '+2.1%',
+                profitFactor: '1.9',
+                totalTrades: '45',
+                description: 'Multi-timeframe Analyzer combines signals from multiple timeframes to identify high-probability trading opportunities. It uses a time-weighted approach that prioritizes longer timeframe signals while using shorter timeframes for entry/exit timing. The strategy incorporates strong trend filters and volume confirmation.',
+                symbols: 'BTC/USDT, ETH/USDT, SOL/USDT',
+                timeframes: '15m, 1h, 4h, 1d',
+                risk: '1.0%',
+                maxPositions: '3',
+                threshold: '70%',
+                models: 'N/A',
+                featureSelection: 'N/A',
+                trainingFreq: 'N/A'
+            },
+            '3': {
+                name: 'Sentiment-based Counter',
+                type: 'Sentiment',
+                created: '2025-02-20',
+                status: 'Active',
+                winRate: '64%',
+                avgReturn: '+3.5%',
+                profitFactor: '2.7',
+                totalTrades: '12',
+                description: 'Sentiment-based Counter is a contrarian strategy that looks for extreme market sentiment conditions to identify potential reversals. The strategy uses the Fear & Greed Index along with social media sentiment analysis to determine market psychology. It enters positions when sentiment reaches extreme levels and confirms with technical analysis.',
+                symbols: 'BTC/USDT',
+                timeframes: '4h, 1d',
+                risk: '2.0%',
+                maxPositions: '1',
+                threshold: '85%',
+                models: 'N/A',
+                featureSelection: 'N/A',
+                trainingFreq: 'N/A'
+            },
+            '4': {
+                name: 'RSI Strategy',
+                type: 'Technical',
+                created: '2025-01-10',
+                status: 'Inactive',
+                winRate: '61%',
+                avgReturn: '+1.8%',
+                profitFactor: '1.6',
+                totalTrades: '92',
+                description: 'RSI Strategy is a mean-reversion strategy that identifies overbought and oversold conditions using the Relative Strength Index (RSI). The strategy enters long positions when RSI drops below the oversold threshold and enters short positions when RSI rises above the overbought threshold. It includes confirmation filters for trend and volume.',
+                symbols: 'BTC/USDT, ETH/USDT, BNB/USDT',
+                timeframes: '1h, 4h',
+                risk: '1.0%',
+                maxPositions: '3',
+                threshold: 'N/A',
+                models: 'N/A',
+                featureSelection: 'N/A',
+                trainingFreq: 'N/A'
+            },
+            '5': {
+                name: 'MACD Strategy',
+                type: 'Technical',
+                created: '2025-01-15',
+                status: 'Inactive',
+                winRate: '58%',
+                avgReturn: '+1.5%',
+                profitFactor: '1.4',
+                totalTrades: '76',
+                description: 'MACD Strategy identifies trend direction and momentum using the Moving Average Convergence Divergence (MACD) indicator. The strategy enters long positions when the MACD line crosses above the signal line and enters short positions when the MACD line crosses below the signal line. It uses custom fast and slow period settings optimized for cryptocurrency markets.',
+                symbols: 'BTC/USDT, ETH/USDT',
+                timeframes: '1h, 4h',
+                risk: '1.2%',
+                maxPositions: '2',
+                threshold: 'N/A',
+                models: 'N/A',
+                featureSelection: 'N/A',
+                trainingFreq: 'N/A'
+            },
+            '6': {
+                name: 'Liquidity Analysis',
+                type: 'Order Flow',
+                created: '2025-02-05',
+                status: 'Inactive',
+                winRate: '75%',
+                avgReturn: '+2.9%',
+                profitFactor: '3.1',
+                totalTrades: '8',
+                description: 'Liquidity Analysis strategy identifies and exploits areas of liquidity concentration in the order book. It targets liquidity sweeps and stop hunts by identifying price levels with high order density and anticipating price movements toward and away from these levels. The strategy is particularly effective in volatile market conditions.',
+                symbols: 'BTC/USDT',
+                timeframes: '5m, 15m, 1h',
+                risk: '1.5%',
+                maxPositions: '1',
+                threshold: 'N/A',
+                models: 'N/A',
+                featureSelection: 'N/A',
+                trainingFreq: 'N/A'
+            }
+        };
+        
+        // Set data in modal if we have it for this strategy
+        if (strategyData[strategyId]) {
+            const data = strategyData[strategyId];
+            
+            // Set basic information
+            document.getElementById('strategy-name').textContent = data.name;
+            document.getElementById('strategy-type').textContent = data.type;
+            document.getElementById('strategy-created').textContent = data.created;
+            document.getElementById('strategy-status').innerHTML = data.status === 'Active' ? 
+                '<span class="badge bg-success">Active</span>' : 
+                '<span class="badge bg-secondary">Inactive</span>';
+            
+            // Set performance metrics
+            document.getElementById('strategy-win-rate').textContent = data.winRate;
+            document.getElementById('strategy-avg-return').textContent = data.avgReturn;
+            document.getElementById('strategy-profit-factor').textContent = data.profitFactor;
+            document.getElementById('strategy-total-trades').textContent = data.totalTrades;
+            
+            // Set description
+            document.getElementById('strategy-description').textContent = data.description;
+            
+            // Set configuration
+            document.getElementById('strategy-symbols').textContent = data.symbols;
+            document.getElementById('strategy-timeframes').textContent = data.timeframes;
+            document.getElementById('strategy-risk').textContent = data.risk;
+            document.getElementById('strategy-max-positions').textContent = data.maxPositions;
+            
+            // Set strategy-specific parameters
+            document.getElementById('strategy-threshold').textContent = data.threshold;
+            document.getElementById('strategy-models').textContent = data.models;
+            document.getElementById('strategy-feature-selection').textContent = data.featureSelection;
+            document.getElementById('strategy-training-freq').textContent = data.trainingFreq;
+        }
+        
+        // Show the modal
+        strategyModal.show();
+        
+        // Create strategy detail chart
+        this.createStrategyDetailChart();
+    },
+    
+    // Edit strategy
+    editStrategy: function(event) {
+        const strategyId = event.target.getAttribute('data-strategy-id');
+        
+        // In a real implementation, this would fetch strategy details from the server
+        console.log('Editing strategy ID:', strategyId);
+        
+        // For demonstration purposes, we'll show the edit modal with sample data
+        document.getElementById('editStrategyModalLabel').textContent = 'Edit Strategy';
+        
+        // Set sample form values (would come from the server in a real implementation)
+        document.getElementById('strategy-name-input').value = 'Composite ML Strategy';
+        document.getElementById('strategy-type-select').value = 'ml';
+        this.updateStrategyParameters();
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editStrategyModal'));
+        modal.show();
+    },
+    
+    // Activate strategy
+    activateStrategy: function(event) {
+        const strategyId = event.target.getAttribute('data-strategy-id');
+        
+        // In a real implementation, this would send an activation request to the server
+        console.log('Activating strategy ID:', strategyId);
+        
+        // Show a temporary message
+        alert('Strategy activated successfully!');
+    },
+    
+    // Deactivate strategy
+    deactivateStrategy: function(event) {
+        const strategyId = event.target.getAttribute('data-strategy-id');
+        
+        // In a real implementation, this would send a deactivation request to the server
+        console.log('Deactivating strategy ID:', strategyId);
+        
+        // Show a temporary message
+        alert('Strategy deactivated successfully!');
+    },
+    
+    // Activate all strategies
+    activateAll: function() {
+        // In a real implementation, this would send an activation request for all strategies
+        console.log('Activating all strategies');
+        
+        // Show a temporary message
+        alert('All strategies activated successfully!');
+    },
+    
+    // Deactivate all strategies
+    deactivateAll: function() {
+        // In a real implementation, this would send a deactivation request for all strategies
+        console.log('Deactivating all strategies');
+        
+        // Show a temporary message
+        alert('All strategies deactivated successfully!');
+    },
+    
+    // Create strategy performance comparison chart
+    createPerformanceChart: function() {
+        const ctx = document.getElementById('strategy-performance-chart').getContext('2d');
+        
+        // Sample data for strategy performance
+        const data = {
+            labels: ['Composite ML', 'Multi-timeframe', 'Sentiment-based', 'RSI', 'MACD', 'Liquidity Analysis'],
+            datasets: [
+                {
+                    label: 'Win Rate (%)',
+                    data: [72, 68, 64, 61, 58, 75],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Avg. Return (%)',
+                    data: [2.8, 2.1, 3.5, 1.8, 1.5, 2.9],
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Profit Factor',
+                    data: [2.4, 1.9, 2.7, 1.6, 1.4, 3.1],
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }
+            ]
+        };
+        
+        // Create chart
+        if (window.performanceChart) {
+            window.performanceChart.destroy();
+        }
+        
+        window.performanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    },
+    
+    // Create market regime performance chart
+    createMarketRegimeChart: function() {
+        const ctx = document.getElementById('market-regime-chart').getContext('2d');
+        
+        // Sample data for market regime performance
+        const data = {
+            labels: ['Trending Up', 'Trending Down', 'Ranging', 'Volatile', 'Breakout'],
+            datasets: [
+                {
+                    label: 'Composite ML',
+                    data: [2.1, 1.8, 0.9, 2.5, 3.2],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Multi-timeframe',
+                    data: [2.4, 1.5, 0.7, 1.9, 2.8],
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Sentiment-based',
+                    data: [1.2, 2.7, 1.1, 3.8, 1.4],
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }
+            ]
+        };
+        
+        // Create chart
+        if (window.regimeChart) {
+            window.regimeChart.destroy();
+        }
+        
+        window.regimeChart = new Chart(ctx, {
+            type: 'radar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 4,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    },
+    
+    // Create strategy detail chart
+    createStrategyDetailChart: function() {
+        const ctx = document.getElementById('strategy-detail-chart').getContext('2d');
+        
+        // Generate sample data for past 30 days
+        const labels = [];
+        const equityData = [];
+        
+        // Generate dates for the last 30 days
+        const today = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(today.getDate() - i);
+            labels.push(date.toLocaleDateString());
+        }
+        
+        // Generate random equity curve with an upward trend
+        let equity = 10000;
+        for (let i = 0; i < 30; i++) {
+            const dailyReturn = (Math.random() - 0.3) * 2; // Bias toward positive returns
+            equity *= (1 + dailyReturn / 100);
+            equityData.push(equity);
+        }
+        
+        // Create chart
+        if (window.strategyDetailChart) {
+            window.strategyDetailChart.destroy();
+        }
+        
+        window.strategyDetailChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Strategy Equity Curve',
+                    data: equityData,
+                    borderColor: '#11cdef',
+                    backgroundColor: 'rgba(17, 205, 239, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
+    
+    // Update bot status
+    updateBotStatus: function() {
+        // In a real implementation, this would fetch the bot status from the server
+        const botStatusBadge = document.getElementById('bot-status-badge');
+        const toggleBotButton = document.getElementById('toggle-bot');
+        
+        // Fetch bot status
+        fetch('/api/bot/status')
+            .then(response => response.json())
+            .then(data => {
+                // Update badge
+                botStatusBadge.textContent = data.running ? 'Running' : 'Stopped';
+                botStatusBadge.className = data.running ? 'badge bg-success me-2' : 'badge bg-danger me-2';
+                
+                // Update button
+                toggleBotButton.textContent = data.running ? 'Stop Bot' : 'Start Bot';
+                toggleBotButton.className = data.running ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success';
+            })
+            .catch(error => console.error('Error fetching bot status:', error));
+    },
+    
+    // Toggle bot
+    toggleBot: function() {
         const action = this.textContent === 'Stop Bot' ? 'stop' : 'start';
         
         // Send API request to control bot
@@ -908,6 +990,16 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({ action: action })
         })
         .then(response => response.json())
+        .then(data => {
+            // Update status after toggling
+            strategiesManager.updateBotStatus();
+        })
         .catch(error => console.error('Error:', error));
-    });
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize strategies manager
+    strategiesManager.init();
 });
