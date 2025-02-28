@@ -7,10 +7,10 @@ class SocketClient {
   constructor() {
     this.socket = null;
     this.connected = false;
-    this.callbacks = {};
+    this.callbacks = {}; 
     this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 5;
-    this.reconnectDelay = 3000;
+    this.maxReconnectAttempts = 15; // Tăng số lần thử kết nối lại (15 lần)
+    this.reconnectDelay = 5000; // Tăng thời gian chờ giữa các lần thử kết nối (5 giây)
   }
 
   // Initialize the socket connection
@@ -22,12 +22,14 @@ class SocketClient {
         return false;
       }
       
-      // Create socket connection with transport options
+      // Tạo kết nối socket với các tùy chọn nâng cao
       this.socket = io({
-        transports: ['websocket', 'polling'],
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        timeout: 20000
+        transports: ['websocket', 'polling'], // Sử dụng cả WebSocket và polling
+        reconnectionAttempts: this.maxReconnectAttempts, // Sử dụng giá trị từ constructor
+        reconnectionDelay: this.reconnectDelay, // Sử dụng giá trị từ constructor
+        timeout: 30000, // Tăng timeout lên 30 giây
+        forceNew: true, // Tạo kết nối mới thay vì tái sử dụng
+        autoConnect: true // Tự động kết nối khi khởi tạo
       });
       
       // Setup event handlers
@@ -153,10 +155,43 @@ class SocketClient {
     
     if (connected) {
       statusElement.className = 'badge bg-success';
-      statusElement.textContent = 'Connected';
+      statusElement.textContent = 'Đã Kết Nối'; // Connected
+      statusElement.title = 'Kết nối thành công đến máy chủ dữ liệu thời gian thực';
     } else {
       statusElement.className = 'badge bg-danger';
-      statusElement.textContent = 'Disconnected';
+      statusElement.textContent = 'Mất Kết Nối'; // Disconnected
+      statusElement.title = 'Không thể kết nối đến máy chủ dữ liệu thời gian thực';
+    }
+    
+    // Hiển thị thông báo về trạng thái kết nối
+    if (!connected && this.reconnectAttempts > 3) {
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+          <div class="toast-header bg-warning text-dark">
+            <strong class="me-auto">Thông Báo Kết Nối</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            Đang thử kết nối lại với máy chủ dữ liệu thời gian thực lần thứ ${this.reconnectAttempts}...
+            <small class="text-secondary d-block mt-1">Các cập nhật số dư và tín hiệu giao dịch có thể bị chậm trễ.</small>
+          </div>
+        `;
+        toastContainer.appendChild(toast);
+        
+        // Tự động ẩn thông báo sau 3 giây
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toastContainer.removeChild(toast);
+          }, 300);
+        }, 3000);
+      }
     }
   }
   
