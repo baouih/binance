@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="vi" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Bot - Dashboard</title>
+    <title>Trading Bot - Bảng điều khiển</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -378,43 +378,43 @@
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        <a class="nav-link active" href="/dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-robot"></i> Bot Management
+                        <a class="nav-link" href="/bot_management" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-robot"></i> Quản lý bot
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-chart-bar"></i> Market Analysis
+                        <a class="nav-link" href="/market_analysis" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-chart-bar"></i> Phân tích thị trường
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-exchange-alt"></i> Open Positions
+                        <a class="nav-link" href="/positions" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-exchange-alt"></i> Vị thế đang mở
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-history"></i> Trading History
+                        <a class="nav-link" href="/history" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-history"></i> Lịch sử giao dịch
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-brain"></i> Strategy Builder
+                        <a class="nav-link" href="/strategy" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-brain"></i> Chiến lược giao dịch
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-flask"></i> Backtesting
+                        <a class="nav-link" href="/backtesting" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-flask"></i> Kiểm thử chiến lược
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-cog"></i> Settings
+                        <a class="nav-link" href="/settings" onclick="handleMenuClick(this, event)">
+                            <i class="fas fa-cog"></i> Cài đặt
                         </a>
                     </li>
                 </ul>
@@ -429,8 +429,8 @@
         <div class="content" id="content">
             <div class="row mb-4">
                 <div class="col-12">
-                    <h1 class="h3 mb-0">Trading Dashboard</h1>
-                    <p class="text-muted">Tổng quan thị trường và quản lý trading</p>
+                    <h1 class="h3 mb-0">Bảng Điều Khiển Giao Dịch</h1>
+                    <p class="text-muted">Tổng quan thị trường và quản lý giao dịch</p>
                 </div>
             </div>
 
@@ -918,10 +918,14 @@
         // Xử lý đặt lệnh
         async function placeOrder(symbol, side, amount, leverage) {
             try {
-                // Lấy giá hiện tại từ API thay vì dùng biến local
-                const priceResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
-                const priceData = await priceResponse.json();
-                const price = parseFloat(priceData.price);
+                // Hiển thị nút đang xử lý
+                const actionButton = side === 'BUY' ? document.getElementById('buyBtn') : document.getElementById('sellBtn');
+                const originalText = actionButton.innerText;
+                actionButton.innerText = 'Đang xử lý...';
+                actionButton.disabled = true;
+                
+                // Sử dụng giá hiện tại từ biến global để tránh gọi API Binance bị chặn
+                const price = window.current_price;
                 
                 // Đặt lệnh qua API
                 const response = await fetch('/api/place_order', {
@@ -938,13 +942,46 @@
                 });
                 const data = await response.json();
                 
+                // Khôi phục nút
+                actionButton.innerText = originalText;
+                actionButton.disabled = false;
+                
                 if (data.status === 'success') {
-                    alert(`Đặt lệnh ${side} ${symbol} thành công!`);
+                    // Thêm lệnh vào lịch sử giao dịch
+                    const tradeHistory = document.getElementById('trade-history');
+                    if (tradeHistory) {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString('vi-VN');
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>${timeStr}</td>
+                            <td>${symbol}</td>
+                            <td><span class="badge bg-${side === 'BUY' ? 'success' : 'danger'}">${side === 'BUY' ? 'MUA' : 'BÁN'}</span></td>
+                            <td>${price.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                            <td>${(parseFloat(amount) / price).toFixed(4)} ${symbol.replace('USDT', '')}</td>
+                            <td>${parseFloat(amount).toLocaleString('en-US', {minimumFractionDigits: 2})} USDT</td>
+                            <td><span class="badge bg-primary">${side === 'BUY' ? 'VÀO LỆNH' : 'RA LỆNH'}</span></td>
+                        `;
+                        
+                        if (tradeHistory.querySelector('tbody')) {
+                            tradeHistory.querySelector('tbody').prepend(newRow);
+                        }
+                    }
+                    
+                    // Hiển thị thông báo thành công
+                    showNotification(`Đặt lệnh ${side === 'BUY' ? 'MUA' : 'BÁN'} ${symbol} thành công!`, 'success');
                 } else {
-                    alert(`Lỗi: ${data.message}`);
+                    showNotification(`Lỗi: ${data.message}`, 'error');
                 }
             } catch (error) {
-                alert(`Lỗi khi đặt lệnh: ${error.message}`);
+                // Khôi phục nút nếu có lỗi
+                const actionButton = side === 'BUY' ? document.getElementById('buyBtn') : document.getElementById('sellBtn');
+                if (actionButton) {
+                    actionButton.innerText = side === 'BUY' ? 'Mua' : 'Bán';
+                    actionButton.disabled = false;
+                }
+                
+                showNotification(`Lỗi khi đặt lệnh: ${error.message}`, 'error');
                 console.error('Error placing order:', error);
             }
         }
@@ -956,27 +993,112 @@
         
         async function closePosition(symbol) {
             try {
+                // Hiển thị thông báo đang xử lý
+                const closeBtn = document.getElementById('closePositionBtn');
+                const originalText = closeBtn.innerText;
+                closeBtn.innerText = 'Đang xử lý...';
+                closeBtn.disabled = true;
+                
                 const response = await fetch('/api/close_position', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        position_id: 'BTCUSDT-position'
+                        position_id: `${symbol}-position`,
+                        symbol: symbol
                     }),
                 });
                 
                 const data = await response.json();
                 
+                // Khôi phục nút đóng vị thế
+                closeBtn.innerText = originalText;
+                closeBtn.disabled = false;
+                
                 if (data.status === 'success') {
-                    alert(`Đóng vị thế ${symbol} thành công!`);
+                    // Cập nhật trạng thái vị thế trên UI
+                    document.getElementById('position-pnl').textContent = '0.00 (0.00%)';
+                    document.getElementById('position-pnl').style.color = '#8f9ba6';
+                    
+                    // Thêm lệnh vào lịch sử giao dịch
+                    const tradeHistory = document.getElementById('trade-history');
+                    if (tradeHistory) {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString('vi-VN');
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>${timeStr}</td>
+                            <td>${symbol}</td>
+                            <td><span class="badge bg-danger">SELL (ĐÓNG)</span></td>
+                            <td>${current_price.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                            <td>0.5 BTC</td>
+                            <td>${(current_price * 0.5).toLocaleString('en-US', {minimumFractionDigits: 2})} USDT</td>
+                            <td><span class="badge bg-info">ĐÓNG VỊ THẾ</span></td>
+                        `;
+                        
+                        if (tradeHistory.querySelector('tbody')) {
+                            tradeHistory.querySelector('tbody').prepend(newRow);
+                        }
+                    }
+                    
+                    // Hiển thị thông báo thành công
+                    showNotification(`Đóng vị thế ${symbol} thành công!`, 'success');
                 } else {
-                    alert(`Lỗi: ${data.message}`);
+                    showNotification(`Lỗi: ${data.message}`, 'error');
                 }
             } catch (error) {
-                alert(`Lỗi khi đóng vị thế: ${error.message}`);
+                document.getElementById('closePositionBtn').disabled = false;
+                showNotification(`Lỗi khi đóng vị thế: ${error.message}`, 'error');
                 console.error('Error closing position:', error);
             }
+        }
+        
+        // Hiển thị thông báo tốt hơn thay vì dùng alert
+        function showNotification(message, type = 'info') {
+            const notifContainer = document.getElementById('notification-container');
+            if (!notifContainer) {
+                // Tạo container thông báo nếu chưa tồn tại
+                const container = document.createElement('div');
+                container.id = 'notification-container';
+                container.style.position = 'fixed';
+                container.style.top = '20px';
+                container.style.right = '20px';
+                container.style.zIndex = '9999';
+                document.body.appendChild(container);
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.backgroundColor = type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db';
+            notification.style.color = 'white';
+            notification.style.padding = '15px 20px';
+            notification.style.marginBottom = '10px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            notification.style.minWidth = '250px';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(50px)';
+            notification.style.transition = 'all 0.3s ease-in-out';
+            
+            notification.innerHTML = message;
+            
+            document.getElementById('notification-container').appendChild(notification);
+            
+            // Hiển thị thông báo với hiệu ứng
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Tự động đóng thông báo sau 5 giây
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(50px)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
         }
         
         // Initial price fetch
