@@ -771,25 +771,69 @@ def generate_price_data():
         if account_update_counter >= 3:
             account_update_counter = 0
             try:
-                # Calculate real PnL from the current Bitcoin price
-                pnl_value = (current_price - entry_price) * quantity
-                pnl_percent = (pnl_value / (entry_price * quantity)) * 100
+                # Lấy thông tin tài khoản Binance thực tế
+                account_info = binance_api.get_account_info()
                 
-                # Create account update data with real PnL calculation
+                # Lấy vị thế đang mở
+                positions = binance_api.get_positions()
+                
+                # Lấy lệnh đang mở
+                open_orders = binance_api.get_open_orders()
+                
+                # Tính toán tổng rủi ro
+                total_risk = 0
+                for pos in positions:
+                    pos_amt = float(pos.get('positionAmt', 0))
+                    entry_price = float(pos.get('entryPrice', 0))
+                    leverage = float(pos.get('leverage', 1))
+                    notional = abs(pos_amt * entry_price)
+                    risk = notional / leverage
+                    total_risk += risk
+                
+                # Dữ liệu tài khoản thực từ Binance API
                 account_data = {
-                    'total_balance': account_balance,
-                    'available_balance': account_balance * 0.8,
-                    'margin_balance': account_balance * 0.2,
-                    'unrealized_pnl': pnl_value,
-                    'unrealized_pnl_percent': pnl_percent,
-                    'equity': account_balance + pnl_value
+                    'balance': float(account_info.get('totalWalletBalance', 0)),
+                    'unrealized_pnl': float(account_info.get('totalUnrealizedProfit', 0)),
+                    'margin_balance': float(account_info.get('totalMarginBalance', 0)),
+                    'available_balance': float(account_info.get('availableBalance', 0)),
+                    'maintenance_margin': float(account_info.get('totalMaintMargin', 0)),
+                    'initial_margin': float(account_info.get('totalInitialMargin', 0)),
+                    'positions': positions,
+                    'orders': open_orders,
+                    'risk': {
+                        'total_risk': total_risk,
+                        'risk_percentage': (total_risk / float(account_info.get('totalWalletBalance', 1))) * 100
+                    }
                 }
                 
                 # Emit the account update
                 socketio.emit('account_update', account_data)
-                logger.debug(f"Emitting account update: Balance: {account_data['total_balance']:.2f}, PnL: {account_data['unrealized_pnl']:.2f}")
+                logger.info(f"Đã gửi cập nhật tài khoản: {len(positions)} vị thế, {len(open_orders)} lệnh đang mở")
             except Exception as e:
-                logger.error(f"Error emitting account update: {str(e)}")
+                # Backup plan: gửi dữ liệu mô phỏng nếu có lỗi
+                pnl_value = (current_price - entry_price) * quantity
+                pnl_percent = (pnl_value / (entry_price * quantity)) * 100
+                
+                # Dữ liệu mô phỏng
+                account_data = {
+                    'balance': account_balance,
+                    'unrealized_pnl': pnl_value,
+                    'margin_balance': account_balance + pnl_value,
+                    'available_balance': account_balance * 0.8,
+                    'positions': [{
+                        'symbol': 'BTCUSDT',
+                        'positionAmt': str(quantity),
+                        'entryPrice': str(entry_price),
+                        'markPrice': str(current_price),
+                        'unRealizedProfit': str(pnl_value),
+                        'leverage': '10',
+                        'marginType': 'isolated'
+                    }],
+                    'orders': []
+                }
+                
+                socketio.emit('account_update', account_data)
+                logger.error(f"Lỗi khi lấy dữ liệu tài khoản thực tế: {str(e)}")
         
         # Sleep for 1 second
         time.sleep(1)
