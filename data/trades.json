@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "symbol": "BTCUSDT",
+    "side": "SELL",
+    "type": "MARKET",
+    "quantity": 0.001,
+    "price": 0,
+    "status": "FILLED",
+    "position_id": "BTCUSDT-position",
+    "timestamp": "2025-02-28T09:46:13.672881"
+  }
+]

@@ -325,10 +325,114 @@ class BinanceAPI:
             url = f"{self.base_url}/fapi/v2/account"
             response = requests.get(url, params=params, headers=self._get_headers())
             response.raise_for_status()
+            logger.info(f"Đã lấy được thông tin tài khoản Binance thành công")
             return response.json()
         except Exception as e:
             logger.error(f"Error getting account info: {str(e)}")
             return {}
+            
+    def get_open_orders(self, symbol=None):
+        """Get all open orders on a symbol or all symbols"""
+        if self.simulation_mode:
+            return [
+                {
+                    "orderId": 1917641,
+                    "symbol": "BTCUSDT",
+                    "status": "NEW",
+                    "clientOrderId": "web_6gCrw2kF8MCDF1EjKxHn",
+                    "price": "23416.10",
+                    "avgPrice": "0.00",
+                    "origQty": "0.001",
+                    "executedQty": "0",
+                    "cumQuote": "0",
+                    "timeInForce": "GTC",
+                    "type": "LIMIT",
+                    "reduceOnly": False,
+                    "closePosition": False,
+                    "side": "BUY",
+                    "positionSide": "BOTH",
+                    "stopPrice": "0",
+                    "workingType": "CONTRACT_PRICE",
+                    "priceProtect": False,
+                    "origType": "LIMIT",
+                    "updateTime": int(time.time() * 1000)
+                }
+            ]
+            
+        try:
+            timestamp = self.get_server_time()
+            params = {
+                'timestamp': timestamp
+            }
+            
+            if symbol:
+                params['symbol'] = symbol
+                
+            signature = self._get_signature(params)
+            params['signature'] = signature
+            
+            url = f"{self.base_url}/fapi/v1/openOrders"
+            response = requests.get(url, params=params, headers=self._get_headers())
+            response.raise_for_status()
+            logger.info(f"Đã lấy được thông tin lệnh đang mở thành công: {len(response.json())} lệnh")
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting open orders: {str(e)}")
+            return []
+            
+    def get_positions(self):
+        """Get current positions (extracted from account info)"""
+        try:
+            account_info = self.get_account_info()
+            if 'positions' in account_info:
+                # Filter out positions with zero amount
+                active_positions = [p for p in account_info['positions'] if float(p.get('positionAmt', 0)) != 0]
+                logger.info(f"Đã lấy được thông tin vị thế đang mở: {len(active_positions)} vị thế")
+                return active_positions
+            return []
+        except Exception as e:
+            logger.error(f"Error extracting positions: {str(e)}")
+            return []
+
+    def get_income_history(self, symbol=None, income_type=None, limit=100):
+        """Get income history (realized PnL, funding fees, etc.)"""
+        if self.simulation_mode:
+            return [
+                {
+                    "symbol": "BTCUSDT",
+                    "incomeType": "REALIZED_PNL",
+                    "income": "0.00000000",
+                    "asset": "USDT",
+                    "time": int(time.time() * 1000) - 86400000,
+                    "info": "FUNDING_FEE",
+                    "tranId": 9243,
+                    "tradeId": ""
+                }
+            ]
+            
+        try:
+            timestamp = self.get_server_time()
+            params = {
+                'timestamp': timestamp,
+                'limit': limit
+            }
+            
+            if symbol:
+                params['symbol'] = symbol
+            if income_type:
+                params['incomeType'] = income_type
+                
+            signature = self._get_signature(params)
+            params['signature'] = signature
+            
+            url = f"{self.base_url}/fapi/v1/income"
+            response = requests.get(url, params=params, headers=self._get_headers())
+            response.raise_for_status()
+            logger.info(f"Đã lấy được thông tin lịch sử thu nhập: {len(response.json())} bản ghi")
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting income history: {str(e)}")
+            return []
     
     def get_order_book(self, symbol, limit=20):
         """Get order book"""
