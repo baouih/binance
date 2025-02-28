@@ -657,7 +657,16 @@
         
         // Xử lý menu click với hiệu ứng tốt hơn
         function handleMenuClick(link, e) {
-            // Ngăn chặn hành vi mặc định của link
+            // Cho phép điều hướng đến trang cài đặt
+            if (link.getAttribute('href') === "/settings") {
+                // Xóa active class từ tất cả links
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                // Thêm active class vào link này
+                link.classList.add('active');
+                return true; // Cho phép điều hướng bình thường
+            }
+            
+            // Với các trang khác, ngăn chặn hành vi mặc định
             e.preventDefault();
             
             // Xóa active class khỏi tất cả các link
