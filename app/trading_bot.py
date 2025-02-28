@@ -178,74 +178,78 @@ class TradingBot:
         Args:
             side (str): BUY or SELL
         """
-        # Check if we can open more positions
-        if len(self.positions) >= self.max_positions:
-            logger.info(f"Maximum positions ({self.max_positions}) already open")
-            return
-            
-        # Get account info
-        account = self.binance_api.get_account_info()
-        if not account:
-            logger.warning("Could not get account info")
-            return
-            
-        # Calculate position size (10% of available balance)
-        available_balance = float(account.get('availableBalance', 0))
-        if available_balance <= 0:
-            logger.warning(f"Insufficient balance: {available_balance}")
-            return
-            
-        position_size = available_balance * 0.1
-        
-        # Get current price
-        latest_price = self._get_current_price()
-        if not latest_price or latest_price <= 0:
-            logger.warning(f"Invalid current price: {latest_price}")
-            return
-            
-        # Calculate quantity
         try:
-            quantity = position_size / latest_price
-            
-            # Ensure the quantity is valid
-            if not np.isfinite(quantity) or quantity <= 0:
-                logger.warning(f"Invalid quantity calculated: {quantity}")
+            # Check if we can open more positions
+            if len(self.positions) >= self.max_positions:
+                logger.info(f"Maximum positions ({self.max_positions}) already open")
                 return
                 
-            # Round quantity to appropriate precision
-            quantity = round(quantity, 3)  # Assuming 3 decimal places for quantity
+            # Get account info
+            account = self.binance_api.get_account_info()
+            if not account:
+                logger.warning("Could not get account info")
+                return
+                
+            # Calculate position size (10% of available balance)
+            available_balance = float(account.get('availableBalance', 0))
+            if available_balance <= 0:
+                logger.warning(f"Insufficient balance: {available_balance}")
+                return
+                
+            position_size = available_balance * 0.1
             
+            # Get current price
+            latest_price = self._get_current_price()
+            if not latest_price or latest_price <= 0:
+                logger.warning(f"Invalid current price: {latest_price}")
+                return
+                
+            # Calculate quantity
+            try:
+                quantity = position_size / latest_price
+                
+                # Ensure the quantity is valid
+                if not np.isfinite(quantity) or quantity <= 0:
+                    logger.warning(f"Invalid quantity calculated: {quantity}")
+                    return
+                    
+                # Round quantity to appropriate precision
+                quantity = round(quantity, 3)  # Assuming 3 decimal places for quantity
+                
+            except Exception as e:
+                logger.error(f"Error calculating quantity: {e}")
+                return
+                
+            # Execute the order
+            if self.test_mode:
+                # In test mode, just simulate the order
+                order_id = int(time.time() * 1000)
+                status = 'FILLED'
+                filled_qty = quantity
+                filled_price = latest_price
+                logger.info(f"TEST MODE: {side} order placed for {quantity} {self.symbol} at {latest_price}")
+            else:
+                # In live mode, place a real order
+                order = self.binance_api.create_order(
+                    symbol=self.symbol,
+                    side=side,
+                    order_type='MARKET',
+                    quantity=quantity
+                )
+                
+                if not order:
+                    logger.warning("Failed to place order")
+                    return
+                    
+                order_id = order.get('orderId')
+                status = order.get('status')
+                filled_qty = float(order.get('executedQty', 0))
+                filled_price = float(order.get('avgPrice', latest_price))
+                
+                logger.info(f"Order placed: {order_id}, Status: {status}, Qty: {filled_qty}, Price: {filled_price}")
         except Exception as e:
-            logger.error(f"Error calculating quantity: {e}")
+            logger.error(f"Error opening position: {str(e)}")
             return
-            
-        # Execute the order
-        if self.test_mode:
-            # In test mode, just simulate the order
-            order_id = int(time.time() * 1000)
-            status = 'FILLED'
-            filled_qty = quantity
-            filled_price = latest_price
-            logger.info(f"TEST MODE: {side} order placed for {quantity} {self.symbol} at {latest_price}")
-        else:
-            # In live mode, place a real order
-            order = self.binance_api.create_order(
-                symbol=self.symbol,
-                side=side,
-                order_type='MARKET',
-                quantity=quantity
-            )
-            
-            if not order:
-                logger.warning("Failed to place order")
-                return
-                
-            order_id = order.get('orderId')
-            status = order.get('status')
-            filled_qty = float(order.get('executedQty', 0))
-            filled_price = float(order.get('avgPrice', latest_price))
-            
-            logger.info(f"Order placed: {order_id}, Status: {status}, Qty: {filled_qty}, Price: {filled_price}")
             
         # Add to positions if order was filled
         if status == 'FILLED' and filled_qty > 0:
@@ -334,26 +338,30 @@ class TradingBot:
         # Determine the side for closing (opposite of opening side)
         close_side = 'SELL' if position['side'] == 'BUY' else 'BUY'
         
-        if self.test_mode:
-            # In test mode, just simulate the closing
-            logger.info(f"TEST MODE: Closing position {position['id']} at {price}")
-            status = 'FILLED'
-        else:
-            # In live mode, place a real order to close
-            order = self.binance_api.create_order(
-                symbol=position['symbol'],
-                side=close_side,
-                order_type='MARKET',
-                quantity=position['quantity']
-            )
-            
-            if not order:
-                logger.warning(f"Failed to close position {position['id']}")
-                return
+        try:
+            if self.test_mode:
+                # In test mode, just simulate the closing
+                logger.info(f"TEST MODE: Closing position {position['id']} at {price}")
+                status = 'FILLED'
+            else:
+                # In live mode, place a real order to close
+                order = self.binance_api.create_order(
+                    symbol=position['symbol'],
+                    side=close_side,
+                    order_type='MARKET',
+                    quantity=position['quantity']
+                )
                 
-            status = order.get('status')
-            
-            logger.info(f"Closing order placed: {order.get('orderId')}, Status: {status}")
+                if not order:
+                    logger.warning(f"Failed to close position {position['id']}")
+                    return
+                    
+                status = order.get('status')
+                
+                logger.info(f"Closing order placed: {order.get('orderId')}, Status: {status}")
+        except Exception as e:
+            logger.error(f"Error closing position {position['id']}: {str(e)}")
+            return
             
         # Update position if successfully closed
         if status == 'FILLED':
