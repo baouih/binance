@@ -919,7 +919,7 @@ class DashboardController {
     
     toast.innerHTML = `
       <div class="toast-header bg-danger text-white">
-        <strong class="me-auto">Error</strong>
+        <strong class="me-auto">Lỗi <small class="text-light">(Error)</small></strong>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
