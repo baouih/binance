@@ -9,6 +9,7 @@ import threading
 import time
 import random
 from datetime import datetime, timedelta
+from app.storage import Storage
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

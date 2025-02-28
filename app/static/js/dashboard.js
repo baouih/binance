@@ -488,8 +488,17 @@ class DashboardController {
   // Create a new trading bot
   async createTradeBot() {
     try {
+      this.showLoading(true);
+      
       // Get strategy parameters
-      const strategy = document.getElementById('strategy-selector').value;
+      const strategySelector = document.getElementById('strategy-selector');
+      const strategy = strategySelector ? strategySelector.value : '';
+      
+      if (!strategy) {
+        this.showError('Vui lòng chọn chiến lược giao dịch (Please select a trading strategy)');
+        this.showLoading(false);
+        return;
+      }
       
       // Get strategy-specific parameters
       let params = {};
@@ -508,6 +517,13 @@ class DashboardController {
         params = {
           deviation_multiplier: parseFloat(document.getElementById('bb-multiplier').value || 2.0)
         };
+      } else if (strategy === 'macd') {
+        // MACD doesn't need parameters in this implementation
+        params = {};
+      } else if (strategy === 'ml') {
+        params = {
+          probability_threshold: parseFloat(document.getElementById('ml-threshold').value || 0.65)
+        };
       }
       
       // Create bot request
@@ -517,6 +533,8 @@ class DashboardController {
         strategy: strategy,
         params: params
       };
+      
+      console.log('Creating bot with data:', botData);
       
       const response = await fetch('/api/create_bot', {
         method: 'POST',
@@ -528,16 +546,19 @@ class DashboardController {
       
       const result = await response.json();
       
-      if (result.bot_id) {
-        this.showSuccess(`Bot created successfully with ID: ${result.bot_id}`);
+      if (response.ok && result.bot_id) {
+        this.showSuccess(result.message || `Bot tạo thành công với ID: ${result.bot_id}`);
         // Refresh bot status
         await this.loadBotStatus();
       } else {
-        this.showError(result.error || 'Failed to create bot');
+        this.showError(result.error || 'Không thể tạo bot giao dịch (Failed to create bot)');
       }
+      
+      this.showLoading(false);
     } catch (error) {
       console.error('Error creating bot:', error);
-      this.showError('Failed to create trading bot');
+      this.showError('Lỗi khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
+      this.showLoading(false);
     }
   }
   

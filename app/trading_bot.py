@@ -90,20 +90,38 @@ class TradingBot:
         Returns:
             bool: Success or failure
         """
-        if self.is_running:
-            logger.warning("Trading bot is already running")
-            return False
+        try:
+            if self.is_running:
+                logger.warning(f"Bot for {self.symbol} is already running")
+                return False
+                
+            # Check if we can get market data to verify API connection
+            df = self.data_processor.get_historical_data(self.symbol, self.interval, lookback_days=7)
+            if df is None or df.empty:
+                logger.error(f"Cannot start bot for {self.symbol}: no market data available")
+                return False
+                
+            # Initialize positions from storage if any
+            try:
+                self._load_from_storage()
+            except Exception as e:
+                logger.warning(f"Could not load positions from storage: {str(e)}")
+                
+            self.is_running = True
+            self.last_check_time = datetime.now()
             
-        self.is_running = True
-        self.last_check_time = datetime.now()
-        
-        # Start the bot in a separate thread
-        self.thread = threading.Thread(target=self._run, args=(check_interval,))
-        self.thread.daemon = True
-        self.thread.start()
-        
-        logger.info(f"Trading bot started with {check_interval}s check interval")
-        return True
+            # Start the bot in a separate thread
+            self.thread = threading.Thread(target=self._run, args=(check_interval,))
+            self.thread.daemon = True
+            self.thread.start()
+            
+            logger.info(f"Trading bot started for {self.symbol} with {self.strategy.name} strategy, check interval: {check_interval}s")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error starting trading bot: {str(e)}")
+            self.is_running = False
+            return False
         
     def stop(self):
         """
