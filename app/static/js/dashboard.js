@@ -1,6 +1,9 @@
 /**
  * Dashboard Controller
  * Manages the trading dashboard UI and interactions
+ * 
+ * Bộ điều khiển Dashboard
+ * Quản lý giao diện người dùng và tương tác của bảng điều khiển giao dịch
  */
 
 class DashboardController {
@@ -883,7 +886,7 @@ class DashboardController {
     
     toast.innerHTML = `
       <div class="toast-header bg-success text-white">
-        <strong class="me-auto">Success</strong>
+        <strong class="me-auto">Thành Công <small class="text-light">(Success)</small></strong>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">

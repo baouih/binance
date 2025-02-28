@@ -65,11 +65,11 @@
               </div>
             </div>
               <div>
-                <span class="text-secondary small">24h High</span>
+                <span class="text-secondary small">Giá Cao Nhất 24h <small class="text-secondary">(24h High)</small></span>
                 <div id="price-high">0.00</div>
               </div>
               <div>
-                <span class="text-secondary small">24h Low</span>
+                <span class="text-secondary small">Giá Thấp Nhất 24h <small class="text-secondary">(24h Low)</small></span>
                 <div id="price-low">0.00</div>
               </div>
             </div>
@@ -231,20 +231,20 @@
     <div class="col-lg-4">
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Active Trading Bots</h5>
+          <h5 class="mb-0">Bot Giao Dịch Đang Hoạt Động <small class="text-secondary">(Active Trading Bots)</small></h5>
         </div>
         <div class="card-body">
           <div id="bots-container">
             <div class="alert alert-info">
-              <p class="mb-0">No active bots. Create a bot to start trading.</p>
+              <p class="mb-0">Chưa có bot nào đang hoạt động <small class="text-secondary">(No active bots)</small></p>
             </div>
           </div>
           
           <div class="create-bot mt-3">
-            <h6>Create New Bot</h6>
+            <h6>Tạo Bot Mới <small class="text-secondary">(Create New Bot)</small></h6>
             <div class="row">
               <div class="col-12 mb-2">
-                <label class="form-label small">Strategy</label>
+                <label class="form-label small">Chiến Lược <small class="text-secondary">(Strategy)</small></label>
                 <select id="bot-strategy" class="form-select">
                   <!-- Will be populated with strategies -->
                 </select>
@@ -253,18 +253,18 @@
               <div id="strategy-params">
                 <div class="row" id="rsi-params">
                   <div class="col-6 mb-2">
-                    <label class="form-label small">Overbought</label>
+                    <label class="form-label small">Quá Mua <small class="text-secondary">(Overbought)</small></label>
                     <input type="number" id="rsi-overbought" class="form-control" value="70" min="50" max="90">
                   </div>
                   <div class="col-6 mb-2">
-                    <label class="form-label small">Oversold</label>
+                    <label class="form-label small">Quá Bán <small class="text-secondary">(Oversold)</small></label>
                     <input type="number" id="rsi-oversold" class="form-control" value="30" min="10" max="50">
                   </div>
                 </div>
               </div>
               
               <div class="col-12">
-                <button id="create-bot-btn" class="btn btn-primary">Create Bot</button>
+                <button id="create-bot-btn" class="btn btn-primary">Tạo Bot <small class="text-secondary">(Create Bot)</small></button>
               </div>
             </div>
           </div>

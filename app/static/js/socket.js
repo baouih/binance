@@ -117,6 +117,9 @@ class SocketClient {
     
     // Add visual indicator to the UI
     this.updateConnectionStatus(true);
+    
+    // Dừng chế độ mô phỏng khi kết nối lại thành công
+    this._stopSimulation();
   }
   
   // Handle disconnection
@@ -196,6 +199,9 @@ class SocketClient {
     
     // Attempt to reconnect
     this.attemptReconnect();
+    
+    // Start simulation mode when connection error occurs
+    this._startSimulation();
   }
   
   // Attempt to reconnect after disconnection
