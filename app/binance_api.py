@@ -689,11 +689,25 @@ class BinanceAPI:
             logger.error(f"Exception when setting leverage: {str(e)}")
             return None
             
+    def get_symbol_price(self, symbol):
+        """
+        Lấy giá hiện tại của một cặp giao dịch
+        
+        Args:
+            symbol (str): Mã cặp giao dịch (ví dụ: BTCUSDT)
+            
+        Returns:
+            float: Giá hiện tại, None nếu không lấy được
+        """
+        return self._get_simulated_execution_price(symbol, "MARKET")
+        
     def _get_simulated_execution_price(self, symbol, side):
         """Get simulated execution price for market orders"""
         # Lấy giá thị trường hiện tại từ Coinbase API để đảm bảo chính xác
         try:
-            url = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+            # Convert from BTCUSDT to BTC-USD format
+            base_symbol = symbol.replace("USDT", "-USD")
+            url = f"https://api.coinbase.com/v2/prices/{base_symbol}/spot"
             response = requests.get(url)
             response.raise_for_status()
             data = response.json()
