@@ -143,18 +143,44 @@ class Storage:
         Returns:
             list: List of trades
         """
-        trades = self._load_json(self.trades_file)
-        
-        if symbol:
-            trades = [t for t in trades if t.get('symbol') == symbol]
+        try:
+            trades = self._load_json(self.trades_file)
             
-        # Sort by time (most recent first)
-        trades.sort(key=lambda x: x.get('exit_time', x.get('entry_time', 0)), reverse=True)
-        
-        if limit:
-            return trades[:limit]
+            if symbol:
+                trades = [t for t in trades if t.get('symbol') == symbol]
+                
+            # Sort by time (most recent first)
+            # Use safe getter for timestamps that handles potential None values
+            def safe_timestamp_getter(trade):
+                exit_time = trade.get('exit_time')
+                if exit_time:
+                    if isinstance(exit_time, str):
+                        try:
+                            return datetime.fromisoformat(exit_time)
+                        except:
+                            return datetime.min
+                    return exit_time
+                
+                entry_time = trade.get('entry_time')
+                if entry_time:
+                    if isinstance(entry_time, str):
+                        try:
+                            return datetime.fromisoformat(entry_time)
+                        except:
+                            return datetime.min
+                    return entry_time
+                
+                return datetime.min
+                
+            trades.sort(key=safe_timestamp_getter, reverse=True)
             
-        return trades
+            if limit and isinstance(limit, int) and limit > 0:
+                return trades[:limit]
+                
+            return trades
+        except Exception as e:
+            logger.error(f"Error retrieving trades: {str(e)}")
+            return []
         
     def save_settings(self, settings):
         """
