@@ -291,12 +291,22 @@ class DashboardController {
       this.charts.updatePriceDisplay(this.marketData.price);
     }
     
+    // Quick price element (thay đổi)
+    const quickPriceElement = document.getElementById('quick-price');
+    if (quickPriceElement && this.marketData.price) {
+      const formattedPrice = new Intl.NumberFormat('vi-VN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(this.marketData.price);
+      quickPriceElement.innerHTML = `${formattedPrice} <span id="price-change-24h" class="badge ${this.marketData.change_24h >= 0 ? 'text-bg-success' : 'text-bg-danger'}">${this.marketData.change_24h >= 0 ? '+' : ''}${this.marketData.change_24h.toFixed(2)}%</span>`;
+    }
+    
     // 24h change
     const changeElement = document.getElementById('price-change-24h');
     if (changeElement && this.marketData.change_24h !== undefined) {
       const change = this.marketData.change_24h;
       changeElement.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-      changeElement.className = change >= 0 ? 'text-success' : 'text-danger';
+      changeElement.className = `badge ${change >= 0 ? 'text-bg-success' : 'text-bg-danger'}`;
     }
     
     // 24h volume
