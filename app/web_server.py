@@ -207,6 +207,65 @@ def close_position():
 # Store backtesting results
 backtest_results = {}
 
+@app.route('/api/account', methods=['GET'])
+def get_account_api():
+    """Lấy thông tin tài khoản chi tiết từ Binance API."""
+    try:
+        # Gọi API Binance để lấy thông tin tài khoản thực
+        account_info = binance_api.get_account_info()
+        
+        # Kiểm tra nếu có lỗi hoặc không có dữ liệu
+        if not account_info:
+            return jsonify({
+                'status': 'error', 
+                'message': 'Không thể lấy thông tin tài khoản Binance'
+            }), 500
+        
+        # Lấy danh sách vị thế đang mở (không bằng 0)
+        positions = binance_api.get_positions()
+        
+        # Lấy danh sách lệnh đang mở
+        open_orders = binance_api.get_open_orders()
+        
+        # Tính toán tổng rủi ro
+        total_risk = 0
+        for pos in positions:
+            pos_amt = float(pos.get('positionAmt', 0))
+            entry_price = float(pos.get('entryPrice', 0))
+            leverage = float(pos.get('leverage', 1))
+            notional = abs(pos_amt * entry_price)
+            risk = notional / leverage
+            total_risk += risk
+            
+        # Định dạng lại dữ liệu phản hồi
+        response_data = {
+            'status': 'success',
+            'account': {
+                'totalWalletBalance': account_info.get('totalWalletBalance', '0'),
+                'totalUnrealizedProfit': account_info.get('totalUnrealizedProfit', '0'),
+                'totalMarginBalance': account_info.get('totalMarginBalance', '0'),
+                'availableBalance': account_info.get('availableBalance', '0'),
+                'totalMaintMargin': account_info.get('totalMaintMargin', '0'),
+                'totalInitialMargin': account_info.get('totalInitialMargin', '0'),
+            },
+            'positions': positions,
+            'orders': open_orders,
+            'risk': {
+                'total_risk': total_risk,
+                'risk_percentage': (total_risk / float(account_info.get('totalWalletBalance', 1))) * 100
+            }
+        }
+        
+        logger.info(f"API: Đã lấy thông tin tài khoản: {len(positions)} vị thế, {len(open_orders)} lệnh đang mở")
+        return jsonify(response_data)
+    
+    except Exception as e:
+        logger.error(f"API: Lỗi khi lấy thông tin tài khoản: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Lỗi khi lấy thông tin tài khoản: {str(e)}'
+        }), 500
+
 @app.route('/')
 def index():
     """Render the main dashboard."""
