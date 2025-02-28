@@ -627,9 +627,9 @@ class TradingBot:
         # Risk metrics
         if winning_trades and losing_trades:
             profit_factor = abs(sum(t['pnl_amount'] for t in winning_trades) / 
-                            sum(t['pnl_amount'] for t in losing_trades)) if sum(t['pnl_amount'] for t in losing_trades) != 0 else float('inf')
+                            sum(t['pnl_amount'] for t in losing_trades)) if sum(t['pnl_amount'] for t in losing_trades) != 0 else 999.99
         else:
-            profit_factor = 0 if not winning_trades else float('inf')
+            profit_factor = 0 if not winning_trades else 999.99
             
         # Calculate drawdown
         balances = [initial_balance]
