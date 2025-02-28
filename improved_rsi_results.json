@@ -5,16 +5,25 @@
     "overbought": 60,
     "oversold": 40
   },
+  "risk_management": {
+    "trailing_stop": true,
+    "take_profit_pct": 15.0,
+    "stop_loss_pct": 7.0
+  },
+  "filters": {
+    "trend_filter": true,
+    "volume_filter": false
+  },
   "initial_balance": 10000.0,
-  "final_balance": 7280.151068367423,
-  "profit": -2719.8489316325768,
-  "profit_percent": -27.19848931632577,
-  "num_trades": 43,
-  "winning_trades": 21,
-  "losing_trades": 22,
-  "win_rate": 48.837209302325576,
-  "profit_factor": 0.10246610490799407,
-  "max_drawdown": 27.47956730833802,
-  "start_date": "2024-11-30 16:17:23.139927",
-  "end_date": "2025-02-28 15:17:23.139927"
+  "final_balance": 10818.96840035382,
+  "profit": 818.9684003538205,
+  "profit_percent": 8.189684003538204,
+  "num_trades": 20,
+  "winning_trades": 17,
+  "losing_trades": 3,
+  "win_rate": 85.0,
+  "profit_factor": 18.68188283057646,
+  "max_drawdown": 0.22665065414714264,
+  "start_date": "2024-11-30 16:23:51.323638",
+  "end_date": "2025-02-28 15:23:51.323638"
 }
