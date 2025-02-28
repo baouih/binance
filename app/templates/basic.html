@@ -242,27 +242,83 @@
             document.getElementById('update-time').textContent = now.toLocaleString('vi-VN', options);
         }
         
-        // Cập nhật dữ liệu giá
-        function updatePrice() {
+        // Lấy giá thời gian thực từ Binance API
+        async function fetchRealTimePrice() {
+            try {
+                // Sử dụng API công khai của Binance
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const data = await response.json();
+                
+                if (data && data.price) {
+                    // Cập nhật giá từ API
+                    const price = parseFloat(data.price).toFixed(2);
+                    document.getElementById('btc-price').textContent = price + ' USDT';
+                    console.log('Đã cập nhật giá BTC từ Binance API:', price);
+                    
+                    // Cập nhật giá ETH (tùy chọn)
+                    fetchETHPrice();
+                    
+                    return price;
+                } else {
+                    console.error('Không thể lấy giá từ Binance API:', data);
+                    updatePriceSimulated();
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy giá từ Binance API:', error);
+                updatePriceSimulated();
+            }
+        }
+        
+        // Lấy giá ETH
+        async function fetchETHPrice() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT');
+                const data = await response.json();
+                
+                if (data && data.price) {
+                    // Cập nhật giá ETH
+                    const ethCards = document.querySelectorAll('.coin-card');
+                    for (const card of ethCards) {
+                        if (card.textContent.includes('Ethereum')) {
+                            const priceElement = card.querySelector('.price-display');
+                            if (priceElement) {
+                                priceElement.textContent = parseFloat(data.price).toFixed(2) + ' USDT';
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy giá ETH:', error);
+            }
+        }
+        
+        // Cập nhật dữ liệu giá mô phỏng (backup nếu API không khả dụng)
+        function updatePriceSimulated() {
             // Giá mô phỏng với một chút biến động ngẫu nhiên
-            const basePrice = 61245.80;
+            const basePrice = 83167.4; // Cập nhật giá mới theo ảnh được cung cấp
             const randomChange = (Math.random() - 0.5) * 200; // Thay đổi ngẫu nhiên từ -100 đến +100
             const newPrice = basePrice + randomChange;
             document.getElementById('btc-price').textContent = newPrice.toFixed(2) + ' USDT';
         }
         
         // Hàm làm mới dữ liệu
-        function refreshData() {
+        async function refreshData() {
             updateDateTime();
-            updatePrice();
-            alert('Đã cập nhật dữ liệu mới nhất!');
+            const price = await fetchRealTimePrice();
+            if (price) {
+                alert('Đã cập nhật giá BTC: ' + price + ' USDT');
+            } else {
+                alert('Không thể lấy giá từ Binance API, đã sử dụng giá mô phỏng.');
+            }
         }
         
         // Khởi tạo
         updateDateTime();
+        fetchRealTimePrice();
         
-        // Cập nhật thời gian mỗi phút
+        // Cập nhật thời gian và giá theo định kỳ
         setInterval(updateDateTime, 60000);
+        setInterval(fetchRealTimePrice, 10000); // Cập nhật giá mỗi 10 giây
     </script>
 </body>
 </html>
