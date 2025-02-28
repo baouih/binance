@@ -26,9 +26,12 @@ logger = logging.getLogger('trading_bot_runner')
 # Import các module từ ứng dụng
 from app.binance_api import BinanceAPI
 from app.data_processor import DataProcessor
+# Import classes from strategy
 from app.strategy import (RSIStrategy, MACDStrategy, EMACrossStrategy,
-                         BBandsStrategy, CombinedStrategy, MLStrategy, AutoStrategy,
-                         StrategyFactory)
+                         BBandsStrategy, CombinedStrategy, MLStrategy, AutoStrategy)
+
+# Import StrategyFactory from strategy_factory
+from app.strategy_factory import StrategyFactory
 from app.trading_bot import TradingBot
 from app.ml_optimizer import MLOptimizer
 from app.market_regime_detector import MarketRegimeDetector
@@ -313,15 +316,37 @@ class TradingBotRunner:
         Tạo chiến lược dựa trên loại chiến lược được chỉ định
         
         Args:
-            strategy_type (str): Loại chiến lược ('auto', 'ml', 'rsi', 'macd', 'ema', 'bbands')
+            strategy_type (str): Loại chiến lược ('auto', 'ml', 'rsi', 'macd', 'ema', 'bbands', 'advanced_ml', etc.)
             
         Returns:
             Strategy: Chiến lược đã tạo
         """
         logger.info(f"Tạo chiến lược theo yêu cầu: {strategy_type}")
         
-        if strategy_type == 'auto':
-            # Tạo AutoStrategy (tương tự như _create_default_strategy)
+        # Chuẩn bị các tham số chung
+        ml_optimizer = None
+        model_path = None
+        
+        # Nếu cần ML và use_ml=True, chuẩn bị ML optimizer
+        if self.use_ml and (strategy_type in ['ml', 'auto', 'combined', 'advanced_ml', 'regime_ml']):
+            try:
+                from app.ml_optimizer import MLOptimizer
+                ml_optimizer = MLOptimizer()
+                
+                # Tìm kiếm các mô hình hiện có
+                if os.path.exists('models'):
+                    model_files = [f for f in os.listdir('models') if f.endswith('.joblib')]
+                    if model_files:
+                        model_path = os.path.join('models', model_files[-1])  # Lấy mô hình mới nhất
+                        logger.info(f"Tìm thấy mô hình ML: {model_path}")
+                    else:
+                        logger.warning("Không tìm thấy mô hình ML trong thư mục models")
+            except Exception as e:
+                logger.warning(f"Không thể chuẩn bị ML Optimizer: {str(e)}")
+        
+        # Chuẩn bị market_regime_detector nếu cần
+        market_regime_detector = None
+        if strategy_type in ['auto', 'ml', 'advanced_ml', 'regime_ml']:
             market_regime_detector = MarketRegimeDetector()
             
             # Phát hiện chế độ thị trường ban đầu
@@ -329,46 +354,36 @@ class TradingBotRunner:
             if df is not None and not df.empty:
                 initial_regime = market_regime_detector.detect_regime(df)
                 logger.info(f"Chế độ thị trường khởi tạo: {initial_regime}")
+        
+        # Đặt ngưỡng tin cậy theo mức độ sử dụng ML
+        probability_threshold = 0.65 if self.use_ml else 0.80
+        
+        # Định nghĩa các tham số bổ sung cho StrategyFactory
+        kwargs = {
+            'use_ml': self.use_ml,
+            'ml_optimizer': ml_optimizer,
+            'market_regime_detector': market_regime_detector,
+            'probability_threshold': probability_threshold
+        }
+        
+        # Tạo chiến lược sử dụng StrategyFactory
+        strategy = StrategyFactory.create_strategy(
+            strategy_type=strategy_type, 
+            model_path=model_path,
+            **kwargs
+        )
+        
+        if strategy:
+            logger.info(f"Đã tạo chiến lược {type(strategy).__name__} thành công")
+            return strategy
+        else:
+            logger.error(f"Không thể tạo chiến lược {strategy_type}, sử dụng AutoStrategy mặc định")
             
-            # Khởi tạo ML Optimizer nếu sử dụng ML
-            ml_optimizer = None
-            if self.use_ml:
-                ml_optimizer = MLOptimizer()
-                try:
-                    if os.path.exists('models/ensemble_model.joblib'):
-                        logger.info("Đang tải mô hình ML đã huấn luyện...")
-                        ml_optimizer.load_models('models')
-                        logger.info("Đã tải xong mô hình ML")
-                except Exception as e:
-                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
+            # Fallback to AutoStrategy as default
+            if market_regime_detector is None:
+                market_regime_detector = MarketRegimeDetector()
             
-            logger.info("Tạo chiến lược AutoStrategy với khả năng thích ứng theo chế độ thị trường")
             return AutoStrategy(market_regime_detector, ml_optimizer)
-            
-        elif strategy_type == 'ml':
-            # Tạo MLStrategy
-            if not self.use_ml:
-                logger.warning("Đã yêu cầu chiến lược ML nhưng tùy chọn --no-ml được bật. Sẽ sử dụng ML ở độ tin cậy thấp.")
-            
-            ml_optimizer = MLOptimizer()
-            try:
-                if os.path.exists('models/ensemble_model.joblib'):
-                    logger.info("Đang tải mô hình ML đã huấn luyện...")
-                    ml_optimizer.load_models('models')
-                    logger.info("Đã tải xong mô hình ML")
-            except Exception as e:
-                logger.warning(f"Không thể tải mô hình ML: {str(e)}")
-            
-            market_regime_detector = MarketRegimeDetector()
-            # Đặt ngưỡng tin cậy thấp hơn nếu --no-ml được bật
-            probability_threshold = 0.65 if self.use_ml else 0.80
-            
-            logger.info(f"Tạo chiến lược MLStrategy với probability_threshold={probability_threshold}")
-            return MLStrategy(
-                ml_optimizer=ml_optimizer,
-                market_regime_detector=market_regime_detector,
-                probability_threshold=probability_threshold
-            )
             
         elif strategy_type == 'combined':
             # Tạo CombinedStrategy với các chiến lược cơ bản

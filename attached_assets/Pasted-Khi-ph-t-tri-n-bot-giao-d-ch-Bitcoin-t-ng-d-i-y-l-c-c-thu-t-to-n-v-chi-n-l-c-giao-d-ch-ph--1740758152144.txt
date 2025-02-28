@@ -1,0 +1,69 @@
+Khi phát triển bot giao dịch Bitcoin tự động, dưới đây là các thuật toán và chiến lược giao dịch phổ biến:
+
+### Các thuật toán học máy nên sử dụng:
+
+1. **Mạng thần kinh (Neural Networks)**
+   - LSTM (Long Short-Term Memory) - tốt cho phân tích chuỗi thời gian
+   - GRU (Gated Recurrent Units) - tương tự LSTM nhưng đơn giản hơn
+   - CNN (Convolutional Neural Networks) - hiệu quả khi phát hiện mẫu trong dữ liệu thị trường
+
+2. **Thuật toán học tăng cường (Reinforcement Learning)**
+   - Q-Learning
+   - Deep Q Networks (DQN)
+   - Proximal Policy Optimization (PPO)
+
+3. **Thuật toán hồi quy và phân loại**
+   - Random Forest
+   - XGBoost
+   - Support Vector Machines (SVM)
+   - Logistic Regression
+
+4. **Phân tích chuỗi thời gian**
+   - ARIMA (AutoRegressive Integrated Moving Average)
+   - SARIMA (Seasonal ARIMA)
+   - Prophet (từ Facebook)
+
+### Chiến lược giao dịch:
+
+1. **Chiến lược dựa trên chỉ báo kỹ thuật**
+   - Moving Average Crossover (MA, EMA)
+   - RSI (Relative Strength Index) để xác định thị trường quá mua/quá bán
+   - MACD (Moving Average Convergence Divergence)
+   - Bollinger Bands để xác định biến động và xu hướng đảo chiều
+   - Ichimoku Cloud để nhận diện hỗ trợ, kháng cự và xu hướng
+
+2. **Chiến lược dựa trên mẫu hình giá**
+   - Nhận diện mẫu hình nến Nhật
+   - Mẫu hình đầu và vai, tam giác, cờ hiệu
+   - Fibonacci retracement levels
+
+3. **Chiến lược thống kê và chênh lệch giá**
+   - Mean reversion (quay về giá trị trung bình)
+   - Cointegration (đồng tích hợp) giữa các cặp tiền điện tử
+   - Statistical arbitrage
+
+4. **Chiến lược theo xu hướng**
+   - Momentum trading (giao dịch theo đà)
+   - Breakout trading (giao dịch đột phá)
+   - Trend following với các chỉ báo ADX
+
+5. **Chiến lược phân tích tâm lý thị trường**
+   - Phân tích dữ liệu mạng xã hội (sentiment analysis)
+   - Google Trends và độ phổ biến từ khóa
+   - Chỉ số Fear & Greed
+
+6. **Chiến lược quản lý rủi ro**
+   - Stop-loss động (trailing stop-loss)
+   - Position sizing theo phần trăm vốn
+   - Kelly Criterion để tối ưu hóa kích thước giao dịch
+
+Dữ liệu huấn luyện nên bao gồm:
+- Dữ liệu giá theo thời gian (OHLCV)
+- Dữ liệu khối lượng giao dịch
+- Dữ liệu về độ sâu thị trường (order book)
+- Chỉ số biến động
+- Dữ liệu về tâm lý thị trường
+- Dữ liệu từ các blockchain (on-chain metrics)
+- Dữ liệu vĩ mô liên quan đến Bitcoin
+
+Để có kết quả tốt, bot nên kết hợp nhiều chiến lược khác nhau và có khả năng thích nghi với điều kiện thị trường thay đổi.​​​​​​​​​​​​​​​​
