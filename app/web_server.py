@@ -75,15 +75,22 @@ def place_order():
         order_type = data.get('type', 'MARKET').upper()
         quantity = float(data.get('quantity', 0.001))
         
+        # Kiểm tra API key
+        if not binance_api.api_key or not binance_api.api_secret:
+            return jsonify({
+                'status': 'error',
+                'message': 'Chưa cấu hình API key Binance. Vui lòng cấu hình API key để sử dụng chức năng này (API key not configured)'
+            }), 400
+        
         if quantity <= 0:
             return jsonify({
                 'status': 'error',
-                'message': 'Invalid quantity'
+                'message': 'Khối lượng không hợp lệ (Invalid quantity)'
             }), 400
         
-        logger.info(f"Placing order: {side} {quantity} {symbol} at {order_type}")
+        logger.info(f"Đang đặt lệnh: {side} {quantity} {symbol} tại {order_type}")
         
-        # Execute the order using BinanceAPI
+        # Thực hiện đặt lệnh qua BinanceAPI
         result = binance_api.create_order(
             symbol=symbol,
             side=side,
@@ -91,10 +98,23 @@ def place_order():
             quantity=quantity
         )
         
-        # Return success response
+        # Lưu thông tin lệnh
+        storage = Storage()
+        trade_info = {
+            'symbol': symbol,
+            'side': side,
+            'type': order_type,
+            'quantity': quantity,
+            'price': result.get('price', 0),
+            'status': 'FILLED',
+            'timestamp': datetime.now().isoformat()
+        }
+        storage.save_trade(trade_info)
+        
+        # Trả về kết quả thành công
         return jsonify({
             'status': 'success',
-            'message': f'Order {side} {quantity} {symbol} placed successfully',
+            'message': f'Đặt lệnh {side} {quantity} {symbol} thành công (Order placed successfully)',
             'order': result
         })
         
@@ -115,30 +135,65 @@ def close_position():
         if not position_id:
             return jsonify({
                 'status': 'error',
-                'message': 'Position ID required'
+                'message': 'ID vị thế cần được cung cấp (Position ID required)'
             }), 400
         
-        logger.info(f"Closing position: {position_id}")
+        # Kiểm tra API key
+        if not binance_api.api_key or not binance_api.api_secret:
+            return jsonify({
+                'status': 'error',
+                'message': 'Chưa cấu hình API key Binance. Vui lòng cấu hình API key để sử dụng chức năng này (API key not configured)'
+            }), 400
+            
+        # Parse thông tin vị thế từ position_id
+        # Format: symbol_side_quantity_timestamp
+        try:
+            parts = position_id.split('_')
+            if len(parts) >= 3:
+                symbol = parts[0]
+                position_side = parts[1]
+                quantity = float(parts[2])
+            else:
+                # Mặc định nếu định dạng không đúng
+                symbol = "BTCUSDT"
+                position_side = "LONG"
+                quantity = 0.001
+        except:
+            symbol = "BTCUSDT"
+            position_side = "LONG"
+            quantity = 0.001
+        
+        logger.info(f"Đang đóng vị thế: {position_id} [{symbol} {position_side} {quantity}]")
         
         # Đặt lệnh đảo ngược vị thế hiện tại để đóng vị thế
         # Nếu vị thế hiện tại là LONG, đặt lệnh SELL để đóng
-        # Ví dụ: Vị thế này là LONG BTC, nên đặt lệnh SELL để đóng
-        symbol = "BTCUSDT"  # Lấy từ position_id
-        side = "SELL"  # Đảo ngược của LONG là SELL
-        quantity = 0.5  # Số lượng BTC trong vị thế
+        close_side = "SELL" if position_side == "LONG" else "BUY"
         
         # Đặt lệnh đóng vị thế thông qua BinanceAPI
-        # Ở đây dùng chế độ thực tế thay vì giả lập
         result = binance_api.create_order(
             symbol=symbol,
-            side=side,
+            side=close_side,
             order_type="MARKET",
             quantity=quantity
         )
         
+        # Lưu thông tin giao dịch
+        storage = Storage()
+        trade_info = {
+            'symbol': symbol,
+            'side': close_side,
+            'type': 'MARKET',
+            'quantity': quantity,
+            'price': result.get('price', 0),
+            'status': 'FILLED',
+            'position_id': position_id,
+            'timestamp': datetime.now().isoformat()
+        }
+        storage.save_trade(trade_info)
+        
         return jsonify({
             'status': 'success',
-            'message': f'Position {position_id} closed successfully', 
+            'message': f'Vị thế {position_id} đã được đóng thành công (Position closed successfully)', 
             'order': result
         })
         
@@ -146,7 +201,7 @@ def close_position():
         logger.error(f"Error closing position: {str(e)}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to close position: {str(e)}'
+            'message': f'Không thể đóng vị thế: {str(e)} (Failed to close position)'
         }), 500
 
 # Store backtesting results
