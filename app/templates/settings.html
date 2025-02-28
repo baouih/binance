@@ -274,7 +274,7 @@
         Are you sure you want to proceed?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" id="cancelActionBtn">Cancel</button>
         <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
       </div>
     </div>
@@ -648,46 +648,64 @@
     
     // Confirmation modal helper
     function showConfirmationModal(title, message, onConfirm, onCancel) {
-      const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+      // Get the modal element
+      const modalEl = document.getElementById('confirmationModal');
+      
+      // Create a new Bootstrap modal instance
+      const modal = new bootstrap.Modal(modalEl);
+      
+      // Set the title and message
       document.getElementById('confirmationModalLabel').textContent = title;
       document.getElementById('confirmationModalBody').textContent = message;
       
+      // Get the confirm and cancel buttons
       const confirmBtn = document.getElementById('confirmActionBtn');
+      const cancelBtn = document.querySelector('#confirmationModal .btn-secondary');
+      const closeBtn = document.querySelector('#confirmationModal .btn-close');
       
-      // Remove previous event listeners
-      const newConfirmBtn = confirmBtn.cloneNode(true);
-      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      // Remove any existing event listeners
+      const confirmClone = confirmBtn.cloneNode(true);
+      const cancelClone = cancelBtn.cloneNode(true);
+      const closeClone = closeBtn.cloneNode(true);
       
-      // Add new event listener
-      newConfirmBtn.addEventListener('click', function() {
+      confirmBtn.parentNode.replaceChild(confirmClone, confirmBtn);
+      cancelBtn.parentNode.replaceChild(cancelClone, cancelBtn);
+      closeBtn.parentNode.replaceChild(closeClone, closeBtn);
+      
+      // Create event handlers
+      const handleConfirm = function() {
         modal.hide();
-        onConfirm();
-      });
+        // Add a small delay to make sure modal is fully hidden
+        setTimeout(() => {
+          onConfirm();
+        }, 300);
+      };
       
-      // Add cancel listener if provided
+      const handleCancel = function() {
+        modal.hide();
+        // If a cancel handler was provided, call it
+        if (onCancel) {
+          // Add a small delay to make sure modal is fully hidden
+          setTimeout(() => {
+            onCancel();
+          }, 300);
+        }
+      };
+      
+      // Add event listeners to new buttons
+      confirmClone.addEventListener('click', handleConfirm);
+      cancelClone.addEventListener('click', handleCancel);
+      closeClone.addEventListener('click', handleCancel);
+      
+      // Clear any previous hidden event handlers
+      modalEl.removeEventListener('hidden.bs.modal', handleCancel);
+      
+      // Add a new hidden event handler
       if (onCancel) {
-        const closeBtn = document.querySelector('#confirmationModal .btn-close');
-        const cancelBtn = document.querySelector('#confirmationModal .btn-secondary');
-        
-        const handleCancel = function() {
-          onCancel();
-        };
-        
-        // Clone and replace to remove old listeners
-        const newCloseBtn = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-        
-        const newCancelBtn = cancelBtn.cloneNode(true);
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-        
-        // Add new cancel listeners
-        newCloseBtn.addEventListener('click', handleCancel);
-        newCancelBtn.addEventListener('click', handleCancel);
-        
-        // Also handle modal dismiss
-        modal._element.addEventListener('hidden.bs.modal', handleCancel, { once: true });
+        modalEl.addEventListener('hidden.bs.modal', handleCancel, { once: true });
       }
       
+      // Show the modal
       modal.show();
     }
     
