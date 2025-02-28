@@ -211,78 +211,112 @@ def handle_disconnect():
 def simulate_price_updates():
     """Giả lập cập nhật giá thời gian thực"""
     import time
-    while True:
-        # Update price with small random change
-        price_change = random.uniform(-50, 50)
-        market_data['btc_price'] = round(market_data['btc_price'] + price_change, 2)
-        
-        socketio.emit('price_update', {
-            'symbol': 'BTCUSDT',
-            'price': market_data['btc_price'],
-            'time': datetime.now().isoformat()
-        })
-        time.sleep(5)  # Cập nhật mỗi 5 giây
+    import threading
+    
+    def update_loop():
+        while True:
+            try:
+                # Update price with small random change
+                price_change = random.uniform(-50, 50)
+                market_data['btc_price'] = round(market_data['btc_price'] + price_change, 2)
+                
+                socketio.emit('price_update', {
+                    'symbol': 'BTCUSDT',
+                    'price': market_data['btc_price'],
+                    'time': datetime.now().isoformat()
+                })
+                time.sleep(5)  # Cập nhật mỗi 5 giây
+            except Exception as e:
+                logger.error(f"Error in price update loop: {e}")
+                time.sleep(5)  # Wait before retry
+    
+    # Create and start the thread
+    thread = threading.Thread(target=update_loop)
+    thread.daemon = True
+    thread.start()
 
 def simulate_sentiment_updates():
     """Giả lập cập nhật tâm lý thị trường"""
     import time
-    while True:
-        # Simulate sentiment changes occasionally
-        if random.random() < 0.3:  # 30% chance to change sentiment
-            sentiment_states = ["extreme_fear", "fear", "neutral", "greed", "extreme_greed"]
-            sentiment_descriptions = ["Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"]
-            
-            idx = random.randint(0, 4)
-            market_data['sentiment']['state'] = sentiment_states[idx]
-            market_data['sentiment']['description'] = sentiment_descriptions[idx]
-            market_data['sentiment']['value'] = random.randint(idx * 20, (idx + 1) * 20 - 1)
-        
-        socketio.emit('sentiment_update', market_data['sentiment'])
-        time.sleep(30)  # Cập nhật mỗi 30 giây
+    import threading
+    
+    def update_loop():
+        while True:
+            try:
+                # Simulate sentiment changes occasionally
+                if random.random() < 0.3:  # 30% chance to change sentiment
+                    sentiment_states = ["extreme_fear", "fear", "neutral", "greed", "extreme_greed"]
+                    sentiment_descriptions = ["Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"]
+                    
+                    idx = random.randint(0, 4)
+                    market_data['sentiment']['state'] = sentiment_states[idx]
+                    market_data['sentiment']['description'] = sentiment_descriptions[idx]
+                    market_data['sentiment']['value'] = random.randint(idx * 20, (idx + 1) * 20 - 1)
+                
+                socketio.emit('sentiment_update', market_data['sentiment'])
+                time.sleep(30)  # Cập nhật mỗi 30 giây
+            except Exception as e:
+                logger.error(f"Error in sentiment update loop: {e}")
+                time.sleep(5)  # Wait before retry
+    
+    # Create and start the thread
+    thread = threading.Thread(target=update_loop)
+    thread.daemon = True
+    thread.start()
 
 def simulate_account_updates():
     """Giả lập cập nhật tài khoản và vị thế"""
     import time
-    while True:
-        # Update positions with current market price
-        for position in account_data['positions']:
-            price_change = random.uniform(-10, 10)
-            position['current_price'] = round(position['current_price'] + price_change, 2)
-            
-            # Calculate P&L
-            if position['type'] == 'LONG':
-                pnl = (position['current_price'] - position['entry_price']) * position['quantity']
-                pnl_percent = (position['current_price'] / position['entry_price'] - 1) * 100
-            else:  # SHORT
-                pnl = (position['entry_price'] - position['current_price']) * position['quantity']
-                pnl_percent = (position['entry_price'] / position['current_price'] - 1) * 100
+    import threading
+    
+    def update_loop():
+        while True:
+            try:
+                # Update positions with current market price
+                for position in account_data['positions']:
+                    price_change = random.uniform(-10, 10)
+                    position['current_price'] = round(position['current_price'] + price_change, 2)
+                    
+                    # Calculate P&L
+                    if position['type'] == 'LONG':
+                        pnl = (position['current_price'] - position['entry_price']) * position['quantity']
+                        pnl_percent = (position['current_price'] / position['entry_price'] - 1) * 100
+                    else:  # SHORT
+                        pnl = (position['entry_price'] - position['current_price']) * position['quantity']
+                        pnl_percent = (position['entry_price'] / position['current_price'] - 1) * 100
+                        
+                    position['pnl'] = round(pnl, 2)
+                    position['pnl_percent'] = round(pnl_percent, 2)
+                    
+                # Update account balance based on positions P&L
+                total_pnl = sum(position['pnl'] for position in account_data['positions'])
+                account_data['balance'] = round(10000 + total_pnl, 2)
                 
-            position['pnl'] = round(pnl, 2)
-            position['pnl_percent'] = round(pnl_percent, 2)
-            
-        # Update account balance based on positions P&L
-        total_pnl = sum(position['pnl'] for position in account_data['positions'])
-        account_data['balance'] = round(10000 + total_pnl, 2)
-        
-        socketio.emit('account_update', {
-            'balance': account_data['balance'],
-            'positions': account_data['positions']
-        })
-        time.sleep(10)  # Cập nhật mỗi 10 giây
+                socketio.emit('account_update', {
+                    'balance': account_data['balance'],
+                    'positions': account_data['positions']
+                })
+                time.sleep(10)  # Cập nhật mỗi 10 giây
+            except Exception as e:
+                logger.error(f"Error in account update loop: {e}")
+                time.sleep(5)  # Wait before retry
+    
+    # Create and start the thread
+    thread = threading.Thread(target=update_loop)
+    thread.daemon = True
+    thread.start()
 
 # Start the background tasks
 def start_background_tasks():
-    # We'll use separate threads for each simulation task to avoid blocking
-    import threading
+    """
+    Start background tasks for simulation
     
-    # Create daemon threads for each simulation task
-    price_thread = threading.Thread(target=simulate_price_updates, daemon=True)
-    sentiment_thread = threading.Thread(target=simulate_sentiment_updates, daemon=True)
-    account_thread = threading.Thread(target=simulate_account_updates, daemon=True)
-    
-    # Start the threads
-    price_thread.start()
-    sentiment_thread.start()
-    account_thread.start()
+    Note: Each simulation function manages its own thread now,
+    so we just need to call them to start the background processes
+    """
+    # Just call each function to start their internal threads
+    simulate_price_updates()
+    simulate_sentiment_updates() 
+    simulate_account_updates()
     
     logger.info("Background simulation tasks started")
