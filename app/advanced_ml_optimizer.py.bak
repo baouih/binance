@@ -375,7 +375,7 @@ class AdvancedMLOptimizer:
             return None, None
         
         # Tiền xử lý dữ liệu
-        X_processed = self._preprocess_features(X, y=None, regime=regime, is_training=False)
+        X_processed = self._preprocess_features(X, regime, is_training=False)
         
         # Sử dụng mô hình tổng hợp nếu có
         if self.use_ensemble:
@@ -571,7 +571,7 @@ class AdvancedMLOptimizer:
         eval_metrics = {}
         
         # Tiền xử lý dữ liệu
-        X_processed = self._preprocess_features(X, y=None, regime=regime, is_training=False)
+        X_processed = self._preprocess_features(X, regime, is_training=False)
         
         for model_key, model in self.models.items():
             # Bỏ qua các mô hình không phù hợp với chế độ thị trường hiện tại
