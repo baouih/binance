@@ -1,0 +1,17 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "strategy": "RSI",
+  "initial_balance": 10000.0,
+  "final_balance": NaN,
+  "profit": NaN,
+  "profit_percent": NaN,
+  "num_trades": 2,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "win_rate": 0.0,
+  "profit_factor": Infinity,
+  "max_drawdown": NaN,
+  "start_date": "0",
+  "end_date": "999"
+}

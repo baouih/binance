@@ -32,6 +32,18 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T15:52:48.050805",
+    "end_time": "2025-02-28T16:09:40.015780",
+    "duration": 16.866083
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:09:40.015792",
+    "end_time": "2025-02-28T16:11:01.432153",
+    "duration": 1.3569394333333333
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:11:01.432165",
     "end_time": null,
     "duration": 0
   }
