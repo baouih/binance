@@ -472,10 +472,10 @@
                                     <tr>
                                         <td>BTC/USDT</td>
                                         <td><span class="tag tag-green">LONG</span></td>
-                                        <td>78,250.00</td>
+                                        <td>82,902.00</td>
                                         <td id="btc-current-price-table">Loading...</td>
                                         <td>0.5 BTC</td>
-                                        <td id="position-pnl">+350.00 (0.45%)</td>
+                                        <td id="position-pnl">Loading...</td>
                                         <td>
                                             <button class="btn btn-sm btn-danger">Close</button>
                                         </td>
@@ -653,6 +653,23 @@
         document.getElementById('toggle-sidebar').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('content').classList.toggle('active');
+        });
+        
+        // Add click event to all nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                
+                // Add active class to the clicked link
+                this.classList.add('active');
+                
+                // For now just show an alert with the page name (since we don't have the actual pages yet)
+                const pageName = this.textContent.trim();
+                alert(`Trang "${pageName}" đang được phát triển. Chức năng sẽ sớm được hoàn thiện.`);
+                
+                e.preventDefault(); // Prevent default link behavior
+            });
         });
         
         // Price chart setup
@@ -836,7 +853,8 @@
         }
         
         function updatePositionPNL(currentPrice) {
-            const entryPrice = 78250.00; // From example position
+            // Lấy từ API Binance giá BTC thực tế là khoảng 82.9k USDT theo ảnh người dùng cung cấp
+            const entryPrice = 82902.00; // Cập nhật giá dựa trên ảnh được cung cấp (82902.0 USDT)
             const quantity = 0.5;
             const pnlValue = (currentPrice - entryPrice) * quantity;
             const pnlPercent = (pnlValue / (entryPrice * quantity)) * 100;
