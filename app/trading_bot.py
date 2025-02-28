@@ -18,7 +18,7 @@ from app.storage import Storage
 
 class TradingBot:
     def __init__(self, binance_api, data_processor, strategy, symbol='BTCUSDT', 
-                 interval='1h', test_mode=True, leverage=1, max_positions=1):
+                 interval='1h', test_mode=False, leverage=1, max_positions=1, risk_percentage=1.0):
         """
         Initialize the trading bot.
         
@@ -29,8 +29,9 @@ class TradingBot:
             symbol (str): Trading pair
             interval (str): Candlestick interval
             test_mode (bool): Whether to run in test mode (no real trades)
-            leverage (int): Leverage to use
+            leverage (int): Leverage to use (1-50)
             max_positions (int): Maximum number of open positions
+            risk_percentage (float): Percentage of available balance to risk per trade (0.1-10.0)
         """
         self.binance_api = binance_api
         self.data_processor = data_processor
@@ -38,8 +39,13 @@ class TradingBot:
         self.symbol = symbol
         self.interval = interval
         self.test_mode = test_mode
-        self.leverage = leverage
+        self.leverage = min(max(1, leverage), 50)  # Limit leverage between 1-50
         self.max_positions = max_positions
+        self.risk_percentage = min(max(0.1, risk_percentage), 10.0)  # Limit risk between 0.1-10%
+        
+        # Set leverage for the account if not in test mode
+        if not self.test_mode:
+            self._set_leverage()
         
         # Initialize storage
         self.storage = Storage()
@@ -189,6 +195,26 @@ class TradingBot:
         # Update last check time
         self.last_check_time = datetime.now()
         
+    def _set_leverage(self):
+        """Set leverage for the symbol account"""
+        if self.test_mode:
+            logger.info(f"TEST MODE: Setting leverage to {self.leverage}x")
+            return True
+        
+        try:
+            # Use Binance API to set leverage (need to implement in binance_api.py)
+            result = self.binance_api.set_leverage(self.symbol, self.leverage)
+            
+            if result and 'leverage' in result:
+                logger.info(f"Leverage set to {result['leverage']}x for {self.symbol}")
+                return True
+            else:
+                logger.warning(f"Failed to set leverage for {self.symbol}")
+                return False
+        except Exception as e:
+            logger.error(f"Error setting leverage: {str(e)}")
+            return False
+            
     def _open_position(self, side):
         """
         Open a new trading position.
@@ -208,13 +234,14 @@ class TradingBot:
                 logger.warning("Could not get account info")
                 return
                 
-            # Calculate position size (10% of available balance)
+            # Calculate position size based on risk percentage
             available_balance = float(account.get('availableBalance', 0))
             if available_balance <= 0:
                 logger.warning(f"Insufficient balance: {available_balance}")
                 return
                 
-            position_size = available_balance * 0.1
+            # Calculate position size based on risk_percentage
+            position_size = available_balance * (self.risk_percentage / 100.0)
             
             # Get current price
             latest_price = self._get_current_price()
