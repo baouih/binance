@@ -24,4 +24,11 @@ if __name__ == '__main__':
     logger.info(f"Starting app on port {port}")
     
     # In development, we use socketio.run to include websocket support
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+    socketio.run(
+        app, 
+        host='0.0.0.0', 
+        port=port, 
+        debug=True,
+        use_reloader=False,  # Disable reloader to prevent duplicate threads
+        log_output=True      # Enable logs
+    )
