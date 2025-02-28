@@ -382,34 +382,34 @@ class AdvancedMLOptimizer:
         # Tiền xử lý dữ liệu
         X_processed = self._preprocess_features(X, y=None, regime=regime, is_training=False)
         
-        # Sử dụng mô hình tổng hợp nếu có
-        if self.use_ensemble:
-            ensemble_key = f"ensemble_{regime}" if regime and self.use_model_per_regime else "ensemble"
-            if ensemble_key in self.models:
-                # Xác định số lượng lớp dự kiến dựa vào mô hình đã đào tạo
-                num_classes = 2  # Giá trị mặc định (binary classification)
-                
-                # Tạo đặc trưng tổng hợp
-                ensemble_features = np.zeros((X_processed.shape[0], len(self.base_models) * num_classes))
-                
-                col_idx = 0
-                for model_type in self.base_models:
-                    model_key = self._get_model_key(model_type, regime)
-                    if model_key in self.models:
-                        model = self.models[model_key]
-                        if hasattr(model, 'predict_proba'):
-                            proba = model.predict_proba(X_processed)
-                            n_classes = proba.shape[1]
-                            ensemble_features[:, col_idx:col_idx+n_classes] = proba
-                            col_idx += n_classes
-                
-                # Dự đoán bằng mô hình tổng hợp
-                meta_model = self.models[ensemble_key]
-                y_pred = meta_model.predict(ensemble_features)
-                probas = meta_model.predict_proba(ensemble_features)
-                
-                logger.info(f"Dự đoán bằng mô hình tổng hợp {ensemble_key}")
-                return y_pred, probas
+        # Sử dụng model đơn lẻ tốt nhất thay vì ensemble để tránh lỗi broadcasting
+        # (Giải pháp tạm thời để giải quyết vấn đề broadcasting)
+        # Tìm model tốt nhất dựa trên F1 score
+        best_model_key = None
+        best_f1_score = -1
+        
+        for model_key in self.models:
+            if 'ensemble' not in model_key and model_key in self.model_metrics:
+                f1_score = self.model_metrics[model_key].get('f1_score', 0)
+                if f1_score > best_f1_score:
+                    best_f1_score = f1_score
+                    best_model_key = model_key
+        
+        if best_model_key:
+            logger.info(f"Sử dụng mô hình {best_model_key} với F1 score {best_f1_score}")
+            model = self.models[best_model_key]
+            y_pred = model.predict(X_processed)
+            
+            if hasattr(model, 'predict_proba'):
+                probas = model.predict_proba(X_processed)
+            else:
+                probas = None
+            
+            return y_pred, probas
+        
+        # Nếu không có mô hình nào phù hợp, trả về giá trị mặc định
+        logger.error("Không tìm thấy mô hình phù hợp")
+        return None, None
         
         # Sử dụng mô hình dành riêng cho chế độ thị trường nếu có
         if regime and self.use_model_per_regime:
