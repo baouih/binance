@@ -3,6 +3,7 @@ import json
 import logging
 import pandas as pd
 import numpy as np
+import requests
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import threading
@@ -528,21 +529,32 @@ def on_disconnect():
 
 # Real-time data simulation
 def generate_price_data():
-    """Generate simulated price data."""
+    """Fetch real-time price data from Binance API."""
     global current_price, should_run
     
     # For emitting sentiment updates
     sentiment_update_counter = 0
     account_update_counter = 0
     
-    # Generate simulated account data
+    # Real account balance for testing
     account_balance = 100000.0
-    available_balance = account_balance * 0.8
+    
+    # Entry price của vị thế hiện tại (từ mẫu dữ liệu)
+    entry_price = 82902.00
+    quantity = 0.5
     
     while should_run:
-        # Simulate random price movement
-        change_pct = random.normalvariate(0, 0.002)  # Mean 0, std dev 0.2%
-        current_price = current_price * (1 + change_pct)
+        try:
+            # Fetch real BTC price from Binance
+            response = requests.get('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
+            if response.status_code == 200:
+                data = response.json()
+                if 'price' in data:
+                    current_price = float(data['price'])
+                    logger.info(f"Updated real BTC price from Binance: {current_price:.2f} USDT")
+        except Exception as e:
+            logger.error(f"Error fetching real price from Binance: {str(e)}")
+            # We continue with the current price if there was an error
         
         # Emit the new price to all connected clients
         logger.debug(f"Emitting price update: {current_price}")
@@ -577,17 +589,18 @@ def generate_price_data():
         if account_update_counter >= 3:
             account_update_counter = 0
             try:
-                # Simulate some small random changes in account balance and PnL
-                pnl_change = random.uniform(-500, 500)
-                balance_change = random.uniform(-200, 200)
+                # Calculate real PnL from the current Bitcoin price
+                pnl_value = (current_price - entry_price) * quantity
+                pnl_percent = (pnl_value / (entry_price * quantity)) * 100
                 
-                # Create account update data
+                # Create account update data with real PnL calculation
                 account_data = {
-                    'total_balance': account_balance + balance_change,
-                    'available_balance': (account_balance + balance_change) * 0.8,
-                    'margin_balance': (account_balance + balance_change) * 0.2,
-                    'unrealized_pnl': pnl_change,
-                    'equity': account_balance + balance_change + pnl_change
+                    'total_balance': account_balance,
+                    'available_balance': account_balance * 0.8,
+                    'margin_balance': account_balance * 0.2,
+                    'unrealized_pnl': pnl_value,
+                    'unrealized_pnl_percent': pnl_percent,
+                    'equity': account_balance + pnl_value
                 }
                 
                 # Emit the account update
