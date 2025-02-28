@@ -504,58 +504,78 @@ def create_bot():
     try:
         # Lấy dữ liệu từ request
         try:
-            data = request.json
-            logger.info(f"API create_bot nhận được dữ liệu raw: {request.data}")
-            logger.info(f"API create_bot nhận được dữ liệu parsed: {data}")
+            data = request.get_json(force=True, silent=True)
+            if not data:
+                logger.error(f"API create_bot lỗi: Dữ liệu JSON không hợp lệ hoặc rỗng, raw data: {request.data}")
+                return jsonify({'error': 'Dữ liệu JSON không hợp lệ hoặc rỗng'}), 400
+                
+            logger.info(f"API create_bot nhận được dữ liệu: {data}")
         except Exception as e:
-            logger.error(f"API create_bot lỗi khi parse JSON data: {str(e)}")
+            logger.error(f"API create_bot lỗi nghiêm trọng khi parse JSON: {str(e)}, raw data: {request.data}")
             return jsonify({'error': f'Lỗi định dạng dữ liệu JSON: {str(e)}'}), 400
         
-        if not data:
-            logger.error("API create_bot lỗi: Không có dữ liệu JSON")
-            return jsonify({'error': 'Không có dữ liệu JSON'}), 400
-        
-        # Lấy các tham số cần thiết
-        symbol = data.get('symbol', 'BTCUSDT')
+        # Lấy các tham số cần thiết và kiểm tra tính hợp lệ
+        symbol = data.get('symbol', 'BTCUSDT') 
+        if not symbol or not isinstance(symbol, str):
+            symbol = 'BTCUSDT'
+            logger.warning(f"Symbol không hợp lệ, sử dụng mặc định: {symbol}")
+            
         interval = data.get('interval', '1h')
+        if not interval or not isinstance(interval, str):
+            interval = '1h'
+            logger.warning(f"Interval không hợp lệ, sử dụng mặc định: {interval}")
+            
         strategy_type = data.get('strategy', 'rsi')
+        if not strategy_type or not isinstance(strategy_type, str) or strategy_type == "null" or strategy_type == "undefined":
+            strategy_type = 'rsi'  # Mặc định dùng RSI nếu không chọn
+            logger.warning(f"Strategy không hợp lệ, sử dụng mặc định: {strategy_type}")
+            
         strategy_params = data.get('params', {})
+        if not isinstance(strategy_params, dict):
+            strategy_params = {}
+            logger.warning("Strategy params không phải là dictionary, sử dụng mặc định: {}")
         
         logger.info(f"API create_bot: Xử lý yêu cầu với symbol={symbol}, interval={interval}, strategy={strategy_type}, params={strategy_params}")
         
-        # Kiểm tra và xác thực tham số đầu vào
-        if not symbol or not interval:
-            logger.error(f"API create_bot lỗi: Thiếu thông tin cặp giao dịch hoặc khung thời gian")
-            return jsonify({'error': 'Thiếu thông tin cặp giao dịch hoặc khung thời gian (Missing symbol or interval)'}), 400
-            
-        # Xử lý strategy_type để hỗ trợ giá trị trống từ form
-        if not strategy_type or strategy_type == "null" or strategy_type == "undefined":
-            strategy_type = 'rsi'  # Mặc định dùng RSI nếu không chọn
-            logger.info(f"API create_bot: Sử dụng chiến lược mặc định: {strategy_type}")
-        
         logger.info(f"Creating bot for {symbol} with {strategy_type} strategy, interval: {interval}")
         
-        # Create the strategy
-        strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
-        
-        # Create a unique bot ID
-        bot_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
-        
-        # Create the bot
-        bot = TradingBot(
-            binance_api=binance_api,
-            data_processor=data_processor,
-            strategy=strategy,
-            symbol=symbol,
-            interval=interval,
-            test_mode=True
-        )
-        
-        # Store the bot
-        trading_bots[bot_id] = bot
-        
-        # Start the bot
-        success = bot.start()
+        try:
+            # Create the strategy
+            logger.info(f"Tạo chiến lược {strategy_type} với tham số {strategy_params}")
+            strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
+            if not strategy:
+                logger.error(f"Không thể tạo chiến lược {strategy_type}")
+                return jsonify({'error': f'Không thể tạo chiến lược {strategy_type}'}), 500
+                
+            # Create a unique bot ID
+            bot_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
+            logger.info(f"Tạo bot với ID: {bot_id}")
+            
+            # Create the bot
+            bot = TradingBot(
+                binance_api=binance_api,
+                data_processor=data_processor,
+                strategy=strategy,
+                symbol=symbol,
+                interval=interval,
+                test_mode=True
+            )
+            
+            if not bot:
+                logger.error(f"Không thể khởi tạo bot với ID: {bot_id}")
+                return jsonify({'error': 'Không thể khởi tạo bot giao dịch'}), 500
+                
+            # Store the bot
+            trading_bots[bot_id] = bot
+            logger.info(f"Đã lưu bot {bot_id} vào trading_bots")
+            
+            # Start the bot
+            logger.info(f"Khởi động bot {bot_id}")
+            success = bot.start()
+            logger.info(f"Kết quả khởi động bot {bot_id}: {'thành công' if success else 'thất bại'}")
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi tạo hoặc khởi động bot: {str(e)}")
+            return jsonify({'error': f'Lỗi khi khởi tạo hoặc khởi động bot: {str(e)}'}), 500
         
         if success:
             # Lưu bot vào storage để dùng lại sau khi khởi động lại
