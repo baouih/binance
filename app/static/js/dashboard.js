@@ -549,11 +549,21 @@ class DashboardController {
       this.showLoading(true);
       console.log("Creating new trading bot...");
       
-      // Get strategy parameters from botStrategySelector (not strategySelector)
-      const botStrategySelector = document.getElementById('bot-strategy');
-      const strategy = botStrategySelector ? botStrategySelector.value : '';
+      // Get form values
+      const botForm = document.getElementById('create-bot-form');
+      const botSymbolElement = document.getElementById('create-bot-symbol');
+      const botIntervalElement = document.getElementById('create-bot-interval');
+      const botStrategySelector = document.getElementById('create-bot-strategy'); // Element có thể khác nhau giữa trang
       
-      console.log("Selected strategy:", strategy);
+      // Fallback to bot-strategy selector nếu không có create-bot-strategy
+      const strategy = botStrategySelector ? botStrategySelector.value : 
+                      (document.getElementById('bot-strategy') ? document.getElementById('bot-strategy').value : '');
+      
+      // Lấy biểu tượng và khoảng thời gian từ form hoặc từ đối tượng hiện tại
+      const symbol = botSymbolElement ? botSymbolElement.value : this.symbol;
+      const interval = botIntervalElement ? botIntervalElement.value : this.timeframe;
+      
+      console.log(`Creating bot with symbol=${symbol}, interval=${interval}, strategy=${strategy}`);
       
       if (!strategy) {
         this.showError('Vui lòng chọn chiến lược giao dịch (Please select a trading strategy)');
@@ -565,39 +575,57 @@ class DashboardController {
       let params = {};
       
       if (strategy === 'rsi') {
-        params = {
-          overbought: parseFloat(document.getElementById('rsi-overbought').value || 70),
-          oversold: parseFloat(document.getElementById('rsi-oversold').value || 30)
-        };
+        // Try different element ids in case the form has variations
+        const overbought = parseFloat(
+          (document.getElementById('rsi-overbought') || document.getElementById('create-bot-rsi-overbought') || {value: '70'}).value || 70
+        );
+        const oversold = parseFloat(
+          (document.getElementById('rsi-oversold') || document.getElementById('create-bot-rsi-oversold') || {value: '30'}).value || 30
+        );
+        params = { overbought, oversold };
+        console.log(`RSI parameters: overbought=${overbought}, oversold=${oversold}`);
       } else if (strategy === 'ema_cross') {
-        params = {
-          short_period: parseInt(document.getElementById('ema-short-period').value || 9),
-          long_period: parseInt(document.getElementById('ema-long-period').value || 21)
-        };
+        const shortPeriod = parseInt(
+          (document.getElementById('ema-short-period') || document.getElementById('ema-short') || {value: '9'}).value || 9
+        );
+        const longPeriod = parseInt(
+          (document.getElementById('ema-long-period') || document.getElementById('ema-long') || {value: '21'}).value || 21
+        );
+        params = { short_period: shortPeriod, long_period: longPeriod };
+        console.log(`EMA Cross parameters: short_period=${shortPeriod}, long_period=${longPeriod}`);
       } else if (strategy === 'bbands') {
-        params = {
-          deviation_multiplier: parseFloat(document.getElementById('bb-multiplier').value || 2.0)
-        };
+        const multiplier = parseFloat(
+          (document.getElementById('bb-multiplier') || {value: '2.0'}).value || 2.0
+        );
+        params = { deviation_multiplier: multiplier };
+        console.log(`Bollinger Bands parameters: multiplier=${multiplier}`);
       } else if (strategy === 'macd') {
-        // MACD doesn't need parameters in this implementation
+        // MACD has default parameters
         params = {};
+        console.log(`Using default MACD parameters`);
       } else if (strategy === 'ml') {
-        params = {
-          probability_threshold: parseFloat(document.getElementById('ml-threshold').value || 0.65)
-        };
+        const threshold = parseFloat(
+          (document.getElementById('ml-threshold') || {value: '0.65'}).value || 0.65
+        );
+        params = { probability_threshold: threshold };
+        console.log(`ML parameters: threshold=${threshold}`);
       }
+      
+      // Hiển thị thông báo đang xử lý
+      this.showInfo('Đang tạo bot giao dịch...');
       
       // Create bot request
       const botData = {
-        symbol: this.symbol,
-        interval: this.timeframe,
+        symbol: symbol,
+        interval: interval,
         strategy: strategy,
         params: params
       };
       
-      console.log('Creating bot with data:', botData);
+      console.log('Creating bot with data:', JSON.stringify(botData));
       
       try {
+        // Send API request
         const response = await fetch('/api/create_bot', {
           method: 'POST',
           headers: {
@@ -608,28 +636,39 @@ class DashboardController {
         
         console.log('Create bot response status:', response.status);
         
-        // Kiểm tra xem response có phải là JSON hay không
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          console.error('Received non-JSON response:', await response.text());
-          throw new Error('Server did not return JSON response');
+        let result;
+        try {
+          // Đọc body trong mọi trường hợp để debugging
+          const responseText = await response.text();
+          console.log('Raw response:', responseText);
+          
+          // Thử parse JSON từ text
+          try {
+            result = JSON.parse(responseText);
+            console.log('Create bot result:', result);
+          } catch (jsonError) {
+            console.error('Failed to parse JSON response:', jsonError);
+            throw new Error(`Server response is not valid JSON: ${responseText.substring(0, 100)}...`);
+          }
+        } catch (responseError) {
+          console.error('Error reading response:', responseError);
+          throw new Error('Could not read server response');
         }
-        
-        const result = await response.json();
-        console.log('Create bot result:', result);
       
-      if (response.ok && result.bot_id) {
-        this.showSuccess(result.message || `Bot tạo thành công với ID: ${result.bot_id}`);
-        // Refresh bot status
-        await this.loadBotStatus();
-      } else {
-        this.showError(result.error || 'Không thể tạo bot giao dịch (Failed to create bot)');
-      }
+        if (response.ok && result && result.bot_id) {
+          this.showSuccess(result.message || `Bot tạo thành công với ID: ${result.bot_id}`);
+          // Refresh bot status
+          await this.loadBotStatus();
+        } else {
+          const errorMessage = result && result.error ? result.error : 'Không thể tạo bot giao dịch (Failed to create bot)';
+          this.showError(errorMessage);
+          console.error('Error from server:', errorMessage);
+        }
       
-      this.showLoading(false);
       } catch (error) {
-        console.error('Error creating bot:', error);
-        this.showError('Lỗi khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
+        console.error('Error in API call:', error);
+        this.showError('Lỗi khi gọi API: ' + (error.message || 'Không rõ lỗi'));
+      } finally {
         this.showLoading(false);
       }
     } catch (error) {
@@ -637,6 +676,30 @@ class DashboardController {
       this.showError('Lỗi nghiêm trọng khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
       this.showLoading(false);
     }
+  }
+  
+  // Helper method to display info messages
+  showInfo(message) {
+    const alertContainer = document.getElementById('alerts-container');
+    if (!alertContainer) {
+      console.error('Alerts container not found');
+      return;
+    }
+    
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-info alert-dismissible fade show';
+    alert.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertContainer.appendChild(alert);
+    
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+      alert.classList.remove('show');
+      setTimeout(() => alert.remove(), 300);
+    }, 5000);
   }
   
   // Execute a manual trading order

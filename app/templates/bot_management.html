@@ -494,14 +494,14 @@
                 <form id="create-bot-form">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Tên Bot</label>
-                            <input type="text" class="form-control" placeholder="Nhập tên bot" required>
+                            <label class="form-label">Tên Bot (Bot Name)</label>
+                            <input type="text" class="form-control" id="create-bot-name" placeholder="Nhập tên bot" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Cặp Giao Dịch</label>
-                            <select class="form-select" required>
+                            <label class="form-label">Cặp Giao Dịch (Trading Pair)</label>
+                            <select class="form-select" id="create-bot-symbol" required>
                                 <option value="">Chọn cặp giao dịch</option>
-                                <option value="BTCUSDT">BTC/USDT</option>
+                                <option value="BTCUSDT" selected>BTC/USDT</option>
                                 <option value="ETHUSDT">ETH/USDT</option>
                                 <option value="BNBUSDT">BNB/USDT</option>
                                 <option value="ADAUSDT">ADA/USDT</option>
@@ -512,29 +512,34 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Chiến Lược Giao Dịch</label>
-                            <select class="form-select" id="strategy-select" required>
+                            <label class="form-label">Chiến Lược Giao Dịch (Strategy)</label>
+                            <select class="form-select" id="create-bot-strategy" required>
                                 <option value="">Chọn chiến lược</option>
-                                <option value="rsi">RSI Reversion</option>
+                                <option value="rsi" selected>RSI Reversion</option>
                                 <option value="macd">MACD Crossover</option>
-                                <option value="ema">EMA Crossover</option>
-                                <option value="bollinger">Bollinger Bands</option>
+                                <option value="ema_cross">EMA Crossover</option>
+                                <option value="bbands">Bollinger Bands</option>
                                 <option value="ml">Machine Learning</option>
-                                <option value="custom">Tùy Chỉnh</option>
                             </select>
+                            <div class="form-text text-muted">
+                                Chiến lược giao dịch sẽ quyết định cách bot phân tích và đưa ra quyết định
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Khung Thời Gian</label>
-                            <select class="form-select" required>
+                            <label class="form-label">Khung Thời Gian (Timeframe)</label>
+                            <select class="form-select" id="create-bot-interval" required>
                                 <option value="">Chọn khung thời gian</option>
                                 <option value="1m">1 phút</option>
                                 <option value="5m">5 phút</option>
                                 <option value="15m">15 phút</option>
                                 <option value="30m">30 phút</option>
-                                <option value="1h">1 giờ</option>
+                                <option value="1h" selected>1 giờ</option>
                                 <option value="4h">4 giờ</option>
                                 <option value="1d">1 ngày</option>
                             </select>
+                            <div class="form-text text-muted">
+                                Khung thời gian dùng để phân tích thị trường và đưa ra quyết định
+                            </div>
                         </div>
                     </div>
 
@@ -545,24 +550,24 @@
                         <div id="rsi-params" class="strategy-params">
                             <div class="row mb-2">
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Chu Kỳ RSI</label>
-                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="14" min="1" max="50">
+                                    <label class="form-label text-light">Chu Kỳ RSI (Period)</label>
+                                    <input type="number" id="rsi-period" class="form-control bg-dark text-light border-secondary" value="14" min="1" max="50">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Mức Quá Mua</label>
-                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="70" min="50" max="90">
+                                    <label class="form-label text-light">Mức Quá Mua (Overbought)</label>
+                                    <input type="number" id="rsi-overbought" class="form-control bg-dark text-light border-secondary" value="70" min="50" max="90">
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Mức Quá Bán</label>
-                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="30" min="10" max="50">
+                                    <label class="form-label text-light">Mức Quá Bán (Oversold)</label>
+                                    <input type="number" id="rsi-oversold" class="form-control bg-dark text-light border-secondary" value="30" min="10" max="50">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-light">Xác Nhận Nến</label>
-                                    <select class="form-select bg-dark text-light border-secondary">
+                                    <label class="form-label text-light">Xác Nhận Nến (Confirmation)</label>
+                                    <select class="form-select bg-dark text-light border-secondary" id="rsi-confirmation">
                                         <option value="1">1 nến</option>
-                                        <option value="2">2 nến</option>
+                                        <option value="2" selected>2 nến</option>
                                         <option value="3">3 nến</option>
                                     </select>
                                 </div>
@@ -753,15 +758,98 @@
         });
 
         document.getElementById('create-bot-btn')?.addEventListener('click', function() {
-            // Currently just a stub - in production this would validate and submit the form
             console.log("Creating new bot...");
             
-            // Show a success message
-            alert("Bot giao dịch mới đã được tạo thành công!");
+            // Get values from form
+            const symbol = document.getElementById('create-bot-symbol').value;
+            const interval = document.getElementById('create-bot-interval').value;
+            const strategy = document.getElementById('create-bot-strategy').value;
             
-            // Close the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('createBotModal'));
-            modal.hide();
+            // Validate form
+            if (!symbol || !interval || !strategy) {
+                alert("Vui lòng điền đầy đủ thông tin!");
+                return;
+            }
+
+            // Get strategy-specific parameters
+            let params = {};
+            if (strategy === 'rsi') {
+                params = {
+                    overbought: parseInt(document.getElementById('rsi-overbought').value) || 70,
+                    oversold: parseInt(document.getElementById('rsi-oversold').value) || 30
+                };
+            } else if (strategy === 'ema_cross') {
+                params = {
+                    short_period: parseInt(document.getElementById('ema-short').value || document.getElementById('ema-short-period')?.value) || 9,
+                    long_period: parseInt(document.getElementById('ema-long').value || document.getElementById('ema-long-period')?.value) || 21
+                };
+            }
+            
+            // Build request payload
+            const botData = {
+                symbol: symbol,
+                interval: interval,
+                strategy: strategy,
+                params: params
+            };
+            
+            console.log("Sending bot data:", botData);
+            
+            // Display loading state
+            const createBotBtn = document.getElementById('create-bot-btn');
+            const originalText = createBotBtn.innerHTML;
+            createBotBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tạo...';
+            createBotBtn.disabled = true;
+            
+            // Send API request
+            fetch('/api/create_bot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(botData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.text().then(text => {
+                    try {
+                        // Try to parse as JSON
+                        return JSON.parse(text);
+                    } catch (e) {
+                        // If not JSON, return an error object
+                        console.error('Failed to parse response as JSON:', text);
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                });
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.bot_id) {
+                    // Show success message
+                    alert(`Bot giao dịch mới đã được tạo thành công! ID: ${data.bot_id}`);
+                    
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createBotModal'));
+                    modal.hide();
+                    
+                    // Reload the bot list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    // Show error message
+                    alert(`Lỗi: ${data.error || 'Không thể tạo bot giao dịch'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error creating bot:', error);
+                alert(`Lỗi: ${error.message || 'Không thể tạo bot giao dịch'}`);
+            })
+            .finally(() => {
+                // Reset button state
+                createBotBtn.innerHTML = originalText;
+                createBotBtn.disabled = false;
+            });
         });
     });
 </script>
