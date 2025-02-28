@@ -504,7 +504,7 @@ class DashboardController {
     botListContainer.innerHTML = '';
     
     if (this.activeBots.length === 0) {
-      botListContainer.innerHTML = '<div class="alert alert-info">No active bots. Create a bot to start trading.</div>';
+      botListContainer.innerHTML = '<div class="alert alert-info">Chưa có bot nào đang hoạt động. <small class="text-secondary">(No active bots)</small></div>';
       return;
     }
     
@@ -516,13 +516,13 @@ class DashboardController {
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th>Symbol</th>
-        <th>Strategy</th>
-        <th>Status</th>
-        <th>Trades</th>
-        <th>Win Rate</th>
-        <th>P&L</th>
-        <th>Actions</th>
+        <th>Cặp Giao Dịch <small class="text-secondary">(Symbol)</small></th>
+        <th>Chiến Lược <small class="text-secondary">(Strategy)</small></th>
+        <th>Trạng Thái <small class="text-secondary">(Status)</small></th>
+        <th>Giao Dịch <small class="text-secondary">(Trades)</small></th>
+        <th>Tỉ Lệ Thắng <small class="text-secondary">(Win Rate)</small></th>
+        <th>Lãi/Lỗ <small class="text-secondary">(P&L)</small></th>
+        <th>Thao Tác <small class="text-secondary">(Actions)</small></th>
       </tr>
     `;
     table.appendChild(thead);
@@ -542,7 +542,7 @@ class DashboardController {
       tr.innerHTML = `
         <td>${bot.symbol}</td>
         <td>${bot.strategy}</td>
-        <td><span class="badge ${bot.running ? 'bg-success' : 'bg-danger'}">${bot.running ? 'Active' : 'Stopped'}</span></td>
+        <td><span class="badge ${bot.running ? 'bg-success' : 'bg-danger'}">${bot.running ? 'Đang Chạy' : 'Đã Dừng'}</span></td>
         <td>${trades}</td>
         <td>${winRate}</td>
         <td class="${pnlClass}">${pnl}</td>
@@ -550,7 +550,7 @@ class DashboardController {
           <button class="btn btn-sm ${bot.running ? 'btn-warning' : 'btn-success'} me-1" 
                   data-bot-id="${bot.bot_id}" 
                   data-action="${bot.running ? 'stop' : 'start'}">
-            ${bot.running ? 'Stop' : 'Start'}
+            ${bot.running ? 'Dừng' : 'Chạy'}
           </button>
           <button class="btn btn-sm btn-danger" data-bot-id="${bot.bot_id}" data-action="delete">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
