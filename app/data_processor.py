@@ -261,6 +261,19 @@ class DataProcessor:
         macd_signal = safe_value(latest['MACD_Signal'])
         volume_ratio = safe_value(latest['Volume_Ratio'])
             
+        # Lấy thông tin về chế độ thị trường
+        regime_info = "Unknown"
+        if hasattr(self, 'current_regime') and self.current_regime:
+            regime_info = self.current_regime
+            # Lấy mô tả chi tiết nếu có
+            if hasattr(self, 'market_regime_detector'):
+                try:
+                    regime_description = self.market_regime_detector._get_regime_description(self.current_regime)
+                    if regime_description and 'vi' in regime_description:
+                        regime_info = f"{self.current_regime} - {regime_description['vi']}"
+                except:
+                    pass
+        
         # Log the analysis
         logger.info("\n=== Latest Market Analysis ===")
         logger.info(f"Price: {close_price:.2f} ({price_change:.2f}% change)")
@@ -268,6 +281,7 @@ class DataProcessor:
         logger.info(f"RSI: {rsi_value:.2f} ({rsi_status})")
         logger.info(f"MACD: {macd_value:.2f} (Signal: {macd_signal:.2f})")
         logger.info(f"Volume: {volume_ratio:.2f}x average")
+        logger.info(f"Market Regime: {regime_info}")
         logger.info("===========================")
         
     def prepare_features_for_ml(self, df):
