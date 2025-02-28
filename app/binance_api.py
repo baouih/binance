@@ -27,7 +27,14 @@ class BinanceAPI:
         """
         self.api_key = api_key or os.getenv('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.getenv('BINANCE_API_SECRET', '')
-        self.testnet = testnet
+        
+        # Kiểm tra cấu hình testnet từ biến môi trường nếu có
+        env_testnet = os.getenv('BINANCE_TESTNET')
+        if env_testnet is not None:
+            self.testnet = env_testnet.lower() == 'true'
+        else:
+            self.testnet = testnet
+            
         self.simulation_mode = simulation_mode
         
         # Kiểm tra keys
