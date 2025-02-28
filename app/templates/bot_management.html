@@ -485,8 +485,8 @@
 <!-- Create Bot Modal -->
 <div class="modal fade" id="createBotModal" tabindex="-1" aria-labelledby="createBotModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-dark">
                 <h5 class="modal-title" id="createBotModalLabel">Tạo Bot Giao Dịch Mới</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -539,28 +539,28 @@
                     </div>
 
                     <!-- Strategy Parameters (dynamic based on selection) -->
-                    <div id="strategy-params" class="mb-3 p-3 border rounded bg-light">
-                        <h6 class="mb-3">Thông Số Chiến Lược</h6>
+                    <div id="strategy-params" class="mb-3 p-3 border rounded bg-dark border-secondary">
+                        <h6 class="mb-3 text-light">Thông Số Chiến Lược</h6>
                         <!-- RSI Strategy Params (default) -->
                         <div id="rsi-params" class="strategy-params">
                             <div class="row mb-2">
                                 <div class="col-md-6">
-                                    <label class="form-label">Chu Kỳ RSI</label>
-                                    <input type="number" class="form-control" value="14" min="1" max="50">
+                                    <label class="form-label text-light">Chu Kỳ RSI</label>
+                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="14" min="1" max="50">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Mức Quá Mua</label>
-                                    <input type="number" class="form-control" value="70" min="50" max="90">
+                                    <label class="form-label text-light">Mức Quá Mua</label>
+                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="70" min="50" max="90">
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label">Mức Quá Bán</label>
-                                    <input type="number" class="form-control" value="30" min="10" max="50">
+                                    <label class="form-label text-light">Mức Quá Bán</label>
+                                    <input type="number" class="form-control bg-dark text-light border-secondary" value="30" min="10" max="50">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Xác Nhận Nến</label>
-                                    <select class="form-select">
+                                    <label class="form-label text-light">Xác Nhận Nến</label>
+                                    <select class="form-select bg-dark text-light border-secondary">
                                         <option value="1">1 nến</option>
                                         <option value="2">2 nến</option>
                                         <option value="3">3 nến</option>
@@ -572,82 +572,82 @@
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Vốn Tối Đa (USDT)</label>
-                            <input type="number" class="form-control" value="1000" min="10">
+                            <label class="form-label text-light">Vốn Tối Đa (USDT)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" value="1000" min="10">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">% Vốn/Giao Dịch</label>
-                            <input type="number" class="form-control" value="5" min="1" max="100">
+                            <label class="form-label text-light">% Vốn/Giao Dịch</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" value="5" min="1" max="100">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Tự Động Quản Lý Rủi Ro</label>
+                            <label class="form-label text-light">Tự Động Quản Lý Rủi Ro</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="risk-management-switch" checked>
-                                <label class="form-check-label" for="risk-management-switch">Bật</label>
+                                <label class="form-check-label text-light" for="risk-management-switch">Bật</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Chế Độ Backtest</label>
+                            <label class="form-label text-light">Chế Độ Backtest</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="backtest-mode-switch">
-                                <label class="form-check-label" for="backtest-mode-switch">Bật</label>
+                                <label class="form-check-label text-light" for="backtest-mode-switch">Bật</label>
                             </div>
                         </div>
                     </div>
 
-                    <div id="risk-management-params" class="mb-3 p-3 border rounded bg-light">
-                        <h6 class="mb-3">Thông Số Quản Lý Rủi Ro</h6>
+                    <div id="risk-management-params" class="mb-3 p-3 border rounded bg-dark border-secondary">
+                        <h6 class="mb-3 text-light">Thông Số Quản Lý Rủi Ro</h6>
                         <div class="row mb-2">
                             <div class="col-md-6">
-                                <label class="form-label">Take Profit (%)</label>
-                                <input type="number" class="form-control" value="2.5" min="0.1" step="0.1">
+                                <label class="form-label text-light">Take Profit (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="2.5" min="0.1" step="0.1">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Stop Loss (%)</label>
-                                <input type="number" class="form-control" value="1.5" min="0.1" step="0.1">
+                                <label class="form-label text-light">Stop Loss (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="1.5" min="0.1" step="0.1">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="form-label">Trailing Stop (%)</label>
-                                <input type="number" class="form-control" value="0.5" min="0" step="0.1">
+                                <label class="form-label text-light">Trailing Stop (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="0.5" min="0" step="0.1">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Max Drawdown (%)</label>
-                                <input type="number" class="form-control" value="15" min="1" max="50">
+                                <label class="form-label text-light">Max Drawdown (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="15" min="1" max="50">
                             </div>
                         </div>
                     </div>
 
-                    <div id="backtest-params" class="mb-3 p-3 border rounded bg-light d-none">
-                        <h6 class="mb-3">Thông Số Backtest</h6>
+                    <div id="backtest-params" class="mb-3 p-3 border rounded bg-dark border-secondary d-none">
+                        <h6 class="mb-3 text-light">Thông Số Backtest</h6>
                         <div class="row mb-2">
                             <div class="col-md-6">
-                                <label class="form-label">Từ Ngày</label>
-                                <input type="date" class="form-control">
+                                <label class="form-label text-light">Từ Ngày</label>
+                                <input type="date" class="form-control bg-dark text-light border-secondary">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Đến Ngày</label>
-                                <input type="date" class="form-control">
+                                <label class="form-label text-light">Đến Ngày</label>
+                                <input type="date" class="form-control bg-dark text-light border-secondary">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="form-label">Vốn Ban Đầu (USDT)</label>
-                                <input type="number" class="form-control" value="10000" min="100">
+                                <label class="form-label text-light">Vốn Ban Đầu (USDT)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="10000" min="100">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Phí Giao Dịch (%)</label>
-                                <input type="number" class="form-control" value="0.1" min="0" step="0.01">
+                                <label class="form-label text-light">Phí Giao Dịch (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" value="0.1" min="0" step="0.01">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-dark">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-success" id="create-bot-btn">
                     <i class="fas fa-plus me-2"></i> Tạo Bot

@@ -53,8 +53,8 @@ socketio = SocketIO(
 )
 
 # Global objects
-binance_api = BinanceAPI(simulation_mode=False)  # Sử dụng chế độ thực tế, không giả lập
-data_processor = DataProcessor(binance_api, simulation_mode=False)  # Chuyển sang chế độ thực tế
+binance_api = BinanceAPI(simulation_mode=True)  # Sử dụng chế độ mô phỏng để tránh hiện lệnh đang mở giả
+data_processor = DataProcessor(binance_api, simulation_mode=True)  # Sử dụng chế độ mô phỏng
 ml_optimizer = MLOptimizer()
 sentiment_analyzer = SentimentAnalyzer(data_processor=data_processor, simulation_mode=False)  # Chuyển sang chế độ thực tế
 trading_bots = {}
