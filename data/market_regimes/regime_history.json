@@ -356,6 +356,36 @@
   {
     "regime": "ranging",
     "start_time": "2025-02-28T18:05:08.927097",
+    "end_time": "2025-02-28T18:07:15.556641",
+    "duration": 2.1104924666666665
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T18:07:15.556658",
+    "end_time": "2025-02-28T18:08:21.836661",
+    "duration": 1.1046668
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T18:08:21.836672",
+    "end_time": "2025-02-28T18:12:37.632566",
+    "duration": 4.263265
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T18:12:37.632577",
+    "end_time": "2025-02-28T18:13:38.370519",
+    "duration": 1.0122991000000001
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T18:13:38.370527",
+    "end_time": "2025-02-28T18:14:09.409390",
+    "duration": 0.5173145166666667
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T18:14:09.409406",
     "end_time": null,
     "duration": 0
   }

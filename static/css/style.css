@@ -1,0 +1,168 @@
+/* Custom styles for CryptoBot Dashboard */
+
+/* General styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Icons */
+.icon-lg {
+    width: 2rem;
+    height: 2rem;
+    stroke-width: 1.5;
+}
+
+.icon-sm {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+/* Card customization */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Theme switcher */
+.theme-switch {
+    position: relative;
+}
+
+.theme-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+#lightIcon {
+    display: none;
+}
+
+[data-bs-theme="light"] #lightIcon {
+    display: inline-block;
+}
+
+[data-bs-theme="light"] #darkIcon {
+    display: none;
+}
+
+/* Progress bars */
+.progress {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 1rem;
+}
+
+/* Tables */
+.table th {
+    font-weight: 500;
+    border-top: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .card-title {
+        font-size: 1.25rem;
+    }
+    
+    .table {
+        font-size: 0.875rem;
+    }
+}
+
+/* Custom component styles */
+.market-regime-gauge {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Custom badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    border-radius: 0.25rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.live-indicator {
+    animation: pulse 2s infinite;
+}
+
+/* Dark mode specific styles */
+[data-bs-theme="dark"] .card {
+    background-color: rgba(45, 55, 72, 0.9);
+}
+
+[data-bs-theme="dark"] .list-group-item {
+    background-color: rgba(45, 55, 72, 0.3);
+}
+
+/* Utility classes */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+/* Strategy item styles */
+.strategy-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.strategy-item:last-child {
+    border-bottom: none;
+}
+
+/* Sentiment colors */
+.sentiment-extreme-fear {
+    color: #e74c3c;
+}
+
+.sentiment-fear {
+    color: #e67e22;
+}
+
+.sentiment-neutral {
+    color: #3498db;
+}
+
+.sentiment-greed {
+    color: #2980b9;
+}
+
+.sentiment-extreme-greed {
+    color: #27ae60;
+}
