@@ -1,0 +1,13 @@
+{
+  "composite_score": -0.20000000000000004,
+  "signal": -0.5,
+  "confidence": 20.000000000000004,
+  "individual_scores": {
+    "volume_trend": -0.2
+  },
+  "weighted_scores": {
+    "volume_trend": -0.04000000000000001
+  },
+  "signal_description": "B\u00c1N nh\u1eb9",
+  "summary": "B\u00c1N nh\u1eb9 v\u1edbi \u0111\u1ed9 tin c\u1eady 20.0%"
+}

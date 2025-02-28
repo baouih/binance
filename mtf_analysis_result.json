@@ -1,0 +1,43 @@
+{
+  "signal": -1,
+  "confidence": 70.0,
+  "position_size_factor": 0.7,
+  "rsi_analysis": {},
+  "trend_analysis": {
+    "15m": {
+      "trend": -2,
+      "ema20": 7.908316343985594e+261,
+      "ema50": 3.86152235103474e+286,
+      "ema200": 3.266135837735413e+298,
+      "close": 0.0,
+      "weight": 0.15
+    },
+    "1h": {
+      "trend": -2,
+      "ema20": 7.908316343985594e+261,
+      "ema50": 3.86152235103474e+286,
+      "ema200": 3.266135837735413e+298,
+      "close": 0.0,
+      "weight": 0.25
+    },
+    "4h": {
+      "trend": -2,
+      "ema20": 7.908316343985594e+261,
+      "ema50": 3.86152235103474e+286,
+      "ema200": 3.266135837735413e+298,
+      "close": 0.0,
+      "weight": 0.3
+    },
+    "1d": {
+      "trend": -2,
+      "ema20": 7.908316343985594e+261,
+      "ema50": 3.86152235103474e+286,
+      "ema200": 3.266135837735413e+298,
+      "close": 0.0,
+      "weight": 0.4
+    }
+  },
+  "raw_signal": -0.7,
+  "signal_description": "T\u00edn hi\u1ec7u B\u00c1N m\u1ea1nh",
+  "summary": "T\u00edn hi\u1ec7u B\u00c1N m\u1ea1nh v\u1edbi \u0111\u1ed9 tin c\u1eady 70.0% (H\u1ec7 s\u1ed1 v\u1ecb th\u1ebf: 0.70)"
+}
