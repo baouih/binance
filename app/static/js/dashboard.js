@@ -6,7 +6,8 @@
 class DashboardController {
   constructor() {
     this.charts = new TradingCharts();
-    this.socket = new SocketClient();
+    // Use the global socketClient instance that's initialized in the HTML
+    this.socket = window.socketClient || new SocketClient();
     this.trader = new TradingController();
     this.symbol = 'BTCUSDT';
     this.timeframe = '1h';
@@ -21,8 +22,10 @@ class DashboardController {
     // Setup event listeners
     this.setupEventListeners();
     
-    // Initialize socket connection
-    this.socket.init();
+    // Make sure socket is initialized
+    if (!this.socket.isConnected() && typeof this.socket.init === 'function') {
+      this.socket.init();
+    }
     
     // Get symbols and intervals
     await this.loadSymbols();

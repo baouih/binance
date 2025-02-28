@@ -164,22 +164,32 @@ class TradingBot:
             
         # Calculate position size (10% of available balance)
         available_balance = float(account.get('availableBalance', 0))
+        if available_balance <= 0:
+            logger.warning(f"Insufficient balance: {available_balance}")
+            return
+            
         position_size = available_balance * 0.1
         
         # Get current price
         latest_price = self._get_current_price()
-        if not latest_price:
-            logger.warning("Could not get current price")
+        if not latest_price or latest_price <= 0:
+            logger.warning(f"Invalid current price: {latest_price}")
             return
             
         # Calculate quantity
-        quantity = position_size / latest_price
-        
-        # Round quantity to appropriate precision
-        quantity = round(quantity, 3)  # Assuming 3 decimal places for quantity
-        
-        if quantity <= 0:
-            logger.warning(f"Invalid quantity: {quantity}")
+        try:
+            quantity = position_size / latest_price
+            
+            # Ensure the quantity is valid
+            if not np.isfinite(quantity) or quantity <= 0:
+                logger.warning(f"Invalid quantity calculated: {quantity}")
+                return
+                
+            # Round quantity to appropriate precision
+            quantity = round(quantity, 3)  # Assuming 3 decimal places for quantity
+            
+        except Exception as e:
+            logger.error(f"Error calculating quantity: {e}")
             return
             
         # Execute the order
