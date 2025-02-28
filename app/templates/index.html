@@ -2,6 +2,30 @@
 
 {% block title %}Trading Bot - Home{% endblock %}
 
+{% block scripts %}
+<script>
+  // Initialize socket connection when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create socket client instance if it doesn't exist
+    window.socketClient = window.socketClient || new SocketClient();
+    window.socketClient.init();
+
+    // Subscribe to price updates
+    window.socketClient.subscribe('price_update', function(data) {
+      const priceElement = document.getElementById('current-price');
+      if (priceElement && data.price) {
+        // Format price with commas and 2 decimal places
+        const formattedPrice = parseFloat(data.price).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        priceElement.textContent = formattedPrice;
+      }
+    });
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
   <div class="row">
@@ -76,7 +100,7 @@
           <div class="mb-3">
             <label class="form-label">BTC Price:</label>
             <div class="d-flex align-items-center">
-              <span id="current-price" class="price-display">45,000.00</span>
+              <span id="current-price" class="price-display">63,500.00</span>
               <span id="price-change-24h" class="ms-2 badge bg-success">+1.2%</span>
             </div>
           </div>
