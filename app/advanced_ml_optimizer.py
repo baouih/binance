@@ -251,8 +251,8 @@ class AdvancedMLOptimizer:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
         
         # Tiền xử lý dữ liệu
-        X_train_processed = self._preprocess_features(X_train, regime, is_training=True)
-        X_test_processed = self._preprocess_features(X_test, regime, is_training=False)
+        X_train_processed = self._preprocess_features(X_train, y_train, regime, is_training=True)
+        X_test_processed = self._preprocess_features(X_test, None, regime, is_training=False)
         
         # Đào tạo mô hình cho mỗi loại
         for model_type in self.base_models:
