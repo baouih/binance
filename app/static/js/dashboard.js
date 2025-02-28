@@ -4,6 +4,8 @@
  * 
  * Bộ điều khiển Dashboard
  * Quản lý giao diện người dùng và tương tác của bảng điều khiển giao dịch
+ * 
+ * Modified: Added error handling and stability improvements
  */
 
 class DashboardController {

@@ -36,8 +36,16 @@ app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 app.template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 logger.info(f"Template directory: {app.template_folder}")
 
-# Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Initialize SocketIO with improved error handling and settings
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*",
+    async_mode='eventlet',  # Use eventlet for better performance
+    ping_timeout=60,        # Increase ping timeout
+    ping_interval=25,       # Adjust ping interval
+    logger=True,            # Enable SocketIO logging
+    engineio_logger=True    # Enable Engine.IO logging
+)
 
 # Global objects
 binance_api = BinanceAPI(simulation_mode=True)

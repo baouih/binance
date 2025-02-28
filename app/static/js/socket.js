@@ -75,17 +75,23 @@ class SocketClient {
       return true;
     }
     
-    // Set up listener if socket is available
-    if (this.socket && this.callbacks[event].length === 0) {
+    // Set up listener if socket is available and there aren't any duplicates
+    if (this.socket && this.callbacks[event].length === 1) {
+      // Remove any existing listeners to prevent duplicates
+      this.socket.off(event);
+      
+      // Add the listener
       this.socket.on(event, (data) => {
-        this.callbacks[event].forEach(cb => cb(data));
-      });
-    }
-    
-    // Set up listener if not already
-    if (this.callbacks[event].length === 1) {
-      this.socket.on(event, (data) => {
-        this.callbacks[event].forEach(cb => cb(data));
+        // Handle case where callbacks were changed during execution
+        if (this.callbacks[event]) {
+          this.callbacks[event].forEach(cb => {
+            try {
+              cb(data);
+            } catch (err) {
+              console.error(`Error in socket callback for event ${event}:`, err);
+            }
+          });
+        }
       });
     }
     
