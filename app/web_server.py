@@ -271,7 +271,7 @@ def index():
     """Render the main dashboard."""
     return render_template('index.html')
 
-@app.route('/analysis')
+@app.route('/market_analysis')
 def market_analysis():
     """Trang phân tích thị trường."""
     return render_template('under_development.html', title="Phân tích thị trường")
@@ -291,12 +291,7 @@ def strategy():
     """Trang chiến lược giao dịch."""
     return render_template('under_development.html', title="Chiến lược giao dịch")
 
-@app.route('/testing')
-def testing():
-    """Trang kiểm thử chiến lược."""
-    return render_template('under_development.html', title="Kiểm thử chiến lược")
-
-@app.route('/bot')
+@app.route('/bot_management')
 def bot_management():
     """Trang quản lý bot."""
     return render_template('under_development.html', title="Quản lý bot")
@@ -307,9 +302,9 @@ def trading_dashboard():
     return render_template('dashboard.html')
 
 @app.route('/backtesting')
-def backtesting():
+def backtesting_page():
     """Render the backtesting page."""
-    return render_template('backtesting.html')
+    return render_template('under_development.html', title="Kiểm thử chiến lược")
 
 @app.route('/settings')
 def settings():
