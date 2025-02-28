@@ -58,7 +58,7 @@ class RSIStrategy(Strategy):
         
     def generate_signal(self, dataframe):
         """
-        Generate trading signals based on RSI.
+        Generate trading signals based on RSI with additional trend and volume filters.
         
         Args:
             dataframe (pandas.DataFrame): DataFrame with price and indicator data
@@ -66,20 +66,57 @@ class RSIStrategy(Strategy):
         Returns:
             int: Signal (-1 for sell, 0 for hold, 1 for buy)
         """
-        # Check if dataframe is valid and contains RSI
-        if dataframe is None or dataframe.empty or 'RSI' not in dataframe.columns:
+        # Check if dataframe is valid and contains required columns
+        required_columns = ['RSI', 'volume']
+        if dataframe is None or dataframe.empty or not all(col in dataframe.columns for col in required_columns):
             return 0
             
-        # Get the latest RSI value
+        # Get the latest data
         latest_rsi = dataframe['RSI'].iloc[-1]
         
-        # Generate signals
-        if latest_rsi > self.overbought:
-            return -1  # Sell signal
-        elif latest_rsi < self.oversold:
-            return 1  # Buy signal
-        else:
-            return 0  # Hold
+        # Get price and moving averages to determine trend if available
+        has_trend_info = all(col in dataframe.columns for col in ['close', 'EMA_50', 'EMA_200'])
+        has_prev_data = len(dataframe) > 1
+        
+        # If previous data is available, get previous RSI
+        prev_rsi = dataframe['RSI'].iloc[-2] if has_prev_data else latest_rsi
+        
+        # Check trend
+        trend = "neutral"
+        if has_trend_info:
+            latest_close = dataframe['close'].iloc[-1]
+            latest_ema50 = dataframe['EMA_50'].iloc[-1]
+            latest_ema200 = dataframe['EMA_200'].iloc[-1]
+            
+            if latest_ema50 > latest_ema200 and latest_close > latest_ema50:
+                trend = "uptrend"
+            elif latest_ema50 < latest_ema200 and latest_close < latest_ema50:
+                trend = "downtrend"
+                
+        # Check volume
+        high_volume = False
+        if 'volume' in dataframe.columns:
+            latest_volume = dataframe['volume'].iloc[-1]
+            avg_volume = dataframe['volume'].rolling(window=20).mean().iloc[-1] if len(dataframe) >= 20 else latest_volume
+            volume_ratio = latest_volume / avg_volume if avg_volume > 0 else 1.0
+            high_volume = volume_ratio > 1.2  # Volume is at least 20% above average
+            
+        # Generate signals with filters
+        if latest_rsi < self.oversold:
+            # Buy signals - stronger in uptrends with high volume or RSI turning up
+            if (trend == "uptrend" and high_volume) or (has_prev_data and latest_rsi > prev_rsi):
+                return 1  # Strong buy signal
+            elif trend != "downtrend":  # Avoid buying in downtrends
+                return 1  # Normal buy signal
+                
+        elif latest_rsi > self.overbought:
+            # Sell signals - stronger in downtrends with high volume or RSI turning down
+            if (trend == "downtrend" and high_volume) or (has_prev_data and latest_rsi < prev_rsi):
+                return -1  # Strong sell signal
+            elif trend != "uptrend":  # Avoid selling in uptrends  
+                return -1  # Normal sell signal
+                
+        return 0  # Hold signal
             
     def get_strategy_info(self):
         """
@@ -90,10 +127,14 @@ class RSIStrategy(Strategy):
         """
         return {
             "name": self.name,
-            "description": "Generates signals based on RSI values",
+            "description": {
+                "en": "Enhanced RSI strategy with trend and volume filters",
+                "vi": "Chiến lược RSI nâng cao với bộ lọc xu hướng và khối lượng"
+            },
             "parameters": {
                 "overbought": self.overbought,
-                "oversold": self.oversold
+                "oversold": self.oversold,
+                "features": "Trend detection, volume confirmation, RSI reversal detection"
             }
         }
 
@@ -355,7 +396,7 @@ class CombinedStrategy(Strategy):
             
     def generate_signal(self, dataframe):
         """
-        Generate trading signals by combining multiple strategies.
+        Generate trading signals by combining multiple strategies with improved conflict resolution.
         
         Args:
             dataframe (pandas.DataFrame): DataFrame with price and indicator data
@@ -363,25 +404,58 @@ class CombinedStrategy(Strategy):
         Returns:
             int: Signal (-1 for sell, 0 for hold, 1 for buy)
         """
-        if not self.strategies:
+        if not self.strategies or dataframe is None or dataframe.empty:
             return 0
             
-        # Get signals from all strategies
+        # Get signals from all strategies with debug logging
         signals = []
-        for strategy in self.strategies:
+        strategy_signals = {}
+        
+        for i, strategy in enumerate(self.strategies):
             signal = strategy.generate_signal(dataframe)
+            strategy_name = strategy.name
+            strategy_signals[strategy_name] = signal
             signals.append(signal)
             
-        # Combine signals using weights
+            # Log the signal from each strategy for debugging
+            logger.debug(f"Strategy '{strategy_name}' signal: {signal}")
+            
+        # Check for market conditions
+        market_trend = "neutral"
+        if all(col in dataframe.columns for col in ['close', 'EMA_50', 'EMA_200']):
+            latest_close = dataframe['close'].iloc[-1]
+            latest_ema50 = dataframe['EMA_50'].iloc[-1]
+            latest_ema200 = dataframe['EMA_200'].iloc[-1]
+            
+            if latest_ema50 > latest_ema200 and latest_close > latest_ema50:
+                market_trend = "uptrend"
+            elif latest_ema50 < latest_ema200 and latest_close < latest_ema50:
+                market_trend = "downtrend"
+                
+        # Calculate consensus signal with market trend consideration
         weighted_signal = sum(s * w for s, w in zip(signals, self.weights))
         
-        # Threshold for decision
-        if weighted_signal > 0.3:
-            return 1
-        elif weighted_signal < -0.3:
-            return -1
+        # Improved signal threshold logic with market trend consideration
+        if market_trend == "uptrend":
+            # In uptrend, we're more lenient with buy signals and stricter with sell signals
+            if weighted_signal > 0.2:  # Lower threshold for buy signals in uptrend
+                return 1
+            elif weighted_signal < -0.4:  # Higher threshold for sell signals in uptrend
+                return -1
+        elif market_trend == "downtrend":
+            # In downtrend, we're more lenient with sell signals and stricter with buy signals
+            if weighted_signal > 0.4:  # Higher threshold for buy signals in downtrend
+                return 1
+            elif weighted_signal < -0.2:  # Lower threshold for sell signals in downtrend
+                return -1
         else:
-            return 0
+            # In neutral trend, use standard thresholds
+            if weighted_signal > 0.3:
+                return 1
+            elif weighted_signal < -0.3:
+                return -1
+                
+        return 0  # Hold signal when there's no strong consensus
             
     def get_strategy_info(self):
         """
@@ -392,10 +466,14 @@ class CombinedStrategy(Strategy):
         """
         return {
             "name": self.name,
-            "description": "Combines signals from multiple strategies",
+            "description": {
+                "en": "Enhanced combined strategy with trend-adaptive signal thresholds",
+                "vi": "Chiến lược kết hợp nâng cao với ngưỡng tín hiệu thích ứng theo xu hướng"
+            },
             "parameters": {
                 "strategies": [s.name for s in self.strategies],
-                "weights": self.weights
+                "weights": self.weights,
+                "features": "Market trend detection, adaptive signal thresholds, consensus weighting"
             }
         }
 
@@ -455,7 +533,9 @@ class StrategyFactory:
                     EMACrossStrategy(9, 21)
                 ]
                 weights = [0.4, 0.3, 0.3]
-                return CombinedStrategy(strategies, weights, name="Auto Strategy")
+                combined_strategy = CombinedStrategy(strategies, weights)
+                combined_strategy.name = "Auto Strategy"
+                return combined_strategy
         else:
             logger.warning(f"Unknown strategy type: {strategy_type}")
             return Strategy()
