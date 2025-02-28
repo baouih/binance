@@ -220,8 +220,10 @@ class TradingController {
     const tbody = document.createElement('tbody');
     
     // Sort by timestamp descending (newest first)
-    const sortedHistory = [...this.account.trade_history].sort((a, b) => {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+    // Add defensive check to handle undefined or null trade_history
+    const tradeHistory = this.account && this.account.trade_history ? this.account.trade_history : [];
+    const sortedHistory = [...tradeHistory].sort((a, b) => {
+      return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
     });
     
     // Take only the last 10 trades

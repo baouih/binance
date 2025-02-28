@@ -32,6 +32,8 @@ class SocketClient {
       // Check if Socket.IO is available
       if (typeof io === 'undefined') {
         console.error('Socket.IO not found. Real-time updates will not be available.');
+        // Start simulation mode for continuous UI updates even if Socket.IO is not loaded
+        this._startSimulation();
         return false;
       }
       
@@ -42,7 +44,8 @@ class SocketClient {
         reconnectionDelay: this.reconnectDelay, // Sử dụng giá trị từ constructor
         timeout: 30000, // Tăng timeout lên 30 giây
         forceNew: true, // Tạo kết nối mới thay vì tái sử dụng
-        autoConnect: true // Tự động kết nối khi khởi tạo
+        autoConnect: true, // Tự động kết nối khi khởi tạo
+        path: '/socket.io' // Đảm bảo chính xác đường dẫn socket.io
       });
       
       // Setup event handlers
@@ -59,17 +62,25 @@ class SocketClient {
   
   // Subscribe to a specific event
   subscribe(event, callback) {
-    if (!this.socket) {
-      console.error('Socket not initialized. Cannot subscribe to events.');
-      return false;
-    }
-    
-    // Store callback
+    // Store callback even if socket is not initialized
     if (!this.callbacks[event]) {
       this.callbacks[event] = [];
     }
     
     this.callbacks[event].push(callback);
+    
+    // If socket is not available, we still accept subscriptions for simulation mode
+    if (!this.socket) {
+      console.warn('Socket not initialized. Events will be handled in simulation mode.');
+      return true;
+    }
+    
+    // Set up listener if socket is available
+    if (this.socket && this.callbacks[event].length === 0) {
+      this.socket.on(event, (data) => {
+        this.callbacks[event].forEach(cb => cb(data));
+      });
+    }
     
     // Set up listener if not already
     if (this.callbacks[event].length === 1) {

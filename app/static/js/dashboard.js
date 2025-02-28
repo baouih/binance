@@ -160,9 +160,19 @@ class DashboardController {
       if (intervalSelector) {
         intervalSelector.innerHTML = '';
         intervals.forEach(interval => {
+          // Check if interval is an object with id and name, or just a string
+          const value = typeof interval === 'object' ? interval.id : interval;
+          const text = typeof interval === 'object' ? interval.name : interval;
+          
           const option = document.createElement('option');
-          option.value = interval;
-          option.textContent = interval;
+          option.value = value;
+          option.textContent = text;
+          
+          // Add description as title if available
+          if (typeof interval === 'object' && interval.description) {
+            option.title = interval.description;
+          }
+          
           intervalSelector.appendChild(option);
         });
         
