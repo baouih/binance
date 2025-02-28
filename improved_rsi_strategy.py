@@ -52,83 +52,104 @@ def generate_sample_data(days=90, interval='1h'):
     start_date = end_date - timedelta(days=days)
     
     if interval == '1h':
-        dates = pd.date_range(start=start_date, end=end_date, freq='H')
+        dates = pd.date_range(start=start_date, end=end_date, freq='h')
     elif interval == '15m':
         dates = pd.date_range(start=start_date, end=end_date, freq='15min')
     elif interval == '1d':
         dates = pd.date_range(start=start_date, end=end_date, freq='D')
     else:
-        dates = pd.date_range(start=start_date, end=end_date, freq='H')
+        dates = pd.date_range(start=start_date, end=end_date, freq='h')
     
     # Giới hạn số lượng
     dates = dates[:periods]
     
-    # Tạo giá mô phỏng với xu hướng, dao động và một số biến động
-    np.random.seed(42)  # Để kết quả có thể tái tạo
+    # Tạo đối tượng numpy random với seed cố định
+    rng = np.random.RandomState(42)
     
-    # Giá ban đầu
-    initial_price = 80000
+    # Tạo giá mẫu có tính chất giống Bitcoin thực tế hơn
+    initial_price = 80000  # Giá ban đầu trên Binance
+    prices = [initial_price]
     
-    # Tạo xu hướng cơ bản
-    trend = np.linspace(0, 0.2, periods)  # Xu hướng tăng nhẹ
+    # Biến động giá BTC giảm dần với kích thước
+    volatility = 0.015  # 1.5% biến động hàng ngày trung bình
+    drift = 0.001       # 0.1% xu hướng tăng trung bình mỗi ngày
     
-    # Thêm dao động
-    oscillation = np.sin(np.linspace(0, 15, periods)) * 0.1
+    for i in range(1, periods):
+        # Xu hướng ngẫu nhiên với thiên hướng tăng nhẹ
+        daily_return = drift + volatility * rng.randn()
+        
+        # Thêm một số dao động theo mùa
+        seasonal = 0.005 * np.sin(i / (periods/6))  # dao động 6 chu kỳ
+        
+        # Thêm biến động thời gian thực (trong ngày)
+        intraday = 0.003 * np.sin(i / 24 * 2 * np.pi)
+        
+        # Tính giá mới
+        new_price = prices[-1] * (1 + daily_return + seasonal + intraday)
+        
+        # Đôi khi có biến động lớn
+        if rng.random() < 0.01:  # 1% khả năng có biến động lớn
+            spike = rng.choice([-1, 1]) * rng.uniform(0.03, 0.08)  # Biến động 3-8%
+            new_price *= (1 + spike)
+        
+        # Không cho phép giá dưới 20000
+        new_price = max(20000, new_price)
+        
+        prices.append(new_price)
     
-    # Thêm biến động ngẫu nhiên
-    noise = np.random.normal(0, 0.01, periods)
-    
-    # Thêm các biến động đột ngột
-    random_spikes = np.zeros(periods)
-    spike_points = np.random.choice(periods, size=5, replace=False)
-    random_spikes[spike_points] = np.random.uniform(-0.1, 0.1, 5)
-    
-    # Tính toán chỉ số giá theo ngày
-    price_factors = 1 + trend + oscillation + noise + random_spikes
-    price_index = initial_price * np.cumprod(price_factors)
-    
-    # Tạo giá OHLC
+    # Tạo DataFrame
     df = pd.DataFrame(index=dates)
-    df['close'] = price_index
+    df['close'] = prices
     
-    # Tạo open, high, low từ close
+    # Tạo open, high, low
     df['open'] = df['close'].shift(1)
-    df.loc[df.index[0], 'open'] = df['close'].iloc[0] * (1 - np.random.uniform(0, 0.01))
+    df.loc[df.index[0], 'open'] = prices[0] * (1 - rng.uniform(0, 0.01))
     
-    daily_volatility = 0.02
-    df['high'] = df[['open', 'close']].max(axis=1) * (1 + np.random.uniform(0, daily_volatility, size=len(df)))
-    df['low'] = df[['open', 'close']].min(axis=1) * (1 - np.random.uniform(0, daily_volatility, size=len(df)))
+    daily_volatility = 0.01
+    df['high'] = df[['open', 'close']].max(axis=1) * (1 + rng.uniform(0, daily_volatility, size=len(df)))
+    df['low'] = df[['open', 'close']].min(axis=1) * (1 - rng.uniform(0, daily_volatility, size=len(df)))
     
     # Tạo khối lượng
     base_volume = 1000
-    volume_trend = np.linspace(0, 0.5, periods)  # Tăng dần khối lượng
-    volume_oscillation = np.sin(np.linspace(0, 30, periods)) * 0.5  # Dao động khối lượng
-    volume_noise = np.random.normal(0, 0.2, periods)  # Nhiễu khối lượng
     
-    volume_factors = 1 + volume_trend + volume_oscillation + volume_noise
-    volume_factors = np.maximum(volume_factors, 0.1)  # Đảm bảo toàn bộ giá trị là dương
-    df['volume'] = base_volume * volume_factors
+    # Tạo mẫu khối lượng dựa trên biến động giá
+    price_changes = np.abs(df['close'].pct_change().fillna(0).values)
+    volume = base_volume * (1 + 5 * price_changes)  # Khối lượng tăng khi giá biến động mạnh
     
-    # Thêm các chỉ báo
-    # RSI (phương pháp Wilder)
+    # Thêm một xu hướng nhẹ tăng dần
+    volume_trend = np.linspace(1, 1.5, len(df))
+    
+    # Thêm một số dao động ngẫu nhiên
+    volume_noise = 1 + 0.3 * rng.randn(len(df))
+    volume_noise = np.maximum(volume_noise, 0.5)  # Giới hạn dưới
+    
+    df['volume'] = volume * volume_trend * volume_noise
+    
+    # Tính toán chỉ báo RSI
+    # Tính toán delta
     delta = df['close'].diff()
-    gain = (delta.where(delta > 0, 0)).fillna(0)
-    loss = (-delta.where(delta < 0, 0)).fillna(0)
+    gain = delta.copy()
+    gain[gain < 0] = 0
+    loss = -delta.copy()
+    loss[loss < 0] = 0
     
-    # Sử dụng phương pháp Wilder's Smoothing
-    avg_gain = gain.ewm(alpha=1/14, min_periods=14).mean()
-    avg_loss = loss.ewm(alpha=1/14, min_periods=14).mean()
+    # Tính trung bình di động theo kiểu Wilder
+    avg_gain = gain.rolling(window=14).mean()
+    avg_loss = loss.rolling(window=14).mean()
     
+    # Tính RS và RSI
     rs = avg_gain / avg_loss
-    df['rsi'] = 100 - (100 / (1 + rs))
+    rsi = 100.0 - (100.0 / (1.0 + rs))
     
-    # Thêm một vài biến động ngẫu nhiên vào RSI để tạo tín hiệu
-    np.random.seed(42)
-    rsi_noise = np.random.normal(0, 5, len(df))
-    df['rsi'] = df['rsi'] + rsi_noise
+    # Thêm nhiễu vào RSI để tạo ra các tín hiệu giao dịch
+    rsi_noise = 5 * rng.randn(len(df))
+    rsi = rsi + rsi_noise
     
-    # Đảm bảo giá trị RSI trong khoảng 0-100
-    df['rsi'] = np.clip(df['rsi'], 0, 100)
+    # Clip để đảm bảo giá trị RSI trong khoảng 0-100
+    df['rsi'] = np.clip(rsi, 0, 100)
+    
+    # Đảm bảo không có giá trị NaN
+    df = df.fillna(method='bfill')
     
     logger.info(f"Đã tạo {len(df)} candles từ {df.index[0]} đến {df.index[-1]}")
     return df
@@ -173,9 +194,9 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
         logger.error("Không thể lấy dữ liệu")
         return None
     
-    # Khởi tạo chiến lược RSI
-    strategy = RSIStrategy(overbought=overbought, oversold=oversold)
-    logger.info(f"Đã tạo chiến lược RSI")
+    # Chiến lược RSI tùy chỉnh trực tiếp, không dựa vào lớp RSIStrategy
+    # để tránh các vấn đề về phụ thuộc và tương thích
+    logger.info(f"Sử dụng chiến lược RSI tùy chỉnh với ngưỡng overbought={overbought}, oversold={oversold}")
     
     # Danh sách để lưu trữ các giao dịch
     trades = []
@@ -197,9 +218,35 @@ def backtest_rsi_strategy(days=90, interval='1h', initial_balance=10000.0,
     # Để có đủ dữ liệu cho RSI, bỏ qua các candles đầu tiên
     start_idx = 20  # Bỏ qua 20 candles đầu tiên
     
+    # Thêm bộ đệm tín hiệu để ngăn quá nhiều tín hiệu liên tục
+    signal_buffer_count = 0
+    last_signal = 0
+    
     for i in range(start_idx, len(df) - 1):
         current_data = df.iloc[:i+1]
-        signal = strategy.generate_signal(current_data)
+        
+        # Tạo tín hiệu RSI tùy chỉnh
+        current_rsi = current_data['rsi'].iloc[-1]
+        
+        # Tạo tín hiệu dựa trên RSI
+        signal = 0
+        
+        # Chỉ tạo tín hiệu mới nếu hết thời gian đệm
+        if signal_buffer_count <= 0:
+            if current_rsi <= oversold:
+                signal = 1  # Mua khi RSI dưới ngưỡng oversold
+                signal_buffer_count = 5  # Đặt thời gian đệm
+            elif current_rsi >= overbought:
+                signal = -1  # Bán khi RSI trên ngưỡng overbought
+                signal_buffer_count = 5  # Đặt thời gian đệm
+        else:
+            signal_buffer_count -= 1
+            
+        if signal != 0:
+            logger.info(f"Candle {i}: RSI = {current_rsi:.2f}, Signal = {signal}")
+        
+        # Lưu tín hiệu cuối cùng
+        last_signal = signal
         
         current_price = current_data['close'].iloc[-1]
         current_date = current_data.index[-1]
