@@ -572,6 +572,52 @@ class BinanceAPI:
             logger.error(f"Error creating order: {str(e)}")
             return {}
             
+    def set_leverage(self, symbol, leverage):
+        """
+        Set leverage for a symbol
+        
+        Args:
+            symbol (str): The trading pair
+            leverage (int): Leverage value (1-125)
+            
+        Returns:
+            dict: Response containing the leverage information
+        """
+        if self.simulation_mode:
+            logger.info(f"SIMULATION: Setting leverage to {leverage}x for {symbol}")
+            return {
+                'leverage': leverage,
+                'maxNotionalValue': '1000000',
+                'symbol': symbol
+            }
+            
+        try:
+            timestamp = int(time.time() * 1000)
+            params = {
+                'symbol': symbol,
+                'leverage': leverage,
+                'timestamp': timestamp
+            }
+            
+            signature = self._get_signature(params)
+            params['signature'] = signature
+            
+            url = f"{self.base_url}/fapi/v1/leverage"
+            headers = self._get_headers()
+            
+            response = requests.post(url, params=params, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"Leverage set to {result.get('leverage')}x for {symbol}")
+                return result
+            else:
+                logger.error(f"Error setting leverage: {response.status_code} - {response.text}")
+                return None
+        except Exception as e:
+            logger.error(f"Exception when setting leverage: {str(e)}")
+            return None
+            
     def _get_simulated_execution_price(self, symbol, side):
         """Get simulated execution price for market orders"""
         # Lấy giá thị trường hiện tại từ Coinbase API để đảm bảo chính xác
