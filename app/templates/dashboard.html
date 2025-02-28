@@ -5,20 +5,22 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <div class="row">
-    <!-- Market Overview -->
+    <!-- Market Overview - Tổng Quan Thị Trường -->
     <div class="col-lg-4">
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Market Overview</h5>
+          <h5 class="mb-0">Tổng Quan Thị Trường <small class="text-secondary">(Market Overview)</small></h5>
         </div>
         <div class="card-body">
           <div class="row mb-3">
             <div class="col">
+              <label class="form-label small">Cặp Tiền <small class="text-secondary">(Symbol)</small></label>
               <select id="symbol-selector" class="form-select">
                 <!-- Will be populated with available symbols -->
               </select>
             </div>
             <div class="col">
+              <label class="form-label small">Khung Thời Gian <small class="text-secondary">(Timeframe)</small></label>
               <select id="timeframe-selector" class="form-select">
                 <!-- Will be populated with available timeframes -->
               </select>
@@ -31,29 +33,29 @@
               
               <!-- Market Sentiment Indicator -->
               <div id="sentiment-container" class="mt-3 p-3 border rounded" style="border-width: 2px;">
-                <h6 class="mb-2">Market Sentiment</h6>
+                <h6 class="mb-2">Tâm Lý Thị Trường <small class="text-secondary">(Market Sentiment)</small></h6>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="fs-4" id="sentiment-value">50.0</span>
-                  <span class="badge bg-secondary" id="sentiment-label">Neutral</span>
+                  <span class="badge bg-secondary" id="sentiment-label">Trung Lập</span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
-                  <small class="text-muted">Bearish</small>
-                  <small class="text-muted">Bullish</small>
+                  <small class="text-muted">Tiêu Cực <small class="text-secondary">(Bearish)</small></small>
+                  <small class="text-muted">Tích Cực <small class="text-secondary">(Bullish)</small></small>
                 </div>
                 <div class="progress mt-1">
                   <div id="sentiment-progress" class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="row mt-3">
                   <div class="col-4">
-                    <small class="d-block text-muted">Technical</small>
+                    <small class="d-block text-muted">Kỹ Thuật <small class="text-secondary">(Technical)</small></small>
                     <span id="technical-sentiment">50.0</span>
                   </div>
                   <div class="col-4">
-                    <small class="d-block text-muted">Social</small>
+                    <small class="d-block text-muted">Mạng Xã Hội <small class="text-secondary">(Social)</small></small>
                     <span id="social-sentiment">50.0</span>
                   </div>
                   <div class="col-4">
-                    <small class="d-block text-muted">Fear/Greed</small>
+                    <small class="d-block text-muted">Sợ Hãi/Tham Lam <small class="text-secondary">(Fear/Greed)</small></small>
                     <span id="fear-greed-index">50.0</span>
                   </div>
                 </div>
@@ -84,7 +86,7 @@
     <div class="col-lg-8">
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Technical Indicators</h5>
+          <h5 class="mb-0">Chỉ Báo Kỹ Thuật <small class="text-secondary">(Technical Indicators)</small></h5>
         </div>
         <div class="card-body">
           <div class="row">
