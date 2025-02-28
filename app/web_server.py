@@ -165,36 +165,75 @@ def get_indicators():
 @app.route('/api/create_bot', methods=['POST'])
 def create_bot():
     """Create a new trading bot."""
-    data = request.json
-    
-    symbol = data.get('symbol', 'BTCUSDT')
-    interval = data.get('interval', '1h')
-    strategy_type = data.get('strategy', 'rsi')
-    strategy_params = data.get('params', {})
-    
-    # Create the strategy
-    strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
-    
-    # Create a unique bot ID
-    bot_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
-    
-    # Create the bot
-    bot = TradingBot(
-        binance_api=binance_api,
-        data_processor=data_processor,
-        strategy=strategy,
-        symbol=symbol,
-        interval=interval,
-        test_mode=True
-    )
-    
-    # Store the bot
-    trading_bots[bot_id] = bot
-    
-    # Start the bot
-    bot.start()
-    
-    return jsonify({'bot_id': bot_id, 'status': 'started'})
+    try:
+        data = request.json
+        
+        symbol = data.get('symbol', 'BTCUSDT')
+        interval = data.get('interval', '1h')
+        strategy_type = data.get('strategy', 'rsi')
+        strategy_params = data.get('params', {})
+        
+        # Kiểm tra và xác thực tham số đầu vào
+        if not symbol or not interval:
+            return jsonify({'error': 'Thiếu thông tin cặp giao dịch hoặc khung thời gian (Missing symbol or interval)'}), 400
+            
+        # Xử lý strategy_type để hỗ trợ giá trị trống từ form
+        if not strategy_type or strategy_type == "null" or strategy_type == "undefined":
+            strategy_type = 'rsi'  # Mặc định dùng RSI nếu không chọn
+        
+        logger.info(f"Creating bot for {symbol} with {strategy_type} strategy, interval: {interval}")
+        
+        # Create the strategy
+        strategy = StrategyFactory.create_strategy(strategy_type, **strategy_params)
+        
+        # Create a unique bot ID
+        bot_id = f"{symbol}_{interval}_{strategy_type}_{int(time.time())}"
+        
+        # Create the bot
+        bot = TradingBot(
+            binance_api=binance_api,
+            data_processor=data_processor,
+            strategy=strategy,
+            symbol=symbol,
+            interval=interval,
+            test_mode=True
+        )
+        
+        # Store the bot
+        trading_bots[bot_id] = bot
+        
+        # Start the bot
+        success = bot.start()
+        
+        if success:
+            # Lưu bot vào storage để dùng lại sau khi khởi động lại
+            storage = Storage()
+            storage.save_bot({
+                'id': bot_id,
+                'symbol': symbol,
+                'interval': interval,
+                'strategy': strategy_type,
+                'params': strategy_params,
+                'status': 'active',
+                'created_at': datetime.now().isoformat()
+            })
+            
+            return jsonify({
+                'bot_id': bot_id, 
+                'status': 'started',
+                'message': 'Bot đã được tạo thành công và đang hoạt động (Bot created and started successfully)'
+            })
+        else:
+            return jsonify({
+                'error': 'Không thể khởi động bot (Failed to start bot)',
+                'bot_id': bot_id
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Error creating bot: {str(e)}")
+        return jsonify({
+            'error': f'Lỗi khi tạo bot: {str(e)} (Error creating bot)'
+        }), 500
 
 @app.route('/api/stop_bot', methods=['POST'])
 def stop_bot():

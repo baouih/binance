@@ -179,22 +179,114 @@ class DashboardController {
   async loadStrategies() {
     try {
       const response = await fetch('/api/strategies');
+      if (!response.ok) {
+        throw new Error('Failed to load trading strategies');
+      }
+      
       const strategies = await response.json();
       
       // Populate strategy selector
       const strategySelector = document.getElementById('strategy-selector');
+      const backTestStrategySelector = document.getElementById('backtest-strategy');
+      
+      // Update bot strategy selector
       if (strategySelector) {
         strategySelector.innerHTML = '';
+        
+        // Add default empty option with instructions
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Chọn Chiến Lược (Select Strategy)';
+        defaultOption.selected = true;
+        strategySelector.appendChild(defaultOption);
+        
+        // Add strategy options
         strategies.forEach(strategy => {
           const option = document.createElement('option');
-          option.value = strategy;
-          option.textContent = strategy.charAt(0).toUpperCase() + strategy.slice(1).replace('_', ' ');
+          option.value = strategy.id;
+          option.textContent = strategy.name;
+          option.setAttribute('data-description', strategy.description);
           strategySelector.appendChild(option);
+        });
+        
+        // Add help text element for strategy description if not exists
+        if (!document.getElementById('strategy-description')) {
+          const helpText = document.createElement('small');
+          helpText.id = 'strategy-description';
+          helpText.className = 'form-text text-muted mt-1';
+          helpText.style.display = 'none';
+          strategySelector.parentNode.appendChild(helpText);
+        }
+        
+        // Add event listener to show strategy-specific parameters and description
+        strategySelector.addEventListener('change', (e) => {
+          const selectedStrategy = e.target.value;
+          this.showStrategyParams(selectedStrategy, 'bot');
+          
+          // Show strategy description
+          const selectedOption = strategySelector.options[strategySelector.selectedIndex];
+          const description = selectedOption.getAttribute('data-description');
+          const helpText = document.getElementById('strategy-description');
+          
+          if (helpText && description) {
+            helpText.textContent = description;
+            helpText.style.display = 'block';
+          } else if (helpText) {
+            helpText.style.display = 'none';
+          }
+        });
+      }
+      
+      // Update backtest strategy selector
+      if (backTestStrategySelector) {
+        backTestStrategySelector.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Chọn Chiến Lược (Select Strategy)';
+        defaultOption.selected = true;
+        backTestStrategySelector.appendChild(defaultOption);
+        
+        // Add strategy options
+        strategies.forEach(strategy => {
+          const option = document.createElement('option');
+          option.value = strategy.id;
+          option.textContent = strategy.name;
+          option.setAttribute('data-description', strategy.description);
+          backTestStrategySelector.appendChild(option);
+        });
+        
+        // Add help text element for strategy description if not exists
+        if (!document.getElementById('backtest-strategy-description')) {
+          const helpText = document.createElement('small');
+          helpText.id = 'backtest-strategy-description';
+          helpText.className = 'form-text text-muted mt-1';
+          helpText.style.display = 'none';
+          backTestStrategySelector.parentNode.appendChild(helpText);
+        }
+        
+        // Add event listener to show strategy-specific parameters and description
+        backTestStrategySelector.addEventListener('change', (e) => {
+          const selectedStrategy = e.target.value;
+          this.showStrategyParams(selectedStrategy, 'backtest');
+          
+          // Show strategy description
+          const selectedOption = backTestStrategySelector.options[backTestStrategySelector.selectedIndex];
+          const description = selectedOption.getAttribute('data-description');
+          const helpText = document.getElementById('backtest-strategy-description');
+          
+          if (helpText && description) {
+            helpText.textContent = description;
+            helpText.style.display = 'block';
+          } else if (helpText) {
+            helpText.style.display = 'none';
+          }
         });
       }
     } catch (error) {
       console.error('Error loading strategies:', error);
-      this.showError('Failed to load trading strategies');
+      this.showError('Không thể tải chiến lược giao dịch (Failed to load trading strategies)');
     }
   }
   
