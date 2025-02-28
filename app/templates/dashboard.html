@@ -662,7 +662,11 @@
                 return true;
             }
             
-            // Với các trang khác, ngăn chặn hành vi mặc định
+            // Với các trang khác, lấy URL và điều hướng đến đó
+            const url = link.getAttribute('href');
+            window.location.href = url;
+            
+            // Ngăn chặn hành vi mặc định để tránh điều hướng trùng lặp
             e.preventDefault();
             
             // Xóa active class khỏi tất cả các link
