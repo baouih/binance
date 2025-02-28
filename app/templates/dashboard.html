@@ -413,7 +413,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('settings') }}">
+                        <a class="nav-link" id="settings-link" href="{{ url_for('settings') }}">
                             <i class="fas fa-cog"></i> Cài đặt
                         </a>
                     </li>
@@ -657,7 +657,12 @@
         
         // Xử lý menu click với hiệu ứng tốt hơn
         function handleMenuClick(link, e) {
-            // Với tất cả các trang ngoại trừ settings, ngăn chặn hành vi mặc định
+            // Kiểm tra nếu đây là link settings, cho phép điều hướng trực tiếp
+            if (link.id === 'settings-link') {
+                return true;
+            }
+            
+            // Với các trang khác, ngăn chặn hành vi mặc định
             e.preventDefault();
             
             // Xóa active class khỏi tất cả các link
