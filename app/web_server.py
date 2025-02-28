@@ -323,6 +323,10 @@ def get_market_data():
     # Get current sentiment data
     sentiment_data = sentiment_analyzer.get_current_sentiment(symbol)
     
+    # Generate simulated account data
+    account_balance = 100000.0  # Simulated account balance in USDT
+    available_balance = account_balance * 0.8  # Simulated available balance
+    
     # Generate some simulated metrics
     market_data = {
         'symbol': symbol,
@@ -337,6 +341,13 @@ def get_market_data():
             'category': sentiment_data['category'],
             'label': SentimentAnalyzer.SENTIMENT_CATEGORIES[sentiment_data['category']]['label'],
             'color': SentimentAnalyzer.SENTIMENT_CATEGORIES[sentiment_data['category']]['color']
+        },
+        'account': {
+            'total_balance': account_balance,
+            'available_balance': available_balance,
+            'margin_balance': account_balance * 0.2,
+            'unrealized_pnl': random.uniform(-5000, 5000),
+            'equity': account_balance + random.uniform(-3000, 3000)
         }
     }
     
@@ -391,6 +402,11 @@ def generate_price_data():
     
     # For emitting sentiment updates
     sentiment_update_counter = 0
+    account_update_counter = 0
+    
+    # Generate simulated account data
+    account_balance = 100000.0
+    available_balance = account_balance * 0.8
     
     while should_run:
         # Simulate random price movement
@@ -424,6 +440,30 @@ def generate_price_data():
                 logger.debug(f"Emitting sentiment update: {sentiment_data['sentiment_score']:.2f} ({category})")
             except Exception as e:
                 logger.error(f"Error emitting sentiment update: {str(e)}")
+        
+        # Emit account updates every 3 seconds
+        account_update_counter += 1
+        if account_update_counter >= 3:
+            account_update_counter = 0
+            try:
+                # Simulate some small random changes in account balance and PnL
+                pnl_change = random.uniform(-500, 500)
+                balance_change = random.uniform(-200, 200)
+                
+                # Create account update data
+                account_data = {
+                    'total_balance': account_balance + balance_change,
+                    'available_balance': (account_balance + balance_change) * 0.8,
+                    'margin_balance': (account_balance + balance_change) * 0.2,
+                    'unrealized_pnl': pnl_change,
+                    'equity': account_balance + balance_change + pnl_change
+                }
+                
+                # Emit the account update
+                socketio.emit('account_update', account_data)
+                logger.debug(f"Emitting account update: Balance: {account_data['total_balance']:.2f}, PnL: {account_data['unrealized_pnl']:.2f}")
+            except Exception as e:
+                logger.error(f"Error emitting account update: {str(e)}")
         
         # Sleep for 1 second
         time.sleep(1)
