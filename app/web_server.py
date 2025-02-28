@@ -502,24 +502,36 @@ def get_indicators():
 def create_bot():
     """Create a new trading bot."""
     try:
-        data = request.json
+        # Lấy dữ liệu từ request
+        try:
+            data = request.json
+            logger.info(f"API create_bot nhận được dữ liệu raw: {request.data}")
+            logger.info(f"API create_bot nhận được dữ liệu parsed: {data}")
+        except Exception as e:
+            logger.error(f"API create_bot lỗi khi parse JSON data: {str(e)}")
+            return jsonify({'error': f'Lỗi định dạng dữ liệu JSON: {str(e)}'}), 400
         
-        logger.info(f"API create_bot được gọi với dữ liệu: {data}")
+        if not data:
+            logger.error("API create_bot lỗi: Không có dữ liệu JSON")
+            return jsonify({'error': 'Không có dữ liệu JSON'}), 400
         
+        # Lấy các tham số cần thiết
         symbol = data.get('symbol', 'BTCUSDT')
         interval = data.get('interval', '1h')
         strategy_type = data.get('strategy', 'rsi')
         strategy_params = data.get('params', {})
         
+        logger.info(f"API create_bot: Xử lý yêu cầu với symbol={symbol}, interval={interval}, strategy={strategy_type}, params={strategy_params}")
+        
         # Kiểm tra và xác thực tham số đầu vào
         if not symbol or not interval:
-            logger.error(f"Tạo bot lỗi: Thiếu thông tin cặp giao dịch hoặc khung thời gian")
+            logger.error(f"API create_bot lỗi: Thiếu thông tin cặp giao dịch hoặc khung thời gian")
             return jsonify({'error': 'Thiếu thông tin cặp giao dịch hoặc khung thời gian (Missing symbol or interval)'}), 400
             
         # Xử lý strategy_type để hỗ trợ giá trị trống từ form
         if not strategy_type or strategy_type == "null" or strategy_type == "undefined":
             strategy_type = 'rsi'  # Mặc định dùng RSI nếu không chọn
-            logger.info(f"Sử dụng chiến lược mặc định: {strategy_type}")
+            logger.info(f"API create_bot: Sử dụng chiến lược mặc định: {strategy_type}")
         
         logger.info(f"Creating bot for {symbol} with {strategy_type} strategy, interval: {interval}")
         

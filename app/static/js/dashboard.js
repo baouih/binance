@@ -597,15 +597,26 @@ class DashboardController {
       
       console.log('Creating bot with data:', botData);
       
-      const response = await fetch('/api/create_bot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(botData)
-      });
-      
-      const result = await response.json();
+      try {
+        const response = await fetch('/api/create_bot', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(botData)
+        });
+        
+        console.log('Create bot response status:', response.status);
+        
+        // Kiểm tra xem response có phải là JSON hay không
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Received non-JSON response:', await response.text());
+          throw new Error('Server did not return JSON response');
+        }
+        
+        const result = await response.json();
+        console.log('Create bot result:', result);
       
       if (response.ok && result.bot_id) {
         this.showSuccess(result.message || `Bot tạo thành công với ID: ${result.bot_id}`);
@@ -616,9 +627,14 @@ class DashboardController {
       }
       
       this.showLoading(false);
+      } catch (error) {
+        console.error('Error creating bot:', error);
+        this.showError('Lỗi khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
+        this.showLoading(false);
+      }
     } catch (error) {
-      console.error('Error creating bot:', error);
-      this.showError('Lỗi khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
+      console.error('Error in createTradeBot top-level:', error);
+      this.showError('Lỗi nghiêm trọng khi tạo bot: ' + (error.message || 'Không rõ lỗi'));
       this.showLoading(false);
     }
   }
