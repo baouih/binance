@@ -68,7 +68,7 @@ class AdvancedMLStrategy(Strategy):
         self.performance_by_regime = {}
         
         # Thống kê hiệu suất
-        for regime in self.market_regime_detector.REGIMES:
+        for regime in self.market_regime_detector.REGIME_THRESHOLDS.keys():
             self.performance_by_regime[regime] = {
                 'wins': 0,
                 'losses': 0,

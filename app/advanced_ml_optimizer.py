@@ -456,30 +456,47 @@ class AdvancedMLOptimizer:
         Args:
             directory: Thư mục để lưu mô hình
         """
-        # Tạo thư mục nếu chưa tồn tại
-        os.makedirs(directory, exist_ok=True)
-        
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = os.path.join(directory, f'ml_models_{timestamp}.pkl')
-        
-        save_data = {
-            'models': self.models,
-            'scalers': self.scalers,
-            'feature_selectors': self.feature_selectors,
-            'feature_importances': self.feature_importances,
-            'model_metrics': self.model_metrics,
-            'base_models': self.base_models,
-            'use_model_per_regime': self.use_model_per_regime,
-            'feature_selection': self.feature_selection,
-            'use_ensemble': self.use_ensemble,
-            'selected_features': self.selected_features,
-            'timestamp': timestamp
-        }
-        
-        joblib.dump(save_data, filename)
-        logger.info(f"Đã lưu mô hình vào {filename}")
-        
-        return filename
+        try:
+            # Kiểm tra nếu đường dẫn chứa .joblib, thì lấy thư mục cha
+            if '.joblib' in directory:
+                parent_dir = os.path.dirname(directory)
+                os.makedirs(parent_dir, exist_ok=True)
+                base_path = parent_dir
+            else:
+                # Nếu không, sử dụng như thư mục
+                os.makedirs(directory, exist_ok=True)
+                base_path = directory
+            
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = os.path.join(base_path, f'ml_models_{timestamp}.pkl')
+            
+            save_data = {
+                'models': self.models,
+                'scalers': self.scalers,
+                'feature_selectors': self.feature_selectors,
+                'feature_importances': self.feature_importances,
+                'model_metrics': self.model_metrics,
+                'base_models': self.base_models,
+                'use_model_per_regime': self.use_model_per_regime,
+                'feature_selection': self.feature_selection,
+                'use_ensemble': self.use_ensemble,
+                'selected_features': self.selected_features,
+                'timestamp': timestamp
+            }
+            
+            joblib.dump(save_data, filename)
+            logger.info(f"Đã lưu mô hình vào {filename}")
+            
+            return filename
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu mô hình: {str(e)}")
+            # Dự phòng: lưu trong thư mục models gốc
+            fallback_dir = 'models' 
+            os.makedirs(fallback_dir, exist_ok=True)
+            fallback_filename = os.path.join(fallback_dir, f'ml_models_backup_{timestamp}.pkl')
+            joblib.dump(save_data, fallback_filename)
+            logger.info(f"Đã lưu mô hình dự phòng vào {fallback_filename}")
+            return fallback_filename
     
     def load_models(self, filename):
         """
@@ -492,7 +509,28 @@ class AdvancedMLOptimizer:
             success: True nếu tải thành công, False nếu thất bại
         """
         try:
-            save_data = joblib.load(filename)
+            # Kiểm tra nếu đường dẫn là thư mục
+            if os.path.isdir(filename):
+                # Nếu là thư mục, tìm file pkl mới nhất
+                model_files = []
+                for root, dirs, files in os.walk(filename):
+                    for file in files:
+                        if file.endswith('.pkl'):
+                            model_files.append(os.path.join(root, file))
+                
+                if not model_files:
+                    logger.error(f"Không tìm thấy file mô hình nào trong thư mục {filename}")
+                    return False
+                
+                # Lấy file mới nhất dựa trên ngày sửa đổi
+                latest_model = max(model_files, key=os.path.getmtime)
+                logger.info(f"Tải mô hình mới nhất: {latest_model}")
+                actual_file = latest_model
+            else:
+                actual_file = filename
+            
+            # Tải mô hình từ file
+            save_data = joblib.load(actual_file)
             
             self.models = save_data['models']
             self.scalers = save_data['scalers']
@@ -505,7 +543,7 @@ class AdvancedMLOptimizer:
             self.use_ensemble = save_data.get('use_ensemble', self.use_ensemble)
             self.selected_features = save_data.get('selected_features', {})
             
-            logger.info(f"Đã tải mô hình từ {filename}")
+            logger.info(f"Đã tải mô hình từ {actual_file}")
             logger.info(f"Số lượng mô hình: {len(self.models)}")
             
             return True

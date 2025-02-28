@@ -108,12 +108,27 @@ def train_ml_models(symbol='BTCUSDT', timeframes=['1h', '4h', '1d']):
         
         # Chia dữ liệu thành các chế độ thị trường khác nhau
         regime_data = {}
+        # Cần đảm bảo df_train có cùng kích thước với X và y đã điều chỉnh
+        df_train = df_train.iloc[:len(X)]
+        
+        # Kiểm tra lại kích thước
+        if len(df_train) != len(X) or len(df_train) != len(y):
+            logger.warning(f"Kích thước không khớp: df_train={len(df_train)}, X={len(X)}, y={len(y)}")
+            # Điều chỉnh lại để đảm bảo tất cả đều có cùng kích thước
+            min_len = min(len(df_train), len(X), len(y))
+            df_train = df_train.iloc[:min_len]
+            X = X.iloc[:min_len]
+            y = y[:min_len]
+            logger.info(f"Đã điều chỉnh lại kích thước: df_train={len(df_train)}, X={len(X)}, y={len(y)}")
+        
         for regime in market_regime_detector.REGIME_THRESHOLDS.keys():
             mask = df_train['regime'] == regime
             if sum(mask) > 30:  # Cần ít nhất 30 mẫu để huấn luyện
+                # Sử dụng index để đảm bảo tương thích
+                regime_indices = df_train[mask].index
                 regime_data[regime] = {
-                    'X': X[mask],
-                    'y': y[mask]
+                    'X': X.loc[regime_indices],
+                    'y': y[df_train.index.get_indexer(regime_indices)]
                 }
                 logger.info(f"Chế độ {regime}: {sum(mask)} mẫu")
         

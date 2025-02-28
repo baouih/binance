@@ -1,1 +1,30 @@
-{}
+{
+  "1h": {
+    "performance": {
+      "ranging": {}
+    },
+    "model_path": "models/BTCUSDT_1h_ml_models.joblib",
+    "data_length": 1000,
+    "regimes": {
+      "trending_up": 0,
+      "trending_down": 0,
+      "volatile": 0,
+      "ranging": 890,
+      "breakout": 0
+    }
+  },
+  "4h": {
+    "performance": {
+      "ranging": {}
+    },
+    "model_path": "models/BTCUSDT_4h_ml_models.joblib",
+    "data_length": 1000,
+    "regimes": {
+      "trending_up": 0,
+      "trending_down": 0,
+      "volatile": 0,
+      "ranging": 890,
+      "breakout": 0
+    }
+  }
+}
