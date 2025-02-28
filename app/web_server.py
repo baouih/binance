@@ -271,6 +271,36 @@ def index():
     """Render the main dashboard."""
     return render_template('index.html')
 
+@app.route('/analysis')
+def market_analysis():
+    """Trang phân tích thị trường."""
+    return render_template('under_development.html', title="Phân tích thị trường")
+
+@app.route('/positions')
+def positions():
+    """Trang vị thế đang mở."""
+    return render_template('under_development.html', title="Vị thế đang mở")
+
+@app.route('/history')
+def trade_history():
+    """Trang lịch sử giao dịch."""
+    return render_template('under_development.html', title="Lịch sử giao dịch")
+
+@app.route('/strategy')
+def strategy():
+    """Trang chiến lược giao dịch."""
+    return render_template('under_development.html', title="Chiến lược giao dịch")
+
+@app.route('/testing')
+def testing():
+    """Trang kiểm thử chiến lược."""
+    return render_template('under_development.html', title="Kiểm thử chiến lược")
+
+@app.route('/bot')
+def bot_management():
+    """Trang quản lý bot."""
+    return render_template('under_development.html', title="Quản lý bot")
+
 @app.route('/trading_dashboard')
 def trading_dashboard():
     """Render the trading dashboard."""
