@@ -499,23 +499,43 @@ def run_backtest(config):
         equity_curve[-1] = balance
     
     # Tính toán các chỉ số hiệu suất
-    winning_trades = [t for t in trades if t['pnl'] > 0]
-    losing_trades = [t for t in trades if t['pnl'] <= 0]
+    winning_trades = [t for t in trades if t.get('pnl', 0) > 0]
+    losing_trades = [t for t in trades if t.get('pnl', 0) <= 0]
     
     win_rate = len(winning_trades) / len(trades) * 100 if trades else 0
-    total_profit = sum([t['pnl'] for t in winning_trades]) if winning_trades else 0
-    total_loss = sum([t['pnl'] for t in losing_trades]) if losing_trades else 0
     
-    profit_factor = abs(total_profit / total_loss) if total_loss != 0 else float('inf')
+    # Lọc ra các giá trị NaN trong quá trình tính tổng
+    total_profit = 0
+    for t in winning_trades:
+        pnl = t.get('pnl', 0)
+        if pnl is not None and not np.isnan(pnl):
+            total_profit += pnl
+    
+    total_loss = 0
+    for t in losing_trades:
+        pnl = t.get('pnl', 0)
+        if pnl is not None and not np.isnan(pnl):
+            total_loss += pnl
+    
+    # Xử lý trường hợp chia cho 0 hoặc NaN
+    if total_loss != 0 and not np.isnan(total_loss):
+        profit_factor = abs(total_profit / total_loss)
+    else:
+        profit_factor = 0 if total_profit == 0 else 100  # Giá trị lớn nếu không có lỗ
     
     # Tính drawdown
-    max_equity = equity_curve[0]
-    max_drawdown = 0
-    
-    for equity in equity_curve:
-        max_equity = max(max_equity, equity)
-        drawdown = (max_equity - equity) / max_equity * 100
-        max_drawdown = max(max_drawdown, drawdown)
+    if equity_curve and not np.isnan(equity_curve[0]):
+        max_equity = equity_curve[0]
+        max_drawdown = 0
+        
+        for equity in equity_curve:
+            if not np.isnan(equity):
+                max_equity = max(max_equity, equity)
+                if max_equity > 0:  # Tránh chia cho 0
+                    drawdown = (max_equity - equity) / max_equity * 100
+                    max_drawdown = max(max_drawdown, drawdown)
+    else:
+        max_drawdown = 0
     
     # Kết quả
     performance = {

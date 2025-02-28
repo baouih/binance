@@ -1,0 +1,69 @@
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "initial_balance": 10000.0,
+  "risk_percentage": 1.0,
+  "leverage": 3,
+  "check_interval": 60,
+  "run_duration": 3600,
+  "backtest_days": 30,
+  "simulation_mode": true,
+  "strategies": {
+    "rsi": {
+      "enabled": true,
+      "overbought": 70,
+      "oversold": 30,
+      "weight": 0.3
+    },
+    "macd": {
+      "enabled": true,
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9,
+      "weight": 0.2
+    },
+    "ema_cross": {
+      "enabled": true,
+      "short_period": 9,
+      "long_period": 21,
+      "weight": 0.15
+    },
+    "bollinger_bands": {
+      "enabled": true,
+      "period": 20,
+      "std_dev": 2.0,
+      "weight": 0.15
+    },
+    "ml": {
+      "enabled": true,
+      "probability_threshold": 0.65,
+      "weight": 0.2
+    }
+  },
+  "risk_management": {
+    "take_profit_pct": 5.0,
+    "stop_loss_pct": 2.0,
+    "trailing_stop": true,
+    "ts_activation_pct": 2.5,
+    "ts_callback_pct": 1.0,
+    "dynamic_position_sizing": true,
+    "max_open_trades": 3,
+    "max_daily_trades": 10
+  },
+  "advanced_features": {
+    "use_multi_timeframe": true,
+    "use_composite_indicators": true,
+    "use_liquidity_analysis": true,
+    "use_market_regimes": true,
+    "use_ml": true
+  },
+  "additional_timeframes": ["15m", "4h", "1d"],
+  "notifications": {
+    "enable_telegram": false,
+    "telegram_bot_token": "",
+    "telegram_chat_id": "",
+    "notify_on_trade": true,
+    "notify_on_signal": false,
+    "notify_on_error": true
+  }
+}

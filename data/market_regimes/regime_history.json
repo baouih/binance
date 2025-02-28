@@ -68,6 +68,30 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T16:49:40.769308",
+    "end_time": "2025-02-28T16:50:29.879544",
+    "duration": 0.8185040166666667
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:50:29.879555",
+    "end_time": "2025-02-28T16:51:30.720352",
+    "duration": 1.0140134
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:51:30.720366",
+    "end_time": "2025-02-28T16:51:30.878170",
+    "duration": 0.0026301333333333334
+  },
+  {
+    "regime": "trending_up",
+    "start_time": "2025-02-28T16:51:30.878180",
+    "end_time": "2025-02-28T16:51:52.338990",
+    "duration": 0.35768025
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T16:51:52.339001",
     "end_time": null,
     "duration": 0
   }
