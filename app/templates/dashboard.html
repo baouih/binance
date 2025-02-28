@@ -28,6 +28,37 @@
           <div class="current-price mb-3">
             <h2 id="current-price">0.00</h2>
             <div class="d-flex justify-content-between">
+              
+              <!-- Market Sentiment Indicator -->
+              <div id="sentiment-container" class="mt-3 p-3 border rounded" style="border-width: 2px;">
+                <h6 class="mb-2">Market Sentiment</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fs-4" id="sentiment-value">50.0</span>
+                  <span class="badge bg-secondary" id="sentiment-label">Neutral</span>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                  <small class="text-muted">Bearish</small>
+                  <small class="text-muted">Bullish</small>
+                </div>
+                <div class="progress mt-1">
+                  <div id="sentiment-progress" class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-4">
+                    <small class="d-block text-muted">Technical</small>
+                    <span id="technical-sentiment">50.0</span>
+                  </div>
+                  <div class="col-4">
+                    <small class="d-block text-muted">Social</small>
+                    <span id="social-sentiment">50.0</span>
+                  </div>
+                  <div class="col-4">
+                    <small class="d-block text-muted">Fear/Greed</small>
+                    <span id="fear-greed-index">50.0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
               <div>
                 <span class="text-secondary small">24h High</span>
                 <div id="price-high">0.00</div>

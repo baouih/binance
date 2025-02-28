@@ -21,6 +21,7 @@ try:
     from app.strategy import StrategyFactory
     from app.trading_bot import TradingBot
     from app.ml_optimizer import MLOptimizer
+    from app.sentiment_analyzer import SentimentAnalyzer
     logger.info("Successfully imported all required packages")
 except ImportError as e:
     logger.error(f"Error importing required packages: {str(e)}")
@@ -41,12 +42,13 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 binance_api = BinanceAPI(simulation_mode=True)
 data_processor = DataProcessor(binance_api, simulation_mode=True)
 ml_optimizer = MLOptimizer()
+sentiment_analyzer = SentimentAnalyzer(data_processor=data_processor, simulation_mode=True)
 trading_bots = {}
 
 # Data generation thread (for simulating real-time price updates)
 data_thread = None
 should_run = False
-current_price = 63500.0  # Updated BTC price as of February 2024
+current_price = 84106.3  # Updated BTC price as of February 2024 from Binance Futures
 
 # Store backtesting results
 backtest_results = {}
@@ -318,6 +320,9 @@ def get_market_data():
     # In simulation mode, use the current price
     price = current_price
     
+    # Get current sentiment data
+    sentiment_data = sentiment_analyzer.get_current_sentiment(symbol)
+    
     # Generate some simulated metrics
     market_data = {
         'symbol': symbol,
@@ -326,10 +331,47 @@ def get_market_data():
         'volume_24h': price * random.uniform(5000, 20000),
         'high_24h': price * (1 + random.uniform(0.01, 0.05)),
         'low_24h': price * (1 - random.uniform(0.01, 0.05)),
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now().isoformat(),
+        'sentiment': {
+            'score': sentiment_data['sentiment_score'],
+            'category': sentiment_data['category'],
+            'label': SentimentAnalyzer.SENTIMENT_CATEGORIES[sentiment_data['category']]['label'],
+            'color': SentimentAnalyzer.SENTIMENT_CATEGORIES[sentiment_data['category']]['color']
+        }
     }
     
     return jsonify(market_data)
+
+@app.route('/api/sentiment', methods=['GET'])
+def get_sentiment():
+    """Get current market sentiment data."""
+    symbol = request.args.get('symbol', 'BTCUSDT')
+    
+    # Get current sentiment
+    sentiment_data = sentiment_analyzer.get_current_sentiment(symbol)
+    
+    # Add label and color info
+    category = sentiment_data['category']
+    sentiment_data['label'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['label']
+    sentiment_data['color'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['color']
+    
+    return jsonify(sentiment_data)
+
+@app.route('/api/sentiment/history', methods=['GET'])
+def get_sentiment_history():
+    """Get historical market sentiment data."""
+    hours = int(request.args.get('hours', 24))
+    
+    # Get sentiment history
+    history = sentiment_analyzer.get_sentiment_history(hours=hours)
+    
+    # Add label and color info to each data point
+    for item in history:
+        category = item['category']
+        item['label'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['label']
+        item['color'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['color']
+    
+    return jsonify(history)
 
 # SocketIO event handlers
 @socketio.on('connect')
@@ -347,6 +389,9 @@ def generate_price_data():
     """Generate simulated price data."""
     global current_price, should_run
     
+    # For emitting sentiment updates
+    sentiment_update_counter = 0
+    
     while should_run:
         # Simulate random price movement
         change_pct = random.normalvariate(0, 0.002)  # Mean 0, std dev 0.2%
@@ -359,6 +404,26 @@ def generate_price_data():
             'price': current_price,
             'time': datetime.now().isoformat()
         })
+        
+        # Emit sentiment updates every 5 seconds to avoid too much load
+        sentiment_update_counter += 1
+        if sentiment_update_counter >= 5:
+            sentiment_update_counter = 0
+            try:
+                # Get current sentiment
+                symbol = 'BTCUSDT'
+                sentiment_data = sentiment_analyzer.get_current_sentiment(symbol)
+                
+                # Add label and color
+                category = sentiment_data['category']
+                sentiment_data['label'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['label']
+                sentiment_data['color'] = SentimentAnalyzer.SENTIMENT_CATEGORIES[category]['color']
+                
+                # Emit the sentiment update
+                socketio.emit('sentiment_update', sentiment_data)
+                logger.debug(f"Emitting sentiment update: {sentiment_data['sentiment_score']:.2f} ({category})")
+            except Exception as e:
+                logger.error(f"Error emitting sentiment update: {str(e)}")
         
         # Sleep for 1 second
         time.sleep(1)
