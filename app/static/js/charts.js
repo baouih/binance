@@ -39,8 +39,24 @@ class TradingCharts {
       return;
     }
     
+    // Initialize chart data if needed
+    if (!this.chartData) {
+      this.chartData = { 
+        ohlc: [], 
+        volume: [],
+        timestamps: []
+      };
+      
+      // Generate sample data if none provided
+      if (!data) {
+        console.log('No initial price data, generating sample data');
+        data = this._generateSampleData();
+      }
+    }
+    
     // If we have data, process it
     if (data) {
+      console.log(`Processing ${data.length} data points for chart`);
       this.updateChartData(data);
     }
     

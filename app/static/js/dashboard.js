@@ -547,10 +547,13 @@ class DashboardController {
   async createTradeBot() {
     try {
       this.showLoading(true);
+      console.log("Creating new trading bot...");
       
       // Get strategy parameters from botStrategySelector (not strategySelector)
       const botStrategySelector = document.getElementById('bot-strategy');
       const strategy = botStrategySelector ? botStrategySelector.value : '';
+      
+      console.log("Selected strategy:", strategy);
       
       if (!strategy) {
         this.showError('Vui lòng chọn chiến lược giao dịch (Please select a trading strategy)');
