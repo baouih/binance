@@ -273,7 +273,7 @@ def index():
 
 @app.route('/trading_dashboard')
 def trading_dashboard():
-    """Render the trading dashboard (alias)."""
+    """Render the trading dashboard."""
     return render_template('dashboard.html')
 
 @app.route('/backtesting')

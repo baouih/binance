@@ -274,7 +274,7 @@
         Are you sure you want to proceed?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancelActionBtn">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
       </div>
     </div>
@@ -354,19 +354,6 @@
         if (data.status === 'success') {
           updateNetworkDisplay(useTestnet);
           showToast(`Đã chuyển sang chế độ ${useTestnet ? 'TESTNET' : 'MAINNET'}`, 'success');
-          
-          // Update navigation bar without page refresh
-          const simulationBadge = document.querySelector('.navbar-nav .badge');
-          if (simulationBadge) {
-            simulationBadge.textContent = useTestnet ? 'Testnet Mode' : 'MAINNET';
-            simulationBadge.className = useTestnet ? 'badge bg-info' : 'badge bg-danger';
-          }
-          
-          // Update footer status
-          const footerStatus = document.querySelector('footer .text-warning');
-          if (footerStatus) {
-            footerStatus.textContent = `${useTestnet ? 'Testnet' : 'MAINNET'} Mode: ${useTestnet ? 'Using test network' : 'USING REAL MONEY'}`;
-          }
         } else {
           showToast(`Lỗi: ${data.message}`, 'danger');
           // Revert switch if there was an error
@@ -396,31 +383,6 @@
         if (data.status === 'success') {
           updateSimulationDisplay(useSimulation);
           showToast(`Đã ${useSimulation ? 'BẬT' : 'TẮT'} chế độ mô phỏng`, 'success');
-          
-          // Update navigation bar badge without page refresh
-          const navbarBadge = document.querySelector('.navbar-nav .badge');
-          if (navbarBadge) {
-            if (useSimulation) {
-              navbarBadge.textContent = 'Simulation Mode';
-              navbarBadge.className = 'badge bg-warning';
-            } else {
-              // Keep the current network status badge (could be testnet or mainnet)
-              const isTestnet = testnetSwitch.checked;
-              navbarBadge.textContent = isTestnet ? 'Testnet Mode' : 'MAINNET';
-              navbarBadge.className = isTestnet ? 'badge bg-info' : 'badge bg-danger';
-            }
-          }
-          
-          // Update footer status too
-          const footerStatus = document.querySelector('footer .text-warning');
-          if (footerStatus) {
-            if (useSimulation) {
-              footerStatus.textContent = 'Simulation Mode: No real trades are executed';
-            } else {
-              const isTestnet = testnetSwitch.checked;
-              footerStatus.textContent = `${isTestnet ? 'Testnet' : 'MAINNET'} Mode: ${isTestnet ? 'Using test network' : 'USING REAL MONEY'}`;
-            }
-          }
         } else {
           showToast(`Lỗi: ${data.message}`, 'danger');
           simulationSwitch.checked = !useSimulation;
@@ -686,64 +648,46 @@
     
     // Confirmation modal helper
     function showConfirmationModal(title, message, onConfirm, onCancel) {
-      // Get the modal element
-      const modalEl = document.getElementById('confirmationModal');
-      
-      // Create a new Bootstrap modal instance
-      const modal = new bootstrap.Modal(modalEl);
-      
-      // Set the title and message
+      const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
       document.getElementById('confirmationModalLabel').textContent = title;
       document.getElementById('confirmationModalBody').textContent = message;
       
-      // Get the confirm and cancel buttons
       const confirmBtn = document.getElementById('confirmActionBtn');
-      const cancelBtn = document.querySelector('#confirmationModal .btn-secondary');
-      const closeBtn = document.querySelector('#confirmationModal .btn-close');
       
-      // Remove any existing event listeners
-      const confirmClone = confirmBtn.cloneNode(true);
-      const cancelClone = cancelBtn.cloneNode(true);
-      const closeClone = closeBtn.cloneNode(true);
+      // Remove previous event listeners
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
       
-      confirmBtn.parentNode.replaceChild(confirmClone, confirmBtn);
-      cancelBtn.parentNode.replaceChild(cancelClone, cancelBtn);
-      closeBtn.parentNode.replaceChild(closeClone, closeBtn);
-      
-      // Create event handlers
-      const handleConfirm = function() {
+      // Add new event listener
+      newConfirmBtn.addEventListener('click', function() {
         modal.hide();
-        // Add a small delay to make sure modal is fully hidden
-        setTimeout(() => {
-          onConfirm();
-        }, 300);
-      };
+        onConfirm();
+      });
       
-      const handleCancel = function() {
-        modal.hide();
-        // If a cancel handler was provided, call it
-        if (onCancel) {
-          // Add a small delay to make sure modal is fully hidden
-          setTimeout(() => {
-            onCancel();
-          }, 300);
-        }
-      };
-      
-      // Add event listeners to new buttons
-      confirmClone.addEventListener('click', handleConfirm);
-      cancelClone.addEventListener('click', handleCancel);
-      closeClone.addEventListener('click', handleCancel);
-      
-      // Clear any previous hidden event handlers
-      modalEl.removeEventListener('hidden.bs.modal', handleCancel);
-      
-      // Add a new hidden event handler
+      // Add cancel listener if provided
       if (onCancel) {
-        modalEl.addEventListener('hidden.bs.modal', handleCancel, { once: true });
+        const closeBtn = document.querySelector('#confirmationModal .btn-close');
+        const cancelBtn = document.querySelector('#confirmationModal .btn-secondary');
+        
+        const handleCancel = function() {
+          onCancel();
+        };
+        
+        // Clone and replace to remove old listeners
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        // Add new cancel listeners
+        newCloseBtn.addEventListener('click', handleCancel);
+        newCancelBtn.addEventListener('click', handleCancel);
+        
+        // Also handle modal dismiss
+        modal._element.addEventListener('hidden.bs.modal', handleCancel, { once: true });
       }
       
-      // Show the modal
       modal.show();
     }
     

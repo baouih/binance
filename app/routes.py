@@ -5,7 +5,7 @@ def register_routes(app):
     Đăng ký các tuyến đường bổ sung cho ứng dụng.
     """
     # Trang dashboard mới
-    @app.route('/dashboard')
+    @app.route('/')
     def dashboard():
         """Trang dashboard chính với biểu đồ thời gian thực."""
         return render_template('dashboard.html')
