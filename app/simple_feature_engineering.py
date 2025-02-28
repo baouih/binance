@@ -298,8 +298,8 @@ class SimpleFeatureEngineering:
         # Tạo bản sao để tránh thay đổi dataframe gốc
         df_result = df.copy()
         
-        # Điền các giá trị NA bằng phương pháp bfill và ffill
-        df_result = df_result.fillna(method='ffill').fillna(method='bfill')
+        # Điền các giá trị NA bằng phương pháp ffill rồi đến bfill
+        df_result = df_result.ffill().bfill()
         
         # Thay thế các giá trị vô cùng bằng NaN, sau đó điền bằng 0
         df_result = df_result.replace([np.inf, -np.inf], np.nan).fillna(0)

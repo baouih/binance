@@ -661,7 +661,7 @@ class AdvancedMLOptimizer:
         
         return X
     
-    def prepare_target_for_training(self, df, lookahead=1, threshold=0):
+    def prepare_target_for_training(self, df, lookahead=1, threshold=0.0):
         """
         Chuẩn bị nhãn mục tiêu cho đào tạo
         
@@ -677,16 +677,42 @@ class AdvancedMLOptimizer:
             logger.error("Cột 'close' không có trong DataFrame")
             return None
             
+        # Tạo một bản sao để tránh ảnh hưởng đến DataFrame gốc
+        df_copy = df.copy()
+        
         # Tính toán phần trăm thay đổi giá sau lookahead chu kỳ
-        df['future_return'] = df['close'].shift(-lookahead) / df['close'] - 1
+        df_copy['future_return'] = df_copy['close'].shift(-lookahead) / df_copy['close'] - 1
         
         # Tạo nhãn
-        y = np.zeros(len(df))
-        y[df['future_return'] > threshold] = 1  # Tăng
-        y[df['future_return'] < -threshold] = -1  # Giảm
+        y = np.zeros(len(df_copy))
+        mask_up = df_copy['future_return'] > threshold
+        mask_down = df_copy['future_return'] < -threshold
         
-        # Loại bỏ các giá trị NaN ở cuối
-        y = y[:-lookahead]
+        # Thay thế giá trị NaN bằng False trước khi gán
+        mask_up = mask_up.fillna(False)
+        mask_down = mask_down.fillna(False)
+        
+        y[mask_up] = 1  # Tăng
+        y[mask_down] = -1  # Giảm
+        
+        # Xử lý các giá trị NaN ở cuối
+        if lookahead > 0:
+            # Cắt bỏ các hàng cuối cùng có giá trị NaN
+            y = y[:-lookahead]
+        
+        # Đảm bảo kích thước y khớp với X
+        X = self.prepare_features_for_prediction(df)
+        if len(X) > len(y):
+            # Cắt X để khớp với y
+            X = X[:len(y)]
+            logger.info(f"Đã cắt X từ {len(df)} xuống {len(y)} để khớp với y")
+        elif len(X) < len(y):
+            # Cắt y để khớp với X
+            y = y[:len(X)]
+            logger.info(f"Đã cắt y từ {len(df)-lookahead} xuống {len(X)} để khớp với X")
+        
+        # Thông báo kích thước cuối cùng
+        logger.info(f"Kích thước cuối cùng: X = {len(X)}, y = {len(y)}")
         
         return y
 

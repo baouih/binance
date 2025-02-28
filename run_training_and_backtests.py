@@ -90,8 +90,20 @@ def train_ml_models(symbol='BTCUSDT', timeframes=['1h', '4h', '1d']):
         X = ml_optimizer.prepare_features_for_prediction(df_train)
         y = ml_optimizer.prepare_target_for_training(df_train, lookahead=10, threshold=0.5)
         
+        if X is None or y is None:
+            logger.error("X hoặc y là None, không thể tiếp tục huấn luyện")
+            continue
+            
         if len(X) != len(y):
-            logger.error(f"Kích thước X ({len(X)}) và y ({len(y)}) không khớp")
+            logger.warning(f"Kích thước X ({len(X)}) và y ({len(y)}) không khớp, đang điều chỉnh...")
+            # Điều chỉnh kích thước để khớp nhau
+            min_len = min(len(X), len(y))
+            X = X.iloc[:min_len]
+            y = y[:min_len]
+            logger.info(f"Đã điều chỉnh kích thước: X = {len(X)}, y = {len(y)}")
+            
+        if len(X) < 100:
+            logger.error(f"Không đủ dữ liệu sau khi điều chỉnh kích thước (chỉ có {len(X)} mẫu)")
             continue
         
         # Chia dữ liệu thành các chế độ thị trường khác nhau

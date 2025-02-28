@@ -5,12 +5,12 @@
     "avg_duration": 0.0
   },
   "neutral": {
-    "count": 12,
+    "count": 14,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "ranging": {
-    "count": 1,
+    "count": 3,
     "total_duration": 0,
     "avg_duration": 0.0
   }
