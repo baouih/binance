@@ -301,41 +301,13 @@
     
     // Set up event listeners for network switches
     testnetSwitch.addEventListener('change', function() {
-      // Show confirmation if switching to mainnet
-      if (!this.checked) {
-        showConfirmationModal(
-          'Chuyển sang Mainnet',
-          'Cảnh báo: Chuyển sang Mainnet sẽ sử dụng tiền thật trong tài khoản Binance của bạn. Bạn có chắc chắn muốn tiếp tục?',
-          function() {
-            updateNetworkSettings(false);
-          },
-          function() {
-            // If user cancels, revert switch state
-            testnetSwitch.checked = true;
-          }
-        );
-      } else {
-        updateNetworkSettings(true);
-      }
+      // Direct update without confirmation dialog
+      updateNetworkSettings(this.checked);
     });
     
     simulationSwitch.addEventListener('change', function() {
-      // Show confirmation if disabling simulation mode
-      if (!this.checked) {
-        showConfirmationModal(
-          'Tắt Chế Độ Mô Phỏng',
-          'Cảnh báo: Tắt chế độ mô phỏng sẽ cho phép thực hiện giao dịch thật. Bạn có chắc chắn muốn tiếp tục?',
-          function() {
-            updateSimulationSettings(false);
-          },
-          function() {
-            // If user cancels, revert switch state
-            simulationSwitch.checked = true;
-          }
-        );
-      } else {
-        updateSimulationSettings(true);
-      }
+      // Direct update without confirmation dialog
+      updateSimulationSettings(this.checked);
     });
     
     // Network settings update function
