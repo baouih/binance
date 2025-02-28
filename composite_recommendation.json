@@ -4,7 +4,7 @@
   "confidence": 20.000000000000004,
   "composite_score": -0.20000000000000004,
   "score_trend": "\u0111i ngang",
-  "price": 0.0,
+  "price": 42074.7375,
   "individual_signals": {
     "volume_trend": {
       "score": -0.2,
@@ -13,7 +13,7 @@
   },
   "description": "B\u00c1N nh\u1eb9 v\u1edbi \u0111\u1ed9 tin c\u1eady 20.0%. \u0110i\u1ec3m t\u1ed5ng h\u1ee3p -0.20 \u0111ang c\u00f3 xu h\u01b0\u1edbng \u0111i ngang.",
   "action": "B\u00c1N",
-  "take_profit": 0.0,
-  "stop_loss": 0.0,
-  "action_details": "B\u00c1N t\u1ea1i 0.00, M\u1ee5c ti\u00eau: 0.00, D\u1eebng l\u1ed7: 0.00, T\u1ef7 l\u1ec7 RR: nan"
+  "take_profit": 41906.438550000006,
+  "stop_loss": 42158.886975,
+  "action_details": "B\u00c1N t\u1ea1i 42074.74, M\u1ee5c ti\u00eau: 41906.44, D\u1eebng l\u1ed7: 42158.89, T\u1ef7 l\u1ec7 RR: 2.00"
 }

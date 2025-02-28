@@ -1,0 +1,29 @@
+{
+  "initial_balance": 10000.0,
+  "current_balance": 10000.0,
+  "risk_percentage": 1.0,
+  "timeframes": [
+    "1h",
+    "4h",
+    "1d"
+  ],
+  "use_multi_timeframe": true,
+  "use_composite_indicators": true,
+  "use_liquidity_analysis": true,
+  "use_market_regimes": true,
+  "open_positions": [],
+  "closed_positions": [],
+  "performance_metrics": {
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "total_profit": 0.0,
+    "total_loss": 0.0,
+    "max_drawdown": 0.0,
+    "win_rate": 0.0,
+    "profit_factor": 0.0,
+    "average_profit": 0.0,
+    "average_loss": 0.0
+  },
+  "timestamp": "2025-02-28T17:22:53.398452"
+}
