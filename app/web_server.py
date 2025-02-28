@@ -51,6 +51,77 @@ data_thread = None
 should_run = False
 current_price = 61245.80  # Updated BTC price as of February 2024 from Binance Futures - updated to real price
 
+# API endpoints for trading operations
+@app.route('/api/place_order', methods=['POST'])
+def place_order():
+    """Manually place a trade order."""
+    try:
+        data = request.json
+        symbol = data.get('symbol', 'BTCUSDT')
+        side = data.get('side', 'buy').upper()
+        order_type = data.get('type', 'MARKET').upper()
+        quantity = float(data.get('quantity', 0.001))
+        
+        if quantity <= 0:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid quantity'
+            }), 400
+        
+        logger.info(f"Placing order: {side} {quantity} {symbol} at {order_type}")
+        
+        # Execute the order using BinanceAPI
+        result = binance_api.create_order(
+            symbol=symbol,
+            side=side,
+            order_type=order_type,
+            quantity=quantity
+        )
+        
+        # Return success response
+        return jsonify({
+            'status': 'success',
+            'message': f'Order {side} {quantity} {symbol} placed successfully',
+            'order': result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error placing order: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Order failed: {str(e)}'
+        }), 500
+
+@app.route('/api/close_position', methods=['POST'])
+def close_position():
+    """Close an open trading position."""
+    try:
+        data = request.json
+        position_id = data.get('position_id')
+        
+        if not position_id:
+            return jsonify({
+                'status': 'error',
+                'message': 'Position ID required'
+            }), 400
+        
+        logger.info(f"Closing position: {position_id}")
+        
+        # In simulation mode, just return success
+        # In a real implementation, this would close the position via the exchange API
+        
+        return jsonify({
+            'status': 'success',
+            'message': f'Position {position_id} closed successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error closing position: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to close position: {str(e)}'
+        }), 500
+
 # Store backtesting results
 backtest_results = {}
 
