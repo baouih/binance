@@ -1,0 +1,557 @@
+pfp
+lỗi gì đây và cách sửa
+# spring.application.name=AsignmentPY00168
+# spring.jpa.hibernate.ddl-auto=update
+# spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+# spring.datasource.username=root
+# spring.datasource.password=Nothing123@
+# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# spring.jpa.show-sql: true
+#config spring security
+# spring.security.user.name=bang
+# spring.security.user.password=$2a$10$.JBE4BYfRlwFepUpzNNdkOjQQZ7VBzYg7bBW0o7E4NtkFfBUsl1Em
+logging.level.org.springframework.security=DEBUG
+server.error.path=/error
+# Cấu hình SQL Server
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
+
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+# Kích thước tối đa của file tải lên (10MB)
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+#Config session
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+#server.servlet.session.timeout
+#spring.session.jdbc.table-name=SPRING_SESSION
+
+#dangnhap google
+spring.security.oauth2.client.registration.google.client-id=1040797313148-atjs13m5kbv1e6th8jhabmfo8ih612la.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.redirect-uri=https://rubeefunix.github.io/Spring-PY00168
+spring.security.oauth2.client.registration.google.scope=openid,profile,email
+
+
+server.servlet.encoding.force=true
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force-request-encoding=true
+server.servlet.encoding.force-response-encoding=true
+spring.http.encoding.charset=UTF-8
+spring.http.encoding.force=true
+
+
+#Mail
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tranbao13061988@gmail.com
+spring.mail.password=tcqc ufws nyug bdaz
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2
+
+
+Dựa trên file cấu hình bạn cung cấp, tôi sẽ phân tích các lỗi tiềm ẩn và cách khắc phục. File này là application.properties của Spring Boot, sử dụng cả MySQL và SQL Server cùng lúc, điều này có thể gây xung đột. Dưới đây là các vấn đề và giải pháp:
+
+1. Xung đột cấu hình datasource (MySQL và SQL Server)
+Vấn đề:
+Bạn đã khai báo cấu hình cho cả MySQL và SQL Server trong cùng一个文件:
+MySQL:
+text
+Wrap
+Copy
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+spring.datasource.username=root
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+SQL Server:
+text
+Wrap
+Copy
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
+Spring Boot chỉ hỗ trợ một datasource mặc định tại một thời điểm. Nếu bạn khai báo cả hai như vậy, cấu hình sau (SQL Server) sẽ ghi đè cấu hình trước (MySQL), dẫn đến việc ứng dụng chỉ kết nối với SQL Server mà bỏ qua MySQL.
+Cách sửa:
+Nếu bạn chỉ muốn dùng một database (ví dụ: SQL Server), hãy xóa bỏ toàn bộ cấu hình của MySQL hoặc comment lại:
+properties
+Wrap
+Copy
+# spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+# spring.datasource.username=root
+# spring.datasource.password=Nothing123@
+# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+Nếu bạn cần sử dụng cả hai database, bạn phải cấu hình multiple datasources bằng cách dùng @Configuration trong code Java thay vì chỉ dựa vào application.properties. Ví dụ:
+Tạo hai bean DataSource riêng biệt cho MySQL và SQL Server.
+Chỉ định rõ ràng datasource nào dùng cho JPA/Hibernate.
+2. Sai cú pháp thuộc tính spring.jpa.show-sql
+Vấn đề:
+Bạn viết spring.jpa.show-sql: true (có dấu :) ở dòng đầu tiên, đây là cú pháp sai. Thuộc tính này không cần dấu : mà chỉ cần =:
+properties
+Wrap
+Copy
+spring.jpa.show-sql: true  # Sai
+Sau đó, bạn lại viết đúng ở phần cấu hình SQL Server:
+properties
+Wrap
+Copy
+spring.jpa.show-sql=true   # Đúng
+Cách sửa:
+Sửa dòng sai thành:
+properties
+Wrap
+Copy
+spring.jpa.show-sql=true
+Xóa dòng dư thừa nếu chỉ dùng một database.
+3. Cấu hình Spring Security OAuth2 Google
+Vấn đề:
+Redirect URI của Google OAuth2 được đặt là:
+properties
+Wrap
+Copy
+spring.security.oauth2.client.registration.google.redirect-uri=https://rubeefunix.github.io/Spring-PY00168
+URI này trỏ đến một trang GitHub Pages, không phải ứng dụng Spring Boot chạy trên localhost hoặc server thực tế. Điều này sẽ gây lỗi khi Google cố gắng chuyển hướng sau khi xác thực.
+Cách sửa:
+Nếu bạn đang phát triển trên localhost, hãy sửa lại thành:
+properties
+Wrap
+Copy
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+Đảm bảo URI này khớp với Redirect URI đã đăng ký trong Google Cloud Console.
+4. Cấu hình email (Spring Mail)
+Vấn đề:
+Mật khẩu ứng dụng của Gmail (tcqc ufws nyug bdaz) có thể không đúng hoặc tài khoản chưa bật App Password.
+Thuộc tính spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2 không cần thiết vì Gmail mặc định đã hỗ trợ TLS.
+Cách sửa:
+Đảm bảo bạn đã:
+Bật Xác thực 2 yếu tố (2FA) trên tài khoản Gmail.
+Tạo App Password trong Google Account và sử dụng đúng mật khẩu đó.
+Xóa dòng không cần thiết:
+properties
+Wrap
+Copy
+# spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2
+Kiểm tra kết nối bằng cách chạy ứng dụng và gửi email thử.
+5. Cấu hình session JDBC
+Vấn đề:
+Bạn bật spring.session.store-type=jdbc để lưu session trong database, nhưng không khai báo rõ ràng bảng SPRING_SESSION sẽ dùng schema nào (MySQL hay SQL Server).
+Nếu database chính là SQL Server, cần đảm bảo Hibernate tạo đúng bảng SPRING_SESSION với dialect phù hợp.
+Cách sửa:
+Giữ nguyên cấu hình nếu bạn dùng SQL Server:
+properties
+Wrap
+Copy
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+Chạy ứng dụng và kiểm tra log để đảm bảo bảng SPRING_SESSION được tạo trong database petshop.
+6. Cấu hình encoding dư thừa
+Vấn đề:
+Bạn khai báo nhiều thuộc tính encoding:
+properties
+Wrap
+Copy
+server.servlet.encoding.force=true
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force-request-encoding=true
+server.servlet.encoding.force-response-encoding=true
+spring.http.encoding.charset=UTF-8
+spring.http.encoding.force=true
+Một số thuộc tính này đã lỗi thời hoặc không cần thiết trong Spring Boot phiên bản mới (2.x hoặc 3.x).
+Cách sửa:
+Chỉ giữ lại các dòng cơ bản:
+properties
+Wrap
+Copy
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=true
+Xóa các dòng còn lại để tránh trùng lặp.
+File cấu hình sửa lại (giả sử chỉ dùng SQL Server):
+Dưới đây là phiên bản đã chỉnh sửa, giả định bạn chỉ dùng SQL Server:
+
+properties
+Wrap
+Copy
+spring.application.name=AsignmentPY00168
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
+
+server.error.path=/error
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+
+spring.security.oauth2.client.registration.google.client-id=1040797313148-atjs13m5kbv1e6th8jhabmfo8ih612la.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+spring.security.oauth2.client.registration.google.scope=openid,profile,email
+
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=true
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tranbao13061988@gmail.com
+spring.mail.password=tcqc ufws nyug bdaz
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+logging.level.org.springframework.security=DEBUG
+Kiểm tra và chạy thử:
+Đảm bảo SQL Server đang chạy trên localhost:1433 và tài khoản Admin/Nothing123@ hợp lệ.
+Chạy ứng dụng và kiểm tra log (với DEBUG đã bật).
+Nếu có lỗi cụ thể, hãy cung cấp log để tôi hỗ trợ thêm!
+Hy vọng giải thích này giúp bạn sửa lỗi thành công!
+
+
+
+
+
+
+tôi cấu hình trên replit bị lỗi
+
+Dựa trên file cấu hình bạn cung cấp, tôi sẽ phân tích các lỗi tiềm ẩn và cách khắc phục. File này là application.properties của Spring Boot, sử dụng cả MySQL và SQL Server cùng lúc, điều này có thể gây xung đột. Dưới đây là các vấn đề và giải pháp:
+
+1. Xung đột cấu hình datasource (MySQL và SQL Server)
+Vấn đề:
+Bạn đã khai báo cấu hình cho cả MySQL và SQL Server trong cùng一个文件:
+MySQL:
+text
+Wrap
+Copy
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+spring.datasource.username=root
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+SQL Server:
+text
+Wrap
+Copy
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
+Spring Boot chỉ hỗ trợ một datasource mặc định tại một thời điểm. Nếu bạn khai báo cả hai như vậy, cấu hình sau (SQL Server) sẽ ghi đè cấu hình trước (MySQL), dẫn đến việc ứng dụng chỉ kết nối với SQL Server mà bỏ qua MySQL.
+Cách sửa:
+Nếu bạn chỉ muốn dùng một database (ví dụ: SQL Server), hãy xóa bỏ toàn bộ cấu hình của MySQL hoặc comment lại:
+properties
+Wrap
+Copy
+# spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+# spring.datasource.username=root
+# spring.datasource.password=Nothing123@
+# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+Nếu bạn cần sử dụng cả hai database, bạn phải cấu hình multiple datasources bằng cách dùng @Configuration trong code Java thay vì chỉ dựa vào application.properties. Ví dụ:
+Tạo hai bean DataSource riêng biệt cho MySQL và SQL Server.
+Chỉ định rõ ràng datasource nào dùng cho JPA/Hibernate.
+2. Sai cú pháp thuộc tính spring.jpa.show-sql
+Vấn đề:
+Bạn viết spring.jpa.show-sql: true (có dấu :) ở dòng đầu tiên, đây là cú pháp sai. Thuộc tính này không cần dấu : mà chỉ cần =:
+properties
+Wrap
+Copy
+spring.jpa.show-sql: true  # Sai
+Sau đó, bạn lại viết đúng ở phần cấu hình SQL Server:
+properties
+Wrap
+Copy
+spring.jpa.show-sql=true   # Đúng
+Cách sửa:
+Sửa dòng sai thành:
+properties
+Wrap
+Copy
+spring.jpa.show-sql=true
+Xóa dòng dư thừa nếu chỉ dùng một database.
+3. Cấu hình Spring Security OAuth2 Google
+Vấn đề:
+Redirect URI của Google OAuth2 được đặt là:
+properties
+Wrap
+Copy
+spring.security.oauth2.client.registration.google.redirect-uri=https://rubeefunix.github.io/Spring-PY00168
+URI này trỏ đến một trang GitHub Pages, không phải ứng dụng Spring Boot chạy trên localhost hoặc server thực tế. Điều này sẽ gây lỗi khi Google cố gắng chuyển hướng sau khi xác thực.
+Cách sửa:
+Nếu bạn đang phát triển trên localhost, hãy sửa lại thành:
+properties
+Wrap
+Copy
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+Đảm bảo URI này khớp với Redirect URI đã đăng ký trong Google Cloud Console.
+4. Cấu hình email (Spring Mail)
+Vấn đề:
+Mật khẩu ứng dụng của Gmail (tcqc ufws nyug bdaz) có thể không đúng hoặc tài khoản chưa bật App Password.
+Thuộc tính spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2 không cần thiết vì Gmail mặc định đã hỗ trợ TLS.
+Cách sửa:
+Đảm bảo bạn đã:
+Bật Xác thực 2 yếu tố (2FA) trên tài khoản Gmail.
+Tạo App Password trong Google Account và sử dụng đúng mật khẩu đó.
+Xóa dòng không cần thiết:
+properties
+Wrap
+Copy
+# spring.mail.properties.mail.smtp.ssl.protocols=TLSv1.2
+Kiểm tra kết nối bằng cách chạy ứng dụng và gửi email thử.
+5. Cấu hình session JDBC
+Vấn đề:
+Bạn bật spring.session.store-type=jdbc để lưu session trong database, nhưng không khai báo rõ ràng bảng SPRING_SESSION sẽ dùng schema nào (MySQL hay SQL Server).
+Nếu database chính là SQL Server, cần đảm bảo Hibernate tạo đúng bảng SPRING_SESSION với dialect phù hợp.
+Cách sửa:
+Giữ nguyên cấu hình nếu bạn dùng SQL Server:
+properties
+Wrap
+Copy
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+Chạy ứng dụng và kiểm tra log để đảm bảo bảng SPRING_SESSION được tạo trong database petshop.
+6. Cấu hình encoding dư thừa
+Vấn đề:
+Bạn khai báo nhiều thuộc tính encoding:
+properties
+Wrap
+Copy
+server.servlet.encoding.force=true
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force-request-encoding=true
+server.servlet.encoding.force-response-encoding=true
+spring.http.encoding.charset=UTF-8
+spring.http.encoding.force=true
+Một số thuộc tính này đã lỗi thời hoặc không cần thiết trong Spring Boot phiên bản mới (2.x hoặc 3.x).
+Cách sửa:
+Chỉ giữ lại các dòng cơ bản:
+properties
+Wrap
+Copy
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=true
+Xóa các dòng còn lại để tránh trùng lặp.
+File cấu hình sửa lại (giả sử chỉ dùng SQL Server):
+Dưới đây là phiên bản đã chỉnh sửa, giả định bạn chỉ dùng SQL Server:
+
+properties
+Wrap
+Copy
+spring.application.name=AsignmentPY00168
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
+
+server.error.path=/error
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+
+spring.security.oauth2.client.registration.google.client-id=1040797313148-atjs13m5kbv1e6th8jhabmfo8ih612la.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+spring.security.oauth2.client.registration.google.scope=openid,profile,email
+
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=true
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tranbao13061988@gmail.com
+spring.mail.password=tcqc ufws nyug bdaz
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+logging.level.org.springframework.security=DEBUG
+Kiểm tra và chạy thử:
+Đảm bảo SQL Server đang chạy trên localhost:1433 và tài khoản Admin/Nothing123@ hợp lệ.
+Chạy ứng dụng và kiểm tra log (với DEBUG đã bật).
+Nếu có lỗi cụ thể, hãy cung cấp log để tôi hỗ trợ thêm!
+
+
+Bạn đang chạy ứng dụng Spring Boot trên Replit và gặp lỗi với cấu hình trên. Replit là một môi trường phát triển trực tuyến, nên có một số hạn chế và đặc thù so với việc chạy cục bộ trên máy tính. Dựa trên file application.properties bạn cung cấp và phân tích trước đó, tôi sẽ điều chỉnh cách tiếp cận để phù hợp với Replit. Dưới đây là các vấn đề tiềm ẩn và cách khắc phục:
+
+1. Vấn đề kết nối database trên Replit
+Vấn đề:
+Replit không chạy được SQL Server hoặc MySQL cục bộ (như localhost:1433 hoặc localhost:3306) vì nó không cài sẵn các dịch vụ database này.
+Cấu hình của bạn:
+properties
+Wrap
+Copy
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=petshop;encrypt=false
+spring.datasource.username=Admin
+spring.datasource.password=Nothing123@
+hoặc
+properties
+Wrap
+Copy
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/petshop
+spring.datasource.username=root
+spring.datasource.password=Nothing123@
+đều giả định database chạy trên localhost, điều không khả thi trên Replit.
+Cách sửa:
+Sử dụng database bên ngoài: Bạn cần kết nối đến một database từ xa (ví dụ: dịch vụ miễn phí như MySQL trên Clever Cloud, Supabase, hoặc PlanetScale cho MySQL).
+Ví dụ với MySQL từ xa:
+Đăng ký tài khoản trên một dịch vụ như Clever Cloud, tạo database petshop.
+Lấy thông tin kết nối (URL, username, password) từ dịch vụ đó.
+Cập nhật cấu hình:
+properties
+Wrap
+Copy
+spring.datasource.url=jdbc:mysql://<host-from-service>:3306/petshop
+spring.datasource.username=<your-username>
+spring.datasource.password=<your-password>
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+Tạm thời dùng H2 Database (in-memory) để thử nghiệm trên Replit:
+Thêm dependency H2 vào pom.xml:
+xml
+Wrap
+Copy
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+Cập nhật cấu hình:
+properties
+Wrap
+Copy
+spring.datasource.url=jdbc:h2:mem:petshop
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+2. Sai port mặc định trên Replit
+Vấn đề:
+Replit yêu cầu ứng dụng lắng nghe trên port được chỉ định bởi biến môi trường PORT (thường không phải 8080 mặc định của Spring Boot).
+Cấu hình OAuth2 redirect URI (http://localhost:8080/...) cũng không hoạt động vì Replit cung cấp URL công khai (ví dụ: https://<your-replit-id>.repl.co).
+Cách sửa:
+Cấu hình Spring Boot để dùng port động:
+properties
+Wrap
+Copy
+server.port=${PORT:8080}
+Cập nhật redirect URI cho Google OAuth2:
+Truy cập Replit, chạy ứng dụng, lấy URL công khai (ví dụ: https://<your-replit-id>.repl.co).
+Sửa trong application.properties:
+properties
+Wrap
+Copy
+spring.security.oauth2.client.registration.google.redirect-uri=https://<your-replit-id>.repl.co/login/oauth2/code/google
+Cập nhật URI này trong Google Cloud Console dưới Credentials > OAuth 2.0 Client IDs.
+3. Maven dependency trên Replit
+Vấn đề:
+Nếu bạn dùng driver SQL Server (com.microsoft.sqlserver.jdbc.SQLServerDriver) hoặc MySQL (com.mysql.cj.jdbc.Driver), cần đảm bảo dependency đã được thêm vào pom.xml. Replit không tự động tải các thư viện này trừ khi khai báo.
+Cách sửa:
+Thêm dependency vào pom.xml:
+Cho MySQL:
+xml
+Wrap
+Copy
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+Cho SQL Server:
+xml
+Wrap
+Copy
+<dependency>
+    <groupId>com.microsoft.sqlserver</groupId>
+    <artifactId>mssql-jdbc</artifactId>
+    <version>12.6.1.jre11</version>
+</dependency>
+Sau khi thêm, chạy mvn clean install trên Replit Shell để tải thư viện.
+4. Cấu hình email trên Replit
+Vấn đề:
+Cấu hình email của bạn:
+properties
+Wrap
+Copy
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tranbao13061988@gmail.com
+spring.mail.password=tcqc ufws nyug bdaz
+có thể hoạt động, nhưng nếu Gmail chặn kết nối từ Replit (do IP không đáng tin), bạn sẽ gặp lỗi.
+Cách sửa:
+Đảm bảo mật khẩu ứng dụng (tcqc ufws nyug bdaz) là chính xác (tạo mới nếu cần từ Google Account với App Password).
+Nếu vẫn lỗi, bật log chi tiết để kiểm tra:
+properties
+Wrap
+Copy
+logging.level.org.springframework.mail=DEBUG
+File cấu hình sửa lại cho Replit (dùng H2 tạm thời):
+Dưới đây là cấu hình tối giản để chạy trên Replit mà không cần database ngoài:
+
+properties
+Wrap
+Copy
+spring.application.name=AsignmentPY00168
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:h2:mem:petshop
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.show-sql=true
+
+server.port=${PORT:8080}
+server.error.path=/error
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+spring.session.store-type=jdbc
+spring.session.timeout=30m
+spring.session.jdbc.initialize-schema=always
+
+spring.security.oauth2.client.registration.google.client-id=1040797313148-atjs13m5kbv1e6th8jhabmfo8ih612la.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.redirect-uri=https://<your-replit-id>.repl.co/login/oauth2/code/google
+spring.security.oauth2.client.registration.google.scope=openid,profile,email
+
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=true
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tranbao13061988@gmail.com
+spring.mail.password=tcqc ufws nyug bdaz
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+logging.level.org.springframework.security=DEBUG
+logging.level.org.springframework.mail=DEBUG

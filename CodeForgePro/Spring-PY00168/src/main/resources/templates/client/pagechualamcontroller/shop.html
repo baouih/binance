@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Fruitables - Pet Shop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/content/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/content/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link rel="stylesheet" th:href="@{/content/client/css/bootstrap.min.css}">
+    <!-- Template Stylesheet -->
+    <link rel="stylesheet" th:href="@{/content/client/css/style.css}">
+    <style>
+        .pagination a {
+            padding: 8px 12px;
+            text-decoration: none;
+            border: 1px solid #e0e0e0;
+            color: #333;
+            border-radius: 6px;
+            background: #fff;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .pagination a:hover {
+            background: #1976d2;
+            color: #fff;
+        }
+        .pagination a.active {
+            background: #1976d2;
+            color: #fff;
+            font-weight: bold;
+            border-color: #1976d2;
+        }
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #6c757d;
+            border-color: #e0e0e0;
+            opacity: 0.6;
+        }
+        .category-label {
+            top: 10px;
+            left: 10px;
+        }
+        .product-title {
+            height: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <div th:insert="~{fragments/client/header :: header}"></div>
+
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tìm kiếm sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <form th:action="@{/shop}" method="get" class="input-group w-75 mx-auto d-flex">
+                        <input type="search" name="keyword" class="form-control p-3" placeholder="Nhập tên sản phẩm..." th:value="${keyword}" aria-describedby="search-icon-1">
+                        <button type="submit" id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Search End -->
+
+    <!-- Fruits Shop Start -->
+    <div class="container-fluid fruite py-5 mt-5">
+        <nav aria-label="breadcrumb" style="background: linear-gradient(90deg, #56ab2f, #a8e063); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <ol class="breadcrumb mb-0" style="margin: 0; padding: 0; list-style: none; display: flex; align-items: center; font-size: 1rem; color: #fff;">
+                <li class="breadcrumb-item" style="margin-right: 10px;">
+                    <a href="/" style="text-decoration: none; color: #fdfdfd; font-weight: 600; transition: color 0.3s;">Trang Chủ</a>
+                    <span style="margin-left: 8px; color: rgba(255, 255, 255, 0.7);">/</span>
+                </li>
+                <li class="breadcrumb-item active" style="margin-right: 10px;">
+                    <a href="/shop" style="text-decoration: none; color: #fdfdfd; font-weight: 600; transition: color 0.3s;">Cửa Hàng</a>
+                </li>
+            </ol>
+        </nav>
+        <div class="container py-5">
+            <h1 class="mb-4">Pet Shop</h1>
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-xl-3">
+                            <form th:action="@{/shop}" method="get" class="input-group w-100 mx-auto d-flex">
+                                <input type="search" name="keyword" class="form-control p-3" placeholder="Tìm kiếm sản phẩm..." th:value="${keyword}" aria-describedby="search-icon-1">
+                                <button type="submit" id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></button>
+                            </form>
+                        </div>
+                        <div class="col-xl-3 offset-xl-6">
+                            <form th:action="@{/shop}" method="get" class="d-flex justify-content-between align-items-center bg-light ps-3 py-3 rounded mb-4" id="sortForm">
+                                <label for="sortBy" class="me-2">Sắp xếp theo:</label>
+                                <select id="sortBy" name="sortBy" class="border-0 form-select-sm bg-light me-3" onchange="document.getElementById('sortForm').submit();">
+                                    <option value="productId" th:selected="${sortBy == 'productId'}">Mã sản phẩm</option>
+                                    <option value="tenSP" th:selected="${sortBy == 'tenSP'}">Tên sản phẩm</option>
+                                    <option value="gia" th:selected="${sortBy == 'gia'}">Giá</option>
+                                </select>
+                                <select id="direction" name="direction" class="border-0 form-select-sm bg-light me-3" onchange="document.getElementById('sortForm').submit();">
+                                    <option value="asc" th:selected="${direction == 'asc'}">Tăng dần</option>
+                                    <option value="desc" th:selected="${direction == 'desc'}">Giảm dần</option>
+                                </select>
+                                <!-- Giữ các tham số khác -->
+                                <input type="hidden" name="page" th:value="${currentPage}">
+                                <input type="hidden" name="size" value="9">
+                                <input type="hidden" name="keyword" th:value="${keyword}">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-lg-3">
+                            <div class="row g-4">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <h4>Danh mục</h4>
+                                        <ul class="list-unstyled fruite-categorie">
+                                            <li th:each="product : ${products}">
+                                                <div class="d-flex justify-content-between fruite-name">
+                                                    <a href="#" th:text="${product.category.categoryName}"><i class="fas fa-paw me-2"></i></a>
+                                                    <span>(3)</span>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <h4 class="mb-2">Giá</h4>
+                                        <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="500" value="0" oninput="amount.value=rangeInput.value">
+                                        <output id="amount" name="amount" min-value="0" max-value="500" for="rangeInput">0</output>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <h4>Bổ sung</h4>
+                                        <div class="mb-2">
+                                            <input type="radio" class="me-2" id="Categories-3" name="Categories-1" value="All">
+                                            <label for="Categories-3">Tất cả</label>
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="radio" class="me-2" id="Categories-4" name="Categories-1" value="Discount">
+                                            <label for="Categories-4">Giảm giá</label>
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="radio" class="me-2" id="Categories-5" name="Categories-1" value="OutOfStock">
+                                            <label for="Categories-5">Hết hàng</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <h4 class="mb-3">Sản phẩm bán chạy</h4>
+                                    <div class="d-flex align-items-center justify-content-start" th:each="product : ${products}">
+                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
+                                            <img th:src="@{|/images/product/${product.imageURL}|}" class="img-fluid rounded" alt="">
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-2" th:text="${product.tenSP}">Big Banana</h6>
+                                            <div class="d-flex mb-2">
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                <h5 class="fw-bold me-2" th:text="${#numbers.formatDecimal(product.gia, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">2.99 $</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-center my-4">
+                                        <a href="/" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">Xem thêm</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="position-relative">
+                                        <img th:src="@{|/images/product/${products[0].imageURL}|}" class="img-fluid w-100 rounded" alt="">
+                                        <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
+                                            <h3 class="text-secondary fw-bold">Pet <br> Items <br> Banner</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-9">
+                            <div class="row g-4 justify-content-center">
+                                <div class="col-md-6 col-lg-6 col-xl-4" th:each="product : ${products}">
+                                    <div class="rounded shadow-sm bg-white position-relative fruite-item">
+                                        <div class="fruite-img">
+                                            <img th:src="@{|/images/product/${product.imageURL}|}" class="img-fluid w-100 rounded-top" alt="">
+                                        </div>
+                                        <div class="text-white bg-primary px-3 py-1 rounded position-absolute category-label" th:text="${product.category.categoryName}"></div>
+                                        <div class="p-3 border-top-0 rounded-bottom text-center">
+                                            <h5 class="product-title">
+                                                <a th:href="@{/product/{productId}(productId=${product.productId})}" th:text="${product.tenSP}" class="text-dark"></a>
+                                            </h5>
+                                            <p class="price text-danger fw-bold mb-2">
+                                                <span th:text="${#numbers.formatDecimal(product.gia, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                                            </p>
+                                            <form method="POST" th:action="@{/add-product-to-cart/{id}(id=${product.productId})}">
+                                                <div th:if="${product.slTonKho == 0}">
+                                                    <span class="text-danger fw-bold">Hết hàng</span>
+                                                </div>
+                                                <button href="#" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center" th:unless="${product.slTonKho == 0}">
+                                                    <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="pagination d-flex justify-content-center mt-5">
+                                        <a th:class="${currentPage == 0} ? 'disabled' : ''" 
+                                           th:href="@{/shop(page=0,sortBy=${sortBy},direction=${direction},keyword=${keyword})}">«</a>
+                                        <a th:class="${currentPage == 0} ? 'disabled' : ''" 
+                                           th:href="@{/shop(page=${currentPage - 1},sortBy=${sortBy},direction=${direction},keyword=${keyword})}"><</a>
+                                        <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                           th:href="@{/shop(page=${i},sortBy=${sortBy},direction=${direction},keyword=${keyword})}"
+                                           th:text="${i + 1}"
+                                           th:class="${currentPage == i} ? 'active' : ''"></a>
+                                        <a th:class="${currentPage + 1 == totalPages} ? 'disabled' : ''" 
+                                           th:href="@{/shop(page=${currentPage + 1},sortBy=${sortBy},direction=${direction},keyword=${keyword})}">></a>
+                                        <a th:class="${currentPage + 1 == totalPages} ? 'disabled' : ''" 
+                                           th:href="@{/shop(page=${totalPages - 1},sortBy=${sortBy},direction=${direction},keyword=${keyword})}">»</a>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <p>Tổng cộng: <span th:text="${totalElements}"></span> sản phẩm</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Fruits Shop End -->
+
+    <div th:insert="~{fragments/client/banner :: banner}"></div>
+    <div th:insert="~{fragments/client/feature :: feature}"></div>
+    <div th:insert="~{fragments/client/footer :: footer}"></div>
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/content/client/lib/easing/easing.min.js"></script>
+    <script src="/content/client/lib/waypoints/waypoints.min.js"></script>
+    <script src="/content/client/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="/content/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script th:src="@{/content/client/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>User Details</title>
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/content/css/style.css}">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <style>
+        .user-detail-card {
+            border: none;
+            border-radius: 1rem;
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+        .user-detail-header {
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
+        }
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .list-group-item {
+            border: none;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+        }
+        .list-group-item span:first-child {
+            color: #455a64;
+            font-weight: 600;
+            min-width: 150px;
+        }
+        .btn-back {
+            background: #28a745;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        .btn-back:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <div th:insert="~{fragments/header :: navigation}"></div>
+    <div id="layoutSidenav">
+        <div th:insert="~{fragments/sidebar :: sidebar}"></div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4 py-5">
+                    <!-- Header -->
+                    <div class="mb-4">
+                        <h1 class="fw-bold text-dark mb-2">Trang tổng quan</h1>
+                        <ol class="breadcrumb bg-white shadow-sm rounded p-2">
+                            <li class="breadcrumb-item"><a href="/admin" class="text-primary">Trang tổng quan</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/user" class="text-primary">Người dùng</a></li>
+                            <li class="breadcrumb-item active text-muted">Chi tiết người dùng</li>
+                        </ol>
+                    </div>
+
+                    <!-- User Detail Card -->
+                    <div class="user-detail-card mx-auto" style="max-width: 700px;">
+                        <div class="user-detail-header">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-container me-4">
+                                    <img th:if="${user.avatar != null and user.avatar != ''}" 
+                                         th:src="@{|/images/avatar/${user.avatar}|}" 
+                                         alt="User Avatar" 
+                                         class="w-100 h-100 object-fit-cover">
+                                    <div th:if="${user.avatar == null or user.avatar == ''}" 
+                                         class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted">
+                                        Không có ảnh
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 class="h4 fw-bold mb-1" th:text="${user.hoVaTen}"></h2>
+                                    <p class="mb-0 opacity-75">ID: <span th:text="${user.userId}"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex">
+                                    <span>Email:</span>
+                                    <span th:text="${user.email}"></span>
+                                </li>
+                                <li class="list-group-item d-flex">
+                                    <span>Địa chỉ:</span>
+                                    <span th:text="${user.diaChi != null ? user.diaChi : 'Chưa cập nhật'}"></span>
+                                </li>
+                                <li class="list-group-item d-flex">
+                                    <span>Giới tính:</span>
+                                    <span th:text="${user.gioiTinh != null ? user.gioiTinh : 'Chưa cập nhật'}"></span>
+                                </li>
+                                <li class="list-group-item d-flex">
+                                    <span>Ngày sinh:</span>
+                                    <span th:text="${#dates.format(user.ngaySinh, 'dd/MM/yyyy')}"></span>
+                                </li>
+                                <li class="list-group-item d-flex">
+                                    <span>Ngày tạo tài khoản:</span>
+                                    <span th:text="${#dates.format(user.ngayTaoAcc, 'dd/MM/yyyy')}"></span>
+                                </li>
+                                <li class="list-group-item d-flex">
+                                    <span>Vai trò:</span>
+                                    <span th:text="${user.userRole}"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white border-0 p-4 text-end">
+                            <a href="/admin/user" class="btn btn-back rounded-pill text-white">
+                                <i class="fas fa-arrow-left me-2"></i>Quay trở lại trang người dùng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <div th:insert="~{fragments/footer :: footer}"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script th:src="@{/content/js/scripts.js}"></script>
+</body>
+</html>

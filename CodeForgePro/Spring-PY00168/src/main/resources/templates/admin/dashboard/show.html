@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Dashboard - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/content/css/style.css}">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <style>
+        .card-body { font-size: 1.5rem; }
+        .card-footer a { text-decoration: none; }
+        .table-responsive { margin-top: 20px; }
+    </style>
+</head>
+<body class="sb-nav-fixed">
+    <div th:insert="~{fragments/header :: navigation}"></div>
+    <div id="layoutSidenav">
+        <div th:insert="~{fragments/sidebar :: sidebar}"></div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4 py-5">
+                    <h1 class="mt-0 mb-3 fw-bold text-dark">Trang tổng quan</h1>
+                    <ol class="breadcrumb mb-4 bg-white shadow-sm rounded p-2">
+                        <li class="breadcrumb-item active text-muted">Trang tổng quan</li>
+                    </ol>
+
+                    <!-- Statistic Cards -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-primary text-white mb-4 shadow">
+                                <div class="card-body">Tổng sản phẩm: <span th:text="${totalProducts}"></span></div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <a class="small text-white stretched-link" href="/admin/product">Xem chi tiết</a>
+                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-success text-white mb-4 shadow">
+                                <div class="card-body">Tổng đơn hàng: <span th:text="${totalOrders}"></span></div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <a class="small text-white stretched-link" href="/admin/order">Xem chi tiết</a>
+                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-warning text-white mb-4 shadow">
+                                <div class="card-body">Tổng doanh thu: <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <a class="small text-white stretched-link" href="/admin/order">Xem chi tiết</a>
+                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-info text-white mb-4 shadow">
+                                <div class="card-body">Tổng người dùng: <span th:text="${totalUsers}"></span></div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <a class="small text-white stretched-link" href="/admin/user">Xem chi tiết</a>
+                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="row">
+                        <div class="col-xl-6">
+                            <div class="card mb-4 shadow">
+                                <div class="card-header">
+                                    <i class="fas fa-chart-area me-1"></i>
+                                    Doanh thu theo tháng
+                                </div>
+                                <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6">
+                            <div class="card mb-4 shadow">
+                                <div class="card-header">
+                                    <i class="fas fa-chart-bar me-1"></i>
+                                    Số đơn hàng theo tháng
+                                </div>
+                                <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Table -->
+                    <div class="card mb-4 shadow">
+                        <div class="card-header">
+                            <i class="fas fa-table me-1"></i>
+                            Đơn hàng gần đây
+                        </div>
+                        <div class="card-body">
+                            <table id="datatablesSimple" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn hàng</th>
+                                        <th>Khách hàng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="order : ${recentOrders}">
+                                        <td th:text="${order.orderId}"></td>
+                                        <td th:text="${order.user != null ? order.user.hoVaTen : 'Khách vãng lai'}"></td>
+                                        <td th:text="${#dates.format(order.ngayOrder, 'dd/MM/yyyy')}"></td>
+                                        <td th:text="${#numbers.formatDecimal(order.tongGiaTri, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                        <td th:text="${order.trangThai}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Thống kê doanh thu theo loại hàng -->
+                    <div class="card mb-4 shadow">
+                        <div class="card-header">
+                            <i class="fas fa-chart-pie me-1"></i>
+                            Thống kê doanh thu theo loại hàng
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Loại hàng</th>
+                                        <th>Tổng doanh thu (VNĐ)</th>
+                                        <th>Tổng số lượng</th>
+                                        <th>Giá cao nhất (VNĐ)</th>
+                                        <th>Giá thấp nhất (VNĐ)</th>
+                                        <th>Giá trung bình (VNĐ)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="entry : ${categoryStats}">
+                                        <td th:text="${entry.key}"></td>
+                                        <td th:text="${#numbers.formatDecimal(entry.value.totalRevenue, 0, 'COMMA', 0, 'POINT')}"></td>
+                                        <td th:text="${entry.value.totalQuantity}"></td>
+                                        <td th:text="${#numbers.formatDecimal(entry.value.maxPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                                        <td th:text="${#numbers.formatDecimal(entry.value.minPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                                        <td th:text="${#numbers.formatDecimal(entry.value.avgPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Thống kê 10 khách hàng VIP -->
+                    <div class="card mb-4 shadow">
+                        <div class="card-header">
+                            <i class="fas fa-users me-1"></i>
+                            10 Khách hàng VIP
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tên khách hàng</th>
+                                        <th>Tổng tiền đã mua (VNĐ)</th>
+                                        <th>Ngày mua đầu tiên</th>
+                                        <th>Ngày mua sau cùng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="customer : ${vipCustomers}">
+                                        <td th:text="${customer.name}"></td>
+                                        <td th:text="${#numbers.formatDecimal(customer.totalSpending, 0, 'COMMA', 0, 'POINT')}"></td>
+                                        <td th:text="${#dates.format(customer.firstPurchase, 'dd/MM/yyyy')}"></td>
+                                        <td th:text="${#dates.format(customer.lastPurchase, 'dd/MM/yyyy')}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <div th:insert="~{fragments/footer :: footer}"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script th:src="@{/content/js/scripts.js}"></script>
+    <script th:inline="javascript">
+        // Area Chart (Doanh thu theo tháng)
+        var ctxArea = document.getElementById("myAreaChart").getContext("2d");
+        var myAreaChart = new Chart(ctxArea, {
+            type: 'line',
+            data: {
+                labels: /*[[${monthlyRevenueLabels}]]*/,
+                datasets: [{
+                    label: "Doanh thu (VNĐ)",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: /*[[${monthlyRevenueData}]]*/
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{ time: { unit: 'month' }, gridLines: { display: false } }],
+                    yAxes: [{ ticks: { min: 0, maxTicksLimit: 5 }, gridLines: { color: "rgb(234, 236, 244)" } }]
+                },
+                legend: { display: false }
+            }
+        });
+
+        // Bar Chart (Số đơn hàng theo tháng)
+        var ctxBar = document.getElementById("myBarChart").getContext("2d");
+        var myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: /*[[${monthlyRevenueLabels}]]*/,
+                datasets: [{
+                    label: "Số đơn hàng",
+                    backgroundColor: "rgba(78, 115, 223, 1)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    data: /*[[${monthlyOrderData}]]*/
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{ time: { unit: 'month' }, gridLines: { display: false } }],
+                    yAxes: [{ ticks: { min: 0, maxTicksLimit: 5 }, gridLines: { color: "rgb(234, 236, 244)" } }]
+                },
+                legend: { display: false }
+            }
+        });
+    </script>
+</body>
+</html>
