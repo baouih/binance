@@ -229,13 +229,28 @@ class DataProcessor:
         # Price change percentage
         price_change_pct = latest['Price_Change'] * 100 if 'Price_Change' in latest else 0
         
+        # Giới hạn giá trị để tránh lỗi hiển thị
+        def safe_value(val, default=0):
+            """Trả về giá trị an toàn, tránh NaN và inf"""
+            if pd.isna(val) or np.isinf(val):
+                return default
+            return val
+            
+        # Áp dụng safe_value cho tất cả các giá trị
+        close_price = safe_value(latest['close'])
+        price_change = safe_value(price_change_pct)
+        rsi_value = safe_value(latest['RSI'])
+        macd_value = safe_value(latest['MACD'])
+        macd_signal = safe_value(latest['MACD_Signal'])
+        volume_ratio = safe_value(latest['Volume_Ratio'])
+            
         # Log the analysis
         logger.info("\n=== Latest Market Analysis ===")
-        logger.info(f"Price: {latest['close']:.2f} ({price_change_pct:.2f}% change)")
+        logger.info(f"Price: {close_price:.2f} ({price_change:.2f}% change)")
         logger.info(f"Trend: {trend}")
-        logger.info(f"RSI: {latest['RSI']:.2f} ({rsi_status})")
-        logger.info(f"MACD: {latest['MACD']:.2f} (Signal: {latest['MACD_Signal']:.2f})")
-        logger.info(f"Volume: {latest['Volume_Ratio']:.2f}x average")
+        logger.info(f"RSI: {rsi_value:.2f} ({rsi_status})")
+        logger.info(f"MACD: {macd_value:.2f} (Signal: {macd_signal:.2f})")
+        logger.info(f"Volume: {volume_ratio:.2f}x average")
         logger.info("===========================")
         
     def prepare_features_for_ml(self, df):
