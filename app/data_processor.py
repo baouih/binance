@@ -2,6 +2,8 @@ import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+from app.simple_feature_engineering import SimpleFeatureEngineering
+from app.market_regime_detector import MarketRegimeDetector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -18,7 +20,10 @@ class DataProcessor:
         """
         self.binance_api = binance_api
         self.simulation_mode = simulation_mode
-        logger.info(f"DataProcessor initialized in {'simulation' if simulation_mode else 'live'} mode")
+        self.feature_engineering = SimpleFeatureEngineering()  # Sử dụng phiên bản đơn giản không cần talib
+        self.market_regime_detector = MarketRegimeDetector()
+        self.current_regime = "neutral"
+        logger.info(f"DataProcessor initialized in {'simulation' if simulation_mode else 'live'} mode with ML features")
         
     def get_historical_data(self, symbol, interval='1h', lookback_days=30, start_time=None, end_time=None):
         """
@@ -55,6 +60,18 @@ class DataProcessor:
             
         # Add indicators
         df = self.add_indicators(df)
+        
+        # Thêm các tính năng ML nâng cao nếu có đủ dữ liệu
+        if len(df) >= 50:
+            try:
+                # Phát hiện chế độ thị trường
+                self.current_regime = self.market_regime_detector.detect_regime(df)
+                logger.info(f"Detected market regime: {self.current_regime}")
+                
+                # Thêm tính năng nâng cao cho ML
+                df = self.feature_engineering.add_all_features(df)
+            except Exception as e:
+                logger.error(f"Error adding ML features: {str(e)}")
         
         # Log some analytics
         self._log_market_analysis(df)
