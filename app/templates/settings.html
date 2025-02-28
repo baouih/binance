@@ -286,18 +286,9 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Network configuration settings
-    const testnetSwitch = document.getElementById('testnet-switch');
-    const simulationSwitch = document.getElementById('simulation-switch');
-    const networkStatusText = document.getElementById('network-status-text');
-    const simulationStatusText = document.getElementById('simulation-status-text');
-    const testnetDetails = document.getElementById('testnet-details');
-    const mainnetDetails = document.getElementById('mainnet-details');
-    
-    // Fetch initial settings status
-    fetchSettingsStatus();
+  // All settings functionality is now in the settings.js file
     
     // Set up event listeners for network switches
     testnetSwitch.addEventListener('change', function() {
