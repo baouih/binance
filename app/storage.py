@@ -74,18 +74,30 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        positions = self._load_json(self.positions_file)
-        
-        # Update if position with same ID exists, otherwise add
-        position_id = position.get('id')
-        for i, pos in enumerate(positions):
-            if pos.get('id') == position_id:
-                positions[i] = position
-                return self._save_json(self.positions_file, positions)
+        try:
+            if not position or not isinstance(position, dict):
+                logger.error(f"Invalid position data: {position}")
+                return False
                 
-        # Position not found, add it
-        positions.append(position)
-        return self._save_json(self.positions_file, positions)
+            if 'id' not in position:
+                logger.error("Position missing 'id' field")
+                return False
+                
+            positions = self._load_json(self.positions_file)
+            
+            # Update if position with same ID exists, otherwise add
+            position_id = position.get('id')
+            for i, pos in enumerate(positions):
+                if pos.get('id') == position_id:
+                    positions[i] = position
+                    return self._save_json(self.positions_file, positions)
+                    
+            # Position not found, add it
+            positions.append(position)
+            return self._save_json(self.positions_file, positions)
+        except Exception as e:
+            logger.error(f"Error saving position: {str(e)}")
+            return False
         
     def get_positions(self, status=None):
         """
@@ -97,12 +109,16 @@ class Storage:
         Returns:
             list: List of positions
         """
-        positions = self._load_json(self.positions_file)
-        
-        if status:
-            return [p for p in positions if p.get('status') == status]
+        try:
+            positions = self._load_json(self.positions_file)
             
-        return positions
+            if status:
+                return [p for p in positions if p.get('status') == status]
+                
+            return positions
+        except Exception as e:
+            logger.error(f"Error retrieving positions: {str(e)}")
+            return []
         
     def delete_position(self, position_id):
         """
@@ -114,9 +130,13 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        positions = self._load_json(self.positions_file)
-        positions = [p for p in positions if p.get('id') != position_id]
-        return self._save_json(self.positions_file, positions)
+        try:
+            positions = self._load_json(self.positions_file)
+            positions = [p for p in positions if p.get('id') != position_id]
+            return self._save_json(self.positions_file, positions)
+        except Exception as e:
+            logger.error(f"Error deleting position {position_id}: {str(e)}")
+            return False
         
     def save_trade(self, trade):
         """
@@ -128,9 +148,17 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        trades = self._load_json(self.trades_file)
-        trades.append(trade)
-        return self._save_json(self.trades_file, trades)
+        try:
+            if not trade or not isinstance(trade, dict):
+                logger.error(f"Invalid trade data: {trade}")
+                return False
+                
+            trades = self._load_json(self.trades_file)
+            trades.append(trade)
+            return self._save_json(self.trades_file, trades)
+        except Exception as e:
+            logger.error(f"Error saving trade: {str(e)}")
+            return False
         
     def get_trades(self, symbol=None, limit=None):
         """
@@ -192,7 +220,15 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        return self._save_json(self.settings_file, settings)
+        try:
+            if not settings or not isinstance(settings, dict):
+                logger.error(f"Invalid settings data: {settings}")
+                return False
+                
+            return self._save_json(self.settings_file, settings)
+        except Exception as e:
+            logger.error(f"Error saving settings: {str(e)}")
+            return False
         
     def get_settings(self):
         """
@@ -201,7 +237,11 @@ class Storage:
         Returns:
             dict: Settings data
         """
-        return self._load_json(self.settings_file)
+        try:
+            return self._load_json(self.settings_file)
+        except Exception as e:
+            logger.error(f"Error loading settings: {str(e)}")
+            return {}
         
     def save_bot(self, bot):
         """
@@ -213,18 +253,30 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        bots = self._load_json(self.bots_file)
-        
-        # Update if bot with same ID exists, otherwise add
-        bot_id = bot.get('id')
-        for i, b in enumerate(bots):
-            if b.get('id') == bot_id:
-                bots[i] = bot
-                return self._save_json(self.bots_file, bots)
+        try:
+            if not bot or not isinstance(bot, dict):
+                logger.error(f"Invalid bot data: {bot}")
+                return False
                 
-        # Bot not found, add it
-        bots.append(bot)
-        return self._save_json(self.bots_file, bots)
+            if 'id' not in bot:
+                logger.error("Bot missing 'id' field")
+                return False
+                
+            bots = self._load_json(self.bots_file)
+            
+            # Update if bot with same ID exists, otherwise add
+            bot_id = bot.get('id')
+            for i, b in enumerate(bots):
+                if b.get('id') == bot_id:
+                    bots[i] = bot
+                    return self._save_json(self.bots_file, bots)
+                    
+            # Bot not found, add it
+            bots.append(bot)
+            return self._save_json(self.bots_file, bots)
+        except Exception as e:
+            logger.error(f"Error saving bot: {str(e)}")
+            return False
         
     def get_bots(self, status=None):
         """
@@ -236,12 +288,16 @@ class Storage:
         Returns:
             list: List of bot configurations
         """
-        bots = self._load_json(self.bots_file)
-        
-        if status:
-            return [b for b in bots if b.get('status') == status]
+        try:
+            bots = self._load_json(self.bots_file)
             
-        return bots
+            if status:
+                return [b for b in bots if b.get('status') == status]
+                
+            return bots
+        except Exception as e:
+            logger.error(f"Error retrieving bot configurations: {str(e)}")
+            return []
         
     def delete_bot(self, bot_id):
         """
@@ -253,6 +309,10 @@ class Storage:
         Returns:
             bool: Success or failure
         """
-        bots = self._load_json(self.bots_file)
-        bots = [b for b in bots if b.get('id') != bot_id]
-        return self._save_json(self.bots_file, bots)
+        try:
+            bots = self._load_json(self.bots_file)
+            bots = [b for b in bots if b.get('id') != bot_id]
+            return self._save_json(self.bots_file, bots)
+        except Exception as e:
+            logger.error(f"Error deleting bot {bot_id}: {str(e)}")
+            return False
