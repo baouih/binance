@@ -187,6 +187,7 @@ class DashboardController {
       
       // Populate strategy selector
       const strategySelector = document.getElementById('strategy-selector');
+      const botStrategySelector = document.getElementById('bot-strategy');
       const backTestStrategySelector = document.getElementById('backtest-strategy');
       
       // Update bot strategy selector
@@ -217,6 +218,28 @@ class DashboardController {
           helpText.style.display = 'none';
           strategySelector.parentNode.appendChild(helpText);
         }
+      }
+      
+      // Add strategies to bot creation selector as well
+      if (botStrategySelector) {
+        botStrategySelector.innerHTML = '';
+        
+        // Add default empty option with instructions
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Chọn Chiến Lược (Select Strategy)';
+        defaultOption.selected = true;
+        botStrategySelector.appendChild(defaultOption);
+        
+        // Add strategy options
+        strategies.forEach(strategy => {
+          const option = document.createElement('option');
+          option.value = strategy.id;
+          option.textContent = strategy.name;
+          option.setAttribute('data-description', strategy.description);
+          botStrategySelector.appendChild(option);
+        });
+      }
         
         // Add event listener to show strategy-specific parameters and description
         strategySelector.addEventListener('change', (e) => {
@@ -503,9 +526,9 @@ class DashboardController {
     try {
       this.showLoading(true);
       
-      // Get strategy parameters
-      const strategySelector = document.getElementById('strategy-selector');
-      const strategy = strategySelector ? strategySelector.value : '';
+      // Get strategy parameters from botStrategySelector (not strategySelector)
+      const botStrategySelector = document.getElementById('bot-strategy');
+      const strategy = botStrategySelector ? botStrategySelector.value : '';
       
       if (!strategy) {
         this.showError('Vui lòng chọn chiến lược giao dịch (Please select a trading strategy)');

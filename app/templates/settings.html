@@ -164,6 +164,15 @@
               </div>
               
               <button type="button" id="save-notification-settings-btn" class="btn btn-primary">Save Notification Settings</button>
+              
+              <!-- Success message that will display when settings are saved (initially hidden) -->
+              <div id="notification-settings-saved" class="alert alert-success mt-3" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                Notification settings saved successfully.
+                <span id="telegram-status-message"></span>
+              </div>
             </form>
           </div>
           
@@ -331,8 +340,58 @@
         return;
       }
       
-      // In a real application, this would send the settings to the server
-      showToast('Notification settings saved successfully', 'success');
+      // Prepare notification settings data
+      const notificationData = {
+        email_enabled: emailEnabled,
+        email_address: emailAddress,
+        telegram_enabled: telegramEnabled,
+        telegram_chat_id: telegramChatId,
+        notify_trade_executed: document.getElementById('notify-trade-executed').checked,
+        notify_position_closed: document.getElementById('notify-position-closed').checked,
+        notify_bot_started: document.getElementById('notify-bot-started').checked,
+        notify_errors: document.getElementById('notify-error').checked
+      };
+      
+      // Send settings to server via API
+      fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notificationData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Show success message
+          showToast('Notification settings saved successfully', 'success');
+          
+          // Show the success message with Telegram status if applicable
+          const successMsg = document.getElementById('notification-settings-saved');
+          const telegramStatusMsg = document.getElementById('telegram-status-message');
+          
+          if (telegramEnabled && data.telegram_enabled) {
+            telegramStatusMsg.textContent = ' Telegram notifications are now active.';
+          } else if (telegramEnabled && !data.telegram_enabled) {
+            telegramStatusMsg.textContent = ' Telegram configuration saved but not active yet.';
+          } else {
+            telegramStatusMsg.textContent = '';
+          }
+          
+          successMsg.style.display = 'block';
+          
+          // Hide the success message after 5 seconds
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 5000);
+        } else {
+          showToast(data.error || 'Failed to save notification settings', 'danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving notification settings:', error);
+        showToast('An error occurred while saving settings', 'danger');
+      });
     });
     
     // Reset Settings button
