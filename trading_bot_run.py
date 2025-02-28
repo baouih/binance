@@ -385,62 +385,6 @@ class TradingBotRunner:
             
             return AutoStrategy(market_regime_detector, ml_optimizer)
             
-        elif strategy_type == 'combined':
-            # Tạo CombinedStrategy với các chiến lược cơ bản
-            strategies = [
-                RSIStrategy(overbought=70, oversold=30),
-                MACDStrategy(),
-                EMACrossStrategy(short_period=9, long_period=21),
-                BBandsStrategy(deviation_multiplier=2.0)
-            ]
-            
-            # Thêm MLStrategy nếu sử dụng ML
-            if self.use_ml:
-                ml_optimizer = MLOptimizer()
-                try:
-                    if os.path.exists('models/ensemble_model.joblib'):
-                        ml_optimizer.load_models('models')
-                except Exception as e:
-                    logger.warning(f"Không thể tải mô hình ML: {str(e)}")
-                
-                market_regime_detector = MarketRegimeDetector()
-                strategies.append(MLStrategy(
-                    ml_optimizer=ml_optimizer,
-                    market_regime_detector=market_regime_detector,
-                    probability_threshold=0.65
-                ))
-                weights = [0.2, 0.2, 0.2, 0.2, 0.2]  # Trọng số bằng nhau cho tất cả chiến lược
-            else:
-                weights = [0.25, 0.25, 0.25, 0.25]  # Trọng số bằng nhau cho các chiến lược không ML
-            
-            logger.info(f"Tạo chiến lược CombinedStrategy với {len(strategies)} chiến lược con")
-            return CombinedStrategy(strategies=strategies, weights=weights)
-            
-        elif strategy_type == 'rsi':
-            # Tạo RSIStrategy
-            logger.info("Tạo chiến lược RSIStrategy với các thông số tiêu chuẩn")
-            return RSIStrategy(overbought=70, oversold=30)
-            
-        elif strategy_type == 'macd':
-            # Tạo MACDStrategy
-            logger.info("Tạo chiến lược MACDStrategy với các thông số tiêu chuẩn")
-            return MACDStrategy()
-            
-        elif strategy_type == 'ema':
-            # Tạo EMACrossStrategy
-            logger.info("Tạo chiến lược EMACrossStrategy với các thông số tiêu chuẩn")
-            return EMACrossStrategy(short_period=9, long_period=21)
-            
-        elif strategy_type == 'bbands':
-            # Tạo BBandsStrategy
-            logger.info("Tạo chiến lược BBandsStrategy với các thông số tiêu chuẩn")
-            return BBandsStrategy(deviation_multiplier=2.0)
-        
-        else:
-            # Mặc định sử dụng AutoStrategy
-            logger.warning(f"Không nhận dạng được loại chiến lược: {strategy_type}. Sử dụng chiến lược AutoStrategy mặc định.")
-            return self._create_default_strategy()
-            
     def _report_status(self):
         """Báo cáo trạng thái hoạt động của bot"""
         if not self.bot:
@@ -527,7 +471,8 @@ def main():
     parser.add_argument('--risk', type=float, default=1.0, help='Phần trăm rủi ro (0.1-10.0)')
     parser.add_argument('--config', type=str, help='File cấu hình tối ưu')
     parser.add_argument('--check-interval', type=int, default=60, help='Khoảng thời gian kiểm tra (giây)')
-    parser.add_argument('--strategy', type=str, choices=['auto', 'ml', 'combined', 'rsi', 'macd', 'ema', 'bbands'], 
+    parser.add_argument('--strategy', type=str, 
+                       choices=['auto', 'ml', 'combined', 'rsi', 'macd', 'ema', 'bbands', 'advanced_ml', 'regime_ml'], 
                        help='Loại chiến lược giao dịch (mặc định: auto)')
     parser.add_argument('--no-ml', action='store_true', help='Không sử dụng học máy trong các dự đoán')
     

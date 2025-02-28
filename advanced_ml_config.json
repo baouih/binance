@@ -1,0 +1,102 @@
+{
+    "AutoStrategy": {
+        "description": "Chiến lược tự động thích ứng với các chế độ thị trường",
+        "best_params": {
+            "use_ml": true,
+            "ml_confidence_threshold": 0.65,
+            "adaptive_mode": true,
+            "trend_filter_threshold": 0.2
+        }
+    },
+    "MLStrategy": {
+        "description": "Chiến lược học máy cơ bản",
+        "best_params": {
+            "probability_threshold": 0.65,
+            "confidence_window": 3,
+            "use_volume_filter": true,
+            "use_trend_filter": true,
+            "ml_fallback_strategy": "combined"
+        }
+    },
+    "advanced_ml": {
+        "description": "Chiến lược học máy nâng cao với nhiều mô hình",
+        "best_params": {
+            "probability_threshold": 0.67,
+            "confidence_threshold": 0.6,
+            "window_size": 3,
+            "regime_specific_models": true,
+            "use_ensemble": true,
+            "feature_selection": true,
+            "base_models": ["random_forest", "gradient_boosting", "neural_network"]
+        }
+    },
+    "RSI": {
+        "description": "Chiến lược RSI tối ưu",
+        "best_params": {
+            "overbought": 70,
+            "oversold": 30,
+            "period": 14,
+            "use_trend_filter": true
+        }
+    },
+    "MACD": {
+        "description": "Chiến lược MACD tối ưu",
+        "best_params": {
+            "fast_period": 12,
+            "slow_period": 26,
+            "signal_period": 9,
+            "hist_threshold": 0.0
+        }
+    },
+    "EMA_Cross": {
+        "description": "Chiến lược EMA Crossover tối ưu",
+        "best_params": {
+            "short_period": 9,
+            "long_period": 21,
+            "confirmation_period": 3
+        }
+    },
+    "Bollinger_Bands": {
+        "description": "Chiến lược Bollinger Bands tối ưu",
+        "best_params": {
+            "num_std_dev": 2.0,
+            "period": 20,
+            "use_dynamic_bands": true
+        }
+    },
+    "Combined": {
+        "description": "Chiến lược kết hợp tối ưu",
+        "best_params": {
+            "strategies": ["RSIStrategy", "MACDStrategy", "EMACrossStrategy", "BBandsStrategy", "MLStrategy"],
+            "weights": [0.2, 0.2, 0.2, 0.2, 0.2],
+            "min_confirmation": 2,
+            "use_adaptive_weights": true
+        }
+    },
+    "market_regimes": {
+        "trending_up": {
+            "strategies": ["EMACrossStrategy", "MACDStrategy", "MLStrategy"],
+            "weights": [0.4, 0.3, 0.3]
+        },
+        "trending_down": {
+            "strategies": ["EMACrossStrategy", "MACDStrategy", "MLStrategy"],
+            "weights": [0.4, 0.3, 0.3]
+        },
+        "ranging": {
+            "strategies": ["RSIStrategy", "BBandsStrategy", "MLStrategy"],
+            "weights": [0.4, 0.4, 0.2]
+        },
+        "volatile": {
+            "strategies": ["BBandsStrategy", "MLStrategy", "RSIStrategy"],
+            "weights": [0.4, 0.4, 0.2]
+        },
+        "breakout": {
+            "strategies": ["BBandsStrategy", "MACDStrategy", "MLStrategy"],
+            "weights": [0.4, 0.3, 0.3]
+        },
+        "neutral": {
+            "strategies": ["CombinedStrategy", "MLStrategy"],
+            "weights": [0.6, 0.4]
+        }
+    }
+}
