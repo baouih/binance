@@ -46,7 +46,7 @@ trading_bots = {}
 # Data generation thread (for simulating real-time price updates)
 data_thread = None
 should_run = False
-current_price = 45000.0  # Starting price for BTC
+current_price = 63500.0  # Updated BTC price as of February 2024
 
 # Store backtesting results
 backtest_results = {}
