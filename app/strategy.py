@@ -11,6 +11,10 @@ class Strategy:
     
     def __init__(self, name="BaseStrategy"):
         self.name = name
+        self.description = {
+            "vi": "Chiến lược cơ sở",
+            "en": "Base strategy class"
+        }
         
     def generate_signal(self, dataframe):
         """
@@ -23,7 +27,7 @@ class Strategy:
             int: Signal (-1 for sell, 0 for hold, 1 for buy)
         """
         # To be implemented by subclasses
-        return 0
+        return 0  # Literal type is important - subclasses must handle type correctly
         
     def get_strategy_info(self):
         """
