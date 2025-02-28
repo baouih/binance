@@ -40,6 +40,7 @@ except ImportError:
     # Sử dụng phiên bản từ thư mục gốc nếu không tìm thấy trong app/
     from composite_indicator import CompositeIndicator
 from telegram_notify import telegram_notifier
+from market_sentiment_analyzer import market_sentiment_analyzer
 
 class MultiCoinBot:
     """Bot giao dịch đa đồng tiền đơn giản hóa"""
@@ -75,6 +76,7 @@ class MultiCoinBot:
         # Trạng thái theo dõi
         self.market_data = {}
         self.signals = {}
+        self.sentiment_data = {}
         
         # Gửi thông báo khi khởi động
         if self.config["general_settings"]["telegram_notifications"]:
@@ -129,6 +131,12 @@ class MultiCoinBot:
         # Lấy giá hiện tại
         current_price = self.api.get_symbol_price(symbol)
         
+        # Phân tích tâm lý thị trường
+        sentiment = market_sentiment_analyzer.calculate_composite_sentiment(symbol, df)
+        
+        # Lưu lại thông tin tâm lý
+        self.sentiment_data[symbol] = sentiment
+        
         # Tổng hợp kết quả
         analysis = {
             "symbol": symbol,
@@ -137,18 +145,40 @@ class MultiCoinBot:
             "composite_score": composite_score['score'],
             "price": current_price,
             "individual_scores": composite_score.get('individual_scores', {}),
+            "sentiment": {
+                "value": sentiment["value"],
+                "state": sentiment["state"],
+                "description": sentiment["description"]
+            }
         }
         
-        # Xác định tín hiệu giao dịch
-        if composite_score['score'] > 0.5:
+        # Xác định tín hiệu giao dịch (kết hợp tâm lý thị trường)
+        # Mức tăng/giảm của ngưỡng tín hiệu dựa trên tâm lý thị trường
+        sentiment_value = sentiment["value"]
+        sentiment_boost = 0
+        
+        # Tăng điểm cho tín hiệu mua khi tâm lý sợ hãi (ngược lại thị trường)
+        if sentiment_value < 40:  # Fear hoặc Extreme Fear
+            if composite_score['score'] > 0:  # Tín hiệu mua
+                sentiment_boost = (40 - sentiment_value) / 40 * 0.2  # Tối đa +0.2
+        # Tăng điểm cho tín hiệu bán khi tâm lý tham lam (ngược lại thị trường)
+        elif sentiment_value > 60:  # Greed hoặc Extreme Greed
+            if composite_score['score'] < 0:  # Tín hiệu bán
+                sentiment_boost = (sentiment_value - 60) / 40 * 0.2  # Tối đa +0.2
+        
+        # Điều chỉnh điểm tín hiệu dựa trên tâm lý thị trường
+        adjusted_score = composite_score['score'] + (composite_score['score'] > 0 and sentiment_boost or -sentiment_boost)
+        
+        if adjusted_score > 0.5:
             analysis["signal"] = "buy"
-        elif composite_score['score'] < -0.5:
+        elif adjusted_score < -0.5:
             analysis["signal"] = "sell"
         else:
             analysis["signal"] = "neutral"
         
         # Tính toán ngưỡng tin cậy (0-1)
-        analysis["confidence"] = abs(composite_score['score']) if abs(composite_score['score']) <= 1.0 else 1.0
+        analysis["confidence"] = abs(adjusted_score) if abs(adjusted_score) <= 1.0 else 1.0
+        analysis["adjusted_score"] = adjusted_score
         
         # Lưu lại thông tin thị trường
         self.market_data[symbol] = analysis
@@ -164,6 +194,11 @@ class MultiCoinBot:
         """
         signals = {}
         
+        # Cập nhật chỉ số Fear & Greed toàn thị trường trước
+        fear_greed = market_sentiment_analyzer.get_fear_greed_index()
+        logger.info(f"Chỉ số Fear & Greed: {fear_greed['value']} - {fear_greed['description']}")
+        
+        # Phân tích từng cặp tiền
         for symbol in self.symbols:
             analysis = self.analyze_market(symbol)
             if not analysis:
@@ -179,7 +214,8 @@ class MultiCoinBot:
                     "action": analysis["signal"],
                     "price": analysis["price"],
                     "confidence": analysis["confidence"],
-                    "market_regime": analysis["market_regime"]
+                    "market_regime": analysis["market_regime"],
+                    "sentiment": analysis["sentiment"]
                 }
                 
                 # Gửi thông báo Telegram nếu cấu hình
@@ -190,7 +226,9 @@ class MultiCoinBot:
             
             # Log tín hiệu
             logger.info(f"Phân tích {symbol}: {analysis['signal']} "
-                       f"(Confidence: {analysis['confidence']:.2f}, Regime: {analysis['market_regime']})")
+                       f"(Confidence: {analysis['confidence']:.2f}, "
+                       f"Regime: {analysis['market_regime']}, "
+                       f"Sentiment: {analysis['sentiment']['state']} - {analysis['sentiment']['value']:.2f})")
         
         self.signals = signals
         return signals
@@ -233,6 +271,15 @@ class MultiCoinBot:
                 else:
                     logger.info("Không có tín hiệu giao dịch đủ mạnh.")
                 
+                # Lấy xu hướng tâm lý
+                for symbol in self.symbols:
+                    try:
+                        sentiment_trend = market_sentiment_analyzer.get_sentiment_trend(symbol, "6h")
+                        if sentiment_trend and "trends" in sentiment_trend and sentiment_trend["trends"]:
+                            logger.info(f"Xu hướng tâm lý {symbol}: {sentiment_trend['trends'].get('symbol_sentiment_trend', {}).get('description', 'Không xác định')}")
+                    except Exception as e:
+                        logger.warning(f"Không thể lấy xu hướng tâm lý cho {symbol}: {str(e)}")
+                
                 # Gửi báo cáo tổng hợp qua Telegram
                 if cycle % 12 == 0:  # Khoảng 1 giờ nếu check_interval=300s
                     self._send_summary_report()
@@ -241,6 +288,10 @@ class MultiCoinBot:
                 if max_cycles is not None and cycle >= max_cycles:
                     logger.info(f"Đã đạt số chu kỳ tối đa ({max_cycles}), dừng bot.")
                     break
+                
+                # Lưu lịch sử tâm lý
+                if cycle % 24 == 0:  # Mỗi 2 giờ nếu check_interval=300s
+                    market_sentiment_analyzer.save_history()
                 
                 logger.info(f"Đang chờ {check_interval} giây đến lần kiểm tra tiếp theo...")
                 time.sleep(check_interval)
@@ -261,9 +312,13 @@ class MultiCoinBot:
         if not self.config["general_settings"]["telegram_notifications"]:
             return
         
+        # Lấy chỉ số Fear & Greed toàn thị trường
+        fear_greed = market_sentiment_analyzer.get_fear_greed_index()
+        
         # Tạo báo cáo
         report = "<b>📊 BÁO CÁO TỔNG QUAN THỊ TRƯỜNG</b>\n\n"
-        report += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        report += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        report += f"<b>Chỉ số Fear & Greed:</b> {fear_greed['value']} - {fear_greed['description']}\n\n"
         
         # Thêm thông tin cho mỗi cặp
         for symbol in self.symbols:
@@ -272,12 +327,18 @@ class MultiCoinBot:
                 regime = data["market_regime"]
                 price = data["price"]
                 score = data["composite_score"]
+                sentiment = data["sentiment"]["state"]
+                sentiment_value = data["sentiment"]["value"]
                 
                 # Emoji dựa trên tín hiệu
                 emoji = "🟢" if score > 0.3 else "🔴" if score < -0.3 else "⚪️"
                 
+                # Emoji cho tâm lý
+                sentiment_emoji = "😨" if sentiment == "extreme_fear" else "😰" if sentiment == "fear" else "😐" if sentiment == "neutral" else "😋" if sentiment == "greed" else "🤑"
+                
                 report += f"{emoji} <b>{symbol}:</b> ${price:,.2f}\n"
                 report += f"    Regime: {regime}, Score: {score:.2f}\n"
+                report += f"    Sentiment: {sentiment_emoji} {sentiment.replace('_', ' ').title()} ({sentiment_value:.1f})\n"
         
         # Gửi báo cáo
         telegram_notifier.send_message(report)
@@ -296,6 +357,9 @@ def main():
                         help='Số chu kỳ tối đa, None nếu chạy vô hạn')
     
     args = parser.parse_args()
+    
+    # Cố gắng tải lịch sử tâm lý nếu có
+    market_sentiment_analyzer.load_history()
     
     # Khởi tạo và chạy bot
     bot = MultiCoinBot(config_file=args.config, live_mode=args.live)

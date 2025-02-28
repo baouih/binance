@@ -6,13 +6,16 @@ cảnh báo, báo cáo hiệu suất) tới người dùng qua Telegram.
 """
 
 import os
+import json
 import logging
-import requests
-from typing import Dict, List, Optional, Union, Any
+import time
 from datetime import datetime
+from typing import Dict, List, Optional
+import requests
 
 # Thiết lập logging
-logger = logging.getLogger('telegram_notify')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("telegram_notify")
 
 class TelegramNotifier:
     """Lớp xử lý thông báo Telegram cho bot giao dịch"""
@@ -25,15 +28,17 @@ class TelegramNotifier:
             token (str, optional): Telegram Bot API token. Nếu None, sẽ lấy từ biến môi trường TELEGRAM_BOT_TOKEN
             chat_id (str, optional): Telegram chat ID. Nếu None, sẽ lấy từ biến môi trường TELEGRAM_CHAT_ID
         """
-        self.token = token or os.environ.get('TELEGRAM_BOT_TOKEN')
-        self.chat_id = chat_id or os.environ.get('TELEGRAM_CHAT_ID')
-        self.enabled = self.token is not None and self.chat_id is not None
+        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN")
+        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+        self.api_url = f"https://api.telegram.org/bot{self.token}" if self.token else None
         
-        if not self.enabled:
+        if not self.token or not self.chat_id:
             logger.warning("Telegram notifier không được kích hoạt do thiếu token hoặc chat_id")
             logger.warning("Đặt TELEGRAM_BOT_TOKEN và TELEGRAM_CHAT_ID trong biến môi trường để kích hoạt")
+            self.enabled = False
         else:
-            logger.info(f"Telegram notifier đã được kích hoạt cho chat ID: {self.chat_id}")
+            self.enabled = True
+            logger.info("Telegram notifier đã được kích hoạt")
     
     def send_message(self, message: str) -> bool:
         """
@@ -46,28 +51,24 @@ class TelegramNotifier:
             bool: True nếu gửi thành công, False nếu không
         """
         if not self.enabled:
-            logger.debug(f"Không gửi tin nhắn Telegram (không kích hoạt): {message}")
             return False
         
         try:
-            url = f"https://api.telegram.org/bot{self.token}/sendMessage"
-            payload = {
+            endpoint = f"{self.api_url}/sendMessage"
+            data = {
                 "chat_id": self.chat_id,
                 "text": message,
-                "parse_mode": "HTML"
+                "parse_mode": "HTML",
             }
-            
-            response = requests.post(url, json=payload, timeout=10)
+            response = requests.post(endpoint, json=data)
             
             if response.status_code == 200:
-                logger.debug(f"Đã gửi tin nhắn Telegram: {message[:50]}...")
                 return True
             else:
-                logger.error(f"Lỗi khi gửi tin nhắn Telegram: {response.status_code} - {response.text}")
+                logger.error(f"Lỗi gửi tin nhắn Telegram: {response.status_code} - {response.text}")
                 return False
-                
         except Exception as e:
-            logger.error(f"Lỗi khi gửi tin nhắn Telegram: {str(e)}")
+            logger.error(f"Lỗi gửi tin nhắn Telegram: {str(e)}")
             return False
     
     def send_trade_signal(self, signal_data: Dict) -> bool:
@@ -80,35 +81,34 @@ class TelegramNotifier:
         Returns:
             bool: True nếu gửi thành công, False nếu không
         """
-        if not self.enabled or signal_data.get('final_signal') == 'neutral':
+        if not self.enabled:
             return False
         
-        symbol = signal_data.get('symbol', 'UNKNOWN')
-        signal = signal_data.get('final_signal', 'neutral')
-        confidence = signal_data.get('ml_confidence', 0)
-        regime = signal_data.get('market_regime', 'unknown')
-        price = signal_data.get('current_price', 0)
-        
-        # Biểu tượng emoji
-        emoji = "🟢" if signal == "buy" else "🔴" if signal == "sell" else "⚪️"
-        
-        # Xây dựng tin nhắn
-        message = f"<b>{emoji} TÍN HIỆU GIAO DỊCH: {symbol}</b>\n\n"
-        message += f"<b>Tín hiệu:</b> {signal.upper()}\n"
-        message += f"<b>Giá hiện tại:</b> ${price:,.2f}\n"
-        message += f"<b>Độ tin cậy:</b> {confidence:.2%}\n"
-        message += f"<b>Chế độ thị trường:</b> {regime}\n"
-        message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        
-        # Thêm chi tiết từ các chỉ báo riêng biệt
-        if 'individual_scores' in signal_data:
-            message += "\n<b>Chi tiết chỉ báo:</b>\n"
-            for indicator, score in signal_data['individual_scores'].items():
-                if abs(score) >= 0.3:  # Chỉ hiện thị các chỉ báo có tín hiệu đáng kể
-                    direction = "↗️" if score > 0 else "↘️"
-                    message += f"- {indicator}: {direction} {score:.2f}\n"
-        
-        return self.send_message(message)
+        try:
+            # Tạo emoji cho tín hiệu
+            signal = signal_data.get("signal", "neutral").lower()
+            emoji = "🟢" if signal == "buy" else "🔴" if signal == "sell" else "⚪️"
+            
+            # Định dạng tin nhắn
+            message = f"<b>{emoji} TÍN HIỆU GIAO DỊCH</b>\n\n"
+            message += f"<b>Cặp:</b> {signal_data.get('symbol', 'Unknown')}\n"
+            message += f"<b>Tín hiệu:</b> {signal.upper()}\n"
+            message += f"<b>Giá hiện tại:</b> ${signal_data.get('price', 0):,.2f}\n"
+            message += f"<b>Độ tin cậy:</b> {signal_data.get('confidence', 0) * 100:.1f}%\n"
+            message += f"<b>Chế độ thị trường:</b> {signal_data.get('market_regime', 'unknown')}\n"
+            message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            
+            # Thêm thông tin chi tiết
+            if "individual_scores" in signal_data:
+                message += "<b>Chi tiết chỉ báo:</b>\n"
+                for indicator, score in signal_data["individual_scores"].items():
+                    indicator_emoji = "🟢" if score > 0.1 else "🔴" if score < -0.1 else "⚪️"
+                    message += f"{indicator_emoji} {indicator}: {score:.2f}\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi tín hiệu giao dịch: {str(e)}")
+            return False
     
     def send_trade_execution(self, trade_data: Dict) -> bool:
         """
@@ -123,26 +123,30 @@ class TelegramNotifier:
         if not self.enabled:
             return False
         
-        symbol = trade_data.get('symbol', 'UNKNOWN')
-        side = trade_data.get('side', 'UNKNOWN')
-        quantity = trade_data.get('quantity', 0)
-        price = trade_data.get('price', 0)
-        
-        # Biểu tượng emoji
-        emoji = "🟢" if side == "BUY" else "🔴" if side == "SELL" else "⚪️"
-        
-        # Xây dựng tin nhắn
-        message = f"<b>{emoji} ĐÃ THỰC HIỆN GIAO DỊCH: {symbol}</b>\n\n"
-        message += f"<b>Hành động:</b> {side}\n"
-        message += f"<b>Số lượng:</b> {quantity}\n"
-        message += f"<b>Giá:</b> ${price:,.2f}\n"
-        message += f"<b>Tổng giá trị:</b> ${quantity * price:,.2f}\n"
-        message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        
-        if 'simulated' in trade_data and trade_data['simulated']:
-            message += "\n<i>Ghi chú: Đây là giao dịch giả lập</i>"
-        
-        return self.send_message(message)
+        try:
+            # Tạo emoji cho loại giao dịch
+            side = trade_data.get("side", "").lower()
+            emoji = "🟢" if side == "buy" else "🔴" if side == "sell" else "⚪️"
+            
+            # Định dạng tin nhắn
+            message = f"<b>{emoji} GIAO DỊCH ĐÃ THỰC HIỆN</b>\n\n"
+            message += f"<b>Cặp:</b> {trade_data.get('symbol', 'Unknown')}\n"
+            message += f"<b>Hành động:</b> {side.upper()}\n"
+            message += f"<b>Giá vào lệnh:</b> ${trade_data.get('entry_price', 0):,.2f}\n"
+            message += f"<b>Số lượng:</b> {trade_data.get('quantity', 0):,.6f}\n"
+            message += f"<b>Giá trị:</b> ${trade_data.get('value', 0):,.2f}\n"
+            message += f"<b>Đòn bẩy:</b> {trade_data.get('leverage', 1)}x\n"
+            message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            
+            # Thêm thông tin rủi ro
+            message += "<b>Quản lý rủi ro:</b>\n"
+            message += f"🎯 Take Profit: ${trade_data.get('take_profit', 0):,.2f}\n"
+            message += f"🛑 Stop Loss: ${trade_data.get('stop_loss', 0):,.2f}\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi thông báo giao dịch: {str(e)}")
+            return False
     
     def send_position_closed(self, position_data: Dict) -> bool:
         """
@@ -157,29 +161,27 @@ class TelegramNotifier:
         if not self.enabled:
             return False
         
-        symbol = position_data.get('symbol', 'UNKNOWN')
-        side = position_data.get('side', 'UNKNOWN')
-        entry_price = position_data.get('entry_price', 0)
-        exit_price = position_data.get('exit_price', 0)
-        quantity = position_data.get('quantity', 0)
-        pnl = position_data.get('pnl', 0)
-        
-        # Biểu tượng emoji
-        emoji = "✅" if pnl > 0 else "❌" if pnl < 0 else "⚪️"
-        
-        # Xây dựng tin nhắn
-        message = f"<b>{emoji} ĐÃ ĐÓNG VỊ THẾ: {symbol}</b>\n\n"
-        message += f"<b>Loại vị thế:</b> {side}\n"
-        message += f"<b>Giá vào:</b> ${entry_price:,.2f}\n"
-        message += f"<b>Giá ra:</b> ${exit_price:,.2f}\n"
-        message += f"<b>Số lượng:</b> {quantity}\n"
-        message += f"<b>Lãi/Lỗ:</b> ${pnl:,.2f}\n"
-        
-        pnl_pct = (pnl / (entry_price * quantity)) * 100
-        message += f"<b>Lãi/Lỗ (%):</b> {pnl_pct:,.2f}%\n"
-        message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        
-        return self.send_message(message)
+        try:
+            # Tạo emoji cho kết quả
+            pnl = position_data.get("pnl", 0)
+            pnl_pct = position_data.get("pnl_percentage", 0)
+            emoji = "🟢" if pnl > 0 else "🔴" if pnl < 0 else "⚪️"
+            
+            # Định dạng tin nhắn
+            message = f"<b>{emoji} VỊ THẾ ĐÃ ĐÓNG</b>\n\n"
+            message += f"<b>Cặp:</b> {position_data.get('symbol', 'Unknown')}\n"
+            message += f"<b>Hướng:</b> {position_data.get('side', '').upper()}\n"
+            message += f"<b>Giá vào:</b> ${position_data.get('entry_price', 0):,.2f}\n"
+            message += f"<b>Giá thoát:</b> ${position_data.get('exit_price', 0):,.2f}\n"
+            message += f"<b>Lãi/Lỗ:</b> ${pnl:,.2f} ({pnl_pct:.2f}%)\n"
+            message += f"<b>Lý do đóng:</b> {position_data.get('exit_reason', 'Unknown')}\n"
+            message += f"<b>Thời gian nắm giữ:</b> {position_data.get('holding_time', 'Unknown')}\n"
+            message += f"<b>Thời gian đóng:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi thông báo đóng vị thế: {str(e)}")
+            return False
     
     def send_daily_report(self, performance_data: Dict) -> bool:
         """
@@ -194,45 +196,37 @@ class TelegramNotifier:
         if not self.enabled:
             return False
         
-        # Xây dựng tin nhắn
-        message = f"<b>📊 BÁO CÁO HIỆU SUẤT HÀNG NGÀY</b>\n\n"
-        message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        
-        # Thông tin số dư
-        balance = performance_data.get('balance', 0)
-        message += f"<b>Số dư hiện tại:</b> ${balance:,.2f}\n"
-        
-        # Thông tin lãi/lỗ
-        daily_pnl = performance_data.get('daily_pnl', 0)
-        daily_pnl_pct = performance_data.get('daily_pnl_pct', 0)
-        emoji = "📈" if daily_pnl >= 0 else "📉"
-        message += f"<b>Lãi/Lỗ hôm nay:</b> {emoji} ${daily_pnl:,.2f} ({daily_pnl_pct:,.2f}%)\n\n"
-        
-        # Thông tin giao dịch
-        trades = performance_data.get('trades', [])
-        num_trades = len(trades)
-        win_trades = sum(1 for t in trades if t.get('pnl', 0) > 0)
-        loss_trades = sum(1 for t in trades if t.get('pnl', 0) < 0)
-        
-        if num_trades > 0:
-            win_rate = (win_trades / num_trades) * 100
-            message += f"<b>Số giao dịch:</b> {num_trades}\n"
-            message += f"<b>Thắng/Thua:</b> {win_trades}/{loss_trades}\n"
-            message += f"<b>Tỷ lệ thắng:</b> {win_rate:.2f}%\n\n"
-        else:
-            message += "<b>Không có giao dịch nào hôm nay</b>\n\n"
-        
-        # Hiệu suất các cặp giao dịch
-        if 'symbol_performance' in performance_data:
-            message += "<b>Hiệu suất theo cặp:</b>\n"
-            for symbol, perf in performance_data['symbol_performance'].items():
-                symbol_emoji = "🟢" if perf.get('pnl', 0) >= 0 else "🔴"
-                message += f"- {symbol_emoji} {symbol}: ${perf.get('pnl', 0):,.2f}\n"
-        
-        # Ghi chú
-        message += "\n<i>Bot đang hoạt động bình thường.</i>"
-        
-        return self.send_message(message)
+        try:
+            # Định dạng tin nhắn
+            message = f"<b>📊 BÁO CÁO HIỆU SUẤT HÀNG NGÀY</b>\n\n"
+            message += f"<b>Ngày:</b> {datetime.now().strftime('%Y-%m-%d')}\n"
+            
+            # Tổng quan
+            message += "\n<b>TỔNG QUAN:</b>\n"
+            message += f"💰 Số dư hiện tại: ${performance_data.get('current_balance', 0):,.2f}\n"
+            message += f"📈 Lãi/Lỗ hôm nay: ${performance_data.get('daily_pnl', 0):,.2f} ({performance_data.get('daily_pnl_percentage', 0):.2f}%)\n"
+            message += f"🔄 Giao dịch hôm nay: {performance_data.get('daily_trades', 0)}\n"
+            message += f"✅ Tỷ lệ thắng: {performance_data.get('win_rate', 0) * 100:.1f}%\n"
+            
+            # Các vị thế đang mở
+            open_positions = performance_data.get("open_positions", [])
+            if open_positions:
+                message += "\n<b>VỊ THẾ ĐANG MỞ:</b>\n"
+                for pos in open_positions:
+                    emoji = "🟢" if pos.get("unrealized_pnl", 0) > 0 else "🔴" if pos.get("unrealized_pnl", 0) < 0 else "⚪️"
+                    message += f"{emoji} {pos.get('symbol')}: {pos.get('unrealized_pnl_percentage', 0):.2f}%\n"
+            
+            # Tóm tắt thị trường
+            market_summary = performance_data.get("market_summary", {})
+            if market_summary:
+                message += "\n<b>TÓM TẮT THỊ TRƯỜNG:</b>\n"
+                for symbol, data in market_summary.items():
+                    message += f"📊 {symbol}: ${data.get('price', 0):,.2f} ({data.get('change_24h', 0):.2f}%)\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi báo cáo hiệu suất: {str(e)}")
+            return False
     
     def send_error_alert(self, error_message: str, error_type: str = "General") -> bool:
         """
@@ -248,12 +242,16 @@ class TelegramNotifier:
         if not self.enabled:
             return False
         
-        # Xây dựng tin nhắn
-        message = f"<b>⚠️ CẢNH BÁO LỖI: {error_type}</b>\n\n"
-        message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        message += f"<b>Chi tiết:</b> {error_message}\n"
-        
-        return self.send_message(message)
+        try:
+            # Định dạng tin nhắn
+            message = f"<b>⚠️ CẢNH BÁO LỖI: {error_type}</b>\n\n"
+            message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            message += f"<b>Thông báo lỗi:</b>\n{error_message}\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi cảnh báo lỗi: {str(e)}")
+            return False
     
     def send_startup_notification(self) -> bool:
         """
@@ -262,15 +260,19 @@ class TelegramNotifier:
         Returns:
             bool: True nếu gửi thành công, False nếu không
         """
-        message = (
-            "<b>🤖 BOT GIAO DỊCH ĐÃ KHỞI ĐỘNG</b>\n\n"
-            f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            "<b>Trạng thái:</b> Đang hoạt động\n"
-            "<b>Chế độ:</b> Giả lập (không có giao dịch thực)\n\n"
-            "<i>Bot đang theo dõi thị trường và sẽ gửi tín hiệu khi có cơ hội giao dịch.</i>"
-        )
+        if not self.enabled:
+            return False
         
-        return self.send_message(message)
+        try:
+            message = f"<b>🚀 BOT GIAO DỊCH ĐÃ KHỞI ĐỘNG</b>\n\n"
+            message += f"<b>Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            message += f"<b>Chế độ:</b> {'Thực tế' if os.environ.get('LIVE_MODE') == 'true' else 'Giả lập'}\n"
+            message += f"<b>Phiên bản:</b> 1.0.0\n"
+            
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Lỗi gửi thông báo khởi động: {str(e)}")
+            return False
 
-# Tạo instance khi import module
+# Tạo instance toàn cục
 telegram_notifier = TelegramNotifier()
