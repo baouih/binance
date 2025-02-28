@@ -10,6 +10,7 @@ import time
 import random
 from datetime import datetime, timedelta
 from app.storage import Storage
+from app.routes import register_routes
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -35,6 +36,9 @@ app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 # Configure template directory
 app.template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 logger.info(f"Template directory: {app.template_folder}")
+
+# Register additional routes
+register_routes(app)
 
 # Initialize SocketIO with improved error handling and settings
 socketio = SocketIO(

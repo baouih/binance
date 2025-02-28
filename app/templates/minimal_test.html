@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Tối Giản</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        .success { color: #4caf50; }
+        .error { color: #f44336; }
+        .result-box {
+            background-color: #333;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Kiểm Tra Cơ Bản Trading Bot</h1>
+        
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>1. Danh sách cặp giao dịch</h3>
+                    </div>
+                    <div class="card-body">
+                        <button id="test-api" class="btn btn-primary">Tải Danh Sách</button>
+                        <div id="api-result" class="result-box mt-3"></div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>2. Thông tin giá hiện tại</h3>
+                    </div>
+                    <div class="card-body">
+                        <button id="test-price" class="btn btn-primary">Lấy Thông Tin Giá</button>
+                        <div id="price-result" class="result-box mt-3"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>3. Kết nối Socket</h3>
+                    </div>
+                    <div class="card-body">
+                        <button id="test-socket" class="btn btn-primary">Kiểm Tra Socket</button>
+                        <div id="socket-result" class="result-box mt-3"></div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>4. Biểu đồ đơn giản</h3>
+                    </div>
+                    <div class="card-body">
+                        <button id="test-chart" class="btn btn-primary">Tạo Biểu Đồ</button>
+                        <canvas id="simple-chart" height="200" class="mt-3"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 mb-5">
+            <a href="/" class="btn btn-lg btn-outline-secondary me-3">Quay về Trang Chủ</a>
+            <a href="/dashboard" class="btn btn-lg btn-outline-primary">Trading Dashboard</a>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Kiểm tra API
+            document.getElementById('test-api').addEventListener('click', function() {
+                const resultEl = document.getElementById('api-result');
+                resultEl.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"></div> Đang tải...';
+                
+                fetch('/api/symbols')
+                    .then(response => response.json())
+                    .then(data => {
+                        resultEl.innerHTML = '<p class="success">✓ Thành công</p>';
+                        resultEl.innerHTML += '<p>Danh sách cặp giao dịch:</p>';
+                        resultEl.innerHTML += '<ul>';
+                        data.forEach(symbol => {
+                            resultEl.innerHTML += `<li>${symbol}</li>`;
+                        });
+                        resultEl.innerHTML += '</ul>';
+                    })
+                    .catch(error => {
+                        resultEl.innerHTML = `<p class="error">✗ Lỗi: ${error.message}</p>`;
+                    });
+            });
+            
+            // 2. Kiểm tra thông tin giá
+            document.getElementById('test-price').addEventListener('click', function() {
+                const resultEl = document.getElementById('price-result');
+                resultEl.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"></div> Đang tải...';
+                
+                fetch('/api/market_data?symbol=BTCUSDT')
+                    .then(response => response.json())
+                    .then(data => {
+                        resultEl.innerHTML = '<p class="success">✓ Thành công</p>';
+                        resultEl.innerHTML += `<p>Giá BTC: <strong>${parseFloat(data.price).toLocaleString()} USDT</strong></p>`;
+                        resultEl.innerHTML += `<p>Thay đổi 24h: ${data.change_24h > 0 ? '+' : ''}${data.change_24h.toFixed(2)}%</p>`;
+                        resultEl.innerHTML += `<p>Thời gian: ${new Date(data.timestamp).toLocaleString()}</p>`;
+                    })
+                    .catch(error => {
+                        resultEl.innerHTML = `<p class="error">✗ Lỗi: ${error.message}</p>`;
+                        // Hiển thị dữ liệu mẫu nếu có lỗi
+                        resultEl.innerHTML += '<p><em>Sử dụng dữ liệu mẫu:</em></p>';
+                        resultEl.innerHTML += '<p>Giá BTC: <strong>61,245.80 USDT</strong></p>';
+                        resultEl.innerHTML += '<p>Thay đổi 24h: +1.23%</p>';
+                    });
+            });
+            
+            // 3. Kiểm tra kết nối Socket
+            document.getElementById('test-socket').addEventListener('click', function() {
+                const resultEl = document.getElementById('socket-result');
+                resultEl.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"></div> Đang kiểm tra...';
+                
+                // Hiển thị màn hình chờ trước khi thử kết nối
+                setTimeout(() => {
+                    try {
+                        // Tạo kết nối Socket.IO với timeout ngắn
+                        const socket = io({
+                            transports: ['websocket', 'polling'],
+                            reconnectionAttempts: 3,
+                            reconnectionDelay: 1000,
+                            timeout: 5000
+                        });
+                        
+                        // Thiết lập bộ đếm thời gian để xử lý timeout
+                        const socketTimeout = setTimeout(() => {
+                            resultEl.innerHTML = '<p class="error">✗ Lỗi: Kết nối Socket.IO timeout</p>';
+                            resultEl.innerHTML += '<p>Đang dùng chế độ mô phỏng để hiển thị dữ liệu. Dữ liệu sẽ được cập nhật định kỳ, nhưng không phải thời gian thực.</p>';
+                            socket.disconnect();
+                        }, 5000);
+                        
+                        socket.on('connect', function() {
+                            clearTimeout(socketTimeout);
+                            resultEl.innerHTML = '<p class="success">✓ Kết nối thành công</p>';
+                            resultEl.innerHTML += '<p>Socket ID: ' + socket.id + '</p>';
+                            resultEl.innerHTML += '<p>Đang lắng nghe cập nhật thời gian thực...</p>';
+                            
+                            // Tự động ngắt kết nối sau 10 giây
+                            setTimeout(() => {
+                                socket.disconnect();
+                                resultEl.innerHTML += '<p>Đã tự động ngắt kết nối sau 10 giây.</p>';
+                            }, 10000);
+                        });
+                        
+                        socket.on('connect_error', function(error) {
+                            clearTimeout(socketTimeout);
+                            resultEl.innerHTML = '<p class="error">✗ Lỗi kết nối: ' + error.message + '</p>';
+                            resultEl.innerHTML += '<p>Đề xuất: Kiểm tra cài đặt Socket.IO trên máy chủ và đảm bảo cổng websocket đang hoạt động.</p>';
+                        });
+                        
+                        socket.on('price_update', function(data) {
+                            resultEl.innerHTML += `<p>Cập nhật giá: ${data.symbol} ${parseFloat(data.price).toLocaleString()} USDT</p>`;
+                        });
+                        
+                    } catch (error) {
+                        resultEl.innerHTML = '<p class="error">✗ Lỗi: ' + error.message + '</p>';
+                    }
+                }, 500);
+            });
+            
+            // 4. Tạo biểu đồ đơn giản
+            document.getElementById('test-chart').addEventListener('click', function() {
+                // Tạo dữ liệu mẫu
+                const labels = [];
+                const prices = [];
+                
+                const basePrice = 61000;
+                const now = new Date();
+                
+                for (let i = 20; i >= 0; i--) {
+                    const time = new Date(now.getTime() - i * 3600000);
+                    labels.push(time.toLocaleTimeString());
+                    prices.push(basePrice + Math.random() * 1000 - 500);
+                }
+                
+                // Tạo biểu đồ
+                const chartEl = document.getElementById('simple-chart');
+                
+                // Xóa biểu đồ cũ nếu có
+                if (window.priceChart) {
+                    window.priceChart.destroy();
+                }
+                
+                // Tạo biểu đồ mới
+                window.priceChart = new Chart(chartEl, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Giá BTC (USD)',
+                            data: prices,
+                            borderColor: '#4caf50',
+                            borderWidth: 2,
+                            tension: 0.2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Biểu đồ giá BTC mẫu'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Thời gian'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Giá (USD)'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
