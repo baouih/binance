@@ -296,6 +296,24 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T17:39:54.241103",
+    "end_time": "2025-02-28T17:40:54.369319",
+    "duration": 1.0021370166666668
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T17:40:54.369329",
+    "end_time": "2025-02-28T17:43:00.595774",
+    "duration": 2.1037741833333334
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-02-28T17:43:00.595785",
+    "end_time": "2025-02-28T17:44:00.777807",
+    "duration": 1.0030338166666666
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-02-28T17:44:00.777821",
     "end_time": null,
     "duration": 0
   }

@@ -24,6 +24,7 @@ from app.data_processor import DataProcessor
 from app.advanced_ml_optimizer import AdvancedMLOptimizer
 from app.market_regime_detector import MarketRegimeDetector
 from app.advanced_ml_strategy import AdvancedMLStrategy
+from telegram_notify import TelegramNotifier
 try:
     from app.composite_indicator import CompositeIndicator
 except ImportError:
