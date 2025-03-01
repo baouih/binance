@@ -89,6 +89,16 @@ class TelegramNotifier:
             return False
         
         try:
+            # Kiểm tra file có tồn tại không
+            if not os.path.exists(photo_path):
+                logger.error(f"File hình ảnh không tồn tại: {photo_path}")
+                return False
+                
+            # Kiểm tra kích thước file
+            if os.path.getsize(photo_path) == 0:
+                logger.error(f"File hình ảnh trống: {photo_path}")
+                return False
+                
             url = f"{self.base_url}{self.token}/sendPhoto"
             data = {
                 "chat_id": self.chat_id,
@@ -98,12 +108,21 @@ class TelegramNotifier:
             if caption:
                 data["caption"] = caption
             
-            files = {"photo": open(photo_path, "rb")}
-            
-            response = requests.post(url, data=data, files=files)
-            response.raise_for_status()
-            
-            return True
+            # Mở file với tùy chọn xử lý lỗi
+            try:
+                with open(photo_path, "rb") as photo_file:
+                    files = {"photo": photo_file}
+                    response = requests.post(url, data=data, files=files)
+                    
+                    # Kiểm tra kết quả
+                    if response.status_code == 200:
+                        return True
+                    else:
+                        logger.error(f"Lỗi khi gửi hình ảnh: {response.status_code} - {response.text}")
+                        return False
+            except IOError as e:
+                logger.error(f"Lỗi mở file hình ảnh: {e}")
+                return False
             
         except Exception as e:
             logger.error(f"Lỗi khi gửi hình ảnh qua Telegram: {e}")
@@ -126,6 +145,16 @@ class TelegramNotifier:
             return False
         
         try:
+            # Kiểm tra file có tồn tại không
+            if not os.path.exists(document_path):
+                logger.error(f"File tài liệu không tồn tại: {document_path}")
+                return False
+                
+            # Kiểm tra kích thước file
+            if os.path.getsize(document_path) == 0:
+                logger.error(f"File tài liệu trống: {document_path}")
+                return False
+                
             url = f"{self.base_url}{self.token}/sendDocument"
             data = {
                 "chat_id": self.chat_id,
@@ -135,12 +164,21 @@ class TelegramNotifier:
             if caption:
                 data["caption"] = caption
             
-            files = {"document": open(document_path, "rb")}
-            
-            response = requests.post(url, data=data, files=files)
-            response.raise_for_status()
-            
-            return True
+            # Mở file với tùy chọn xử lý lỗi
+            try:
+                with open(document_path, "rb") as doc_file:
+                    files = {"document": doc_file}
+                    response = requests.post(url, data=data, files=files)
+                    
+                    # Kiểm tra kết quả
+                    if response.status_code == 200:
+                        return True
+                    else:
+                        logger.error(f"Lỗi khi gửi tài liệu: {response.status_code} - {response.text}")
+                        return False
+            except IOError as e:
+                logger.error(f"Lỗi mở file tài liệu: {e}")
+                return False
             
         except Exception as e:
             logger.error(f"Lỗi khi gửi tài liệu qua Telegram: {e}")

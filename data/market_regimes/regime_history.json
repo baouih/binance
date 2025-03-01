@@ -1886,6 +1886,12 @@
   {
     "regime": "ranging",
     "start_time": "2025-03-01T08:08:11.929142",
+    "end_time": "2025-03-01T08:10:07.438000",
+    "duration": 1.9251477666666665
+  },
+  {
+    "regime": "volatile",
+    "start_time": "2025-03-01T08:10:07.438016",
     "end_time": null,
     "duration": 0
   }
