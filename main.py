@@ -17,10 +17,26 @@ from datetime import datetime, timedelta
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Cấu hình logging cho các module
+logging.getLogger('engineio').setLevel(logging.WARNING)
+logging.getLogger('socketio').setLevel(logging.WARNING)
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
 # Khởi tạo Flask app và Socket.IO
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', ping_timeout=10, ping_interval=5)
+
+# Cấu hình SocketIO với các thông số tối ưu để xử lý kết nối tốt hơn
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*", 
+    async_mode='eventlet',
+    ping_timeout=60,     # Tăng thời gian timeout 
+    ping_interval=25,    # Giảm số lần ping để giảm tải
+    max_http_buffer_size=10*1024*1024,  # Tăng kích thước buffer 
+    manage_session=False,  # Tắt quản lý phiên để giảm tải CPU
+    engineio_logger=False  # Tắt logging để giảm I/O
+)
 
 # Import Blueprint cho cấu hình
 try:
@@ -337,21 +353,34 @@ def simulate_account_updates():
 
 def check_and_restart_bot():
     """Kiểm tra và khởi động lại bot nếu cần"""
+    # Kiểm tra nếu cần tự động khởi động lại bot khi gặp sự cố
+    AUTO_RESTART_BOT = os.environ.get("AUTO_RESTART_BOT", "false").lower() == "true"
+    
     while True:
         try:
-            # Tạm dừng chức năng auto-restart bot để giảm tải hệ thống
-            # result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
-            # if not result and bot_status['status'] == 'running':
-            #     logger.info("Bot is not running but status is 'running'. Restarting...")
-            #     os.system("python multi_coin_bot.py &")
-            #     bot_status['last_action'] = 'Bot auto-restarted'
-            #     bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
-            #     socketio.emit('bot_status', bot_status)
+            if AUTO_RESTART_BOT:
+                # Kiểm tra nếu bot đã dừng nhưng trạng thái vẫn là đang chạy
+                result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+                if not result and bot_status['status'] == 'running':
+                    logger.info("Bot is not running but status is 'running'. Restarting...")
+                    os.system("python multi_coin_bot.py &")
+                    bot_status['last_action'] = 'Bot auto-restarted'
+                    bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
+                    socketio.emit('bot_status', bot_status)
+            else:
+                # Nếu không ở chế độ tự động khởi động lại, chỉ cập nhật trạng thái
+                result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+                if not result and bot_status['status'] == 'running':
+                    logger.info("Bot has stopped but status is still 'running'. Updating status...")
+                    bot_status['status'] = 'stopped'
+                    bot_status['last_action'] = 'Bot stopped unexpectedly'
+                    socketio.emit('bot_status', bot_status)
             
-            # Thay vì tự động khởi động lại bot, chỉ cập nhật trạng thái
+            # Cập nhật trạng thái
             bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
-            bot_status['last_action'] = 'Monitoring market conditions'
-            time.sleep(120)  # Tăng thời gian kiểm tra lên 2 phút để giảm tải
+            if bot_status['status'] == 'running':
+                bot_status['last_action'] = 'Monitoring market conditions'
+            time.sleep(120)  # Thời gian kiểm tra 2 phút để giảm tải
         except Exception as e:
             logger.error(f"Lỗi trong quá trình kiểm tra bot: {e}")
             time.sleep(120)
@@ -376,12 +405,16 @@ def start_background_tasks():
     threading.Thread(target=check_and_restart_bot, daemon=True).start()
     threading.Thread(target=generate_daily_report, daemon=True).start()
     
-    # Tạm thời tắt chức năng khởi động bot tự động để giảm tải
-    # result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
-    # if not result:
-    #     logger.info("Starting trading bot...")
-    #     os.system("python multi_coin_bot.py &")
-    logger.info("Skipping auto-start bot to reduce system load")
+    # Kiểm tra nếu cần tự động khởi động bot (dựa trên biến môi trường)
+    AUTO_START_BOT = os.environ.get("AUTO_START_BOT", "false").lower() == "true"
+    
+    if AUTO_START_BOT:
+        result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+        if not result:
+            logger.info("Starting trading bot automatically...")
+            os.system("python multi_coin_bot.py &")
+    else:
+        logger.info("Auto-start bot is disabled in testing environment")
     
     logger.info("Background tasks started")
 
@@ -394,6 +427,11 @@ if __name__ == '__main__':
     import eventlet
     eventlet.monkey_patch()
     
+    # Cấu hình Eventlet để xử lý lỗi kết nối tốt hơn
+    eventlet.wsgi.MAX_HEADER_LINE = 32768
+    eventlet.wsgi.MINIMUM_CHUNK_SIZE = 4096
+    
+    # Tắt debug mode để tăng hiệu suất và ổn định
     # Giảm memory footprint của các background thread
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True,
-                threaded=False, max_size=200)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=False, allow_unsafe_werkzeug=True,
+                threaded=False, max_size=100, ping_timeout=60, ping_interval=25)
