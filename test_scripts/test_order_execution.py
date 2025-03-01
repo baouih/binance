@@ -527,6 +527,9 @@ except ImportError as e:
                 time_pct = (elapsed_seconds / twap_info['duration_seconds']) * 100 if twap_info['duration_seconds'] > 0 else 0
                 
                 avg_price = self.calculate_average_fill_price(twap_info['orders'])
+                # Nếu average_price là 0 và có price được thiết lập, sử dụng price đó
+                if avg_price == 0.0 and 'price' in twap_info and twap_info['price']:
+                    avg_price = twap_info['price']
                 
                 return {
                     'execution_id': execution_id,

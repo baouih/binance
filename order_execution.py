@@ -398,7 +398,7 @@ class TWAPExecutor(BaseOrderExecutor):
         Tính giá trung bình thực hiện cho nhiều lệnh
         
         Args:
-            order_response (List[Dict]): Danh sách các lệnh
+            order_response (List[Dict], Dict): Danh sách các lệnh hoặc một lệnh đơn lẻ
             
         Returns:
             float: Giá trung bình
@@ -432,6 +432,11 @@ class TWAPExecutor(BaseOrderExecutor):
                 total_cost += qty * price
                 
         if total_qty == 0:
+            # Kiểm tra xem có lệnh limit nào được thực hiện không
+            for order in orders:
+                if order_type := order.get('type'):
+                    if order_type == 'LIMIT' and 'price' in order:
+                        return float(order['price'])
             return 0.0
             
         return total_cost / total_qty

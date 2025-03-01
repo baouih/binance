@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "timestamp": "2025-03-01T07:45:43.759322",
+    "module_available": false,
+    "duration_seconds": 6.248502
+  },
+  "tests": {
+    "test_base_order_executor": {
+      "passed": true
+    },
+    "test_iceberg_order_executor": {
+      "passed": true
+    },
+    "test_twap_executor": {
+      "passed": true
+    },
+    "test_scaled_order_executor": {
+      "passed": true
+    },
+    "test_oco_order_executor": {
+      "passed": true
+    },
+    "test_order_execution_factory": {
+      "passed": true
+    }
+  }
+}
