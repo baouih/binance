@@ -67,76 +67,91 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame với các chỉ báo đã tính
     """
-    # Tạo một bản sao
-    df_indicators = df.copy()
-    
-    # Tính RSI (Relative Strength Index)
-    delta = df_indicators['close'].diff()
-    gain = delta.where(delta > 0, 0)
-    loss = -delta.where(delta < 0, 0)
-    
-    avg_gain = gain.rolling(window=14).mean()
-    avg_loss = loss.rolling(window=14).mean()
-    
-    rs = avg_gain / avg_loss
-    df_indicators['rsi'] = 100 - (100 / (1 + rs))
-    
-    # Tính MACD (Moving Average Convergence Divergence)
-    ema12 = df_indicators['close'].ewm(span=12, adjust=False).mean()
-    ema26 = df_indicators['close'].ewm(span=26, adjust=False).mean()
-    df_indicators['macd'] = ema12 - ema26
-    df_indicators['macd_signal'] = df_indicators['macd'].ewm(span=9, adjust=False).mean()
-    df_indicators['macd_hist'] = df_indicators['macd'] - df_indicators['macd_signal']
-    
-    # Tính Bollinger Bands
-    df_indicators['bb_middle'] = df_indicators['close'].rolling(window=20).mean()
-    df_indicators['bb_std'] = df_indicators['close'].rolling(window=20).std()
-    df_indicators['bb_upper'] = df_indicators['bb_middle'] + (df_indicators['bb_std'] * 2)
-    df_indicators['bb_lower'] = df_indicators['bb_middle'] - (df_indicators['bb_std'] * 2)
-    df_indicators['bb_width'] = (df_indicators['bb_upper'] - df_indicators['bb_lower']) / df_indicators['bb_middle']
-    
-    # Tính EMA (Exponential Moving Average)
-    for period in [9, 21, 50, 200]:
-        df_indicators[f'ema_{period}'] = df_indicators['close'].ewm(span=period, adjust=False).mean()
-    
-    # Tính SMA (Simple Moving Average)
-    for period in [10, 20, 50, 200]:
-        df_indicators[f'sma_{period}'] = df_indicators['close'].rolling(window=period).mean()
-    
-    # Tính ATR (Average True Range)
-    high_low = df_indicators['high'] - df_indicators['low']
-    high_close = (df_indicators['high'] - df_indicators['close'].shift()).abs()
-    low_close = (df_indicators['low'] - df_indicators['close'].shift()).abs()
-    true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-    df_indicators['atr'] = true_range.rolling(window=14).mean()
-    
-    # Tính Stochastic Oscillator
-    low_14 = df_indicators['low'].rolling(window=14).min()
-    high_14 = df_indicators['high'].rolling(window=14).max()
-    df_indicators['stoch_k'] = 100 * ((df_indicators['close'] - low_14) / (high_14 - low_14))
-    df_indicators['stoch_d'] = df_indicators['stoch_k'].rolling(window=3).mean()
-    
-    # Tính OBV (On-Balance Volume)
-    df_indicators['obv'] = np.where(
-        df_indicators['close'] > df_indicators['close'].shift(1),
-        df_indicators['volume'],
-        np.where(
-            df_indicators['close'] < df_indicators['close'].shift(1),
-            -df_indicators['volume'],
-            0
-        )
-    ).cumsum()
-    
-    # Các biến đặc trưng khác
-    df_indicators['returns'] = df_indicators['close'].pct_change()
-    df_indicators['log_returns'] = np.log(df_indicators['close'] / df_indicators['close'].shift(1))
-    df_indicators['volatility'] = df_indicators['log_returns'].rolling(window=20).std() * np.sqrt(252)
-    
-    # Loại bỏ NaN
-    df_indicators.dropna(inplace=True)
-    
-    logger.info(f"Đã tính {len(df_indicators.columns) - len(df.columns)} chỉ báo")
-    return df_indicators
+    try:
+        # Thử sử dụng module feature_engineering nâng cao
+        from feature_engineering import add_technical_indicators
+        
+        logger.info("Sử dụng module feature_engineering để tính toán chỉ báo nâng cao")
+        df_indicators = add_technical_indicators(df)
+        
+        # Loại bỏ NaN
+        df_indicators.dropna(inplace=True)
+        
+        logger.info(f"Đã tính tổng cộng {len(df_indicators.columns) - len(df.columns)} chỉ báo nâng cao")
+        return df_indicators
+        
+    except ImportError:
+        logger.warning("Không thể import module feature_engineering, sử dụng phương pháp tính chỉ báo cơ bản")
+        # Tạo một bản sao
+        df_indicators = df.copy()
+        
+        # Tính RSI (Relative Strength Index)
+        delta = df_indicators['close'].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        
+        rs = avg_gain / avg_loss
+        df_indicators['rsi'] = 100 - (100 / (1 + rs))
+        
+        # Tính MACD (Moving Average Convergence Divergence)
+        ema12 = df_indicators['close'].ewm(span=12, adjust=False).mean()
+        ema26 = df_indicators['close'].ewm(span=26, adjust=False).mean()
+        df_indicators['macd'] = ema12 - ema26
+        df_indicators['macd_signal'] = df_indicators['macd'].ewm(span=9, adjust=False).mean()
+        df_indicators['macd_hist'] = df_indicators['macd'] - df_indicators['macd_signal']
+        
+        # Tính Bollinger Bands
+        df_indicators['bb_middle'] = df_indicators['close'].rolling(window=20).mean()
+        df_indicators['bb_std'] = df_indicators['close'].rolling(window=20).std()
+        df_indicators['bb_upper'] = df_indicators['bb_middle'] + (df_indicators['bb_std'] * 2)
+        df_indicators['bb_lower'] = df_indicators['bb_middle'] - (df_indicators['bb_std'] * 2)
+        df_indicators['bb_width'] = (df_indicators['bb_upper'] - df_indicators['bb_lower']) / df_indicators['bb_middle']
+        
+        # Tính EMA (Exponential Moving Average)
+        for period in [9, 21, 50, 200]:
+            df_indicators[f'ema_{period}'] = df_indicators['close'].ewm(span=period, adjust=False).mean()
+        
+        # Tính SMA (Simple Moving Average)
+        for period in [10, 20, 50, 200]:
+            df_indicators[f'sma_{period}'] = df_indicators['close'].rolling(window=period).mean()
+        
+        # Tính ATR (Average True Range)
+        high_low = df_indicators['high'] - df_indicators['low']
+        high_close = (df_indicators['high'] - df_indicators['close'].shift()).abs()
+        low_close = (df_indicators['low'] - df_indicators['close'].shift()).abs()
+        true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+        df_indicators['atr'] = true_range.rolling(window=14).mean()
+        
+        # Tính Stochastic Oscillator
+        low_14 = df_indicators['low'].rolling(window=14).min()
+        high_14 = df_indicators['high'].rolling(window=14).max()
+        df_indicators['stoch_k'] = 100 * ((df_indicators['close'] - low_14) / (high_14 - low_14))
+        df_indicators['stoch_d'] = df_indicators['stoch_k'].rolling(window=3).mean()
+        
+        # Tính OBV (On-Balance Volume)
+        df_indicators['obv'] = np.where(
+            df_indicators['close'] > df_indicators['close'].shift(1),
+            df_indicators['volume'],
+            np.where(
+                df_indicators['close'] < df_indicators['close'].shift(1),
+                -df_indicators['volume'],
+                0
+            )
+        ).cumsum()
+        
+        # Các biến đặc trưng khác
+        df_indicators['returns'] = df_indicators['close'].pct_change()
+        df_indicators['log_returns'] = np.log(df_indicators['close'] / df_indicators['close'].shift(1))
+        df_indicators['volatility'] = df_indicators['log_returns'].rolling(window=20).std() * np.sqrt(252)
+        
+        # Loại bỏ NaN
+        df_indicators.dropna(inplace=True)
+        
+        logger.info(f"Đã tính {len(df_indicators.columns) - len(df.columns)} chỉ báo cơ bản")
+        return df_indicators
 
 def create_target(df: pd.DataFrame, prediction_days: int = 1, threshold: float = 0.0) -> pd.DataFrame:
     """
