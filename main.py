@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Khởi tạo Flask app và Socket.IO
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', ping_timeout=10, ping_interval=5)
 
 # Import Blueprint cho cấu hình
 try:
@@ -370,4 +370,10 @@ with app.app_context():
     start_background_tasks()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
+    # Giảm số lượng thread backgroundtrên eventlet để tránh quá tải
+    import eventlet
+    eventlet.monkey_patch()
+    
+    # Giảm memory footprint của các background thread
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True,
+                threaded=False, max_size=200)

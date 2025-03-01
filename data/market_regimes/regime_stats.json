@@ -10,12 +10,12 @@
     "avg_duration": 0.0
   },
   "ranging": {
-    "count": 130,
+    "count": 161,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "volatile": {
-    "count": 110,
+    "count": 142,
     "total_duration": 0,
     "avg_duration": 0.0
   },
