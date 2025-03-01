@@ -504,7 +504,8 @@ def run_enhanced_backtest(
             symbol=symbol,
             interval=primary_interval,
             strategy_type=strategy_type,
-            initial_balance=initial_balance
+            initial_balance=initial_balance,
+            output_prefix=output_prefix
         )
         
         return performance_metrics
@@ -782,8 +783,8 @@ def display_results(
     
     plt.legend()
     
-    # Lưu đồ thị
-    chart_path = f'backtest_charts/{symbol}_{interval}_{strategy_type}_equity.png'
+    # Lưu đồ thị (với tiền tố nếu có)
+    chart_path = f'backtest_charts/{output_prefix}{symbol}_{interval}_{strategy_type}_equity.png'
     plt.savefig(chart_path)
     logger.info(f"Đã lưu đồ thị đường cong vốn vào '{chart_path}'")
     
