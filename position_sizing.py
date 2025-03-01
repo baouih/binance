@@ -1,19 +1,19 @@
 """
-Module quản lý vốn và tính toán kích thước vị thế nâng cao
+Module quản lý vốn nâng cao (Advanced Position Sizing)
 
-Module này cung cấp các thuật toán quản lý vốn tiên tiến như:
-- Position Sizing động dựa trên biến động thị trường
-- Kelly Criterion để tối ưu hóa kích thước vị thế
-- Anti-Martingale thông minh thay đổi kích thước dựa trên chuỗi thắng/thua
-- Phân bổ tài sản đa cặp tiền với tính toán tương quan
+Module này cung cấp các công cụ tiên tiến để tính toán và quản lý kích thước vị thế:
+- Kelly Criterion cho tối ưu hóa kỳ vọng
+- Anti-Martingale position sizing thông minh
+- Quản lý vốn động theo điều kiện thị trường
+- Phân bổ danh mục đầu tư với model tương quan
 
-Các thuật toán này giúp tối ưu hóa hiệu suất dài hạn và quản lý rủi ro tốt hơn.
+Mục tiêu là tối ưu hóa kích thước lệnh dựa trên đặc điểm thị trường,
+tỷ lệ thắng kỳ vọng, và bảo vệ tài khoản khi thị trường bất lợi.
 """
 
 import numpy as np
-import pandas as pd
-from typing import Dict, List, Optional, Tuple, Union
 import logging
+from typing import Dict, List, Tuple, Union, Optional
 
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO, 
@@ -21,757 +21,659 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger("position_sizing")
 
 class BasePositionSizer:
-    """Lớp cơ sở cho tất cả các chiến lược tính toán kích thước vị thế"""
+    """Lớp cơ sở để tính toán kích thước vị thế theo phần trăm rủi ro"""
     
     def __init__(self, account_balance: float, max_risk_pct: float = 2.0, 
-                max_position_pct: float = 20.0):
+                leverage: int = 1, min_position_size: float = 0.0):
         """
-        Khởi tạo position sizer.
+        Khởi tạo Position Sizer cơ bản.
         
         Args:
-            account_balance (float): Số dư tài khoản hiện tại
-            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
-            max_position_pct (float): Phần trăm tối đa của tài khoản cho một vị thế
+            account_balance (float): Số dư tài khoản
+            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch (%)
+            leverage (int): Đòn bẩy
+            min_position_size (float): Kích thước vị thế tối thiểu
         """
-        self.account_balance = account_balance
-        self.max_risk_pct = max_risk_pct
-        self.max_position_pct = max_position_pct
-    
+        self.account_balance = max(0.0, account_balance)
+        self.max_risk_pct = max(0.1, min(max_risk_pct, 10.0))  # Giới hạn 0.1% đến 10%
+        self.leverage = max(1, leverage)
+        self.min_position_size = max(0.0, min_position_size)
+        
     def calculate_position_size(self, entry_price: float, stop_loss_price: float, 
-                               **kwargs) -> Tuple[float, float]:
+                              **kwargs) -> Tuple[float, float]:
         """
-        Tính toán kích thước vị thế cơ bản.
+        Tính toán kích thước vị thế dựa trên mức rủi ro.
         
         Args:
             entry_price (float): Giá vào lệnh
-            stop_loss_price (float): Giá stop loss
+            stop_loss_price (float): Giá dừng lỗ
+            **kwargs: Tham số bổ sung
             
         Returns:
-            Tuple[float, float]: (Số lượng hợp đồng/coin, Phần trăm tài khoản)
+            Tuple[float, float]: (kích thước vị thế, phần trăm rủi ro thực tế)
         """
-        # Tính toán rủi ro theo số tiền
+        # Validate input
+        if entry_price <= 0:
+            logger.warning(f"Invalid entry price: {entry_price}")
+            return 0.0, 0.0
+            
+        if stop_loss_price <= 0:
+            logger.warning(f"Invalid stop loss price: {stop_loss_price}")
+            return 0.0, 0.0
+            
+        # Tính phần trăm rủi ro trên mỗi đơn vị
+        if entry_price == stop_loss_price:
+            logger.warning("Entry price equals stop loss price")
+            return 0.0, 0.0
+            
+        # Tính kích thước vị thế
+        if entry_price > stop_loss_price:  # Long position
+            risk_per_unit = (entry_price - stop_loss_price) / entry_price
+        else:  # Short position
+            risk_per_unit = (stop_loss_price - entry_price) / entry_price
+            
+        # Nếu rủi ro trên đơn vị quá nhỏ hoặc bằng 0, đặt một giá trị tối thiểu an toàn
+        risk_per_unit = max(risk_per_unit, 0.001)  # Tối thiểu 0.1%
+        
+        # Tính số tiền rủi ro
         risk_amount = self.account_balance * (self.max_risk_pct / 100)
         
-        # Tính khoảng cách từ entry đến stop loss theo phần trăm
-        if stop_loss_price > 0:
-            risk_per_unit = abs(entry_price - stop_loss_price)
-        else:
-            # Nếu không có stop loss cụ thể, sử dụng giá trị mặc định 2%
-            risk_per_unit = entry_price * 0.02
-            
-        # Tính số lượng hợp đồng/coin
-        if risk_per_unit > 0:
-            position_size = risk_amount / risk_per_unit
-        else:
-            position_size = 0
-            
-        # Tính giá trị vị thế
-        position_value = position_size * entry_price
+        # Tính kích thước vị thế (số lượng)
+        position_size = risk_amount / (entry_price * risk_per_unit)
         
-        # Giới hạn kích thước vị thế theo phần trăm tài khoản tối đa
-        max_position_value = self.account_balance * (self.max_position_pct / 100)
-        if position_value > max_position_value:
-            position_size = max_position_value / entry_price
-            position_value = position_size * entry_price
-            
-        position_pct = (position_value / self.account_balance) * 100
+        # Điều chỉnh cho đòn bẩy
+        position_size = position_size * self.leverage
         
-        return position_size, position_pct
+        # Đảm bảo kích thước tối thiểu
+        position_size = max(self.min_position_size, position_size)
         
-    def update_balance(self, new_balance: float) -> None:
+        # Tính phần trăm rủi ro thực tế
+        actual_risk_pct = (position_size * entry_price * risk_per_unit) / self.account_balance * 100
+        actual_risk_pct = min(actual_risk_pct, self.max_risk_pct)  # Giới hạn theo max_risk_pct
+        
+        logger.debug(f"Calculated position size: {position_size:.6f}, risk: {actual_risk_pct:.2f}%")
+        return position_size, actual_risk_pct
+        
+    def update_account_balance(self, new_balance: float) -> None:
         """
         Cập nhật số dư tài khoản.
         
         Args:
             new_balance (float): Số dư tài khoản mới
         """
-        self.account_balance = new_balance
-        
-    def set_risk_parameters(self, max_risk_pct: float = None, 
-                          max_position_pct: float = None) -> None:
-        """
-        Cập nhật tham số rủi ro.
-        
-        Args:
-            max_risk_pct (float, optional): Phần trăm rủi ro tối đa mới
-            max_position_pct (float, optional): Phần trăm tối đa của tài khoản cho một vị thế
-        """
-        if max_risk_pct is not None:
-            self.max_risk_pct = max_risk_pct
-        if max_position_pct is not None:
-            self.max_position_pct = max_position_pct
+        self.account_balance = max(0.0, new_balance)
+        logger.debug(f"Updated account balance: {self.account_balance}")
 
 
 class DynamicPositionSizer(BasePositionSizer):
-    """Chiến lược tính toán kích thước vị thế dựa trên biến động thị trường"""
+    """Lớp tính toán kích thước vị thế động theo biến động thị trường"""
     
     def __init__(self, account_balance: float, max_risk_pct: float = 2.0, 
-                max_position_pct: float = 20.0, volatility_factor: float = 1.0,
-                confidence_factor: float = 1.0):
+                leverage: int = 1, volatility_factor: float = 1.0, 
+                confidence_factor: float = 1.0, min_position_size: float = 0.0):
         """
-        Khởi tạo position sizer động.
+        Khởi tạo Dynamic Position Sizer.
         
         Args:
-            account_balance (float): Số dư tài khoản hiện tại
-            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
-            max_position_pct (float): Phần trăm tối đa của tài khoản cho một vị thế
-            volatility_factor (float): Hệ số điều chỉnh theo biến động (1.0 = không điều chỉnh)
-            confidence_factor (float): Hệ số điều chỉnh theo độ tin cậy tín hiệu (1.0 = không điều chỉnh)
+            account_balance (float): Số dư tài khoản
+            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch (%)
+            leverage (int): Đòn bẩy
+            volatility_factor (float): Hệ số điều chỉnh theo biến động (>1 giảm size khi volatility cao)
+            confidence_factor (float): Hệ số điều chỉnh theo độ tin cậy tín hiệu
+            min_position_size (float): Kích thước vị thế tối thiểu
         """
-        super().__init__(account_balance, max_risk_pct, max_position_pct)
-        self.volatility_factor = volatility_factor
-        self.confidence_factor = confidence_factor
+        super().__init__(account_balance, max_risk_pct, leverage, min_position_size)
+        self.volatility_factor = max(0.1, volatility_factor)
+        self.confidence_factor = max(0.1, confidence_factor)
         
-    def calculate_position_size(self, entry_price: float, stop_loss_price: float,
-                               volatility: float = None, signal_confidence: float = None,
-                               **kwargs) -> Tuple[float, float]:
+    def calculate_position_size(self, entry_price: float, stop_loss_price: float, 
+                              volatility: float = None, signal_confidence: float = None, 
+                              **kwargs) -> Tuple[float, float]:
         """
-        Tính toán kích thước vị thế dựa trên biến động và độ tin cậy.
+        Tính toán kích thước vị thế dựa trên mức rủi ro, điều chỉnh theo biến động và độ tin cậy.
         
         Args:
             entry_price (float): Giá vào lệnh
-            stop_loss_price (float): Giá stop loss
-            volatility (float, optional): Chỉ số biến động (ATR hoặc biến động chuẩn)
-            signal_confidence (float, optional): Độ tin cậy của tín hiệu (0-1)
+            stop_loss_price (float): Giá dừng lỗ
+            volatility (float, optional): Chỉ số biến động thị trường (0-1)
+            signal_confidence (float, optional): Độ tin cậy của tín hiệu giao dịch (0-1)
+            **kwargs: Tham số bổ sung
             
         Returns:
-            Tuple[float, float]: (Số lượng hợp đồng/coin, Phần trăm tài khoản)
+            Tuple[float, float]: (kích thước vị thế, phần trăm rủi ro thực tế)
         """
         # Tính kích thước vị thế cơ bản
-        base_size, base_pct = super().calculate_position_size(entry_price, stop_loss_price)
+        base_size, base_risk = super().calculate_position_size(entry_price, stop_loss_price)
         
         # Điều chỉnh theo biến động
-        volatility_multiplier = 1.0
         if volatility is not None:
-            # Điều chỉnh kích thước vị thế ngược với biến động
-            # Biến động cao -> kích thước nhỏ, biến động thấp -> kích thước lớn
-            normalized_volatility = min(max(volatility, 0.5), 2.0)  # Giới hạn trong khoảng 0.5-2.0
-            volatility_multiplier = 1.0 / (normalized_volatility ** self.volatility_factor)
+            volatility = max(0.0, min(1.0, volatility))  # Đảm bảo trong khoảng 0-1
+            volatility_multiplier = 1.0 / (1.0 + volatility * self.volatility_factor)
+        else:
+            volatility_multiplier = 1.0
             
-        # Điều chỉnh theo độ tin cậy
-        confidence_multiplier = 1.0
+        # Điều chỉnh theo độ tin cậy của tín hiệu
         if signal_confidence is not None:
-            # Độ tin cậy cao -> kích thước lớn, độ tin cậy thấp -> kích thước nhỏ
-            confidence_multiplier = signal_confidence ** self.confidence_factor
+            signal_confidence = max(0.0, min(1.0, signal_confidence))  # Đảm bảo trong khoảng 0-1
+            confidence_multiplier = signal_confidence * self.confidence_factor
+        else:
+            confidence_multiplier = 1.0
             
-        # Áp dụng điều chỉnh
+        # Tính kích thước vị thế điều chỉnh
         adjusted_size = base_size * volatility_multiplier * confidence_multiplier
-        adjusted_value = adjusted_size * entry_price
-        adjusted_pct = (adjusted_value / self.account_balance) * 100
         
-        # Đảm bảo không vượt quá giới hạn
-        max_position_value = self.account_balance * (self.max_position_pct / 100)
-        if adjusted_value > max_position_value:
-            adjusted_size = max_position_value / entry_price
-            adjusted_value = adjusted_size * entry_price
-            adjusted_pct = (adjusted_value / self.account_balance) * 100
+        # Đảm bảo kích thước tối thiểu
+        adjusted_size = max(self.min_position_size, adjusted_size)
+        
+        # Tính phần trăm rủi ro điều chỉnh
+        if entry_price > stop_loss_price:  # Long position
+            risk_per_unit = (entry_price - stop_loss_price) / entry_price
+        else:  # Short position
+            risk_per_unit = (stop_loss_price - entry_price) / entry_price
             
-        logger.info(f"Dynamic position sizing: Base size={base_size:.4f}, " + 
-                   f"Adjusted size={adjusted_size:.4f} " +
-                   f"(Volatility={volatility}, Confidence={signal_confidence})")
-            
-        return adjusted_size, adjusted_pct
+        risk_per_unit = max(risk_per_unit, 0.001)  # Tối thiểu 0.1%
+        actual_risk_pct = (adjusted_size * entry_price * risk_per_unit) / self.account_balance * 100
+        actual_risk_pct = min(actual_risk_pct, self.max_risk_pct)  # Giới hạn theo max_risk_pct
         
-    def set_adjustment_factors(self, volatility_factor: float = None, 
-                             confidence_factor: float = None) -> None:
-        """
-        Cập nhật các hệ số điều chỉnh.
-        
-        Args:
-            volatility_factor (float, optional): Hệ số điều chỉnh biến động mới
-            confidence_factor (float, optional): Hệ số điều chỉnh độ tin cậy mới
-        """
-        if volatility_factor is not None:
-            self.volatility_factor = volatility_factor
-        if confidence_factor is not None:
-            self.confidence_factor = confidence_factor
+        logger.debug(f"Dynamic position size: {adjusted_size:.6f}, risk: {actual_risk_pct:.2f}%")
+        return adjusted_size, actual_risk_pct
 
 
 class KellyCriterionSizer(BasePositionSizer):
-    """Chiến lược tính toán kích thước vị thế dựa trên công thức Kelly Criterion"""
+    """Lớp tính toán kích thước vị thế dựa trên công thức Kelly Criterion"""
     
-    def __init__(self, account_balance: float, max_risk_pct: float = 2.0,
-                max_position_pct: float = 20.0, kelly_fraction: float = 0.5,
-                win_rate: float = 0.5, avg_win_loss_ratio: float = 1.0):
+    def __init__(self, account_balance: float, win_rate: float = 0.5, 
+                avg_win_loss_ratio: float = 1.0, max_risk_pct: float = 5.0,
+                kelly_fraction: float = 1.0, leverage: int = 1, 
+                min_position_size: float = 0.0):
         """
-        Khởi tạo Kelly position sizer.
+        Khởi tạo Kelly Criterion Position Sizer.
         
         Args:
-            account_balance (float): Số dư tài khoản hiện tại
-            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
-            max_position_pct (float): Phần trăm tối đa của tài khoản cho một vị thế
-            kelly_fraction (float): Phần Kelly sử dụng (1.0 = Full Kelly, 0.5 = Half Kelly)
-            win_rate (float): Tỷ lệ thắng lịch sử (0-1)
-            avg_win_loss_ratio (float): Tỷ lệ lời trung bình / lỗ trung bình
+            account_balance (float): Số dư tài khoản
+            win_rate (float): Tỷ lệ thắng kỳ vọng (0-1)
+            avg_win_loss_ratio (float): Tỷ lệ lợi nhuận trung bình / thua lỗ trung bình
+            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch (%)
+            kelly_fraction (float): Phần công thức Kelly sử dụng (0-1) - 0.5 = "Half Kelly"
+            leverage (int): Đòn bẩy
+            min_position_size (float): Kích thước vị thế tối thiểu
         """
-        super().__init__(account_balance, max_risk_pct, max_position_pct)
-        self.kelly_fraction = kelly_fraction
-        self.win_rate = win_rate
-        self.avg_win_loss_ratio = avg_win_loss_ratio
-        # Lịch sử giao dịch để tự động tính toán tỷ lệ thắng và tỷ lệ lời/lỗ
-        self.trade_history = []
+        super().__init__(account_balance, max_risk_pct, leverage, min_position_size)
+        self.win_rate = max(0.01, min(0.99, win_rate))  # Giới hạn 1%-99%
+        self.avg_win_loss_ratio = max(0.1, avg_win_loss_ratio)
+        self.kelly_fraction = max(0.1, min(1.0, kelly_fraction))  # Giới hạn 10%-100%
         
-    def calculate_position_size(self, entry_price: float, stop_loss_price: float,
-                               take_profit_price: float = None, win_rate: float = None,
-                               win_loss_ratio: float = None, **kwargs) -> Tuple[float, float]:
+    def calculate_position_size(self, entry_price: float, stop_loss_price: float, 
+                              take_profit_price: float = None, **kwargs) -> Tuple[float, float]:
         """
         Tính toán kích thước vị thế dựa trên công thức Kelly Criterion.
         
         Args:
             entry_price (float): Giá vào lệnh
-            stop_loss_price (float): Giá stop loss
-            take_profit_price (float, optional): Giá take profit
-            win_rate (float, optional): Tỷ lệ thắng ước tính cho giao dịch này
-            win_loss_ratio (float, optional): Tỷ lệ lời/lỗ ước tính cho giao dịch này
+            stop_loss_price (float): Giá dừng lỗ
+            take_profit_price (float, optional): Giá chốt lời
+            **kwargs: Tham số bổ sung
             
         Returns:
-            Tuple[float, float]: (Số lượng hợp đồng/coin, Phần trăm tài khoản)
+            Tuple[float, float]: (kích thước vị thế, phần trăm rủi ro thực tế)
         """
-        # Sử dụng giá trị được cung cấp hoặc giá trị mặc định
-        win_probability = win_rate if win_rate is not None else self.win_rate
-        
-        # Tính tỷ lệ lời/lỗ nếu chưa cung cấp
-        if win_loss_ratio is None:
-            if take_profit_price is not None and stop_loss_price is not None:
-                # Tính từ mức take profit và stop loss
-                potential_profit = abs(take_profit_price - entry_price)
-                potential_loss = abs(entry_price - stop_loss_price)
+        # Validate input
+        if entry_price <= 0 or stop_loss_price <= 0:
+            logger.warning(f"Invalid prices: entry={entry_price}, stop_loss={stop_loss_price}")
+            return 0.0, 0.0
+            
+        # Tính tỷ lệ R (risk/reward) dựa trên giá chốt lời và dừng lỗ
+        if take_profit_price is not None and take_profit_price > 0:
+            if entry_price > stop_loss_price:  # Long position
+                win_amount = take_profit_price - entry_price
+                loss_amount = entry_price - stop_loss_price
+            else:  # Short position
+                win_amount = entry_price - take_profit_price
+                loss_amount = stop_loss_price - entry_price
                 
-                if potential_loss > 0:
-                    calculated_ratio = potential_profit / potential_loss
-                else:
-                    calculated_ratio = 1.0  # Giá trị mặc định nếu không có stop loss
-            else:
-                # Sử dụng giá trị lịch sử
-                calculated_ratio = self.avg_win_loss_ratio
+            if loss_amount <= 0:
+                logger.warning("Invalid stop loss (no risk)")
+                return 0.0, 0.0
+                
+            current_rr_ratio = win_amount / loss_amount
         else:
-            calculated_ratio = win_loss_ratio
+            # Sử dụng tỷ lệ trung bình nếu không có take_profit
+            current_rr_ratio = self.avg_win_loss_ratio
             
         # Tính Kelly percentage
-        # formula: f* = (p * b - q) / b = (p * b - (1-p)) / b
-        # where p = win probability, q = 1-p = loss probability, b = win/loss ratio
-        q = 1 - win_probability
-        kelly_pct = (win_probability * calculated_ratio - q) / calculated_ratio
+        kelly_pct = (self.win_rate * (current_rr_ratio + 1) - 1) / current_rr_ratio
         
-        # Kelly có thể âm (nghĩa là không nên giao dịch)
-        # hoặc lớn hơn 1 (nghĩa là đòn bẩy)
-        kelly_pct = max(0, min(1, kelly_pct))
-        
-        # Áp dụng phân số Kelly để giảm biến động
-        kelly_pct *= self.kelly_fraction
-        
-        # Đảm bảo không vượt quá mức rủi ro tối đa
-        risk_pct = min(kelly_pct * 100, self.max_risk_pct)
-        
-        # Tính số tiền rủi ro
-        risk_amount = self.account_balance * (risk_pct / 100)
-        
-        # Tính khoảng cách từ entry đến stop loss
-        if stop_loss_price > 0:
-            risk_per_unit = abs(entry_price - stop_loss_price)
-        else:
-            # Nếu không có stop loss cụ thể, sử dụng giá trị mặc định 2%
-            risk_per_unit = entry_price * 0.02
+        # Nếu Kelly âm, có nghĩa là kỳ vọng âm, không nên giao dịch
+        if kelly_pct <= 0:
+            logger.info("Kelly Criterion suggests not to trade (negative expectancy)")
+            return 0.0, 0.0
             
-        # Tính số lượng hợp đồng/coin
-        if risk_per_unit > 0:
-            position_size = risk_amount / risk_per_unit
-        else:
-            position_size = 0
+        # Áp dụng Kelly fraction
+        kelly_pct = kelly_pct * self.kelly_fraction
+        
+        # Giới hạn theo max_risk_pct
+        kelly_pct = min(kelly_pct, self.max_risk_pct / 100)
+        
+        # Tính kích thước vị thế
+        # Tính risk per unit (phần trăm)
+        if entry_price > stop_loss_price:  # Long position
+            risk_per_unit = (entry_price - stop_loss_price) / entry_price
+        else:  # Short position
+            risk_per_unit = (stop_loss_price - entry_price) / entry_price
             
-        # Tính giá trị vị thế
-        position_value = position_size * entry_price
+        risk_per_unit = max(risk_per_unit, 0.001)  # Tối thiểu 0.1%
         
-        # Giới hạn kích thước vị thế theo phần trăm tài khoản tối đa
-        max_position_value = self.account_balance * (self.max_position_pct / 100)
-        if position_value > max_position_value:
-            position_size = max_position_value / entry_price
-            position_value = position_size * entry_price
-            
-        position_pct = (position_value / self.account_balance) * 100
+        # Tính position size
+        position_value = self.account_balance * kelly_pct
+        position_size = position_value / entry_price
         
-        logger.info(f"Kelly position sizing: Kelly%={kelly_pct:.4f}, " + 
-                   f"Position%={position_pct:.2f}%, Size={position_size:.4f} " +
-                   f"(Win rate={win_probability:.2f}, Win/Loss ratio={calculated_ratio:.2f})")
-            
-        return position_size, position_pct
-    
-    def update_statistics_from_trade(self, trade_result: Dict) -> None:
-        """
-        Cập nhật thống kê từ kết quả giao dịch.
+        # Điều chỉnh theo risk per unit thực tế
+        max_position_size = (self.account_balance * self.max_risk_pct / 100) / (entry_price * risk_per_unit)
+        position_size = min(position_size, max_position_size)
         
-        Args:
-            trade_result (Dict): Kết quả giao dịch với các thông tin như lợi nhuận, thắng/thua
-        """
-        # Thêm vào lịch sử
-        self.trade_history.append(trade_result)
+        # Điều chỉnh cho đòn bẩy
+        position_size = position_size * self.leverage
         
-        # Giới hạn kích thước lịch sử
-        if len(self.trade_history) > 100:
-            self.trade_history = self.trade_history[-100:]
-            
-        # Tính toán lại thống kê
-        wins = sum(1 for trade in self.trade_history if trade.get('profit', 0) > 0)
-        self.win_rate = wins / len(self.trade_history) if self.trade_history else 0.5
+        # Đảm bảo kích thước tối thiểu
+        position_size = max(self.min_position_size, position_size)
         
-        # Tính tỷ lệ lời/lỗ
-        winning_trades = [trade for trade in self.trade_history if trade.get('profit', 0) > 0]
-        losing_trades = [trade for trade in self.trade_history if trade.get('profit', 0) <= 0]
+        # Tính phần trăm rủi ro thực tế
+        actual_risk_pct = (position_size * entry_price * risk_per_unit) / self.account_balance * 100
         
-        avg_win = np.mean([trade.get('profit', 0) for trade in winning_trades]) if winning_trades else 0
-        avg_loss = abs(np.mean([trade.get('profit', 0) for trade in losing_trades])) if losing_trades else 1
-        
-        if avg_loss > 0:
-            self.avg_win_loss_ratio = avg_win / avg_loss
-        else:
-            self.avg_win_loss_ratio = 1.0
-            
-        logger.info(f"Updated Kelly statistics: Win rate={self.win_rate:.2f}, " +
-                   f"Win/Loss ratio={self.avg_win_loss_ratio:.2f}")
-    
-    def set_kelly_parameters(self, kelly_fraction: float = None, 
-                           win_rate: float = None, 
-                           avg_win_loss_ratio: float = None) -> None:
-        """
-        Cập nhật tham số Kelly.
-        
-        Args:
-            kelly_fraction (float, optional): Phần Kelly sử dụng
-            win_rate (float, optional): Tỷ lệ thắng
-            avg_win_loss_ratio (float, optional): Tỷ lệ lời/lỗ trung bình
-        """
-        if kelly_fraction is not None:
-            self.kelly_fraction = kelly_fraction
-        if win_rate is not None:
-            self.win_rate = win_rate
-        if avg_win_loss_ratio is not None:
-            self.avg_win_loss_ratio = avg_win_loss_ratio
+        logger.debug(f"Kelly position size: {position_size:.6f}, risk: {actual_risk_pct:.2f}%, " +
+                   f"Kelly: {kelly_pct*100:.2f}%")
+        return position_size, actual_risk_pct
 
 
 class AntiMartingaleSizer(BasePositionSizer):
-    """Chiến lược Anti-Martingale thông minh điều chỉnh kích thước vị thế dựa trên chuỗi thắng/thua"""
+    """
+    Lớp tính toán kích thước vị thế theo Anti-Martingale
+    Tăng kích thước vị thế sau mỗi lần thắng, reset sau khi thua
+    """
     
-    def __init__(self, account_balance: float, max_risk_pct: float = 2.0,
-                max_position_pct: float = 20.0, base_unit_pct: float = 1.0,
-                increase_factor: float = 1.5, decrease_factor: float = 0.7,
-                max_consecutive_increases: int = 3):
+    def __init__(self, account_balance: float, max_risk_pct: float = 2.0, 
+                base_unit_pct: float = 1.0, increase_factor: float = 1.5,
+                max_units: int = 4, leverage: int = 1, min_position_size: float = 0.0):
         """
-        Khởi tạo Anti-Martingale position sizer.
+        Khởi tạo Anti-Martingale Position Sizer.
         
         Args:
-            account_balance (float): Số dư tài khoản hiện tại
-            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
-            max_position_pct (float): Phần trăm tối đa của tài khoản cho một vị thế
-            base_unit_pct (float): Phần trăm rủi ro cơ bản cho đơn vị đầu tiên
-            increase_factor (float): Hệ số tăng kích thước sau thắng
-            decrease_factor (float): Hệ số giảm kích thước sau thua
-            max_consecutive_increases (int): Số lần tăng kích thước tối đa liên tiếp
+            account_balance (float): Số dư tài khoản
+            max_risk_pct (float): Phần trăm rủi ro tối đa trên mỗi giao dịch (%)
+            base_unit_pct (float): Phần trăm rủi ro của đơn vị cơ bản (%)
+            increase_factor (float): Hệ số tăng kích thước sau mỗi lần thắng
+            max_units (int): Số đơn vị tối đa cho phép
+            leverage (int): Đòn bẩy
+            min_position_size (float): Kích thước vị thế tối thiểu
         """
-        super().__init__(account_balance, max_risk_pct, max_position_pct)
-        self.base_unit_pct = base_unit_pct
-        self.increase_factor = increase_factor
-        self.decrease_factor = decrease_factor
-        self.max_consecutive_increases = max_consecutive_increases
-        
-        # Trạng thái hiện tại
-        self.current_unit_pct = base_unit_pct
+        super().__init__(account_balance, max_risk_pct, leverage, min_position_size)
+        self.base_unit_pct = max(0.1, min(base_unit_pct, max_risk_pct))
+        self.increase_factor = max(1.0, increase_factor)
+        self.max_units = max(1, max_units)
+        self.current_units = 1  # Bắt đầu với 1 đơn vị
         self.consecutive_wins = 0
-        self.consecutive_losses = 0
-        self.last_trade_result = None  # 'win', 'loss', or None
         
-    def calculate_position_size(self, entry_price: float, stop_loss_price: float,
-                               **kwargs) -> Tuple[float, float]:
+    def calculate_position_size(self, entry_price: float, stop_loss_price: float, 
+                              **kwargs) -> Tuple[float, float]:
         """
-        Tính toán kích thước vị thế dựa trên chiến lược Anti-Martingale.
+        Tính toán kích thước vị thế dựa trên Anti-Martingale.
         
         Args:
             entry_price (float): Giá vào lệnh
-            stop_loss_price (float): Giá stop loss
+            stop_loss_price (float): Giá dừng lỗ
+            **kwargs: Tham số bổ sung
             
         Returns:
-            Tuple[float, float]: (Số lượng hợp đồng/coin, Phần trăm tài khoản)
+            Tuple[float, float]: (kích thước vị thế, phần trăm rủi ro thực tế)
         """
-        # Đảm bảo không vượt quá mức rủi ro tối đa
-        risk_pct = min(self.current_unit_pct, self.max_risk_pct)
+        # Tính kích thước đơn vị cơ bản
+        base_position_sizer = BasePositionSizer(
+            self.account_balance, self.base_unit_pct, self.leverage, self.min_position_size
+        )
+        base_size, base_risk = base_position_sizer.calculate_position_size(entry_price, stop_loss_price)
         
-        # Tính số tiền rủi ro
-        risk_amount = self.account_balance * (risk_pct / 100)
+        # Tính số đơn vị hiện tại dựa trên chuỗi thắng
+        current_units = min(self.current_units, self.max_units)
         
-        # Tính khoảng cách từ entry đến stop loss
-        if stop_loss_price > 0:
-            risk_per_unit = abs(entry_price - stop_loss_price)
-        else:
-            # Nếu không có stop loss cụ thể, sử dụng giá trị mặc định 2%
-            risk_per_unit = entry_price * 0.02
-            
-        # Tính số lượng hợp đồng/coin
-        if risk_per_unit > 0:
-            position_size = risk_amount / risk_per_unit
-        else:
-            position_size = 0
-            
-        # Tính giá trị vị thế
-        position_value = position_size * entry_price
+        # Tính kích thước vị thế theo Anti-Martingale
+        position_size = base_size * current_units
         
-        # Giới hạn kích thước vị thế theo phần trăm tài khoản tối đa
-        max_position_value = self.account_balance * (self.max_position_pct / 100)
-        if position_value > max_position_value:
-            position_size = max_position_value / entry_price
-            position_value = position_size * entry_price
+        # Tính phần trăm rủi ro thực tế
+        if entry_price > stop_loss_price:  # Long position
+            risk_per_unit = (entry_price - stop_loss_price) / entry_price
+        else:  # Short position
+            risk_per_unit = (stop_loss_price - entry_price) / entry_price
             
-        position_pct = (position_value / self.account_balance) * 100
+        risk_per_unit = max(risk_per_unit, 0.001)  # Tối thiểu 0.1%
+        actual_risk_pct = (position_size * entry_price * risk_per_unit) / self.account_balance * 100
         
-        logger.info(f"Anti-Martingale position sizing: Current unit%={self.current_unit_pct:.2f}%, " + 
-                   f"Position%={position_pct:.2f}%, Size={position_size:.4f} " +
-                   f"(Consecutive wins={self.consecutive_wins}, losses={self.consecutive_losses})")
+        # Đảm bảo không vượt quá max_risk_pct
+        if actual_risk_pct > self.max_risk_pct:
+            position_size = (self.account_balance * self.max_risk_pct / 100) / (entry_price * risk_per_unit)
+            actual_risk_pct = self.max_risk_pct
             
-        return position_size, position_pct
-    
+        logger.debug(f"Anti-Martingale position size: {position_size:.6f}, units: {current_units}, " +
+                   f"risk: {actual_risk_pct:.2f}%")
+        return position_size, actual_risk_pct
+        
     def update_after_trade(self, is_win: bool) -> None:
         """
-        Cập nhật trạng thái sau giao dịch.
+        Cập nhật trạng thái sau một giao dịch.
         
         Args:
-            is_win (bool): True nếu giao dịch thắng, False nếu thua
+            is_win (bool): Giao dịch thắng hay thua
         """
         if is_win:
-            # Sau khi thắng, tăng kích thước vị thế
+            # Tăng chuỗi thắng và số đơn vị
             self.consecutive_wins += 1
-            self.consecutive_losses = 0
-            self.last_trade_result = 'win'
-            
-            # Chỉ tăng nếu chưa đạt số lần tăng tối đa
-            if self.consecutive_wins <= self.max_consecutive_increases:
-                self.current_unit_pct *= self.increase_factor
-                # Đảm bảo không vượt quá max_risk_pct
-                self.current_unit_pct = min(self.current_unit_pct, self.max_risk_pct)
+            self.current_units = self.current_units * self.increase_factor
         else:
-            # Sau khi thua, giảm kích thước vị thế
-            self.consecutive_losses += 1
+            # Reset về đơn vị cơ bản sau khi thua
             self.consecutive_wins = 0
-            self.last_trade_result = 'loss'
+            self.current_units = 1
             
-            # Giảm kích thước
-            self.current_unit_pct *= self.decrease_factor
-            # Đảm bảo không dưới base_unit_pct
-            self.current_unit_pct = max(self.current_unit_pct, self.base_unit_pct)
-            
-        logger.info(f"Updated Anti-Martingale state: current_unit%={self.current_unit_pct:.2f}%, " +
-                   f"after {'win' if is_win else 'loss'}")
-    
-    def reset(self) -> None:
-        """Đặt lại về trạng thái ban đầu"""
-        self.current_unit_pct = self.base_unit_pct
-        self.consecutive_wins = 0
-        self.consecutive_losses = 0
-        self.last_trade_result = None
-        logger.info("Reset Anti-Martingale position sizer to initial state")
-    
-    def set_antimartingale_parameters(self, base_unit_pct: float = None, 
-                                   increase_factor: float = None,
-                                   decrease_factor: float = None,
-                                   max_consecutive_increases: int = None) -> None:
-        """
-        Cập nhật tham số Anti-Martingale.
-        
-        Args:
-            base_unit_pct (float, optional): Phần trăm rủi ro cơ bản mới
-            increase_factor (float, optional): Hệ số tăng mới
-            decrease_factor (float, optional): Hệ số giảm mới
-            max_consecutive_increases (int, optional): Số lần tăng tối đa mới
-        """
-        if base_unit_pct is not None:
-            self.base_unit_pct = base_unit_pct
-        if increase_factor is not None:
-            self.increase_factor = increase_factor
-        if decrease_factor is not None:
-            self.decrease_factor = decrease_factor
-        if max_consecutive_increases is not None:
-            self.max_consecutive_increases = max_consecutive_increases
+        logger.debug(f"Anti-Martingale update: is_win={is_win}, consecutive_wins={self.consecutive_wins}, " +
+                   f"current_units={self.current_units}")
 
 
 class PortfolioSizer:
-    """Phân bổ tài sản cho nhiều cặp tiền dựa trên tính toán tương quan"""
+    """Lớp quản lý phân bổ vốn trong danh mục đầu tư với phân tích tương quan"""
     
-    def __init__(self, account_balance: float, max_portfolio_risk: float = 5.0,
-                max_per_symbol_risk: float = 2.0, correlation_impact: float = 0.5):
+    def __init__(self, account_balance: float, max_portfolio_risk: float = 5.0, 
+                max_symbol_risk: float = 2.0, max_correlated_exposure: float = 3.0,
+                correlation_threshold: float = 0.7):
         """
         Khởi tạo Portfolio Sizer.
         
         Args:
-            account_balance (float): Số dư tài khoản tổng
-            max_portfolio_risk (float): Phần trăm rủi ro tối đa cho cả danh mục đầu tư
-            max_per_symbol_risk (float): Phần trăm rủi ro tối đa cho mỗi cặp tiền
-            correlation_impact (float): Mức độ ảnh hưởng của tương quan (0-1)
+            account_balance (float): Số dư tài khoản
+            max_portfolio_risk (float): Phần trăm rủi ro tối đa cho toàn bộ danh mục (%)
+            max_symbol_risk (float): Phần trăm rủi ro tối đa cho mỗi cặp tiền (%)
+            max_correlated_exposure (float): Mức phơi nhiễm tương quan tối đa
+            correlation_threshold (float): Ngưỡng tương quan để tính phơi nhiễm
         """
-        self.account_balance = account_balance
-        self.max_portfolio_risk = max_portfolio_risk
-        self.max_per_symbol_risk = max_per_symbol_risk
-        self.correlation_impact = correlation_impact
+        self.account_balance = max(0.0, account_balance)
+        self.max_portfolio_risk = max(1.0, min(max_portfolio_risk, 20.0))  # Giới hạn 1-20%
+        self.max_symbol_risk = max(0.5, min(max_symbol_risk, 5.0))  # Giới hạn 0.5-5%
+        self.max_correlated_exposure = max(1.0, max_correlated_exposure)
+        self.correlation_threshold = max(0.5, min(correlation_threshold, 1.0))  # Giới hạn 0.5-1.0
         
-        # Lưu trữ dữ liệu
-        self.positions = {}  # Các vị thế hiện tại
-        self.correlations = {}  # Ma trận tương quan giữa các cặp tiền
+        # Theo dõi các vị thế hiện tại
+        self.current_positions = {}
         
-    def calculate_position_allocations(self, symbols: List[str],
-                                    signals: Dict[str, Dict],
-                                    correlations: Dict[str, Dict] = None) -> Dict[str, Dict]:
+    def calculate_position_allocations(self, symbols: List[str], 
+                                     signals: Dict[str, Dict], 
+                                     correlation_matrix: Dict[str, Dict]) -> Dict[str, Dict]:
         """
-        Tính toán phân bổ vốn cho nhiều cặp tiền.
+        Tính toán phân bổ kích thước vị thế tối ưu cho danh mục đầu tư.
         
         Args:
-            symbols (List[str]): Danh sách các cặp tiền cần phân bổ
-            signals (Dict[str, Dict]): Tín hiệu giao dịch cho mỗi cặp tiền
-                Định dạng: {symbol: {'signal': 'buy'/'sell'/'neutral', 'strength': 0-1, 'entry_price': float, 'stop_loss': float}}
-            correlations (Dict[str, Dict], optional): Ma trận tương quan giữa các cặp tiền
-                Định dạng: {symbol1: {symbol2: correlation_value}}
+            symbols (List[str]): Danh sách các cặp tiền
+            signals (Dict[str, Dict]): Thông tin tín hiệu cho mỗi cặp
+                {symbol: {'signal': 'buy'/'sell'/'neutral', 'strength': 0-1, 
+                        'entry_price': float, 'stop_loss': float, ...}}
+            correlation_matrix (Dict[str, Dict]): Ma trận tương quan giữa các cặp tiền
+                {symbol1: {symbol1: 1.0, symbol2: 0.7, ...}, ...}
                 
         Returns:
-            Dict[str, Dict]: Phân bổ vốn cho mỗi cặp tiền
-                Định dạng: {symbol: {'position_size': float, 'position_pct': float, 'risk_pct': float, 'risk_amount': float}}
+            Dict[str, Dict]: Thông tin phân bổ cho mỗi cặp tiền
+                {symbol: {'position_size': float, 'position_value': float, 'risk_pct': float, ...}}
         """
-        # Cập nhật ma trận tương quan nếu được cung cấp
-        if correlations:
-            self.correlations = correlations
-            
-        # Lọc các cặp tiền có tín hiệu không phải neutral
-        active_symbols = [s for s in symbols if signals.get(s, {}).get('signal', 'neutral') != 'neutral']
+        # Lọc các cặp có tín hiệu giao dịch (không phải neutral)
+        tradable_symbols = [s for s in symbols if s in signals and 
+                          signals[s].get('signal') in ['buy', 'sell']]
         
-        if not active_symbols:
-            logger.info("No active trading signals, skipping portfolio allocation")
+        if not tradable_symbols:
+            logger.info("No tradable symbols with valid signals")
             return {}
             
-        # Tính toán điểm số ban đầu cho mỗi cặp tiền dựa trên độ mạnh tín hiệu
-        initial_scores = {}
-        for symbol in active_symbols:
-            signal_strength = signals.get(symbol, {}).get('strength', 0.5)
-            initial_scores[symbol] = signal_strength
-            
-        # Tính toán điều chỉnh dựa trên tương quan
-        if self.correlations and len(active_symbols) > 1:
-            adjusted_scores = initial_scores.copy()
-            
-            # Duyệt qua từng cặp tiền và điều chỉnh dựa trên tương quan với các cặp khác
-            for symbol in active_symbols:
-                correlation_adjustment = 0
-                
-                for other_symbol in active_symbols:
-                    if symbol != other_symbol:
-                        # Lấy tương quan, mặc định là 0 nếu không có dữ liệu
-                        corr = self.correlations.get(symbol, {}).get(other_symbol, 0)
-                        
-                        # Cùng hướng tín hiệu -> điều chỉnh giảm để tránh quá tập trung
-                        # Ngược hướng tín hiệu -> điều chỉnh tăng để đa dạng hóa
-                        other_signal = signals.get(other_symbol, {}).get('signal', 'neutral')
-                        current_signal = signals.get(symbol, {}).get('signal', 'neutral')
-                        
-                        if current_signal != 'neutral' and other_signal != 'neutral':
-                            # Nếu cùng hướng, tương quan cao -> giảm
-                            if (current_signal == other_signal) and corr > 0.5:
-                                correlation_adjustment -= corr * 0.1
-                            # Nếu ngược hướng, tương quan âm -> tăng
-                            elif (current_signal != other_signal) and corr < -0.3:
-                                correlation_adjustment += abs(corr) * 0.1
-                
-                # Áp dụng điều chỉnh với hệ số ảnh hưởng
-                adjusted_scores[symbol] += correlation_adjustment * self.correlation_impact
-                # Đảm bảo điểm số trong khoảng hợp lý
-                adjusted_scores[symbol] = max(0.1, min(1.0, adjusted_scores[symbol]))
-        else:
-            adjusted_scores = initial_scores
-                
-        # Tính tổng điểm số để chuẩn hóa
-        total_score = sum(adjusted_scores.values())
+        # Tính initial allocations không tính đến tương quan
+        initial_allocations = {}
+        total_risk = 0.0
         
-        # Phân bổ rủi ro dựa trên điểm đã điều chỉnh
-        risk_allocations = {}
-        total_allocated_risk = 0
-        
-        for symbol in active_symbols:
-            # Tính phần trăm rủi ro cho cặp này
-            normalized_score = adjusted_scores[symbol] / total_score if total_score > 0 else 0
-            symbol_risk_pct = normalized_score * self.max_portfolio_risk
+        for symbol in tradable_symbols:
+            signal = signals[symbol]
             
-            # Đảm bảo không vượt quá rủi ro tối đa cho mỗi cặp
-            symbol_risk_pct = min(symbol_risk_pct, self.max_per_symbol_risk)
+            # Lấy thông tin cần thiết
+            entry_price = signal.get('entry_price', 0)
+            stop_loss = signal.get('stop_loss', 0)
+            signal_strength = signal.get('strength', 0.5)
             
-            risk_amount = self.account_balance * (symbol_risk_pct / 100)
-            total_allocated_risk += symbol_risk_pct
-            
-            risk_allocations[symbol] = {
-                'risk_pct': symbol_risk_pct,
-                'risk_amount': risk_amount,
-                'adjusted_score': adjusted_scores[symbol],
-                'initial_score': initial_scores[symbol]
-            }
-            
-        # Tính kích thước vị thế cho mỗi cặp tiền
-        position_allocations = {}
-        
-        for symbol in active_symbols:
-            signal_data = signals.get(symbol, {})
-            entry_price = signal_data.get('entry_price', 0)
-            stop_loss = signal_data.get('stop_loss', 0)
-            
+            # Kiểm tra dữ liệu hợp lệ
+            if entry_price <= 0 or stop_loss <= 0:
+                logger.warning(f"Invalid prices for {symbol}: entry={entry_price}, stop={stop_loss}")
+                continue
+                
             # Tính risk_per_unit
-            if stop_loss > 0 and entry_price > 0:
-                risk_per_unit = abs(entry_price - stop_loss)
-            else:
-                # Nếu không có stop loss cụ thể, sử dụng giá trị mặc định 2%
-                risk_per_unit = entry_price * 0.02
+            if signal['signal'] == 'buy':  # Long position
+                risk_per_unit = (entry_price - stop_loss) / entry_price
+            else:  # Short position
+                risk_per_unit = (stop_loss - entry_price) / entry_price
                 
-            risk_amount = risk_allocations[symbol]['risk_amount']
+            risk_per_unit = max(risk_per_unit, 0.001)  # Tối thiểu 0.1%
             
-            # Tính size
-            if risk_per_unit > 0 and entry_price > 0:
-                position_size = risk_amount / risk_per_unit
-                position_value = position_size * entry_price
-                position_pct = (position_value / self.account_balance) * 100
-            else:
-                position_size = 0
-                position_value = 0
-                position_pct = 0
-                
-            position_allocations[symbol] = {
+            # Phân bổ rủi ro dựa trên strength
+            symbol_risk_pct = self.max_symbol_risk * signal_strength
+            
+            # Tính kích thước vị thế
+            risk_amount = self.account_balance * (symbol_risk_pct / 100)
+            position_size = risk_amount / (entry_price * risk_per_unit)
+            
+            # Lưu thông tin phân bổ
+            initial_allocations[symbol] = {
                 'position_size': position_size,
-                'position_value': position_value,
-                'position_pct': position_pct,
-                'risk_pct': risk_allocations[symbol]['risk_pct'],
-                'risk_amount': risk_allocations[symbol]['risk_amount'],
-                'adjusted_score': risk_allocations[symbol]['adjusted_score'],
-                'initial_score': risk_allocations[symbol]['initial_score']
+                'position_value': position_size * entry_price,
+                'risk_amount': risk_amount,
+                'risk_pct': symbol_risk_pct,
+                'side': signal['signal'],
+                'entry_price': entry_price,
+                'stop_loss': stop_loss,
+                'signal_strength': signal_strength
             }
             
-        # Log thông tin phân bổ
-        logger.info(f"Portfolio allocation for {len(active_symbols)} symbols:")
-        for symbol, alloc in position_allocations.items():
-            logger.info(f"  {symbol}: Size={alloc['position_size']:.4f}, " +
-                       f"Value=${alloc['position_value']:.2f} ({alloc['position_pct']:.2f}%), " +
-                       f"Risk={alloc['risk_pct']:.2f}%")
+            total_risk += symbol_risk_pct
             
-        return position_allocations
-    
-    def update_portfolio_state(self, active_positions: Dict[str, Dict]) -> None:
+        # Nếu tổng rủi ro vượt quá giới hạn danh mục, điều chỉnh tỷ lệ
+        if total_risk > self.max_portfolio_risk:
+            scaling_factor = self.max_portfolio_risk / total_risk
+            
+            for symbol in initial_allocations:
+                initial_allocations[symbol]['position_size'] *= scaling_factor
+                initial_allocations[symbol]['position_value'] *= scaling_factor
+                initial_allocations[symbol]['risk_amount'] *= scaling_factor
+                initial_allocations[symbol]['risk_pct'] *= scaling_factor
+                
+            logger.info(f"Scaled all positions by {scaling_factor:.2f} to meet portfolio risk limit")
+            
+        # Tiếp theo, kiểm tra và điều chỉnh phơi nhiễm tương quan
+        final_allocations = self._adjust_for_correlation(initial_allocations, correlation_matrix)
+        
+        return final_allocations
+        
+    def _adjust_for_correlation(self, allocations: Dict[str, Dict], 
+                              correlation_matrix: Dict[str, Dict]) -> Dict[str, Dict]:
         """
-        Cập nhật trạng thái danh mục đầu tư.
+        Điều chỉnh phân bổ dựa trên tương quan giữa các cặp tiền.
         
         Args:
-            active_positions (Dict[str, Dict]): Các vị thế đang mở
-                Định dạng: {symbol: position_data}
+            allocations (Dict[str, Dict]): Phân bổ ban đầu
+            correlation_matrix (Dict[str, Dict]): Ma trận tương quan
+            
+        Returns:
+            Dict[str, Dict]: Phân bổ sau khi điều chỉnh
         """
-        self.positions = active_positions
+        if not allocations:
+            return {}
+            
+        # Kiểm tra ma trận tương quan
+        if not correlation_matrix:
+            logger.warning("No correlation matrix provided, skipping correlation adjustment")
+            return allocations
+            
+        # Tính exposure scores cho mỗi cặp và tìm các cặp có tương quan cao
+        exposure_scores = {}
+        correlations = {}
         
-    def update_balance(self, new_balance: float) -> None:
+        for symbol1, alloc1 in allocations.items():
+            exposure_scores[symbol1] = 1.0  # Bắt đầu với 1.0 (tự tương quan)
+            correlations[symbol1] = {}
+            
+            for symbol2, alloc2 in allocations.items():
+                if symbol1 == symbol2:
+                    continue
+                    
+                # Tính correlation factor
+                try:
+                    if symbol1 in correlation_matrix and symbol2 in correlation_matrix[symbol1]:
+                        corr = correlation_matrix[symbol1][symbol2]
+                    elif symbol2 in correlation_matrix and symbol1 in correlation_matrix[symbol2]:
+                        corr = correlation_matrix[symbol2][symbol1]
+                    else:
+                        logger.warning(f"No correlation data for {symbol1}-{symbol2}, assuming 0")
+                        corr = 0.0
+                except Exception as e:
+                    logger.warning(f"Error getting correlation for {symbol1}-{symbol2}: {e}")
+                    corr = 0.0
+                    
+                # Chỉ xét các correlation vượt ngưỡng
+                if abs(corr) >= self.correlation_threshold:
+                    # Kiểm tra xem các vị thế có cùng chiều không
+                    same_direction = (alloc1['side'] == alloc2['side'])
+                    
+                    # Nếu tương quan dương và cùng chiều, hoặc tương quan âm và ngược chiều
+                    # thì tăng exposure; ngược lại giảm exposure (vì sẽ hedged)
+                    if (corr > 0 and same_direction) or (corr < 0 and not same_direction):
+                        exposure_factor = abs(corr)
+                    else:
+                        exposure_factor = -abs(corr)  # Âm để thể hiện hedging
+                        
+                    correlations[symbol1][symbol2] = {
+                        'correlation': corr,
+                        'exposure_factor': exposure_factor,
+                        'side1': alloc1['side'],
+                        'side2': alloc2['side']
+                    }
+                    
+                    # Cập nhật exposure score
+                    exposure_scores[symbol1] += exposure_factor * alloc2['risk_pct'] / alloc1['risk_pct']
+        
+        # Điều chỉnh các vị thế có exposure_score vượt ngưỡng
+        adjusted_allocations = allocations.copy()
+        
+        for symbol, score in exposure_scores.items():
+            if score > self.max_correlated_exposure:
+                # Tính tỷ lệ scale down
+                scale_factor = self.max_correlated_exposure / score
+                
+                # Điều chỉnh phân bổ
+                adjusted_allocations[symbol]['position_size'] *= scale_factor
+                adjusted_allocations[symbol]['position_value'] *= scale_factor
+                adjusted_allocations[symbol]['risk_amount'] *= scale_factor
+                adjusted_allocations[symbol]['risk_pct'] *= scale_factor
+                
+                # Thêm thông tin correlation
+                adjusted_allocations[symbol]['correlation_info'] = {
+                    'exposure_score': score,
+                    'scale_factor': scale_factor,
+                    'correlations': correlations[symbol]
+                }
+                
+                logger.info(f"Scaled {symbol} position by {scale_factor:.2f} due to high correlation exposure")
+                
+        return adjusted_allocations
+        
+    def update_account_balance(self, new_balance: float) -> None:
         """
         Cập nhật số dư tài khoản.
         
         Args:
             new_balance (float): Số dư tài khoản mới
         """
-        self.account_balance = new_balance
-        
-    def set_portfolio_parameters(self, max_portfolio_risk: float = None,
-                               max_per_symbol_risk: float = None,
-                               correlation_impact: float = None) -> None:
-        """
-        Cập nhật tham số danh mục đầu tư.
-        
-        Args:
-            max_portfolio_risk (float, optional): Phần trăm rủi ro tối đa cho cả danh mục
-            max_per_symbol_risk (float, optional): Phần trăm rủi ro tối đa cho mỗi cặp tiền
-            correlation_impact (float, optional): Mức độ ảnh hưởng của tương quan
-        """
-        if max_portfolio_risk is not None:
-            self.max_portfolio_risk = max_portfolio_risk
-        if max_per_symbol_risk is not None:
-            self.max_per_symbol_risk = max_per_symbol_risk
-        if correlation_impact is not None:
-            self.correlation_impact = correlation_impact
-            
-            
+        self.account_balance = max(0.0, new_balance)
+        logger.debug(f"Updated account balance: {self.account_balance}")
+
+
 def create_position_sizer(sizer_type: str, account_balance: float, **kwargs) -> BasePositionSizer:
     """
-    Tạo position sizer theo loại.
+    Factory function để tạo position sizer phù hợp.
     
     Args:
-        sizer_type (str): Loại position sizer ('dynamic', 'kelly', 'antimartingale', 'basic')
+        sizer_type (str): Loại position sizer ('basic', 'dynamic', 'kelly', 'antimartingale', 'portfolio')
         account_balance (float): Số dư tài khoản
-        **kwargs: Các tham số bổ sung
+        **kwargs: Tham số bổ sung cho từng loại sizer
         
     Returns:
         BasePositionSizer: Đối tượng position sizer
     """
-    if sizer_type.lower() == 'dynamic':
+    if sizer_type.lower() == 'basic':
+        return BasePositionSizer(account_balance, **kwargs)
+    elif sizer_type.lower() == 'dynamic':
         return DynamicPositionSizer(account_balance, **kwargs)
     elif sizer_type.lower() == 'kelly':
         return KellyCriterionSizer(account_balance, **kwargs)
     elif sizer_type.lower() == 'antimartingale':
         return AntiMartingaleSizer(account_balance, **kwargs)
-    else:  # basic
+    elif sizer_type.lower() == 'portfolio':
+        return PortfolioSizer(account_balance, **kwargs)
+    else:
+        logger.warning(f"Unknown position sizer type: {sizer_type}, falling back to basic")
         return BasePositionSizer(account_balance, **kwargs)
 
 
 def main():
-    """Hàm chính để test module"""
-    # Ví dụ cơ bản
-    account_balance = 10000.0
+    """Hàm demo"""
+    # Khởi tạo các position sizer
+    account_balance = 10000
     
-    # Test position sizer cơ bản
-    basic_sizer = BasePositionSizer(account_balance, max_risk_pct=2.0)
-    size, pct = basic_sizer.calculate_position_size(40000.0, 39000.0)
-    print(f"Basic sizer: size={size}, pct={pct}%")
+    # Basic position sizer
+    basic_sizer = BasePositionSizer(account_balance)
+    size, risk = basic_sizer.calculate_position_size(40000, 39000)
+    print(f"Basic position sizer: size={size:.6f}, risk={risk:.2f}%")
     
-    # Test dynamic position sizer
-    dynamic_sizer = DynamicPositionSizer(account_balance, volatility_factor=0.8, confidence_factor=1.2)
-    size, pct = dynamic_sizer.calculate_position_size(40000.0, 39000.0, volatility=1.5, signal_confidence=0.8)
-    print(f"Dynamic sizer: size={size}, pct={pct}%")
+    # Dynamic position sizer
+    dynamic_sizer = DynamicPositionSizer(account_balance)
+    size, risk = dynamic_sizer.calculate_position_size(40000, 39000, volatility=0.2, signal_confidence=0.8)
+    print(f"Dynamic position sizer: size={size:.6f}, risk={risk:.2f}%")
     
-    # Test Kelly sizer
-    kelly_sizer = KellyCriterionSizer(account_balance, kelly_fraction=0.5, win_rate=0.6, avg_win_loss_ratio=2.0)
-    size, pct = kelly_sizer.calculate_position_size(40000.0, 39000.0, take_profit_price=42000.0)
-    print(f"Kelly sizer: size={size}, pct={pct}%")
+    # Kelly Criterion sizer
+    kelly_sizer = KellyCriterionSizer(account_balance, win_rate=0.6, avg_win_loss_ratio=2.0)
+    size, risk = kelly_sizer.calculate_position_size(40000, 39000, take_profit_price=42000)
+    print(f"Kelly position sizer: size={size:.6f}, risk={risk:.2f}%")
     
-    # Test Anti-Martingale sizer
-    anti_sizer = AntiMartingaleSizer(account_balance, base_unit_pct=1.0, increase_factor=1.5)
-    size, pct = anti_sizer.calculate_position_size(40000.0, 39000.0)
-    print(f"Anti-Martingale initial: size={size}, pct={pct}%")
+    # Anti-Martingale sizer
+    anti_sizer = AntiMartingaleSizer(account_balance)
+    for i in range(3):
+        size, risk = anti_sizer.calculate_position_size(40000, 39000)
+        print(f"Anti-Martingale (wins={i}): size={size:.6f}, risk={risk:.2f}%")
+        anti_sizer.update_after_trade(True)  # Simulate win
     
-    # Cập nhật sau khi thắng
-    anti_sizer.update_after_trade(True)
-    size, pct = anti_sizer.calculate_position_size(40000.0, 39000.0)
-    print(f"Anti-Martingale after win: size={size}, pct={pct}%")
+    # After a loss
+    anti_sizer.update_after_trade(False)  # Simulate loss
+    size, risk = anti_sizer.calculate_position_size(40000, 39000)
+    print(f"Anti-Martingale (after loss): size={size:.6f}, risk={risk:.2f}%")
     
-    # Cập nhật sau khi thua
-    anti_sizer.update_after_trade(False)
-    size, pct = anti_sizer.calculate_position_size(40000.0, 39000.0)
-    print(f"Anti-Martingale after loss: size={size}, pct={pct}%")
-    
-    # Test portfolio sizer
-    portfolio_sizer = PortfolioSizer(account_balance, max_portfolio_risk=5.0, correlation_impact=0.5)
-    
-    # Ví dụ ma trận tương quan
-    correlations = {
+    # Portfolio Sizer
+    portfolio_sizer = PortfolioSizer(account_balance)
+    correlation_matrix = {
         'BTCUSDT': {'BTCUSDT': 1.0, 'ETHUSDT': 0.8, 'SOLUSDT': 0.6},
         'ETHUSDT': {'BTCUSDT': 0.8, 'ETHUSDT': 1.0, 'SOLUSDT': 0.7},
         'SOLUSDT': {'BTCUSDT': 0.6, 'ETHUSDT': 0.7, 'SOLUSDT': 1.0}
     }
     
-    # Ví dụ tín hiệu
     signals = {
-        'BTCUSDT': {'signal': 'buy', 'strength': 0.8, 'entry_price': 40000.0, 'stop_loss': 39000.0},
-        'ETHUSDT': {'signal': 'buy', 'strength': 0.7, 'entry_price': 2500.0, 'stop_loss': 2400.0},
-        'SOLUSDT': {'signal': 'sell', 'strength': 0.6, 'entry_price': 100.0, 'stop_loss': 105.0}
+        'BTCUSDT': {'signal': 'buy', 'strength': 0.8, 'entry_price': 40000, 'stop_loss': 39000},
+        'ETHUSDT': {'signal': 'buy', 'strength': 0.7, 'entry_price': 2500, 'stop_loss': 2400},
+        'SOLUSDT': {'signal': 'sell', 'strength': 0.6, 'entry_price': 100, 'stop_loss': 105}
     }
     
-    # Tính toán phân bổ
     allocations = portfolio_sizer.calculate_position_allocations(
-        ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'], signals, correlations
+        ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'], signals, correlation_matrix
     )
     
     print("\nPortfolio allocations:")
-    for symbol, data in allocations.items():
-        print(f"{symbol}: Size={data['position_size']:.4f}, Value=${data['position_value']:.2f} " +
-              f"({data['position_pct']:.2f}%), Risk={data['risk_pct']:.2f}%")
-    
+    for symbol, allocation in allocations.items():
+        print(f"{symbol}: size={allocation['position_size']:.6f}, " + 
+            f"value=${allocation['position_value']:.2f}, risk={allocation['risk_pct']:.2f}%")
+
 if __name__ == "__main__":
     main()
