@@ -57,12 +57,21 @@ class BasePositionSizer:
         # Tính toán phần trăm rủi ro trên mỗi đơn vị
         risk_per_unit = abs(entry_price - stop_loss_price) / entry_price
         
+        # Kiểm tra nếu khoảng cách quá nhỏ, giới hạn kích thước vị thế để tránh vị thế quá lớn
+        if risk_per_unit < 0.001:  # Nếu khoảng cách nhỏ hơn 0.1%
+            risk_per_unit = 0.001  # Giới hạn tối thiểu để tránh vị thế quá lớn
+            logger.warning(f"Khoảng cách giữa entry và stop quá nhỏ, giới hạn risk_per_unit={risk_per_unit}")
+        
         # Số tiền rủi ro tối đa
         risk_amount = self.account_balance * (self.max_risk_pct / 100)
         
         # Kích thước vị thế
         position_size = risk_amount / (entry_price * risk_per_unit)
         position_size *= self.leverage
+        
+        # Giới hạn kích thước vị thế tối đa là 5% giá trị tài khoản để ngăn vị thế quá lớn
+        max_allowed_position = (self.account_balance * 5) / entry_price
+        position_size = min(position_size, max_allowed_position)
         
         return max(self.min_position_size, position_size), self.max_risk_pct
         
@@ -321,10 +330,18 @@ class PortfolioSizer:
                 continue
                 
             signal = signals[symbol]
-            entry_price = signal.get('entry_price', 0)
-            stop_loss = signal.get('stop_loss', 0)
-            signal_strength = signal.get('strength', 0.5)
+            entry_price = float(signal.get('entry_price', 0))
+            stop_loss = float(signal.get('stop_loss', 0))
+            signal_strength = float(signal.get('strength', 0.5))
             
+            # Chuyển đổi kiểu dữ liệu và kiểm tra giá trị hợp lệ
+            try:
+                entry_price = float(entry_price)
+                stop_loss = float(stop_loss)
+            except (ValueError, TypeError):
+                logger.warning(f"Dữ liệu không hợp lệ cho {symbol}: entry_price={entry_price}, stop_loss={stop_loss}")
+                continue
+                
             if entry_price <= 0 or stop_loss <= 0:
                 continue
                 

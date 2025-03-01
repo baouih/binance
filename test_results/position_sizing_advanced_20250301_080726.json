@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-03-01T08:07:26.589376",
+  "total_tests": 7,
+  "successful_tests": 5,
+  "failed_tests": 1,
+  "error_tests": 1,
+  "using_actual_module": true,
+  "failures": [
+    {
+      "test": "test_05_portfolio_allocation (__main__.TestPositionSizingAdvanced.test_05_portfolio_allocation)",
+      "error": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing_advanced.py\", line 638, in test_05_portfolio_allocation\n    self.assertLessEqual(combined_risk, sizer.max_correlated_exposure + alloc['risk_pct'] * 0.5,\nAssertionError: 6.4 not less than or equal to 6.2 : R\u1ee7i ro t\u01b0\u01a1ng quan cho BTCUSDT (6.4%) qu\u00e1 cao\n"
+    }
+  ],
+  "errors": [
+    {
+      "test": "test_01_base_sizing_edge_cases (__main__.TestPositionSizingAdvanced.test_01_base_sizing_edge_cases)",
+      "error": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing_advanced.py\", line 316, in test_01_base_sizing_edge_cases\n    sizer.calculate_position_size(1000.0, 1000.0)\n  File \"/home/runner/workspace/position_sizing.py\", line 55, in calculate_position_size\n    raise ValueError(\"Gi\u00e1 v\u00e0o l\u1ec7nh v\u00e0 gi\u00e1 d\u1eebng l\u1ed7 kh\u00f4ng \u0111\u01b0\u1ee3c b\u1eb1ng nhau\")\nValueError: Gi\u00e1 v\u00e0o l\u1ec7nh v\u00e0 gi\u00e1 d\u1eebng l\u1ed7 kh\u00f4ng \u0111\u01b0\u1ee3c b\u1eb1ng nhau\n"
+    }
+  ]
+}
