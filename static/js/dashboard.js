@@ -27,8 +27,8 @@ const API_ENDPOINTS = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard initialized');
     
-    // Initialize socket connection
-    initializeSocket();
+    // Initialize REST API data polling
+    initializeDataPolling();
     
     // Initialize charts
     initializeCharts();
@@ -41,13 +41,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Initialize data polling and API connections
+ * Initialize data polling through REST API
  */
-function initializeSocket() {
-    console.log('Initializing data polling and API connections');
+function initializeDataPolling() {
+    console.log('Initializing REST API data polling');
     
-    // This function name is kept for backward compatibility
-    // Socket.IO is no longer used - setting up REST API polling instead
+    // Start data polling with REST API endpoints
     startDataPolling();
 }
 
