@@ -325,10 +325,10 @@ def perform_grid_search(X_train: pd.DataFrame, y_train: pd.Series, model_type: s
         logger.error(f"Loại mô hình không hợp lệ: {model_type}")
         raise ValueError(f"Loại mô hình không hợp lệ: {model_type}")
     
-    # Sử dụng RandomizedSearchCV để tăng tốc quá trình tìm kiếm
-    grid_search = RandomizedSearchCV(
+    # Sử dụng GridSearchCV để tìm kiếm toàn diện
+    grid_search = GridSearchCV(
         model, param_grid, cv=5, scoring='accuracy',
-        n_iter=20, random_state=42, n_jobs=-1, verbose=1
+        n_jobs=-1, verbose=1
     )
     
     # Huấn luyện
