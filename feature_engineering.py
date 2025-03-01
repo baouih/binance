@@ -949,6 +949,89 @@ def create_all_features(df: pd.DataFrame) -> pd.DataFrame:
     
     return result
 
+def process_and_enhance_dataset(input_file: str, output_file: str, 
+                            basic_only: bool = False,
+                            exclude_patterns: bool = False,
+                            exclude_time: bool = False,
+                            exclude_liquidity: bool = False,
+                            exclude_interactions: bool = False) -> str:
+    """
+    Xử lý và nâng cao dataset, thêm các đặc trưng ML nâng cao
+    
+    Args:
+        input_file (str): Đường dẫn đến file CSV dữ liệu đầu vào
+        output_file (str): Đường dẫn đến file CSV dữ liệu đầu ra
+        basic_only (bool): Chỉ tạo đặc trưng cơ bản
+        exclude_patterns (bool): Không tạo đặc trưng mẫu hình giá
+        exclude_time (bool): Không tạo đặc trưng thời gian
+        exclude_liquidity (bool): Không tạo đặc trưng thanh khoản
+        exclude_interactions (bool): Không tạo tương tác đặc trưng
+        
+    Returns:
+        str: Đường dẫn đến file dữ liệu đã xử lý
+    """
+    try:
+        # Đọc file đầu vào
+        logger.info(f"Đọc dữ liệu từ {input_file}")
+        input_df = pd.read_csv(input_file)
+        
+        # Chuyển đổi cột timestamp nếu có
+        if 'timestamp' in input_df.columns:
+            input_df['timestamp'] = pd.to_datetime(input_df['timestamp'])
+        
+        # Xử lý dữ liệu và tạo đặc trưng
+        logger.info("Bắt đầu xử lý dữ liệu và tạo đặc trưng...")
+        
+        if basic_only:
+            logger.info("Chỉ tạo đặc trưng cơ bản")
+            output_df = add_technical_indicators(input_df)
+        else:
+            output_df = add_technical_indicators(input_df)
+            output_df = add_advanced_indicators(output_df)
+            
+            if not exclude_patterns:
+                output_df = add_price_pattern_features(output_df)
+            
+            if not exclude_time:
+                output_df = add_time_features(output_df)
+            
+            if not exclude_liquidity:
+                output_df = add_liquidity_features(output_df)
+            
+            if not exclude_interactions:
+                output_df = create_feature_interactions(output_df)
+        
+        # Xử lý missing values
+        output_df = output_df.replace([np.inf, -np.inf], np.nan)
+        
+        # Loại bỏ các cột có quá nhiều NaN (>30% của dữ liệu)
+        threshold = len(output_df) * 0.3
+        na_counts = output_df.isna().sum()
+        cols_to_drop = na_counts[na_counts > threshold].index
+        
+        if len(cols_to_drop) > 0:
+            logger.info(f"Loại bỏ {len(cols_to_drop)} cột có quá nhiều giá trị NaN: {list(cols_to_drop)}")
+            output_df = output_df.drop(columns=cols_to_drop)
+        
+        # Điền các giá trị NaN còn lại
+        num_na = output_df.isna().sum().sum()
+        if num_na > 0:
+            logger.info(f"Điền {num_na} giá trị NaN còn lại với forward/backward fill")
+            output_df = output_df.fillna(method='ffill').fillna(method='bfill').fillna(0)
+        
+        # Ghi dữ liệu ra file đầu ra
+        logger.info(f"Lưu dữ liệu đã xử lý vào {output_file}")
+        output_df.to_csv(output_file, index=False)
+        
+        logger.info(f"Đã tạo thành công tổng cộng {len(output_df.columns) - len(input_df.columns)} đặc trưng mới")
+        logger.info(f"Dữ liệu đầu ra có {len(output_df)} dòng và {len(output_df.columns)} cột")
+        
+        return output_file
+    
+    except Exception as e:
+        logger.error(f"Lỗi khi xử lý dữ liệu: {e}")
+        raise e
+
 if __name__ == "__main__":
     import argparse
     
@@ -964,9 +1047,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     try:
-        # Đọc file đầu vào
-        logger.info(f"Đọc dữ liệu từ {args.input_file}")
-        input_df = pd.read_csv(args.input_file)
+        # Gọi hàm xử lý và nâng cao dataset
+        process_and_enhance_dataset(
+            args.input_file, 
+            args.output_file,
+            args.basic_only,
+            args.exclude_patterns,
+            args.exclude_time,
+            args.exclude_liquidity,
+            args.exclude_interactions
+        )
         
         # Chuyển đổi cột timestamp nếu có
         if 'timestamp' in input_df.columns:
