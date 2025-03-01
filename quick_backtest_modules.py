@@ -1767,16 +1767,19 @@ class ModuleBacktester:
         
         # Đóng vị thế đang mở nếu còn
         if current_position:
+            # Lấy giá cuối cùng
+            last_price = df.iloc[-1]['close']
+            
             # Tính PnL
             if current_position['side'] == 'LONG':
-                pnl = current_position['quantity'] * (price - current_position['entry_price'])
+                pnl = current_position['quantity'] * (last_price - current_position['entry_price'])
             else:
-                pnl = current_position['quantity'] * (current_position['entry_price'] - price)
+                pnl = current_position['quantity'] * (current_position['entry_price'] - last_price)
                 
             # Đóng vị thế
             risk_manager.close_trade(
                 trade_id=current_position['trade_id'],
-                exit_price=price,
+                exit_price=last_price,
                 pnl=pnl,
                 exit_reason="end_of_backtest"
             )
@@ -1788,7 +1791,7 @@ class ModuleBacktester:
                 'symbol': symbol,
                 'side': current_position['side'],
                 'entry_price': current_position['entry_price'],
-                'exit_price': price,
+                'exit_price': last_price,
                 'quantity': current_position['quantity'],
                 'pnl': pnl,
                 'exit_reason': "end_of_backtest"
