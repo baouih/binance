@@ -134,8 +134,221 @@ def generate_price_series(days=90, initial_price=60000, volatility=0.02, interva
     
     return df
 
+def generate_extended_data(symbol='BTCUSDT', base_data_file=None, days=180, interval='1h'):
+    """
+    Tạo dữ liệu mở rộng dựa trên dữ liệu hiện có
+    
+    Args:
+        symbol (str): Mã cặp giao dịch
+        base_data_file (str): File dữ liệu gốc để dựa vào
+        days (int): Số ngày dữ liệu cần tạo
+        interval (str): Khung thời gian
+        
+    Returns:
+        pd.DataFrame: DataFrame chứa dữ liệu OHLCV
+    """
+    import pandas as pd
+    import numpy as np
+    from datetime import datetime, timedelta
+    
+    # Tải dữ liệu gốc nếu có
+    if base_data_file:
+        df_base = pd.read_csv(base_data_file)
+        # Chuyển timestamp thành datetime
+        df_base['timestamp'] = pd.to_datetime(df_base['timestamp'])
+        
+        # Lấy giá cuối cùng làm giá khởi đầu
+        initial_price = df_base['close'].iloc[-1]
+        
+        # Tính toán biến động
+        volatility = df_base['close'].pct_change().std()
+        
+        # Lấy thời gian cuối cùng
+        last_time = df_base['timestamp'].iloc[-1]
+    else:
+        # Giá trị mặc định nếu không có dữ liệu gốc
+        initial_price = 60000
+        volatility = 0.02
+        last_time = datetime.now() - timedelta(days=days)
+    
+    # Xác định số lượng khoảng thời gian cần tạo
+    if interval == '1h':
+        periods = days * 24
+        freq = 'H'
+    elif interval == '4h':
+        periods = days * 6
+        freq = '4H'
+    elif interval == '1d':
+        periods = days
+        freq = 'D'
+    else:
+        periods = days * 24
+        freq = 'H'
+    
+    # Tạo dữ liệu thời gian
+    timestamps = pd.date_range(start=last_time, periods=periods+1, freq=freq)
+    timestamps = timestamps[1:]  # Bỏ thời điểm cuối cùng của dữ liệu gốc
+    
+    # Tạo các mảng giá và khối lượng
+    prices = []
+    volumes = []
+    
+    price = initial_price
+    
+    # Thêm nhiễu ngẫu nhiên
+    for i in range(periods):
+        # Tính giá mới
+        change_pct = np.random.normal(0, volatility)
+        price = price * (1 + change_pct)
+        
+        # Thêm xu hướng
+        # Thêm xu hướng tăng nhẹ
+        if i % 200 < 100:  # 100 kỳ tăng
+            price *= 1.0005
+        else:  # 100 kỳ giảm
+            price *= 0.9995
+            
+        # Thêm biến động theo mùa
+        if i % 24 < 12:  # Biến động theo giờ trong ngày
+            price *= 1.0001
+        
+        # Giá không thể âm
+        price = max(price, 100)
+        
+        # Thêm vào danh sách
+        prices.append(price)
+        
+        # Tạo khối lượng ngẫu nhiên
+        volume = np.random.lognormal(0, 1) * (price / 10000)
+        volumes.append(volume)
+    
+    # Tạo DataFrame
+    df = pd.DataFrame({
+        'timestamp': timestamps,
+        'open': prices,
+        'close': prices,
+        'high': [p * (1 + np.random.uniform(0, 0.01)) for p in prices],
+        'low': [p * (1 - np.random.uniform(0, 0.01)) for p in prices],
+        'volume': volumes
+    })
+    
+    # Thêm các cột giống với dữ liệu Binance
+    df['close_time'] = df['timestamp'] + pd.Timedelta(seconds=60*60-1)
+    df['quote_asset_volume'] = df['volume'] * df['close']
+    df['number_of_trades'] = (df['volume'] * 100).astype(int)
+    df['taker_buy_base_asset_volume'] = df['volume'] * 0.5
+    df['taker_buy_quote_asset_volume'] = df['taker_buy_base_asset_volume'] * df['close']
+    df['ignore'] = 0
+    
+    # Sắp xếp theo thời gian
+    df = df.sort_values('timestamp')
+    
+    return df
+
 def main():
     """Hàm chính để tạo dữ liệu"""
+    import os
+    import pandas as pd
+    
+    # Danh sách 9 đồng coin cần tạo dữ liệu
+    symbols = [
+        'BTCUSDT', 'ETHUSDT', 'BNBUSDT',
+        'SOLUSDT', 'DOGEUSDT', 'XRPUSDT',
+        'ADAUSDT', 'DOTUSDT', 'LINKUSDT'
+    ]
+    
+    # Danh sách khung thời gian
+    intervals = ['1h', '4h', '1d']
+    
+    # Giá tham khảo cho mỗi đồng coin
+    initial_prices = {
+        'BTCUSDT': 60000,
+        'ETHUSDT': 3500,
+        'BNBUSDT': 600,
+        'SOLUSDT': 130,
+        'DOGEUSDT': 0.15,
+        'XRPUSDT': 0.60,
+        'ADAUSDT': 0.50,
+        'DOTUSDT': 8.0,
+        'LINKUSDT': 18.0
+    }
+    
+    # Độ biến động cho mỗi đồng coin
+    volatilities = {
+        'BTCUSDT': 0.02,
+        'ETHUSDT': 0.025,
+        'BNBUSDT': 0.03,
+        'SOLUSDT': 0.04,
+        'DOGEUSDT': 0.05,
+        'XRPUSDT': 0.035,
+        'ADAUSDT': 0.03,
+        'DOTUSDT': 0.035,
+        'LINKUSDT': 0.03
+    }
+    
+    # Khung thời gian
+    time_ranges = {
+        '1_month': 30,
+        '3_months': 90,
+        '6_months': 180
+    }
+    
+    # Thư mục gốc
+    root_dir = 'real_data'
+    os.makedirs(root_dir, exist_ok=True)
+    
+    # Kết quả tổng hợp
+    results = {
+        "time": pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S'),
+        "symbols": {},
+        "total_files": 0,
+        "total_candles": 0
+    }
+    
+    for symbol in symbols:
+        results["symbols"][symbol] = {}
+        
+        for interval in intervals:
+            results["symbols"][symbol][interval] = {}
+            
+            for time_label, days in time_ranges.items():
+                # Tạo thư mục nếu chưa tồn tại
+                range_dir = f"{root_dir}/{time_label}"
+                os.makedirs(range_dir, exist_ok=True)
+                
+                print(f"Đang tạo dữ liệu {symbol} {interval} cho {time_label}...")
+                
+                # Tạo dữ liệu
+                df = generate_extended_data(
+                    symbol=symbol,
+                    days=days,
+                    interval=interval,
+                    initial_price=initial_prices[symbol],
+                    volatility=volatilities[symbol]
+                )
+                
+                # Lưu dữ liệu
+                file_path = f"{range_dir}/{symbol}_{interval}.csv"
+                df.to_csv(file_path, index=False)
+                
+                results["symbols"][symbol][interval][time_label] = {
+                    "file_path": file_path,
+                    "candles": len(df),
+                    "start_date": df['timestamp'].min().strftime('%Y-%m-%d %H:%M:%S'),
+                    "end_date": df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                results["total_files"] += 1
+                results["total_candles"] += len(df)
+                
+                print(f"Đã lưu {len(df)} dòng dữ liệu vào {file_path}")
+    
+    # Lưu kết quả
+    import json
+    with open(f"{root_dir}/fetch_results.json", "w") as f:
+        json.dump(results, f, indent=2)
+    
+    print(f"Hoàn tất! Đã tạo {results['total_files']} file với tổng cộng {results['total_candles']} nến.")
     # Các cặp tiền và khung thời gian cần tạo dữ liệu
     symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']
     intervals = ['1h', '4h', '1d', '15m']
