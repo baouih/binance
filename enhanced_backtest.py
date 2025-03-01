@@ -679,7 +679,8 @@ def display_results(
     symbol: str,
     interval: str,
     strategy_type: str,
-    initial_balance: float
+    initial_balance: float,
+    output_prefix: str = ''
 ):
     """
     Hiển thị kết quả backtest
@@ -844,19 +845,19 @@ def display_results(
     
     plt.tight_layout()
     
-    # Lưu biểu đồ thống kê
-    stats_chart_path = f'backtest_charts/{symbol}_{interval}_{strategy_type}_stats.png'
+    # Lưu biểu đồ thống kê (với tiền tố nếu có)
+    stats_chart_path = f'backtest_charts/{output_prefix}{symbol}_{interval}_{strategy_type}_stats.png'
     plt.savefig(stats_chart_path)
     logger.info(f"Đã lưu biểu đồ thống kê vào '{stats_chart_path}'")
     
-    # Lưu giao dịch
+    # Lưu giao dịch (với tiền tố nếu có)
     trades_df = pd.DataFrame(trades)
-    trades_file = f'backtest_results/{symbol}_{interval}_{strategy_type}_trades.csv'
+    trades_file = f'backtest_results/{output_prefix}{symbol}_{interval}_{strategy_type}_trades.csv'
     trades_df.to_csv(trades_file, index=False)
     logger.info(f"Đã lưu lịch sử giao dịch vào '{trades_file}'")
     
-    # Lưu kết quả
-    results_file = f'backtest_results/{symbol}_{interval}_{strategy_type}_results.json'
+    # Lưu kết quả (với tiền tố nếu có)
+    results_file = f'backtest_results/{output_prefix}{symbol}_{interval}_{strategy_type}_results.json'
     
     with open(results_file, 'w') as f:
         # Chuyển danh sách giao dịch thành định dạng có thể serialize
