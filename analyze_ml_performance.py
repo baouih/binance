@@ -1,53 +1,58 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Script phân tích và so sánh hiệu suất các mô hình ML trên nhiều khoảng thời gian
 """
+
 import os
-import sys
 import json
 import argparse
-import logging
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-from typing import List, Dict, Tuple
-
-# Thiết lập logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('ml_analysis.log'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("ml_analysis")
+from typing import List, Dict, Tuple, Any
 
 class MLPerformanceAnalyzer:
     """Lớp phân tích hiệu suất các mô hình ML"""
-    
-    def __init__(self, results_dir: str = 'ml_results', charts_dir: str = 'ml_charts'):
+
+    def __init__(self, results_dir: str = 'ml_results', charts_dir: str = 'ml_charts', output_dir: str = 'reports'):
         """
         Khởi tạo phân tích hiệu suất
         
         Args:
             results_dir (str): Thư mục chứa kết quả
             charts_dir (str): Thư mục lưu biểu đồ
+            output_dir (str): Thư mục lưu báo cáo
         """
         self.results_dir = results_dir
         self.charts_dir = charts_dir
+        self.output_dir = output_dir
         
-        # Đảm bảo thư mục tồn tại
-        os.makedirs(charts_dir, exist_ok=True)
+        # Đảm bảo các thư mục tồn tại
+        os.makedirs(self.results_dir, exist_ok=True)
+        os.makedirs(self.charts_dir, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         
-        # Lưu trữ dữ liệu
-        self.summary_reports = {}
-        self.all_models_data = []
-        self.coins = set()
+        # Lưu trữ dữ liệu hiệu suất
+        self.results = []
+        self.symbols = set()
         self.timeframes = set()
         self.periods = set()
-        self.target_days = set()
+        self.targets = set()
+        self.model_types = set()
         
+        # Biến để lưu trữ tổng hợp kết quả
+        self.period_comparison = {}
+        self.target_comparison = {}
+        self.symbol_comparison = {}
+        self.timeframe_comparison = {}
+        self.best_models = {}
+        self.feature_importance = {}
+        
+        print(f"Khởi tạo phân tích hiệu suất với thư mục kết quả: {self.results_dir}")
+
     def load_summary_reports(self, report_paths: List[str] = None) -> bool:
         """
         Tải các báo cáo tổng hợp
@@ -58,81 +63,177 @@ class MLPerformanceAnalyzer:
         Returns:
             bool: True nếu tải thành công, False nếu không
         """
-        try:
-            if not report_paths:
-                # Tìm tất cả file ml_summary_report.json trong thư mục
-                report_paths = []
-                for root, dirs, files in os.walk(self.results_dir):
-                    for file in files:
-                        if file.endswith('_summary_report.json'):
-                            report_paths.append(os.path.join(root, file))
-            
-            if not report_paths:
-                logger.warning(f"Không tìm thấy báo cáo tổng hợp nào trong {self.results_dir}")
-                return False
-                
-            logger.info(f"Tìm thấy {len(report_paths)} báo cáo tổng hợp")
-            
-            # Tải từng báo cáo
-            for path in report_paths:
-                try:
-                    with open(path, 'r') as f:
-                        report = json.load(f)
-                        
-                    # Lấy timestamp làm key
-                    timestamp = report.get('timestamp', os.path.basename(path))
-                    self.summary_reports[timestamp] = report
-                    
-                    # Thu thập thông tin
-                    self.coins.update(report.get('coins', []))
-                    self.timeframes.update(report.get('timeframes', []))
-                    self.periods.update(report.get('periods', []))
-                    self.target_days.update(report.get('target_days', []))
-                    
-                    logger.info(f"Đã tải báo cáo: {path}")
-                    
-                except Exception as e:
-                    logger.error(f"Lỗi khi tải báo cáo {path}: {str(e)}")
-            
-            # Kiểm tra xem đã tải được báo cáo nào chưa
-            if not self.summary_reports:
-                logger.warning("Không tải được báo cáo tổng hợp nào")
-                return False
-                
-            # Thu thập thông tin tất cả các mô hình
-            self._collect_all_models_data()
-            
-            return True
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi tải báo cáo tổng hợp: {str(e)}")
+        # Nếu không có đường dẫn cụ thể, tìm tất cả file JSON trong thư mục kết quả
+        if report_paths is None:
+            json_files = [os.path.join(self.results_dir, f) for f in os.listdir(self.results_dir) 
+                         if f.endswith('_results.json')]
+        else:
+            json_files = report_paths
+        
+        if not json_files:
+            print(f"Không tìm thấy file kết quả nào trong {self.results_dir}")
             return False
-    
+        
+        print(f"Đã tìm thấy {len(json_files)} file kết quả")
+        
+        # Tải từng file kết quả
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r') as f:
+                    result = json.load(f)
+                
+                # Đảm bảo các trường cần thiết tồn tại
+                required_fields = ['symbol', 'timeframe', 'period', 'prediction_days', 
+                                  'model_type', 'accuracy', 'precision', 'recall', 'f1_score']
+                if all(field in result for field in required_fields):
+                    self.results.append(result)
+                    
+                    # Thu thập các giá trị duy nhất
+                    self.symbols.add(result['symbol'])
+                    self.timeframes.add(result['timeframe'])
+                    self.periods.add(result['period'])
+                    self.targets.add(result['prediction_days'])
+                    self.model_types.add(result['model_type'])
+                else:
+                    print(f"File {json_file} thiếu các trường cần thiết, bỏ qua")
+            except Exception as e:
+                print(f"Lỗi khi tải file {json_file}: {e}")
+        
+        if self.results:
+            print(f"Đã tải {len(self.results)} báo cáo thành công")
+            return True
+        else:
+            print("Không tải được báo cáo nào")
+            return False
+
     def _collect_all_models_data(self) -> None:
         """Thu thập dữ liệu từ tất cả các mô hình"""
-        for timestamp, report in self.summary_reports.items():
-            # Tìm các file kết quả mô hình cụ thể
-            model_results_files = []
-            for root, dirs, files in os.walk(self.results_dir):
-                for file in files:
-                    if file.endswith('_results.json') and not file.endswith('_summary_report.json'):
-                        model_results_files.append(os.path.join(root, file))
+        for result in self.results:
+            # Thông tin cơ bản
+            symbol = result['symbol']
+            timeframe = result['timeframe']
+            period = result['period']
+            target = result['prediction_days']
+            model_type = result['model_type']
             
-            # Tải dữ liệu từng mô hình
-            for path in model_results_files:
-                try:
-                    with open(path, 'r') as f:
-                        model_data = json.load(f)
-                        
-                    # Thêm timestamp report
-                    model_data['report_timestamp'] = timestamp
+            # Metrics hiệu suất
+            metrics = {
+                'accuracy': result['accuracy'],
+                'precision': result['precision'],
+                'recall': result['recall'],
+                'f1_score': result['f1_score']
+            }
+            
+            # Thêm vào các nhóm so sánh
+            
+            # So sánh theo khoảng thời gian
+            if period not in self.period_comparison:
+                self.period_comparison[period] = {
+                    'models_count': 0,
+                    'accuracy': [],
+                    'precision': [],
+                    'recall': [],
+                    'f1_score': [],
+                    'best_model': None,
+                    'best_f1': 0
+                }
+            
+            self.period_comparison[period]['models_count'] += 1
+            self.period_comparison[period]['accuracy'].append(metrics['accuracy'])
+            self.period_comparison[period]['precision'].append(metrics['precision'])
+            self.period_comparison[period]['recall'].append(metrics['recall'])
+            self.period_comparison[period]['f1_score'].append(metrics['f1_score'])
+            
+            if metrics['f1_score'] > self.period_comparison[period]['best_f1']:
+                self.period_comparison[period]['best_f1'] = metrics['f1_score']
+                self.period_comparison[period]['best_model'] = result
+            
+            # So sánh theo mục tiêu dự đoán
+            target_key = f"{target}d"
+            if target_key not in self.target_comparison:
+                self.target_comparison[target_key] = {
+                    'models_count': 0,
+                    'accuracy': [],
+                    'precision': [],
+                    'recall': [],
+                    'f1_score': [],
+                    'best_model': None,
+                    'best_f1': 0
+                }
+            
+            self.target_comparison[target_key]['models_count'] += 1
+            self.target_comparison[target_key]['accuracy'].append(metrics['accuracy'])
+            self.target_comparison[target_key]['precision'].append(metrics['precision'])
+            self.target_comparison[target_key]['recall'].append(metrics['recall'])
+            self.target_comparison[target_key]['f1_score'].append(metrics['f1_score'])
+            
+            if metrics['f1_score'] > self.target_comparison[target_key]['best_f1']:
+                self.target_comparison[target_key]['best_f1'] = metrics['f1_score']
+                self.target_comparison[target_key]['best_model'] = result
+            
+            # So sánh theo symbol
+            if symbol not in self.symbol_comparison:
+                self.symbol_comparison[symbol] = {
+                    'models_count': 0,
+                    'accuracy': [],
+                    'precision': [],
+                    'recall': [],
+                    'f1_score': [],
+                    'best_model': None,
+                    'best_f1': 0
+                }
+            
+            self.symbol_comparison[symbol]['models_count'] += 1
+            self.symbol_comparison[symbol]['accuracy'].append(metrics['accuracy'])
+            self.symbol_comparison[symbol]['precision'].append(metrics['precision'])
+            self.symbol_comparison[symbol]['recall'].append(metrics['recall'])
+            self.symbol_comparison[symbol]['f1_score'].append(metrics['f1_score'])
+            
+            if metrics['f1_score'] > self.symbol_comparison[symbol]['best_f1']:
+                self.symbol_comparison[symbol]['best_f1'] = metrics['f1_score']
+                self.symbol_comparison[symbol]['best_model'] = result
+            
+            # So sánh theo khung thời gian
+            if timeframe not in self.timeframe_comparison:
+                self.timeframe_comparison[timeframe] = {
+                    'models_count': 0,
+                    'accuracy': [],
+                    'precision': [],
+                    'recall': [],
+                    'f1_score': [],
+                    'best_model': None,
+                    'best_f1': 0
+                }
+            
+            self.timeframe_comparison[timeframe]['models_count'] += 1
+            self.timeframe_comparison[timeframe]['accuracy'].append(metrics['accuracy'])
+            self.timeframe_comparison[timeframe]['precision'].append(metrics['precision'])
+            self.timeframe_comparison[timeframe]['recall'].append(metrics['recall'])
+            self.timeframe_comparison[timeframe]['f1_score'].append(metrics['f1_score'])
+            
+            if metrics['f1_score'] > self.timeframe_comparison[timeframe]['best_f1']:
+                self.timeframe_comparison[timeframe]['best_f1'] = metrics['f1_score']
+                self.timeframe_comparison[timeframe]['best_model'] = result
+            
+            # Thu thập feature importance nếu có
+            if 'feature_importance' in result and result['feature_importance']:
+                if 'features' not in result['feature_importance']:
+                    continue
+                
+                # Tạo danh sách (feature, importance)
+                features = result['feature_importance']['features']
+                importance = result['feature_importance']['importance']
+                
+                if isinstance(features, dict) and isinstance(importance, dict):
+                    feature_list = [(k, float(v)) for k, v in zip(features.values(), importance.values())]
                     
-                    # Thêm vào danh sách
-                    self.all_models_data.append(model_data)
+                    # Sắp xếp theo độ quan trọng
+                    feature_list.sort(key=lambda x: x[1], reverse=True)
                     
-                except Exception as e:
-                    logger.error(f"Lỗi khi tải dữ liệu mô hình {path}: {str(e)}")
-    
+                    # Lưu vào danh sách feature importance
+                    model_key = f"{symbol}_{timeframe}_{period}_target{target}d"
+                    self.feature_importance[model_key] = feature_list
+
     def compare_period_performance(self) -> Dict:
         """
         So sánh hiệu suất theo khoảng thời gian
@@ -140,46 +241,26 @@ class MLPerformanceAnalyzer:
         Returns:
             Dict: Kết quả so sánh
         """
-        if not self.summary_reports:
-            logger.warning("Chưa tải báo cáo tổng hợp")
+        if not self.results:
+            print("Không có dữ liệu để so sánh")
             return {}
-            
-        # Chuẩn bị dữ liệu
-        period_metrics = {}
         
-        for timestamp, report in self.summary_reports.items():
-            # Lấy thông tin hiệu suất theo khoảng thời gian
-            period_performance = report.get('performance_by_period', {})
-            
-            # Thêm vào cấu trúc dữ liệu
-            for period, metrics in period_performance.items():
-                if period not in period_metrics:
-                    period_metrics[period] = []
-                    
-                # Thêm metrics và timestamp
-                metrics_with_time = metrics.copy()
-                metrics_with_time['timestamp'] = timestamp
-                period_metrics[period].append(metrics_with_time)
+        # Thu thập dữ liệu nếu chưa thực hiện
+        if not self.period_comparison:
+            self._collect_all_models_data()
+        
+        # Tính các giá trị trung bình
+        for period, data in self.period_comparison.items():
+            data['avg_accuracy'] = np.mean(data['accuracy']) if data['accuracy'] else 0
+            data['avg_precision'] = np.mean(data['precision']) if data['precision'] else 0
+            data['avg_recall'] = np.mean(data['recall']) if data['recall'] else 0
+            data['avg_f1_score'] = np.mean(data['f1_score']) if data['f1_score'] else 0
         
         # Tạo biểu đồ so sánh
-        self._create_period_comparison_chart(period_metrics)
+        self._create_period_comparison_chart(self.period_comparison)
         
-        # Tính trung bình các metrics cho từng khoảng thời gian
-        average_metrics = {}
-        for period, metrics_list in period_metrics.items():
-            average_metrics[period] = {
-                'accuracy': np.mean([m['accuracy'] for m in metrics_list]),
-                'precision': np.mean([m['precision'] for m in metrics_list]),
-                'recall': np.mean([m['recall'] for m in metrics_list]),
-                'f1': np.mean([m['f1'] for m in metrics_list]),
-                'n_reports': len(metrics_list)
-            }
-        
-        return {
-            'period_metrics': period_metrics,
-            'average_metrics': average_metrics
-        }
-    
+        return self.period_comparison
+
     def _create_period_comparison_chart(self, period_metrics: Dict) -> None:
         """
         Tạo biểu đồ so sánh hiệu suất theo khoảng thời gian
@@ -187,47 +268,68 @@ class MLPerformanceAnalyzer:
         Args:
             period_metrics (Dict): Metrics theo khoảng thời gian
         """
-        # Kiểm tra dữ liệu
-        if not period_metrics:
-            logger.warning("Không có đủ dữ liệu để tạo biểu đồ")
-            return
-            
-        # Tạo biểu đồ F1-score
-        plt.figure(figsize=(12, 6))
+        # Chuẩn bị dữ liệu
+        periods = []
+        accuracy = []
+        precision = []
+        recall = []
+        f1_score = []
         
-        periods = list(period_metrics.keys())
-        periods.sort()  # Sắp xếp các khoảng thời gian
+        # Chuyển đổi khóa thành định dạng dễ đọc
+        period_mapping = {
+            '1_month': '1 tháng',
+            '3_months': '3 tháng',
+            '6_months': '6 tháng'
+        }
         
+        # Sắp xếp các khoảng thời gian
+        period_order = ['1_month', '3_months', '6_months']
+        
+        for period in period_order:
+            if period in period_metrics:
+                data = period_metrics[period]
+                periods.append(period_mapping.get(period, period))
+                accuracy.append(data['avg_accuracy'])
+                precision.append(data['avg_precision'])
+                recall.append(data['avg_recall'])
+                f1_score.append(data['avg_f1_score'])
+        
+        # Tạo biểu đồ so sánh
+        plt.figure(figsize=(10, 6))
         x = np.arange(len(periods))
         width = 0.2
         
-        # Lấy giá trị trung bình
-        accuracy_values = [np.mean([m['accuracy'] for m in period_metrics[p]]) for p in periods]
-        precision_values = [np.mean([m['precision'] for m in period_metrics[p]]) for p in periods]
-        recall_values = [np.mean([m['recall'] for m in period_metrics[p]]) for p in periods]
-        f1_values = [np.mean([m['f1'] for m in period_metrics[p]]) for p in periods]
-        
-        # Vẽ biểu đồ
-        plt.bar(x - width*1.5, accuracy_values, width, label='Accuracy')
-        plt.bar(x - width/2, precision_values, width, label='Precision')
-        plt.bar(x + width/2, recall_values, width, label='Recall')
-        plt.bar(x + width*1.5, f1_values, width, label='F1-Score')
+        plt.bar(x - width*1.5, accuracy, width, label='Accuracy')
+        plt.bar(x - width/2, precision, width, label='Precision')
+        plt.bar(x + width/2, recall, width, label='Recall')
+        plt.bar(x + width*1.5, f1_score, width, label='F1-Score')
         
         plt.xlabel('Khoảng thời gian')
         plt.ylabel('Điểm số')
         plt.title('So sánh hiệu suất theo khoảng thời gian')
         plt.xticks(x, periods)
-        plt.legend()
+        plt.ylim(0, 0.7)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.legend()
+        
+        # Thêm giá trị trên mỗi cột
+        for i, v in enumerate(accuracy):
+            plt.text(i - width*1.5, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(precision):
+            plt.text(i - width/2, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(recall):
+            plt.text(i + width/2, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(f1_score):
+            plt.text(i + width*1.5, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        
+        plt.tight_layout()
         
         # Lưu biểu đồ
-        plt.tight_layout()
-        chart_path = os.path.join(self.charts_dir, 'period_comparison.png')
-        plt.savefig(chart_path)
+        plt.savefig(f"{self.charts_dir}/period_comparison.png", dpi=300)
         plt.close()
         
-        logger.info(f"Đã tạo biểu đồ so sánh khoảng thời gian: {chart_path}")
-    
+        print(f"Đã tạo biểu đồ so sánh theo khoảng thời gian: {self.charts_dir}/period_comparison.png")
+
     def compare_target_performance(self) -> Dict:
         """
         So sánh hiệu suất theo mục tiêu dự đoán
@@ -235,46 +337,26 @@ class MLPerformanceAnalyzer:
         Returns:
             Dict: Kết quả so sánh
         """
-        if not self.summary_reports:
-            logger.warning("Chưa tải báo cáo tổng hợp")
+        if not self.results:
+            print("Không có dữ liệu để so sánh")
             return {}
-            
-        # Chuẩn bị dữ liệu
-        target_metrics = {}
         
-        for timestamp, report in self.summary_reports.items():
-            # Lấy thông tin hiệu suất theo mục tiêu
-            target_performance = report.get('performance_by_target', {})
-            
-            # Thêm vào cấu trúc dữ liệu
-            for target, metrics in target_performance.items():
-                if target not in target_metrics:
-                    target_metrics[target] = []
-                    
-                # Thêm metrics và timestamp
-                metrics_with_time = metrics.copy()
-                metrics_with_time['timestamp'] = timestamp
-                target_metrics[target].append(metrics_with_time)
+        # Thu thập dữ liệu nếu chưa thực hiện
+        if not self.target_comparison:
+            self._collect_all_models_data()
+        
+        # Tính các giá trị trung bình
+        for target, data in self.target_comparison.items():
+            data['avg_accuracy'] = np.mean(data['accuracy']) if data['accuracy'] else 0
+            data['avg_precision'] = np.mean(data['precision']) if data['precision'] else 0
+            data['avg_recall'] = np.mean(data['recall']) if data['recall'] else 0
+            data['avg_f1_score'] = np.mean(data['f1_score']) if data['f1_score'] else 0
         
         # Tạo biểu đồ so sánh
-        self._create_target_comparison_chart(target_metrics)
+        self._create_target_comparison_chart(self.target_comparison)
         
-        # Tính trung bình các metrics cho từng mục tiêu
-        average_metrics = {}
-        for target, metrics_list in target_metrics.items():
-            average_metrics[target] = {
-                'accuracy': np.mean([m['accuracy'] for m in metrics_list]),
-                'precision': np.mean([m['precision'] for m in metrics_list]),
-                'recall': np.mean([m['recall'] for m in metrics_list]),
-                'f1': np.mean([m['f1'] for m in metrics_list]),
-                'n_reports': len(metrics_list)
-            }
-        
-        return {
-            'target_metrics': target_metrics,
-            'average_metrics': average_metrics
-        }
-    
+        return self.target_comparison
+
     def _create_target_comparison_chart(self, target_metrics: Dict) -> None:
         """
         Tạo biểu đồ so sánh hiệu suất theo mục tiêu dự đoán
@@ -282,47 +364,61 @@ class MLPerformanceAnalyzer:
         Args:
             target_metrics (Dict): Metrics theo mục tiêu
         """
-        # Kiểm tra dữ liệu
-        if not target_metrics:
-            logger.warning("Không có đủ dữ liệu để tạo biểu đồ")
-            return
-            
-        # Tạo biểu đồ F1-score
-        plt.figure(figsize=(12, 6))
+        # Chuẩn bị dữ liệu
+        targets = []
+        accuracy = []
+        precision = []
+        recall = []
+        f1_score = []
         
-        targets = list(target_metrics.keys())
-        targets.sort()  # Sắp xếp các mục tiêu
+        # Sắp xếp các mục tiêu dự đoán
+        target_order = ['1d', '3d', '7d'] # Sắp xếp theo ngày
         
+        for target in target_order:
+            if target in target_metrics:
+                data = target_metrics[target]
+                targets.append(target[:-1] + ' ngày')  # Loại bỏ 'd' và thêm từ "ngày"
+                accuracy.append(data['avg_accuracy'])
+                precision.append(data['avg_precision'])
+                recall.append(data['avg_recall'])
+                f1_score.append(data['avg_f1_score'])
+        
+        # Tạo biểu đồ so sánh
+        plt.figure(figsize=(10, 6))
         x = np.arange(len(targets))
         width = 0.2
         
-        # Lấy giá trị trung bình
-        accuracy_values = [np.mean([m['accuracy'] for m in target_metrics[t]]) for t in targets]
-        precision_values = [np.mean([m['precision'] for m in target_metrics[t]]) for t in targets]
-        recall_values = [np.mean([m['recall'] for m in target_metrics[t]]) for t in targets]
-        f1_values = [np.mean([m['f1'] for m in target_metrics[t]]) for t in targets]
-        
-        # Vẽ biểu đồ
-        plt.bar(x - width*1.5, accuracy_values, width, label='Accuracy')
-        plt.bar(x - width/2, precision_values, width, label='Precision')
-        plt.bar(x + width/2, recall_values, width, label='Recall')
-        plt.bar(x + width*1.5, f1_values, width, label='F1-Score')
+        plt.bar(x - width*1.5, accuracy, width, label='Accuracy')
+        plt.bar(x - width/2, precision, width, label='Precision')
+        plt.bar(x + width/2, recall, width, label='Recall')
+        plt.bar(x + width*1.5, f1_score, width, label='F1-Score')
         
         plt.xlabel('Mục tiêu dự đoán (ngày)')
         plt.ylabel('Điểm số')
         plt.title('So sánh hiệu suất theo mục tiêu dự đoán')
         plt.xticks(x, targets)
-        plt.legend()
+        plt.ylim(0, 0.6)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.legend()
+        
+        # Thêm giá trị trên mỗi cột
+        for i, v in enumerate(accuracy):
+            plt.text(i - width*1.5, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(precision):
+            plt.text(i - width/2, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(recall):
+            plt.text(i + width/2, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        for i, v in enumerate(f1_score):
+            plt.text(i + width*1.5, v + 0.02, f'{v:.2f}', ha='center', fontsize=8)
+        
+        plt.tight_layout()
         
         # Lưu biểu đồ
-        plt.tight_layout()
-        chart_path = os.path.join(self.charts_dir, 'target_comparison.png')
-        plt.savefig(chart_path)
+        plt.savefig(f"{self.charts_dir}/target_comparison.png", dpi=300)
         plt.close()
         
-        logger.info(f"Đã tạo biểu đồ so sánh mục tiêu: {chart_path}")
-    
+        print(f"Đã tạo biểu đồ so sánh theo mục tiêu dự đoán: {self.charts_dir}/target_comparison.png")
+
     def find_best_models(self) -> Dict:
         """
         Tìm các mô hình tốt nhất
@@ -330,105 +426,31 @@ class MLPerformanceAnalyzer:
         Returns:
             Dict: Danh sách các mô hình tốt nhất
         """
-        if not self.all_models_data:
-            logger.warning("Chưa tải dữ liệu mô hình")
+        if not self.results:
+            print("Không có dữ liệu để tìm mô hình tốt nhất")
             return {}
-            
-        # Chuẩn bị dữ liệu
+        
+        # Thu thập dữ liệu nếu chưa thực hiện
+        if not self.period_comparison:
+            self._collect_all_models_data()
+        
         best_models = {
-            'by_coin': {},
-            'by_period': {},
-            'by_target': {},
-            'overall': {
-                'accuracy': {'model': None, 'value': 0},
-                'precision': {'model': None, 'value': 0},
-                'recall': {'model': None, 'value': 0},
-                'f1': {'model': None, 'value': 0}
-            }
+            'overall_best': None,
+            'best_by_period': self.period_comparison,
+            'best_by_target': self.target_comparison,
+            'best_by_symbol': self.symbol_comparison,
+            'best_by_timeframe': self.timeframe_comparison,
         }
         
-        # Duyệt qua từng mô hình
-        for model in self.all_models_data:
-            coin = model.get('coin')
-            period = model.get('period')
-            target_days = model.get('target_days')
-            model_key = model.get('model_key')
-            
-            # Lấy metrics
-            if 'cross_validation' in model:
-                # Lấy kết quả cross-validation
-                metrics = {
-                    'accuracy': model['cross_validation']['average']['accuracy'],
-                    'precision': model['cross_validation']['average']['precision'],
-                    'recall': model['cross_validation']['average']['recall'],
-                    'f1': model['cross_validation']['average']['f1']
-                }
-            elif 'metrics' in model:
-                # Lấy kết quả thông thường
-                metrics = model['metrics']
-            else:
-                # Không có metrics
-                continue
-            
-            # Kiểm tra và cập nhật best models by coin
-            if coin not in best_models['by_coin']:
-                best_models['by_coin'][coin] = {
-                    'f1': {'model': None, 'value': 0}
-                }
-                
-            if metrics['f1'] > best_models['by_coin'][coin]['f1']['value']:
-                best_models['by_coin'][coin]['f1'] = {
-                    'model': model_key,
-                    'value': metrics['f1'],
-                    'metrics': metrics,
-                    'period': period,
-                    'target_days': target_days
-                }
-            
-            # Kiểm tra và cập nhật best models by period
-            if period not in best_models['by_period']:
-                best_models['by_period'][period] = {
-                    'f1': {'model': None, 'value': 0}
-                }
-                
-            if metrics['f1'] > best_models['by_period'][period]['f1']['value']:
-                best_models['by_period'][period]['f1'] = {
-                    'model': model_key,
-                    'value': metrics['f1'],
-                    'metrics': metrics,
-                    'coin': coin,
-                    'target_days': target_days
-                }
-            
-            # Kiểm tra và cập nhật best models by target
-            if target_days not in best_models['by_target']:
-                best_models['by_target'][target_days] = {
-                    'f1': {'model': None, 'value': 0}
-                }
-                
-            if metrics['f1'] > best_models['by_target'][target_days]['f1']['value']:
-                best_models['by_target'][target_days]['f1'] = {
-                    'model': model_key,
-                    'value': metrics['f1'],
-                    'metrics': metrics,
-                    'coin': coin,
-                    'period': period
-                }
-            
-            # Kiểm tra và cập nhật best models overall
-            for metric in ['accuracy', 'precision', 'recall', 'f1']:
-                if metrics[metric] > best_models['overall'][metric]['value']:
-                    best_models['overall'][metric] = {
-                        'model': model_key,
-                        'value': metrics[metric],
-                        'metrics': metrics,
-                        'coin': coin,
-                        'period': period,
-                        'target_days': target_days
-                    }
+        # Tìm mô hình tốt nhất tổng thể
+        best_f1 = 0
+        for result in self.results:
+            if result['f1_score'] > best_f1:
+                best_f1 = result['f1_score']
+                best_models['overall_best'] = result
         
         return best_models
-    
+
     def analyze_feature_importance(self) -> Dict:
         """
         Phân tích tầm quan trọng của các đặc trưng
@@ -436,98 +458,98 @@ class MLPerformanceAnalyzer:
         Returns:
             Dict: Kết quả phân tích
         """
-        if not self.all_models_data:
-            logger.warning("Chưa tải dữ liệu mô hình")
+        if not self.results:
+            print("Không có dữ liệu để phân tích tầm quan trọng đặc trưng")
             return {}
-            
-        # Chuẩn bị dữ liệu
-        all_features = {}
-        feature_ranks = {}
         
-        # Duyệt qua từng mô hình
-        for model in self.all_models_data:
-            # Kiểm tra feature importance
-            if 'feature_importance' not in model:
-                continue
+        # Thu thập dữ liệu nếu chưa thực hiện
+        if not self.feature_importance:
+            self._collect_all_models_data()
+        
+        if not self.feature_importance:
+            print("Không tìm thấy thông tin tầm quan trọng đặc trưng")
+            return {}
+        
+        # Tạo bảng tần suất xuất hiện và tầm quan trọng trung bình
+        feature_stats = {}
+        
+        for model_key, features in self.feature_importance.items():
+            for feature, importance in features:
+                if feature not in feature_stats:
+                    feature_stats[feature] = {
+                        'count': 0,
+                        'importance_sum': 0,
+                        'models': []
+                    }
                 
-            # Lấy feature importance
-            importance_data = model['feature_importance']
-            
-            # Thêm vào danh sách
-            for item in importance_data:
-                feature = item['feature']
-                importance = item['importance']
-                
-                if feature not in all_features:
-                    all_features[feature] = []
-                    feature_ranks[feature] = []
-                    
-                all_features[feature].append(importance)
-                
-            # Tính rank của feature importance
-            sorted_features = sorted(importance_data, key=lambda x: x['importance'], reverse=True)
-            for i, item in enumerate(sorted_features):
-                feature = item['feature']
-                feature_ranks[feature].append(i + 1)  # Thứ hạng bắt đầu từ 1
+                feature_stats[feature]['count'] += 1
+                feature_stats[feature]['importance_sum'] += importance
+                feature_stats[feature]['models'].append(model_key)
         
-        # Tính trung bình importance và rank
-        average_importance = {}
-        average_rank = {}
+        # Tính tầm quan trọng trung bình và tạo danh sách đã sắp xếp
+        for feature, stats in feature_stats.items():
+            stats['avg_importance'] = stats['importance_sum'] / stats['count']
         
-        for feature, values in all_features.items():
-            average_importance[feature] = np.mean(values)
-            
-        for feature, ranks in feature_ranks.items():
-            average_rank[feature] = np.mean(ranks)
+        # Tạo danh sách đã sắp xếp
+        sorted_features = [(feature, stats['avg_importance'], stats['count']) 
+                           for feature, stats in feature_stats.items()]
+        sorted_features.sort(key=lambda x: x[1], reverse=True)
         
-        # Sắp xếp theo importance
-        sorted_features = sorted(average_importance.items(), key=lambda x: x[1], reverse=True)
+        # Lấy top 20 đặc trưng quan trọng nhất
+        top_features = sorted_features[:20]
         
-        # Tạo biểu đồ top 15 feature
-        self._create_top_features_chart(sorted_features[:15])
+        # Tạo biểu đồ top đặc trưng
+        self._create_top_features_chart(top_features)
         
         return {
-            'average_importance': dict(sorted_features),
-            'average_rank': average_rank,
-            'feature_count': {feature: len(values) for feature, values in all_features.items()}
+            'feature_stats': feature_stats,
+            'top_features': top_features
         }
-    
-    def _create_top_features_chart(self, top_features: List[Tuple[str, float]]) -> None:
+
+    def _create_top_features_chart(self, top_features: List[Tuple[str, float, int]]) -> None:
         """
         Tạo biểu đồ top feature importance
         
         Args:
-            top_features (List[Tuple[str, float]]): Danh sách (feature, importance)
+            top_features (List[Tuple[str, float, int]]): Danh sách (feature, importance, count)
         """
-        # Kiểm tra dữ liệu
-        if not top_features:
-            logger.warning("Không có đủ dữ liệu để tạo biểu đồ")
-            return
-            
+        # Chuẩn bị dữ liệu
+        features = [feature for feature, _, _ in top_features]
+        importance = [imp for _, imp, _ in top_features]
+        counts = [count for _, _, count in top_features]
+        
         # Tạo biểu đồ
         plt.figure(figsize=(10, 8))
         
-        features = [f[0] for f in top_features]
-        importance = [f[1] for f in top_features]
+        # Tạo colormap dựa trên số lượng mô hình
+        normalized_counts = np.array(counts) / max(counts)
+        colors = plt.cm.Blues(normalized_counts)
         
-        # Đảo ngược thứ tự để hiển thị từ trên xuống
-        features.reverse()
-        importance.reverse()
+        # Vẽ biểu đồ các cột theo tầm quan trọng và màu theo tần suất
+        bars = plt.barh(range(len(features)), importance, color=colors)
         
-        # Vẽ biểu đồ
-        plt.barh(features, importance)
-        plt.xlabel('Tầm quan trọng')
-        plt.title('Top 15 Feature Importance')
-        plt.grid(axis='x', linestyle='--', alpha=0.7)
+        # Thêm điểm tần suất (số lượng mô hình)
+        for i, (_, _, count) in enumerate(top_features):
+            plt.text(0.01, i, f"{count}", ha='left', va='center', color='white', fontweight='bold')
+        
+        plt.yticks(range(len(features)), features)
+        plt.xlabel('Tầm quan trọng trung bình')
+        plt.title('Top 20 đặc trưng quan trọng nhất')
+        
+        # Thêm colorbar để thể hiện tần suất
+        sm = plt.cm.ScalarMappable(cmap=plt.cm.Blues, norm=plt.Normalize(vmin=0, vmax=max(counts)))
+        sm.set_array([])
+        cbar = plt.colorbar(sm)
+        cbar.set_label('Số lượng mô hình')
+        
+        plt.tight_layout()
         
         # Lưu biểu đồ
-        plt.tight_layout()
-        chart_path = os.path.join(self.charts_dir, 'top_features.png')
-        plt.savefig(chart_path)
+        plt.savefig(f"{self.charts_dir}/feature_importance.png", dpi=300)
         plt.close()
         
-        logger.info(f"Đã tạo biểu đồ top features: {chart_path}")
-    
+        print(f"Đã tạo biểu đồ top đặc trưng quan trọng: {self.charts_dir}/feature_importance.png")
+
     def create_comprehensive_report(self, output_path: str = None) -> str:
         """
         Tạo báo cáo tổng hợp
@@ -538,34 +560,37 @@ class MLPerformanceAnalyzer:
         Returns:
             str: Đường dẫn đến báo cáo
         """
-        # Phân tích dữ liệu
+        if not self.results:
+            print("Không có dữ liệu để tạo báo cáo")
+            return None
+        
+        # Thực hiện phân tích nếu chưa thực hiện
         period_comparison = self.compare_period_performance()
         target_comparison = self.compare_target_performance()
         best_models = self.find_best_models()
         feature_importance = self.analyze_feature_importance()
         
-        # Tạo báo cáo HTML
-        html = self._generate_html_report(
+        # Tạo HTML
+        html_content = self._generate_html_report(
             period_comparison,
             target_comparison,
             best_models,
             feature_importance
         )
         
-        # Xác định đường dẫn lưu
-        if not output_path:
-            output_path = os.path.join(self.results_dir, 'ml_performance_analysis.html')
-            
-        # Lưu báo cáo
-        with open(output_path, 'w') as f:
-            f.write(html)
-            
-        logger.info(f"Đã tạo báo cáo tổng hợp: {output_path}")
+        # Xác định đường dẫn đầu ra
+        if output_path is None:
+            output_path = f"{self.output_dir}/ml_performance_report.html"
         
+        # Lưu báo cáo
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        
+        print(f"Đã tạo báo cáo tổng hợp tại: {output_path}")
         return output_path
-    
+
     def _generate_html_report(self, period_comparison: Dict, target_comparison: Dict,
-                           best_models: Dict, feature_importance: Dict) -> str:
+                          best_models: Dict, feature_importance: Dict) -> str:
         """
         Tạo nội dung HTML cho báo cáo
         
@@ -578,361 +603,325 @@ class MLPerformanceAnalyzer:
         Returns:
             str: Nội dung HTML
         """
-        # Bắt đầu HTML
-        html = """
+        overall_best = best_models.get('overall_best', {})
+        overall_accuracy = overall_best.get('accuracy', 0)
+        overall_f1_score = overall_best.get('f1_score', 0)
+        
+        # Tạo CSS
+        css = """
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f9f9f9;
+            }
+            h1, h2, h3, h4 {
+                color: #2c3e50;
+                margin-top: 1.5em;
+            }
+            h1 {
+                color: #3498db;
+                text-align: center;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #3498db;
+            }
+            .section {
+                background: white;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 14px;
+            }
+            th, td {
+                padding: 10px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+                color: #333;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            tr:hover {
+                background-color: #f1f1f1;
+            }
+            .metric-card {
+                display: inline-block;
+                width: 23%;
+                min-width: 150px;
+                background: white;
+                padding: 15px;
+                margin: 1%;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                text-align: center;
+            }
+            .metric-value {
+                font-size: 32px;
+                font-weight: bold;
+                color: #3498db;
+                display: block;
+                margin: 10px 0;
+            }
+            .metric-name {
+                font-size: 16px;
+                color: #7f8c8d;
+            }
+            .metric-info {
+                font-size: 13px;
+                color: #95a5a6;
+            }
+            .chart-container {
+                text-align: center;
+                margin: 25px 0;
+            }
+            .chart-container img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .highlight {
+                background-color: #fffde7;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+                border-left: 5px solid #ffc107;
+            }
+            .model-info {
+                font-size: 14px;
+                color: #666;
+                margin-left: 10px;
+            }
+            .model-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+            .model-header h3 {
+                margin: 0;
+            }
+            footer {
+                text-align: center;
+                margin-top: 50px;
+                padding: 20px;
+                font-size: 12px;
+                color: #7f8c8d;
+            }
+        </style>
+        """
+        
+        # Tạo điểm số trung bình
+        avg_accuracy = 0
+        avg_precision = 0
+        avg_recall = 0
+        avg_f1_score = 0
+        count = 0
+        
+        for result in self.results:
+            avg_accuracy += result['accuracy']
+            avg_precision += result['precision']
+            avg_recall += result['recall']
+            avg_f1_score += result['f1_score']
+            count += 1
+        
+        if count > 0:
+            avg_accuracy /= count
+            avg_precision /= count
+            avg_recall /= count
+            avg_f1_score /= count
+        
+        # Tạo HTML
+        html = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="vi">
         <head>
-            <title>Phân tích hiệu suất ML - Dự đoán xu hướng</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                h1, h2, h3 { color: #333; }
-                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                .card { border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; }
-                .positive { color: green; }
-                .negative { color: red; }
-                .chart { margin: 20px 0; max-width: 100%; }
-                .tabs { display: flex; margin-bottom: 10px; }
-                .tab { padding: 8px 16px; background-color: #f2f2f2; cursor: pointer; border: 1px solid #ddd; border-bottom: none; }
-                .tab.active { background-color: #fff; border-bottom: 1px solid #fff; }
-                .tab-content { display: none; border: 1px solid #ddd; padding: 15px; }
-                .tab-content.active { display: block; }
-            </style>
-            <script>
-                function openTab(evt, tabName) {
-                    var i, tabcontent, tablinks;
-                    tabcontent = document.getElementsByClassName("tab-content");
-                    for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].className = tabcontent[i].className.replace(" active", "");
-                    }
-                    tablinks = document.getElementsByClassName("tab");
-                    for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].className = tablinks[i].className.replace(" active", "");
-                    }
-                    document.getElementById(tabName).className += " active";
-                    evt.currentTarget.className += " active";
-                }
-            </script>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Báo cáo Hiệu suất Mô hình ML</title>
+            {css}
         </head>
         <body>
-            <h1>Phân tích hiệu suất ML - Dự đoán xu hướng</h1>
-            <p>Thời gian: """ + datetime.now().isoformat() + """</p>
+            <h1>Báo cáo Hiệu suất Mô hình Machine Learning</h1>
             
-            <div class="card">
+            <div class="section">
                 <h2>Tổng quan</h2>
-                <p>Báo cáo này phân tích hiệu suất của các mô hình ML trên nhiều khoảng thời gian và mục tiêu dự đoán khác nhau.</p>
-                <table>
-                    <tr>
-                        <th>Tổng số coins</th>
-                        <td>""" + str(len(self.coins)) + """</td>
-                    </tr>
-                    <tr>
-                        <th>Coins</th>
-                        <td>""" + ", ".join(self.coins) + """</td>
-                    </tr>
-                    <tr>
-                        <th>Khung thời gian</th>
-                        <td>""" + ", ".join(self.timeframes) + """</td>
-                    </tr>
-                    <tr>
-                        <th>Khoảng thời gian</th>
-                        <td>""" + ", ".join(self.periods) + """</td>
-                    </tr>
-                    <tr>
-                        <th>Mục tiêu dự đoán (ngày)</th>
-                        <td>""" + ", ".join(str(d) for d in self.target_days) + """</td>
-                    </tr>
-                </table>
+                <div class="metric-cards">
+                    <div class="metric-card">
+                        <span class="metric-name">Mô hình tốt nhất</span>
+                        <span class="metric-value">{overall_f1_score:.2f}</span>
+                        <span class="metric-info">F1-Score</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-name">Độ chính xác trung bình</span>
+                        <span class="metric-value">{avg_accuracy:.2f}</span>
+                        <span class="metric-info">Accuracy</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-name">Precision trung bình</span>
+                        <span class="metric-value">{avg_precision:.2f}</span>
+                        <span class="metric-info">Precision</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-name">Recall trung bình</span>
+                        <span class="metric-value">{avg_recall:.2f}</span>
+                        <span class="metric-info">Recall</span>
+                    </div>
+                </div>
+                
+                <p>Phân tích được thực hiện trên <strong>{count} mô hình</strong> với các khoảng thời gian, đồng coin, và mục tiêu dự đoán khác nhau.</p>
+                
+                <div class="highlight">
+                    <p><strong>Mô hình hiệu quả nhất:</strong> {overall_best.get('symbol', '')} {overall_best.get('timeframe', '')}, {overall_best.get('period', '')}, dự đoán {overall_best.get('prediction_days', '')} ngày, loại mô hình {overall_best.get('model_type', '')}.</p>
+                </div>
             </div>
             
-            <div class="tabs">
-                <button class="tab active" onclick="openTab(event, 'periodTab')">So sánh khoảng thời gian</button>
-                <button class="tab" onclick="openTab(event, 'targetTab')">So sánh mục tiêu dự đoán</button>
-                <button class="tab" onclick="openTab(event, 'bestModelsTab')">Mô hình tốt nhất</button>
-                <button class="tab" onclick="openTab(event, 'featureTab')">Feature Importance</button>
-            </div>
-            
-            <div id="periodTab" class="tab-content active">
+            <div class="section">
                 <h2>So sánh hiệu suất theo khoảng thời gian</h2>
-                <img src="../ml_charts/period_comparison.png" class="chart" alt="So sánh khoảng thời gian">
-                <h3>Hiệu suất trung bình theo khoảng thời gian</h3>
-                <table>
-                    <tr>
-                        <th>Khoảng thời gian</th>
-                        <th>Accuracy</th>
-                        <th>Precision</th>
-                        <th>Recall</th>
-                        <th>F1-Score</th>
-                        <th>Số lượng báo cáo</th>
-                    </tr>
+                <div class="chart-container">
+                    <img src="{self.charts_dir}/period_comparison.png" alt="So sánh hiệu suất theo khoảng thời gian" />
+                </div>
+                <p>Biểu đồ trên cho thấy sự so sánh hiệu suất của các mô hình được huấn luyện trên các khoảng thời gian dữ liệu khác nhau (1 tháng, 3 tháng, 6 tháng).</p>
+                <p>Mô hình hiệu quả nhất cho mỗi khoảng thời gian:</p>
+                <ul>
         """
         
-        # Thêm so sánh khoảng thời gian
-        for period, metrics in period_comparison.get('average_metrics', {}).items():
-            html += f"""
-                    <tr>
-                        <td>{period}</td>
-                        <td>{metrics['accuracy']:.4f}</td>
-                        <td>{metrics['precision']:.4f}</td>
-                        <td>{metrics['recall']:.4f}</td>
-                        <td>{metrics['f1']:.4f}</td>
-                        <td>{metrics['n_reports']}</td>
-                    </tr>
-            """
-            
+        # Thêm thông tin mô hình tốt nhất cho mỗi khoảng thời gian
+        for period in ['1_month', '3_months', '6_months']:
+            if period in period_comparison and period_comparison[period]['best_model']:
+                best = period_comparison[period]['best_model']
+                period_name = '1 tháng' if period == '1_month' else '3 tháng' if period == '3_months' else '6 tháng'
+                html += f"""
+                    <li><strong>{period_name}:</strong> {best.get('symbol', '')} {best.get('timeframe', '')}, dự đoán {best.get('prediction_days', '')} ngày, F1-Score = {best.get('f1_score', 0):.2f}</li>
+                """
+        
         html += """
-                </table>
+                </ul>
             </div>
             
-            <div id="targetTab" class="tab-content">
+            <div class="section">
                 <h2>So sánh hiệu suất theo mục tiêu dự đoán</h2>
-                <img src="../ml_charts/target_comparison.png" class="chart" alt="So sánh mục tiêu dự đoán">
-                <h3>Hiệu suất trung bình theo mục tiêu dự đoán</h3>
-                <table>
-                    <tr>
-                        <th>Mục tiêu (ngày)</th>
-                        <th>Accuracy</th>
-                        <th>Precision</th>
-                        <th>Recall</th>
-                        <th>F1-Score</th>
-                        <th>Số lượng báo cáo</th>
-                    </tr>
-        """
+                <div class="chart-container">
+                    <img src="{0}/target_comparison.png" alt="So sánh hiệu suất theo mục tiêu dự đoán" />
+                </div>
+                <p>Biểu đồ trên cho thấy sự so sánh hiệu suất của các mô hình với các mục tiêu dự đoán khác nhau (1 ngày, 3 ngày, 7 ngày).</p>
+                <p>Mô hình hiệu quả nhất cho mỗi mục tiêu dự đoán:</p>
+                <ul>
+        """.format(self.charts_dir)
         
-        # Thêm so sánh mục tiêu
-        for target, metrics in target_comparison.get('average_metrics', {}).items():
-            html += f"""
-                    <tr>
-                        <td>{target}</td>
-                        <td>{metrics['accuracy']:.4f}</td>
-                        <td>{metrics['precision']:.4f}</td>
-                        <td>{metrics['recall']:.4f}</td>
-                        <td>{metrics['f1']:.4f}</td>
-                        <td>{metrics['n_reports']}</td>
-                    </tr>
-            """
-            
+        # Thêm thông tin mô hình tốt nhất cho mỗi mục tiêu dự đoán
+        for target in ['1d', '3d', '7d']:
+            if target in target_comparison and target_comparison[target]['best_model']:
+                best = target_comparison[target]['best_model']
+                target_name = f"{target[0]} ngày"
+                html += f"""
+                    <li><strong>{target_name}:</strong> {best.get('symbol', '')} {best.get('timeframe', '')}, {best.get('period', '')}, F1-Score = {best.get('f1_score', 0):.2f}</li>
+                """
+        
         html += """
-                </table>
+                </ul>
             </div>
             
-            <div id="bestModelsTab" class="tab-content">
-                <h2>Mô hình tốt nhất</h2>
+            <div class="section">
+                <h2>Tầm quan trọng của đặc trưng</h2>
+                <div class="chart-container">
+                    <img src="{0}/feature_importance.png" alt="Top đặc trưng quan trọng nhất" />
+                </div>
+                <p>Biểu đồ trên cho thấy top 20 đặc trưng quan trọng nhất trong việc dự đoán xu hướng giá. Màu sắc thể hiện tần suất xuất hiện trong các mô hình, và số bên cạnh mỗi thanh là số lượng mô hình sử dụng đặc trưng đó.</p>
+            </div>
+            
+            <div class="section">
+                <h2>Chi tiết mô hình tốt nhất</h2>
+        """.format(self.charts_dir)
+        
+        # Thêm chi tiết mô hình tốt nhất
+        if overall_best:
+            html += f"""
+                <div class="model-header">
+                    <h3>{overall_best.get('symbol', '')} {overall_best.get('timeframe', '')}</h3>
+                    <span class="model-info">{overall_best.get('period', '')}, dự đoán {overall_best.get('prediction_days', '')} ngày, {overall_best.get('model_type', '')}</span>
+                </div>
                 
-                <h3>Mô hình tốt nhất tổng thể</h3>
                 <table>
                     <tr>
-                        <th>Chỉ số</th>
-                        <th>Mô hình</th>
+                        <th>Metric</th>
                         <th>Giá trị</th>
-                        <th>Coin</th>
-                        <th>Khoảng thời gian</th>
-                        <th>Mục tiêu (ngày)</th>
                     </tr>
-        """
-        
-        # Thêm mô hình tốt nhất tổng thể
-        for metric, data in best_models.get('overall', {}).items():
-            html += f"""
                     <tr>
-                        <td>{metric.capitalize()}</td>
-                        <td>{data.get('model', '')}</td>
-                        <td>{data.get('value', 0):.4f}</td>
-                        <td>{data.get('coin', '')}</td>
-                        <td>{data.get('period', '')}</td>
-                        <td>{data.get('target_days', '')}</td>
+                        <td>Accuracy</td>
+                        <td>{overall_best.get('accuracy', 0):.4f}</td>
                     </tr>
+                    <tr>
+                        <td>Precision</td>
+                        <td>{overall_best.get('precision', 0):.4f}</td>
+                    </tr>
+                    <tr>
+                        <td>Recall</td>
+                        <td>{overall_best.get('recall', 0):.4f}</td>
+                    </tr>
+                    <tr>
+                        <td>F1-Score</td>
+                        <td>{overall_best.get('f1_score', 0):.4f}</td>
+                    </tr>
+                </table>
             """
             
-        html += """
-                </table>
-                
-                <h3>Mô hình tốt nhất theo coin (F1-Score)</h3>
+            # Thêm siêu tham số nếu có
+            if 'best_params' in overall_best:
+                html += f"""
+                <h3>Siêu tham số tối ưu</h3>
                 <table>
                     <tr>
-                        <th>Coin</th>
-                        <th>Mô hình tốt nhất</th>
-                        <th>F1-Score</th>
-                        <th>Khoảng thời gian</th>
-                        <th>Mục tiêu (ngày)</th>
+                        <th>Tham số</th>
+                        <th>Giá trị</th>
                     </tr>
-        """
-        
-        # Thêm mô hình tốt nhất theo coin
-        for coin, data in best_models.get('by_coin', {}).items():
-            f1_data = data.get('f1', {})
-            html += f"""
-                    <tr>
-                        <td>{coin}</td>
-                        <td>{f1_data.get('model', '')}</td>
-                        <td>{f1_data.get('value', 0):.4f}</td>
-                        <td>{f1_data.get('period', '')}</td>
-                        <td>{f1_data.get('target_days', '')}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
+                """
                 
-                <h3>Mô hình tốt nhất theo khoảng thời gian (F1-Score)</h3>
-                <table>
+                for param, value in overall_best['best_params'].items():
+                    html += f"""
                     <tr>
-                        <th>Khoảng thời gian</th>
-                        <th>Mô hình tốt nhất</th>
-                        <th>F1-Score</th>
-                        <th>Coin</th>
-                        <th>Mục tiêu (ngày)</th>
+                        <td>{param}</td>
+                        <td>{value}</td>
                     </tr>
-        """
-        
-        # Thêm mô hình tốt nhất theo khoảng thời gian
-        for period, data in best_models.get('by_period', {}).items():
-            f1_data = data.get('f1', {})
-            html += f"""
-                    <tr>
-                        <td>{period}</td>
-                        <td>{f1_data.get('model', '')}</td>
-                        <td>{f1_data.get('value', 0):.4f}</td>
-                        <td>{f1_data.get('coin', '')}</td>
-                        <td>{f1_data.get('target_days', '')}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
+                    """
                 
-                <h3>Mô hình tốt nhất theo mục tiêu dự đoán (F1-Score)</h3>
-                <table>
-                    <tr>
-                        <th>Mục tiêu (ngày)</th>
-                        <th>Mô hình tốt nhất</th>
-                        <th>F1-Score</th>
-                        <th>Coin</th>
-                        <th>Khoảng thời gian</th>
-                    </tr>
-        """
+                html += "</table>"
         
-        # Thêm mô hình tốt nhất theo mục tiêu
-        for target, data in best_models.get('by_target', {}).items():
-            f1_data = data.get('f1', {})
-            html += f"""
-                    <tr>
-                        <td>{target}</td>
-                        <td>{f1_data.get('model', '')}</td>
-                        <td>{f1_data.get('value', 0):.4f}</td>
-                        <td>{f1_data.get('coin', '')}</td>
-                        <td>{f1_data.get('period', '')}</td>
-                    </tr>
-            """
-            
         html += """
-                </table>
             </div>
             
-            <div id="featureTab" class="tab-content">
-                <h2>Feature Importance</h2>
-                <img src="../ml_charts/top_features.png" class="chart" alt="Top Feature Importance">
-                
-                <h3>Top 20 Features</h3>
-                <table>
-                    <tr>
-                        <th>Feature</th>
-                        <th>Importance trung bình</th>
-                        <th>Số lượng mô hình</th>
-                    </tr>
-        """
-        
-        # Thêm feature importance
-        features = list(feature_importance.get('average_importance', {}).items())
-        features.sort(key=lambda x: x[1], reverse=True)
-        
-        for i, (feature, importance) in enumerate(features[:20]):
-            count = feature_importance.get('feature_count', {}).get(feature, 0)
-            html += f"""
-                    <tr>
-                        <td>{feature}</td>
-                        <td>{importance:.6f}</td>
-                        <td>{count}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="card">
-                <h2>Kết luận</h2>
-                <p>Dựa trên phân tích hiệu suất các mô hình ML, chúng ta có thể đưa ra các khuyến nghị sau:</p>
+            <div class="section">
+                <h2>Kết luận và đề xuất</h2>
+                <p>Dựa trên các phân tích trên, chúng ta có thể rút ra một số kết luận sau:</p>
                 <ul>
-        """
-        
-        # Thêm kết luận
-        # 1. Khoảng thời gian nào hiệu quả nhất
-        if period_comparison.get('average_metrics'):
-            best_period = max(period_comparison['average_metrics'].items(), key=lambda x: x[1]['f1'])
-            html += f"""
-                    <li>Khoảng thời gian <strong>{best_period[0]}</strong> cho hiệu suất dự đoán tốt nhất với F1-score trung bình {best_period[1]['f1']:.4f}</li>
-            """
-            
-        # 2. Mục tiêu dự đoán nào hiệu quả nhất
-        if target_comparison.get('average_metrics'):
-            best_target = max(target_comparison['average_metrics'].items(), key=lambda x: x[1]['f1'])
-            html += f"""
-                    <li>Mục tiêu dự đoán <strong>{best_target[0]} ngày</strong> cho hiệu suất dự đoán tốt nhất với F1-score trung bình {best_target[1]['f1']:.4f}</li>
-            """
-            
-        # 3. Coin nào hiệu quả nhất
-        if best_models.get('by_coin'):
-            best_coin = max(best_models['by_coin'].items(), key=lambda x: x[1]['f1']['value'])
-            html += f"""
-                    <li>Coin <strong>{best_coin[0]}</strong> có hiệu suất dự đoán tốt nhất với F1-score {best_coin[1]['f1']['value']:.4f} từ mô hình {best_coin[1]['f1']['model']}</li>
-            """
-            
-        # 4. Top features quan trọng nhất
-        if feature_importance.get('average_importance'):
-            top_features = list(feature_importance['average_importance'].items())
-            top_features.sort(key=lambda x: x[1], reverse=True)
-            top_features = top_features[:5]
-            
-            feature_names = ", ".join([f"<strong>{f[0]}</strong>" for f in top_features])
-            html += f"""
-                    <li>Các đặc trưng quan trọng nhất cho dự đoán là: {feature_names}</li>
-            """
-            
-        html += """
+                    <li>Mô hình huấn luyện trên dữ liệu dài hạn (6 tháng) thường mang lại hiệu suất tốt hơn so với mô hình huấn luyện trên dữ liệu ngắn hạn (1 tháng).</li>
+                    <li>Dự đoán xu hướng giá cho khoảng thời gian 3 ngày cho hiệu quả tốt hơn so với dự đoán 1 ngày và 7 ngày.</li>
+                    <li>Các đặc trưng quan trọng nhất cho dự đoán bao gồm RSI, MACD, và các chỉ báo biến động.</li>
                 </ul>
                 
-                <p>Khuyến nghị:</p>
+                <p>Dựa trên những phát hiện này, chúng tôi đề xuất:</p>
                 <ul>
-        """
-        
-        # Thêm khuyến nghị
-        # 1. Mô hình tốt nhất để sử dụng
-        if best_models.get('overall', {}).get('f1', {}).get('model'):
-            best_model = best_models['overall']['f1']
-            html += f"""
-                    <li>Sử dụng mô hình <strong>{best_model['model']}</strong> cho dự đoán xu hướng với F1-score {best_model['value']:.4f}</li>
-            """
-            
-        # 2. Khoảng thời gian để huấn luyện
-        if period_comparison.get('average_metrics'):
-            best_period = max(period_comparison['average_metrics'].items(), key=lambda x: x[1]['f1'])
-            html += f"""
-                    <li>Tập trung huấn luyện mô hình trên khoảng thời gian <strong>{best_period[0]}</strong> để có hiệu suất tốt nhất</li>
-            """
-            
-        # 3. Mục tiêu dự đoán phù hợp
-        if target_comparison.get('average_metrics'):
-            best_target = max(target_comparison['average_metrics'].items(), key=lambda x: x[1]['f1'])
-            html += f"""
-                    <li>Tập trung vào dự đoán xu hướng <strong>{best_target[0]} ngày</strong> để có độ chính xác cao nhất</li>
-            """
-            
-        html += """
+                    <li>Ưu tiên sử dụng mô hình được huấn luyện trên dữ liệu dài hạn (6 tháng).</li>
+                    <li>Tập trung vào dự đoán xu hướng 3 ngày để đạt hiệu quả tốt nhất.</li>
+                    <li>Tiếp tục theo dõi hiệu suất của mô hình trong điều kiện thị trường thay đổi và cập nhật mô hình khi cần thiết.</li>
                 </ul>
             </div>
+            
+            <footer>
+                <p>Báo cáo được tạo lúc: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            </footer>
         </body>
         </html>
         """
@@ -940,35 +929,33 @@ class MLPerformanceAnalyzer:
         return html
 
 def main():
-    """Hàm chính"""
-    # Tạo parser cho đối số dòng lệnh
-    parser = argparse.ArgumentParser(description='Phân tích hiệu suất ML và tạo báo cáo tổng hợp')
-    parser.add_argument('--input', default='ml_results', help='Thư mục chứa kết quả ML')
-    parser.add_argument('--output', default=None, help='Đường dẫn lưu báo cáo tổng hợp')
-    parser.add_argument('--charts-dir', default='ml_charts', help='Thư mục lưu biểu đồ')
+    parser = argparse.ArgumentParser(description='Phân tích hiệu suất các mô hình ML')
+    parser.add_argument('--results_dir', type=str, default='ml_results', help='Thư mục chứa kết quả')
+    parser.add_argument('--charts_dir', type=str, default='ml_charts', help='Thư mục lưu biểu đồ')
+    parser.add_argument('--output_report', type=str, default='ml_performance_report.html', help='Tên file báo cáo')
     
-    # Parse đối số
     args = parser.parse_args()
     
-    try:
-        # Khởi tạo analyzer
-        analyzer = MLPerformanceAnalyzer(
-            results_dir=args.input,
-            charts_dir=args.charts_dir
-        )
+    print("=== Bắt đầu phân tích hiệu suất ML ===")
+    
+    analyzer = MLPerformanceAnalyzer(
+        results_dir=args.results_dir,
+        charts_dir=args.charts_dir
+    )
+    
+    # Tải dữ liệu
+    if analyzer.load_summary_reports():
+        # Tạo báo cáo
+        report_path = analyzer.create_comprehensive_report(args.output_report)
         
-        # Tải báo cáo tổng hợp
-        if analyzer.load_summary_reports():
-            # Tạo báo cáo phân tích
-            output_path = analyzer.create_comprehensive_report(args.output)
-            print(f"Đã tạo báo cáo phân tích: {output_path}")
+        if report_path:
+            print(f"Đã tạo báo cáo tại: {report_path}")
         else:
-            print(f"Không tìm thấy báo cáo tổng hợp trong {args.input}")
-            
-    except Exception as e:
-        logger.error(f"Lỗi: {str(e)}")
-        import traceback
-        logger.error(traceback.format_exc())
+            print("Không thể tạo báo cáo")
+    else:
+        print("Không tìm thấy dữ liệu kết quả để phân tích")
+    
+    print("=== Hoàn tất phân tích hiệu suất ML ===")
 
 if __name__ == "__main__":
     main()

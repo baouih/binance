@@ -2,249 +2,241 @@
 # -*- coding: utf-8 -*-
 
 """
-Script tạo dữ liệu mẫu cho 9 đồng coin với 3 khung thời gian (1, 3, và 6 tháng)
+Script tạo và chuẩn bị bộ dữ liệu cho việc huấn luyện và kiểm thử mô hình ML
 """
 
 import os
 import json
-import time
+import argparse
 import logging
+from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from typing import List, Dict, Tuple, Optional
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
-logger = logging.getLogger('generate_datasets')
+logger = logging.getLogger(__name__)
 
-def generate_price_data(symbol, days, interval, initial_price, volatility):
+def generate_price_series(days: int = 180, initial_price: float = 50000.0, 
+                         volatility: float = 0.02, timeframe: str = '1h',
+                         with_trends: bool = True) -> pd.DataFrame:
     """
-    Tạo dữ liệu giá mẫu với biến động ngẫu nhiên và xu hướng
+    Tạo dữ liệu giá mẫu với xu hướng ngẫu nhiên
     
     Args:
-        symbol (str): Mã cặp giao dịch
-        days (int): Số ngày dữ liệu cần tạo
-        interval (str): Khung thời gian (1h, 4h, 1d)
-        initial_price (float): Giá bắt đầu
-        volatility (float): Độ biến động giá
+        days (int): Số ngày dữ liệu
+        initial_price (float): Giá ban đầu
+        volatility (float): Độ biến động (0.01 = 1%)
+        timeframe (str): Khung thời gian ('1h', '4h', '1d')
+        with_trends (bool): Có tạo xu hướng không
         
     Returns:
-        pd.DataFrame: DataFrame chứa dữ liệu OHLCV
+        pd.DataFrame: DataFrame với dữ liệu OHLCV
     """
-    # Xác định số lượng khoảng thời gian
-    if interval == '1h':
-        periods = days * 24
-        freq = 'H'
-    elif interval == '4h':
-        periods = days * 6
-        freq = '4H'
-    elif interval == '1d':
-        periods = days
-        freq = 'D'
-    else:
-        periods = days * 24
-        freq = 'H'
+    # Xác định số điểm dữ liệu dựa trên timeframe
+    points_per_day = {
+        '1h': 24,
+        '4h': 6,
+        '1d': 1
+    }
+    num_points = days * points_per_day.get(timeframe, 24)
     
-    # Tạo dữ liệu thời gian
-    end_time = datetime.now()
-    start_time = end_time - timedelta(days=days)
-    # Chỉ dùng start_time và periods (không dùng end_time và freq cùng lúc)
-    timestamps = pd.date_range(start=start_time, periods=periods, freq=freq)
+    # Tạo chuỗi thời gian
+    end_date = datetime.now()
+    if timeframe == '1h':
+        start_date = end_date - timedelta(hours=num_points)
+        date_range = pd.date_range(start=start_date, end=end_date, periods=num_points)
+    elif timeframe == '4h':
+        start_date = end_date - timedelta(hours=num_points * 4)
+        date_range = pd.date_range(start=start_date, end=end_date, periods=num_points)
+    elif timeframe == '1d':
+        start_date = end_date - timedelta(days=num_points)
+        date_range = pd.date_range(start=start_date, end=end_date, periods=num_points)
     
-    # Tạo mảng giá
-    np.random.seed(42)  # Để kết quả có thể tái tạo
-    
-    # Tạo chuỗi giá theo xu hướng thực tế
-    price = initial_price
-    prices = []
-    
-    # Thêm một số xu hướng và chu kỳ để mô phỏng thị trường thực tế
-    # Giai đoạn: xu hướng tăng -> sideway -> điều chỉnh -> xu hướng tăng mạnh -> điều chỉnh mạnh
-    trend_phases = [
-        (0.0005, int(periods * 0.15)),  # Xu hướng tăng nhẹ
-        (0.0, int(periods * 0.2)),  # Sideway
-        (-0.0003, int(periods * 0.15)),  # Điều chỉnh nhẹ
-        (0.0015, int(periods * 0.3)),  # Xu hướng tăng mạnh
-        (-0.0010, int(periods * 0.2))  # Điều chỉnh mạnh
-    ]
-    
-    # Vị trí trong chu kỳ
-    phase_start = 0
-    
-    for phase, length in trend_phases:
-        phase_end = phase_start + length
-        if phase_end > periods:
-            phase_end = periods
-            
-        for i in range(phase_start, phase_end):
-            # Thành phần ngẫu nhiên
-            random_change = np.random.normal(0, volatility)
-            
-            # Thành phần xu hướng
-            trend_change = phase
-            
-            # Thành phần chu kỳ (sin wave)
-            cycle_change = 0.0002 * np.sin(i / 20)
-            
-            # Tổng thay đổi
-            total_change = random_change + trend_change + cycle_change
-            
-            # Cập nhật giá
-            price = price * (1 + total_change)
-            
-            # Bảo đảm giá không âm
-            price = max(price, 0.00001)
-            
-            prices.append(price)
-            
-        phase_start = phase_end
+    # Tạo các xu hướng
+    if with_trends:
+        # Tạo xu hướng cơ bản
+        trend_changes = np.random.randint(5, 20, size=days // 30 + 1)  # Thay đổi xu hướng mỗi 5-20 ngày
+        trends = []
+        current_trend = np.random.choice([-1, 1])  # Bắt đầu với xu hướng ngẫu nhiên
         
-    # Điền thêm nếu thiếu
-    while len(prices) < periods:
-        prices.append(prices[-1])
+        for duration in trend_changes:
+            trends.extend([current_trend] * duration * points_per_day.get(timeframe, 24))
+            current_trend *= -1  # Đảo ngược xu hướng
+        
+        trends = trends[:num_points]  # Cắt về đúng kích thước
+        trend_factor = np.array(trends) * volatility * 0.5  # Điều chỉnh xu hướng thành % thay đổi
+    else:
+        trend_factor = np.zeros(num_points)
     
-    # Tạo giá high, low và volume
-    high_prices = [p * (1 + abs(np.random.normal(0, volatility * 0.5))) for p in prices]
-    low_prices = [p * (1 - abs(np.random.normal(0, volatility * 0.5))) for p in prices]
+    # Tạo nhiễu ngẫu nhiên
+    returns = np.random.normal(0, volatility, num_points) + trend_factor
     
-    # Có thể thêm biến động volume theo giá
-    volumes = []
-    for i in range(len(prices)):
-        if i > 0:
-            price_change = abs(prices[i] / prices[i-1] - 1)
-            # Volume tăng khi giá biến động mạnh
-            vol_boost = 1 + 5 * price_change
-        else:
-            vol_boost = 1
-            
-        base_volume = np.random.lognormal(0, 0.5) * initial_price / 10000
-        volumes.append(base_volume * vol_boost)
+    # Tạo chuỗi giá
+    price_series = initial_price * (1 + returns).cumprod()
     
-    # Tạo DataFrame
+    # Tạo dữ liệu OHLCV
     df = pd.DataFrame({
-        'timestamp': timestamps,
-        'open': prices,
-        'high': high_prices,
-        'low': low_prices,
-        'close': prices,
-        'volume': volumes
+        'timestamp': date_range,
+        'open': price_series,
+        'close': price_series,
+        'high': price_series,
+        'low': price_series,
+        'volume': np.zeros(num_points)
     })
     
-    # Thêm các cột khác để tương thích với dữ liệu Binance
-    df['close_time'] = df['timestamp'] + pd.Timedelta(seconds=3600-1)
+    # Thêm biến động ngẫu nhiên cho giá open/high/low
+    for i in range(len(df)):
+        intrabar_volatility = volatility * price_series[i] * 0.5
+        df.at[i, 'open'] = price_series[i] * (1 + np.random.normal(0, 0.2) * intrabar_volatility / price_series[i])
+        df.at[i, 'high'] = max(df.at[i, 'open'], df.at[i, 'close']) + abs(np.random.normal(0, 1)) * intrabar_volatility
+        df.at[i, 'low'] = min(df.at[i, 'open'], df.at[i, 'close']) - abs(np.random.normal(0, 1)) * intrabar_volatility
+        df.at[i, 'volume'] = abs(np.random.normal(1, 0.5)) * 1000 * (1 + abs(returns[i]) * 10)  # Khối lượng tỷ lệ với độ biến động
+    
+    # Đảm bảo high luôn cao nhất và low luôn thấp nhất
+    df['high'] = df[['high', 'open', 'close']].max(axis=1)
+    df['low'] = df[['low', 'open', 'close']].min(axis=1)
+    
+    # Thêm các cột bổ sung cần thiết cho dữ liệu Binance
+    df['close_time'] = df['timestamp'] + pd.Timedelta(hours=1)
     df['quote_asset_volume'] = df['volume'] * df['close']
-    df['number_of_trades'] = (df['volume'] * 100).astype(int)
-    df['taker_buy_base_asset_volume'] = df['volume'] * 0.5
+    df['number_of_trades'] = (df['volume'] / 10).astype(int) + 100
+    df['taker_buy_base_asset_volume'] = df['volume'] * np.random.uniform(0.4, 0.6, len(df))
     df['taker_buy_quote_asset_volume'] = df['taker_buy_base_asset_volume'] * df['close']
     df['ignore'] = 0
     
+    logger.info(f"Đã tạo {len(df)} điểm dữ liệu từ {df['timestamp'].min()} đến {df['timestamp'].max()}")
+    
     return df
 
-def main():
-    """Hàm chính để tạo dữ liệu"""
-    # Danh sách 9 đồng coin cần tạo dữ liệu
-    symbols = [
-        'BTCUSDT', 'ETHUSDT', 'BNBUSDT',
-        'SOLUSDT', 'DOGEUSDT', 'XRPUSDT',
-        'ADAUSDT', 'DOTUSDT', 'LINKUSDT'
-    ]
+def prepare_datasets(symbols: List[str], timeframes: List[str], 
+                    periods: List[str], output_dir: str = 'real_data'):
+    """
+    Chuẩn bị bộ dữ liệu cho nhiều đồng tiền, khung thời gian và khoảng thời gian
     
-    # Danh sách khung thời gian
-    intervals = ['1h', '4h', '1d']
-    
-    # Giá tham khảo cho mỗi đồng coin
-    initial_prices = {
-        'BTCUSDT': 60000,
-        'ETHUSDT': 3500,
-        'BNBUSDT': 600,
-        'SOLUSDT': 130,
-        'DOGEUSDT': 0.15,
-        'XRPUSDT': 0.60,
-        'ADAUSDT': 0.50,
-        'DOTUSDT': 8.0,
-        'LINKUSDT': 18.0
-    }
-    
-    # Độ biến động cho mỗi đồng coin
-    volatilities = {
-        'BTCUSDT': 0.02,
-        'ETHUSDT': 0.025,
-        'BNBUSDT': 0.03,
-        'SOLUSDT': 0.04,
-        'DOGEUSDT': 0.05,
-        'XRPUSDT': 0.035,
-        'ADAUSDT': 0.03,
-        'DOTUSDT': 0.035,
-        'LINKUSDT': 0.03
-    }
-    
-    # Khung thời gian
-    time_ranges = {
+    Args:
+        symbols (List[str]): Danh sách các đồng tiền
+        timeframes (List[str]): Danh sách các khung thời gian
+        periods (List[str]): Danh sách các khoảng thời gian ('1_month', '3_months', '6_months')
+        output_dir (str): Thư mục đầu ra
+    """
+    # Ánh xạ khoảng thời gian thành số ngày
+    period_days = {
         '1_month': 30,
         '3_months': 90,
         '6_months': 180
     }
     
-    # Thư mục gốc
-    root_dir = 'real_data'
-    os.makedirs(root_dir, exist_ok=True)
+    # Tạo thư mục đầu ra
+    os.makedirs(output_dir, exist_ok=True)
+    for period in periods:
+        os.makedirs(os.path.join(output_dir, period), exist_ok=True)
     
-    # Kết quả tổng hợp
-    results = {
-        "time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        "symbols": {},
-        "total_files": 0,
-        "total_candles": 0
-    }
+    # Tạo các bộ dữ liệu
+    fetch_results = []
     
-    # Tạo dữ liệu cho từng đồng coin, khung thời gian và khoảng thời gian
     for symbol in symbols:
-        results["symbols"][symbol] = {}
+        # Thiết lập giá ban đầu và độ biến động dựa trên đồng tiền
+        if symbol == 'BTCUSDT':
+            initial_price = 50000.0
+            volatility = 0.02
+        elif symbol == 'ETHUSDT':
+            initial_price = 3000.0
+            volatility = 0.025
+        elif symbol == 'BNBUSDT':
+            initial_price = 500.0
+            volatility = 0.03
+        elif symbol == 'SOLUSDT':
+            initial_price = 100.0
+            volatility = 0.035
+        elif symbol == 'XRPUSDT':
+            initial_price = 0.5
+            volatility = 0.03
+        elif symbol == 'DOGEUSDT':
+            initial_price = 0.1
+            volatility = 0.04
+        elif symbol == 'ADAUSDT':
+            initial_price = 0.5
+            volatility = 0.03
+        elif symbol == 'DOTUSDT':
+            initial_price = 15.0
+            volatility = 0.035
+        elif symbol == 'MATICUSDT':
+            initial_price = 1.0
+            volatility = 0.04
+        else:
+            initial_price = 100.0
+            volatility = 0.03
         
-        for interval in intervals:
-            results["symbols"][symbol][interval] = {}
+        # Tạo dữ liệu cho mỗi khung thời gian
+        for timeframe in timeframes:
+            # Tạo dữ liệu dài nhất (6 tháng)
+            max_days = period_days.get('6_months', 180)
+            df_full = generate_price_series(
+                days=max_days,
+                initial_price=initial_price,
+                volatility=volatility,
+                timeframe=timeframe,
+                with_trends=True
+            )
             
-            for time_label, days in time_ranges.items():
-                # Tạo thư mục nếu chưa tồn tại
-                range_dir = f"{root_dir}/{time_label}"
-                os.makedirs(range_dir, exist_ok=True)
+            # Lưu dữ liệu cho từng khoảng thời gian
+            for period in periods:
+                days = period_days.get(period, 30)
                 
-                print(f"Đang tạo dữ liệu {symbol} {interval} cho {time_label}...")
+                # Lấy phần dữ liệu tương ứng với khoảng thời gian
+                df = df_full.tail(days * 24 if timeframe == '1h' else days * 6 if timeframe == '4h' else days)
                 
-                # Tạo dữ liệu
-                df = generate_price_data(
-                    symbol=symbol,
-                    days=days,
-                    interval=interval,
-                    initial_price=initial_prices[symbol],
-                    volatility=volatilities[symbol]
-                )
+                # Lưu file
+                output_file = os.path.join(output_dir, period, f"{symbol}_{timeframe}.csv")
+                df.to_csv(output_file, index=False)
                 
-                # Lưu dữ liệu
-                file_path = f"{range_dir}/{symbol}_{interval}.csv"
-                df.to_csv(file_path, index=False)
-                
-                results["symbols"][symbol][interval][time_label] = {
-                    "file_path": file_path,
-                    "candles": len(df),
-                    "start_date": df['timestamp'].min().strftime('%Y-%m-%d %H:%M:%S'),
-                    "end_date": df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                
-                results["total_files"] += 1
-                results["total_candles"] += len(df)
-                
-                print(f"Đã lưu {len(df)} dòng dữ liệu vào {file_path}")
+                logger.info(f"Đã lưu dữ liệu {symbol} {timeframe} ({period}) tại: {output_file}")
+                fetch_results.append({
+                    'symbol': symbol,
+                    'timeframe': timeframe,
+                    'period': period,
+                    'file_path': output_file,
+                    'num_records': len(df),
+                    'start_date': df['timestamp'].min().strftime('%Y-%m-%d %H:%M:%S'),
+                    'end_date': df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S'),
+                })
     
-    # Lưu kết quả
-    with open(f"{root_dir}/fetch_results.json", "w") as f:
-        json.dump(results, f, indent=2)
+    # Lưu kết quả tạo dữ liệu
+    with open(os.path.join(output_dir, 'fetch_results.json'), 'w') as f:
+        json.dump(fetch_results, f, indent=2)
     
-    print(f"\nHoàn tất! Đã tạo {results['total_files']} file với tổng cộng {results['total_candles']} nến.")
-    print(f"Báo cáo chi tiết được lưu tại {root_dir}/fetch_results.json")
+    logger.info(f"Đã tạo tổng cộng {len(fetch_results)} bộ dữ liệu")
+
+def main():
+    parser = argparse.ArgumentParser(description='Tạo bộ dữ liệu cho huấn luyện ML')
+    parser.add_argument('--symbols', type=str, default='BTCUSDT,ETHUSDT,BNBUSDT,SOLUSDT,XRPUSDT',
+                        help='Danh sách các đồng tiền, phân tách bằng dấu phẩy')
+    parser.add_argument('--timeframes', type=str, default='1h,4h,1d',
+                        help='Danh sách các khung thời gian, phân tách bằng dấu phẩy')
+    parser.add_argument('--periods', type=str, default='1_month,3_months,6_months',
+                        help='Danh sách các khoảng thời gian, phân tách bằng dấu phẩy')
+    parser.add_argument('--output_dir', type=str, default='real_data',
+                        help='Thư mục đầu ra cho dữ liệu')
+    
+    args = parser.parse_args()
+    
+    # Chuyển đổi các danh sách từ chuỗi
+    symbols = args.symbols.split(',')
+    timeframes = args.timeframes.split(',')
+    periods = args.periods.split(',')
+    
+    logger.info(f"Bắt đầu tạo dữ liệu cho {len(symbols)} đồng tiền, {len(timeframes)} khung thời gian, {len(periods)} khoảng thời gian")
+    
+    # Tạo bộ dữ liệu
+    prepare_datasets(symbols, timeframes, periods, args.output_dir)
+    
+    logger.info("Hoàn thành tạo dữ liệu")
 
 if __name__ == "__main__":
     main()
