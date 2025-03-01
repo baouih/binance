@@ -1,0 +1,227 @@
+{
+  "model_key": "ETHUSDT_1h_3m_target3d",
+  "coin": "ETHUSDT",
+  "timeframe": "1h",
+  "period": "3m",
+  "target_days": 3,
+  "metrics": {
+    "accuracy": 0.5,
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6666666666666666
+  },
+  "data_info": {
+    "n_samples": 458,
+    "train_samples": 366,
+    "test_samples": 92,
+    "date_range": [
+      "2025-02-09 16:00:00",
+      "2025-02-28 17:00:00"
+    ],
+    "features": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "sma5",
+      "sma10",
+      "sma20",
+      "sma50",
+      "sma100",
+      "ema5",
+      "ema10",
+      "ema20",
+      "ema50",
+      "rsi",
+      "macd",
+      "macd_signal",
+      "macd_hist",
+      "bb_middle",
+      "bb_upper",
+      "bb_lower",
+      "price_sma20_ratio",
+      "price_sma50_ratio",
+      "volatility",
+      "daily_return",
+      "weekly_return",
+      "volume_sma5",
+      "volume_ratio",
+      "direction_1d",
+      "direction_3d",
+      "direction_5d"
+    ],
+    "class_distribution": {
+      "up": 229,
+      "down": 229
+    }
+  },
+  "classification_report": {
+    "0": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 46.0
+    },
+    "1": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1-score": 0.6666666666666666,
+      "support": 46.0
+    },
+    "accuracy": 0.5,
+    "macro avg": {
+      "precision": 0.25,
+      "recall": 0.5,
+      "f1-score": 0.3333333333333333,
+      "support": 92.0
+    },
+    "weighted avg": {
+      "precision": 0.25,
+      "recall": 0.5,
+      "f1-score": 0.3333333333333333,
+      "support": 92.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      0,
+      46
+    ],
+    [
+      0,
+      46
+    ]
+  ],
+  "charts": {
+    "confusion_matrix": "ml_charts/ETHUSDT_1h_3m_target3d_confusion_matrix.png",
+    "predictions": "ml_charts/ETHUSDT_1h_3m_target3d_predictions.png",
+    "feature_importance": "ml_charts/ETHUSDT_1h_3m_target3d_feature_importance.png"
+  },
+  "feature_importance": [
+    {
+      "feature": "macd",
+      "importance": 0.05761309907109265
+    },
+    {
+      "feature": "macd_signal",
+      "importance": 0.05502842545478637
+    },
+    {
+      "feature": "price_sma50_ratio",
+      "importance": 0.04950662571524261
+    },
+    {
+      "feature": "volume_sma5",
+      "importance": 0.047219443907999495
+    },
+    {
+      "feature": "sma50",
+      "importance": 0.04339051514141152
+    },
+    {
+      "feature": "bb_lower",
+      "importance": 0.03962284302072007
+    },
+    {
+      "feature": "ema50",
+      "importance": 0.03896651367092832
+    },
+    {
+      "feature": "weekly_return",
+      "importance": 0.038837985429045485
+    },
+    {
+      "feature": "close",
+      "importance": 0.037492513319262226
+    },
+    {
+      "feature": "bb_middle",
+      "importance": 0.037237623342023
+    },
+    {
+      "feature": "bb_upper",
+      "importance": 0.037225213016591076
+    },
+    {
+      "feature": "sma100",
+      "importance": 0.03480403224833617
+    },
+    {
+      "feature": "price_sma20_ratio",
+      "importance": 0.03464685058284952
+    },
+    {
+      "feature": "volume",
+      "importance": 0.033917677018361646
+    },
+    {
+      "feature": "sma20",
+      "importance": 0.03371890426203912
+    },
+    {
+      "feature": "ema10",
+      "importance": 0.033387773250686426
+    },
+    {
+      "feature": "macd_hist",
+      "importance": 0.03240916985026377
+    },
+    {
+      "feature": "daily_return",
+      "importance": 0.03114167288478469
+    },
+    {
+      "feature": "ema5",
+      "importance": 0.031129695927451025
+    },
+    {
+      "feature": "sma10",
+      "importance": 0.02957865562427085
+    },
+    {
+      "feature": "high",
+      "importance": 0.029143404729767324
+    },
+    {
+      "feature": "sma5",
+      "importance": 0.02830311907464392
+    },
+    {
+      "feature": "rsi",
+      "importance": 0.028282637294303817
+    },
+    {
+      "feature": "ema20",
+      "importance": 0.02697365724650787
+    },
+    {
+      "feature": "volatility",
+      "importance": 0.02550726720437572
+    },
+    {
+      "feature": "volume_ratio",
+      "importance": 0.02528687696576472
+    },
+    {
+      "feature": "open",
+      "importance": 0.025068008323914554
+    },
+    {
+      "feature": "low",
+      "importance": 0.023638172341686352
+    },
+    {
+      "feature": "direction_5d",
+      "importance": 0.00498802260718494
+    },
+    {
+      "feature": "direction_3d",
+      "importance": 0.00378359749922067
+    },
+    {
+      "feature": "direction_1d",
+      "importance": 0.002150003974484253
+    }
+  ]
+}

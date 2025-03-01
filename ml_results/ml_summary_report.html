@@ -1,0 +1,348 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Báo cáo ML - Dự đoán xu hướng</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1, h2, h3 { color: #333; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .card { border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; }
+                    .positive { color: green; }
+                    .negative { color: red; }
+                    .chart { margin: 20px 0; max-width: 100%; }
+                    .tabs { display: flex; margin-bottom: 10px; }
+                    .tab { padding: 8px 16px; background-color: #f2f2f2; cursor: pointer; border: 1px solid #ddd; border-bottom: none; }
+                    .tab.active { background-color: #fff; border-bottom: 1px solid #fff; }
+                    .tab-content { display: none; border: 1px solid #ddd; padding: 15px; }
+                    .tab-content.active { display: block; }
+                </style>
+                <script>
+                    function openTab(evt, tabName) {
+                        var i, tabcontent, tablinks;
+                        tabcontent = document.getElementsByClassName("tab-content");
+                        for (i = 0; i < tabcontent.length; i++) {
+                            tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+                        }
+                        tablinks = document.getElementsByClassName("tab");
+                        for (i = 0; i < tablinks.length; i++) {
+                            tablinks[i].className = tablinks[i].className.replace(" active", "");
+                        }
+                        document.getElementById(tabName).className += " active";
+                        evt.currentTarget.className += " active";
+                    }
+                </script>
+            </head>
+            <body>
+                <h1>Báo cáo ML - Dự đoán xu hướng</h1>
+                <p>Thời gian: 2025-03-01T15:53:46.669318</p>
+                
+                <div class="card">
+                    <h2>Tổng quan</h2>
+                    <table>
+                        <tr>
+                            <th>Tổng số mô hình</th>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <th>Coins</th>
+                            <td>ETHUSDT, BTCUSDT</td>
+                        </tr>
+                        <tr>
+                            <th>Khung thời gian</th>
+                            <td>1h</td>
+                        </tr>
+                        <tr>
+                            <th>Khoảng thời gian</th>
+                            <td>3m, 1m</td>
+                        </tr>
+                        <tr>
+                            <th>Mục tiêu dự đoán (ngày)</th>
+                            <td>1, 3</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h2>Mô hình tốt nhất</h2>
+                    <table>
+                        <tr>
+                            <th>Chỉ số</th>
+                            <th>Mô hình</th>
+                            <th>Giá trị</th>
+                        </tr>
+            
+                        <tr>
+                            <td>Accuracy</td>
+                            <td>BTCUSDT_1h_1m_target1d</td>
+                            <td>0.5543</td>
+                        </tr>
+                
+                        <tr>
+                            <td>Precision</td>
+                            <td>BTCUSDT_1h_1m_target3d</td>
+                            <td>0.5714</td>
+                        </tr>
+                
+                        <tr>
+                            <td>Recall</td>
+                            <td>ETHUSDT_1h_1m_target1d</td>
+                            <td>1.0000</td>
+                        </tr>
+                
+                        <tr>
+                            <td>F1</td>
+                            <td>ETHUSDT_1h_1m_target3d</td>
+                            <td>0.6667</td>
+                        </tr>
+                
+                    </table>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="openTab(event, 'byCoin')">Theo Coin</button>
+                    <button class="tab" onclick="openTab(event, 'byPeriod')">Theo khoảng thời gian</button>
+                    <button class="tab" onclick="openTab(event, 'byTarget')">Theo mục tiêu dự đoán</button>
+                    <button class="tab" onclick="openTab(event, 'allModels')">Tất cả mô hình</button>
+                </div>
+                
+                <div id="byCoin" class="tab-content active">
+                    <h2>Hiệu suất theo Coin</h2>
+                    <table>
+                        <tr>
+                            <th>Coin</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>Số lượng mô hình</th>
+                        </tr>
+            
+                        <tr>
+                            <td>ETHUSDT</td>
+                            <td>0.4891</td>
+                            <td>0.4891</td>
+                            <td>1.0000</td>
+                            <td>0.6569</td>
+                            <td>4</td>
+                        </tr>
+                
+                        <tr>
+                            <td>BTCUSDT</td>
+                            <td>0.5435</td>
+                            <td>0.2857</td>
+                            <td>0.0455</td>
+                            <td>0.0784</td>
+                            <td>4</td>
+                        </tr>
+                
+                    </table>
+                </div>
+                
+                <div id="byPeriod" class="tab-content">
+                    <h2>Hiệu suất theo khoảng thời gian</h2>
+                    <table>
+                        <tr>
+                            <th>Khoảng thời gian</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>Số lượng mô hình</th>
+                        </tr>
+            
+                        <tr>
+                            <td>3m</td>
+                            <td>0.5163</td>
+                            <td>0.3874</td>
+                            <td>0.5227</td>
+                            <td>0.3676</td>
+                            <td>4</td>
+                        </tr>
+                
+                        <tr>
+                            <td>1m</td>
+                            <td>0.5163</td>
+                            <td>0.3874</td>
+                            <td>0.5227</td>
+                            <td>0.3676</td>
+                            <td>4</td>
+                        </tr>
+                
+                    </table>
+                </div>
+                
+                <div id="byTarget" class="tab-content">
+                    <h2>Hiệu suất theo mục tiêu dự đoán</h2>
+                    <table>
+                        <tr>
+                            <th>Mục tiêu (ngày)</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>Số lượng mô hình</th>
+                        </tr>
+            
+                        <tr>
+                            <td>1</td>
+                            <td>0.5163</td>
+                            <td>0.2391</td>
+                            <td>0.5000</td>
+                            <td>0.3235</td>
+                            <td>4</td>
+                        </tr>
+                
+                        <tr>
+                            <td>3</td>
+                            <td>0.5163</td>
+                            <td>0.5357</td>
+                            <td>0.5455</td>
+                            <td>0.4118</td>
+                            <td>4</td>
+                        </tr>
+                
+                    </table>
+                </div>
+                
+                <div id="allModels" class="tab-content">
+                    <h2>Tất cả mô hình</h2>
+                    <table>
+                        <tr>
+                            <th>Mô hình</th>
+                            <th>Coin</th>
+                            <th>Timeframe</th>
+                            <th>Khoảng thời gian</th>
+                            <th>Mục tiêu (ngày)</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>Biểu đồ</th>
+                        </tr>
+            
+                        <tr>
+                            <td>BTCUSDT_1h_1m_target1d</td>
+                            <td>BTCUSDT</td>
+                            <td>1h</td>
+                            <td>1m</td>
+                            <td>1</td>
+                            <td>0.5543</td>
+                            <td>0.0000</td>
+                            <td>0.0000</td>
+                            <td>0.0000</td>
+                            <td><a href="../ml_charts/BTCUSDT_1h_1m_target1d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/BTCUSDT_1h_1m_target1d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/BTCUSDT_1h_1m_target1d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>BTCUSDT_1h_1m_target3d</td>
+                            <td>BTCUSDT</td>
+                            <td>1h</td>
+                            <td>1m</td>
+                            <td>3</td>
+                            <td>0.5326</td>
+                            <td>0.5714</td>
+                            <td>0.0909</td>
+                            <td>0.1569</td>
+                            <td><a href="../ml_charts/BTCUSDT_1h_1m_target3d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/BTCUSDT_1h_1m_target3d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/BTCUSDT_1h_1m_target3d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>BTCUSDT_1h_3m_target1d</td>
+                            <td>BTCUSDT</td>
+                            <td>1h</td>
+                            <td>3m</td>
+                            <td>1</td>
+                            <td>0.5543</td>
+                            <td>0.0000</td>
+                            <td>0.0000</td>
+                            <td>0.0000</td>
+                            <td><a href="../ml_charts/BTCUSDT_1h_3m_target1d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/BTCUSDT_1h_3m_target1d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/BTCUSDT_1h_3m_target1d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>BTCUSDT_1h_3m_target3d</td>
+                            <td>BTCUSDT</td>
+                            <td>1h</td>
+                            <td>3m</td>
+                            <td>3</td>
+                            <td>0.5326</td>
+                            <td>0.5714</td>
+                            <td>0.0909</td>
+                            <td>0.1569</td>
+                            <td><a href="../ml_charts/BTCUSDT_1h_3m_target3d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/BTCUSDT_1h_3m_target3d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/BTCUSDT_1h_3m_target3d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>ETHUSDT_1h_1m_target1d</td>
+                            <td>ETHUSDT</td>
+                            <td>1h</td>
+                            <td>1m</td>
+                            <td>1</td>
+                            <td>0.4783</td>
+                            <td>0.4783</td>
+                            <td>1.0000</td>
+                            <td>0.6471</td>
+                            <td><a href="../ml_charts/ETHUSDT_1h_1m_target1d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/ETHUSDT_1h_1m_target1d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/ETHUSDT_1h_1m_target1d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>ETHUSDT_1h_1m_target3d</td>
+                            <td>ETHUSDT</td>
+                            <td>1h</td>
+                            <td>1m</td>
+                            <td>3</td>
+                            <td>0.5000</td>
+                            <td>0.5000</td>
+                            <td>1.0000</td>
+                            <td>0.6667</td>
+                            <td><a href="../ml_charts/ETHUSDT_1h_1m_target3d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/ETHUSDT_1h_1m_target3d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/ETHUSDT_1h_1m_target3d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>ETHUSDT_1h_3m_target1d</td>
+                            <td>ETHUSDT</td>
+                            <td>1h</td>
+                            <td>3m</td>
+                            <td>1</td>
+                            <td>0.4783</td>
+                            <td>0.4783</td>
+                            <td>1.0000</td>
+                            <td>0.6471</td>
+                            <td><a href="../ml_charts/ETHUSDT_1h_3m_target1d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/ETHUSDT_1h_3m_target1d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/ETHUSDT_1h_3m_target1d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                        <tr>
+                            <td>ETHUSDT_1h_3m_target3d</td>
+                            <td>ETHUSDT</td>
+                            <td>1h</td>
+                            <td>3m</td>
+                            <td>3</td>
+                            <td>0.5000</td>
+                            <td>0.5000</td>
+                            <td>1.0000</td>
+                            <td>0.6667</td>
+                            <td><a href="../ml_charts/ETHUSDT_1h_3m_target3d_confusion_matrix.png" target="_blank">confusion_matrix</a><br><a href="../ml_charts/ETHUSDT_1h_3m_target3d_predictions.png" target="_blank">predictions</a><br><a href="../ml_charts/ETHUSDT_1h_3m_target3d_feature_importance.png" target="_blank">feature_importance</a><br></td>
+                        </tr>
+                
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h2>Kết luận</h2>
+                    <p>Dựa trên kết quả kiểm thử các mô hình ML, chúng ta có thể đưa ra các nhận xét sau:</p>
+                    <ul>
+            
+                        <li>Coin có hiệu suất dự đoán tốt nhất là <strong>ETHUSDT</strong> với F1-score trung bình 0.6569</li>
+            
+                        <li>Khoảng thời gian kiểm thử cho kết quả tốt nhất là <strong>3m</strong> với F1-score trung bình 0.3676</li>
+            
+                        <li>Mục tiêu dự đoán cho kết quả tốt nhất là <strong>3 ngày</strong> với F1-score trung bình 0.4118</li>
+            
+                    </ul>
+                </div>
+            </body>
+            </html>
+            

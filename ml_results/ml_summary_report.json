@@ -1,0 +1,85 @@
+{
+  "timestamp": "2025-03-01T15:53:46.669318",
+  "total_models": 8,
+  "coins": [
+    "ETHUSDT",
+    "BTCUSDT"
+  ],
+  "timeframes": [
+    "1h"
+  ],
+  "periods": [
+    "3m",
+    "1m"
+  ],
+  "target_days": [
+    1,
+    3
+  ],
+  "performance_by_coin": {
+    "ETHUSDT": {
+      "accuracy": 0.4891304347826087,
+      "precision": 0.4891304347826087,
+      "recall": 1.0,
+      "f1": 0.6568627450980392,
+      "n_models": 4
+    },
+    "BTCUSDT": {
+      "accuracy": 0.5434782608695652,
+      "precision": 0.2857142857142857,
+      "recall": 0.045454545454545456,
+      "f1": 0.0784313725490196,
+      "n_models": 4
+    }
+  },
+  "performance_by_period": {
+    "3m": {
+      "accuracy": 0.5163043478260869,
+      "precision": 0.38742236024844723,
+      "recall": 0.5227272727272727,
+      "f1": 0.36764705882352944,
+      "n_models": 4
+    },
+    "1m": {
+      "accuracy": 0.5163043478260869,
+      "precision": 0.38742236024844723,
+      "recall": 0.5227272727272727,
+      "f1": 0.36764705882352944,
+      "n_models": 4
+    }
+  },
+  "performance_by_target": {
+    "1": {
+      "accuracy": 0.5163043478260869,
+      "precision": 0.2391304347826087,
+      "recall": 0.5,
+      "f1": 0.3235294117647059,
+      "n_models": 4
+    },
+    "3": {
+      "accuracy": 0.5163043478260869,
+      "precision": 0.5357142857142857,
+      "recall": 0.5454545454545454,
+      "f1": 0.4117647058823529,
+      "n_models": 4
+    }
+  },
+  "best_models": {
+    "accuracy": {
+      "model": "BTCUSDT_1h_1m_target1d",
+      "value": 0.5543478260869565
+    },
+    "precision": {
+      "model": "BTCUSDT_1h_1m_target3d",
+      "value": 0.5714285714285714
+    },
+    "recall": {
+      "model": "ETHUSDT_1h_1m_target1d",
+      "value": 1.0
+    },
+    "f1": {
+      "model": "ETHUSDT_1h_1m_target3d",
+      "value": 0.6666666666666666
+    }
+  }
+}

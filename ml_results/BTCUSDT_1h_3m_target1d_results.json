@@ -1,0 +1,227 @@
+{
+  "model_key": "BTCUSDT_1h_3m_target1d",
+  "coin": "BTCUSDT",
+  "timeframe": "1h",
+  "period": "3m",
+  "target_days": 1,
+  "metrics": {
+    "accuracy": 0.5543478260869565,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "data_info": {
+    "n_samples": 458,
+    "train_samples": 366,
+    "test_samples": 92,
+    "date_range": [
+      "2025-02-09 16:00:00",
+      "2025-02-28 17:00:00"
+    ],
+    "features": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "sma5",
+      "sma10",
+      "sma20",
+      "sma50",
+      "sma100",
+      "ema5",
+      "ema10",
+      "ema20",
+      "ema50",
+      "rsi",
+      "macd",
+      "macd_signal",
+      "macd_hist",
+      "bb_middle",
+      "bb_upper",
+      "bb_lower",
+      "price_sma20_ratio",
+      "price_sma50_ratio",
+      "volatility",
+      "daily_return",
+      "weekly_return",
+      "volume_sma5",
+      "volume_ratio",
+      "direction_1d",
+      "direction_3d",
+      "direction_5d"
+    ],
+    "class_distribution": {
+      "up": 229,
+      "down": 229
+    }
+  },
+  "classification_report": {
+    "0": {
+      "precision": 0.5543478260869565,
+      "recall": 1.0,
+      "f1-score": 0.7132867132867133,
+      "support": 51.0
+    },
+    "1": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 41.0
+    },
+    "accuracy": 0.5543478260869565,
+    "macro avg": {
+      "precision": 0.27717391304347827,
+      "recall": 0.5,
+      "f1-score": 0.35664335664335667,
+      "support": 92.0
+    },
+    "weighted avg": {
+      "precision": 0.3073015122873346,
+      "recall": 0.5543478260869565,
+      "f1-score": 0.3954089388871998,
+      "support": 92.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      51,
+      0
+    ],
+    [
+      41,
+      0
+    ]
+  ],
+  "charts": {
+    "confusion_matrix": "ml_charts/BTCUSDT_1h_3m_target1d_confusion_matrix.png",
+    "predictions": "ml_charts/BTCUSDT_1h_3m_target1d_predictions.png",
+    "feature_importance": "ml_charts/BTCUSDT_1h_3m_target1d_feature_importance.png"
+  },
+  "feature_importance": [
+    {
+      "feature": "daily_return",
+      "importance": 0.04924705946910955
+    },
+    {
+      "feature": "sma100",
+      "importance": 0.049183067200900515
+    },
+    {
+      "feature": "volume_ratio",
+      "importance": 0.04289238371239598
+    },
+    {
+      "feature": "price_sma50_ratio",
+      "importance": 0.04232491971993071
+    },
+    {
+      "feature": "macd",
+      "importance": 0.039239265058101866
+    },
+    {
+      "feature": "volatility",
+      "importance": 0.03889614467754154
+    },
+    {
+      "feature": "close",
+      "importance": 0.038638249137977025
+    },
+    {
+      "feature": "rsi",
+      "importance": 0.03779506114894378
+    },
+    {
+      "feature": "low",
+      "importance": 0.036133354512801884
+    },
+    {
+      "feature": "bb_lower",
+      "importance": 0.03593425016705308
+    },
+    {
+      "feature": "sma50",
+      "importance": 0.03560768195293211
+    },
+    {
+      "feature": "high",
+      "importance": 0.035502532771866616
+    },
+    {
+      "feature": "bb_upper",
+      "importance": 0.035320118711743224
+    },
+    {
+      "feature": "open",
+      "importance": 0.035264491050613384
+    },
+    {
+      "feature": "volume_sma5",
+      "importance": 0.035231849157255864
+    },
+    {
+      "feature": "volume",
+      "importance": 0.034992606088745555
+    },
+    {
+      "feature": "price_sma20_ratio",
+      "importance": 0.034484448714357206
+    },
+    {
+      "feature": "weekly_return",
+      "importance": 0.03430322078870928
+    },
+    {
+      "feature": "sma5",
+      "importance": 0.032860766565962846
+    },
+    {
+      "feature": "macd_hist",
+      "importance": 0.03260767080842166
+    },
+    {
+      "feature": "ema5",
+      "importance": 0.031078643466574327
+    },
+    {
+      "feature": "ema10",
+      "importance": 0.030367358102672607
+    },
+    {
+      "feature": "macd_signal",
+      "importance": 0.030246126627373186
+    },
+    {
+      "feature": "ema50",
+      "importance": 0.029361168674897888
+    },
+    {
+      "feature": "sma20",
+      "importance": 0.02660626624945761
+    },
+    {
+      "feature": "sma10",
+      "importance": 0.025631906410329836
+    },
+    {
+      "feature": "bb_middle",
+      "importance": 0.025565626834153116
+    },
+    {
+      "feature": "ema20",
+      "importance": 0.01888578506396144
+    },
+    {
+      "feature": "direction_1d",
+      "importance": 0.01156465877165047
+    },
+    {
+      "feature": "direction_3d",
+      "importance": 0.009429557840544075
+    },
+    {
+      "feature": "direction_5d",
+      "importance": 0.004803760543021726
+    }
+  ]
+}

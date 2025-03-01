@@ -1,0 +1,42 @@
+{
+  "features": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "sma5",
+    "sma10",
+    "sma20",
+    "sma50",
+    "sma100",
+    "ema5",
+    "ema10",
+    "ema20",
+    "ema50",
+    "rsi",
+    "macd",
+    "macd_signal",
+    "macd_hist",
+    "bb_middle",
+    "bb_upper",
+    "bb_lower",
+    "price_sma20_ratio",
+    "price_sma50_ratio",
+    "volatility",
+    "daily_return",
+    "weekly_return",
+    "volume_sma5",
+    "volume_ratio",
+    "direction_1d",
+    "direction_3d",
+    "direction_5d"
+  ],
+  "creation_date": "2025-03-01T15:53:40.166224",
+  "info": {
+    "coin": "BTCUSDT",
+    "timeframe": "1h",
+    "period": "1m",
+    "target_days": 3
+  }
+}

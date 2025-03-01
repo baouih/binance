@@ -1,0 +1,227 @@
+{
+  "model_key": "ETHUSDT_1h_3m_target1d",
+  "coin": "ETHUSDT",
+  "timeframe": "1h",
+  "period": "3m",
+  "target_days": 1,
+  "metrics": {
+    "accuracy": 0.4782608695652174,
+    "precision": 0.4782608695652174,
+    "recall": 1.0,
+    "f1": 0.6470588235294118
+  },
+  "data_info": {
+    "n_samples": 458,
+    "train_samples": 366,
+    "test_samples": 92,
+    "date_range": [
+      "2025-02-09 16:00:00",
+      "2025-02-28 17:00:00"
+    ],
+    "features": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "sma5",
+      "sma10",
+      "sma20",
+      "sma50",
+      "sma100",
+      "ema5",
+      "ema10",
+      "ema20",
+      "ema50",
+      "rsi",
+      "macd",
+      "macd_signal",
+      "macd_hist",
+      "bb_middle",
+      "bb_upper",
+      "bb_lower",
+      "price_sma20_ratio",
+      "price_sma50_ratio",
+      "volatility",
+      "daily_return",
+      "weekly_return",
+      "volume_sma5",
+      "volume_ratio",
+      "direction_1d",
+      "direction_3d",
+      "direction_5d"
+    ],
+    "class_distribution": {
+      "up": 243,
+      "down": 215
+    }
+  },
+  "classification_report": {
+    "0": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 48.0
+    },
+    "1": {
+      "precision": 0.4782608695652174,
+      "recall": 1.0,
+      "f1-score": 0.6470588235294118,
+      "support": 44.0
+    },
+    "accuracy": 0.4782608695652174,
+    "macro avg": {
+      "precision": 0.2391304347826087,
+      "recall": 0.5,
+      "f1-score": 0.3235294117647059,
+      "support": 92.0
+    },
+    "weighted avg": {
+      "precision": 0.2287334593572779,
+      "recall": 0.4782608695652174,
+      "f1-score": 0.309462915601023,
+      "support": 92.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      0,
+      48
+    ],
+    [
+      0,
+      44
+    ]
+  ],
+  "charts": {
+    "confusion_matrix": "ml_charts/ETHUSDT_1h_3m_target1d_confusion_matrix.png",
+    "predictions": "ml_charts/ETHUSDT_1h_3m_target1d_predictions.png",
+    "feature_importance": "ml_charts/ETHUSDT_1h_3m_target1d_feature_importance.png"
+  },
+  "feature_importance": [
+    {
+      "feature": "volatility",
+      "importance": 0.04908167589507661
+    },
+    {
+      "feature": "volume_ratio",
+      "importance": 0.047585430802829995
+    },
+    {
+      "feature": "daily_return",
+      "importance": 0.04466554114244167
+    },
+    {
+      "feature": "rsi",
+      "importance": 0.04156616200277891
+    },
+    {
+      "feature": "price_sma20_ratio",
+      "importance": 0.04147629924104368
+    },
+    {
+      "feature": "volume",
+      "importance": 0.04144325204403627
+    },
+    {
+      "feature": "price_sma50_ratio",
+      "importance": 0.04105082121608978
+    },
+    {
+      "feature": "macd",
+      "importance": 0.03966995981051743
+    },
+    {
+      "feature": "weekly_return",
+      "importance": 0.03834937323051589
+    },
+    {
+      "feature": "macd_signal",
+      "importance": 0.03600485632976687
+    },
+    {
+      "feature": "close",
+      "importance": 0.03535782781625666
+    },
+    {
+      "feature": "macd_hist",
+      "importance": 0.035351323478476346
+    },
+    {
+      "feature": "bb_lower",
+      "importance": 0.03467700653670988
+    },
+    {
+      "feature": "high",
+      "importance": 0.034638318725106296
+    },
+    {
+      "feature": "volume_sma5",
+      "importance": 0.03454949388749591
+    },
+    {
+      "feature": "sma100",
+      "importance": 0.033576948062787576
+    },
+    {
+      "feature": "bb_upper",
+      "importance": 0.03307785995461631
+    },
+    {
+      "feature": "sma5",
+      "importance": 0.03113212250555604
+    },
+    {
+      "feature": "ema50",
+      "importance": 0.03049264102756997
+    },
+    {
+      "feature": "ema5",
+      "importance": 0.029960555619232537
+    },
+    {
+      "feature": "ema20",
+      "importance": 0.02891937116364724
+    },
+    {
+      "feature": "sma20",
+      "importance": 0.02882886696337866
+    },
+    {
+      "feature": "low",
+      "importance": 0.02838634944409631
+    },
+    {
+      "feature": "open",
+      "importance": 0.02832976677822797
+    },
+    {
+      "feature": "ema10",
+      "importance": 0.027939799829261418
+    },
+    {
+      "feature": "sma50",
+      "importance": 0.02780783276721167
+    },
+    {
+      "feature": "sma10",
+      "importance": 0.027644143205036338
+    },
+    {
+      "feature": "bb_middle",
+      "importance": 0.027490431146160933
+    },
+    {
+      "feature": "direction_1d",
+      "importance": 0.010908873377682664
+    },
+    {
+      "feature": "direction_3d",
+      "importance": 0.006632018897766418
+    },
+    {
+      "feature": "direction_5d",
+      "importance": 0.0034050770986255928
+    }
+  ]
+}
