@@ -4,7 +4,7 @@
 
 echo "=== BẮT ĐẦU CHẠY TOÀN BỘ BACKTEST ==="
 echo "Script này sẽ chạy các backtest cho:"
-echo "- 9 đồng coin (BTC, ETH, BNB, ADA, SOL, DOT, XRP, LTC, PI)"
+echo "- 8 đồng coin (BTC, ETH, BNB, ADA, SOL, DOT, XRP, LTC)"
 echo "- 6 chiến lược (RSI, MACD, EMA, BBands, Auto, Combined)"
 echo "- 4 khoảng thời gian (1 tháng, 3 tháng, 6 tháng, 9 tháng)"
 echo "- Khung thời gian 1h"
