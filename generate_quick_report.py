@@ -237,8 +237,8 @@ class QuickReportGenerator:
                 strategy_counts = {}
                 
                 for regime, count in regime_counts.items():
-                    if regime in self.strategy_mapping:
-                        for strategy, weight in self.strategy_mapping[regime].items():
+                    if regime in strategy_mapping:
+                        for strategy, weight in strategy_mapping[regime].items():
                             strategy_count = count * weight
                             if strategy in strategy_counts:
                                 strategy_counts[strategy] += strategy_count
