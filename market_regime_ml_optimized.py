@@ -524,9 +524,9 @@ class StrategySelector:
                 'atr': {'atr_period': 14, 'atr_multiplier': 1.5, 'use_atr_stops': True},
             },
             'quiet': {
-                'bbands': {'bb_period': 20, 'bb_std': 1.0, 'use_bb_squeeze': True},
+                'bbands': {'bb_period': 30, 'bb_std': 0.8, 'use_bb_squeeze': True},
                 'rsi': {'overbought': 55, 'oversold': 45, 'use_trend_filter': False},
-                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 65, 'oversold': 35},
+                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 60, 'oversold': 40},
                 'atr': {'atr_period': 14, 'atr_multiplier': 0.7, 'use_atr_stops': True},
             }
         }
@@ -566,11 +566,11 @@ class StrategySelector:
                 'max_trades': 1
             },
             'quiet': {
-                'risk_percentage': 0.6,
-                'take_profit_pct': 1.2,
-                'stop_loss_pct': 0.6,
+                'risk_percentage': 0.5,
+                'take_profit_pct': 1.0,
+                'stop_loss_pct': 0.5,
                 'trailing_stop': True,
-                'trailing_activation': 0.4,
+                'trailing_activation': 0.3,
                 'max_trades': 1
             }
         }
@@ -923,30 +923,32 @@ class BollingerBandsStrategy(Strategy):
         # Logic đặc biệt cho thị trường yên tĩnh
         if is_quiet_market and signal == 0:
             # Trong thị trường yên tĩnh, sử dụng phương pháp "Mean Reversion"
-            # với ngưỡng gần hơn để trả giá nhanh
-            mean_reversion_threshold = 0.7  # Phần trăm của khoảng cách từ giữa đến biên
+            # với ngưỡng hẹp hơn để giảm số lượng giao dịch và tăng tỷ lệ thành công
+            mean_reversion_threshold = 0.85  # Phần trăm của khoảng cách từ giữa đến biên - tăng lên so với 0.7
             
             # Tính khoảng cách tương đối đến giá trung bình
             upper_distance = (current_upper - current_middle) * mean_reversion_threshold
             lower_distance = (current_middle - current_lower) * mean_reversion_threshold
             
-            # Tín hiệu dựa trên sự trở về giá trị trung bình với ngưỡng thấp hơn
+            # Chỉ sinh tín hiệu khi giá gần chạm biên hơn nữa
             if current_price >= current_middle + upper_distance:
-                # Giá quá cao so với trung bình trong thị trường yên tĩnh
-                signal = -1  # Tín hiệu bán để hưởng lợi từ sự đảo chiều
+                # Chỉ sinh tín hiệu bán khi giá gần chạm biên trên
+                if current_price >= current_upper * 0.98:
+                    signal = -1  # Tín hiệu bán khi giá gần chạm biên trên
             elif current_price <= current_middle - lower_distance:
-                # Giá quá thấp so với trung bình trong thị trường yên tĩnh
-                signal = 1   # Tín hiệu mua để hưởng lợi từ sự đảo chiều
+                # Chỉ sinh tín hiệu mua khi giá gần chạm biên dưới
+                if current_price <= current_lower * 1.02:
+                    signal = 1   # Tín hiệu mua khi giá gần chạm biên dưới
                 
-            # Thêm tín hiệu "touch và bounce" trong thị trường yên tĩnh
+            # Thêm tín hiệu "touch và bounce" với ngưỡng chặt chẽ hơn
             if signal == 0:
-                # Kiểm tra sự phản hồi từ biên
-                if previous_price <= current_lower * 1.002 and current_price > previous_price:
-                    # Giá chạm dải dưới và bắt đầu tăng
-                    signal = 1  # Mua khi có dấu hiệu phản hồi
-                elif previous_price >= current_upper * 0.998 and current_price < previous_price:
-                    # Giá chạm dải trên và bắt đầu giảm
-                    signal = -1  # Bán khi có dấu hiệu phản hồi
+                # Kiểm tra sự phản hồi rõ ràng từ biên với điều kiện chặt chẽ hơn
+                if previous_price <= current_lower * 1.001 and current_price > previous_price * 1.002:
+                    # Giá chạm dải dưới và có sự phản hồi rõ ràng (tăng ít nhất 0.2%)
+                    signal = 1  # Mua khi có dấu hiệu phản hồi rõ ràng
+                elif previous_price >= current_upper * 0.999 and current_price < previous_price * 0.998:
+                    # Giá chạm dải trên và có sự phản hồi rõ ràng (giảm ít nhất 0.2%)
+                    signal = -1  # Bán khi có dấu hiệu phản hồi rõ ràng
         else:
             # Tín hiệu cơ bản của Bollinger Bands cho các thị trường khác
             if signal == 0:
