@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "timestamp": "2025-03-01T04:05:56.153312",
+    "python_version": "3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]",
+    "has_modules": false,
+    "duration_seconds": 0.007081
+  },
+  "position_sizing": {
+    "base": {
+      "size": 0.2,
+      "risk": 2.0
+    },
+    "error_zero_entry": "Error correctly raised",
+    "error_equal_prices": "Error correctly raised",
+    "kelly": {
+      "size": 0.09999999999999999,
+      "risk": 40.0
+    },
+    "kelly_variations": [
+      {
+        "win_rate": 0.4,
+        "ratio": 1.0,
+        "size": 0.0,
+        "risk": 0
+      },
+      {
+        "win_rate": 0.4,
+        "ratio": 2.0,
+        "size": 0.02500000000000001,
+        "risk": 10.000000000000004
+      },
+      {
+        "win_rate": 0.4,
+        "ratio": 3.0,
+        "size": 0.05000000000000001,
+        "risk": 20.000000000000004
+      },
+      {
+        "win_rate": 0.5,
+        "ratio": 1.0,
+        "size": 0.0,
+        "risk": 0
+      },
+      {
+        "win_rate": 0.5,
+        "ratio": 2.0,
+        "size": 0.0625,
+        "risk": 25.0
+      },
+      {
+        "win_rate": 0.5,
+        "ratio": 3.0,
+        "size": 0.08333333333333334,
+        "risk": 33.333333333333336
+      },
+      {
+        "win_rate": 0.6,
+        "ratio": 1.0,
+        "size": 0.04999999999999999,
+        "risk": 19.999999999999996
+      },
+      {
+        "win_rate": 0.6,
+        "ratio": 2.0,
+        "size": 0.09999999999999999,
+        "risk": 40.0
+      },
+      {
+        "win_rate": 0.6,
+        "ratio": 3.0,
+        "size": 0.11666666666666667,
+        "risk": 46.666666666666664
+      }
+    ],
+    "kelly_calculation_correct": false
+  },
+  "order_execution": {
+    "market_order": {
+      "status": "FILLED",
+      "order_id": "1000"
+    },
+    "limit_order": {
+      "status": "FILLED",
+      "order_id": "1001"
+    },
+    "avg_fill_price": 40000.0,
+    "error_handling": {
+      "error_rate": 0.0,
+      "sample_orders": [
+        {
+          "success": true,
+          "order": {
+            "orderId": "1000",
+            "symbol": "BTCUSDT",
+            "side": "BUY",
+            "type": "MARKET",
+            "price": null,
+            "origQty": 0.1,
+            "executedQty": 0.1,
+            "status": "FILLED",
+            "fills": [
+              {
+                "price": 40000,
+                "qty": 0.1
+              }
+            ]
+          }
+        },
+        {
+          "success": true,
+          "order": {
+            "orderId": "1001",
+            "symbol": "BTCUSDT",
+            "side": "BUY",
+            "type": "MARKET",
+            "price": null,
+            "origQty": 0.1,
+            "executedQty": 0.1,
+            "status": "FILLED",
+            "fills": [
+              {
+                "price": 40000,
+                "qty": 0.1
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "risk_management": {
+    "trade_checks": [
+      {
+        "trade": {
+          "symbol": "BTCUSDT",
+          "risk_amount": 150.0,
+          "entry_price": 40000.0,
+          "stop_loss_price": 39000.0
+        },
+        "allowed": true,
+        "reason": "Trade meets risk requirements"
+      },
+      {
+        "trade": {
+          "symbol": "BTCUSDT",
+          "risk_amount": 300.0,
+          "entry_price": 40000.0,
+          "stop_loss_price": 39000.0
+        },
+        "allowed": false,
+        "reason": "Exceeds maximum risk per trade (3.00% > 2.00%)"
+      },
+      {
+        "trade": {
+          "symbol": "ETHUSDT",
+          "risk_amount": 400.0,
+          "entry_price": 2500.0,
+          "stop_loss_price": 2400.0
+        },
+        "allowed": false,
+        "reason": "Exceeds maximum risk per trade (4.00% > 2.00%)"
+      }
+    ],
+    "trade_lifecycle": {
+      "trade_id": "trade_1740801956",
+      "close_result": true,
+      "new_balance": 10100.0,
+      "has_closed_trade": true
+    }
+  },
+  "enhanced_reporting": {
+    "win_rate": 0.66,
+    "profit_factor": 2.8405727782870356,
+    "expectancy": 0.01277787718381834,
+    "max_drawdown": 421.5099768604655,
+    "regime_performance": {
+      "Bullish": {
+        "count": 25,
+        "win_rate": 0.8,
+        "expectancy": 0.02100067695657033
+      },
+      "Bearish": {
+        "count": 38,
+        "win_rate": 0.5526315789473685,
+        "expectancy": 0.007820772406975313
+      },
+      "Sideways": {
+        "count": 37,
+        "win_rate": 0.6756756756756757,
+        "expectancy": 0.012313011973040912
+      }
+    }
+  },
+  "integration": {
+    "status": "skipped"
+  }
+}

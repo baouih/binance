@@ -1,0 +1,24 @@
+{
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "strategy": "simple_ma_cross",
+    "start_date": "2024-12-31",
+    "end_date": "2025-03-01",
+    "initial_balance": 10000.0,
+    "final_balance": 10000.0,
+    "total_pnl": 0.0,
+    "pnl_percentage": 0.0,
+    "total_trades": 0,
+    "win_count": 0,
+    "lose_count": 0,
+    "win_rate": 0,
+    "profit_factor": Infinity,
+    "max_drawdown": 0,
+    "max_drawdown_pct": 0,
+    "modules_used": [
+        "Dynamic Position Sizer",
+        "Iceberg Order Executor",
+        "Base Risk Manager"
+    ],
+    "trades": []
+}
