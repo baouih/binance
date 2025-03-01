@@ -108,7 +108,8 @@ def run_enhanced_backtest(
     trailing_stop=True,
     data_dir='test_data',
     start_date=None,
-    end_date=None
+    end_date=None,
+    output_prefix=''
 ):
     """
     Chạy backtest nâng cao với dữ liệu thực
@@ -908,6 +909,7 @@ def main():
     parser.add_argument('--data_dir', type=str, default='test_data', help='Thư mục chứa dữ liệu (mặc định: test_data)')
     parser.add_argument('--start_date', type=str, default=None, help='Ngày bắt đầu (YYYY-MM-DD)')
     parser.add_argument('--end_date', type=str, default=None, help='Ngày kết thúc (YYYY-MM-DD)')
+    parser.add_argument('--output_prefix', type=str, default='', help='Tiền tố cho file đầu ra (ví dụ: "3month_")')
     
     args = parser.parse_args()
     
@@ -929,7 +931,8 @@ def main():
         trailing_stop=trailing_stop,
         data_dir=args.data_dir,
         start_date=args.start_date,
-        end_date=args.end_date
+        end_date=args.end_date,
+        output_prefix=args.output_prefix
     )
 
 if __name__ == "__main__":
