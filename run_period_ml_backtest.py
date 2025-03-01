@@ -2,443 +2,531 @@
 # -*- coding: utf-8 -*-
 
 """
-Script chạy backtest ML cho một khoảng thời gian và symbol cụ thể,
-tối ưu hóa và đánh giá hiệu suất với các tham số mục tiêu khác nhau.
+Script backtest ML theo giai đoạn thời gian khác nhau (1 tháng, 3 tháng, 6 tháng)
+
+Script này thực hiện huấn luyện và kiểm thử mô hình ML trên dữ liệu giai đoạn 
+cụ thể, tạo dự đoán xu hướng giá, và đánh giá hiệu suất mô hình.
 """
 
 import os
 import json
 import argparse
 import logging
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
+from typing import Dict, List, Tuple, Any
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
+    filename='period_ml_backtest.log',
+    filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
 
-def load_data(symbol, timeframe, period, data_folder='real_data'):
+def load_data(symbol: str, timeframe: str, period: str, data_folder: str = 'real_data') -> pd.DataFrame:
     """
-    Tải dữ liệu từ file CSV
+    Tải dữ liệu từ file CSV theo đồng tiền, khung thời gian và khoảng thời gian
     
     Args:
-        symbol (str): Mã cặp giao dịch
-        timeframe (str): Khung thời gian
-        period (str): Khoảng thời gian (1_month, 3_months, 6_months)
+        symbol (str): Mã cặp giao dịch (ví dụ: BTCUSDT)
+        timeframe (str): Khung thời gian (ví dụ: 1h, 4h, 1d)
+        period (str): Khoảng thời gian (ví dụ: 1_month, 3_months, 6_months)
         data_folder (str): Thư mục chứa dữ liệu
         
     Returns:
-        pd.DataFrame: DataFrame dữ liệu
+        pd.DataFrame: DataFrame với dữ liệu giá
     """
-    file_path = f"{data_folder}/{period}/{symbol}_{timeframe}.csv"
-    logger.info(f"Đang tải dữ liệu từ {file_path}...")
+    file_path = os.path.join(data_folder, period, f"{symbol}_{timeframe}.csv")
+    if not os.path.exists(file_path):
+        logger.error(f"Không tìm thấy file dữ liệu: {file_path}")
+        raise FileNotFoundError(f"Không tìm thấy file dữ liệu: {file_path}")
     
     df = pd.read_csv(file_path)
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df.set_index('timestamp', inplace=True)
     
-    logger.info(f"Đã tải dữ liệu từ {df.index.min()} đến {df.index.max()}, tổng cộng {len(df)} mẫu")
+    logger.info(f"Đã tải dữ liệu từ {file_path}: {len(df)} dòng từ {df.index.min()} đến {df.index.max()}")
     return df
 
-def add_features(df):
+def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Thêm các đặc trưng kỹ thuật
+    Tính toán các chỉ báo kỹ thuật
     
     Args:
-        df (pd.DataFrame): DataFrame dữ liệu gốc
+        df (pd.DataFrame): DataFrame với dữ liệu giá
         
     Returns:
-        pd.DataFrame: DataFrame với các đặc trưng mới
+        pd.DataFrame: DataFrame với các chỉ báo đã tính
     """
-    # Sao chép dữ liệu để tránh thay đổi dữ liệu gốc
-    df_feat = df.copy()
+    # Tạo một bản sao
+    df_indicators = df.copy()
     
-    # Thêm các chỉ báo price-based
-    df_feat['price_change'] = df_feat['close'].pct_change()
-    df_feat['price_change_1'] = df_feat['close'].pct_change(1)
-    df_feat['price_change_2'] = df_feat['close'].pct_change(2) 
-    df_feat['price_change_3'] = df_feat['close'].pct_change(3)
-    df_feat['price_change_5'] = df_feat['close'].pct_change(5)
-    df_feat['price_change_10'] = df_feat['close'].pct_change(10)
-    
-    # Volatility measures
-    df_feat['high_low_diff'] = (df_feat['high'] - df_feat['low']) / df_feat['close']
-    df_feat['high_close_diff'] = (df_feat['high'] - df_feat['close']) / df_feat['close']
-    df_feat['low_close_diff'] = (df_feat['close'] - df_feat['low']) / df_feat['close']
-    
-    # Moving averages
-    for window in [5, 10, 20, 50, 100]:
-        df_feat[f'MA_{window}'] = df_feat['close'].rolling(window=window).mean()
-        df_feat[f'MA_diff_{window}'] = df_feat['close'] / df_feat[f'MA_{window}'] - 1
-    
-    # Volume-based features
-    df_feat['volume_change'] = df_feat['volume'].pct_change()
-    df_feat['volume_ma_5'] = df_feat['volume'].rolling(window=5).mean()
-    df_feat['volume_ma_10'] = df_feat['volume'].rolling(window=10).mean()
-    df_feat['volume_ratio_5'] = df_feat['volume'] / df_feat['volume_ma_5']
-    df_feat['volume_ratio_10'] = df_feat['volume'] / df_feat['volume_ma_10']
-    
-    # RSI (Relative Strength Index)
-    delta = df_feat['close'].diff()
+    # Tính RSI (Relative Strength Index)
+    delta = df_indicators['close'].diff()
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
     
-    for window in [14, 7, 21]:
-        avg_gain = gain.rolling(window=window).mean()
-        avg_loss = loss.rolling(window=window).mean()
-        rs = avg_gain / avg_loss
-        df_feat[f'RSI_{window}'] = 100 - (100 / (1 + rs))
+    avg_gain = gain.rolling(window=14).mean()
+    avg_loss = loss.rolling(window=14).mean()
     
-    # Bollinger Bands
-    for window in [20]:
-        df_feat[f'BB_MA_{window}'] = df_feat['close'].rolling(window=window).mean()
-        df_feat[f'BB_STD_{window}'] = df_feat['close'].rolling(window=window).std()
-        df_feat[f'BB_Upper_{window}'] = df_feat[f'BB_MA_{window}'] + 2 * df_feat[f'BB_STD_{window}']
-        df_feat[f'BB_Lower_{window}'] = df_feat[f'BB_MA_{window}'] - 2 * df_feat[f'BB_STD_{window}']
-        df_feat[f'BB_Width_{window}'] = (df_feat[f'BB_Upper_{window}'] - df_feat[f'BB_Lower_{window}']) / df_feat[f'BB_MA_{window}']
-        df_feat[f'BB_Position_{window}'] = (df_feat['close'] - df_feat[f'BB_Lower_{window}']) / (df_feat[f'BB_Upper_{window}'] - df_feat[f'BB_Lower_{window}'])
+    rs = avg_gain / avg_loss
+    df_indicators['rsi'] = 100 - (100 / (1 + rs))
     
-    # MACD
-    ema_12 = df_feat['close'].ewm(span=12, adjust=False).mean()
-    ema_26 = df_feat['close'].ewm(span=26, adjust=False).mean()
-    df_feat['MACD_Line'] = ema_12 - ema_26
-    df_feat['MACD_Signal'] = df_feat['MACD_Line'].ewm(span=9, adjust=False).mean()
-    df_feat['MACD_Hist'] = df_feat['MACD_Line'] - df_feat['MACD_Signal']
+    # Tính MACD (Moving Average Convergence Divergence)
+    ema12 = df_indicators['close'].ewm(span=12, adjust=False).mean()
+    ema26 = df_indicators['close'].ewm(span=26, adjust=False).mean()
+    df_indicators['macd'] = ema12 - ema26
+    df_indicators['macd_signal'] = df_indicators['macd'].ewm(span=9, adjust=False).mean()
+    df_indicators['macd_hist'] = df_indicators['macd'] - df_indicators['macd_signal']
     
-    # ATR (Average True Range)
-    high_low = df_feat['high'] - df_feat['low']
-    high_close = (df_feat['high'] - df_feat['close'].shift()).abs()
-    low_close = (df_feat['low'] - df_feat['close'].shift()).abs()
+    # Tính Bollinger Bands
+    df_indicators['bb_middle'] = df_indicators['close'].rolling(window=20).mean()
+    df_indicators['bb_std'] = df_indicators['close'].rolling(window=20).std()
+    df_indicators['bb_upper'] = df_indicators['bb_middle'] + (df_indicators['bb_std'] * 2)
+    df_indicators['bb_lower'] = df_indicators['bb_middle'] - (df_indicators['bb_std'] * 2)
+    df_indicators['bb_width'] = (df_indicators['bb_upper'] - df_indicators['bb_lower']) / df_indicators['bb_middle']
     
+    # Tính EMA (Exponential Moving Average)
+    for period in [9, 21, 50, 200]:
+        df_indicators[f'ema_{period}'] = df_indicators['close'].ewm(span=period, adjust=False).mean()
+    
+    # Tính SMA (Simple Moving Average)
+    for period in [10, 20, 50, 200]:
+        df_indicators[f'sma_{period}'] = df_indicators['close'].rolling(window=period).mean()
+    
+    # Tính ATR (Average True Range)
+    high_low = df_indicators['high'] - df_indicators['low']
+    high_close = (df_indicators['high'] - df_indicators['close'].shift()).abs()
+    low_close = (df_indicators['low'] - df_indicators['close'].shift()).abs()
     true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-    df_feat['ATR_14'] = true_range.rolling(14).mean()
+    df_indicators['atr'] = true_range.rolling(window=14).mean()
     
-    # Stochastic Oscillator
-    for window in [14]:
-        df_feat[f'Stoch_Low_{window}'] = df_feat['low'].rolling(window=window).min()
-        df_feat[f'Stoch_High_{window}'] = df_feat['high'].rolling(window=window).max()
-        df_feat[f'Stoch_K_{window}'] = 100 * ((df_feat['close'] - df_feat[f'Stoch_Low_{window}']) / 
-                                         (df_feat[f'Stoch_High_{window}'] - df_feat[f'Stoch_Low_{window}']))
-        df_feat[f'Stoch_D_{window}'] = df_feat[f'Stoch_K_{window}'].rolling(window=3).mean()
+    # Tính Stochastic Oscillator
+    low_14 = df_indicators['low'].rolling(window=14).min()
+    high_14 = df_indicators['high'].rolling(window=14).max()
+    df_indicators['stoch_k'] = 100 * ((df_indicators['close'] - low_14) / (high_14 - low_14))
+    df_indicators['stoch_d'] = df_indicators['stoch_k'].rolling(window=3).mean()
     
-    # ADX (Average Directional Index)
-    plus_dm = df_feat['high'].diff()
-    minus_dm = df_feat['low'].diff(-1).abs()
-    plus_dm[plus_dm < 0] = 0
-    minus_dm[minus_dm < 0] = 0
+    # Tính OBV (On-Balance Volume)
+    df_indicators['obv'] = np.where(
+        df_indicators['close'] > df_indicators['close'].shift(1),
+        df_indicators['volume'],
+        np.where(
+            df_indicators['close'] < df_indicators['close'].shift(1),
+            -df_indicators['volume'],
+            0
+        )
+    ).cumsum()
     
-    tr = true_range
-    plus_di_14 = 100 * (plus_dm.rolling(14).sum() / tr.rolling(14).sum())
-    minus_di_14 = 100 * (minus_dm.rolling(14).sum() / tr.rolling(14).sum())
-    dx = 100 * (plus_di_14 - minus_di_14).abs() / (plus_di_14 + minus_di_14)
-    df_feat['ADX_14'] = dx.rolling(14).mean()
-    df_feat['Plus_DI_14'] = plus_di_14
-    df_feat['Minus_DI_14'] = minus_di_14
+    # Các biến đặc trưng khác
+    df_indicators['returns'] = df_indicators['close'].pct_change()
+    df_indicators['log_returns'] = np.log(df_indicators['close'] / df_indicators['close'].shift(1))
+    df_indicators['volatility'] = df_indicators['log_returns'].rolling(window=20).std() * np.sqrt(252)
     
-    # Làm sạch các giá trị NaN sau khi tính toán
-    df_feat.dropna(inplace=True)
+    # Loại bỏ NaN
+    df_indicators.dropna(inplace=True)
     
-    logger.info(f"Đã tạo {len(df_feat.columns) - len(df.columns)} đặc trưng mới, còn lại {len(df_feat)} mẫu")
-    
-    return df_feat
+    logger.info(f"Đã tính {len(df_indicators.columns) - len(df.columns)} chỉ báo")
+    return df_indicators
 
-def create_target(df, prediction_days=3):
+def create_target(df: pd.DataFrame, prediction_days: int = 1, threshold: float = 0.0) -> pd.DataFrame:
     """
-    Tạo biến mục tiêu dựa trên chuyển động giá trong tương lai
+    Tạo biến mục tiêu (xu hướng giá tương lai)
     
     Args:
-        df (pd.DataFrame): DataFrame dữ liệu
-        prediction_days (int): Số ngày dự đoán tương lai
+        df (pd.DataFrame): DataFrame với dữ liệu giá và chỉ báo
+        prediction_days (int): Số ngày dự đoán xu hướng
+        threshold (float): Ngưỡng để xác định là xu hướng (%)
         
     Returns:
-        pd.DataFrame: DataFrame với biến mục tiêu
+        pd.DataFrame: DataFrame với cột target đã thêm
     """
-    df_target = df.copy()
+    # Tạo một bản sao
+    df_with_target = df.copy()
     
-    # Tạo mục tiêu: tăng hay giảm giá sau prediction_days
-    df_target['future_price'] = df_target['close'].shift(-prediction_days)
-    df_target['target'] = (df_target['future_price'] > df_target['close']).astype(int)
+    # Tính tỷ lệ thay đổi giá sau prediction_days ngày
+    df_with_target['future_price'] = df_with_target['close'].shift(-prediction_days)
+    df_with_target['price_change'] = df_with_target['future_price'] / df_with_target['close'] - 1
     
-    # Tạo % biến động
-    df_target['price_change_pct'] = (df_target['future_price'] - df_target['close']) / df_target['close'] * 100
+    # Tạo mục tiêu dựa trên threshold
+    df_with_target['target'] = np.where(
+        df_with_target['price_change'] > threshold, 
+        1,  # Xu hướng lên
+        np.where(
+            df_with_target['price_change'] < -threshold,
+            -1,  # Xu hướng xuống
+            0   # Đi ngang
+        )
+    )
     
-    # Loại bỏ các hàng không có giá trị mục tiêu
-    df_target.dropna(subset=['future_price', 'target'], inplace=True)
+    # Loại bỏ NaN
+    df_with_target.dropna(inplace=True)
     
-    # Thống kê phân bố lớp
-    class_distribution = df_target['target'].value_counts(normalize=True)
-    logger.info(f"Phân bố lớp mục tiêu (target): \n{class_distribution}")
-    logger.info(f"% thay đổi giá trung bình: {df_target['price_change_pct'].mean():.2f}%")
-    logger.info(f"% thay đổi giá trung vị: {df_target['price_change_pct'].median():.2f}%")
+    # Log phân phối mục tiêu
+    target_distribution = df_with_target['target'].value_counts(normalize=True) * 100
+    logger.info(f"Phân phối mục tiêu: Tăng={target_distribution.get(1, 0):.2f}%, Giảm={target_distribution.get(-1, 0):.2f}%, Đi ngang={target_distribution.get(0, 0):.2f}%")
     
-    return df_target
+    return df_with_target
 
-def prepare_features_targets(df, drop_columns=None):
+def prepare_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     """
-    Chuẩn bị đặc trưng và mục tiêu cho huấn luyện
+    Chuẩn bị đặc trưng và mục tiêu cho mô hình
     
     Args:
-        df (pd.DataFrame): DataFrame dữ liệu
-        drop_columns (list): Danh sách cột cần loại bỏ
+        df (pd.DataFrame): DataFrame với dữ liệu đã xử lý
         
     Returns:
-        tuple: (X_features, y_target)
+        Tuple[pd.DataFrame, pd.Series]: (Đặc trưng, Mục tiêu)
     """
-    if drop_columns is None:
-        drop_columns = ['open', 'high', 'low', 'close', 'volume', 'close_time',
-                         'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume',
-                         'taker_buy_quote_asset_volume', 'ignore', 'future_price', 'price_change_pct']
+    # Danh sách cột không phải đặc trưng
+    non_feature_columns = ['open', 'high', 'low', 'close', 'volume', 'future_price', 'price_change', 'target',
+                          'close_time', 'quote_asset_volume', 'number_of_trades', 
+                          'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore']
     
-    df_ml = df.copy()
+    # Lọc các cột đặc trưng
+    feature_columns = [col for col in df.columns if col not in non_feature_columns]
     
-    X = df_ml.drop(columns=drop_columns + ['target'])
-    y = df_ml['target']
+    X = df[feature_columns]
+    y = df['target']
     
-    logger.info(f"Dữ liệu đặc trưng có hình dạng: {X.shape}")
-    logger.info(f"Biến mục tiêu có hình dạng: {y.shape}")
-    
+    logger.info(f"Đã chuẩn bị {len(feature_columns)} đặc trưng")
     return X, y
 
-def train_and_evaluate_model(X, y, model_type='random_forest', output_folder='ml_results', 
-                           charts_folder='ml_charts', models_folder='ml_models', 
-                           symbol='BTCUSDT', timeframe='1h', period='1_month', 
-                           prediction_days=1, test_size=0.2, tune_hyperparams=True):
+def train_test_model(X: pd.DataFrame, y: pd.Series, model_type: str = 'random_forest', 
+                   tune_hyperparams: bool = False, test_size: float = 0.2, random_state: int = 42) -> Dict:
     """
-    Huấn luyện và đánh giá mô hình
+    Huấn luyện và kiểm thử mô hình
     
     Args:
-        X (pd.DataFrame): Đặc trưng đầu vào
-        y (pd.Series): Biến mục tiêu
+        X (pd.DataFrame): Dữ liệu đặc trưng
+        y (pd.Series): Dữ liệu mục tiêu
         model_type (str): Loại mô hình ('random_forest', 'gradient_boosting')
-        output_folder (str): Thư mục lưu kết quả
-        charts_folder (str): Thư mục lưu biểu đồ
-        models_folder (str): Thư mục lưu mô hình
-        symbol (str): Mã cặp giao dịch
-        timeframe (str): Khung thời gian
-        period (str): Khoảng thời gian
-        prediction_days (int): Số ngày dự đoán tương lai
-        test_size (float): Tỷ lệ dữ liệu test
-        tune_hyperparams (bool): Có tối ưu hóa siêu tham số không
+        tune_hyperparams (bool): Có tinh chỉnh siêu tham số không
+        test_size (float): Tỷ lệ dữ liệu kiểm thử
+        random_state (int): Random seed
         
     Returns:
-        dict: Kết quả đánh giá mô hình
+        Dict: Kết quả huấn luyện và kiểm thử
     """
-    # Đảm bảo thư mục tồn tại
-    os.makedirs(output_folder, exist_ok=True)
-    os.makedirs(charts_folder, exist_ok=True)
-    os.makedirs(models_folder, exist_ok=True)
-    
     # Chuẩn hóa đặc trưng
-    logger.info("Chuẩn hóa đặc trưng...")
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     
-    # Chia tập dữ liệu train/test
-    logger.info(f"Chia tập dữ liệu với test_size={test_size}...")
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=test_size, shuffle=False)
+    # Tách dữ liệu thành tập huấn luyện và kiểm thử
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=test_size, random_state=random_state)
     
-    # Chọn và khởi tạo mô hình
-    if model_type == 'random_forest':
-        model = RandomForestClassifier(random_state=42)
+    # Thiết lập mô hình dựa trên loại
+    if model_type.lower() == 'random_forest':
+        model = RandomForestClassifier(random_state=random_state)
         param_grid = {
-            'n_estimators': [100, 200, 300],
+            'n_estimators': [50, 100, 200],
             'max_depth': [None, 10, 20, 30],
             'min_samples_split': [2, 5, 10],
             'min_samples_leaf': [1, 2, 4]
         }
-    elif model_type == 'gradient_boosting':
-        model = GradientBoostingClassifier(random_state=42)
+    elif model_type.lower() == 'gradient_boosting':
+        model = GradientBoostingClassifier(random_state=random_state)
         param_grid = {
-            'n_estimators': [100, 200, 300],
-            'learning_rate': [0.01, 0.05, 0.1],
+            'n_estimators': [50, 100, 200],
+            'learning_rate': [0.01, 0.1, 0.2],
             'max_depth': [3, 5, 7],
             'min_samples_split': [2, 5, 10],
             'min_samples_leaf': [1, 2, 4]
         }
     else:
-        raise ValueError(f"Không hỗ trợ loại mô hình: {model_type}")
+        raise ValueError(f"Loại mô hình không hỗ trợ: {model_type}")
     
-    # Tối ưu hóa siêu tham số nếu được yêu cầu
+    # Tinh chỉnh siêu tham số nếu được yêu cầu
     if tune_hyperparams:
-        logger.info("Bắt đầu tối ưu hóa siêu tham số...")
-        grid_search = GridSearchCV(model, param_grid, cv=5, scoring='f1', n_jobs=-1)
+        logger.info(f"Bắt đầu tinh chỉnh siêu tham số cho {model_type}...")
+        grid_search = GridSearchCV(model, param_grid, cv=5, scoring='f1_macro', n_jobs=-1)
         grid_search.fit(X_train, y_train)
         
-        # Lấy mô hình tốt nhất
+        best_params = grid_search.best_params_
         model = grid_search.best_estimator_
-        logger.info(f"Siêu tham số tốt nhất: {grid_search.best_params_}")
+        logger.info(f"Siêu tham số tốt nhất: {best_params}")
     else:
-        # Huấn luyện mô hình với tham số mặc định
-        logger.info("Huấn luyện mô hình với tham số mặc định...")
         model.fit(X_train, y_train)
+        best_params = {}
     
-    # Dự đoán
-    logger.info("Dự đoán và đánh giá mô hình...")
+    # Dự đoán trên tập kiểm thử
     y_pred = model.predict(X_test)
     
-    # Tính các chỉ số đánh giá
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
+    # Tính các chỉ số hiệu suất
+    metrics = {
+        'accuracy': accuracy_score(y_test, y_pred),
+        'precision': precision_score(y_test, y_pred, average='macro'),
+        'recall': recall_score(y_test, y_pred, average='macro'),
+        'f1_score': f1_score(y_test, y_pred, average='macro'),
+        'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
+    }
     
-    logger.info(f"Accuracy: {accuracy:.4f}")
-    logger.info(f"Precision: {precision:.4f}")
-    logger.info(f"Recall: {recall:.4f}")
-    logger.info(f"F1-Score: {f1:.4f}")
-    
-    # Lấy báo cáo chi tiết
-    classification_rep = classification_report(y_test, y_pred, output_dict=True)
-    conf_matrix = confusion_matrix(y_test, y_pred)
-    
-    # Lấy tầm quan trọng đặc trưng
-    feature_importance = None
+    # Tính feature importance
+    feature_importance = {}
     if hasattr(model, 'feature_importances_'):
-        feature_importance = pd.DataFrame({
-            'feature': X.columns,
-            'importance': model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        # Lấy tên đặc trưng từ dữ liệu gốc
+        feature_names = X.columns.tolist()
+        importances = model.feature_importances_
+        
+        # Sắp xếp theo độ quan trọng
+        indices = np.argsort(importances)[::-1]
+        top_features = {i: feature_names[i] for i in indices[:20]}  # Top 20 features
+        top_importance = {i: float(importances[i]) for i in indices[:20]}
+        
+        feature_importance = {
+            'features': top_features,
+            'importance': top_importance
+        }
     
-    # Tạo các biểu đồ
-    file_prefix = f"{symbol}_{timeframe}_{period.split('_')[0]}m_target{prediction_days}d"
+    logger.info(f"Kết quả huấn luyện {model_type}: Accuracy={metrics['accuracy']:.4f}, F1-Score={metrics['f1_score']:.4f}")
     
-    # 1. Vẽ ma trận nhầm lẫn
+    return {
+        'model': model,
+        'scaler': scaler,
+        'metrics': metrics,
+        'best_params': best_params,
+        'feature_importance': feature_importance
+    }
+
+def create_charts(df: pd.DataFrame, result: Dict, symbol: str, timeframe: str, 
+                period: str, prediction_days: int, charts_folder: str = 'ml_charts') -> Dict:
+    """
+    Tạo biểu đồ phân tích và dự đoán
+    
+    Args:
+        df (pd.DataFrame): DataFrame với dữ liệu đã xử lý
+        result (Dict): Kết quả huấn luyện và kiểm thử
+        symbol (str): Mã cặp giao dịch
+        timeframe (str): Khung thời gian
+        period (str): Khoảng thời gian dữ liệu
+        prediction_days (int): Số ngày dự đoán
+        charts_folder (str): Thư mục lưu biểu đồ
+        
+    Returns:
+        Dict: Đường dẫn đến các biểu đồ
+    """
+    os.makedirs(charts_folder, exist_ok=True)
+    chart_paths = {}
+    
+    # Biểu đồ 1: Phân tích giá và xu hướng
+    plt.figure(figsize=(12, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(df.index, df['close'], label='Giá đóng cửa')
+    plt.title(f'Biểu đồ giá {symbol} {timeframe} ({period})')
+    plt.ylabel('Giá')
+    plt.grid(True)
+    plt.legend()
+    
+    plt.subplot(2, 1, 2)
+    plt.scatter(df.index, df['target'], c=df['target'], cmap='viridis', alpha=0.6)
+    plt.title(f'Xu hướng tương lai ({prediction_days} ngày)')
+    plt.ylabel('Xu hướng (-1, 0, 1)')
+    plt.grid(True)
+    
+    chart_path = os.path.join(charts_folder, f"{symbol}_{timeframe}_{period}_price_trend.png")
+    plt.tight_layout()
+    plt.savefig(chart_path)
+    plt.close()
+    chart_paths['price_trend'] = chart_path
+    
+    # Biểu đồ 2: Confusion Matrix
+    cm = result['metrics']['confusion_matrix']
     plt.figure(figsize=(8, 6))
-    plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
-    plt.title(f'Ma trận nhầm lẫn ({symbol} {timeframe}, {period}, {prediction_days}d)')
+    plt.imshow(cm, interpolation='nearest', cmap='Blues')
+    plt.title(f'Confusion Matrix - {symbol} {timeframe} ({period})')
     plt.colorbar()
     
-    classes = ['Giảm', 'Tăng']
+    classes = ['Giảm', 'Đi ngang', 'Tăng']
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes)
+    plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
     
-    thresh = conf_matrix.max() / 2
-    for i in range(conf_matrix.shape[0]):
-        for j in range(conf_matrix.shape[1]):
-            plt.text(j, i, format(conf_matrix[i, j], 'd'),
-                    ha="center", va="center",
-                    color="white" if conf_matrix[i, j] > thresh else "black")
+    # Hiển thị giá trị trên từng ô
+    thresh = np.max(cm) / 2.
+    for i in range(len(cm)):
+        for j in range(len(cm[i])):
+            plt.text(j, i, format(cm[i][j], 'd'),
+                    horizontalalignment="center",
+                    color="white" if cm[i][j] > thresh else "black")
     
-    plt.ylabel('Nhãn thực tế')
-    plt.xlabel('Nhãn dự đoán')
+    plt.xlabel('Dự đoán')
+    plt.ylabel('Thực tế')
     plt.tight_layout()
-    conf_matrix_path = f"{charts_folder}/{file_prefix}_confusion_matrix.png"
-    plt.savefig(conf_matrix_path)
+    
+    chart_path = os.path.join(charts_folder, f"{symbol}_{timeframe}_{period}_confusion_matrix.png")
+    plt.savefig(chart_path)
     plt.close()
+    chart_paths['confusion_matrix'] = chart_path
     
-    # 2. Vẽ feature importance nếu có
-    if feature_importance is not None:
-        plt.figure(figsize=(10, 8))
-        top_features = feature_importance.head(20)
-        plt.barh(top_features['feature'][::-1], top_features['importance'][::-1])
-        plt.title(f'Top 20 đặc trưng quan trọng nhất ({symbol} {timeframe}, {period}, {prediction_days}d)')
+    # Biểu đồ 3: Feature Importance
+    if 'feature_importance' in result and result['feature_importance']:
+        features = result['feature_importance']['features']
+        importance = result['feature_importance']['importance']
+        
+        # Lấy 10 đặc trưng quan trọng nhất
+        top_indices = sorted(importance.keys(), key=lambda i: float(importance[i]), reverse=True)[:10]
+        top_features = [features[i] for i in top_indices]
+        top_importance = [importance[i] for i in top_indices]
+        
+        plt.figure(figsize=(10, 6))
+        plt.barh(range(len(top_features)), top_importance, align='center')
+        plt.yticks(range(len(top_features)), top_features)
+        plt.xlabel('Độ quan trọng')
+        plt.title(f'Top 10 đặc trưng quan trọng - {symbol} {timeframe} ({period})')
         plt.tight_layout()
-        feature_importance_path = f"{charts_folder}/{file_prefix}_feature_importance.png"
-        plt.savefig(feature_importance_path)
+        
+        chart_path = os.path.join(charts_folder, f"{symbol}_{timeframe}_{period}_feature_importance.png")
+        plt.savefig(chart_path)
         plt.close()
+        chart_paths['feature_importance'] = chart_path
     
-    # Lưu kết quả đánh giá
-    result = {
+    return chart_paths
+
+def save_results(result: Dict, symbol: str, timeframe: str, period: str, 
+               prediction_days: int, model_type: str, chart_paths: Dict,
+               output_folder: str = 'ml_results', models_folder: str = 'ml_models') -> str:
+    """
+    Lưu kết quả huấn luyện và kiểm thử
+    
+    Args:
+        result (Dict): Kết quả huấn luyện và kiểm thử
+        symbol (str): Mã cặp giao dịch
+        timeframe (str): Khung thời gian
+        period (str): Khoảng thời gian dữ liệu
+        prediction_days (int): Số ngày dự đoán
+        model_type (str): Loại mô hình
+        chart_paths (Dict): Đường dẫn đến các biểu đồ
+        output_folder (str): Thư mục lưu kết quả
+        models_folder (str): Thư mục lưu mô hình
+        
+    Returns:
+        str: Đường dẫn đến file kết quả
+    """
+    # Tạo thư mục đầu ra nếu chưa tồn tại
+    os.makedirs(output_folder, exist_ok=True)
+    os.makedirs(models_folder, exist_ok=True)
+    
+    # Tạo tên file dựa trên tham số
+    result_filename = f"{symbol}_{timeframe}_{period}_{prediction_days}d_{model_type}_results.json"
+    model_filename = f"{symbol}_{timeframe}_{period}_{prediction_days}d_{model_type}_model.joblib"
+    
+    # Tạo đối tượng kết quả
+    result_obj = {
         'symbol': symbol,
         'timeframe': timeframe,
         'period': period,
         'prediction_days': prediction_days,
         'model_type': model_type,
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1_score': f1,
-        'classification_report': classification_rep,
-        'confusion_matrix': conf_matrix.tolist(),
-        'feature_importance': feature_importance.to_dict() if feature_importance is not None else None,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'accuracy': result['metrics']['accuracy'],
+        'precision': result['metrics']['precision'],
+        'recall': result['metrics']['recall'],
+        'f1_score': result['metrics']['f1_score'],
+        'confusion_matrix': result['metrics']['confusion_matrix'],
+        'best_params': result['best_params'],
+        'feature_importance': result['feature_importance'],
+        'charts': chart_paths
     }
     
-    # Thêm siêu tham số nếu có tối ưu hóa
-    if tune_hyperparams:
-        result['best_params'] = grid_search.best_params_
+    # Lưu kết quả
+    result_path = os.path.join(output_folder, result_filename)
+    with open(result_path, 'w') as f:
+        json.dump(result_obj, f, indent=2)
     
-    # Lưu kết quả thành file JSON
-    result_file = f"{output_folder}/{file_prefix}_results.json"
-    with open(result_file, 'w') as f:
-        json.dump(result, f, indent=2)
+    # Lưu mô hình (optional)
+    try:
+        import joblib
+        model_path = os.path.join(models_folder, model_filename)
+        joblib.dump({'model': result['model'], 'scaler': result['scaler']}, model_path)
+        logger.info(f"Đã lưu mô hình tại {model_path}")
+    except Exception as e:
+        logger.warning(f"Không thể lưu mô hình: {e}")
     
-    # Lưu mô hình
-    import joblib
-    model_file = f"{models_folder}/{file_prefix}_model.joblib"
-    joblib.dump(model, model_file)
+    logger.info(f"Đã lưu kết quả tại {result_path}")
+    return result_path
+
+def run_backtest(symbol: str, timeframe: str, period: str, prediction_days: int = 1,
+               model_type: str = 'random_forest', tune_hyperparams: bool = False,
+               data_folder: str = 'real_data', output_folder: str = 'ml_results',
+               charts_folder: str = 'ml_charts', models_folder: str = 'ml_models') -> str:
+    """
+    Chạy quá trình backtest đầy đủ
     
-    # Lưu scaler
-    scaler_file = f"{models_folder}/{file_prefix}_scaler.joblib"
-    joblib.dump(scaler, scaler_file)
+    Args:
+        symbol (str): Mã cặp giao dịch
+        timeframe (str): Khung thời gian
+        period (str): Khoảng thời gian dữ liệu
+        prediction_days (int): Số ngày dự đoán
+        model_type (str): Loại mô hình
+        tune_hyperparams (bool): Có tinh chỉnh siêu tham số không
+        data_folder (str): Thư mục chứa dữ liệu
+        output_folder (str): Thư mục lưu kết quả
+        charts_folder (str): Thư mục lưu biểu đồ
+        models_folder (str): Thư mục lưu mô hình
+        
+    Returns:
+        str: Đường dẫn đến file kết quả
+    """
+    logger.info(f"Bắt đầu backtest: {symbol} {timeframe} ({period}), dự đoán {prediction_days} ngày, mô hình {model_type}")
     
-    logger.info(f"Đã lưu kết quả vào {result_file}")
-    logger.info(f"Đã lưu mô hình vào {model_file}")
+    # Bước 1: Tải dữ liệu
+    df = load_data(symbol, timeframe, period, data_folder)
     
-    return result
+    # Bước 2: Tính toán chỉ báo
+    df_indicators = calculate_indicators(df)
+    
+    # Bước 3: Tạo biến mục tiêu
+    df_with_target = create_target(df_indicators, prediction_days)
+    
+    # Bước 4: Chuẩn bị đặc trưng
+    X, y = prepare_features(df_with_target)
+    
+    # Bước 5: Huấn luyện và kiểm thử mô hình
+    result = train_test_model(X, y, model_type, tune_hyperparams)
+    
+    # Bước 6: Tạo biểu đồ
+    chart_paths = create_charts(df_with_target, result, symbol, timeframe, period, prediction_days, charts_folder)
+    
+    # Bước 7: Lưu kết quả
+    result_path = save_results(
+        result, symbol, timeframe, period, prediction_days, model_type, chart_paths,
+        output_folder, models_folder
+    )
+    
+    logger.info(f"Hoàn thành backtest: {symbol} {timeframe} ({period}), dự đoán {prediction_days} ngày, mô hình {model_type}")
+    return result_path
 
 def main():
-    parser = argparse.ArgumentParser(description='ML Backtest cho một khoảng thời gian')
+    parser = argparse.ArgumentParser(description='Chạy backtest ML theo giai đoạn thời gian')
     parser.add_argument('--symbol', type=str, default='BTCUSDT', help='Mã cặp giao dịch')
-    parser.add_argument('--timeframe', type=str, default='1h', help='Khung thời gian')
-    parser.add_argument('--period', type=str, default='1_month', help='Khoảng thời gian')
-    parser.add_argument('--prediction_days', type=int, default=1, help='Số ngày dự đoán tương lai')
-    parser.add_argument('--model_type', type=str, default='random_forest', help='Loại mô hình')
-    parser.add_argument('--data_folder', type=str, default='real_data', help='Thư mục dữ liệu')
-    parser.add_argument('--output_folder', type=str, default='ml_results', help='Thư mục kết quả')
-    parser.add_argument('--charts_folder', type=str, default='ml_charts', help='Thư mục biểu đồ')
-    parser.add_argument('--models_folder', type=str, default='ml_models', help='Thư mục mô hình')
-    parser.add_argument('--test_size', type=float, default=0.2, help='Tỷ lệ dữ liệu test')
-    parser.add_argument('--tune_hyperparams', action='store_true', help='Tối ưu hóa siêu tham số')
+    parser.add_argument('--timeframe', type=str, default='1h', help='Khung thời gian (1h, 4h, 1d)')
+    parser.add_argument('--period', type=str, default='1_month', help='Khoảng thời gian (1_month, 3_months, 6_months)')
+    parser.add_argument('--prediction_days', type=int, default=1, help='Số ngày dự đoán xu hướng')
+    parser.add_argument('--model_type', type=str, default='random_forest', help='Loại mô hình (random_forest, gradient_boosting)')
+    parser.add_argument('--tune_hyperparams', action='store_true', help='Có tinh chỉnh siêu tham số không')
+    parser.add_argument('--data_folder', type=str, default='real_data', help='Thư mục chứa dữ liệu')
+    parser.add_argument('--output_folder', type=str, default='ml_results', help='Thư mục lưu kết quả')
+    parser.add_argument('--charts_folder', type=str, default='ml_charts', help='Thư mục lưu biểu đồ')
+    parser.add_argument('--models_folder', type=str, default='ml_models', help='Thư mục lưu mô hình')
     
     args = parser.parse_args()
     
-    logger.info("=== Bắt đầu ML Backtest ===")
-    logger.info(f"Symbol: {args.symbol}")
-    logger.info(f"Timeframe: {args.timeframe}")
-    logger.info(f"Khoảng thời gian: {args.period}")
-    logger.info(f"Dự đoán tương lai: {args.prediction_days} ngày")
-    logger.info(f"Loại mô hình: {args.model_type}")
-    
-    # Tải dữ liệu
-    df = load_data(args.symbol, args.timeframe, args.period, args.data_folder)
-    
-    # Thêm đặc trưng kỹ thuật
-    df_features = add_features(df)
-    
-    # Tạo biến mục tiêu
-    df_target = create_target(df_features, args.prediction_days)
-    
-    # Chuẩn bị dữ liệu
-    X, y = prepare_features_targets(df_target)
-    
-    # Huấn luyện và đánh giá mô hình
-    result = train_and_evaluate_model(
-        X, y, 
-        model_type=args.model_type,
-        output_folder=args.output_folder,
-        charts_folder=args.charts_folder,
-        models_folder=args.models_folder,
-        symbol=args.symbol,
-        timeframe=args.timeframe,
-        period=args.period,
-        prediction_days=args.prediction_days,
-        test_size=args.test_size,
-        tune_hyperparams=args.tune_hyperparams
+    result_path = run_backtest(
+        args.symbol, args.timeframe, args.period, args.prediction_days,
+        args.model_type, args.tune_hyperparams,
+        args.data_folder, args.output_folder, args.charts_folder, args.models_folder
     )
     
-    logger.info("=== Hoàn tất ML Backtest ===")
+    print(f"Backtest hoàn thành! Kết quả được lưu tại: {result_path}")
 
 if __name__ == "__main__":
     main()

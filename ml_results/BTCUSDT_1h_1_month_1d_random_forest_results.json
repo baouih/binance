@@ -1,0 +1,25 @@
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "period": "1_month",
+  "prediction_days": 1,
+  "model_type": "random_forest",
+  "timestamp": "2025-03-01 16:47:04",
+  "accuracy": 0.5904761904761905,
+  "precision": 0.5972222222222223,
+  "recall": 0.5956632653061225,
+  "f1_score": 0.5898810064492688,
+  "confusion_matrix": [
+    [
+      33,
+      16
+    ],
+    [
+      27,
+      29
+    ]
+  ],
+  "best_params": {},
+  "feature_importance": {
+    "features": {
+      
