@@ -26,17 +26,9 @@ logging.getLogger('werkzeug').setLevel(logging.WARNING)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 
-# Cấu hình SocketIO với các thông số tối ưu để xử lý kết nối tốt hơn
-socketio = SocketIO(
-    app, 
-    cors_allowed_origins="*", 
-    async_mode='eventlet',
-    ping_timeout=60,     # Tăng thời gian timeout 
-    ping_interval=25,    # Giảm số lần ping để giảm tải
-    max_http_buffer_size=10*1024*1024,  # Tăng kích thước buffer 
-    manage_session=False,  # Tắt quản lý phiên để giảm tải CPU
-    engineio_logger=False  # Tắt logging để giảm I/O
-)
+# Loại bỏ Socket.IO để cải thiện hiệu suất 
+# và giảm thiểu lỗi kết nối
+# Thay vào đó sử dụng AJAX hoặc fetch API để cập nhật dữ liệu
 
 # Import Blueprint cho cấu hình
 try:
@@ -482,8 +474,7 @@ def bot_control():
     
     bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
     
-    # Emit status to all clients
-    socketio.emit('bot_status', bot_status)
+    # Đã loại bỏ socket.io, không cần emit status nữa
     
     return jsonify({"success": True, "status": bot_status})
 
@@ -497,7 +488,7 @@ def close_position():
         if pos['id'] == position_id:
             sample_account['positions'].pop(i)
             sample_account['balance'] += pos['pnl']
-            socketio.emit('account_update', sample_account)
+            # Đã loại bỏ socket.io, không cần emit account_update nữa
             return jsonify({"success": True})
     
     return jsonify({"success": False, "error": "Position not found"})
@@ -569,20 +560,41 @@ def get_coins():
         {"symbol": "ETHUSDT", "timeframes": ["1h", "4h", "1d"], "strategies": ["composite", "ml"]}
     ]})
 
-# WebSocket Endpoints
-@socketio.on('connect')
-def handle_connect():
-    """Xử lý khi client kết nối"""
-    logger.info('Client connected')
-    emit('bot_status', bot_status)
-    emit('account_update', sample_account)
-    emit('market_update', {"prices": sample_prices})
-    emit('signal_update', {"signals": sample_signals})
+# REST API thay thế cho WebSocket để tăng hiệu năng
+@app.route('/api/realtime/account', methods=['GET'])
+def get_realtime_account():
+    """API lấy dữ liệu tài khoản theo thời gian thực"""
+    # Tải trạng thái giao dịch từ file
+    state = load_trading_state()
+    if state:
+        return jsonify(get_account_from_state(state))
+    return jsonify(sample_account)
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Xử lý khi client ngắt kết nối"""
-    logger.info('Client disconnected')
+@app.route('/api/realtime/market', methods=['GET'])
+def get_realtime_market():
+    """API lấy dữ liệu thị trường theo thời gian thực"""
+    return jsonify({"prices": sample_prices})
+
+@app.route('/api/realtime/signals', methods=['GET'])
+def get_realtime_signals():
+    """API lấy tín hiệu giao dịch theo thời gian thực"""
+    return jsonify({"signals": sample_signals})
+
+def get_account_from_state(state):
+    """Tạo dữ liệu tài khoản từ trạng thái"""
+    balance = state.get('current_balance', 10000.0)
+    positions = state.get('open_positions', [])
+    equity = balance
+    for pos in positions:
+        equity += pos.get('pnl', 0)
+    
+    return {
+        "balance": balance,
+        "equity": equity,
+        "margin": 0,
+        "free_balance": balance,
+        "positions": positions
+    }
 
 # Các hàm giả lập cập nhật dữ liệu theo thời gian thực
 def simulate_price_updates():
@@ -594,7 +606,7 @@ def simulate_price_updates():
                 change_pct = random.uniform(-0.005, 0.005)
                 sample_prices[symbol] *= (1 + change_pct)
             
-            socketio.emit('price_update', {"prices": sample_prices})
+            # Không cần emit qua socket.io nữa
             time.sleep(60)  # Tăng khoảng thời gian cập nhật từ 5 lên 60 giây để giảm tải
         except Exception as e:
             logger.error(f"Lỗi trong quá trình cập nhật giá: {e}")
@@ -604,13 +616,14 @@ def simulate_sentiment_updates():
     """Giả lập cập nhật tâm lý thị trường"""
     while True:
         try:
+            # Tạo dữ liệu sentiment ngẫu nhiên
             sentiment = {
                 "value": random.randint(30, 70),
                 "change": random.uniform(-5, 5),
                 "trend": "neutral"
             }
             
-            socketio.emit('sentiment_update', sentiment)
+            # Không cần emit qua socket.io nữa
             time.sleep(120)  # Tăng lên 2 phút để giảm tải
         except Exception as e:
             logger.error(f"Lỗi trong quá trình cập nhật tâm lý thị trường: {e}")
@@ -622,22 +635,7 @@ def simulate_account_updates():
         try:
             # Tải trạng thái giao dịch từ file
             state = load_trading_state()
-            if state:
-                balance = state.get('current_balance', 10000.0)
-                positions = state.get('open_positions', [])
-                equity = balance
-                for pos in positions:
-                    equity += pos.get('pnl', 0)
-                
-                account_data = {
-                    "balance": balance,
-                    "equity": equity,
-                    "margin": 0,
-                    "free_balance": balance,
-                    "positions": positions
-                }
-                socketio.emit('account_update', account_data)
-            else:
+            if not state:
                 # Cập nhật giá hiện tại cho các vị thế
                 for pos in sample_account['positions']:
                     pos['current_price'] = sample_prices.get(pos['symbol'], pos['current_price'])
@@ -654,8 +652,6 @@ def simulate_account_updates():
                 sample_account['equity'] = sample_account['balance']
                 for pos in sample_account['positions']:
                     sample_account['equity'] += pos['pnl']
-                
-                socketio.emit('account_update', sample_account)
             
             time.sleep(60)  # Tăng thời gian cập nhật từ 10 lên 60 giây để giảm tải
         except Exception as e:
@@ -677,7 +673,7 @@ def check_and_restart_bot():
                     os.system("python multi_coin_bot.py &")
                     bot_status['last_action'] = 'Bot auto-restarted'
                     bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
-                    socketio.emit('bot_status', bot_status)
+                    # Không cần emit qua socket.io nữa
             else:
                 # Nếu không ở chế độ tự động khởi động lại, chỉ cập nhật trạng thái
                 result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
@@ -685,7 +681,7 @@ def check_and_restart_bot():
                     logger.info("Bot has stopped but status is still 'running'. Updating status...")
                     bot_status['status'] = 'stopped'
                     bot_status['last_action'] = 'Bot stopped unexpectedly'
-                    socketio.emit('bot_status', bot_status)
+                    # Không cần emit qua socket.io nữa
             
             # Cập nhật trạng thái
             bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
@@ -734,15 +730,5 @@ with app.app_context():
     start_background_tasks()
 
 if __name__ == '__main__':
-    # Giảm số lượng thread backgroundtrên eventlet để tránh quá tải
-    import eventlet
-    eventlet.monkey_patch()
-    
-    # Cấu hình Eventlet để xử lý lỗi kết nối tốt hơn
-    eventlet.wsgi.MAX_HEADER_LINE = 32768
-    eventlet.wsgi.MINIMUM_CHUNK_SIZE = 4096
-    
-    # Tắt debug mode để tăng hiệu suất và ổn định
-    # Giảm memory footprint của các background thread
-    socketio.run(app, host="0.0.0.0", port=5000, debug=False, allow_unsafe_werkzeug=True,
-                threaded=False, max_size=100, ping_timeout=60, ping_interval=25)
+    # Chạy Flask App trực tiếp không qua Socket.IO để tăng hiệu suất
+    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
