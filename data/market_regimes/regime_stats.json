@@ -5,17 +5,17 @@
     "avg_duration": 0.0
   },
   "neutral": {
-    "count": 82,
+    "count": 84,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "ranging": {
-    "count": 47,
+    "count": 50,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "volatile": {
-    "count": 42,
+    "count": 43,
     "total_duration": 0,
     "avg_duration": 0.0
   }
