@@ -1,0 +1,93 @@
+{
+  "symbols": {
+    "BTCUSDT": {
+      "1h": {
+        "status": "success",
+        "count": 2160,
+        "file_path": "test_data/BTCUSDT/BTCUSDT_1h.csv"
+      },
+      "4h": {
+        "status": "success",
+        "count": 540,
+        "file_path": "test_data/BTCUSDT/BTCUSDT_4h.csv"
+      },
+      "1d": {
+        "status": "success",
+        "count": 90,
+        "file_path": "test_data/BTCUSDT/BTCUSDT_1d.csv"
+      },
+      "15m": {
+        "status": "success",
+        "count": 8640,
+        "file_path": "test_data/BTCUSDT/BTCUSDT_15m.csv"
+      }
+    },
+    "ETHUSDT": {
+      "1h": {
+        "status": "success",
+        "count": 2160,
+        "file_path": "test_data/ETHUSDT/ETHUSDT_1h.csv"
+      },
+      "4h": {
+        "status": "success",
+        "count": 540,
+        "file_path": "test_data/ETHUSDT/ETHUSDT_4h.csv"
+      },
+      "1d": {
+        "status": "success",
+        "count": 90,
+        "file_path": "test_data/ETHUSDT/ETHUSDT_1d.csv"
+      },
+      "15m": {
+        "status": "success",
+        "count": 8640,
+        "file_path": "test_data/ETHUSDT/ETHUSDT_15m.csv"
+      }
+    },
+    "BNBUSDT": {
+      "1h": {
+        "status": "success",
+        "count": 2160,
+        "file_path": "test_data/BNBUSDT/BNBUSDT_1h.csv"
+      },
+      "4h": {
+        "status": "success",
+        "count": 540,
+        "file_path": "test_data/BNBUSDT/BNBUSDT_4h.csv"
+      },
+      "1d": {
+        "status": "success",
+        "count": 90,
+        "file_path": "test_data/BNBUSDT/BNBUSDT_1d.csv"
+      },
+      "15m": {
+        "status": "success",
+        "count": 8640,
+        "file_path": "test_data/BNBUSDT/BNBUSDT_15m.csv"
+      }
+    },
+    "SOLUSDT": {
+      "1h": {
+        "status": "success",
+        "count": 2160,
+        "file_path": "test_data/SOLUSDT/SOLUSDT_1h.csv"
+      },
+      "4h": {
+        "status": "success",
+        "count": 540,
+        "file_path": "test_data/SOLUSDT/SOLUSDT_4h.csv"
+      },
+      "1d": {
+        "status": "success",
+        "count": 90,
+        "file_path": "test_data/SOLUSDT/SOLUSDT_1d.csv"
+      },
+      "15m": {
+        "status": "success",
+        "count": 8640,
+        "file_path": "test_data/SOLUSDT/SOLUSDT_15m.csv"
+      }
+    }
+  },
+  "total_candles": 45720
+}

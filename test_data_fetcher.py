@@ -125,6 +125,11 @@ def get_testnet_data(symbols: List[str], intervals: List[str], days: int = 90, u
                     'taker_buy_quote_asset_volume', 'ignore'
                 ])
                 
+                if df.empty:
+                    logger.warning(f"DataFrame rỗng cho {symbol} - {interval}")
+                    symbol_results[interval] = {"status": "error", "count": 0, "message": "Empty DataFrame"}
+                    continue
+                
                 # Chuyển đổi dữ liệu
                 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
                 for col in ['open', 'high', 'low', 'close', 'volume']:
