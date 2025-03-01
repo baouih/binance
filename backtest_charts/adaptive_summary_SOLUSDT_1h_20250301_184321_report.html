@@ -1,0 +1,397 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Adaptive Trading System Backtest Results</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1, h2 { color: #333; }
+            .metrics { display: flex; flex-wrap: wrap; margin-bottom: 20px; }
+            .metric-box { 
+                background-color: #f5f5f5; 
+                border-radius: 5px; 
+                padding: 15px; 
+                margin: 10px; 
+                min-width: 200px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .metric-title { font-weight: bold; margin-bottom: 5px; color: #555; }
+            .metric-value { font-size: 24px; }
+            .positive { color: green; }
+            .negative { color: red; }
+            .chart-container { margin: 20px 0; }
+            table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+        </style>
+    </head>
+    <body>
+        <h1>Adaptive Trading System Backtest Results</h1>
+        <p>Timeframe: 2025-03-01 18:43:23</p>
+        
+        <div class="metrics">
+            <div class="metric-box">
+                <div class="metric-title">Initial Balance</div>
+                <div class="metric-value">$10000.00</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Final Balance</div>
+                <div class="metric-value">$11466.45</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Total ROI</div>
+                <div class="metric-value positive">14.66%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Win Rate</div>
+                <div class="metric-value">41.89%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Total Trades</div>
+                <div class="metric-value">74</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Max Drawdown</div>
+                <div class="metric-value negative">7.86%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Profit Factor</div>
+                <div class="metric-value">1.39</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Sharpe Ratio</div>
+                <div class="metric-value">0.45</div>
+            </div>
+        </div>
+        
+        <h2>Equity Curve</h2>
+        <div class="chart-container">
+            <img src="adaptive_summary_SOLUSDT_1h_20250301_184321_equity.png" alt="Equity Curve" style="width:100%">
+        </div>
+        
+        <h2>Market Regime Distribution</h2>
+        <div class="chart-container">
+            <img src="adaptive_summary_SOLUSDT_1h_20250301_184321_regimes_pie.png" alt="Market Regime Distribution" style="width:100%">
+        </div>
+        
+        <h2>Performance by Market Regime</h2>
+        <div class="chart-container">
+            <img src="adaptive_summary_SOLUSDT_1h_20250301_184321_win_rates.png" alt="Win Rate by Market Regime" style="width:100%">
+        </div>
+        
+        <h2>Strategy Usage</h2>
+        <div class="chart-container">
+            <img src="adaptive_summary_SOLUSDT_1h_20250301_184321_strategies.png" alt="Strategy Usage" style="width:100%">
+        </div>
+        
+        <h2>Regime Performance Details</h2>
+        <table>
+            <tr>
+                <th>Regime</th>
+                <th>Win Rate</th>
+                <th>Trades</th>
+                <th>Total PnL</th>
+                <th>Avg PnL</th>
+            </tr>
+    
+            <tr>
+                <td>quiet</td>
+                <td>20.00%</td>
+                <td>15</td>
+                <td class="negative">$-451.14</td>
+                <td class="negative">$-30.08</td>
+            </tr>
+        
+            <tr>
+                <td>ranging</td>
+                <td>66.67%</td>
+                <td>3</td>
+                <td class="positive">$269.25</td>
+                <td class="positive">$89.75</td>
+            </tr>
+        
+            <tr>
+                <td>volatile</td>
+                <td>100.00%</td>
+                <td>1</td>
+                <td class="positive">$77.12</td>
+                <td class="positive">$77.12</td>
+            </tr>
+        
+            <tr>
+                <td>trending_up</td>
+                <td>47.06%</td>
+                <td>34</td>
+                <td class="positive">$1997.06</td>
+                <td class="positive">$58.74</td>
+            </tr>
+        
+            <tr>
+                <td>trending_down</td>
+                <td>42.86%</td>
+                <td>21</td>
+                <td class="negative">$-425.84</td>
+                <td class="negative">$-20.28</td>
+            </tr>
+        
+        </table>
+        
+        <h2>Recent Trades</h2>
+        <table>
+            <tr>
+                <th>Entry Date</th>
+                <th>Exit Date</th>
+                <th>Side</th>
+                <th>Entry Price</th>
+                <th>Exit Price</th>
+                <th>PnL</th>
+                <th>ROI</th>
+                <th>Regime</th>
+                <th>Exit Reason</th>
+            </tr>
+    
+            <tr>
+                <td>1498</td>
+                <td>1500</td>
+                <td>SELL</td>
+                <td>$25756.71</td>
+                <td>$25911.25</td>
+                <td class="negative">$-71.85</td>
+                <td class="negative">-0.72%</td>
+                <td>quiet</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1509</td>
+                <td>1512</td>
+                <td>SELL</td>
+                <td>$24978.38</td>
+                <td>$24807.54</td>
+                <td class="positive">$54.27</td>
+                <td class="positive">0.54%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1543</td>
+                <td>1546</td>
+                <td>SELL</td>
+                <td>$25709.32</td>
+                <td>$26094.96</td>
+                <td class="negative">$-119.57</td>
+                <td class="negative">-1.20%</td>
+                <td>trending_down</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1555</td>
+                <td>1558</td>
+                <td>SELL</td>
+                <td>$25777.84</td>
+                <td>$25667.67</td>
+                <td class="positive">$33.73</td>
+                <td class="positive">0.34%</td>
+                <td>trending_down</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1645</td>
+                <td>1647</td>
+                <td>BUY</td>
+                <td>$22141.80</td>
+                <td>$22009.32</td>
+                <td class="negative">$-47.35</td>
+                <td class="negative">-0.47%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1684</td>
+                <td>1685</td>
+                <td>SELL</td>
+                <td>$21484.03</td>
+                <td>$21806.29</td>
+                <td class="negative">$-118.24</td>
+                <td class="negative">-1.18%</td>
+                <td>trending_down</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1750</td>
+                <td>1751</td>
+                <td>BUY</td>
+                <td>$26305.47</td>
+                <td>$26147.63</td>
+                <td class="negative">$-70.23</td>
+                <td class="negative">-0.70%</td>
+                <td>quiet</td>
+                <td>signal_reverse</td>
+            </tr>
+        
+            <tr>
+                <td>1770</td>
+                <td>1775</td>
+                <td>SELL</td>
+                <td>$27644.83</td>
+                <td>$28059.50</td>
+                <td class="negative">$-116.35</td>
+                <td class="negative">-1.16%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1787</td>
+                <td>1794</td>
+                <td>BUY</td>
+                <td>$28794.01</td>
+                <td>$29283.98</td>
+                <td class="positive">$130.67</td>
+                <td class="positive">1.31%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1833</td>
+                <td>1835</td>
+                <td>SELL</td>
+                <td>$35992.75</td>
+                <td>$35908.89</td>
+                <td class="positive">$18.09</td>
+                <td class="positive">0.18%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1850</td>
+                <td>1851</td>
+                <td>SELL</td>
+                <td>$35282.78</td>
+                <td>$35494.48</td>
+                <td class="negative">$-70.01</td>
+                <td class="negative">-0.70%</td>
+                <td>quiet</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1898</td>
+                <td>1900</td>
+                <td>SELL</td>
+                <td>$43561.04</td>
+                <td>$44214.45</td>
+                <td class="negative">$-115.98</td>
+                <td class="negative">-1.16%</td>
+                <td>trending_down</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1914</td>
+                <td>1919</td>
+                <td>BUY</td>
+                <td>$46224.88</td>
+                <td>$46999.25</td>
+                <td class="positive">$128.23</td>
+                <td class="positive">1.28%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1928</td>
+                <td>1929</td>
+                <td>SELL</td>
+                <td>$45773.36</td>
+                <td>$46459.96</td>
+                <td class="negative">$-116.10</td>
+                <td class="negative">-1.16%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1955</td>
+                <td>1957</td>
+                <td>SELL</td>
+                <td>$46632.60</td>
+                <td>$47332.09</td>
+                <td class="negative">$-114.94</td>
+                <td class="negative">-1.15%</td>
+                <td>trending_down</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>1962</td>
+                <td>1965</td>
+                <td>BUY</td>
+                <td>$49151.20</td>
+                <td>$48413.93</td>
+                <td class="negative">$-113.79</td>
+                <td class="negative">-1.14%</td>
+                <td>trending_up</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>2036</td>
+                <td>2040</td>
+                <td>SELL</td>
+                <td>$50943.35</td>
+                <td>$51452.79</td>
+                <td class="negative">$-90.12</td>
+                <td class="negative">-0.90%</td>
+                <td>ranging</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>2057</td>
+                <td>2065</td>
+                <td>SELL</td>
+                <td>$52346.43</td>
+                <td>$51299.50</td>
+                <td class="positive">$178.80</td>
+                <td class="positive">1.79%</td>
+                <td>ranging</td>
+                <td>take_profit</td>
+            </tr>
+        
+            <tr>
+                <td>2112</td>
+                <td>2113</td>
+                <td>SELL</td>
+                <td>$53854.09</td>
+                <td>$54177.22</td>
+                <td class="negative">$-68.12</td>
+                <td class="negative">-0.68%</td>
+                <td>quiet</td>
+                <td>stop_loss</td>
+            </tr>
+        
+            <tr>
+                <td>2146</td>
+                <td>2151</td>
+                <td>SELL</td>
+                <td>$53153.17</td>
+                <td>$52090.10</td>
+                <td class="positive">$180.57</td>
+                <td class="positive">1.81%</td>
+                <td>ranging</td>
+                <td>take_profit</td>
+            </tr>
+        
+        </table>
+    </body>
+    </html>
+    
