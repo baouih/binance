@@ -1,207 +1,155 @@
 #!/usr/bin/env python3
 """
-Main entry point for the Crypto Trading Bot Dashboard
-With fixed gunicorn worker handling
+Main entry point for the Crypto Trading Bot CLI - Command Line Version
 """
 
 import os
-import logging
-from flask import Flask
-from flask_socketio import SocketIO
-
-# Create the Flask application
-app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "cryptobot-dev-key")
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("dashboard")
-
-# Import dummy data and route definitions
+import sys
 import json
-import random
-from datetime import datetime, timedelta
-from flask import render_template, request, jsonify, redirect, url_for, session
+import logging
+import argparse
+from datetime import datetime
 
-# Giả lập dữ liệu bot
-bot_status = {
-    "running": True,
-    "last_start_time": datetime.now() - timedelta(hours=12),
-    "uptime": "12 hours",
-    "version": "1.0.0",
-    "active_strategies": ["Composite ML Strategy", "Multi-timeframe analyzer", "Sentiment-based counter"]
-}
-
-# Giả lập dữ liệu tài khoản
-account_data = {
-    "balance": 10253.42,
-    "change_24h": 2.3,
-    "positions": [
-        {
-            "id": "BTCUSDT_1",
-            "symbol": "BTCUSDT",
-            "type": "LONG",
-            "entry_price": 82458.15,
-            "current_price": 83768.54,
-            "quantity": 0.025,
-            "pnl": 32.61,
-            "pnl_percent": 1.59
-        },
-        {
-            "id": "ETHUSDT_1",
-            "symbol": "ETHUSDT",
-            "type": "SHORT",
-            "entry_price": 2285.36,
-            "current_price": 2212.85,
-            "quantity": 0.35,
-            "pnl": 25.38,
-            "pnl_percent": 3.18
-        }
+# Thiết lập logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('trading_bot.log'),
+        logging.StreamHandler(sys.stdout)
     ]
-}
+)
+logger = logging.getLogger('main')
 
-# Giả lập dữ liệu tín hiệu giao dịch
-signals_data = [
-    {
-        "time": "12:35:18",
-        "symbol": "BTCUSDT",
-        "signal": "BUY",
-        "confidence": 78,
-        "price": 83518.75,
-        "market_regime": "NEUTRAL",
-        "executed": False
-    },
-    {
-        "time": "11:42:06",
-        "symbol": "SOLUSDT",
-        "signal": "SELL",
-        "confidence": 82,
-        "price": 126.48,
-        "market_regime": "VOLATILE",
-        "executed": False
-    },
-    {
-        "time": "10:18:32",
-        "symbol": "ETHUSDT",
-        "signal": "SELL",
-        "confidence": 75,
-        "price": 2248.36,
-        "market_regime": "VOLATILE",
-        "executed": True
-    }
-]
+# Import CLI controller
+try:
+    from cli_controller import (
+        interactive_menu, get_bot_status, format_status,
+        start_bot, stop_bot, restart_bot, view_logs,
+        display_real_time_monitor, get_open_positions, 
+        display_positions, get_recent_trades, display_performance_metrics
+    )
+    logger.info("CLI Controller đã được import thành công")
+except ImportError as e:
+    logger.error(f"Lỗi khi import CLI Controller: {e}")
+    print(f"Lỗi: Không thể import CLI Controller - {e}")
+    sys.exit(1)
 
-# Giả lập dữ liệu phân tích thị trường
-market_data = {
-    "btc_price": 83768.54,
-    "btc_change_24h": 1.5,
-    "market_regime": {
-        "BTC": "VOLATILE",
-        "ETH": "VOLATILE",
-        "BNB": "NEUTRAL",
-        "SOL": "RANGING"
-    },
-    "sentiment": {
-        "value": 16,  # 0-100
-        "state": "extreme_fear",
-        "description": "Extreme Fear"
-    }
-}
-
-@app.route('/')
-def index():
-    """Trang chủ Dashboard"""
-    return render_template('index.html')
-
-@app.route('/strategies')
-def strategies():
-    """Trang quản lý chiến lược"""
-    return render_template('strategies.html')
-
-@app.route('/backtest')
-def backtest():
-    """Trang backtest"""
-    return render_template('backtest.html')
-
-@app.route('/trades')
-def trades():
-    """Trang lịch sử giao dịch"""
-    return render_template('trades.html')
-
-@app.route('/settings')
-def settings():
-    """Trang cài đặt bot"""
-    return render_template('settings.html')
-
-# API Routes
-@app.route('/api/bot/control', methods=['POST'])
-def bot_control():
-    """Điều khiển bot (start/stop/restart)"""
-    if not request.json or 'action' not in request.json:
-        return jsonify({'status': 'error', 'message': 'Missing action parameter'}), 400
+def check_environment():
+    """Kiểm tra môi trường và cấu hình"""
+    # Kiểm tra API keys
+    api_key = os.environ.get('BINANCE_API_KEY')
+    api_secret = os.environ.get('BINANCE_API_SECRET')
     
-    action = request.json['action']
+    warnings = []
+    if not api_key or not api_secret:
+        logger.warning("BINANCE_API_KEY hoặc BINANCE_API_SECRET không được cấu hình")
+        warnings.append("CẢNH BÁO: API keys Binance chưa được cấu hình!")
+        
+    # Kiểm tra tập tin cấu hình
+    if not os.path.exists('multi_coin_config.json'):
+        logger.warning("File cấu hình multi_coin_config.json không tồn tại")
+        warnings.append("CẢNH BÁO: File cấu hình multi_coin_config.json không tồn tại!")
     
-    if action == 'start':
-        bot_status["running"] = True
-        bot_status["last_start_time"] = datetime.now()
-        logger.info("Bot started")
-    elif action == 'stop':
-        bot_status["running"] = False
-        logger.info("Bot stopped")
-    elif action == 'restart':
-        bot_status["running"] = True
-        bot_status["last_start_time"] = datetime.now()
-        logger.info("Bot restarted")
+    return warnings
+
+def check_bot_status():
+    """Kiểm tra trạng thái bot"""
+    try:
+        status = get_bot_status()
+        if status["status"] == "running":
+            logger.info(f"Bot đang chạy với PID: {status.get('pid', 'N/A')}")
+        else:
+            logger.info("Bot không chạy")
+            
+        return status
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái bot: {e}")
+        return {"status": "unknown", "error": str(e)}
+
+def parse_command_line_arguments():
+    """Phân tích tham số dòng lệnh"""
+    parser = argparse.ArgumentParser(description='BinanceTrader Bot CLI')
+    
+    # Thêm các tùy chọn dòng lệnh
+    parser.add_argument('--status', '-s', action='store_true', help='Hiển thị trạng thái bot')
+    parser.add_argument('--positions', '-p', action='store_true', help='Hiển thị vị thế hiện tại')
+    parser.add_argument('--trades', '-t', action='store_true', help='Hiển thị giao dịch gần đây')
+    parser.add_argument('--logs', '-l', type=int, metavar='N', nargs='?', const=20, help='Hiển thị N dòng log gần đây')
+    parser.add_argument('--start', action='store_true', help='Khởi động bot')
+    parser.add_argument('--stop', action='store_true', help='Dừng bot')
+    parser.add_argument('--restart', action='store_true', help='Khởi động lại bot')
+    parser.add_argument('--monitor', '-m', type=int, metavar='INTERVAL', nargs='?', const=5, help='Giám sát bot theo thời gian thực')
+    
+    return parser.parse_args()
+
+def print_welcome_message():
+    """In thông báo chào mừng"""
+    print("\n" + "=" * 60)
+    print("BINANCE FUTURES TRADING BOT - CLI MODE".center(60))
+    print("=" * 60)
+    print("\nPhiên bản: 1.0.0 (CLI Only)")
+    print("Mode: Production\n")
+
+def handle_command_line_args(args):
+    """Xử lý tham số dòng lệnh"""
+    if args.status:
+        status = get_bot_status()
+        print(format_status(status))
+    
+    if args.positions:
+        positions = get_open_positions()
+        display_positions(positions)
+    
+    if args.trades:
+        trades = get_recent_trades()
+        display_positions(trades, "Giao dịch gần đây")
+    
+    if args.logs is not None:
+        view_logs(args.logs)
+    
+    if args.start:
+        start_bot()
+    
+    if args.stop:
+        stop_bot()
+    
+    if args.restart:
+        restart_bot()
+    
+    if args.monitor is not None:
+        display_real_time_monitor(args.monitor)
+
+def main():
+    """Hàm chính"""
+    print_welcome_message()
+    
+    # Kiểm tra môi trường
+    warnings = check_environment()
+    for warning in warnings:
+        print(warning)
+    
+    # Kiểm tra trạng thái bot
+    status = check_bot_status()
+    print(format_status(status))
+    print()
+    
+    # Phân tích tham số dòng lệnh
+    args = parse_command_line_arguments()
+    
+    # Nếu có tham số dòng lệnh, xử lý chúng
+    if len(sys.argv) > 1:
+        handle_command_line_args(args)
     else:
-        return jsonify({'status': 'error', 'message': 'Invalid action parameter'}), 400
-    
-    return jsonify({'status': 'success', 'action': action, 'bot_status': bot_status})
-
-@app.route('/api/positions/close', methods=['POST'])
-def close_position():
-    """Đóng một vị thế"""
-    if not request.json or 'position_id' not in request.json:
-        return jsonify({'status': 'error', 'message': 'Missing position_id parameter'}), 400
-    
-    position_id = request.json['position_id']
-    
-    # Find and remove the position
-    position_index = None
-    for i, position in enumerate(account_data["positions"]):
-        if position["id"] == position_id:
-            position_index = i
-            break
-    
-    if position_index is not None:
-        removed_position = account_data["positions"].pop(position_index)
-        logger.info(f"Position closed: {removed_position}")
-        return jsonify({'status': 'success', 'position': removed_position})
-    else:
-        return jsonify({'status': 'error', 'message': 'Position not found'}), 404
-
-@app.route('/api/bot/status')
-def get_bot_status():
-    """Lấy trạng thái hiện tại của bot"""
-    status_data = bot_status.copy()
-    status_data['last_start_time'] = bot_status['last_start_time'].isoformat()
-    return jsonify(status_data)
-
-@app.route('/api/account')
-def get_account():
-    """Lấy dữ liệu tài khoản"""
-    return jsonify(account_data)
-
-@app.route('/api/signals')
-def get_signals():
-    """Lấy tín hiệu giao dịch gần đây"""
-    return jsonify(signals_data)
-
-@app.route('/api/market')
-def get_market():
-    """Lấy dữ liệu thị trường"""
-    return jsonify(market_data)
+        # Nếu không có tham số, khởi chạy menu tương tác
+        try:
+            interactive_menu()
+        except KeyboardInterrupt:
+            print("\nĐã thoát chương trình.")
+        except Exception as e:
+            logger.error(f"Lỗi không xác định: {e}")
+            print(f"Đã xảy ra lỗi: {e}")
+            print("Xem logs để biết thêm chi tiết.")
 
 if __name__ == "__main__":
-    # Run the application
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    main()
