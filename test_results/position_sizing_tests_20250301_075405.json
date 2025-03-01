@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "timestamp": "2025-03-01T07:54:05.529442",
+    "module_available": false,
+    "duration_seconds": 0.002447
+  },
+  "tests": {
+    "test_base_position_sizer": {
+      "passed": true
+    },
+    "test_dynamic_position_sizer": {
+      "passed": true
+    },
+    "test_kelly_criterion_sizer": {
+      "passed": false,
+      "error": "Expected size 0.049999999999999996, got 0.1",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 946, in run_all_tests\n    passed = test_func()\n             ^^^^^^^^^^^\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 565, in test_kelly_criterion_sizer\n    assert abs(size - expected_size) < 0.001, f\"Expected size {expected_size}, got {size}\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Expected size 0.049999999999999996, got 0.1\n"
+    },
+    "test_anti_martingale_sizer": {
+      "passed": true
+    },
+    "test_portfolio_sizer": {
+      "passed": true
+    },
+    "test_factory_function": {
+      "passed": true
+    }
+  }
+}

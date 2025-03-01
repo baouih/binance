@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-03-01T08:05:35.856536",
+  "total_tests": 7,
+  "successful_tests": 5,
+  "failed_tests": 1,
+  "error_tests": 1,
+  "using_actual_module": true,
+  "failures": [
+    {
+      "test": "test_01_base_sizing_edge_cases (__main__.TestPositionSizingAdvanced.test_01_base_sizing_edge_cases)",
+      "error": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing_advanced.py\", line 290, in test_01_base_sizing_edge_cases\n    self.assertLess(size, 100000, \"K\u00edch th\u01b0\u1edbc v\u1ecb th\u1ebf ph\u1ea3i h\u1ee3p l\u00fd\")\nAssertionError: 200000.0006868504 not less than 100000 : K\u00edch th\u01b0\u1edbc v\u1ecb th\u1ebf ph\u1ea3i h\u1ee3p l\u00fd\n"
+    }
+  ],
+  "errors": [
+    {
+      "test": "test_05_portfolio_allocation (__main__.TestPositionSizingAdvanced.test_05_portfolio_allocation)",
+      "error": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing_advanced.py\", line 613, in test_05_portfolio_allocation\n    allocations = sizer.calculate_position_allocations(symbols, signals, correlation_matrix)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/workspace/position_sizing.py\", line 328, in calculate_position_allocations\n    if entry_price <= 0 or stop_loss <= 0:\n       ^^^^^^^^^^^^^^^^\nTypeError: '<=' not supported between instances of 'str' and 'int'\n"
+    }
+  ]
+}

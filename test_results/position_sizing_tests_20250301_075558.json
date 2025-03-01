@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "timestamp": "2025-03-01T07:55:58.413107",
+    "module_available": false,
+    "duration_seconds": 0.006451
+  },
+  "tests": {
+    "test_base_position_sizer": {
+      "passed": true
+    },
+    "test_dynamic_position_sizer": {
+      "passed": true
+    },
+    "test_kelly_criterion_sizer": {
+      "passed": true
+    },
+    "test_anti_martingale_sizer": {
+      "passed": true
+    },
+    "test_portfolio_sizer": {
+      "passed": true
+    },
+    "test_factory_function": {
+      "passed": true
+    }
+  }
+}
