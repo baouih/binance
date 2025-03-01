@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "timestamp": "2025-03-01T07:52:58.996960",
+    "module_available": false,
+    "duration_seconds": 0.002528
+  },
+  "tests": {
+    "test_base_position_sizer": {
+      "passed": true
+    },
+    "test_dynamic_position_sizer": {
+      "passed": true
+    },
+    "test_kelly_criterion_sizer": {
+      "passed": false,
+      "error": "Expected size 0.09999999999999999, got 0.009999999999999998",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 941, in run_all_tests\n    passed = test_func()\n             ^^^^^^^^^^^\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 490, in test_kelly_criterion_sizer\n    assert abs(size - expected_size) < 0.001, f\"Expected size {expected_size}, got {size}\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Expected size 0.09999999999999999, got 0.009999999999999998\n"
+    },
+    "test_anti_martingale_sizer": {
+      "passed": false,
+      "error": "Expected risk 2.0%, got 3.375%",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 941, in run_all_tests\n    passed = test_func()\n             ^^^^^^^^^^^\n  File \"/home/runner/workspace/test_scripts/test_position_sizing.py\", line 717, in test_anti_martingale_sizer\n    assert abs(risk - expected_risk) < 0.01, f\"Expected risk {expected_risk}%, got {risk}%\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Expected risk 2.0%, got 3.375%\n"
+    },
+    "test_portfolio_sizer": {
+      "passed": true
+    },
+    "test_factory_function": {
+      "passed": true
+    }
+  }
+}
