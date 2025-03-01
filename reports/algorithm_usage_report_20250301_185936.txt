@@ -1,0 +1,141 @@
+================================================================================
+BÁO CÁO PHÂN TÍCH SỬ DỤNG THUẬT TOÁN
+================================================================================
+Thời gian tạo: 2025-03-01 18:59:36
+
+TỔNG QUAN
+----------------------------------------
+Báo cáo này phân tích việc vận dụng thuật toán, chiến lược và chỉ báo
+trong các tình huống thị trường khác nhau.
+
+PHÂN TÍCH CHO BTCUSDT
+========================================
+Chế độ thị trường: quiet
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 8
+
+Sử dụng chiến lược:
+  - BollingerBands: 3
+  - Stochastic: 2
+  - RSI: 1
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 8
+  - macd: 8
+  - bb_width: 8
+
+Chế độ thị trường: trending
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 3
+
+Sử dụng chiến lược:
+  - EMA_Cross: 2
+  - MACD: 2
+  - ADX: 1
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 3
+  - macd: 3
+  - bb_width: 3
+
+Chế độ thị trường: volatile
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 1
+
+Sử dụng chiến lược:
+  - RSI: 0
+  - ATR: 0
+  - BollingerBands: 0
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 1
+  - macd: 1
+  - bb_width: 1
+
+Hiệu quả của chiến lược BBands trong thị trường yên tĩnh
+------------------------------
+Số lần sử dụng BBands: 3
+Số tín hiệu BBands: 3
+Hiệu quả: 0.00%
+
+Chiến lược BBands hoạt động KÉMM HIỆU QUẢ trong thị trường yên tĩnh với 3 tín hiệu
+
+PHÂN TÍCH CHO ETHUSDT
+========================================
+Chế độ thị trường: quiet
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 5
+
+Sử dụng chiến lược:
+  - BollingerBands: 2
+  - Stochastic: 2
+  - RSI: 0
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 5
+  - macd: 5
+  - bb_width: 5
+
+Chế độ thị trường: trending
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 5
+
+Sử dụng chiến lược:
+  - EMA_Cross: 3
+  - MACD: 3
+  - ADX: 1
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 5
+  - macd: 5
+  - bb_width: 5
+
+Chế độ thị trường: volatile
+------------------------------
+Phân bố quyết định:
+  - BUY: 0
+  - SELL: 0
+  - HOLD: 0
+  - UNKNOWN: 2
+
+Sử dụng chiến lược:
+  - RSI: 1
+  - ATR: 1
+  - BollingerBands: 0
+
+Sử dụng chỉ báo kỹ thuật:
+  - rsi: 2
+  - macd: 2
+  - bb_width: 2
+
+Hiệu quả của chiến lược BBands trong thị trường yên tĩnh
+------------------------------
+Số lần sử dụng BBands: 2
+Số tín hiệu BBands: 2
+Hiệu quả: 0.00%
+
+Chiến lược BBands hoạt động KÉMM HIỆU QUẢ trong thị trường yên tĩnh với 2 tín hiệu
+
+KẾT LUẬN VÀ KIẾN NGHỊ
+========================================
+✓ Chiến lược BBands đã được vận dụng hiệu quả trong thị trường yên tĩnh

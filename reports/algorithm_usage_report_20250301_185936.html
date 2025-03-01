@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo phân tích sử dụng thuật toán</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #3498db; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .chart { margin: 20px 0; max-width: 100%; }
+        .success { color: green; }
+        .warning { color: orange; }
+        .danger { color: red; }
+        .container { max-width: 1200px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Báo cáo phân tích sử dụng thuật toán</h1>
+        <p>Thời gian tạo báo cáo: 2025-03-01 18:59:36</p>
+        <h2>Tổng quan</h2>
+        <p>Báo cáo này phân tích việc vận dụng thuật toán, chiến lược và chỉ báo trong các tình huống thị trường khác nhau.</p>
+        <h2>Phân tích cho BTCUSDT</h2>
+        <h3>Phân bố chế độ thị trường</h3>
+        <img class="chart" src="BTCUSDT_regime_distribution.png" alt="Phân bố chế độ thị trường">
+        <h3>Chế độ thị trường: quiet</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>8</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_quiet_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>BollingerBands</td><td>3</td></tr>
+            <tr><td>RSI</td><td>1</td></tr>
+            <tr><td>Stochastic</td><td>2</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_quiet_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>8</td></tr>
+            <tr><td>macd</td><td>8</td></tr>
+            <tr><td>bb_width</td><td>8</td></tr>
+        </table>
+        <h3>Chế độ thị trường: trending</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>3</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_trending_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>EMA_Cross</td><td>2</td></tr>
+            <tr><td>MACD</td><td>2</td></tr>
+            <tr><td>ADX</td><td>1</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_trending_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>3</td></tr>
+            <tr><td>macd</td><td>3</td></tr>
+            <tr><td>bb_width</td><td>3</td></tr>
+        </table>
+        <h3>Chế độ thị trường: volatile</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>1</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_volatile_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>RSI</td><td>0</td></tr>
+            <tr><td>ATR</td><td>0</td></tr>
+            <tr><td>BollingerBands</td><td>0</td></tr>
+        </table>
+        <img class="chart" src="BTCUSDT_volatile_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>1</td></tr>
+            <tr><td>macd</td><td>1</td></tr>
+            <tr><td>bb_width</td><td>1</td></tr>
+        </table>
+        <h3>Hiệu quả của chiến lược BBands trong thị trường yên tĩnh</h3>
+        <table>
+            <tr><th>Thông số</th><th>Giá trị</th></tr>
+            <tr><td>Số lần sử dụng BBands</td><td>3</td></tr>
+            <tr><td>Số tín hiệu BBands</td><td>3</td></tr>
+            <tr><td>Hiệu quả</td><td>0.00%</td></tr>
+        </table>
+        <p class="success">Chiến lược BBands hoạt động KÉMM HIỆU QUẢ trong thị trường yên tĩnh với 3 tín hiệu</p>
+        <h2>Phân tích cho ETHUSDT</h2>
+        <h3>Phân bố chế độ thị trường</h3>
+        <img class="chart" src="ETHUSDT_regime_distribution.png" alt="Phân bố chế độ thị trường">
+        <h3>Chế độ thị trường: quiet</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>5</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_quiet_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>BollingerBands</td><td>2</td></tr>
+            <tr><td>RSI</td><td>0</td></tr>
+            <tr><td>Stochastic</td><td>2</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_quiet_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>5</td></tr>
+            <tr><td>macd</td><td>5</td></tr>
+            <tr><td>bb_width</td><td>5</td></tr>
+        </table>
+        <h3>Chế độ thị trường: trending</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>5</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_trending_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>EMA_Cross</td><td>3</td></tr>
+            <tr><td>MACD</td><td>3</td></tr>
+            <tr><td>ADX</td><td>1</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_trending_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>5</td></tr>
+            <tr><td>macd</td><td>5</td></tr>
+            <tr><td>bb_width</td><td>5</td></tr>
+        </table>
+        <h3>Chế độ thị trường: volatile</h3>
+        <h4>Phân bố quyết định</h4>
+        <table>
+            <tr><th>Loại quyết định</th><th>Số lượng</th></tr>
+            <tr><td>BUY</td><td>0</td></tr>
+            <tr><td>SELL</td><td>0</td></tr>
+            <tr><td>HOLD</td><td>0</td></tr>
+            <tr><td>UNKNOWN</td><td>2</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_volatile_decisions.png" alt="Phân bố quyết định">
+        <h4>Sử dụng chiến lược</h4>
+        <table>
+            <tr><th>Chiến lược</th><th>Số lần sử dụng</th></tr>
+            <tr><td>RSI</td><td>1</td></tr>
+            <tr><td>ATR</td><td>1</td></tr>
+            <tr><td>BollingerBands</td><td>0</td></tr>
+        </table>
+        <img class="chart" src="ETHUSDT_volatile_strategy_usage.png" alt="Sử dụng chiến lược">
+        <h4>Sử dụng chỉ báo kỹ thuật</h4>
+        <table>
+            <tr><th>Chỉ báo</th><th>Số lần sử dụng</th></tr>
+            <tr><td>rsi</td><td>2</td></tr>
+            <tr><td>macd</td><td>2</td></tr>
+            <tr><td>bb_width</td><td>2</td></tr>
+        </table>
+        <h3>Hiệu quả của chiến lược BBands trong thị trường yên tĩnh</h3>
+        <table>
+            <tr><th>Thông số</th><th>Giá trị</th></tr>
+            <tr><td>Số lần sử dụng BBands</td><td>2</td></tr>
+            <tr><td>Số tín hiệu BBands</td><td>2</td></tr>
+            <tr><td>Hiệu quả</td><td>0.00%</td></tr>
+        </table>
+        <p class="success">Chiến lược BBands hoạt động KÉMM HIỆU QUẢ trong thị trường yên tĩnh với 2 tín hiệu</p>
+        <h2>Kết luận và kiến nghị</h2>
+        <p>Dựa trên phân tích sử dụng thuật toán, có thể đưa ra các kết luận và kiến nghị sau:</p>
+        <ul>
+            <li class="success">Chiến lược BBands đã được vận dụng hiệu quả trong thị trường yên tĩnh</li>
+        </ul>
+    </div>
+</body>
+</html>

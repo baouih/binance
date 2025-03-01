@@ -1,0 +1,671 @@
+{
+  "test_summary": {
+    "start_time": "2025-03-01T18:58:08.460Z",
+    "end_time": "2025-03-01T19:58:11.131Z",
+    "duration_hours": 1,
+    "symbols_tested": ["BTCUSDT", "ETHUSDT"],
+    "timeframes": ["1h"]
+  },
+  "algorithm_usage": {
+    "BTCUSDT": {
+      "regime_detection_counts": {
+        "quiet": 20,
+        "trending": 5,
+        "volatile": 2
+      },
+      "strategy_usage_counts": {
+        "bbands": 25,
+        "rsi": 15,
+        "macd": 7,
+        "ema_cross": 5,
+        "stochastic": 10
+      },
+      "indicators_usage": {
+        "rsi": 30,
+        "macd": 15,
+        "bbands": 27,
+        "ema": 22,
+        "atr": 20,
+        "adx": 12
+      }
+    },
+    "ETHUSDT": {
+      "regime_detection_counts": {
+        "quiet": 15,
+        "trending": 10,
+        "volatile": 3
+      },
+      "strategy_usage_counts": {
+        "bbands": 20,
+        "rsi": 12,
+        "macd": 10,
+        "ema_cross": 8,
+        "stochastic": 6
+      },
+      "indicators_usage": {
+        "rsi": 25,
+        "macd": 20,
+        "bbands": 22,
+        "ema": 18,
+        "atr": 15,
+        "adx": 10
+      }
+    }
+  },
+  "detailed_reports": {
+    "BTCUSDT": {
+      "market_regimes": [],
+      "signals": [],
+      "decisions": [
+        {
+          "timestamp": "2025-03-01T18:58:11.127Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 62450.75,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 48.21,
+            "macd": 12.45,
+            "bb_width": 0.027
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:03:12.645Z",
+          "regime": "quiet",
+          "signal": "BUY",
+          "price": 62380.5,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 1
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 42.35,
+            "macd": 8.15,
+            "bb_width": 0.026
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:08:18.321Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 62410.25,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 44.12,
+            "macd": 9.25,
+            "bb_width": 0.025
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:13:22.987Z",
+          "regime": "trending",
+          "signal": "BUY",
+          "price": 62550.75,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 1
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 1
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 52.85,
+            "macd": 15.32,
+            "bb_width": 0.032
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:18:29.543Z",
+          "regime": "trending",
+          "signal": "HOLD",
+          "price": 62680.5,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 55.43,
+            "macd": 18.65,
+            "bb_width": 0.035
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:23:35.298Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 62630.25,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 53.12,
+            "macd": 16.78,
+            "bb_width": 0.028
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:28:42.765Z",
+          "regime": "quiet",
+          "signal": "SELL",
+          "price": 62710.5,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": -1
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": -1
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 62.37,
+            "macd": 22.45,
+            "bb_width": 0.026
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:33:48.432Z",
+          "regime": "volatile",
+          "signal": "HOLD",
+          "price": 62580.75,
+          "strategies_used": {
+            "RSI": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "ATR": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "BollingerBands": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 48.21,
+            "macd": 15.65,
+            "bb_width": 0.042
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:38:55.126Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 62520.5,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 46.32,
+            "macd": 12.85,
+            "bb_width": 0.027
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:44:01.876Z",
+          "regime": "quiet",
+          "signal": "BUY",
+          "price": 62450.0,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 1
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 44.15,
+            "macd": 10.25,
+            "bb_width": 0.025
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:49:08.532Z",
+          "regime": "trending",
+          "signal": "BUY",
+          "price": 62580.25,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 1
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 1
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 51.45,
+            "macd": 14.62,
+            "bb_width": 0.031
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:54:15.297Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 62540.75,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 48.75,
+            "macd": 13.25,
+            "bb_width": 0.028
+          }
+        }
+      ],
+      "performance": {}
+    },
+    "ETHUSDT": {
+      "market_regimes": [],
+      "signals": [],
+      "decisions": [
+        {
+          "timestamp": "2025-03-01T18:58:11.130Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 3545.25,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 46.75,
+            "macd": 2.15,
+            "bb_width": 0.028
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:03:12.648Z",
+          "regime": "quiet",
+          "signal": "BUY",
+          "price": 3532.5,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 1
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 41.85,
+            "macd": 1.45,
+            "bb_width": 0.026
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:08:18.325Z",
+          "regime": "trending",
+          "signal": "BUY",
+          "price": 3550.75,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 1
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 1
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 52.35,
+            "macd": 3.75,
+            "bb_width": 0.032
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:13:22.990Z",
+          "regime": "trending",
+          "signal": "HOLD",
+          "price": 3575.5,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 56.45,
+            "macd": 5.25,
+            "bb_width": 0.035
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:18:29.547Z",
+          "regime": "trending",
+          "signal": "BUY",
+          "price": 3590.25,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 1
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 1
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 58.75,
+            "macd": 6.85,
+            "bb_width": 0.036
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:23:35.302Z",
+          "regime": "volatile",
+          "signal": "HOLD",
+          "price": 3570.5,
+          "strategies_used": {
+            "RSI": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "ATR": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "BollingerBands": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 52.65,
+            "macd": 4.35,
+            "bb_width": 0.042
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:28:42.768Z",
+          "regime": "volatile",
+          "signal": "SELL",
+          "price": 3540.75,
+          "strategies_used": {
+            "RSI": {
+              "weight": 0.4,
+              "signal": -1
+            },
+            "ATR": {
+              "weight": 0.4,
+              "signal": -1
+            },
+            "BollingerBands": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 43.25,
+            "macd": 2.15,
+            "bb_width": 0.038
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:33:48.435Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 3525.5,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 40.85,
+            "macd": 1.25,
+            "bb_width": 0.028
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:38:55.130Z",
+          "regime": "quiet",
+          "signal": "BUY",
+          "price": 3510.25,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 1
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 1
+            }
+          },
+          "indicators": {
+            "rsi": 38.45,
+            "macd": 0.85,
+            "bb_width": 0.026
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:44:01.879Z",
+          "regime": "trending",
+          "signal": "BUY",
+          "price": 3535.75,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 1
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 1
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 48.25,
+            "macd": 2.75,
+            "bb_width": 0.032
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:49:08.536Z",
+          "regime": "trending",
+          "signal": "HOLD",
+          "price": 3550.5,
+          "strategies_used": {
+            "EMA_Cross": {
+              "weight": 0.4,
+              "signal": 0
+            },
+            "MACD": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "ADX": {
+              "weight": 0.3,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 51.35,
+            "macd": 3.45,
+            "bb_width": 0.033
+          }
+        },
+        {
+          "timestamp": "2025-03-01T19:54:15.301Z",
+          "regime": "quiet",
+          "signal": "HOLD",
+          "price": 3540.25,
+          "strategies_used": {
+            "BollingerBands": {
+              "weight": 0.5,
+              "signal": 0
+            },
+            "RSI": {
+              "weight": 0.3,
+              "signal": 0
+            },
+            "Stochastic": {
+              "weight": 0.2,
+              "signal": 0
+            }
+          },
+          "indicators": {
+            "rsi": 47.65,
+            "macd": 2.25,
+            "bb_width": 0.027
+          }
+        }
+      ],
+      "performance": {}
+    }
+  }
+}
