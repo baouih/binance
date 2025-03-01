@@ -524,9 +524,10 @@ class StrategySelector:
                 'atr': {'atr_period': 14, 'atr_multiplier': 1.5, 'use_atr_stops': True},
             },
             'quiet': {
-                'bbands': {'bb_period': 20, 'bb_std': 1.5, 'use_bb_squeeze': True},
-                'rsi': {'overbought': 65, 'oversold': 35, 'use_trend_filter': False},
-                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 75, 'oversold': 25},
+                'bbands': {'bb_period': 20, 'bb_std': 1.2, 'use_bb_squeeze': True},
+                'rsi': {'overbought': 60, 'oversold': 40, 'use_trend_filter': False},
+                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 70, 'oversold': 30},
+                'atr': {'atr_period': 14, 'atr_multiplier': 0.8, 'use_atr_stops': True},
             }
         }
         
@@ -565,12 +566,12 @@ class StrategySelector:
                 'max_trades': 1
             },
             'quiet': {
-                'risk_percentage': 0.8,
-                'take_profit_pct': 1.5,
-                'stop_loss_pct': 0.8,
-                'trailing_stop': False,
-                'trailing_activation': 0.0,
-                'max_trades': 2
+                'risk_percentage': 0.6,
+                'take_profit_pct': 1.2,
+                'stop_loss_pct': 0.6,
+                'trailing_stop': True,
+                'trailing_activation': 0.4,
+                'max_trades': 1
             }
         }
     
@@ -774,14 +775,35 @@ class RSIStrategy(Strategy):
         # Tạo tín hiệu
         signal = 0
         
-        if current_rsi < oversold and previous_rsi < current_rsi:
-            # Tín hiệu mua khi RSI dưới ngưỡng oversold và đang tăng
-            if trend_ok or not use_trend_filter:
+        # Xác định nếu đang ở trong thị trường yên tĩnh (quiet market)
+        is_quiet_market = False
+        if 'bb_upper' in df.columns and 'bb_lower' in df.columns and 'bb_middle' in df.columns:
+            # Tính dải Bollinger Band tương đối
+            bb_width = (df['bb_upper'].iloc[-1] - df['bb_lower'].iloc[-1]) / df['bb_middle'].iloc[-1]
+            
+            # So sánh với ngưỡng hẹp để xác định thị trường yên tĩnh
+            if bb_width < 0.02:  # 2% width là rất hẹp, thị trường yên tĩnh
+                is_quiet_market = True
+        
+        # Bổ sung logic đặc biệt cho thị trường yên tĩnh
+        if is_quiet_market:
+            # Trong thị trường yên tĩnh, sử dụng ngưỡng RSI gần trung tâm hơn
+            if current_rsi < oversold + 5 and previous_rsi < current_rsi and current_rsi > previous_rsi + 2:
+                # Tín hiệu mua khi RSI dưới ngưỡng oversold+5 và đang tăng mạnh
                 signal = 1
-        elif current_rsi > overbought and previous_rsi > current_rsi:
-            # Tín hiệu bán khi RSI trên ngưỡng overbought và đang giảm
-            if not trend_ok or not use_trend_filter:
+            elif current_rsi > overbought - 5 and previous_rsi > current_rsi and previous_rsi > current_rsi + 2:
+                # Tín hiệu bán khi RSI trên ngưỡng overbought-5 và đang giảm mạnh
                 signal = -1
+        else:
+            # Logic thông thường cho các thị trường khác
+            if current_rsi < oversold and previous_rsi < current_rsi:
+                # Tín hiệu mua khi RSI dưới ngưỡng oversold và đang tăng
+                if trend_ok or not use_trend_filter:
+                    signal = 1
+            elif current_rsi > overbought and previous_rsi > current_rsi:
+                # Tín hiệu bán khi RSI trên ngưỡng overbought và đang giảm
+                if not trend_ok or not use_trend_filter:
+                    signal = -1
         
         return signal
 
@@ -867,9 +889,20 @@ class BollingerBandsStrategy(Strategy):
         
         # Lấy thông số từ tham số
         use_bb_squeeze = self.params.get('use_bb_squeeze', True)
+        bb_std = self.params.get('bb_std', 2.0)
         
         # Tạo tín hiệu
         signal = 0
+        
+        # Xác định nếu đang ở trong thị trường yên tĩnh (quiet market)
+        is_quiet_market = False
+        if current_middle is not None:
+            # Tính dải Bollinger Band tương đối
+            bb_width = (current_upper - current_lower) / current_middle
+            
+            # So sánh với ngưỡng hẹp để xác định thị trường yên tĩnh
+            if bb_width < 0.03:  # 3% width là khá hẹp, thị trường yên tĩnh
+                is_quiet_market = True
         
         # Kiểm tra squeeze
         bb_width = None
@@ -887,20 +920,48 @@ class BollingerBandsStrategy(Strategy):
                 elif current_price < previous_price and current_price < current_middle:
                     signal = -1  # Bung ra hướng xuống
         
-        # Tín hiệu cơ bản của Bollinger Bands
-        if signal == 0:
-            # Phản ứng khi giá chạm dải
-            if current_price <= current_lower and previous_price >= current_lower:
-                signal = 1  # Phản ứng mua ở dải dưới
-            elif current_price >= current_upper and previous_price <= current_upper:
-                signal = -1  # Phản ứng bán ở dải trên
+        # Logic đặc biệt cho thị trường yên tĩnh
+        if is_quiet_market and signal == 0:
+            # Trong thị trường yên tĩnh, sử dụng phương pháp "Mean Reversion"
+            # với ngưỡng gần hơn để trả giá nhanh
+            mean_reversion_threshold = 0.7  # Phần trăm của khoảng cách từ giữa đến biên
             
-            # Nếu giá vượt quá dải rõ rệt
-            bb_overshoot_threshold = 0.005  # 0.5% vượt qua dải
-            if current_price < current_lower * (1 - bb_overshoot_threshold):
-                signal = 1  # Quá bán
-            elif current_price > current_upper * (1 + bb_overshoot_threshold):
-                signal = -1  # Quá mua
+            # Tính khoảng cách tương đối đến giá trung bình
+            upper_distance = (current_upper - current_middle) * mean_reversion_threshold
+            lower_distance = (current_middle - current_lower) * mean_reversion_threshold
+            
+            # Tín hiệu dựa trên sự trở về giá trị trung bình với ngưỡng thấp hơn
+            if current_price >= current_middle + upper_distance:
+                # Giá quá cao so với trung bình trong thị trường yên tĩnh
+                signal = -1  # Tín hiệu bán để hưởng lợi từ sự đảo chiều
+            elif current_price <= current_middle - lower_distance:
+                # Giá quá thấp so với trung bình trong thị trường yên tĩnh
+                signal = 1   # Tín hiệu mua để hưởng lợi từ sự đảo chiều
+                
+            # Thêm tín hiệu "touch và bounce" trong thị trường yên tĩnh
+            if signal == 0:
+                # Kiểm tra sự phản hồi từ biên
+                if previous_price <= current_lower * 1.002 and current_price > previous_price:
+                    # Giá chạm dải dưới và bắt đầu tăng
+                    signal = 1  # Mua khi có dấu hiệu phản hồi
+                elif previous_price >= current_upper * 0.998 and current_price < previous_price:
+                    # Giá chạm dải trên và bắt đầu giảm
+                    signal = -1  # Bán khi có dấu hiệu phản hồi
+        else:
+            # Tín hiệu cơ bản của Bollinger Bands cho các thị trường khác
+            if signal == 0:
+                # Phản ứng khi giá chạm dải
+                if current_price <= current_lower and previous_price >= current_lower:
+                    signal = 1  # Phản ứng mua ở dải dưới
+                elif current_price >= current_upper and previous_price <= current_upper:
+                    signal = -1  # Phản ứng bán ở dải trên
+                
+                # Nếu giá vượt quá dải rõ rệt
+                bb_overshoot_threshold = 0.005  # 0.5% vượt qua dải
+                if current_price < current_lower * (1 - bb_overshoot_threshold):
+                    signal = 1  # Quá bán
+                elif current_price > current_upper * (1 + bb_overshoot_threshold):
+                    signal = -1  # Quá mua
         
         return signal
 
