@@ -15,6 +15,8 @@ NC='\033[0m' # Không màu
 echo -e "${BLUE}======================================${NC}"
 echo -e "${BLUE}    BINANCE FUTURES TRADING BOT      ${NC}"
 echo -e "${BLUE}======================================${NC}"
+echo -e "${YELLOW}Chú ý: Sử dụng CLI Controller cho giao diện điều khiển ổn định hơn.${NC}"
+echo -e "${YELLOW}Nhập lệnh ./cli_controller.py hoặc python cli_controller.py${NC}"
 
 # Kiểm tra xem Python đã được cài đặt chưa
 if ! command -v python3 &> /dev/null; then
