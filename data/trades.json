@@ -89,5 +89,19 @@
     "status": "FILLED",
     "position_id": "BTCUSDT-position",
     "timestamp": "2025-02-28T16:58:40.329560"
+  },
+  {
+    "id": 1740852211813,
+    "symbol": "BTCUSDT",
+    "side": "BUY",
+    "quantity": 0.006,
+    "entry_price": 85205.705,
+    "entry_time": "2025-03-01T18:03:31.813585",
+    "current_price": 170411.41,
+    "current_pnl": 1.0,
+    "exit_price": 170411.41,
+    "exit_time": "2025-03-01T18:03:31.822522",
+    "status": "CLOSED",
+    "final_pnl": 1.0
   }
 ]
