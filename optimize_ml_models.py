@@ -52,7 +52,11 @@ def load_data(symbol: str, timeframe: str, period: str, data_folder: str = 'real
     Returns:
         pd.DataFrame: DataFrame chứa dữ liệu
     """
-    data_path = os.path.join(data_folder, period, f"{symbol}_{timeframe}.csv")
+    # Nếu là thư mục enhanced_data, sử dụng quy ước đặt tên khác
+    if 'enhanced' in data_folder:
+        data_path = os.path.join(data_folder, f"{symbol}_{timeframe}_{period}_enhanced.csv")
+    else:
+        data_path = os.path.join(data_folder, period, f"{symbol}_{timeframe}.csv")
     
     if not os.path.exists(data_path):
         logger.error(f"Không tìm thấy file dữ liệu: {data_path}")
@@ -60,8 +64,11 @@ def load_data(symbol: str, timeframe: str, period: str, data_folder: str = 'real
     
     logger.info(f"Đang tải dữ liệu từ {data_path}")
     df = pd.read_csv(data_path)
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df.set_index('timestamp', inplace=True)
+    
+    # Chuyển đổi cột timestamp nếu có
+    if 'timestamp' in df.columns:
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df.set_index('timestamp', inplace=True)
     
     logger.info(f"Đã tải dữ liệu: {len(df)} dòng")
     return df
@@ -256,8 +263,17 @@ def prepare_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     """
     logger.info("Đang chuẩn bị đặc trưng...")
     
-    # Loại bỏ các cột không phải đặc trưng
-    feature_columns = df.columns.difference(['open', 'high', 'low', 'close', 'volume', 'future_close', 'target'])
+    # Lọc ra các cột thời gian và metadata không dùng cho mô hình
+    columns_to_drop = [
+        'timestamp', 'close_time', 'quote_asset_volume', 'number_of_trades',
+        'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore',
+        'open', 'high', 'low', 'close', 'volume', 'future_close', 'target'
+    ]
+    
+    # Chỉ loại bỏ các cột tồn tại trong df
+    drop_cols = [col for col in columns_to_drop if col in df.columns]
+    feature_columns = df.columns.difference(drop_cols)
+    
     X = df[feature_columns]
     y = df['target']
     
