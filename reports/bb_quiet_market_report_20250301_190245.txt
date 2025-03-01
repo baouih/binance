@@ -1,0 +1,50 @@
+================================================================================
+BÁO CÁO BACKTEST CHIẾN LƯỢC BBANDS TRONG THỊ TRƯỜNG YÊN TĨNH
+================================================================================
+Thời gian: 2025-03-01 19:02:45
+
+THÔNG TIN DỮ LIỆU:
+- Số nến: 480
+- Bắt đầu: 2025-02-09 19:02:43
+- Kết thúc: 2025-03-01 18:02:43
+- BB Width trung bình: 0.0259
+
+THAM SỐ CHIẾN LƯỢC:
+- BBands period: 30
+- BBands std: 0.8
+- Sử dụng BB squeeze: True
+- Risk percentage: 0.5%
+- Take profit: 1.0%
+- Stop loss: 0.5%
+
+KẾT QUẢ HIỆU SUẤT:
+- Số lượng giao dịch: 2
+- Số giao dịch thắng: 2
+- Tỷ lệ thắng: 100.00%
+- Profit factor: inf
+- Lợi nhuận trung bình: 0.55
+- Lỗ trung bình: 0.00
+- Drawdown tối đa: 0.00%
+- ROI: 0.01%
+- Số dư cuối: 10001.10
+
+GIAO DỊCH GẦN ĐÂY:
+Giao dịch 1:
+- Vào: 2025-02-12 17:02:43 @ 50004.56
+- Ra: 2025-02-12 20:02:43 @ 50672.84
+- Hướng: BUY
+- Lợi nhuận: 0.67 (1.34%)
+- Lý do thoát: Take Profit
+
+Giao dịch 2:
+- Vào: 2025-02-28 09:02:43 @ 59033.11
+- Ra: 2025-02-28 22:02:43 @ 58528.03
+- Hướng: SELL
+- Lợi nhuận: 0.43 (0.86%)
+- Lý do thoát: Reverse Signal
+
+ĐÁNH GIÁ:
+✓ Chiến lược BBands hoạt động HIỆU QUẢ trong thị trường yên tĩnh
+
+KIẾN NGHỊ:
+================================================================================

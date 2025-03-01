@@ -1,0 +1,52 @@
+{
+    "test_time": "2025-03-01T19:02:45.470493",
+    "data_info": {
+        "periods": 480,
+        "start_date": "2025-02-09T19:02:43.918076",
+        "end_date": "2025-03-01T18:02:43.918076",
+        "average_bb_width": 0.02587422433519635
+    },
+    "strategy_params": {
+        "bb_period": 30,
+        "bb_std": 0.8,
+        "use_bb_squeeze": true,
+        "risk_percentage": 0.5,
+        "take_profit_pct": 1.0,
+        "stop_loss_pct": 0.5
+    },
+    "performance": {
+        "total_trades": 2,
+        "winning_trades": 2,
+        "win_rate": 100.0,
+        "profit_factor": Infinity,
+        "avg_profit": 0.5480236805597538,
+        "avg_loss": 0,
+        "max_drawdown": 0,
+        "roi": 0.010960473611194175,
+        "final_balance": 10001.09604736112
+    },
+    "trades": [
+        {
+            "entry_time": "2025-02-12 17:02:43.918076",
+            "exit_time": "2025-02-12 20:02:43.918076",
+            "side": "BUY",
+            "entry_price": 50004.55735764098,
+            "exit_price": 50672.839082320585,
+            "amount": 50.0,
+            "profit": 0.6682208182545653,
+            "profit_pct": 1.3364416365091305,
+            "exit_reason": "Take Profit"
+        },
+        {
+            "entry_time": "2025-02-28 09:02:43.918076",
+            "exit_time": "2025-02-28 22:02:43.918076",
+            "side": "SELL",
+            "entry_price": 59033.11012896878,
+            "exit_price": 58528.02525137096,
+            "amount": 50.00334110409127,
+            "profit": 0.42782654286494237,
+            "profit_pct": 0.8555959130297749,
+            "exit_reason": "Reverse Signal"
+        }
+    ]
+}
