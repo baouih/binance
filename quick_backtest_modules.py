@@ -1267,6 +1267,9 @@ class ModuleBacktester:
                 stop_loss_price=stop
             )
             
+            # Khởi tạo trade_id với None
+            trade_id = None
+            
             # Tạo giao dịch nếu được chấp nhận
             if check_result['allowed']:
                 trade_info = {
@@ -1296,7 +1299,7 @@ class ModuleBacktester:
                 },
                 'risk_check': check_result,
                 'accepted': check_result['allowed'],
-                'registered_id': trade_id if check_result['allowed'] else None
+                'registered_id': trade_id
             })
             
         # 2. Đóng một số giao dịch đã mở
