@@ -343,6 +343,8 @@ class TWAPExecutor(BaseOrderExecutor):
                 
             # Lấy giá thị trường hiện tại nếu cần
             current_price = None
+            limit_price = None  # Khởi tạo limit_price trước khi sử dụng
+            
             if order_type == 'LIMIT':
                 try:
                     # Lấy giá thị trường hiện tại
