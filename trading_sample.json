@@ -1,0 +1,88 @@
+{
+  "current_balance": 10500.25,
+  "start_time": "2025-03-01 00:00:00",
+  "uptime": "8 hours 32 minutes",
+  "open_positions": [
+    {
+      "id": "pos1",
+      "symbol": "BTCUSDT", 
+      "type": "LONG",
+      "entry_price": 75000.0,
+      "current_price": 80000.0,
+      "quantity": 0.05,
+      "pnl": 250.0,
+      "pnl_percent": 6.67,
+      "entry_time": "2025-03-01 01:30:25"
+    },
+    {
+      "id": "pos2",
+      "symbol": "ETHUSDT", 
+      "type": "SHORT",
+      "entry_price": 2450.0,
+      "current_price": 2400.0,
+      "quantity": 0.5,
+      "pnl": 25.0,
+      "pnl_percent": 2.04,
+      "entry_time": "2025-03-01 03:15:42"
+    }
+  ],
+  "closed_positions": [
+    {
+      "id": "trade1",
+      "symbol": "BTCUSDT", 
+      "type": "LONG",
+      "entry_price": 72000.0,
+      "exit_price": 75000.0,
+      "quantity": 0.1,
+      "pnl": 300.0,
+      "pnl_percent": 4.17,
+      "entry_time": "2025-02-28 18:30:25",
+      "exit_time": "2025-03-01 02:45:12"
+    },
+    {
+      "id": "trade2",
+      "symbol": "SOLUSDT", 
+      "type": "LONG",
+      "entry_price": 125.0,
+      "exit_price": 137.5,
+      "quantity": 1.0,
+      "pnl": 12.5,
+      "pnl_percent": 10.0,
+      "entry_time": "2025-02-28 20:10:05",
+      "exit_time": "2025-03-01 01:22:36"
+    },
+    {
+      "id": "trade3",
+      "symbol": "BNBUSDT", 
+      "type": "SHORT",
+      "entry_price": 410.0,
+      "exit_price": 420.0,
+      "quantity": 0.2,
+      "pnl": -2.0,
+      "pnl_percent": -2.44,
+      "entry_time": "2025-02-28 22:05:17",
+      "exit_time": "2025-03-01 00:18:09"
+    }
+  ],
+  "performance_metrics": {
+    "win_rate": 66.67,
+    "profit_factor": 2.85,
+    "expectancy": 3.24,
+    "total_trades": 15,
+    "winning_trades": 10,
+    "losing_trades": 5,
+    "avg_profit": 92.50,
+    "avg_loss": -32.40,
+    "max_drawdown": 450.20,
+    "max_drawdown_percent": 4.32,
+    "sharpe_ratio": 1.85,
+    "sortino_ratio": 2.31,
+    "risk_reward_ratio": 2.86,
+    "average_holding_time": "4 hours 15 minutes",
+    "best_trade": 320.50,
+    "worst_trade": -120.30,
+    "current_streak": 3,
+    "longest_win_streak": 5,
+    "longest_loss_streak": 2
+  }
+}
