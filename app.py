@@ -9,7 +9,6 @@ import logging
 import random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-from flask_socketio import SocketIO
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +16,6 @@ logger = logging.getLogger("dashboard")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "cryptobot-dev-key")
-
-# Socket.IO cho real-time updates
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Giả lập dữ liệu bot
 bot_status = {
@@ -198,57 +194,70 @@ def get_market():
     """Lấy dữ liệu thị trường"""
     return jsonify(market_data)
 
-# Socket.IO events
-@socketio.on('connect')
-def handle_connect():
-    """Xử lý khi client kết nối"""
-    logger.info("Client connected")
-    
-    # Convert datetime to string for JSON serialization
-    status_data = bot_status.copy()
-    status_data['last_start_time'] = bot_status['last_start_time'].isoformat()
-    
-    # Send initial data
-    socketio.emit('bot_status', status_data)
-    socketio.emit('account_data', account_data)
-    socketio.emit('market_data', market_data)
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Xử lý khi client ngắt kết nối"""
-    logger.info("Client disconnected")
-
-# Simulate real-time updates
-def simulate_price_updates():
-    """Giả lập cập nhật giá thời gian thực"""
+# Data update functions for background threading
+def update_market_data():
+    """Cập nhật dữ liệu thị trường theo định kỳ"""
     import time
     while True:
-        socketio.emit('price_update', {
-            'symbol': 'BTCUSDT',
-            'price': market_data['btc_price'],
-            'time': datetime.now().isoformat()
-        })
+        # Simulate price changes
+        market_data['btc_price'] += random.uniform(-100, 100)
+        market_data['btc_change_24h'] = random.uniform(-2.0, 2.0)
+        
+        # Update sentiment occasionally
+        if random.random() > 0.8:
+            sentiment_value = random.randint(0, 100)
+            if sentiment_value < 25:
+                sentiment_state = "extreme_fear"
+                sentiment_description = "Extreme Fear"
+            elif sentiment_value < 40:
+                sentiment_state = "fear"
+                sentiment_description = "Fear"
+            elif sentiment_value < 60:
+                sentiment_state = "neutral"
+                sentiment_description = "Neutral"
+            elif sentiment_value < 80:
+                sentiment_state = "greed"
+                sentiment_description = "Greed"
+            else:
+                sentiment_state = "extreme_greed"
+                sentiment_description = "Extreme Greed"
+                
+            market_data['sentiment'] = {
+                'value': sentiment_value,
+                'state': sentiment_state,
+                'description': sentiment_description
+            }
+        
         time.sleep(5)  # Cập nhật mỗi 5 giây
 
-def simulate_sentiment_updates():
-    """Giả lập cập nhật tâm lý thị trường"""
+def update_account_data():
+    """Cập nhật dữ liệu tài khoản theo định kỳ"""
     import time
     while True:
-        socketio.emit('sentiment_update', market_data['sentiment'])
-        time.sleep(30)  # Cập nhật mỗi 30 giây
-
-def simulate_account_updates():
-    """Giả lập cập nhật tài khoản và vị thế"""
-    import time
-    while True:
-        socketio.emit('account_update', {
-            'balance': account_data['balance'],
-            'positions': account_data['positions']
-        })
+        # Simulate balance changes
+        account_data['balance'] += random.uniform(-10, 10)
+        
+        # Update position PnL
+        for position in account_data['positions']:
+            if position['symbol'] == 'BTCUSDT':
+                position['current_price'] = market_data['btc_price']
+                if position['type'] == 'LONG':
+                    position['pnl'] = (position['current_price'] - position['entry_price']) * position['quantity']
+                else:
+                    position['pnl'] = (position['entry_price'] - position['current_price']) * position['quantity']
+                position['pnl_percent'] = (position['pnl'] / (position['entry_price'] * position['quantity'])) * 100
+                
         time.sleep(10)  # Cập nhật mỗi 10 giây
 
 if __name__ == '__main__':
-    socketio.start_background_task(simulate_price_updates)
-    socketio.start_background_task(simulate_sentiment_updates)
-    socketio.start_background_task(simulate_account_updates)
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # Start background threads for data updates
+    import threading
+    
+    market_thread = threading.Thread(target=update_market_data, daemon=True)
+    market_thread.start()
+    
+    account_thread = threading.Thread(target=update_account_data, daemon=True)
+    account_thread.start()
+    
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=5000, debug=True)

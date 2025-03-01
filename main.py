@@ -4,7 +4,6 @@ Main entry point for the Crypto Trading Bot Dashboard
 """
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from flask_socketio import SocketIO, emit
 import os
 import json
 import logging
@@ -18,11 +17,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Cấu hình logging cho các module
-logging.getLogger('engineio').setLevel(logging.WARNING)
-logging.getLogger('socketio').setLevel(logging.WARNING)
 logging.getLogger('werkzeug').setLevel(logging.WARNING)
 
-# Khởi tạo Flask app và Socket.IO
+# Khởi tạo Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 
