@@ -524,9 +524,10 @@ class StrategySelector:
                 'atr': {'atr_period': 14, 'atr_multiplier': 1.5, 'use_atr_stops': True},
             },
             'quiet': {
-                'bbands': {'bb_period': 20, 'bb_std': 1.5, 'use_bb_squeeze': True},
-                'rsi': {'overbought': 65, 'oversold': 35, 'use_trend_filter': False},
-                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 75, 'oversold': 25},
+                'bbands': {'bb_period': 20, 'bb_std': 1.2, 'use_bb_squeeze': True, 'mean_reversion_mode': True},
+                'rsi': {'overbought': 60, 'oversold': 40, 'use_trend_filter': False, 'narrower_range': True},
+                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 70, 'oversold': 30, 'wait_for_extremes': True},
+                'volume_profile': {'use_volume_confirmation': True, 'min_volume_threshold': 1.2},
             }
         }
         
@@ -742,7 +743,9 @@ class RSIStrategy(Strategy):
             'overbought': 70,
             'oversold': 30,
             'use_trend_filter': True,
-            'trend_ema': 50
+            'trend_ema': 50,
+            'narrower_range': False,
+            'neutral_zone': 10  # Vùng trung tính giữa oversold và overbought
         }
         merged_params = {**default_params, **(params or {})}
         super().__init__("RSI", merged_params)
@@ -757,10 +760,41 @@ class RSIStrategy(Strategy):
         oversold = self.params.get('oversold', 30)
         use_trend_filter = self.params.get('use_trend_filter', True)
         trend_ema = self.params.get('trend_ema', 50)
+        narrower_range = self.params.get('narrower_range', False)
+        neutral_zone = self.params.get('neutral_zone', 10)
         
         # Lấy giá trị RSI
         current_rsi = df['rsi'].iloc[-1]
         previous_rsi = df['rsi'].iloc[-2]
+        
+        # Tính ngưỡng với dải hẹp hơn cho thị trường yên tĩnh
+        if narrower_range:
+            # Điều chỉnh ngưỡng để phù hợp với thị trường ít biến động
+            # Lấy vùng trung tính làm tham chiếu
+            center = 50
+            effective_overbought = center + (neutral_zone / 2)
+            effective_oversold = center - (neutral_zone / 2)
+            
+            # Khi RSI nằm trong vùng trung tính, không ra tín hiệu
+            if effective_oversold <= current_rsi <= effective_overbought:
+                return 0
+            
+            # Phát hiện tín hiệu bán khi bắt đầu vượt khỏi vùng trung tính lên trên
+            if previous_rsi <= effective_overbought and current_rsi > effective_overbought:
+                return -1
+            
+            # Phát hiện tín hiệu mua khi bắt đầu vượt khỏi vùng trung tính xuống dưới
+            if previous_rsi >= effective_oversold and current_rsi < effective_oversold:
+                return 1
+            
+            # Phát hiện đảo chiều trong vùng quá mua/quá bán
+            if current_rsi > effective_overbought and previous_rsi > current_rsi:
+                # RSI đang ở vùng cao và bắt đầu giảm
+                return -1
+            
+            if current_rsi < effective_oversold and previous_rsi < current_rsi:
+                # RSI đang ở vùng thấp và bắt đầu tăng
+                return 1
         
         # Kiểm tra xu hướng nếu được yêu cầu
         trend_ok = True
@@ -771,7 +805,7 @@ class RSIStrategy(Strategy):
                 current_ema = df[ema_col].iloc[-1]
                 trend_ok = current_price > current_ema  # Xu hướng tăng
         
-        # Tạo tín hiệu
+        # Tạo tín hiệu tiêu chuẩn nếu không phải là chế độ phạm vi hẹp
         signal = 0
         
         if current_rsi < oversold and previous_rsi < current_rsi:
@@ -848,7 +882,10 @@ class BollingerBandsStrategy(Strategy):
         default_params = {
             'bb_period': 20,
             'bb_std': 2.0,
-            'use_bb_squeeze': True
+            'use_bb_squeeze': True,
+            'mean_reversion_mode': False,
+            'min_touch_duration': 2,  # Số nến tối thiểu phải chạm dải trước khi ra tín hiệu
+            'reversal_confirmation': False
         }
         merged_params = {**default_params, **(params or {})}
         super().__init__("BollingerBands", merged_params)
@@ -867,6 +904,9 @@ class BollingerBandsStrategy(Strategy):
         
         # Lấy thông số từ tham số
         use_bb_squeeze = self.params.get('use_bb_squeeze', True)
+        mean_reversion_mode = self.params.get('mean_reversion_mode', False)
+        min_touch_duration = self.params.get('min_touch_duration', 2)
+        reversal_confirmation = self.params.get('reversal_confirmation', False)
         
         # Tạo tín hiệu
         signal = 0
@@ -887,7 +927,49 @@ class BollingerBandsStrategy(Strategy):
                 elif current_price < previous_price and current_price < current_middle:
                     signal = -1  # Bung ra hướng xuống
         
-        # Tín hiệu cơ bản của Bollinger Bands
+        # Chế độ mean reversion (hiệu quả trong thị trường yên tĩnh)
+        if mean_reversion_mode and signal == 0 and current_middle is not None:
+            # Tính khoảng cách từ giá hiện tại đến dải giữa (dưới dạng %)
+            middle_distance = abs(current_price - current_middle) / current_middle
+            
+            # Xem xét mean reversion khi giá ở xa dải giữa
+            if middle_distance > 0.01:  # Cách xa hơn 1%
+                # Đếm số nến chạm dải trên/dưới liên tiếp
+                touch_count = 0
+                
+                if current_price > current_upper:
+                    # Đếm số nến chạm/vượt dải trên liên tiếp
+                    for i in range(1, min(min_touch_duration + 2, len(df))):
+                        if df['close'].iloc[-i] >= df['bb_upper'].iloc[-i]:
+                            touch_count += 1
+                        else:
+                            break
+                    
+                    if touch_count >= min_touch_duration:
+                        # Kiểm tra xác nhận đảo chiều nếu được yêu cầu
+                        if reversal_confirmation:
+                            if df['close'].iloc[-1] < df['close'].iloc[-2]:  # Giá đang giảm
+                                signal = -1  # Tín hiệu bán để quay về dải giữa
+                        else:
+                            signal = -1  # Tín hiệu bán để quay về dải giữa
+                
+                elif current_price < current_lower:
+                    # Đếm số nến chạm/vượt dải dưới liên tiếp
+                    for i in range(1, min(min_touch_duration + 2, len(df))):
+                        if df['close'].iloc[-i] <= df['bb_lower'].iloc[-i]:
+                            touch_count += 1
+                        else:
+                            break
+                    
+                    if touch_count >= min_touch_duration:
+                        # Kiểm tra xác nhận đảo chiều nếu được yêu cầu
+                        if reversal_confirmation:
+                            if df['close'].iloc[-1] > df['close'].iloc[-2]:  # Giá đang tăng
+                                signal = 1  # Tín hiệu mua để quay về dải giữa
+                        else:
+                            signal = 1  # Tín hiệu mua để quay về dải giữa
+        
+        # Tín hiệu cơ bản của Bollinger Bands nếu vẫn chưa có tín hiệu
         if signal == 0:
             # Phản ứng khi giá chạm dải
             if current_price <= current_lower and previous_price >= current_lower:
@@ -895,8 +977,8 @@ class BollingerBandsStrategy(Strategy):
             elif current_price >= current_upper and previous_price <= current_upper:
                 signal = -1  # Phản ứng bán ở dải trên
             
-            # Nếu giá vượt quá dải rõ rệt
-            bb_overshoot_threshold = 0.005  # 0.5% vượt qua dải
+            # Nếu giá vượt quá dải rõ rệt (cho thị trường yên tĩnh, cần dùng ngưỡng nhỏ hơn)
+            bb_overshoot_threshold = 0.003 if mean_reversion_mode else 0.005
             if current_price < current_lower * (1 - bb_overshoot_threshold):
                 signal = 1  # Quá bán
             elif current_price > current_upper * (1 + bb_overshoot_threshold):
@@ -1027,6 +1109,118 @@ class ADXStrategy(Strategy):
         
         return signal
 
+class VolumeProfileStrategy(Strategy):
+    """Chiến lược phân tích hồ sơ khối lượng giao dịch - đặc biệt hiệu quả trong thị trường yên tĩnh"""
+    
+    def __init__(self, params: Dict = None):
+        default_params = {
+            'use_volume_confirmation': True,
+            'volume_ma_period': 20,           # Chu kỳ MA khối lượng
+            'min_volume_threshold': 1.2,      # Ngưỡng tối thiểu so với MA
+            'vwap_deviation': 0.0015,         # Độ lệch so với VWAP (0.15%)
+            'volume_consolidation_periods': 3, # Số chu kỳ tích lũy khối lượng
+            'price_consolidation_threshold': 0.005, # Ngưỡng biến động giá để xác định tích lũy (0.5%)
+            'breakout_volume_threshold': 1.5   # Ngưỡng khối lượng khi breakout
+        }
+        merged_params = {**default_params, **(params or {})}
+        super().__init__("VolumeProfile", merged_params)
+    
+    def generate_signal(self, df: pd.DataFrame) -> int:
+        # Kiểm tra dữ liệu
+        if 'volume' not in df.columns or len(df) < 20:
+            return 0
+        
+        # Lấy thông số từ tham số
+        use_volume_confirmation = self.params.get('use_volume_confirmation', True)
+        volume_ma_period = self.params.get('volume_ma_period', 20)
+        min_volume_threshold = self.params.get('min_volume_threshold', 1.2)
+        vwap_deviation = self.params.get('vwap_deviation', 0.0015)
+        volume_consolidation_periods = self.params.get('volume_consolidation_periods', 3)
+        price_consolidation_threshold = self.params.get('price_consolidation_threshold', 0.005)
+        breakout_volume_threshold = self.params.get('breakout_volume_threshold', 1.5)
+        
+        # Tạo tín hiệu
+        signal = 0
+        
+        # Lấy giá trị hiện tại
+        current_volume = df['volume'].iloc[-1]
+        current_price = df['close'].iloc[-1]
+        previous_price = df['close'].iloc[-2]
+        
+        # Tính Volume Moving Average
+        if 'volume_ma' not in df.columns:
+            volume_ma = df['volume'].rolling(window=volume_ma_period).mean()
+            df['volume_ma'] = volume_ma
+        
+        current_volume_ma = df['volume_ma'].iloc[-1]
+        
+        # Đảm bảo có giá trị Moving Average
+        if pd.isna(current_volume_ma) or current_volume_ma == 0:
+            return 0
+        
+        # Tính VWAP nếu chưa có
+        if 'vwap' not in df.columns:
+            df['vwap'] = (df['high'] + df['low'] + df['close']) / 3
+        
+        current_vwap = df['vwap'].iloc[-1]
+        
+        # Phân tích tích lũy khối lượng
+        is_consolidation = True
+        price_range = 0
+        
+        # Kiểm tra nếu giá nằm trong phạm vi nhất định trong một số nến gần đây
+        if len(df) > volume_consolidation_periods + 1:
+            recent_prices = df['close'].iloc[-(volume_consolidation_periods+1):-1]
+            price_range = (recent_prices.max() - recent_prices.min()) / recent_prices.mean()
+            is_consolidation = price_range < price_consolidation_threshold
+        
+        # Phát hiện breakout từ vùng tích lũy
+        is_breakout = False
+        breakout_direction = 0
+        
+        if is_consolidation:
+            # Kiểm tra khối lượng đột biến
+            volume_ratio = current_volume / current_volume_ma
+            
+            if volume_ratio > breakout_volume_threshold:
+                is_breakout = True
+                # Xác định hướng breakout
+                breakout_direction = 1 if current_price > previous_price else -1
+        
+        # 1. Chiến lược phân tích khối lượng đột biến
+        if is_breakout and is_consolidation:
+            return breakout_direction
+        
+        # 2. Kiểm tra xác nhận khối lượng cho các xu hướng giá
+        if use_volume_confirmation:
+            volume_ratio = current_volume / current_volume_ma
+            price_change = (current_price - previous_price) / previous_price
+            
+            # Khối lượng lớn hơn trung bình
+            if volume_ratio > min_volume_threshold:
+                # Tăng giá mạnh với khối lượng lớn
+                if price_change > 0.005:  # Tăng > 0.5%
+                    signal = 1
+                # Giảm giá mạnh với khối lượng lớn
+                elif price_change < -0.005:  # Giảm > 0.5%
+                    signal = -1
+        
+        # 3. Phân tích giá liên quan đến VWAP
+        if signal == 0 and 'vwap' in df.columns:
+            # Tính độ lệch giá hiện tại so với VWAP
+            vwap_price_deviation = (current_price - current_vwap) / current_vwap
+            
+            # Kiểm tra nếu giá đang quay về VWAP sau khi lệch xa
+            if abs(vwap_price_deviation) > vwap_deviation:
+                # Giá dưới VWAP và đang tăng -> mua
+                if vwap_price_deviation < -vwap_deviation and current_price > previous_price:
+                    signal = 1
+                # Giá trên VWAP và đang giảm -> bán
+                elif vwap_price_deviation > vwap_deviation and current_price < previous_price:
+                    signal = -1
+        
+        return signal
+
 class CompositeStrategy(Strategy):
     """Chiến lược kết hợp nhiều chiến lược khác"""
     
@@ -1069,6 +1263,8 @@ class CompositeStrategy(Strategy):
             strategy = EMACrossStrategy(params)
         elif name.lower() == 'adx':
             strategy = ADXStrategy(params)
+        elif name.lower() == 'volume_profile':
+            strategy = VolumeProfileStrategy(params)
         
         # Thêm vào danh sách nếu khởi tạo thành công
         if strategy:
