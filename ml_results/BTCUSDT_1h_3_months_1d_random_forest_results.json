@@ -1,0 +1,74 @@
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "period": "3_months",
+  "prediction_days": 1,
+  "model_type": "random_forest",
+  "timestamp": "2025-03-01 16:50:03",
+  "accuracy": 0.5750636132315522,
+  "precision": 0.5762404878557281,
+  "recall": 0.5757901554404146,
+  "f1_score": 0.5746670555069505,
+  "confusion_matrix": [
+    [
+      119,
+      74
+    ],
+    [
+      93,
+      107
+    ]
+  ],
+  "best_params": {},
+  "feature_importance": {
+    "features": {
+      "23": "volatility",
+      "22": "log_returns",
+      "18": "stoch_k",
+      "21": "returns",
+      "17": "atr",
+      "0": "rsi",
+      "20": "obv",
+      "3": "macd_hist",
+      "5": "bb_std",
+      "2": "macd_signal",
+      "8": "bb_width",
+      "19": "stoch_d",
+      "1": "macd",
+      "12": "ema_200",
+      "7": "bb_lower",
+      "13": "sma_10",
+      "16": "sma_200",
+      "6": "bb_upper",
+      "9": "ema_9",
+      "11": "ema_50"
+    },
+    "importance": {
+      "23": 0.05253035609562011,
+      "22": 0.05115638992683284,
+      "18": 0.05095216649372193,
+      "21": 0.0506351831823106,
+      "17": 0.05014226297073257,
+      "0": 0.04817762551703393,
+      "20": 0.0466129235699313,
+      "3": 0.04649866795399465,
+      "5": 0.04502062184455419,
+      "2": 0.04369478871008918,
+      "8": 0.04306393784987379,
+      "19": 0.042546269028575674,
+      "1": 0.041749197228699735,
+      "12": 0.0395377014317092,
+      "7": 0.03771315594021705,
+      "13": 0.03743390230521711,
+      "16": 0.03685665963777562,
+      "6": 0.036455272047719395,
+      "9": 0.03499354827888674,
+      "11": 0.03424509518938997
+    }
+  },
+  "charts": {
+    "price_trend": "ml_charts/BTCUSDT_1h_3_months_price_trend.png",
+    "confusion_matrix": "ml_charts/BTCUSDT_1h_3_months_confusion_matrix.png",
+    "feature_importance": "ml_charts/BTCUSDT_1h_3_months_feature_importance.png"
+  }
+}

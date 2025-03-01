@@ -437,6 +437,23 @@ def save_results(result: Dict, symbol: str, timeframe: str, period: str,
         'charts': chart_paths
     }
     
+    # Hàm chuyển đổi NumPy types sang Python standard types
+    def convert_numpy_types(obj):
+        if isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+            return int(obj)
+        elif isinstance(obj, (np.float64, np.float32, np.float16)):
+            return float(obj)
+        elif isinstance(obj, (np.ndarray,)):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {convert_numpy_types(k): convert_numpy_types(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_numpy_types(i) for i in obj]
+        return obj
+
+    # Chuyển đổi các giá trị NumPy trong result_obj
+    result_obj = convert_numpy_types(result_obj)
+    
     # Lưu kết quả
     result_path = os.path.join(output_folder, result_filename)
     with open(result_path, 'w') as f:

@@ -1,0 +1,11 @@
+symbol,timeframe,period,prediction_days,model_type,accuracy,precision,recall,f1_score
+BTCUSDT,1h,1_month,1,random_forest,0.5904761904761905,0.5972222222222223,0.5956632653061225,0.5898810064492688
+BTCUSDT,1h,3_months,1,random_forest,0.5750636132315522,0.5762404878557281,0.5757901554404146,0.5746670555069505
+BTCUSDT,1h,3_months,1,gradient_boosting,0.5318066157760815,0.5329370263914293,0.5326554404145077,0.5311235605353253
+unknown,1h,1m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,1m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,3m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,3m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,1m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,1m,0,unknown,0.0,0.0,0.0,0.0
+unknown,1h,3m,0,unknown,0.0,0.0,0.0,0.0
