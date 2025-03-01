@@ -750,23 +750,31 @@ class IcebergOrderExecutor(BaseOrderExecutor):
                 
         return results
         
-    def calculate_average_fill_price(self, order_results):
+    def calculate_average_fill_price(self, order_response):
         """
         Tính giá trung bình thực hiện cho nhiều lệnh
         
         Args:
-            order_results (List[Dict]): Danh sách các lệnh
+            order_response (List[Dict]): Danh sách các lệnh
             
         Returns:
             float: Giá trung bình
         """
-        if not order_results:
+        if not order_response:
             return 0.0
+            
+        # Xử lý trường hợp nếu order_response là một object đơn lẻ
+        if isinstance(order_response, dict):
+            # Nếu order_response là một dict không phải list, chuyển nó thành list để xử lý
+            orders = [order_response]
+        else:
+            # Nếu đã là list thì giữ nguyên
+            orders = order_response
             
         total_qty = 0.0
         total_cost = 0.0
         
-        for order in order_results:
+        for order in orders:
             if 'fills' in order and order['fills']:
                 for fill in order['fills']:
                     qty = float(fill['qty'])

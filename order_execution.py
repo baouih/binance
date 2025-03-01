@@ -95,24 +95,52 @@ class BaseOrderExecutor:
         Returns:
             float: Giá trung bình
         """
-        if 'fills' not in order_response:
-            if 'price' in order_response:
-                return float(order_response['price'])
+        if not order_response:
             return 0.0
+        
+        # Xử lý trường hợp nếu order_response là một object đơn lẻ
+        if isinstance(order_response, dict):
+            if 'fills' not in order_response:
+                if 'price' in order_response:
+                    return float(order_response['price'])
+                return 0.0
+                
+            fills = order_response['fills']
+            if not fills:
+                return 0.0
+                
+            total_qty = 0.0
+            total_cost = 0.0
             
-        fills = order_response['fills']
-        if not fills:
-            return 0.0
-            
+            for fill in fills:
+                qty = float(fill['qty'])
+                price = float(fill['price'])
+                total_qty += qty
+                total_cost += qty * price
+                
+            if total_qty == 0:
+                return 0.0
+                
+            return total_cost / total_qty
+        
+        # Nếu order_response là một list
         total_qty = 0.0
         total_cost = 0.0
         
-        for fill in fills:
-            qty = float(fill['qty'])
-            price = float(fill['price'])
-            total_qty += qty
-            total_cost += qty * price
+        for order in order_response:
+            if 'fills' in order and order['fills']:
+                for fill in order['fills']:
+                    qty = float(fill['qty'])
+                    price = float(fill['price'])
+                    total_qty += qty
+                    total_cost += qty * price
             
+            elif 'executedQty' in order and 'price' in order and float(order['executedQty']) > 0:
+                qty = float(order['executedQty'])
+                price = float(order['price'])
+                total_qty += qty
+                total_cost += qty * price
+        
         if total_qty == 0:
             return 0.0
             
@@ -208,23 +236,31 @@ class IcebergOrderExecutor(BaseOrderExecutor):
                 
         return results
         
-    def calculate_average_fill_price(self, order_results):
+    def calculate_average_fill_price(self, order_response):
         """
         Tính giá trung bình thực hiện cho nhiều lệnh
         
         Args:
-            order_results (List[Dict]): Danh sách các lệnh
+            order_response (List[Dict]): Danh sách các lệnh
             
         Returns:
             float: Giá trung bình
         """
-        if not order_results:
+        if not order_response:
             return 0.0
+            
+        # Xử lý trường hợp nếu order_response là một object đơn lẻ
+        if isinstance(order_response, dict):
+            # Nếu order_response là một dict không phải list, chuyển nó thành list để xử lý
+            orders = [order_response]
+        else:
+            # Nếu đã là list thì giữ nguyên
+            orders = order_response
             
         total_qty = 0.0
         total_cost = 0.0
         
-        for order in order_results:
+        for order in orders:
             if 'fills' in order and order['fills']:
                 for fill in order['fills']:
                     qty = float(fill['qty'])
@@ -355,23 +391,31 @@ class TWAPExecutor(BaseOrderExecutor):
         
         return summary
         
-    def calculate_average_fill_price(self, order_results):
+    def calculate_average_fill_price(self, order_response):
         """
         Tính giá trung bình thực hiện cho nhiều lệnh
         
         Args:
-            order_results (List[Dict]): Danh sách các lệnh
+            order_response (List[Dict]): Danh sách các lệnh
             
         Returns:
             float: Giá trung bình
         """
-        if not order_results:
+        if not order_response:
             return 0.0
             
+        # Xử lý trường hợp nếu order_response là một object đơn lẻ
+        if isinstance(order_response, dict):
+            # Nếu order_response là một dict không phải list, chuyển nó thành list để xử lý
+            orders = [order_response]
+        else:
+            # Nếu đã là list thì giữ nguyên
+            orders = order_response
+        
         total_qty = 0.0
         total_cost = 0.0
         
-        for order in order_results:
+        for order in orders:
             if 'fills' in order and order['fills']:
                 for fill in order['fills']:
                     qty = float(fill['qty'])
@@ -448,31 +492,46 @@ class ScaledOrderExecutor(BaseOrderExecutor):
             ratios = []
             sum_ratio = 0
             
+            # Tạo tỷ lệ hình học
             for i in range(num_orders):
-                ratio = math.exp(-i / (num_orders / 2))  # Sử dụng hàm mũ
+                if side == 'BUY':
+                    # Nếu mua, đặt nhiều ở giá thấp hơn
+                    ratio = 1 + (num_orders - i - 1) * 0.2
+                else:
+                    # Nếu bán, đặt nhiều ở giá cao hơn
+                    ratio = 1 + i * 0.2
+                    
                 ratios.append(ratio)
                 sum_ratio += ratio
                 
+            # Tính giá và số lượng
             for i in range(num_orders):
                 prices.append(price_low + (price_high - price_low) * i / (num_orders - 1))
                 quantities.append(total_quantity * ratios[i] / sum_ratio)
                 
-        else:  # 'linear' hoặc mặc định
-            # Phân phối tuyến tính
-            for i in range(num_orders):
-                prices.append(price_low + (price_high - price_low) * i / (num_orders - 1))
-                
-                # Nếu là lệnh mua, phân bổ nhiều hơn ở giá thấp
-                # Nếu là lệnh bán, phân bổ nhiều hơn ở giá cao
-                if side == 'BUY':
-                    weight = (num_orders - i) / num_orders
-                else:
-                    weight = (i + 1) / num_orders
+        else:  # linear
+            # Phân phối tuyến tính (số lượng thay đổi theo giá)
+            if side == 'BUY':
+                # Nếu mua, đặt nhiều ở giá thấp hơn
+                for i in range(num_orders):
+                    prices.append(price_low + (price_high - price_low) * i / (num_orders - 1))
+                    weight = 1 + (num_orders - i - 1) * 0.5
+                    quantities.append(weight)
+            else:
+                # Nếu bán, đặt nhiều ở giá cao hơn
+                for i in range(num_orders):
+                    prices.append(price_low + (price_high - price_low) * i / (num_orders - 1))
+                    weight = 1 + i * 0.5
+                    quantities.append(weight)
                     
-                quantities.append(total_quantity * 2 * weight / (num_orders + 1))
+            # Chuẩn hóa số lượng
+            total_weight = sum(quantities)
+            for i in range(num_orders):
+                quantities[i] = total_quantity * quantities[i] / total_weight
                 
         # Thực thi các lệnh
         results = []
+        total_executed = 0.0
         
         for i in range(num_orders):
             order_result = self.execute_order(
@@ -490,39 +549,57 @@ class ScaledOrderExecutor(BaseOrderExecutor):
                 'order': order_result
             })
             
+            if 'executedQty' in order_result:
+                total_executed += float(order_result['executedQty'])
+                
         # Tổng hợp kết quả
         summary = {
             'symbol': symbol,
             'side': side,
             'total_quantity': total_quantity,
+            'executed_quantity': total_executed,
             'price_low': price_low,
             'price_high': price_high,
             'num_orders': num_orders,
             'distribution': distribution,
-            'orders': results
+            'orders': results,
+            'average_price': self.calculate_average_fill_price(results)
         }
         
         return summary
         
-    def calculate_average_fill_price(self, order_results):
+    def calculate_average_fill_price(self, order_response):
         """
         Tính giá trung bình thực hiện cho nhiều lệnh
         
         Args:
-            order_results (List[Dict]): Danh sách các lệnh
+            order_response (List[Dict]): Danh sách các lệnh
             
         Returns:
             float: Giá trung bình
         """
-        if not order_results or 'orders' not in order_results:
-            return 0.0
+        if not order_response or 'orders' not in order_response:
+            # Kiểm tra nếu order_response là một Dict có thuộc tính 'orders'
+            if isinstance(order_response, dict) and 'orders' in order_response:
+                orders = order_response['orders']
+            # Kiểm tra nếu order_response là một List
+            elif isinstance(order_response, list):
+                orders = order_response
+            else:
+                return 0.0
+        else:
+            orders = order_response['orders']
             
         total_qty = 0.0
         total_cost = 0.0
         
-        for order_item in order_results['orders']:
-            order = order_item.get('order', {})
-            
+        for order_item in orders:
+            # Nếu order_item là một Dict có 'order'
+            if isinstance(order_item, dict) and 'order' in order_item:
+                order = order_item['order']
+            else:
+                order = order_item
+                
             if 'fills' in order and order['fills']:
                 for fill in order['fills']:
                     qty = float(fill['qty'])
@@ -540,207 +617,3 @@ class ScaledOrderExecutor(BaseOrderExecutor):
             return 0.0
             
         return total_cost / total_qty
-        
-class OCOOrderExecutor(BaseOrderExecutor):
-    """
-    Lớp thực thi lệnh OCO (One Cancels the Other)
-    
-    Đặt đồng thời lệnh Take Profit và Stop Loss
-    """
-    
-    def __init__(self, api_client):
-        """
-        Khởi tạo OCO Order executor
-        
-        Args:
-            api_client (object): Đối tượng API client
-        """
-        super().__init__(api_client)
-        self.name = "OCO Order Executor"
-        
-    def execute_oco_order(self, symbol, side, quantity, stop_price, stop_limit_price, limit_price, **kwargs):
-        """
-        Thực thi lệnh OCO (đặt đồng thời lệnh Take Profit và Stop Loss)
-        
-        Args:
-            symbol (str): Ký hiệu tiền tệ
-            side (str): Bên giao dịch (BUY/SELL)
-            quantity (float): Số lượng
-            stop_price (float): Giá kích hoạt stop loss
-            stop_limit_price (float): Giá đặt lệnh stop limit
-            limit_price (float): Giá đặt lệnh limit
-            **kwargs: Tham số bổ sung
-            
-        Returns:
-            Dict: Kết quả thực thi
-        """
-        try:
-            # Kiểm tra đầu vào
-            if quantity <= 0:
-                logger.error(f"Số lượng không hợp lệ: {quantity}")
-                return {"error": "Số lượng không hợp lệ"}
-                
-            if stop_price <= 0 or stop_limit_price <= 0 or limit_price <= 0:
-                logger.error(f"Giá không hợp lệ")
-                return {"error": "Giá không hợp lệ"}
-                
-            # Tạo tham số lệnh
-            order_params = {
-                'symbol': symbol,
-                'side': side,
-                'quantity': quantity,
-                'price': limit_price,
-                'stopPrice': stop_price,
-                'stopLimitPrice': stop_limit_price,
-                'stopLimitTimeInForce': 'GTC'
-            }
-            
-            # Thêm các tham số khác
-            for key, value in kwargs.items():
-                order_params[key] = value
-                
-            # Loại bỏ tham số None
-            order_params = {k: v for k, v in order_params.items() if v is not None}
-            
-            # Thực thi lệnh OCO
-            response = self.api_client.order_oco_sell(**order_params) if side == 'SELL' else self.api_client.order_oco_buy(**order_params)
-            logger.info(f"Lệnh OCO thực thi: {symbol} {side} {quantity} stop={stop_price} limit={limit_price}")
-            return response
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi thực thi lệnh OCO: {e}")
-            return {"error": str(e)}
-            
-class OrderExecutionFactory:
-    """
-    Factory cho các Order Executor
-    """
-    
-    @staticmethod
-    def create_executor(executor_type, api_client, **kwargs):
-        """
-        Tạo executor theo loại
-        
-        Args:
-            executor_type (str): Loại executor
-            api_client (object): Đối tượng API client
-            **kwargs: Tham số bổ sung
-            
-        Returns:
-            BaseOrderExecutor: Đối tượng executor
-        """
-        executor_type = executor_type.lower()
-        
-        if executor_type == 'base':
-            return BaseOrderExecutor(api_client)
-        elif executor_type == 'iceberg':
-            return IcebergOrderExecutor(api_client)
-        elif executor_type == 'twap':
-            return TWAPExecutor(api_client)
-        elif executor_type == 'scaled':
-            return ScaledOrderExecutor(api_client)
-        elif executor_type == 'oco':
-            return OCOOrderExecutor(api_client)
-        else:
-            logger.warning(f"Không tìm thấy executor: {executor_type}, sử dụng base")
-            return BaseOrderExecutor(api_client)
-
-# Demo nếu chạy trực tiếp
-if __name__ == "__main__":
-    # Mock API client
-    class MockAPIClient:
-        def create_order(self, **kwargs):
-            print(f"Creating order: {kwargs}")
-            return {
-                'orderId': '123456',
-                'symbol': kwargs.get('symbol'),
-                'side': kwargs.get('side'),
-                'type': kwargs.get('type'),
-                'price': kwargs.get('price'),
-                'origQty': kwargs.get('quantity'),
-                'executedQty': kwargs.get('quantity'),
-                'status': 'FILLED',
-                'fills': [
-                    {
-                        'price': kwargs.get('price', '40000'),
-                        'qty': kwargs.get('quantity', '0.1'),
-                        'commission': '0.001',
-                        'commissionAsset': 'USDT'
-                    }
-                ]
-            }
-            
-        def get_symbol_ticker(self, **kwargs):
-            return {'price': '40000'}
-            
-        def order_oco_sell(self, **kwargs):
-            print(f"Creating OCO SELL order: {kwargs}")
-            return {
-                'orderListId': '123456',
-                'contingencyType': 'OCO',
-                'listStatusType': 'EXEC_STARTED',
-                'listOrderStatus': 'EXECUTING',
-                'orders': [
-                    {
-                        'symbol': kwargs.get('symbol'),
-                        'orderId': '123457',
-                        'clientOrderId': 'limit'
-                    },
-                    {
-                        'symbol': kwargs.get('symbol'),
-                        'orderId': '123458',
-                        'clientOrderId': 'stop'
-                    }
-                ]
-            }
-            
-        def order_oco_buy(self, **kwargs):
-            print(f"Creating OCO BUY order: {kwargs}")
-            return {
-                'orderListId': '123456',
-                'contingencyType': 'OCO',
-                'listStatusType': 'EXEC_STARTED',
-                'listOrderStatus': 'EXECUTING',
-                'orders': [
-                    {
-                        'symbol': kwargs.get('symbol'),
-                        'orderId': '123457',
-                        'clientOrderId': 'limit'
-                    },
-                    {
-                        'symbol': kwargs.get('symbol'),
-                        'orderId': '123458',
-                        'clientOrderId': 'stop'
-                    }
-                ]
-            }
-            
-    # Test các executor
-    api_client = MockAPIClient()
-    
-    # Test Base Executor
-    base_executor = BaseOrderExecutor(api_client)
-    base_order = base_executor.execute_order('BTCUSDT', 'BUY', 0.01, 'LIMIT', 40000)
-    print(f"Base order:\n{base_order}")
-    print(f"Average price: {base_executor.calculate_average_fill_price(base_order)}")
-    
-    # Test Iceberg Executor
-    iceberg_executor = IcebergOrderExecutor(api_client)
-    iceberg_order = iceberg_executor.execute_iceberg_order('BTCUSDT', 'SELL', 0.05, 3, 42000, 'LIMIT')
-    print(f"Iceberg order:\n{iceberg_order}")
-    print(f"Average price: {iceberg_executor.calculate_average_fill_price(iceberg_order)}")
-    
-    # Test TWAP Executor
-    twap_executor = TWAPExecutor(api_client)
-    twap_order = twap_executor.execute_twap_order('BTCUSDT', 'BUY', 0.1, 1, 2)
-    print(f"TWAP order:\n{twap_order}")
-    print(f"Average price: {twap_executor.calculate_average_fill_price(twap_order.get('orders', []))}")
-    
-    # Test OCO Executor
-    oco_executor = OCOOrderExecutor(api_client)
-    oco_order = oco_executor.execute_oco_order('BTCUSDT', 'SELL', 0.01, 39000, 38900, 42000)
-    print(f"OCO order:\n{oco_order}")
-    
-    # Test Factory
-    factory_executor = OrderExecutionFactory.create_executor('iceberg', api_client)
-    print(f"Factory created: {factory_executor.name}")

@@ -346,7 +346,7 @@ except ImportError as e:
                     
             return results
             
-        def calculate_average_fill_price(self, order_results):
+        def calculate_average_fill_price(self, order_response):
             if not order_results:
                 return 0.0
                 
