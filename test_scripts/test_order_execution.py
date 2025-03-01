@@ -993,29 +993,15 @@ def test_twap_executor():
     
     # Check status after completion
     status = executor.get_twap_status(execution_id)
-    
-    # Kiểm tra xem status có phải là dict không trước khi truy cập
-    if not isinstance(status, dict):
-        print(f"  Error: Status is not a dictionary: {status}")
-        assert False, f"Status is not a dictionary: {status}"
-    
-    print(f"  Final status: Parts completed: {status.get('parts_completed', 0)} / {status.get('total_parts', 0)}")
-    print(f"  Average price: {status.get('average_price', 0)}")
+    print(f"  Final status: Parts completed: {status.get('parts_completed')} / {status.get('total_parts')}")
+    print(f"  Average price: {status.get('average_price')}")
     
     # Check if all parts were completed
-    parts_completed = status.get('parts_completed', 0)
-    assert parts_completed == num_parts, f"Not all parts completed: {parts_completed} != {num_parts}"
+    assert status.get('parts_completed') == num_parts, f"Not all parts completed: {status.get('parts_completed')} != {num_parts}"
     
     # Check average price
-    avg_price = status.get('average_price', 0)
-    
-    # Chuyển đổi price thành số trước khi so sánh nếu nó là chuỗi
-    if isinstance(price, str):
-        compare_price = float(price)
-    else:
-        compare_price = price
-        
-    assert abs(avg_price - compare_price) < 0.0001, f"Average price mismatch: {avg_price} != {compare_price}"
+    avg_price = status.get('average_price')
+    assert abs(avg_price - price) < 0.0001, f"Average price mismatch: {avg_price} != {price}"
     
     # Test case 3: Cancel TWAP execution
     print(f"\nTest case 3: Cancel TWAP execution")
@@ -1039,14 +1025,8 @@ def test_twap_executor():
     
     # Check status after cancellation
     status = executor.get_twap_status(execution_id)
-    
-    # Kiểm tra xem status có phải là dict không trước khi truy cập
-    if not isinstance(status, dict):
-        print(f"  Error: Status is not a dictionary: {status}")
-        assert False, f"Status is not a dictionary: {status}"
-        
-    print(f"  Status after cancellation: Is active: {status.get('is_active', False)}")
-    assert not status.get('is_active', False), "TWAP execution still active after cancellation"
+    print(f"  Status after cancellation: Is active: {status.get('is_active')}")
+    assert not status.get('is_active'), "TWAP execution still active after cancellation"
     
     # Test case 4: Error handling for invalid inputs
     print("\nTest case 4: Error handling for invalid inputs")
@@ -1077,8 +1057,7 @@ def test_twap_executor():
     print("\nTest case 5: TWAP status for non-existent execution")
     status = executor.get_twap_status("non-existent-id")
     print(f"  Status: {status}")
-    # Kiểm tra status là dict và có chứa 'error'
-    assert isinstance(status, dict) and 'error' in status, "No error for non-existent execution ID"
+    assert 'error' in status, "No error for non-existent execution ID"
     
     print("\nTWAPExecutor tests completed successfully!")
     return True
