@@ -1,120 +1,78 @@
-# Advanced Cryptocurrency Trading Bot
+# Binance Trading Bot
 
-Hệ thống bot giao dịch tiền điện tử tự động với khả năng học máy và phân tích thị trường thời gian thực. Hỗ trợ giao dịch đa đồng tiền, thích ứng với điều kiện thị trường, và cung cấp thông báo qua Telegram.
+Bot giao dịch Bitcoin tự động với chiến lược thích ứng đa chế độ thị trường và tối ưu hóa ML.
 
-## 🚀 Tính năng chính
+## Chuyển đổi sang CLI Mode
 
-- **Phân tích đa khung thời gian**: Kết hợp tín hiệu từ nhiều khung thời gian (15m, 1h, 4h, 1d) để tìm điểm vào lệnh tối ưu
-- **Học máy thích ứng**: Tự động huấn luyện và cập nhật mô hình ML theo chế độ thị trường
-- **Chỉ báo tổng hợp**: Kết hợp 9 chỉ báo kỹ thuật (RSI, MACD, Bollinger Bands...) với trọng số động
-- **Phân tích thanh khoản**: Phát hiện các vùng tập trung lệnh chờ và cơ hội giao dịch
-- **Quản lý rủi ro thông minh**: Tự động điều chỉnh kích thước vị thế theo biến động thị trường
-- **Thông báo Telegram**: Gửi tín hiệu giao dịch, báo cáo hiệu suất và cảnh báo tới Telegram
-- **Backtest tích hợp**: Kiểm tra hiệu suất chiến lược với dữ liệu lịch sử
-- **Hỗ trợ đa đồng tiền**: Giao dịch đồng thời nhiều cặp tiền (BTC, ETH, BNB, SOL...)
+Hệ thống đã được chuyển đổi từ giao diện web sang giao diện dòng lệnh (CLI) để cải thiện hiệu suất và độ ổn định. Việc này giúp giảm thiểu tài nguyên sử dụng và cải thiện độ tin cậy của bot, đặc biệt là khi chạy trong thời gian dài.
 
-## 📊 Các chế độ thị trường
+## Hướng dẫn sử dụng
 
-Bot tự động phát hiện và thích ứng với 6 chế độ thị trường:
-- **Trending Up**: Xu hướng tăng rõ ràng, tăng tỉ lệ risk/reward
-- **Trending Down**: Xu hướng giảm rõ ràng, thích hợp cho vị thế Short
-- **Ranging**: Thị trường đi ngang, thích hợp cho chiến lược biên độ
-- **Volatile**: Biến động cao, giảm kích thước vị thế và tăng khoảng cách stop loss
-- **Breakout**: Phá vỡ kháng cự/hỗ trợ, tìm cơ hội theo xu hướng mới
-- **Neutral**: Không có xu hướng rõ ràng, thận trọng với các giao dịch
+Có 3 cách để khởi động bot:
 
-## 🔧 Cài đặt
+### 1. Sử dụng script khởi động nhanh
 
-### Yêu cầu
-- Python 3.8+
-- Tài khoản Binance Futures (hoặc testnet)
-- Khóa API Binance với quyền giao dịch
-
-### Thiết lập
-1. Clone repository
-```
-git clone <repository_url>
-cd crypto-trading-bot
+```bash
+./cli_startup.sh
 ```
 
-2. Cài đặt thư viện
-```
-pip install -r requirements.txt
-```
+Script này sẽ kiểm tra môi trường, dừng các dịch vụ web đang chạy và khởi động CLI.
 
-3. Thiết lập biến môi trường
-```
-export BINANCE_API_KEY="your_api_key"
-export BINANCE_API_SECRET="your_api_secret"
+### 2. Khởi động CLI trực tiếp
+
+```bash
+python new_main.py
 ```
 
-4. Cấu hình Telegram (tùy chọn)
-```
-export TELEGRAM_BOT_TOKEN="your_telegram_bot_token"
-export TELEGRAM_CHAT_ID="your_telegram_chat_id"
-```
+### 3. Sử dụng tham số dòng lệnh
 
-## 🚀 Sử dụng
+Bạn có thể sử dụng các tham số dòng lệnh để thực hiện các hành động cụ thể:
 
-### Chạy bot đa đồng tiền
-```
-./start_multi_coin_bot.sh
-```
-
-### Chạy bot trong chế độ thực tế
-```
-./start_multi_coin_bot.sh --live
+```bash
+python new_main.py --status     # Hiển thị trạng thái bot
+python new_main.py --positions  # Hiển thị vị thế hiện tại
+python new_main.py --trades     # Hiển thị giao dịch gần đây
+python new_main.py --logs 50    # Hiển thị 50 dòng log gần đây
+python new_main.py --start      # Khởi động bot
+python new_main.py --stop       # Dừng bot
+python new_main.py --restart    # Khởi động lại bot
+python new_main.py --monitor 10 # Giám sát bot, cập nhật mỗi 10 giây
 ```
 
-### Thay đổi thời gian giữa các lần kiểm tra
-```
-./start_multi_coin_bot.sh --interval 180  # 3 phút
-```
+## Chiến lược Thích ứng
 
-### Cấu hình
-Chỉnh sửa `multi_coin_config.json` để thay đổi:
-- Cặp giao dịch và tham số
-- Cài đặt quản lý rủi ro
-- Tần suất thông báo
-- Thông số học máy và chiến lược
+Bot sử dụng cơ chế phát hiện chế độ thị trường để tự động chọn chiến lược tối ưu:
 
-## 📦 Cấu trúc dự án
+- **Trending**: Sử dụng EMA Cross (0.5), MACD (0.3), ADX (0.2)
+- **Ranging**: Sử dụng RSI (0.4), BBands (0.4), Stochastic (0.2)
+- **Volatile**: Sử dụng BBands (0.3), ATR (0.4), ADX (0.3)
+- **Quiet**: Sử dụng BBands (0.5), RSI (0.3), Stochastic (0.2)
+- **Unknown**: Sử dụng RSI (0.33), MACD (0.33), BBands (0.34)
+
+## Cấu hình
+
+Bạn cần thiết lập API keys Binance trong file `.env`:
 
 ```
-├── multi_coin_trading.py      # Bot giao dịch đa đồng tiền 
-├── start_multi_coin_bot.sh    # Script khởi động bot
-├── multi_coin_config.json     # Cấu hình bot và chiến lược
-├── run_live_trading.py        # Bot giao dịch đơn đồng tiền
-├── telegram_notify.py         # Hệ thống thông báo Telegram
-├── app/
-│   ├── binance_api.py         # Tích hợp Binance API
-│   ├── data_processor.py      # Xử lý dữ liệu và tính toán chỉ báo
-│   ├── advanced_ml_optimizer.py  # ML model optimization
-│   ├── market_regime_detector.py # Phát hiện chế độ thị trường
-│   └── composite_indicator.py # Chỉ báo tổng hợp
-├── models/                    # Thư mục lưu mô hình ML
-└── backtest_charts/           # Biểu đồ và kết quả backtest
+BINANCE_API_KEY=your_api_key
+BINANCE_API_SECRET=your_api_secret
 ```
 
-## 🖥️ Web Dashboard
+Cấu hình chi tiết hơn có thể được điều chỉnh trong file `multi_coin_config.json`.
 
-Bot được cung cấp kèm theo giao diện web để theo dõi:
-- Tín hiệu giao dịch thời gian thực
-- Vị thế đang mở và lịch sử giao dịch
-- Hiệu suất theo thời gian
-- Thông số thị trường và phân tích kỹ thuật
+## Tính năng chính
 
-Để khởi động dashboard:
-```
-python main.py
-```
+- Phát hiện chế độ thị trường tự động
+- Tự động chuyển đổi chiến lược phù hợp
+- Quản lý rủi ro động theo biến động thị trường
+- Báo cáo hiệu suất chi tiết
+- Giao diện dòng lệnh trực quan với menu tương tác
+- Giảm thiểu sử dụng tài nguyên hệ thống
 
-Truy cập: http://localhost:5000
+## Tài liệu bổ sung
 
-## ⚠️ Cảnh báo rủi ro
+Để biết thêm chi tiết, vui lòng tham khảo các tài liệu sau:
 
-Giao dịch tiền điện tử luôn tiềm ẩn rủi ro mất vốn. Bot này được cung cấp cho mục đích giáo dục và thử nghiệm, không phải lời khuyên tài chính. Luôn bắt đầu với số tiền nhỏ và thử nghiệm kỹ lưỡng trước khi sử dụng số tiền lớn.
-
-## 📃 Giấy phép
-
-MIT
+- [Hướng dẫn CLI](README_CLI.md): Hướng dẫn chi tiết về giao diện dòng lệnh
+- [API Docs](API_DOCS.md): Tài liệu API cho phát triển nâng cao
+- [Hướng dẫn triển khai](README_DEPLOYMENT.md): Hướng dẫn triển khai bot trên các nền tảng khác nhau

@@ -1,169 +1,79 @@
-# Binance Trading Bot - CLI Interface
+# Hướng dẫn sử dụng CLI cho Binance Trading Bot
 
-## Tổng quan
+## Giới thiệu
 
-Giao diện dòng lệnh (CLI) cho Binance Trading Bot cung cấp cách đơn giản và hiệu quả để kiểm soát, giám sát và tương tác với bot giao dịch mà không cần sử dụng giao diện web. Điều này đặc biệt hữu ích khi:
+Giao diện dòng lệnh (CLI) của Binance Trading Bot cung cấp một cách hiệu quả và ổn định để kiểm soát và giám sát bot giao dịch mà không cần giao diện web. Điều này đặc biệt hữu ích trong môi trường có kết nối mạng không ổn định hoặc khi cần tiết kiệm tài nguyên.
 
-- Kết nối web không ổn định (các vấn đề về WebSocket)
-- Cần kiểm soát bot từ xa qua SSH
-- Chạy bot trên môi trường máy chủ không có giao diện đồ họa
-- Tạo báo cáo tự động và lên lịch các tác vụ
+## Cách khởi động CLI
 
-## Cài đặt
+Có hai cách để khởi động giao diện CLI:
 
-Bot CLI sử dụng các thư viện Python tiêu chuẩn và một số thư viện bổ sung để tạo biểu đồ và báo cáo:
+1. Sử dụng script chạy trực tiếp:
+   ```
+   ./run_cli.sh
+   ```
 
-```bash
-# Cài đặt các thư viện cần thiết
-pip install matplotlib numpy pandas tabulate
+2. Sử dụng Python trực tiếp:
+   ```
+   python new_main.py
+   ```
 
-# Đảm bảo các script có quyền thực thi
-chmod +x run_tool.sh
-chmod +x reports/create_reports.sh
-chmod +x enhanced_cli_visualizer.py
+## Các tính năng chính
+
+Giao diện CLI cung cấp các chức năng sau:
+
+### Menu chính
+
+Menu chính cung cấp các tùy chọn:
+
+- **Xem vị thế hiện tại**: Hiển thị các vị thế đang mở
+- **Xem giao dịch gần đây**: Hiển thị lịch sử giao dịch gần đây
+- **Xem chỉ số hiệu suất**: Hiển thị các chỉ số hiệu suất của bot
+- **Xem logs**: Hiển thị logs gần đây
+- **Màn hình giám sát thời gian thực**: Giám sát bot theo thời gian thực
+
+- **Khởi động bot**: Bắt đầu chạy bot giao dịch
+- **Khởi động lại bot**: Khởi động lại bot
+
+- **Chạy backtest**: Thực hiện backtest với dữ liệu lịch sử
+- **Cấu hình bot**: Thiết lập cấu hình cho bot
+
+### Các tham số dòng lệnh
+
+Ngoài menu tương tác, bạn có thể sử dụng các tham số dòng lệnh:
+
+```
+python new_main.py --status  # Hiển thị trạng thái bot
+python new_main.py --positions  # Hiển thị vị thế hiện tại
+python new_main.py --trades  # Hiển thị giao dịch gần đây
+python new_main.py --logs 50  # Hiển thị 50 dòng log gần đây
+python new_main.py --start  # Khởi động bot
+python new_main.py --stop  # Dừng bot
+python new_main.py --restart  # Khởi động lại bot
+python new_main.py --monitor 10  # Giám sát bot, cập nhật mỗi 10 giây
 ```
 
-## Cách sử dụng cơ bản
+## Các chế độ thị trường và chiến lược
 
-Để tương tác với bot, sử dụng script `run_tool.sh`:
+Bot hỗ trợ phát hiện và thích ứng với các chế độ thị trường:
 
-```bash
-./run_tool.sh <lệnh> [tham_số]
-```
+- **Trending**: Chiến lược EMA Cross (0.5), MACD (0.3), ADX (0.2)
+- **Ranging**: Chiến lược RSI (0.4), BBands (0.4), Stochastic (0.2)
+- **Volatile**: Chiến lược BBands (0.3), ATR (0.4), ADX (0.3)
+- **Quiet**: Chiến lược BBands (0.5), RSI (0.3), Stochastic (0.2)
+- **Unknown**: Chiến lược RSI (0.33), MACD (0.33), BBands (0.34)
 
-### Các lệnh có sẵn:
+## Quản lý rủi ro
 
-| Lệnh | Mô tả | Ví dụ |
-|------|-------|-------|
-| `status` | Xem trạng thái hiện tại của bot | `./run_tool.sh status` |
-| `start` | Khởi động bot | `./run_tool.sh start` |
-| `stop` | Dừng bot | `./run_tool.sh stop` |
-| `restart` | Khởi động lại bot | `./run_tool.sh restart` |
-| `trades [n]` | Hiển thị n giao dịch gần đây | `./run_tool.sh trades 20` |
-| `positions` | Xem danh sách vị thế đang mở | `./run_tool.sh positions` |
-| `logs [n]` | Xem n dòng log gần đây nhất | `./run_tool.sh logs 50` |
-| `monitor` | Mở màn hình giám sát thời gian thực | `./run_tool.sh monitor` |
-| `backtest` | Chạy backtest nhanh | `./run_tool.sh backtest` |
-| `report` | Tạo báo cáo đầy đủ (HTML và biểu đồ) | `./run_tool.sh report` |
-| `equity` | Tạo biểu đồ đường cong vốn | `./run_tool.sh equity` |
-| `performance` | Tạo biểu đồ hiệu suất | `./run_tool.sh performance` |
+Bot sử dụng các thông số quản lý rủi ro đã được kiểm chứng:
+- Tham số BBands: Chu kỳ 30, độ lệch chuẩn 0.8
+- Rủi ro: 0.5%, TP/SL: 1.0/0.5
 
-## Báo cáo và Trực quan hóa
+## Xử lý lỗi
 
-Bot CLI bao gồm công cụ trực quan hóa nâng cao để tạo biểu đồ và báo cáo chi tiết về hiệu suất giao dịch:
+Nếu gặp lỗi khi sử dụng CLI, kiểm tra:
 
-### Tạo báo cáo đầy đủ
-
-```bash
-./run_tool.sh report
-```
-
-Lệnh này sẽ tạo báo cáo HTML đầy đủ trong thư mục `reports/` kèm theo các biểu đồ:
-- Đường cong vốn và drawdown
-- Biểu đồ chỉ số hiệu suất dạng radar chart
-- Biểu đồ phân tích theo symbol
-
-### Tạo biểu đồ riêng lẻ
-
-```bash
-# Tạo biểu đồ đường cong vốn
-./run_tool.sh equity
-
-# Tạo biểu đồ hiệu suất
-./run_tool.sh performance
-```
-
-## Tính năng giám sát thời gian thực
-
-Sử dụng chế độ `monitor` để giám sát bot theo thời gian thực:
-
-```bash
-./run_tool.sh monitor
-```
-
-Chế độ này hiển thị một màn hình tương tác với thông tin cập nhật liên tục về:
-- Trạng thái bot
-- Vị thế hiện tại
-- Giao dịch gần đây
-- Tài khoản và số dư
-- Tín hiệu thị trường gần đây
-
-Nhấn `Ctrl+C` để thoát chế độ giám sát.
-
-## Cấu hình Tự động khởi động và khởi động lại
-
-Bạn có thể cài đặt bot để tự động khởi động và khởi động lại khi gặp sự cố:
-
-```bash
-# Cập nhật file .env để bật tự động khởi động
-AUTO_START=true
-AUTO_RESTART=true
-```
-
-Cài đặt này có thể được điều chỉnh riêng cho môi trường thử nghiệm và sản xuất:
-
-```bash
-# Cho môi trường thử nghiệm (TEST_MODE=true)
-TEST_AUTO_START=false    # Không tự động khởi động trong môi trường test
-TEST_AUTO_RESTART=true   # Tự động khởi động lại trong môi trường test
-
-# Cho môi trường sản xuất (TEST_MODE=false)
-PROD_AUTO_START=true     # Tự động khởi động trong môi trường sản xuất
-PROD_AUTO_RESTART=true   # Tự động khởi động lại trong môi trường sản xuất
-```
-
-## Sử dụng nâng cao
-
-### Các tùy chọn trực quan hóa nâng cao
-
-Bạn có thể sử dụng trực tiếp công cụ trực quan hóa nâng cao với nhiều tùy chọn chi tiết hơn:
-
-```bash
-# Xem tất cả các tùy chọn có sẵn
-python enhanced_cli_visualizer.py --help
-
-# Ví dụ: Tạo tất cả các biểu đồ và lưu vào thư mục tùy chỉnh
-python enhanced_cli_visualizer.py --dashboard -o custom_reports/
-```
-
-### Lên lịch báo cáo tự động
-
-Bạn có thể sử dụng cron để lên lịch tạo báo cáo tự động:
-
-```bash
-# Mở crontab
-crontab -e
-
-# Thêm dòng này để tạo báo cáo hàng ngày lúc 00:01
-1 0 * * * cd /đường/dẫn/tới/bot && ./reports/create_reports.sh
-```
-
-## Xử lý sự cố
-
-Nếu bạn gặp vấn đề với công cụ CLI:
-
-1. Kiểm tra log:
-```bash
-./run_tool.sh logs 50
-```
-
-2. Đảm bảo tất cả các script có quyền thực thi:
-```bash
-chmod +x *.sh
-chmod +x reports/*.sh
-chmod +x *.py
-```
-
-3. Kiểm tra trạng thái bot:
-```bash
-./run_tool.sh status
-```
-
-4. Nếu bot bị treo, thử khởi động lại:
-```bash
-./run_tool.sh restart
-```
-
-## Kết luận
-
-Giao diện CLI cung cấp cách mạnh mẽ và đáng tin cậy để tương tác với bot giao dịch, tạo báo cáo và giám sát hiệu suất. Đặc biệt hữu ích trong môi trường không ổn định hoặc khi cần quản lý từ xa.
+1. **Logs**: Xem logs trong `trading_bot.log` và `cli_controller.log`
+2. **Kết nối API**: Đảm bảo API key và secret hợp lệ
+3. **Tập tin cấu hình**: Kiểm tra tập tin `multi_coin_config.json`
+4. **Quá trình xử lý**: Kiểm tra xem bot có đang chạy không với lệnh `ps aux | grep multi_coin_bot.py`
