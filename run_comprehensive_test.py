@@ -1,11 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-Script chạy kiểm thử toàn diện với tất cả chiến lược
+Script kiểm tra toàn diện bot giao dịch với dữ liệu thị trường thật
 
 Script này thực hiện:
-1. Tải dữ liệu Binance cho 9 đồng coin trong các khoảng thời gian 1,3,6 tháng
-2. Chạy backtest cho tất cả chiến lược trên tất cả dữ liệu
-3. Áp dụng học máy để tối ưu hóa tham số chiến lược
-4. Tạo báo cáo chi tiết về hiệu suất và so sánh
+1. Kết nối với Binance API để lấy dữ liệu thị trường thực
+2. Theo dõi bot phản ứng với các chế độ thị trường khác nhau
+3. Phân tích chi tiết việc bot tự chọn thuật toán cho từng trường hợp
+4. Tạo báo cáo chi tiết về hoạt động của toàn bộ hệ thống
 """
 
 import os
@@ -13,980 +16,1020 @@ import sys
 import time
 import json
 import logging
+from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-from typing import List, Dict, Tuple, Any, Optional, Union
+from dotenv import load_dotenv
 
-# Thêm thư mục gốc vào đường dẫn
-sys.path.append('.')
-
-# Import các module cần thiết
-from binance_api import BinanceAPI
-from data_processor import DataProcessor
-from market_regime_detector import MarketRegimeDetector
-from strategy_factory import StrategyFactory
-from position_sizing import create_position_sizer
-from risk_manager import RiskManager
-from order_execution_factory import OrderExecutionFactory
-from adapter_pattern_optimizer import AdaptiveParameterTuner
-
-# Thiết lập logging
+# Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('comprehensive_test.log'),
-        logging.StreamHandler()
+        logging.FileHandler("comprehensive_test.log"),
+        logging.StreamHandler(sys.stdout)
     ]
 )
-logger = logging.getLogger("comprehensive_test")
+logger = logging.getLogger(__name__)
 
-# Danh sách các coin cần test
-COINS = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", 
-         "DOTUSDT", "XRPUSDT", "AVAXUSDT", "MATICUSDT"]
+# Load môi trường
+load_dotenv()
 
-# Danh sách các khung thời gian
-TIMEFRAMES = ["1h", "4h", "1d"]
-
-# Danh sách các chiến lược
-STRATEGIES = ["rsi", "macd", "ema_cross", "bbands", "composite", "auto"]
-
-# Thời gian kiểm thử
-PERIODS = {
-    "1m": 30,   # 1 tháng: 30 ngày
-    "3m": 90,   # 3 tháng: 90 ngày
-    "6m": 180,  # 6 tháng: 180 ngày
-}
+# Import các module cần thiết
+try:
+    from binance_api import BinanceAPI
+    from market_regime_ml_optimized import (
+        MarketRegimeDetector, AdaptiveTrader, StrategySelector, 
+        BollingerBandsStrategy, RSIStrategy, MACDStrategy, EMACrossStrategy, 
+        ADXStrategy, Strategy, CompositeStrategy
+    )
+    from data_processor import DataProcessor
+except ImportError as e:
+    logger.error(f"Không thể import module: {str(e)}")
+    sys.exit(1)
 
 class ComprehensiveTester:
-    """Lớp kiểm thử toàn diện"""
+    """Lớp kiểm tra toàn diện bot giao dịch"""
     
-    def __init__(self, api_key: str = None, api_secret: str = None, 
-               use_testnet: bool = True, data_dir: str = 'test_data',
-               results_dir: str = 'test_results', charts_dir: str = 'test_charts'):
+    def __init__(self, symbols=None, timeframes=None, test_duration_hours=24, 
+                data_dir='test_data', report_dir='reports', chart_dir='backtest_charts'):
         """
         Khởi tạo tester
         
         Args:
-            api_key (str, optional): API Key Binance
-            api_secret (str, optional): API Secret Binance
-            use_testnet (bool): Sử dụng testnet hay mainnet
-            data_dir (str): Thư mục lưu dữ liệu
-            results_dir (str): Thư mục lưu kết quả
-            charts_dir (str): Thư mục lưu biểu đồ
+            symbols (list): Danh sách các cặp tiền
+            timeframes (list): Danh sách khung thời gian
+            test_duration_hours (int): Thời lượng kiểm tra (giờ)
+            data_dir (str): Thư mục dữ liệu
+            report_dir (str): Thư mục báo cáo
+            chart_dir (str): Thư mục biểu đồ
         """
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.use_testnet = use_testnet
-        
-        # Tạo các thư mục nếu chưa tồn tại
+        self.symbols = symbols or ['BTCUSDT', 'ETHUSDT', 'SOLUSDT']
+        self.timeframes = timeframes or ['1h', '4h', '1d']
+        self.test_duration_hours = test_duration_hours
         self.data_dir = data_dir
-        self.results_dir = results_dir
-        self.charts_dir = charts_dir
+        self.report_dir = report_dir
+        self.chart_dir = chart_dir
         
-        os.makedirs(data_dir, exist_ok=True)
-        os.makedirs(results_dir, exist_ok=True)
-        os.makedirs(charts_dir, exist_ok=True)
+        # Đảm bảo các thư mục tồn tại
+        for directory in [data_dir, report_dir, chart_dir]:
+            os.makedirs(directory, exist_ok=True)
         
         # Khởi tạo các thành phần
-        self.binance_api = self._init_binance_api()
+        self.api_key = os.environ.get('BINANCE_API_KEY')
+        self.api_secret = os.environ.get('BINANCE_API_SECRET')
+        
+        if not self.api_key or not self.api_secret:
+            logger.warning("API key hoặc secret không tồn tại. Sử dụng mode mô phỏng.")
+            self.use_real_api = False
+            self.binance_api = None
+        else:
+            self.use_real_api = True
+            try:
+                self.binance_api = BinanceAPI(api_key=self.api_key, api_secret=self.api_secret, testnet=True)
+                logger.info("Đã kết nối thành công với Binance API (testnet)")
+            except Exception as e:
+                logger.error(f"Lỗi khi kết nối Binance API: {str(e)}")
+                self.use_real_api = False
+                self.binance_api = None
+        
         self.data_processor = DataProcessor(binance_api=self.binance_api)
-        self.market_regime_detector = MarketRegimeDetector()
         
-        # Lưu kết quả và dữ liệu
-        self.data_cache = {}
-        self.results = {}
-        self.ml_models = {}
+        # Khởi tạo bot cho từng cặp tiền
+        self.regime_detectors = {}
+        self.strategy_selectors = {}
+        self.adaptive_traders = {}
         
-    def _init_binance_api(self) -> BinanceAPI:
-        """
-        Khởi tạo Binance API
-        
-        Returns:
-            BinanceAPI: Đối tượng Binance API
-        """
-        try:
-            # Lấy API key và secret từ biến môi trường nếu không được cung cấp
-            if not self.api_key:
-                self.api_key = os.environ.get('BINANCE_API_KEY')
-            if not self.api_secret:
-                self.api_secret = os.environ.get('BINANCE_API_SECRET')
-                
-            return BinanceAPI(
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-                testnet=self.use_testnet
+        for symbol in self.symbols:
+            self.regime_detectors[symbol] = MarketRegimeDetector()
+            self.strategy_selectors[symbol] = StrategySelector()
+            self.adaptive_traders[symbol] = AdaptiveTrader(
+                regime_detector=self.regime_detectors[symbol],
+                strategy_selector=self.strategy_selectors[symbol]
             )
-        except Exception as e:
-            logger.error(f"Không thể khởi tạo Binance API: {str(e)}")
-            return None
+        
+        # Dữ liệu lịch sử
+        self.historical_data = {}
+        
+        # Dữ liệu theo dõi
+        self.test_data = {
+            'start_time': datetime.now(),
+            'iterations': 0,
+            'by_symbol': {}
+        }
+        
+        for symbol in self.symbols:
+            self.test_data['by_symbol'][symbol] = {
+                'regime_counts': {},
+                'signal_counts': {},
+                'strategy_usage': {},
+                'decisions': [],
+                'iterations': 0
+            }
     
-    def fetch_data(self, coins: List[str] = None, timeframes: List[str] = None, 
-                 periods: Dict[str, int] = None) -> bool:
-        """
-        Tải dữ liệu từ Binance
+    def load_historical_data(self):
+        """Tải dữ liệu lịch sử từ Binance hoặc từ file"""
+        logger.info("Đang tải dữ liệu lịch sử...")
         
-        Args:
-            coins (List[str], optional): Danh sách coin, mặc định dùng COINS
-            timeframes (List[str], optional): Danh sách khung thời gian, mặc định dùng TIMEFRAMES
-            periods (Dict[str, int], optional): Thời gian kiểm thử, mặc định dùng PERIODS
+        for symbol in self.symbols:
+            self.historical_data[symbol] = {}
             
-        Returns:
-            bool: True nếu tải thành công, False nếu không
-        """
-        if not coins:
-            coins = COINS
-        if not timeframes:
-            timeframes = TIMEFRAMES
-        if not periods:
-            periods = PERIODS
-            
-        logger.info(f"Tải dữ liệu cho {len(coins)} coins, {len(timeframes)} khung thời gian, {len(periods)} khoảng thời gian")
-        
-        success_count = 0
-        total_count = len(coins) * len(timeframes) * len(periods)
-        
-        for coin in coins:
-            for timeframe in timeframes:
-                for period_name, days in periods.items():
-                    try:
-                        # Tính thời gian bắt đầu và kết thúc
-                        end_time = datetime.now()
-                        start_time = end_time - timedelta(days=days)
+            for timeframe in self.timeframes:
+                try:
+                    # Thử tải từ file trước
+                    file_path = os.path.join(self.data_dir, f"{symbol}_{timeframe}.csv")
+                    
+                    if os.path.exists(file_path):
+                        df = pd.read_csv(file_path)
+                        df['timestamp'] = pd.to_datetime(df['timestamp'])
+                        df.set_index('timestamp', inplace=True)
+                        logger.info(f"Đã tải dữ liệu {symbol} {timeframe} từ file ({len(df)} nến)")
+                    elif self.use_real_api:
+                        # Tải từ Binance nếu không có file
+                        start_time = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
                         
-                        # Tải dữ liệu
                         df = self.data_processor.download_historical_data(
-                            symbol=coin,
+                            symbol=symbol,
                             interval=timeframe,
-                            start_time=start_time.strftime("%Y-%m-%d"),
-                            end_time=end_time.strftime("%Y-%m-%d"),
+                            start_time=start_time,
+                            save_to_file=True,
                             output_dir=self.data_dir
                         )
                         
-                        if df is not None and not df.empty:
-                            # Thêm vào cache
-                            key = f"{coin}_{timeframe}_{period_name}"
-                            self.data_cache[key] = df
-                            success_count += 1
-                            
-                            logger.info(f"Đã tải dữ liệu {key}: {len(df)} dòng")
-                        else:
-                            logger.warning(f"Không tải được dữ liệu {coin}_{timeframe}_{period_name}")
-                            
-                    except Exception as e:
-                        logger.error(f"Lỗi khi tải dữ liệu {coin}_{timeframe}_{period_name}: {str(e)}")
-                        
-        logger.info(f"Đã tải {success_count}/{total_count} bộ dữ liệu")
-        return success_count > 0
-    
-    def run_backtest(self, coins: List[str] = None, timeframes: List[str] = None, 
-                   periods: Dict[str, int] = None, strategies: List[str] = None) -> bool:
-        """
-        Chạy backtest cho tất cả chiến lược và dữ liệu
-        
-        Args:
-            coins (List[str], optional): Danh sách coin, mặc định dùng COINS
-            timeframes (List[str], optional): Danh sách khung thời gian, mặc định dùng TIMEFRAMES
-            periods (Dict[str, int], optional): Thời gian kiểm thử, mặc định dùng PERIODS
-            strategies (List[str], optional): Danh sách chiến lược, mặc định dùng STRATEGIES
-            
-        Returns:
-            bool: True nếu thành công, False nếu không
-        """
-        if not coins:
-            coins = COINS
-        if not timeframes:
-            timeframes = TIMEFRAMES
-        if not periods:
-            periods = PERIODS
-        if not strategies:
-            strategies = STRATEGIES
-            
-        logger.info(f"Chạy backtest cho {len(coins)} coins, {len(timeframes)} khung thời gian, "
-                 f"{len(periods)} khoảng thời gian, {len(strategies)} chiến lược")
-        
-        success_count = 0
-        total_count = len(coins) * len(timeframes) * len(periods) * len(strategies)
-        
-        for coin in coins:
-            for timeframe in timeframes:
-                for period_name, days in periods.items():
-                    # Lấy dữ liệu từ cache
-                    key = f"{coin}_{timeframe}_{period_name}"
-                    if key not in self.data_cache:
-                        logger.warning(f"Không có dữ liệu {key} trong cache, bỏ qua")
-                        continue
-                        
-                    df = self.data_cache[key]
+                        logger.info(f"Đã tải dữ liệu {symbol} {timeframe} từ Binance ({len(df)} nến)")
+                    else:
+                        # Tạo dữ liệu mô phỏng nếu không có API
+                        df = self._generate_simulated_data(symbol, timeframe)
+                        logger.info(f"Đã tạo dữ liệu mô phỏng cho {symbol} {timeframe} ({len(df)} nến)")
                     
-                    # Phát hiện chế độ thị trường
-                    market_regime = self.market_regime_detector.detect_regime(df)
-                    logger.info(f"Chế độ thị trường cho {key}: {market_regime}")
+                    # Thêm các chỉ báo kỹ thuật
+                    df = self.data_processor.add_indicators(df)
                     
-                    for strategy_name in strategies:
-                        try:
-                            # Tạo chiến lược
-                            strategy = StrategyFactory.create_strategy(strategy_name)
-                            
-                            if strategy is None:
-                                logger.warning(f"Không thể tạo chiến lược {strategy_name}, bỏ qua")
-                                continue
-                                
-                            # Điều chỉnh tham số theo chế độ thị trường
-                            strategy.adapt_to_market_regime(market_regime)
-                            
-                            # Thiết lập quản lý rủi ro
-                            risk_manager = RiskManager(
-                                account_balance=10000.0,
-                                stop_loss_pct=2.0,
-                                take_profit_pct=6.0,
-                                trailing_stop=True,
-                                risk_method='volatility_based'
-                            )
-                            
-                            # Thiết lập position sizer
-                            position_sizer = create_position_sizer(
-                                'dynamic',
-                                account_balance=10000.0,
-                                risk_percentage=1.0,
-                                atr_multiplier=2.0
-                            )
-                            
-                            # Chạy backtest
-                            result = self._run_single_backtest(
-                                df=df,
-                                strategy=strategy,
-                                risk_manager=risk_manager,
-                                position_sizer=position_sizer,
-                                market_regime=market_regime,
-                                symbol=coin,
-                                timeframe=timeframe
-                            )
-                            
-                            # Lưu kết quả
-                            result_key = f"{key}_{strategy_name}"
-                            self.results[result_key] = result
-                            
-                            # Lưu kết quả vào file
-                            self._save_result(result, result_key)
-                            
-                            # Tạo biểu đồ
-                            self._create_chart(result, result_key)
-                            
-                            success_count += 1
-                            
-                            logger.info(f"Đã chạy backtest {result_key}: Lợi nhuận: {result['total_profit']:.2f}%, "
-                                     f"Win rate: {result['win_rate']:.2f}%, Profit factor: {result['profit_factor']:.2f}")
-                                     
-                        except Exception as e:
-                            logger.error(f"Lỗi khi chạy backtest {key}_{strategy_name}: {str(e)}")
-                            
-        logger.info(f"Đã chạy {success_count}/{total_count} backtest")
-        return success_count > 0
-    
-    def _run_single_backtest(self, df: pd.DataFrame, strategy: Any, risk_manager: RiskManager,
-                          position_sizer: Any, market_regime: str, symbol: str, 
-                          timeframe: str) -> Dict:
-        """
-        Chạy backtest đơn lẻ
-        
-        Args:
-            df (pd.DataFrame): DataFrame dữ liệu
-            strategy (Any): Chiến lược giao dịch
-            risk_manager (RiskManager): Quản lý rủi ro
-            position_sizer (Any): Position sizer
-            market_regime (str): Chế độ thị trường
-            symbol (str): Symbol giao dịch
-            timeframe (str): Khung thời gian
-            
-        Returns:
-            Dict: Kết quả backtest
-        """
-        # Reset trạng thái
-        initial_balance = 10000.0
-        risk_manager = RiskManager(account_balance=initial_balance)
-        current_balance = initial_balance
-        
-        trades = []
-        equity_curve = [initial_balance]
-        positions = []
-        
-        # Duyệt từng nến dữ liệu
-        for i in range(50, len(df)):  # Bỏ qua 50 nến đầu để đảm bảo đủ dữ liệu cho các chỉ báo
-            current_data = df.iloc[:i+1]
-            current_row = df.iloc[i]
-            
-            # Tính ATR cho volatility
-            atr = current_row.get('atr', None)
-            
-            # Lấy tín hiệu từ chiến lược
-            signal_result = strategy.generate_signal(current_data)
-            
-            # Xử lý kết quả tín hiệu
-            if isinstance(signal_result, dict):
-                signal = signal_result.get('signal', 0)
-                reason = signal_result.get('reason', '')
-            else:
-                signal = signal_result
-                reason = ''
-                
-            # Xử lý các vị thế đang mở
-            current_time = current_row.name if isinstance(current_row.name, datetime) else datetime.now()
-            current_price = current_row['close']
-            
-            # Kiểm tra giá hiện tại với các stop loss và take profit
-            price_dict = {trade_id: current_price for trade_id in range(1, len(positions) + 1)}
-            closed_trades = risk_manager.update_trades(price_dict, current_time)
-            
-            # Cập nhật trades list
-            for trade in closed_trades:
-                trades.append(trade)
-                
-                # Cập nhật balance
-                current_balance += trade.get('profit', 0)
-                
-                # Cập nhật position_sizer
-                position_sizer.update_balance(current_balance)
-                trade_result = {'profit': trade.get('profit', 0), 'profit_pct': trade.get('profit_pct', 0)}
-                position_sizer.update_trade_result(trade_result)
-                
-            # Lọc ra các vị thế vẫn đang mở
-            positions = [p for p in positions if p['id'] not in [t['id'] for t in closed_trades]]
-            
-            # Xử lý tín hiệu mới
-            if signal != 0:
-                # Kiểm tra nếu có thể thực hiện giao dịch
-                execute_trade = True
-                
-                # Không giao dịch nếu đã có vị thế cùng chiều
-                for pos in positions:
-                    if (signal > 0 and pos['side'] == 'BUY') or (signal < 0 and pos['side'] == 'SELL'):
-                        execute_trade = False
-                        break
-                
-                if execute_trade and risk_manager.should_execute_trade(symbol, 'BUY' if signal > 0 else 'SELL', current_balance):
-                    # Tính toán stop loss và take profit
-                    side = 'BUY' if signal > 0 else 'SELL'
-                    stop_loss, take_profit = risk_manager.calculate_stop_levels(current_price, side, 
-                                                                            current_data, None, current_balance)
-                    
-                    # Tính toán kích thước vị thế
-                    position_size = position_sizer.calculate_position_size(
-                        current_price=current_price,
-                        account_balance=current_balance,
-                        volatility=atr,
-                        entry_price=current_price,
-                        stop_loss_price=stop_loss
-                    )
-                    
-                    # Mở vị thế mới
-                    new_position = risk_manager.open_trade(
-                        symbol=symbol,
-                        side=side,
-                        entry_price=current_price,
-                        quantity=position_size / current_price,  # Chuyển USD sang số lượng coin
-                        stop_loss=stop_loss,
-                        take_profit=take_profit,
-                        entry_time=current_time
-                    )
-                    
-                    if new_position:
-                        positions.append(new_position)
-                        
-            # Cập nhật equity curve
-            equity_curve.append(current_balance + sum([(current_price - p['entry_price']) * p['quantity'] 
-                                                if p['side'] == 'BUY' else 
-                                                (p['entry_price'] - current_price) * p['quantity'] 
-                                                for p in positions]))
-                                                
-        # Đóng các vị thế còn lại ở cuối kỳ backtest
-        if positions:
-            last_price = df.iloc[-1]['close']
-            last_time = df.iloc[-1].name if isinstance(df.iloc[-1].name, datetime) else datetime.now()
-            
-            for position in positions:
-                closed_trade = risk_manager.close_trade(
-                    trade_id=position['id'],
-                    exit_price=last_price,
-                    exit_time=last_time,
-                    exit_reason='end_of_backtest'
-                )
-                
-                if closed_trade:
-                    trades.append(closed_trade)
-                    
-        # Tính toán các chỉ số hiệu suất
-        performance = risk_manager.get_performance_metrics()
-        
-        # Thêm thông tin bổ sung
-        performance.update({
-            'symbol': symbol,
-            'timeframe': timeframe,
-            'strategy': strategy.get_name(),
-            'market_regime': market_regime,
-            'initial_balance': initial_balance,
-            'final_balance': current_balance,
-            'trades': trades,
-            'equity_curve': equity_curve,
-            'total_trades': len(trades),
-            'parameters': strategy.get_parameters()
-        })
-        
-        return performance
-    
-    def _save_result(self, result: Dict, key: str) -> None:
-        """
-        Lưu kết quả vào file
-        
-        Args:
-            result (Dict): Kết quả backtest
-            key (str): Khóa xác định kết quả
-        """
-        try:
-            # Tạo bản sao để tránh thay đổi dữ liệu gốc
-            result_copy = result.copy()
-            
-            # Chuyển đổi các kiểu dữ liệu không thể serialize
-            if 'trades' in result_copy:
-                # Chuyển datetime thành string
-                for trade in result_copy['trades']:
-                    if 'entry_time' in trade and isinstance(trade['entry_time'], datetime):
-                        trade['entry_time'] = trade['entry_time'].isoformat()
-                    if 'exit_time' in trade and isinstance(trade['exit_time'], datetime):
-                        trade['exit_time'] = trade['exit_time'].isoformat()
-            
-            # Lưu vào file json
-            file_path = os.path.join(self.results_dir, f"{key}.json")
-            with open(file_path, 'w') as f:
-                json.dump(result_copy, f, indent=2)
-                
-            # Lưu các giao dịch vào file csv
-            if 'trades' in result_copy and result_copy['trades']:
-                trades_df = pd.DataFrame(result_copy['trades'])
-                trades_path = os.path.join(self.results_dir, f"{key}_trades.csv")
-                trades_df.to_csv(trades_path, index=False)
-                
-            logger.info(f"Đã lưu kết quả vào {file_path}")
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu kết quả {key}: {str(e)}")
-    
-    def _create_chart(self, result: Dict, key: str) -> None:
-        """
-        Tạo biểu đồ từ kết quả
-        
-        Args:
-            result (Dict): Kết quả backtest
-            key (str): Khóa xác định kết quả
-        """
-        try:
-            # Tạo biểu đồ equity curve
-            if 'equity_curve' in result and result['equity_curve']:
-                plt.figure(figsize=(12, 6))
-                plt.plot(result['equity_curve'])
-                plt.title(f"Equity Curve - {key}")
-                plt.xlabel('Candles')
-                plt.ylabel('Balance')
-                plt.grid(True)
-                
-                # Lưu biểu đồ
-                chart_path = os.path.join(self.charts_dir, f"{key}_equity.png")
-                plt.savefig(chart_path)
-                plt.close()
-                
-                logger.info(f"Đã tạo biểu đồ equity curve: {chart_path}")
-                
-            # Tạo biểu đồ trades
-            if 'trades' in result and result['trades']:
-                trades = result['trades']
-                
-                # Tạo DataFrame từ trades
-                try:
-                    trades_df = pd.DataFrame(trades)
-                    
-                    # Tạo biểu đồ win/loss
-                    plt.figure(figsize=(10, 6))
-                    trades_df['profit_color'] = trades_df['profit'].apply(lambda x: 'green' if x > 0 else 'red')
-                    plt.bar(range(len(trades_df)), trades_df['profit'], color=trades_df['profit_color'])
-                    plt.title(f"Trades Profit/Loss - {key}")
-                    plt.xlabel('Trade #')
-                    plt.ylabel('Profit/Loss')
-                    plt.grid(True)
-                    
-                    # Lưu biểu đồ
-                    trades_chart_path = os.path.join(self.charts_dir, f"{key}_trades.png")
-                    plt.savefig(trades_chart_path)
-                    plt.close()
-                    
-                    logger.info(f"Đã tạo biểu đồ trades: {trades_chart_path}")
-                except Exception as e:
-                    logger.error(f"Lỗi khi tạo biểu đồ trades: {str(e)}")
-        except Exception as e:
-            logger.error(f"Lỗi khi tạo biểu đồ {key}: {str(e)}")
-    
-    def apply_machine_learning(self) -> bool:
-        """
-        Áp dụng học máy để tối ưu hóa tham số chiến lược
-        
-        Returns:
-            bool: True nếu thành công, False nếu không
-        """
-        logger.info("Áp dụng học máy để tối ưu hóa tham số chiến lược")
-        
-        # Kiểm tra nếu không có kết quả backtest
-        if not self.results:
-            logger.warning("Không có kết quả backtest để áp dụng học máy")
-            return False
-            
-        try:
-            # Tạo bộ tối ưu hóa tham số
-            parameter_tuner = AdaptiveParameterTuner()
-            
-            # Duyệt qua kết quả backtest
-            for key, result in self.results.items():
-                try:
-                    # Phân tích key để lấy thông tin
-                    parts = key.split('_')
-                    if len(parts) < 4:
-                        continue
-                        
-                    symbol = parts[0]
-                    timeframe = parts[1]
-                    period = parts[2]
-                    strategy_name = '_'.join(parts[3:])
-                    
-                    # Lấy thông tin thị trường
-                    market_regime = result.get('market_regime', 'unknown')
-                    
-                    # Lấy thông tin hiệu suất
-                    performance_data = {
-                        'win_rate': result.get('win_rate', 0),
-                        'profit_factor': result.get('profit_factor', 0),
-                        'expectancy': result.get('expectancy', 0),
-                        'sharpe_ratio': result.get('sharpe_ratio', 0),
-                        'max_drawdown': result.get('max_drawdown', 0),
-                        'total_profit': result.get('total_profit_pct', 0)
-                    }
-                    
-                    # Lấy tham số hiện tại
-                    current_parameters = result.get('parameters', {})
-                    
-                    # Cập nhật điều kiện thị trường
-                    market_data = {
-                        'market_regime': market_regime,
-                        'symbol': symbol,
-                        'timeframe': timeframe,
-                        'period': period
-                    }
-                    
-                    # Cập nhật dữ liệu vào parameter tuner
-                    parameter_tuner.update_market_conditions(market_data)
-                    parameter_tuner.update_performance_metrics(performance_data)
-                    
-                    # Tối ưu hóa tham số
-                    optimal_params = parameter_tuner.optimize_parameters(
-                        optimization_method='bayesian',
-                        target_metric='composite',
-                        max_iterations=50,
-                        use_ml_prediction=True
-                    )
-                    
-                    # Lưu tham số tối ưu
-                    ml_key = f"{symbol}_{timeframe}_{strategy_name}"
-                    self.ml_models[ml_key] = {
-                        'optimal_parameters': optimal_params,
-                        'market_regime': market_regime,
-                        'performance': performance_data,
-                        'current_parameters': current_parameters
-                    }
-                    
-                    # Lưu vào file
-                    ml_path = os.path.join(self.results_dir, f"{ml_key}_ml_optimization.json")
-                    with open(ml_path, 'w') as f:
-                        json.dump(self.ml_models[ml_key], f, indent=2)
-                        
-                    logger.info(f"Đã tối ưu hóa tham số cho {ml_key}")
+                    self.historical_data[symbol][timeframe] = df
                     
                 except Exception as e:
-                    logger.error(f"Lỗi khi tối ưu hóa tham số cho {key}: {str(e)}")
-                    
-            # Huấn luyện mô hình dự đoán tham số
-            if len(self.ml_models) > 5:  # Cần ít nhất 5 mẫu để huấn luyện
-                parameter_tuner.train_parameter_prediction_model()
-                logger.info("Đã huấn luyện mô hình dự đoán tham số")
-                
-            return True
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi áp dụng học máy: {str(e)}")
-            return False
-    
-    def generate_report(self) -> Dict:
-        """
-        Tạo báo cáo tổng hợp
-        
-        Returns:
-            Dict: Báo cáo tổng hợp
-        """
-        logger.info("Tạo báo cáo tổng hợp")
-        
-        # Kiểm tra nếu không có kết quả backtest
-        if not self.results:
-            logger.warning("Không có kết quả backtest để tạo báo cáo")
-            return {}
-            
-        try:
-            # Tạo báo cáo
-            report = {
-                'timestamp': datetime.now().isoformat(),
-                'summary': {
-                    'total_tests': len(self.results),
-                    'coins_tested': len(set([k.split('_')[0] for k in self.results.keys()])),
-                    'timeframes_tested': len(set([k.split('_')[1] for k in self.results.keys()])),
-                    'periods_tested': len(set([k.split('_')[2] for k in self.results.keys()])),
-                    'strategies_tested': len(set(['_'.join(k.split('_')[3:]) for k in self.results.keys()]))
-                },
-                'top_performers': {},
-                'strategy_comparison': {},
-                'coin_comparison': {},
-                'timeframe_comparison': {},
-                'period_comparison': {},
-                'ml_optimization': {}
-            }
-            
-            # Tính toán hiệu suất trung bình cho từng chiến lược
-            strategy_metrics = {}
-            for key, result in self.results.items():
-                parts = key.split('_')
-                if len(parts) < 4:
+                    logger.error(f"Lỗi khi tải dữ liệu {symbol} {timeframe}: {str(e)}")
                     continue
+    
+    def _generate_simulated_data(self, symbol, timeframe, days=30):
+        """
+        Tạo dữ liệu mô phỏng khi không có API
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            days (int): Số ngày dữ liệu
+            
+        Returns:
+            pd.DataFrame: DataFrame dữ liệu mô phỏng
+        """
+        # Xác định tham số dựa trên symbol
+        if symbol == 'BTCUSDT':
+            base_price = 60000
+            volatility = 0.02
+        elif symbol == 'ETHUSDT':
+            base_price = 3500
+            volatility = 0.025
+        else:
+            base_price = 100
+            volatility = 0.03
+        
+        # Xác định số nến dựa trên timeframe
+        if timeframe == '1h':
+            periods = days * 24
+            freq = 'H'
+        elif timeframe == '4h':
+            periods = days * 6
+            freq = '4H'
+        else:  # 1d
+            periods = days
+            freq = 'D'
+        
+        # Tạo thời gian
+        start_date = datetime.now() - timedelta(days=days)
+        date_range = pd.date_range(start=start_date, periods=periods, freq=freq)
+        
+        # Tạo giá với random walk
+        np.random.seed(hash(symbol + timeframe) % 2**32)
+        
+        # Tạo các giai đoạn thị trường khác nhau
+        regimes = ['trending', 'ranging', 'volatile', 'quiet']
+        regime_lengths = np.random.randint(periods // 10, periods // 5, size=len(regimes))
+        
+        # Đảm bảo tổng độ dài không vượt quá số nến
+        if sum(regime_lengths) > periods:
+            scale_factor = periods / sum(regime_lengths)
+            regime_lengths = (regime_lengths * scale_factor).astype(int)
+        
+        remaining_length = periods - sum(regime_lengths)
+        current_regime_idx = 0
+        if remaining_length > 0 and current_regime_idx < len(regime_lengths):
+            regime_lengths[current_regime_idx] += remaining_length
+        
+        # Khởi tạo dữ liệu giá
+        price_data = []
+        current_price = base_price
+        current_regime = regimes[0]
+        
+        for i in range(periods):
+            # Xác định chế độ thị trường hiện tại
+            for j, length in enumerate(regime_lengths):
+                if i < sum(regime_lengths[:j+1]):
+                    current_regime = regimes[j]
+                    break
+            
+            # Điều chỉnh volatility và drift theo chế độ thị trường
+            if current_regime == 'trending':
+                local_volatility = volatility * 0.8
+                local_drift = 0.001
+            elif current_regime == 'ranging':
+                local_volatility = volatility * 0.6
+                local_drift = 0.0
+            elif current_regime == 'volatile':
+                local_volatility = volatility * 1.5
+                local_drift = 0.0
+            else:  # quiet
+                local_volatility = volatility * 0.3
+                local_drift = 0.0
+            
+            # Random walk với drift
+            price_change = np.random.normal(local_drift, local_volatility)
+            
+            # Thêm spike với xác suất thấp
+            spike_prob = 0.01
+            if np.random.random() < spike_prob:
+                price_change += np.random.choice([-1, 1]) * local_volatility * 5
+            
+            # Cập nhật giá
+            current_price *= (1 + price_change)
+            
+            # Tạo OHLCV
+            high_price = current_price * (1 + np.random.uniform(0, local_volatility))
+            low_price = current_price * (1 - np.random.uniform(0, local_volatility))
+            open_price = current_price * (1 + np.random.uniform(-local_volatility/2, local_volatility/2))
+            volume = np.random.exponential(100) * (1 + np.random.uniform(-0.5, 0.5))
+            
+            # Thêm vào dữ liệu
+            price_data.append({
+                'timestamp': date_range[i],
+                'open': open_price,
+                'high': high_price,
+                'low': low_price,
+                'close': current_price,
+                'volume': volume,
+                'regime': current_regime  # Thêm chế độ thị trường thật để so sánh
+            })
+        
+        # Tạo DataFrame
+        df = pd.DataFrame(price_data)
+        df.set_index('timestamp', inplace=True)
+        
+        return df
+    
+    def update_market_data(self):
+        """Cập nhật dữ liệu thị trường mới nhất"""
+        logger.info("Đang cập nhật dữ liệu thị trường...")
+        
+        for symbol in self.symbols:
+            for timeframe in self.timeframes:
+                try:
+                    if self.use_real_api:
+                        # Lấy dữ liệu mới từ Binance
+                        new_candles = self.binance_api.get_klines(
+                            symbol=symbol,
+                            interval=timeframe,
+                            limit=10  # Chỉ lấy 10 nến gần nhất
+                        )
+                        
+                        if not new_candles:
+                            logger.warning(f"Không có dữ liệu mới cho {symbol} {timeframe}")
+                            continue
+                        
+                        # Chuyển đổi thành DataFrame
+                        new_df = self.binance_api.convert_klines_to_dataframe(new_candles)
+                        
+                        # Cập nhật dữ liệu lịch sử
+                        df = self.historical_data[symbol][timeframe]
+                        
+                        # Loại bỏ các nến trùng lặp và thêm nến mới
+                        df = pd.concat([df, new_df]).drop_duplicates(subset=['timestamp']).sort_values('timestamp')
+                        
+                    else:
+                        # Trong mode mô phỏng, thêm 1-2 nến mới với biến động nhỏ
+                        df = self.historical_data[symbol][timeframe]
+                        last_row = df.iloc[-1].copy()
+                        
+                        # Xác định timestamp mới
+                        if timeframe == '1h':
+                            new_timestamp = last_row.name + timedelta(hours=1)
+                        elif timeframe == '4h':
+                            new_timestamp = last_row.name + timedelta(hours=4)
+                        else:  # 1d
+                            new_timestamp = last_row.name + timedelta(days=1)
+                        
+                        # Tạo giá mới với biến động nhỏ
+                        price_change = np.random.normal(0, 0.005)  # 0.5% biến động
+                        new_close = last_row['close'] * (1 + price_change)
+                        new_high = max(new_close, last_row['close']) * (1 + np.random.uniform(0, 0.002))
+                        new_low = min(new_close, last_row['close']) * (1 - np.random.uniform(0, 0.002))
+                        new_open = last_row['close']
+                        new_volume = last_row['volume'] * (1 + np.random.uniform(-0.1, 0.1))
+                        
+                        # Tạo DataFrame mới
+                        new_data = pd.DataFrame({
+                            'open': [new_open],
+                            'high': [new_high],
+                            'low': [new_low],
+                            'close': [new_close],
+                            'volume': [new_volume]
+                        }, index=[new_timestamp])
+                        
+                        # Cập nhật DataFrame
+                        df = pd.concat([df, new_data])
                     
-                strategy_name = '_'.join(parts[3:])
+                    # Thêm các chỉ báo kỹ thuật
+                    df = self.data_processor.add_indicators(df)
+                    
+                    # Cập nhật lại dữ liệu
+                    self.historical_data[symbol][timeframe] = df
+                    
+                    logger.info(f"Đã cập nhật dữ liệu {symbol} {timeframe} - Nến mới nhất: {df.index[-1]}")
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi cập nhật dữ liệu {symbol} {timeframe}: {str(e)}")
+                    continue
+    
+    def run_bot_test_iteration(self):
+        """Chạy một vòng lặp kiểm tra bot"""
+        logger.info("Chạy một vòng kiểm tra bot...")
+        
+        for symbol in self.symbols:
+            try:
+                # Lấy dữ liệu khung thời gian chính (1h)
+                primary_tf = '1h'
+                df = self.historical_data[symbol][primary_tf]
                 
-                if strategy_name not in strategy_metrics:
-                    strategy_metrics[strategy_name] = {
-                        'total_profit': [],
-                        'win_rate': [],
-                        'profit_factor': [],
-                        'max_drawdown': [],
-                        'sharpe_ratio': [],
-                        'expectancy': [],
-                        'count': 0
+                if df.empty:
+                    logger.warning(f"Không có dữ liệu cho {symbol} {primary_tf}")
+                    continue
+                
+                # Phát hiện chế độ thị trường
+                regime_detector = self.regime_detectors[symbol]
+                current_regime = regime_detector.detect_regime(df)
+                
+                # Cập nhật số lần xuất hiện mỗi chế độ
+                if current_regime in self.test_data['by_symbol'][symbol]['regime_counts']:
+                    self.test_data['by_symbol'][symbol]['regime_counts'][current_regime] += 1
+                else:
+                    self.test_data['by_symbol'][symbol]['regime_counts'][current_regime] = 1
+                
+                # Lấy chiến lược tối ưu cho chế độ thị trường hiện tại
+                strategy_selector = self.strategy_selectors[symbol]
+                optimal_strategies = strategy_selector.get_strategies_for_regime(current_regime)
+                
+                # Cập nhật việc sử dụng chiến lược
+                for strategy_name, weight in optimal_strategies.items():
+                    if strategy_name in self.test_data['by_symbol'][symbol]['strategy_usage']:
+                        self.test_data['by_symbol'][symbol]['strategy_usage'][strategy_name] += 1
+                    else:
+                        self.test_data['by_symbol'][symbol]['strategy_usage'][strategy_name] = 1
+                
+                # Lấy tín hiệu giao dịch từ bot thích ứng
+                adaptive_trader = self.adaptive_traders[symbol]
+                signal = adaptive_trader.generate_signal(df)
+                
+                # Ghi nhận tín hiệu
+                if isinstance(signal, dict) and 'action' in signal:
+                    action = signal['action']
+                else:
+                    action = signal
+                
+                if action in self.test_data['by_symbol'][symbol]['signal_counts']:
+                    self.test_data['by_symbol'][symbol]['signal_counts'][action] += 1
+                else:
+                    self.test_data['by_symbol'][symbol]['signal_counts'][action] = 1
+                
+                # Lấy thông tin chi tiết về các chiến lược được sử dụng
+                strategy_details = {}
+                if hasattr(adaptive_trader, 'current_strategy') and adaptive_trader.current_strategy:
+                    if hasattr(adaptive_trader.current_strategy, 'strategies'):
+                        for name, strategy in adaptive_trader.current_strategy.strategies.items():
+                            strategy_details[name] = {
+                                'signal': strategy.generate_signal(df),
+                                'weight': adaptive_trader.current_strategy.strategy_weights.get(name, 0)
+                            }
+                
+                # Ghi nhận quyết định
+                timestamp = datetime.now()
+                current_price = df['close'].iloc[-1]
+                
+                decision = {
+                    'timestamp': timestamp,
+                    'iteration': self.test_data['iterations'],
+                    'regime': current_regime,
+                    'action': action,
+                    'price': current_price,
+                    'strategies': optimal_strategies,
+                    'strategy_details': strategy_details,
+                    'indicators': {
+                        'rsi': df['rsi'].iloc[-1] if 'rsi' in df.columns else None,
+                        'macd': df['macd'].iloc[-1] if 'macd' in df.columns else None,
+                        'bb_width': ((df['bb_upper'].iloc[-1] - df['bb_lower'].iloc[-1]) / df['bb_middle'].iloc[-1]) 
+                                    if all(x in df.columns for x in ['bb_upper', 'bb_lower', 'bb_middle']) else None,
+                        'adx': df['adx'].iloc[-1] if 'adx' in df.columns else None
                     }
-                    
-                metrics = strategy_metrics[strategy_name]
-                metrics['total_profit'].append(result.get('total_profit_pct', 0))
-                metrics['win_rate'].append(result.get('win_rate', 0))
-                metrics['profit_factor'].append(result.get('profit_factor', 0))
-                metrics['max_drawdown'].append(result.get('max_drawdown', 0))
-                metrics['sharpe_ratio'].append(result.get('sharpe_ratio', 0))
-                metrics['expectancy'].append(result.get('expectancy', 0))
-                metrics['count'] += 1
-                
-            # Tính trung bình
-            for strategy_name, metrics in strategy_metrics.items():
-                report['strategy_comparison'][strategy_name] = {
-                    'avg_total_profit': np.mean(metrics['total_profit']),
-                    'avg_win_rate': np.mean(metrics['win_rate']),
-                    'avg_profit_factor': np.mean(metrics['profit_factor']),
-                    'avg_max_drawdown': np.mean(metrics['max_drawdown']),
-                    'avg_sharpe_ratio': np.mean(metrics['sharpe_ratio']),
-                    'avg_expectancy': np.mean(metrics['expectancy']),
-                    'count': metrics['count']
                 }
                 
-            # Tìm top performers
-            top_profit = sorted(self.results.items(), key=lambda x: x[1].get('total_profit_pct', 0), reverse=True)
-            top_sharpe = sorted(self.results.items(), key=lambda x: x[1].get('sharpe_ratio', 0), reverse=True)
-            top_expectancy = sorted(self.results.items(), key=lambda x: x[1].get('expectancy', 0), reverse=True)
-            
-            report['top_performers']['by_profit'] = [{'key': k, 'profit': v.get('total_profit_pct', 0)} 
-                                                for k, v in top_profit[:10]]
-            report['top_performers']['by_sharpe'] = [{'key': k, 'sharpe': v.get('sharpe_ratio', 0)} 
-                                                for k, v in top_sharpe[:10]]
-            report['top_performers']['by_expectancy'] = [{'key': k, 'expectancy': v.get('expectancy', 0)} 
-                                                    for k, v in top_expectancy[:10]]
-                                                    
-            # Thêm thông tin ML optimization
-            if self.ml_models:
-                improvements = []
+                self.test_data['by_symbol'][symbol]['decisions'].append(decision)
                 
-                for key, model in self.ml_models.items():
-                    current_params = model.get('current_parameters', {})
-                    optimal_params = model.get('optimal_parameters', {})
-                    
-                    # Tính sự khác biệt giữa tham số hiện tại và tham số tối ưu
-                    param_diff = {}
-                    for param, value in optimal_params.items():
-                        if param in current_params:
-                            old_value = current_params[param]
-                            if isinstance(old_value, (int, float)) and isinstance(value, (int, float)):
-                                change_pct = (value - old_value) / old_value * 100 if old_value != 0 else 0
-                                param_diff[param] = {
-                                    'old': old_value,
-                                    'new': value,
-                                    'change_pct': change_pct
-                                }
-                    
-                    improvements.append({
-                        'key': key,
-                        'market_regime': model.get('market_regime', 'unknown'),
-                        'performance': model.get('performance', {}),
-                        'param_diff': param_diff
-                    })
+                # Cập nhật số lần kiểm tra
+                self.test_data['by_symbol'][symbol]['iterations'] += 1
                 
-                report['ml_optimization']['improvements'] = improvements
-                                                    
-            # Lưu báo cáo vào file
-            report_path = os.path.join(self.results_dir, "comprehensive_report.json")
-            with open(report_path, 'w') as f:
-                json.dump(report, f, indent=2)
+                logger.info(f"{symbol}: Chế độ: {current_regime}, Hành động: {action}")
+                logger.info(f"Chiến lược được chọn: {optimal_strategies}")
                 
-            # Tạo báo cáo HTML
-            self._create_html_report(report)
-                
-            logger.info(f"Đã tạo báo cáo tổng hợp: {report_path}")
-            
-            return report
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi tạo báo cáo: {str(e)}")
-            return {}
+            except Exception as e:
+                logger.error(f"Lỗi khi chạy bot cho {symbol}: {str(e)}")
+                continue
+        
+        # Cập nhật tổng số lần kiểm tra
+        self.test_data['iterations'] += 1
     
-    def _create_html_report(self, report: Dict) -> None:
+    def create_regime_detection_chart(self, symbol, output_dir=None):
         """
-        Tạo báo cáo HTML
+        Tạo biểu đồ phân bố chế độ thị trường
         
         Args:
-            report (Dict): Báo cáo tổng hợp
+            symbol (str): Mã cặp tiền
+            output_dir (str): Thư mục đầu ra
+            
+        Returns:
+            str: Đường dẫn đến biểu đồ
         """
+        if output_dir is None:
+            output_dir = self.chart_dir
+        
+        if symbol not in self.test_data['by_symbol']:
+            logger.error(f"Không có dữ liệu test cho {symbol}")
+            return None
+        
+        regime_counts = self.test_data['by_symbol'][symbol]['regime_counts']
+        
+        if not regime_counts:
+            logger.warning(f"Không có dữ liệu chế độ thị trường cho {symbol}")
+            return None
+        
         try:
-            # Tạo nội dung HTML
-            html = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Báo cáo kiểm thử toàn diện</title>
-                <style>
-                    body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                    h1, h2, h3 {{ color: #333; }}
-                    table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}
-                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                    th {{ background-color: #f2f2f2; }}
-                    tr:nth-child(even) {{ background-color: #f9f9f9; }}
-                    .positive {{ color: green; }}
-                    .negative {{ color: red; }}
-                    .chart {{ margin: 20px 0; max-width: 100%; }}
-                </style>
-            </head>
-            <body>
-                <h1>Báo cáo kiểm thử toàn diện</h1>
-                <p>Thời gian: {report.get('timestamp', datetime.now().isoformat())}</p>
-                
-                <h2>Tổng quan</h2>
-                <table>
-                    <tr>
-                        <th>Số lượng kiểm thử</th>
-                        <td>{report.get('summary', {}).get('total_tests', 0)}</td>
-                    </tr>
-                    <tr>
-                        <th>Số lượng coin</th>
-                        <td>{report.get('summary', {}).get('coins_tested', 0)}</td>
-                    </tr>
-                    <tr>
-                        <th>Số lượng khung thời gian</th>
-                        <td>{report.get('summary', {}).get('timeframes_tested', 0)}</td>
-                    </tr>
-                    <tr>
-                        <th>Số lượng khoảng thời gian</th>
-                        <td>{report.get('summary', {}).get('periods_tested', 0)}</td>
-                    </tr>
-                    <tr>
-                        <th>Số lượng chiến lược</th>
-                        <td>{report.get('summary', {}).get('strategies_tested', 0)}</td>
-                    </tr>
-                </table>
-                
-                <h2>So sánh chiến lược</h2>
-                <table>
-                    <tr>
-                        <th>Chiến lược</th>
-                        <th>Lợi nhuận trung bình (%)</th>
-                        <th>Tỷ lệ thắng trung bình (%)</th>
-                        <th>Profit factor trung bình</th>
-                        <th>Drawdown tối đa trung bình (%)</th>
-                        <th>Sharpe ratio trung bình</th>
-                        <th>Expectancy trung bình</th>
-                        <th>Số lượng kiểm thử</th>
-                    </tr>
-            """
+            # Tạo biểu đồ pie
+            fig, ax = plt.subplots(figsize=(8, 8))
+            ax.pie(regime_counts.values(), labels=regime_counts.keys(), autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            plt.title(f"Phân bố chế độ thị trường - {symbol}")
             
-            # Thêm dữ liệu so sánh chiến lược
-            for strategy, metrics in report.get('strategy_comparison', {}).items():
-                profit_class = "positive" if metrics.get('avg_total_profit', 0) > 0 else "negative"
-                html += f"""
-                    <tr>
-                        <td>{strategy}</td>
-                        <td class="{profit_class}">{metrics.get('avg_total_profit', 0):.2f}</td>
-                        <td>{metrics.get('avg_win_rate', 0):.2f}</td>
-                        <td>{metrics.get('avg_profit_factor', 0):.2f}</td>
-                        <td>{metrics.get('avg_max_drawdown', 0):.2f}</td>
-                        <td>{metrics.get('avg_sharpe_ratio', 0):.2f}</td>
-                        <td>{metrics.get('avg_expectancy', 0):.2f}</td>
-                        <td>{metrics.get('count', 0)}</td>
-                    </tr>
-                """
-                
-            html += """
-                </table>
-                
-                <h2>Top Performers</h2>
-                <h3>Top 10 theo lợi nhuận</h3>
-                <table>
-                    <tr>
-                        <th>Kiểm thử</th>
-                        <th>Lợi nhuận (%)</th>
-                    </tr>
-            """
+            # Lưu biểu đồ
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = os.path.join(output_dir, f"{symbol}_regime_distribution_{timestamp}.png")
+            plt.savefig(output_path)
+            plt.close()
             
-            # Thêm top performers by profit
-            for performer in report.get('top_performers', {}).get('by_profit', []):
-                profit_class = "positive" if performer.get('profit', 0) > 0 else "negative"
-                html += f"""
-                    <tr>
-                        <td>{performer.get('key', '')}</td>
-                        <td class="{profit_class}">{performer.get('profit', 0):.2f}</td>
-                    </tr>
-                """
-                
-            html += """
-                </table>
-                
-                <h3>Top 10 theo Sharpe ratio</h3>
-                <table>
-                    <tr>
-                        <th>Kiểm thử</th>
-                        <th>Sharpe ratio</th>
-                    </tr>
-            """
+            logger.info(f"Đã tạo biểu đồ phân bố chế độ thị trường cho {symbol}: {output_path}")
             
-            # Thêm top performers by sharpe
-            for performer in report.get('top_performers', {}).get('by_sharpe', []):
-                html += f"""
-                    <tr>
-                        <td>{performer.get('key', '')}</td>
-                        <td>{performer.get('sharpe', 0):.2f}</td>
-                    </tr>
-                """
-                
-            html += """
-                </table>
-                
-                <h2>Tối ưu hóa ML</h2>
-                <table>
-                    <tr>
-                        <th>Chiến lược</th>
-                        <th>Chế độ thị trường</th>
-                        <th>Tham số cải thiện</th>
-                        <th>Hiệu suất hiện tại</th>
-                    </tr>
-            """
-            
-            # Thêm ML optimization results
-            for improvement in report.get('ml_optimization', {}).get('improvements', []):
-                # Format param diff
-                param_diff_html = ""
-                for param, diff in improvement.get('param_diff', {}).items():
-                    change_class = "positive" if diff.get('change_pct', 0) > 0 else "negative"
-                    param_diff_html += f"{param}: {diff.get('old', 0)} → {diff.get('new', 0)} ({diff.get('change_pct', 0):.2f}%)<br>"
-                
-                # Format performance
-                performance = improvement.get('performance', {})
-                performance_html = f"""
-                    Lợi nhuận: {performance.get('total_profit', 0):.2f}%<br>
-                    Win rate: {performance.get('win_rate', 0):.2f}%<br>
-                    Profit factor: {performance.get('profit_factor', 0):.2f}<br>
-                    Sharpe ratio: {performance.get('sharpe_ratio', 0):.2f}
-                """
-                
-                html += f"""
-                    <tr>
-                        <td>{improvement.get('key', '')}</td>
-                        <td>{improvement.get('market_regime', 'unknown')}</td>
-                        <td>{param_diff_html}</td>
-                        <td>{performance_html}</td>
-                    </tr>
-                """
-                
-            html += """
-                </table>
-                
-                <h2>Biểu đồ</h2>
-                <h3>Một số biểu đồ hiệu suất tiêu biểu</h3>
-            """
-            
-            # Thêm một số biểu đồ tiêu biểu (top 5 performance)
-            top_performers = report.get('top_performers', {}).get('by_profit', [])
-            for i, performer in enumerate(top_performers[:5]):
-                key = performer.get('key', '')
-                equity_chart = os.path.join(self.charts_dir, f"{key}_equity.png")
-                trades_chart = os.path.join(self.charts_dir, f"{key}_trades.png")
-                
-                if os.path.exists(equity_chart) and os.path.exists(trades_chart):
-                    html += f"""
-                        <h4>{i+1}. {key}</h4>
-                        <div class="chart">
-                            <img src="{equity_chart}" alt="Equity Curve" width="800">
-                        </div>
-                        <div class="chart">
-                            <img src="{trades_chart}" alt="Trades" width="800">
-                        </div>
-                    """
-                    
-            html += """
-            </body>
-            </html>
-            """
-            
-            # Lưu báo cáo HTML
-            html_path = os.path.join(self.results_dir, "comprehensive_report.html")
-            with open(html_path, 'w') as f:
-                f.write(html)
-                
-            logger.info(f"Đã tạo báo cáo HTML: {html_path}")
+            return output_path
             
         except Exception as e:
-            logger.error(f"Lỗi khi tạo báo cáo HTML: {str(e)}")
+            logger.error(f"Lỗi khi tạo biểu đồ chế độ thị trường cho {symbol}: {str(e)}")
+            return None
+    
+    def create_strategy_usage_chart(self, symbol, output_dir=None):
+        """
+        Tạo biểu đồ sử dụng chiến lược
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            output_dir (str): Thư mục đầu ra
+            
+        Returns:
+            str: Đường dẫn đến biểu đồ
+        """
+        if output_dir is None:
+            output_dir = self.chart_dir
+        
+        if symbol not in self.test_data['by_symbol']:
+            logger.error(f"Không có dữ liệu test cho {symbol}")
+            return None
+        
+        strategy_usage = self.test_data['by_symbol'][symbol]['strategy_usage']
+        
+        if not strategy_usage:
+            logger.warning(f"Không có dữ liệu sử dụng chiến lược cho {symbol}")
+            return None
+        
+        try:
+            # Tạo biểu đồ bar
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.bar(strategy_usage.keys(), strategy_usage.values())
+            plt.title(f"Sử dụng chiến lược - {symbol}")
+            plt.xlabel("Chiến lược")
+            plt.ylabel("Số lần sử dụng")
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            
+            # Lưu biểu đồ
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = os.path.join(output_dir, f"{symbol}_strategy_usage_{timestamp}.png")
+            plt.savefig(output_path)
+            plt.close()
+            
+            logger.info(f"Đã tạo biểu đồ sử dụng chiến lược cho {symbol}: {output_path}")
+            
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tạo biểu đồ sử dụng chiến lược cho {symbol}: {str(e)}")
+            return None
+    
+    def create_signal_distribution_chart(self, symbol, output_dir=None):
+        """
+        Tạo biểu đồ phân bố tín hiệu giao dịch
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            output_dir (str): Thư mục đầu ra
+            
+        Returns:
+            str: Đường dẫn đến biểu đồ
+        """
+        if output_dir is None:
+            output_dir = self.chart_dir
+        
+        if symbol not in self.test_data['by_symbol']:
+            logger.error(f"Không có dữ liệu test cho {symbol}")
+            return None
+        
+        signal_counts = self.test_data['by_symbol'][symbol]['signal_counts']
+        
+        if not signal_counts:
+            logger.warning(f"Không có dữ liệu tín hiệu giao dịch cho {symbol}")
+            return None
+        
+        try:
+            # Tạo biểu đồ pie
+            fig, ax = plt.subplots(figsize=(8, 8))
+            ax.pie(signal_counts.values(), labels=signal_counts.keys(), autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            plt.title(f"Phân bố tín hiệu giao dịch - {symbol}")
+            
+            # Lưu biểu đồ
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = os.path.join(output_dir, f"{symbol}_signal_distribution_{timestamp}.png")
+            plt.savefig(output_path)
+            plt.close()
+            
+            logger.info(f"Đã tạo biểu đồ phân bố tín hiệu giao dịch cho {symbol}: {output_path}")
+            
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tạo biểu đồ phân bố tín hiệu giao dịch cho {symbol}: {str(e)}")
+            return None
+    
+    def create_strategy_by_regime_chart(self, symbol, output_dir=None):
+        """
+        Tạo biểu đồ phân bố chiến lược theo chế độ thị trường
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            output_dir (str): Thư mục đầu ra
+            
+        Returns:
+            str: Đường dẫn đến biểu đồ
+        """
+        if output_dir is None:
+            output_dir = self.chart_dir
+        
+        if symbol not in self.test_data['by_symbol']:
+            logger.error(f"Không có dữ liệu test cho {symbol}")
+            return None
+        
+        decisions = self.test_data['by_symbol'][symbol]['decisions']
+        
+        if not decisions:
+            logger.warning(f"Không có dữ liệu quyết định cho {symbol}")
+            return None
+        
+        try:
+            # Phân tích chiến lược theo chế độ thị trường
+            strategy_by_regime = {}
+            
+            for decision in decisions:
+                regime = decision['regime']
+                
+                if regime not in strategy_by_regime:
+                    strategy_by_regime[regime] = {}
+                
+                for strategy, _ in decision['strategies'].items():
+                    if strategy not in strategy_by_regime[regime]:
+                        strategy_by_regime[regime][strategy] = 0
+                    
+                    strategy_by_regime[regime][strategy] += 1
+            
+            # Tạo biểu đồ
+            fig, ax = plt.subplots(figsize=(12, 8))
+            
+            regimes = list(strategy_by_regime.keys())
+            unique_strategies = set()
+            for regime_data in strategy_by_regime.values():
+                unique_strategies.update(regime_data.keys())
+            
+            unique_strategies = list(unique_strategies)
+            
+            x = np.arange(len(regimes))
+            width = 0.8 / len(unique_strategies)
+            
+            for i, strategy in enumerate(unique_strategies):
+                values = [strategy_by_regime[regime].get(strategy, 0) for regime in regimes]
+                ax.bar(x + i * width, values, width, label=strategy)
+            
+            ax.set_xlabel('Chế độ thị trường')
+            ax.set_ylabel('Số lần sử dụng')
+            ax.set_title(f'Chiến lược theo chế độ thị trường - {symbol}')
+            ax.set_xticks(x + width * (len(unique_strategies) - 1) / 2)
+            ax.set_xticklabels(regimes)
+            ax.legend()
+            
+            plt.tight_layout()
+            
+            # Lưu biểu đồ
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = os.path.join(output_dir, f"{symbol}_strategy_by_regime_{timestamp}.png")
+            plt.savefig(output_path)
+            plt.close()
+            
+            logger.info(f"Đã tạo biểu đồ chiến lược theo chế độ thị trường cho {symbol}: {output_path}")
+            
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tạo biểu đồ chiến lược theo chế độ thị trường cho {symbol}: {str(e)}")
+            return None
+
+    def generate_comprehensive_report(self):
+        """
+        Tạo báo cáo tổng hợp về kết quả kiểm tra
+        
+        Returns:
+            Dict: Thông tin về báo cáo đã tạo
+        """
+        # Tạo báo cáo JSON
+        report_data = {
+            'test_summary': {
+                'start_time': self.test_data['start_time'],
+                'end_time': datetime.now(),
+                'duration_hours': (datetime.now() - self.test_data['start_time']).total_seconds() / 3600,
+                'iterations': self.test_data['iterations'],
+                'symbols_tested': self.symbols,
+                'timeframes': self.timeframes
+            },
+            'by_symbol': {}
+        }
+        
+        charts = {}
+        
+        # Xử lý dữ liệu từng cặp tiền
+        for symbol in self.symbols:
+            symbol_data = self.test_data['by_symbol'][symbol]
+            
+            # Tạo các biểu đồ
+            charts[symbol] = {
+                'regime_distribution': self.create_regime_detection_chart(symbol),
+                'strategy_usage': self.create_strategy_usage_chart(symbol),
+                'signal_distribution': self.create_signal_distribution_chart(symbol),
+                'strategy_by_regime': self.create_strategy_by_regime_chart(symbol)
+            }
+            
+            # Phân tích tương quan giữa chiến lược và chế độ thị trường
+            strategy_regime_correlation = {}
+            strategy_effectiveness = {}
+            
+            if symbol_data['decisions']:
+                # Phân nhóm quyết định theo chế độ thị trường
+                decisions_by_regime = {}
+                
+                for decision in symbol_data['decisions']:
+                    regime = decision['regime']
+                    
+                    if regime not in decisions_by_regime:
+                        decisions_by_regime[regime] = []
+                    
+                    decisions_by_regime[regime].append(decision)
+                
+                # Phân tích từng chế độ thị trường
+                for regime, decisions in decisions_by_regime.items():
+                    strategy_regime_correlation[regime] = {}
+                    
+                    # Đếm số lần sử dụng mỗi chiến lược trong chế độ này
+                    strategy_counts = {}
+                    
+                    for decision in decisions:
+                        for strategy, _ in decision['strategies'].items():
+                            if strategy not in strategy_counts:
+                                strategy_counts[strategy] = 0
+                            
+                            strategy_counts[strategy] += 1
+                    
+                    # Tính tỷ lệ phần trăm
+                    total_decisions = len(decisions)
+                    
+                    if total_decisions > 0:
+                        for strategy, count in strategy_counts.items():
+                            strategy_regime_correlation[regime][strategy] = count / total_decisions * 100
+            
+            # Phân tích độ chính xác của quyết định
+            # (Đánh giá hiệu quả yêu cầu thông tin về kết quả các giao dịch,
+            # nên chúng ta chỉ phân tích cách chọn chiến lược ở đây)
+            
+            report_data['by_symbol'][symbol] = {
+                'iterations': symbol_data['iterations'],
+                'regime_counts': symbol_data['regime_counts'],
+                'signal_counts': symbol_data['signal_counts'],
+                'strategy_usage': symbol_data['strategy_usage'],
+                'strategy_regime_correlation': strategy_regime_correlation,
+                'strategy_effectiveness': strategy_effectiveness,
+                'charts': {k: os.path.basename(v) if v else None for k, v in charts[symbol].items()}
+            }
+        
+        # Tạo báo cáo tổng quát dạng văn bản
+        text_report = []
+        text_report.append("="*80)
+        text_report.append("BÁO CÁO KIỂM TRA TOÀN DIỆN BOT GIAO DỊCH")
+        text_report.append("="*80)
+        text_report.append(f"Thời gian bắt đầu: {self.test_data['start_time'].strftime('%Y-%m-%d %H:%M:%S')}")
+        text_report.append(f"Thời gian kết thúc: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        text_report.append(f"Số vòng lặp: {self.test_data['iterations']}")
+        text_report.append(f"Các cặp tiền: {', '.join(self.symbols)}")
+        text_report.append(f"Các khung thời gian: {', '.join(self.timeframes)}")
+        text_report.append("")
+        
+        for symbol in self.symbols:
+            symbol_data = self.test_data['by_symbol'][symbol]
+            
+            text_report.append(f"PHÂN TÍCH CHO {symbol}")
+            text_report.append("-"*50)
+            
+            # Phân bố chế độ thị trường
+            text_report.append("\nPhân bố chế độ thị trường:")
+            for regime, count in symbol_data['regime_counts'].items():
+                text_report.append(f"  - {regime}: {count} lần")
+            
+            # Phân bố tín hiệu giao dịch
+            text_report.append("\nPhân bố tín hiệu giao dịch:")
+            for signal, count in symbol_data['signal_counts'].items():
+                text_report.append(f"  - {signal}: {count} lần")
+            
+            # Sử dụng chiến lược
+            text_report.append("\nSử dụng chiến lược:")
+            for strategy, count in symbol_data['strategy_usage'].items():
+                text_report.append(f"  - {strategy}: {count} lần")
+            
+            # Chiến lược theo chế độ thị trường
+            if 'strategy_regime_correlation' in report_data['by_symbol'][symbol]:
+                text_report.append("\nChiến lược theo chế độ thị trường:")
+                for regime, strategies in report_data['by_symbol'][symbol]['strategy_regime_correlation'].items():
+                    text_report.append(f"  Chế độ {regime}:")
+                    for strategy, percentage in strategies.items():
+                        text_report.append(f"    - {strategy}: {percentage:.1f}%")
+            
+            # Phân tích 3 quyết định gần nhất
+            if symbol_data['decisions']:
+                text_report.append("\nQuyết định gần nhất:")
+                for i, decision in enumerate(symbol_data['decisions'][-3:]):
+                    text_report.append(f"  Quyết định {i+1}:")
+                    text_report.append(f"    - Thời gian: {decision['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}")
+                    text_report.append(f"    - Chế độ thị trường: {decision['regime']}")
+                    text_report.append(f"    - Hành động: {decision['action']}")
+                    text_report.append(f"    - Giá: {decision['price']}")
+                    text_report.append(f"    - Chiến lược: {decision['strategies']}")
+            
+            text_report.append("")
+        
+        # Phần đánh giá tổng quát
+        text_report.append("\nĐÁNH GIÁ TỔNG QUÁT")
+        text_report.append("-"*50)
+        
+        # Đánh giá về việc phát hiện đa dạng chế độ thị trường
+        unique_regimes = set()
+        for symbol in self.symbols:
+            unique_regimes.update(self.test_data['by_symbol'][symbol]['regime_counts'].keys())
+        
+        text_report.append(f"\n1. Phát hiện chế độ thị trường:")
+        if len(unique_regimes) >= 3:
+            text_report.append("   ✓ Bot đã phát hiện đa dạng các chế độ thị trường")
+            for regime in unique_regimes:
+                text_report.append(f"     - {regime}")
+        else:
+            text_report.append(f"   ⚠ Bot chỉ phát hiện {len(unique_regimes)} chế độ thị trường")
+            for regime in unique_regimes:
+                text_report.append(f"     - {regime}")
+        
+        # Đánh giá về việc sử dụng đa dạng chiến lược
+        unique_strategies = set()
+        for symbol in self.symbols:
+            unique_strategies.update(self.test_data['by_symbol'][symbol]['strategy_usage'].keys())
+        
+        text_report.append(f"\n2. Sử dụng chiến lược giao dịch:")
+        if len(unique_strategies) >= 3:
+            text_report.append("   ✓ Bot đã vận dụng đa dạng các chiến lược giao dịch")
+            for strategy in unique_strategies:
+                text_report.append(f"     - {strategy}")
+        else:
+            text_report.append(f"   ⚠ Bot chỉ sử dụng {len(unique_strategies)} chiến lược giao dịch")
+            for strategy in unique_strategies:
+                text_report.append(f"     - {strategy}")
+        
+        # Đánh giá về sự phù hợp giữa chiến lược và chế độ thị trường
+        text_report.append(f"\n3. Sự phù hợp giữa chiến lược và chế độ thị trường:")
+        
+        strategy_regime_mapping = {
+            'trending': ['ema_cross', 'macd', 'adx'],
+            'ranging': ['rsi', 'stochastic', 'bbands'],
+            'volatile': ['atr', 'adx', 'rsi'],
+            'quiet': ['bbands', 'rsi', 'stochastic']
+        }
+        
+        matching_scores = []
+        
+        for symbol in self.symbols:
+            if 'strategy_regime_correlation' in report_data['by_symbol'][symbol]:
+                for regime, strategies in report_data['by_symbol'][symbol]['strategy_regime_correlation'].items():
+                    if regime in strategy_regime_mapping:
+                        expected_strategies = strategy_regime_mapping[regime]
+                        actual_strategies = list(strategies.keys())
+                        
+                        # Tính số lượng chiến lược trùng khớp
+                        matching = sum(1 for s in actual_strategies if s.lower() in expected_strategies)
+                        
+                        if actual_strategies:
+                            score = matching / len(actual_strategies)
+                            matching_scores.append(score)
+        
+        if matching_scores:
+            avg_matching_score = sum(matching_scores) / len(matching_scores)
+            
+            if avg_matching_score >= 0.7:
+                text_report.append("   ✓ Bot chọn chiến lược PHÙ HỢP với từng chế độ thị trường")
+            elif avg_matching_score >= 0.5:
+                text_report.append("   ⚠ Bot chọn chiến lược TƯƠNG ĐỐI PHÙ HỢP với từng chế độ thị trường")
+            else:
+                text_report.append("   ✗ Bot chọn chiến lược CHƯA PHÙ HỢP với từng chế độ thị trường")
+        else:
+            text_report.append("   ? Chưa đủ dữ liệu để đánh giá sự phù hợp")
+        
+        # Đánh giá về chiến lược BBands trong thị trường yên tĩnh
+        text_report.append(f"\n4. Chiến lược BBands trong thị trường yên tĩnh:")
+        
+        bbands_in_quiet = False
+        for symbol in self.symbols:
+            if 'strategy_regime_correlation' in report_data['by_symbol'][symbol]:
+                if 'quiet' in report_data['by_symbol'][symbol]['strategy_regime_correlation']:
+                    quiet_strategies = report_data['by_symbol'][symbol]['strategy_regime_correlation']['quiet']
+                    
+                    for strategy in quiet_strategies:
+                        if strategy.lower() == 'bbands':
+                            bbands_in_quiet = True
+                            break
+        
+        if bbands_in_quiet:
+            text_report.append("   ✓ Bot đã vận dụng chiến lược BBands trong thị trường yên tĩnh")
+        else:
+            text_report.append("   ⚠ Bot chưa vận dụng chiến lược BBands trong thị trường yên tĩnh")
+        
+        # Tính tỷ lệ tín hiệu HOLD
+        hold_ratio = {}
+        for symbol in self.symbols:
+            signal_counts = self.test_data['by_symbol'][symbol]['signal_counts']
+            total_signals = sum(signal_counts.values())
+            
+            if total_signals > 0:
+                hold_count = signal_counts.get('HOLD', 0)
+                hold_ratio[symbol] = hold_count / total_signals
+        
+        text_report.append(f"\n5. Tỷ lệ giữ vị thế (HOLD):")
+        for symbol, ratio in hold_ratio.items():
+            text_report.append(f"   - {symbol}: {ratio:.1%}")
+        
+        avg_hold_ratio = sum(hold_ratio.values()) / len(hold_ratio) if hold_ratio else 0
+        
+        if avg_hold_ratio >= 0.7:
+            text_report.append("   ⚠ Tỷ lệ HOLD quá cao, bot có thể quá thận trọng")
+        elif avg_hold_ratio <= 0.3:
+            text_report.append("   ⚠ Tỷ lệ HOLD quá thấp, bot có thể quá mạo hiểm")
+        else:
+            text_report.append("   ✓ Tỷ lệ HOLD phù hợp, bot có xu hướng cân bằng")
+        
+        # Kết luận chung
+        text_report.append("\nKẾT LUẬN VÀ KIẾN NGHỊ")
+        text_report.append("-"*50)
+        
+        # Kiến nghị dựa trên các phát hiện
+        text_report.append("\nCác phát hiện chính:")
+        
+        if len(unique_regimes) < 4:
+            text_report.append("- Bot chưa phát hiện đủ các chế độ thị trường")
+            text_report.append("  Kiến nghị: Nên tăng thời gian test hoặc đa dạng hóa dữ liệu test")
+        
+        if not bbands_in_quiet:
+            text_report.append("- Chiến lược BBands chưa được áp dụng trong thị trường yên tĩnh")
+            text_report.append("  Kiến nghị: Điều chỉnh logic lựa chọn chiến lược trong chế độ yên tĩnh")
+        
+        if avg_hold_ratio >= 0.7:
+            text_report.append("- Bot có xu hướng quá thận trọng (tỷ lệ HOLD cao)")
+            text_report.append("  Kiến nghị: Điều chỉnh ngưỡng tín hiệu để bot chủ động hơn")
+        
+        if avg_hold_ratio <= 0.3:
+            text_report.append("- Bot có xu hướng quá mạo hiểm (tỷ lệ HOLD thấp)")
+            text_report.append("  Kiến nghị: Điều chỉnh ngưỡng tín hiệu để bot thận trọng hơn")
+        
+        # Lưu báo cáo
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Lưu báo cáo JSON
+        json_report_path = os.path.join(self.report_dir, f"comprehensive_report_{timestamp}.json")
+        with open(json_report_path, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, indent=4, default=str)
+        
+        # Lưu báo cáo văn bản
+        text_report_path = os.path.join(self.report_dir, f"comprehensive_report_{timestamp}.txt")
+        with open(text_report_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(text_report))
+        
+        logger.info(f"Đã tạo báo cáo JSON: {json_report_path}")
+        logger.info(f"Đã tạo báo cáo văn bản: {text_report_path}")
+        
+        return {
+            'json_report': json_report_path,
+            'text_report': text_report_path,
+            'charts': charts
+        }
+    
+    def run_comprehensive_test(self):
+        """Chạy kiểm tra toàn diện"""
+        logger.info(f"Bắt đầu kiểm tra toàn diện (thời lượng: {self.test_duration_hours} giờ)")
+        
+        # Tải dữ liệu lịch sử
+        self.load_historical_data()
+        
+        # Tính thời điểm kết thúc
+        end_time = datetime.now() + timedelta(hours=self.test_duration_hours)
+        
+        try:
+            # Vòng lặp chính
+            while datetime.now() < end_time:
+                # Cập nhật dữ liệu thị trường
+                self.update_market_data()
+                
+                # Chạy một vòng lặp kiểm tra
+                self.run_bot_test_iteration()
+                
+                # Chờ một khoảng thời gian
+                logger.info(f"Hoàn thành vòng lặp {self.test_data['iterations']}. Chờ 5 phút trước khi cập nhật.")
+                
+                # Trong test ngắn, nên chờ ít thời gian hơn
+                wait_time = min(60, 300 if self.test_duration_hours > 1 else 30)
+                time.sleep(wait_time)
+                
+        except KeyboardInterrupt:
+            logger.info("Kiểm tra bị ngắt bởi người dùng")
+        except Exception as e:
+            logger.error(f"Lỗi không xác định: {str(e)}")
+        finally:
+            # Tạo báo cáo kết quả
+            report_info = self.generate_comprehensive_report()
+            
+            return report_info
 
 def main():
-    """Hàm chính"""
-    try:
-        # Khởi tạo tester
-        tester = ComprehensiveTester()
-        
-        # Tải dữ liệu
-        print("Đang tải dữ liệu...")
-        tester.fetch_data()
-        
-        # Chạy backtest
-        print("Đang chạy backtest...")
-        tester.run_backtest()
-        
-        # Áp dụng học máy
-        print("Đang áp dụng học máy...")
-        tester.apply_machine_learning()
-        
-        # Tạo báo cáo
-        print("Đang tạo báo cáo...")
-        report = tester.generate_report()
-        
-        print(f"Đã hoàn thành! Kết quả được lưu trong thư mục {tester.results_dir}")
-        print(f"Báo cáo chi tiết: {os.path.join(tester.results_dir, 'comprehensive_report.html')}")
-        
-    except Exception as e:
-        logger.error(f"Lỗi khi chạy kiểm thử toàn diện: {str(e)}")
-        logger.error(str(traceback.format_exc()))
+    # Xử lý tham số dòng lệnh
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Kiểm tra toàn diện bot giao dịch tiền điện tử')
+    parser.add_argument('--duration', type=float, default=2, help='Thời lượng test (giờ)')
+    parser.add_argument('--symbols', type=str, default='BTCUSDT,ETHUSDT,SOLUSDT', help='Các cặp tiền cần test (phân cách bằng dấu phẩy)')
+    parser.add_argument('--timeframes', type=str, default='1h,4h', help='Các khung thời gian (phân cách bằng dấu phẩy)')
+    
+    args = parser.parse_args()
+    
+    symbols = args.symbols.split(',')
+    timeframes = args.timeframes.split(',')
+    
+    # Khởi tạo và chạy tester
+    tester = ComprehensiveTester(
+        symbols=symbols,
+        timeframes=timeframes,
+        test_duration_hours=args.duration
+    )
+    
+    tester.run_comprehensive_test()
 
 if __name__ == "__main__":
     main()
