@@ -41,7 +41,7 @@ except ImportError as e:
 
 def download_historical_data(symbol: str, interval: str, months: int = 6) -> pd.DataFrame:
     """
-    Tải dữ liệu lịch sử từ Binance
+    Tải dữ liệu lịch sử từ Binance hoặc sử dụng dữ liệu mẫu
     
     Args:
         symbol (str): Cặp giao dịch (ví dụ: BTCUSDT)
@@ -51,10 +51,6 @@ def download_historical_data(symbol: str, interval: str, months: int = 6) -> pd.
     Returns:
         pd.DataFrame: DataFrame chứa dữ liệu lịch sử OHLCV
     """
-    # Lấy API key và secret từ biến môi trường
-    api_key = os.environ.get('BINANCE_API_KEY')
-    api_secret = os.environ.get('BINANCE_API_SECRET')
-    
     # Tính toán thời gian bắt đầu và kết thúc
     end_time = datetime.now()
     start_time = end_time - timedelta(days=30*months)
@@ -76,6 +72,20 @@ def download_historical_data(symbol: str, interval: str, months: int = 6) -> pd.
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df.set_index('timestamp', inplace=True)
         return df
+    
+    # Tìm file dữ liệu mẫu
+    sample_filename = f"{data_dir}/{symbol}_{interval}_sample.csv"
+    if os.path.exists(sample_filename):
+        logger.info(f"Sử dụng dữ liệu mẫu từ {sample_filename}")
+        df = pd.read_csv(sample_filename)
+        if 'timestamp' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df.set_index('timestamp', inplace=True)
+        return df
+    
+    # Lấy API key và secret từ biến môi trường
+    api_key = os.environ.get('BINANCE_API_KEY')
+    api_secret = os.environ.get('BINANCE_API_SECRET')
     
     if api_key and api_secret:
         # Sử dụng API Binance để tải dữ liệu
@@ -101,11 +111,41 @@ def download_historical_data(symbol: str, interval: str, months: int = 6) -> pd.
             
         except Exception as e:
             logger.error(f"Lỗi khi tải dữ liệu từ Binance: {e}")
-            # Thử tìm dữ liệu đã lưu làm backup
-            raise
+            # Tạo dữ liệu mẫu nếu có thể
+            try:
+                from generate_sample_data import generate_price_series
+                logger.info(f"Tạo dữ liệu mẫu cho {symbol} {interval}...")
+                
+                sample_df = generate_price_series(symbol=symbol, days=30*months, interval=interval)
+                sample_df.to_csv(sample_filename)
+                logger.info(f"Đã lưu dữ liệu mẫu vào {sample_filename}")
+                
+                if 'timestamp' in sample_df.columns:
+                    sample_df['timestamp'] = pd.to_datetime(sample_df['timestamp'])
+                    sample_df.set_index('timestamp', inplace=True)
+                    
+                return sample_df
+            except Exception as sample_error:
+                logger.error(f"Không thể tạo dữ liệu mẫu: {sample_error}")
+                raise ValueError(f"Không thể tải dữ liệu từ Binance và không thể tạo dữ liệu mẫu: {e}")
     else:
-        logger.error("Không có API key/secret Binance")
-        raise ValueError("Không tìm thấy dữ liệu và không có API key/secret Binance để tải mới")
+        # Tạo dữ liệu mẫu nếu không có API key
+        try:
+            from generate_sample_data import generate_price_series
+            logger.info(f"Tạo dữ liệu mẫu cho {symbol} {interval}...")
+            
+            sample_df = generate_price_series(symbol=symbol, days=30*months, interval=interval)
+            sample_df.to_csv(sample_filename)
+            logger.info(f"Đã lưu dữ liệu mẫu vào {sample_filename}")
+            
+            if 'timestamp' in sample_df.columns:
+                sample_df['timestamp'] = pd.to_datetime(sample_df['timestamp'])
+                sample_df.set_index('timestamp', inplace=True)
+                
+            return sample_df
+        except Exception as sample_error:
+            logger.error(f"Không thể tạo dữ liệu mẫu: {sample_error}")
+            raise ValueError("Không có API key/secret Binance và không thể tạo dữ liệu mẫu")
 
 def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
