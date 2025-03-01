@@ -146,17 +146,19 @@ class TelegramNotifier:
             logger.error(f"Lỗi khi gửi tài liệu qua Telegram: {e}")
             return False
     
-    def send_trade_signal(self, symbol: str, signal: str, confidence: float, 
-                         price: float, timeframe: str, description: str = None) -> bool:
+    def send_trade_signal(self, signal_info: Dict = None, symbol: str = None, signal: str = None, 
+                         confidence: float = None, price: float = None, 
+                         timeframe: str = None, description: str = None) -> bool:
         """
         Gửi tín hiệu giao dịch qua Telegram.
         
         Args:
-            symbol (str): Cặp giao dịch
-            signal (str): Loại tín hiệu ('BUY', 'SELL', 'NEUTRAL')
-            confidence (float): Độ tin cậy của tín hiệu (0-100)
-            price (float): Giá hiện tại
-            timeframe (str): Khung thời gian
+            signal_info (Dict, optional): Dictionary chứa thông tin tín hiệu đầy đủ
+            symbol (str, optional): Cặp giao dịch
+            signal (str, optional): Loại tín hiệu ('BUY', 'SELL', 'NEUTRAL')
+            confidence (float, optional): Độ tin cậy của tín hiệu (0-100)
+            price (float, optional): Giá hiện tại
+            timeframe (str, optional): Khung thời gian
             description (str, optional): Mô tả thêm về tín hiệu
             
         Returns:
@@ -166,6 +168,27 @@ class TelegramNotifier:
             return False
         
         try:
+            # Nếu có dictionary thông tin tín hiệu, ưu tiên sử dụng thông tin từ đó
+            if signal_info:
+                symbol = signal_info.get("symbol", symbol)
+                signal = signal_info.get("final_signal", signal_info.get("ml_signal", signal))
+                confidence = signal_info.get("ml_confidence", confidence)
+                if confidence is not None:
+                    confidence *= 100  # Chuyển từ 0-1 sang 0-100
+                price = signal_info.get("current_price", price)
+                timeframe = signal_info.get("timeframe", timeframe)
+                
+                # Tạo mô tả từ thông tin phân tích
+                if description is None and "market_regime" in signal_info:
+                    regime = signal_info.get("market_regime", "")
+                    composite_score = signal_info.get("composite_score", 0)
+                    description = f"Chế độ thị trường: {regime.replace('_', ' ').title()}\n"
+                    description += f"Điểm tổng hợp: {composite_score:.2f}"
+            
+            # Đảm bảo các giá trị mặc định hợp lệ
+            signal = signal.upper() if signal else "NEUTRAL"
+            confidence = confidence if confidence is not None else 50.0
+            
             signal_emoji = "🔴 BÁN" if signal == "SELL" else "🟢 MUA" if signal == "BUY" else "⚪ TRUNG LẬP"
             
             # Xác định màu confidence
@@ -173,11 +196,14 @@ class TelegramNotifier:
             
             # Tạo tin nhắn
             message = f"<b>📊 TÍN HIỆU GIAO DỊCH</b>\n\n"
-            message += f"<b>Cặp:</b> {symbol}\n"
-            message += f"<b>Khung TG:</b> {timeframe}\n"
+            if symbol:
+                message += f"<b>Cặp:</b> {symbol}\n"
+            if timeframe:
+                message += f"<b>Khung TG:</b> {timeframe}\n"
             message += f"<b>Tín hiệu:</b> {signal_emoji}\n"
             message += f"<b>Độ tin cậy:</b> {confidence_color} {confidence:.1f}%\n"
-            message += f"<b>Giá hiện tại:</b> ${price:.2f}\n"
+            if price is not None:
+                message += f"<b>Giá hiện tại:</b> ${price:.2f}\n"
             
             if description:
                 message += f"\n<i>{description}</i>"
@@ -190,8 +216,97 @@ class TelegramNotifier:
             logger.error(f"Lỗi khi gửi tín hiệu giao dịch qua Telegram: {e}")
             return False
     
-    def send_trade_execution(self, symbol: str, side: str, quantity: float, 
-                           price: float, total: float, pnl: float = None) -> bool:
+    def send_position_closed(self, position_data: Dict = None, symbol: str = None, 
+                          side: str = None, entry_price: float = None, exit_price: float = None,
+                          quantity: float = None, pnl: float = None, pnl_percent: float = None,
+                          exit_reason: str = None) -> bool:
+        """
+        Gửi thông báo đóng vị thế qua Telegram.
+        
+        Args:
+            position_data (Dict, optional): Dictionary chứa thông tin vị thế đã đóng
+            symbol (str, optional): Cặp giao dịch
+            side (str, optional): Hướng vị thế ('BUY'/'SELL' hoặc 'LONG'/'SHORT')
+            entry_price (float, optional): Giá vào lệnh
+            exit_price (float, optional): Giá thoát lệnh
+            quantity (float, optional): Số lượng
+            pnl (float, optional): Lãi/lỗ (giá trị tuyệt đối)
+            pnl_percent (float, optional): Lãi/lỗ (%)
+            exit_reason (str, optional): Lý do thoát lệnh
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled:
+            return False
+            
+        try:
+            # Nếu có dictionary thông tin vị thế, ưu tiên sử dụng thông tin từ đó
+            if position_data:
+                symbol = position_data.get("symbol", symbol)
+                side = position_data.get("side", position_data.get("type", side))
+                entry_price = position_data.get("entry_price", entry_price)
+                exit_price = position_data.get("exit_price", exit_price)
+                quantity = position_data.get("quantity", quantity)
+                pnl = position_data.get("pnl", pnl)
+                pnl_percent = position_data.get("pnl_percent", pnl_percent)
+                exit_reason = position_data.get("exit_reason", exit_reason)
+            
+            # Chuẩn hóa side
+            if side:
+                side = side.upper()
+                side_display = "LONG" if side in ["BUY", "LONG"] else "SHORT" if side in ["SELL", "SHORT"] else side
+                side_emoji = "🟢" if side in ["BUY", "LONG"] else "🔴" if side in ["SELL", "SHORT"] else "⚪"
+            else:
+                side_display = "N/A"
+                side_emoji = "⚪"
+            
+            # Tính toán tổng giá trị nếu có thể
+            total = None
+            if quantity is not None and exit_price is not None:
+                total = quantity * exit_price
+            
+            # Tạo tin nhắn
+            message = f"<b>🔚 VỊ THẾ ĐÓNG</b>\n\n"
+            if symbol:
+                message += f"<b>Cặp:</b> {symbol}\n"
+            message += f"<b>Vị thế:</b> {side_emoji} {side_display}\n"
+            
+            if quantity is not None:
+                message += f"<b>Số lượng:</b> {quantity}\n"
+            
+            if entry_price is not None:
+                message += f"<b>Giá vào:</b> ${entry_price:.2f}\n"
+                
+            if exit_price is not None:
+                message += f"<b>Giá ra:</b> ${exit_price:.2f}\n"
+                
+            if total is not None:
+                message += f"<b>Tổng giá trị:</b> ${total:.2f}\n"
+            
+            if pnl is not None:
+                is_profit = pnl >= 0
+                pnl_emoji = "✅" if is_profit else "❌"
+                message += f"<b>Lãi/Lỗ:</b> {pnl_emoji} ${abs(pnl):.2f}"
+                
+                if pnl_percent is not None:
+                    message += f" ({'+' if is_profit else '-'}{abs(pnl_percent):.2f}%)"
+                
+                message += "\n"
+            
+            if exit_reason:
+                message += f"<b>Lý do:</b> {exit_reason}\n"
+            
+            message += f"\n<i>Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>"
+            
+            return self.send_message(message)
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo đóng vị thế qua Telegram: {e}")
+            return False
+    
+    def send_trade_execution(self, symbol: str = None, side: str = None, quantity: float = None, 
+                           price: float = None, total: float = None, pnl: float = None) -> bool:
         """
         Gửi thông báo thực hiện giao dịch qua Telegram.
         
@@ -287,6 +402,21 @@ class TelegramNotifier:
             logger.error(f"Lỗi khi gửi báo cáo hàng ngày qua Telegram: {e}")
             return False
     
+    def send_error_alert(self, error_message: str, error_type: str = "System Error",
+                    severity: str = "medium") -> bool:
+        """
+        Gửi thông báo cảnh báo lỗi qua Telegram.
+        
+        Args:
+            error_message (str): Nội dung thông báo lỗi
+            error_type (str, optional): Loại lỗi
+            severity (str, optional): Mức độ nghiêm trọng ('low', 'medium', 'high')
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        return self.send_error_notification(error_type, error_message, severity)
+        
     def send_error_notification(self, error_type: str, description: str, 
                               severity: str = "medium") -> bool:
         """

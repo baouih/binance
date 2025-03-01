@@ -1,0 +1,37 @@
+Dựa trên hệ thống hiện tại và báo cáo tự động, tôi đề xuất bổ sung các tính năng sau để hoàn thiện hệ thống giao dịch:
+
+### 1. Quản lý vốn nâng cao
+- **Position Sizing động**: Điều chỉnh kích thước vị thế dựa trên volatility và độ tin cậy của tín hiệu
+- **Kelly Criterion tích hợp**: Tối ưu hóa kích thước vị thế dựa trên xác suất thắng và tỷ lệ risk/reward
+- **Anti-Martingale thông minh**: Tăng kích thước vị thế khi có chuỗi thắng, giảm khi thua
+- **Phân bổ tài sản theo danh mục**: Quản lý exposure trên nhiều cặp tiền với tỷ lệ tương quan
+
+### 2. Phương thức đi lệnh nâng cao
+- **Iceberg Orders**: Chia nhỏ lệnh lớn để giảm slippage và tác động thị trường
+- **TWAP/VWAP Execution**: Thực thi lệnh theo thời gian hoặc khối lượng trung bình
+- **Scaled Entry/Exit**: Vào/ra lệnh theo nhiều cấp giá, tối ưu giá trung bình
+- **OCO Orders** (One-Cancels-Other): Kết hợp take-profit và stop-loss trong một lệnh
+- **Conditional Orders**: Lệnh chỉ kích hoạt khi đáp ứng điều kiện phụ (ví dụ: khối lượng, volatility)
+
+### 3. Bổ sung vào báo cáo tự động
+- **Phân tích hiệu suất theo điều kiện thị trường**: Tỷ lệ thắng/thua trong các chế độ thị trường khác nhau
+- **Expectancy Score**: Chỉ số kỳ vọng lợi nhuận trên mỗi giao dịch
+- **Phân tích rủi ro chi tiết**: VaR, CVaR, Maximum Drawdown Duration
+- **Thống kê edge giao dịch**: Cung cấp dữ liệu về edge thống kê của hệ thống
+- **Vùng giá xung đột (Order Book Heat Map)**: Hiển thị vùng tập trung lệnh mua/bán lớn
+
+### 4. Cải tiến về thuật toán và kiến trúc
+- **Portfolio Optimization**: Tối ưu hóa danh mục đầu tư dựa trên Modern Portfolio Theory
+- **Regime-based Model Switching**: Tự động chuyển đổi mô hình dựa trên chế độ thị trường
+- **Adaptive Parameter Tuning**: Tự động điều chỉnh tham số dựa trên điều kiện thị trường
+- **Multi-strategy Ensemble**: Kết hợp nhiều chiến lược với trọng số động
+- **Self-Optimization Loop**: Vòng lặp tự tối ưu hóa dựa trên kết quả gần đây
+
+### 5. Quản lý rủi ro nâng cao
+- **Correlation-based Position Sizing**: Điều chỉnh kích thước vị thế dựa trên tương quan giữa các cặp tiền
+- **Volatility-based Stop Loss**: Stop loss tự động điều chỉnh theo biến động thị trường
+- **Circuit Breakers**: Tự động dừng giao dịch khi thị trường biến động quá mức
+- **Drawdown Control Rules**: Quy tắc giảm kích thước giao dịch khi drawdown vượt ngưỡng
+- **Stress Testing Scenarios**: Mô phỏng kịch bản căng thẳng thị trường và phản ứng hệ thống
+
+Những cải tiến này sẽ giúp hệ thống toàn diện hơn, đặc biệt trong quản lý vốn và phương thức đi lệnh - hai yếu tố quan trọng quyết định hiệu suất dài hạn của bot giao dịch.​​​​​​​​​​​​​​​​

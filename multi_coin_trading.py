@@ -115,7 +115,10 @@ class MultiCoinTradingBot:
         
         # Gửi thông báo Telegram khi khởi động
         if self.general_settings["telegram_notifications"]:
-            telegram_notifier.send_startup_notification()
+            try:
+                telegram_notifier.send_startup_notification()
+            except Exception as e:
+                logger.warning(f"Không gửi được thông báo khởi động: {e}")
         
         logger.info(f"Bot giao dịch đa đồng tiền đã được khởi tạo với {len(self.active_pairs)} cặp giao dịch")
     
