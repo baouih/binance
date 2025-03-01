@@ -9,9 +9,9 @@
 let equityCurveChart, performanceRadarChart;
 const refreshInterval = 10000; // 10 seconds refresh interval
 const API_ENDPOINTS = {
-    ACCOUNT: '/api/realtime/account',
-    MARKET: '/api/realtime/market',
-    SIGNALS: '/api/realtime/signals',
+    ACCOUNT: '/api/account',
+    MARKET: '/api/market',
+    SIGNALS: '/api/signals',
     BOT_STATUS: '/api/bot/status',
     BOT_CONTROL: '/api/bot/control',
     CLOSE_POSITION: '/api/positions/close',
