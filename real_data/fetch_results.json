@@ -1,0 +1,565 @@
+{
+  "time": "2025-03-01 16:16:47",
+  "symbols": {
+    "BTCUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/BTCUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:47",
+          "end_date": "2025-03-01 15:16:47"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BTCUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:47",
+          "end_date": "2025-03-01 15:16:47"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BTCUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:47",
+          "end_date": "2025-03-01 15:16:47"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/BTCUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:47",
+          "end_date": "2025-03-01 12:16:47"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BTCUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BTCUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/BTCUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BTCUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BTCUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        }
+      }
+    },
+    "ETHUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/ETHUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ETHUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ETHUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/ETHUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ETHUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ETHUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/ETHUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ETHUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ETHUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        }
+      }
+    },
+    "BNBUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/BNBUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BNBUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BNBUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/BNBUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BNBUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BNBUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-03-01 12:16:48"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/BNBUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/BNBUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/BNBUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:48",
+          "end_date": "2025-02-28 16:16:48"
+        }
+      }
+    },
+    "SOLUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/SOLUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/SOLUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:48",
+          "end_date": "2025-03-01 15:16:48"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/SOLUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/SOLUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/SOLUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/SOLUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/SOLUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/SOLUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/SOLUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        }
+      }
+    },
+    "DOGEUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOGEUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOGEUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOGEUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOGEUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOGEUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOGEUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOGEUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOGEUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOGEUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-02-28 16:16:49"
+        }
+      }
+    },
+    "XRPUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/XRPUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/XRPUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/XRPUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:49",
+          "end_date": "2025-03-01 15:16:49"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/XRPUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/XRPUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:49",
+          "end_date": "2025-03-01 12:16:49"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/XRPUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/XRPUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/XRPUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/XRPUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        }
+      }
+    },
+    "ADAUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/ADAUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ADAUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ADAUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/ADAUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ADAUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ADAUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/ADAUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/ADAUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/ADAUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        }
+      }
+    },
+    "DOTUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOTUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOTUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOTUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOTUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOTUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOTUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-03-01 12:16:50"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/DOTUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/DOTUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/DOTUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:50",
+          "end_date": "2025-02-28 16:16:50"
+        }
+      }
+    },
+    "LINKUSDT": {
+      "1h": {
+        "1_month": {
+          "file_path": "real_data/1_month/LINKUSDT_1h.csv",
+          "candles": 720,
+          "start_date": "2025-01-30 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/LINKUSDT_1h.csv",
+          "candles": 2160,
+          "start_date": "2024-12-01 16:16:50",
+          "end_date": "2025-03-01 15:16:50"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/LINKUSDT_1h.csv",
+          "candles": 4320,
+          "start_date": "2024-09-02 16:16:51",
+          "end_date": "2025-03-01 15:16:51"
+        }
+      },
+      "4h": {
+        "1_month": {
+          "file_path": "real_data/1_month/LINKUSDT_4h.csv",
+          "candles": 180,
+          "start_date": "2025-01-30 16:16:51",
+          "end_date": "2025-03-01 12:16:51"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/LINKUSDT_4h.csv",
+          "candles": 540,
+          "start_date": "2024-12-01 16:16:51",
+          "end_date": "2025-03-01 12:16:51"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/LINKUSDT_4h.csv",
+          "candles": 1080,
+          "start_date": "2024-09-02 16:16:51",
+          "end_date": "2025-03-01 12:16:51"
+        }
+      },
+      "1d": {
+        "1_month": {
+          "file_path": "real_data/1_month/LINKUSDT_1d.csv",
+          "candles": 30,
+          "start_date": "2025-01-30 16:16:51",
+          "end_date": "2025-02-28 16:16:51"
+        },
+        "3_months": {
+          "file_path": "real_data/3_months/LINKUSDT_1d.csv",
+          "candles": 90,
+          "start_date": "2024-12-01 16:16:51",
+          "end_date": "2025-02-28 16:16:51"
+        },
+        "6_months": {
+          "file_path": "real_data/6_months/LINKUSDT_1d.csv",
+          "candles": 180,
+          "start_date": "2024-09-02 16:16:51",
+          "end_date": "2025-02-28 16:16:51"
+        }
+      }
+    }
+  },
+  "total_files": 81,
+  "total_candles": 83700
+}
