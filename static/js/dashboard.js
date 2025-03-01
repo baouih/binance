@@ -6,9 +6,21 @@
  */
 
 // Global variables
-const socket = io();
 let equityCurveChart, performanceRadarChart;
 const refreshInterval = 10000; // 10 seconds refresh interval
+const API_ENDPOINTS = {
+    ACCOUNT: '/api/realtime/account',
+    MARKET: '/api/realtime/market',
+    SIGNALS: '/api/realtime/signals',
+    BOT_STATUS: '/api/bot/status',
+    BOT_CONTROL: '/api/bot/control',
+    CLOSE_POSITION: '/api/positions/close',
+    TEST_API: '/api/test/api_connection',
+    TEST_TELEGRAM: '/api/test/telegram',
+    TEST_EMAIL: '/api/test/email',
+    RUN_BACKTEST: '/api/backtest/run',
+    GENERATE_REPORT: '/api/reports/generate'
+};
 
 // Document ready function
 document.addEventListener('DOMContentLoaded', function() {
