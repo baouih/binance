@@ -222,19 +222,27 @@ def run_backtest(symbol='BTCUSDT', interval='1h',
     
     # Lưu kết quả
     with open(result_file, 'w') as f:
-        # Xử lý các đối tượng datetime
+        # Xử lý các đối tượng datetime và numpy types
         serializable_result = {}
+        
+        # Xử lý từng phần tử để đảm bảo có thể serializable
         for key, value in result.items():
             if key == 'trades':
                 serializable_result[key] = []
                 for trade in value:
                     serializable_trade = {}
                     for trade_key, trade_value in trade.items():
-                        if isinstance(trade_value, datetime):
+                        # Xử lý datetime
+                        if hasattr(trade_value, 'strftime'):
                             serializable_trade[trade_key] = trade_value.strftime('%Y-%m-%d %H:%M:%S')
+                        # Xử lý numpy types
+                        elif isinstance(trade_value, (np.integer, np.floating)):
+                            serializable_trade[trade_key] = float(trade_value)
                         else:
                             serializable_trade[trade_key] = trade_value
                     serializable_result[key].append(serializable_trade)
+            elif key == 'equity_curve':
+                serializable_result[key] = [float(x) if isinstance(x, (np.integer, np.floating)) else x for x in value]
             elif key == 'dates':
                 serializable_result[key] = [d.strftime('%Y-%m-%d %H:%M:%S') if hasattr(d, 'strftime') else str(d) for d in value]
             elif key == 'regime_changes':
@@ -242,12 +250,33 @@ def run_backtest(symbol='BTCUSDT', interval='1h',
                 for change in value:
                     serializable_change = {}
                     for change_key, change_value in change.items():
-                        if isinstance(change_value, datetime):
+                        if hasattr(change_value, 'strftime'):
                             serializable_change[change_key] = change_value.strftime('%Y-%m-%d %H:%M:%S')
+                        elif isinstance(change_value, (np.integer, np.floating)):
+                            serializable_change[change_key] = float(change_value)
                         else:
                             serializable_change[change_key] = change_value
                     serializable_result[key].append(serializable_change)
+            elif key == 'regime_performance' or key == 'metrics' or key == 'regime_distribution':
+                # Xử lý dictionaries nested
+                serializable_result[key] = {}
+                for sub_key, sub_value in value.items():
+                    if isinstance(sub_value, dict):
+                        serializable_result[key][sub_key] = {}
+                        for sub_sub_key, sub_sub_value in sub_value.items():
+                            if isinstance(sub_sub_value, (np.integer, np.floating)):
+                                serializable_result[key][sub_key][sub_sub_key] = float(sub_sub_value)
+                            else:
+                                serializable_result[key][sub_key][sub_sub_key] = sub_sub_value
+                    elif isinstance(sub_value, (np.integer, np.floating)):
+                        serializable_result[key][sub_key] = float(sub_value)
+                    else:
+                        serializable_result[key][sub_key] = sub_value
+            elif isinstance(value, (np.integer, np.floating)):
+                # Xử lý numpy types
+                serializable_result[key] = float(value)
             else:
+                # Loại dữ liệu khác
                 serializable_result[key] = value
         
         json.dump(serializable_result, f, indent=4)
