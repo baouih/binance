@@ -46,7 +46,7 @@ try:
         from app.market_regime_detector import MarketRegimeDetector
         from app.strategy_factory import StrategyFactory
         from position_sizing import create_position_sizer
-        from order_execution import OrderExecutionFactory
+        from order_execution_factory import OrderExecutionFactory
         from risk_manager import RiskManager
     except ImportError:
         # Thử import từ thư mục gốc
@@ -55,7 +55,7 @@ try:
         from market_regime_detector import MarketRegimeDetector
         from strategy_factory import StrategyFactory
         from position_sizing import create_position_sizer
-        from order_execution import OrderExecutionFactory
+        from order_execution_factory import OrderExecutionFactory
         from risk_manager import RiskManager
 except ImportError as e:
     logger.error(f"Lỗi khi import modules: {str(e)}")
