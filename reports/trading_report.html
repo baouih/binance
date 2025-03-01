@@ -1,0 +1,251 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>BinanceTrader - Báo cáo Giao dịch</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 20px;
+                    color: #333;
+                    background-color: #f5f5f5;
+                }
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background-color: white;
+                    padding: 20px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    border-radius: 5px;
+                }
+                h1, h2, h3 {
+                    color: #2c3e50;
+                }
+                .dashboard {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+                }
+                .metric-card {
+                    background-color: white;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    padding: 15px;
+                    margin-bottom: 15px;
+                    flex: 1 0 calc(25% - 20px);
+                    min-width: 250px;
+                    margin-right: 10px;
+                }
+                .metric-value {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin: 10px 0;
+                }
+                .positive { color: #27ae60; }
+                .negative { color: #e74c3c; }
+                .neutral { color: #2980b9; }
+                .chart-container {
+                    margin: 30px 0;
+                }
+                .chart-container img {
+                    width: 100%;
+                    max-width: 100%;
+                    height: auto;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                }
+                th, td {
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                }
+                thead {
+                    background-color: #f8f9fa;
+                }
+                tr:hover {
+                    background-color: #f5f5f5;
+                }
+                .trade-win { background-color: rgba(46, 204, 113, 0.1); }
+                .trade-loss { background-color: rgba(231, 76, 60, 0.1); }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #888;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>BinanceTrader - Báo cáo Giao dịch</h1>
+                <p>Báo cáo được tạo vào: 2025-03-01 13:06:30</p>
+        
+                <h2>Tổng quan hiệu suất</h2>
+                <div class="dashboard">
+                    <div class="metric-card">
+                        <h3>Số dư hiện tại</h3>
+                        <div class="metric-value neutral">$10500.25</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Lợi nhuận</h3>
+                        <div class="metric-value positive">$500.25 (5.00%)</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Tỷ lệ thắng</h3>
+                        <div class="metric-value neutral">66.67%</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Max Drawdown</h3>
+                        <div class="metric-value negative">4.32%</div>
+                    </div>
+                </div>
+                
+                <div class="dashboard">
+                    <div class="metric-card">
+                        <h3>Tổng số giao dịch</h3>
+                        <div class="metric-value neutral">15</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Profit Factor</h3>
+                        <div class="metric-value positive">2.85</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Sharpe Ratio</h3>
+                        <div class="metric-value positive">1.85</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Risk/Reward</h3>
+                        <div class="metric-value positive">2.86</div>
+                    </div>
+                </div>
+        
+                <h2>Biểu đồ phân tích</h2>
+        
+                <div class="chart-container">
+                    <h3>Biểu đồ Đường Cong Vốn & Drawdown</h3>
+                    <img src="equity_curve_20250301_130627.png" alt="Biểu đồ Đường Cong Vốn & Drawdown">
+                </div>
+            
+                <div class="chart-container">
+                    <h3>Biểu đồ Chỉ Số Hiệu Suất</h3>
+                    <img src="performance_20250301_130627.png" alt="Biểu đồ Chỉ Số Hiệu Suất">
+                </div>
+            
+                <div class="chart-container">
+                    <h3>Biểu đồ Phân Tích Theo Symbol</h3>
+                    <img src="symbol_analysis_20250301_130627.png" alt="Biểu đồ Phân Tích Theo Symbol">
+                </div>
+            
+                <h2>Giao dịch gần đây</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Loại</th>
+                            <th>Giá vào</th>
+                            <th>Giá ra</th>
+                            <th>Khối lượng</th>
+                            <th>Lợi nhuận</th>
+                            <th>%</th>
+                            <th>Thời gian vào</th>
+                            <th>Thời gian ra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            
+                        <tr class="trade-win">
+                            <td>BTCUSDT</td>
+                            <td>LONG</td>
+                            <td>$72000.00</td>
+                            <td>$75000.00</td>
+                            <td>0.1000</td>
+                            <td class="positive">$300.00</td>
+                            <td class="positive">4.17%</td>
+                            <td>2025-02-28 18:30:25</td>
+                            <td>2025-03-01 02:45:12</td>
+                        </tr>
+                
+                        <tr class="trade-win">
+                            <td>SOLUSDT</td>
+                            <td>LONG</td>
+                            <td>$125.00</td>
+                            <td>$137.50</td>
+                            <td>1.0000</td>
+                            <td class="positive">$12.50</td>
+                            <td class="positive">10.00%</td>
+                            <td>2025-02-28 20:10:05</td>
+                            <td>2025-03-01 01:22:36</td>
+                        </tr>
+                
+                        <tr class="trade-loss">
+                            <td>BNBUSDT</td>
+                            <td>SHORT</td>
+                            <td>$410.00</td>
+                            <td>$420.00</td>
+                            <td>0.2000</td>
+                            <td class="negative">$-2.00</td>
+                            <td class="negative">-2.44%</td>
+                            <td>2025-02-28 22:05:17</td>
+                            <td>2025-03-01 00:18:09</td>
+                        </tr>
+                
+                    </tbody>
+                </table>
+            
+                <h2>Vị thế hiện tại</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Loại</th>
+                            <th>Giá vào</th>
+                            <th>Giá hiện tại</th>
+                            <th>Khối lượng</th>
+                            <th>Lợi nhuận</th>
+                            <th>%</th>
+                            <th>Thời gian vào</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            
+                        <tr class="trade-win">
+                            <td>BTCUSDT</td>
+                            <td>LONG</td>
+                            <td>$75000.00</td>
+                            <td>$80000.00</td>
+                            <td>0.0500</td>
+                            <td class="positive">$250.00</td>
+                            <td class="positive">6.67%</td>
+                            <td>2025-03-01 01:30:25</td>
+                        </tr>
+                
+                        <tr class="trade-win">
+                            <td>ETHUSDT</td>
+                            <td>SHORT</td>
+                            <td>$2450.00</td>
+                            <td>$2400.00</td>
+                            <td>0.5000</td>
+                            <td class="positive">$25.00</td>
+                            <td class="positive">2.04%</td>
+                            <td>2025-03-01 03:15:42</td>
+                        </tr>
+                
+                    </tbody>
+                </table>
+            
+                <div class="footer">
+                    <p>BinanceTrader Bot - Báo cáo tạo tự động</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        
