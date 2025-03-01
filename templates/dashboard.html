@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Dashboard</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        .card {
+            margin-bottom: 1.5rem;
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .card-header {
+            font-weight: 600;
+            background-color: var(--bs-dark);
+            color: var(--bs-light);
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .price-up {
+            color: #28a745;
+        }
+        .price-down {
+            color: #dc3545;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .btn-bot-control {
+            width: 120px;
+        }
+        .sentiment-gauge {
+            height: 200px;
+        }
+        .bot-status-pill {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+        }
+        .table th {
+            font-weight: 600;
+        }
+        .dashboard-header {
+            background-color: var(--bs-dark);
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        .nav-item {
+            margin-right: 15px;
+        }
+        .main-content {
+            padding-top: 20px;
+        }
+        .coin-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .coin-change {
+            font-size: 0.9rem;
+        }
+        .stats-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .stats-label {
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+        #tradingViewWidget {
+            height: 500px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>
+                Trading Bot Dashboard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-chart-line me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/strategies"><i class="fas fa-cogs me-1"></i> Strategies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/backtest"><i class="fas fa-vial me-1"></i> Backtest</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trades"><i class="fas fa-history me-1"></i> Trade History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings"><i class="fas fa-sliders-h me-1"></i> Settings</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link" id="server-time">00:00:00</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Trading Pair Panel -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-chart-bar me-2"></i>Trading Chart
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="symbolDropdown" data-bs-toggle="dropdown">
+                                BTCUSDT
+                            </button>
+                            <ul class="dropdown-menu" id="symbolList">
+                                <li><a class="dropdown-item" href="#" data-symbol="BTCUSDT">BTCUSDT</a></li>
+                                <li><a class="dropdown-item" href="#" data-symbol="ETHUSDT">ETHUSDT</a></li>
+                                <li><a class="dropdown-item" href="#" data-symbol="BNBUSDT">BNBUSDT</a></li>
+                                <li><a class="dropdown-item" href="#" data-symbol="SOLUSDT">SOLUSDT</a></li>
+                                <li><a class="dropdown-item" href="#" data-symbol="DOGEUSDT">DOGEUSDT</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- TradingView Widget BEGIN -->
+                        <div id="tradingViewWidget"></div>
+                        <!-- TradingView Widget END -->
+                    </div>
+                </div>
+
+                <!-- Price Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-chart-line me-2"></i>Price Movement (Last 24h)</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" data-interval="1h">1H</button>
+                            <button type="button" class="btn btn-outline-secondary" data-interval="4h">4H</button>
+                            <button type="button" class="btn btn-outline-secondary" data-interval="1d">1D</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Positions -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-shopping-bag me-2"></i>Active Positions
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Entry Price</th>
+                                        <th>Current Price</th>
+                                        <th>Quantity</th>
+                                        <th>P&L</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="positionsTable">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-3">No active positions</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Bot Control Panel -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-robot me-2"></i>Bot Control Panel
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="mb-1">Status</div>
+                                <div>
+                                    <span class="badge bg-success bot-status-pill" id="botStatusBadge">
+                                        <i class="fas fa-circle-notch fa-spin me-1"></i>
+                                        <span id="botStatusText">Running</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-danger btn-bot-control" id="stopBotBtn">
+                                    <i class="fas fa-stop-circle me-1"></i>Stop
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="mb-2">Last Action</div>
+                            <div class="d-flex align-items-center small text-muted" id="lastActionInfo">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span>Bot initialization complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Overview -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-wallet me-2"></i>Account Overview
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="stats-label">Balance</div>
+                                <div class="stats-value" id="accountBalance">$10,000.00</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stats-label">Unrealized P&L</div>
+                                <div class="stats-value text-success" id="unrealizedPnl">+$0.00</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="stats-label">Open Positions</div>
+                                <div class="stats-value" id="openPositions">0</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stats-label">Today's P&L</div>
+                                <div class="stats-value text-success" id="todayPnl">+$0.00</div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Total Trading Volume</span>
+                            <span id="tradingVolume">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Sentiment -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-thermometer-half me-2"></i>Market Sentiment
+                    </div>
+                    <div class="card-body text-center">
+                        <div id="sentimentGauge" class="sentiment-gauge"></div>
+                        <div class="row mt-2">
+                            <div class="col-4 text-start">
+                                <small class="text-danger">Fear</small>
+                            </div>
+                            <div class="col-4 text-center">
+                                <small class="text-warning">Neutral</small>
+                            </div>
+                            <div class="col-4 text-end">
+                                <small class="text-success">Greed</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Signals -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bullhorn me-2"></i>Recent Trading Signals
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Symbol</th>
+                                        <th>Signal</th>
+                                        <th>Strength</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="signalsTable">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">No recent signals</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coins Overview -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-coins me-2"></i>Market Overview
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row" id="coinsList">
+                            <!-- BTC -->
+                            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=026" width="40" height="40" class="me-3" alt="BTC">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="coin-price me-2" id="btcPrice">$83,245.00</span>
+                                            <span class="coin-change price-up" id="btcChange">+1.25%</span>
+                                        </div>
+                                        <div class="text-muted">BTC/USDT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ETH -->
+                            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=026" width="40" height="40" class="me-3" alt="ETH">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="coin-price me-2" id="ethPrice">$2,345.00</span>
+                                            <span class="coin-change price-down" id="ethChange">-0.42%</span>
+                                        </div>
+                                        <div class="text-muted">ETH/USDT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- BNB -->
+                            <div class="col-md-3 col-6">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=026" width="40" height="40" class="me-3" alt="BNB">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="coin-price me-2" id="bnbPrice">$378.90</span>
+                                            <span class="coin-change price-up" id="bnbChange">+0.87%</span>
+                                        </div>
+                                        <div class="text-muted">BNB/USDT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- SOL -->
+                            <div class="col-md-3 col-6">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cryptologos.cc/logos/solana-sol-logo.svg?v=026" width="40" height="40" class="me-3" alt="SOL">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="coin-price me-2" id="solPrice">$142.60</span>
+                                            <span class="coin-change price-up" id="solChange">+2.35%</span>
+                                        </div>
+                                        <div class="text-muted">SOL/USDT</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Dashboard Functionality -->
+    <script>
+        // TradingView Widget
+        function loadTradingViewWidget(symbol = 'BTCUSDT') {
+            const container = document.getElementById('tradingViewWidget');
+            container.innerHTML = '';
+
+            new TradingView.widget({
+                "width": "100%",
+                "height": "500",
+                "symbol": "BINANCE:" + symbol,
+                "interval": "60",
+                "timezone": "exchange",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingViewWidget"
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Socket.io connection
+            const socket = io();
+            
+            // Update server time
+            function updateDateTime() {
+                const now = new Date();
+                document.getElementById('server-time').textContent = now.toLocaleTimeString();
+            }
+            setInterval(updateDateTime, 1000);
+            updateDateTime();
+
+            // TradingView Chart
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/tv.js';
+            script.async = true;
+            script.onload = function() {
+                loadTradingViewWidget();
+            };
+            document.head.appendChild(script);
+
+            // Symbol dropdown
+            document.querySelectorAll('#symbolList a').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const symbol = this.dataset.symbol;
+                    document.getElementById('symbolDropdown').textContent = symbol;
+                    loadTradingViewWidget(symbol);
+                    // Update other parts of the UI based on the selected symbol
+                });
+            });
+
+            // Price Chart
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Price',
+                        data: [],
+                        borderColor: '#3e95cd',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour',
+                                displayFormats: {
+                                    hour: 'HH:mm'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+
+            // Sentiment Gauge
+            const sentimentGauge = new ApexCharts(document.getElementById('sentimentGauge'), {
+                series: [67],
+                chart: {
+                    height: 180,
+                    type: 'radialBar',
+                    offsetY: -10
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -135,
+                        endAngle: 135,
+                        hollow: {
+                            margin: 0,
+                            size: '70%',
+                        },
+                        track: {
+                            background: '#333',
+                            strokeWidth: '97%',
+                            margin: 5,
+                        },
+                        dataLabels: {
+                            name: {
+                                show: false,
+                            },
+                            value: {
+                                fontSize: '22px',
+                                show: true,
+                                formatter: function(val) {
+                                    return val + '/100';
+                                }
+                            }
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'dark',
+                        type: 'horizontal',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#ABE5A1'],
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100]
+                    }
+                },
+                stroke: {
+                    dashArray: 4
+                },
+            });
+            sentimentGauge.render();
+
+            // Simulated data for demo purposes
+            function simulateMarketData() {
+                // Update coin prices
+                const coins = ['btc', 'eth', 'bnb', 'sol'];
+                const initialPrices = {
+                    btc: 82500 + Math.random() * 1000,
+                    eth: 2300 + Math.random() * 100,
+                    bnb: 375 + Math.random() * 10,
+                    sol: 138 + Math.random() * 10
+                };
+                const changes = {
+                    btc: (Math.random() * 4 - 1.5).toFixed(2),
+                    eth: (Math.random() * 4 - 1.5).toFixed(2),
+                    bnb: (Math.random() * 4 - 1.5).toFixed(2),
+                    sol: (Math.random() * 4 - 1.5).toFixed(2)
+                };
+
+                coins.forEach(coin => {
+                    document.getElementById(`${coin}Price`).textContent = `$${initialPrices[coin].toFixed(2)}`;
+                    
+                    const changeElement = document.getElementById(`${coin}Change`);
+                    const changeValue = parseFloat(changes[coin]);
+                    
+                    if (changeValue >= 0) {
+                        changeElement.textContent = `+${changeValue}%`;
+                        changeElement.className = 'coin-change price-up';
+                    } else {
+                        changeElement.textContent = `${changeValue}%`;
+                        changeElement.className = 'coin-change price-down';
+                    }
+                });
+
+                // Update price chart data
+                const now = new Date();
+                const priceData = [];
+                
+                for (let i = 24; i >= 0; i--) {
+                    const time = new Date(now.getTime() - i * 3600000);
+                    const basePrice = 82500;
+                    const randomFactor = Math.sin(i / 3) * 2000 + Math.random() * 1000 - 500;
+                    priceData.push({
+                        x: time,
+                        y: (basePrice + randomFactor).toFixed(2)
+                    });
+                }
+                
+                priceChart.data.datasets[0].data = priceData;
+                priceChart.update();
+
+                // Update sentiment gauge
+                const sentimentValue = Math.floor(30 + Math.random() * 60);
+                sentimentGauge.updateSeries([sentimentValue]);
+
+                // Simulate positions (20% chance to have a position)
+                const hasPositions = Math.random() < 0.2;
+                const positionsTable = document.getElementById('positionsTable');
+                
+                if (hasPositions) {
+                    const isProfit = Math.random() > 0.5;
+                    const pnlValue = (Math.random() * 200).toFixed(2);
+                    const pnlPercent = (Math.random() * 5).toFixed(2);
+                    
+                    positionsTable.innerHTML = `
+                        <tr>
+                            <td>BTCUSDT</td>
+                            <td>LONG</td>
+                            <td>$${(initialPrices.btc - 500).toFixed(2)}</td>
+                            <td>$${initialPrices.btc.toFixed(2)}</td>
+                            <td>0.0125</td>
+                            <td class="${isProfit ? 'text-success' : 'text-danger'}">
+                                ${isProfit ? '+' : '-'}$${pnlValue} (${isProfit ? '+' : '-'}${pnlPercent}%)
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger">Close</button>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    document.getElementById('openPositions').textContent = '1';
+                    document.getElementById('unrealizedPnl').textContent = `${isProfit ? '+' : '-'}$${pnlValue}`;
+                    document.getElementById('unrealizedPnl').className = `stats-value ${isProfit ? 'text-success' : 'text-danger'}`;
+                } else {
+                    positionsTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No active positions</td>
+                        </tr>
+                    `;
+                    
+                    document.getElementById('openPositions').textContent = '0';
+                    document.getElementById('unrealizedPnl').textContent = '$0.00';
+                    document.getElementById('unrealizedPnl').className = 'stats-value';
+                }
+
+                // Simulate trading signals
+                const signalsTable = document.getElementById('signalsTable');
+                const hasSignals = Math.random() < 0.3;
+                
+                if (hasSignals) {
+                    const signals = [];
+                    const signalTypes = ['BUY', 'SELL'];
+                    const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'];
+                    
+                    for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++) {
+                        const time = new Date(now.getTime() - Math.floor(Math.random() * 120) * 60000);
+                        const signal = {
+                            time: time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                            symbol: symbols[Math.floor(Math.random() * symbols.length)],
+                            type: signalTypes[Math.floor(Math.random() * signalTypes.length)],
+                            strength: Math.floor(Math.random() * 30) + 70
+                        };
+                        signals.push(signal);
+                    }
+                    
+                    signalsTable.innerHTML = signals.map(signal => `
+                        <tr>
+                            <td>${signal.time}</td>
+                            <td>${signal.symbol}</td>
+                            <td class="${signal.type === 'BUY' ? 'text-success' : 'text-danger'}">${signal.type}</td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar ${signal.type === 'BUY' ? 'bg-success' : 'bg-danger'}" 
+                                         role="progressbar" 
+                                         style="width: ${signal.strength}%"></div>
+                                </div>
+                                <small class="text-muted">${signal.strength}%</small>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    signalsTable.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center py-3">No recent signals</td>
+                        </tr>
+                    `;
+                }
+
+                // Simulate account data
+                const accountBalance = 10000 + Math.random() * 1000 - 500;
+                document.getElementById('accountBalance').textContent = `$${accountBalance.toFixed(2)}`;
+                
+                const todayPnl = Math.random() * 400 - 200;
+                document.getElementById('todayPnl').textContent = `${todayPnl >= 0 ? '+' : ''}$${todayPnl.toFixed(2)}`;
+                document.getElementById('todayPnl').className = `stats-value ${todayPnl >= 0 ? 'text-success' : 'text-danger'}`;
+                
+                const tradingVolume = Math.random() * 25000 + 5000;
+                document.getElementById('tradingVolume').textContent = `$${tradingVolume.toFixed(2)}`;
+            }
+
+            // Initial load and setup interval
+            simulateMarketData();
+            setInterval(simulateMarketData, 30000);
+
+            // Bot control buttons
+            document.getElementById('stopBotBtn').addEventListener('click', function() {
+                const isRunning = this.classList.contains('btn-danger');
+                
+                if (isRunning) {
+                    // Stop bot
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-success');
+                    this.innerHTML = '<i class="fas fa-play-circle me-1"></i>Start';
+                    
+                    document.getElementById('botStatusBadge').className = 'badge bg-danger bot-status-pill';
+                    document.getElementById('botStatusText').textContent = 'Stopped';
+                    document.getElementById('lastActionInfo').innerHTML = '<i class="fas fa-info-circle me-2"></i><span>Bot stopped manually</span>';
+                } else {
+                    // Start bot
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-danger');
+                    this.innerHTML = '<i class="fas fa-stop-circle me-1"></i>Stop';
+                    
+                    document.getElementById('botStatusBadge').className = 'badge bg-success bot-status-pill';
+                    document.getElementById('botStatusText').textContent = 'Running';
+                    document.getElementById('lastActionInfo').innerHTML = '<i class="fas fa-info-circle me-2"></i><span>Bot started manually</span>';
+                }
+            });
+
+            // Connect socket events
+            socket.on('connect', function() {
+                console.log('Connected to server');
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Disconnected from server');
+            });
+
+            socket.on('price_update', function(data) {
+                console.log('Price update:', data);
+                // Update price display with real data when available
+            });
+
+            socket.on('account_update', function(data) {
+                console.log('Account update:', data);
+                // Update account display with real data when available
+            });
+
+            socket.on('bot_status', function(data) {
+                console.log('Bot status update:', data);
+                // Update bot status display with real data when available
+            });
+
+            socket.on('new_signal', function(data) {
+                console.log('New signal:', data);
+                // Update signals table with real data when available
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

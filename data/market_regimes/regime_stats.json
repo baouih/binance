@@ -5,7 +5,7 @@
     "avg_duration": 0.0
   },
   "neutral": {
-    "count": 31,
+    "count": 32,
     "total_duration": 0,
     "avg_duration": 0.0
   },
@@ -15,7 +15,7 @@
     "avg_duration": 0.0
   },
   "volatile": {
-    "count": 2,
+    "count": 4,
     "total_duration": 0,
     "avg_duration": 0.0
   }

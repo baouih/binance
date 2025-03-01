@@ -386,6 +386,24 @@
   {
     "regime": "neutral",
     "start_time": "2025-02-28T18:14:09.409406",
+    "end_time": "2025-03-01T00:25:41.250180",
+    "duration": 371.5306797
+  },
+  {
+    "regime": "volatile",
+    "start_time": "2025-03-01T00:25:41.250196",
+    "end_time": "2025-03-01T00:26:11.718653",
+    "duration": 0.5078077333333334
+  },
+  {
+    "regime": "neutral",
+    "start_time": "2025-03-01T00:26:11.718667",
+    "end_time": "2025-03-01T00:26:12.097113",
+    "duration": 0.006307566666666667
+  },
+  {
+    "regime": "volatile",
+    "start_time": "2025-03-01T00:26:12.097129",
     "end_time": null,
     "duration": 0
   }
