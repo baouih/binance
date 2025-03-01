@@ -261,81 +261,100 @@ def handle_disconnect():
 def simulate_price_updates():
     """Giả lập cập nhật giá thời gian thực"""
     while True:
-        for symbol in sample_prices:
-            # Thêm biến động ngẫu nhiên (0.1% - 0.5%)
-            change_pct = random.uniform(-0.005, 0.005)
-            sample_prices[symbol] *= (1 + change_pct)
-        
-        socketio.emit('price_update', {"prices": sample_prices})
-        time.sleep(5)  # Cập nhật mỗi 5 giây
+        try:
+            for symbol in sample_prices:
+                # Thêm biến động ngẫu nhiên (0.1% - 0.5%)
+                change_pct = random.uniform(-0.005, 0.005)
+                sample_prices[symbol] *= (1 + change_pct)
+            
+            socketio.emit('price_update', {"prices": sample_prices})
+            time.sleep(60)  # Tăng khoảng thời gian cập nhật từ 5 lên 60 giây để giảm tải
+        except Exception as e:
+            logger.error(f"Lỗi trong quá trình cập nhật giá: {e}")
+            time.sleep(60)  # Dừng một lúc nếu có lỗi
 
 def simulate_sentiment_updates():
     """Giả lập cập nhật tâm lý thị trường"""
     while True:
-        sentiment = {
-            "value": random.randint(30, 70),
-            "change": random.uniform(-5, 5),
-            "trend": "neutral"
-        }
-        
-        socketio.emit('sentiment_update', sentiment)
-        time.sleep(30)  # Cập nhật mỗi 30 giây
+        try:
+            sentiment = {
+                "value": random.randint(30, 70),
+                "change": random.uniform(-5, 5),
+                "trend": "neutral"
+            }
+            
+            socketio.emit('sentiment_update', sentiment)
+            time.sleep(120)  # Tăng lên 2 phút để giảm tải
+        except Exception as e:
+            logger.error(f"Lỗi trong quá trình cập nhật tâm lý thị trường: {e}")
+            time.sleep(120)
 
 def simulate_account_updates():
     """Giả lập cập nhật tài khoản và vị thế"""
     while True:
-        # Tải trạng thái giao dịch từ file
-        state = load_trading_state()
-        if state:
-            balance = state.get('current_balance', 10000.0)
-            positions = state.get('open_positions', [])
-            equity = balance
-            for pos in positions:
-                equity += pos.get('pnl', 0)
-            
-            account_data = {
-                "balance": balance,
-                "equity": equity,
-                "margin": 0,
-                "free_balance": balance,
-                "positions": positions
-            }
-            socketio.emit('account_update', account_data)
-        else:
-            # Cập nhật giá hiện tại cho các vị thế
-            for pos in sample_account['positions']:
-                pos['current_price'] = sample_prices.get(pos['symbol'], pos['current_price'])
+        try:
+            # Tải trạng thái giao dịch từ file
+            state = load_trading_state()
+            if state:
+                balance = state.get('current_balance', 10000.0)
+                positions = state.get('open_positions', [])
+                equity = balance
+                for pos in positions:
+                    equity += pos.get('pnl', 0)
                 
-                # Tính lại P&L
-                if pos['type'] == 'LONG':
-                    pos['pnl'] = (pos['current_price'] - pos['entry_price']) * pos['quantity']
-                    pos['pnl_percent'] = (pos['current_price'] / pos['entry_price'] - 1) * 100
-                else:  # SHORT
-                    pos['pnl'] = (pos['entry_price'] - pos['current_price']) * pos['quantity']
-                    pos['pnl_percent'] = (pos['entry_price'] / pos['current_price'] - 1) * 100
+                account_data = {
+                    "balance": balance,
+                    "equity": equity,
+                    "margin": 0,
+                    "free_balance": balance,
+                    "positions": positions
+                }
+                socketio.emit('account_update', account_data)
+            else:
+                # Cập nhật giá hiện tại cho các vị thế
+                for pos in sample_account['positions']:
+                    pos['current_price'] = sample_prices.get(pos['symbol'], pos['current_price'])
+                    
+                    # Tính lại P&L
+                    if pos['type'] == 'LONG':
+                        pos['pnl'] = (pos['current_price'] - pos['entry_price']) * pos['quantity']
+                        pos['pnl_percent'] = (pos['current_price'] / pos['entry_price'] - 1) * 100
+                    else:  # SHORT
+                        pos['pnl'] = (pos['entry_price'] - pos['current_price']) * pos['quantity']
+                        pos['pnl_percent'] = (pos['entry_price'] / pos['current_price'] - 1) * 100
+                
+                # Cập nhật equity
+                sample_account['equity'] = sample_account['balance']
+                for pos in sample_account['positions']:
+                    sample_account['equity'] += pos['pnl']
+                
+                socketio.emit('account_update', sample_account)
             
-            # Cập nhật equity
-            sample_account['equity'] = sample_account['balance']
-            for pos in sample_account['positions']:
-                sample_account['equity'] += pos['pnl']
-            
-            socketio.emit('account_update', sample_account)
-        
-        time.sleep(10)  # Cập nhật mỗi 10 giây
+            time.sleep(60)  # Tăng thời gian cập nhật từ 10 lên 60 giây để giảm tải
+        except Exception as e:
+            logger.error(f"Lỗi trong quá trình cập nhật tài khoản: {e}")
+            time.sleep(60)
 
 def check_and_restart_bot():
     """Kiểm tra và khởi động lại bot nếu cần"""
     while True:
-        # Kiểm tra xem bot có đang chạy không
-        result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
-        if not result and bot_status['status'] == 'running':
-            logger.info("Bot is not running but status is 'running'. Restarting...")
-            os.system("python multi_coin_bot.py &")
-            bot_status['last_action'] = 'Bot auto-restarted'
+        try:
+            # Tạm dừng chức năng auto-restart bot để giảm tải hệ thống
+            # result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+            # if not result and bot_status['status'] == 'running':
+            #     logger.info("Bot is not running but status is 'running'. Restarting...")
+            #     os.system("python multi_coin_bot.py &")
+            #     bot_status['last_action'] = 'Bot auto-restarted'
+            #     bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
+            #     socketio.emit('bot_status', bot_status)
+            
+            # Thay vì tự động khởi động lại bot, chỉ cập nhật trạng thái
             bot_status['last_update'] = datetime.now().strftime("%H:%M:%S")
-            socketio.emit('bot_status', bot_status)
-        
-        time.sleep(60)  # Kiểm tra mỗi 60 giây
+            bot_status['last_action'] = 'Monitoring market conditions'
+            time.sleep(120)  # Tăng thời gian kiểm tra lên 2 phút để giảm tải
+        except Exception as e:
+            logger.error(f"Lỗi trong quá trình kiểm tra bot: {e}")
+            time.sleep(120)
 
 def generate_daily_report():
     """Tạo báo cáo hàng ngày theo lịch"""
@@ -357,11 +376,12 @@ def start_background_tasks():
     threading.Thread(target=check_and_restart_bot, daemon=True).start()
     threading.Thread(target=generate_daily_report, daemon=True).start()
     
-    # Đảm bảo bot đang chạy
-    result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
-    if not result:
-        logger.info("Starting trading bot...")
-        os.system("python multi_coin_bot.py &")
+    # Tạm thời tắt chức năng khởi động bot tự động để giảm tải
+    # result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+    # if not result:
+    #     logger.info("Starting trading bot...")
+    #     os.system("python multi_coin_bot.py &")
+    logger.info("Skipping auto-start bot to reduce system load")
     
     logger.info("Background tasks started")
 
