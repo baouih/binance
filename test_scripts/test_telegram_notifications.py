@@ -95,10 +95,35 @@ class TestTelegramNotifications(unittest.TestCase):
             
         # Tạo file biểu đồ mẫu nếu chưa tồn tại
         self.sample_chart = os.path.join(self.chart_dir, 'sample_chart.png')
-        if not os.path.exists(self.sample_chart):
-            # Tạo file hình ảnh trống
-            with open(self.sample_chart, 'wb') as f:
-                f.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0bIDAT\x18\x95c\xf8\xff\xff?\x00\x05\xfe\x02\xfe\xdc\xcc\x59\xe7\x00\x00\x00\x00IEND\xaeB`\x82')
+        try:
+            # Thử tạo một biểu đồ đơn giản với matplotlib (nếu có)
+            import matplotlib.pyplot as plt
+            import numpy as np
+            
+            if not os.path.exists(self.sample_chart) or os.path.getsize(self.sample_chart) < 1000:
+                plt.figure(figsize=(8, 6))
+                x = np.linspace(0, 10, 100)
+                y = np.sin(x)
+                plt.plot(x, y)
+                plt.title('Sample Chart for Telegram Test')
+                plt.xlabel('Time')
+                plt.ylabel('Value')
+                plt.grid(True)
+                plt.savefig(self.sample_chart)
+                plt.close()
+                logger.info(f"Đã tạo biểu đồ mẫu tại {self.sample_chart}")
+        except ImportError:
+            # Nếu không có matplotlib, tạo một file PNG đơn giản lớn hơn
+            if not os.path.exists(self.sample_chart) or os.path.getsize(self.sample_chart) < 1000:
+                # Tạo một PNG đơn giản 100x100 pixels
+                png_header = b'\x89PNG\r\n\x1a\n'
+                png_ihdr = b'\x00\x00\x00\x0DIHDR\x00\x00\x00d\x00\x00\x00d\x08\x02\x00\x00\x00\xff\x80\x02\x03'
+                png_data = b'\x00\x00\x00\x01sRGB\x00\xAE\xCE\x1C\xE9\x00\x00\x00\x04gAMA\x00\x00\xB1\x8F\x0B\xFC\x61\x05'
+                png_end = b'\x00\x00\x00\x00IEND\xAEB`\x82'
+                
+                with open(self.sample_chart, 'wb') as f:
+                    f.write(png_header + png_ihdr + png_data + (b'\x00' * 1000) + png_end)
+                logger.info(f"Đã tạo PNG đơn giản tại {self.sample_chart}")
         
         # Tạo file báo cáo mẫu nếu chưa tồn tại
         self.sample_report = os.path.join(self.chart_dir, 'sample_report.json')
