@@ -19,7 +19,8 @@ const API_ENDPOINTS = {
     TEST_TELEGRAM: '/api/test/telegram',
     TEST_EMAIL: '/api/test/email',
     RUN_BACKTEST: '/api/backtest/run',
-    GENERATE_REPORT: '/api/reports/generate'
+    GENERATE_REPORT: '/api/reports/generate',
+    SAVE_SETTINGS: '/api/settings/save'
 };
 
 // Document ready function
@@ -40,69 +41,118 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Initialize Socket.io connection and event handlers
+ * Initialize data polling and API connections
  */
 function initializeSocket() {
-    socket.on('connect', function() {
-        console.log('Connected to server');
-        showToast('Connected to server', 'success');
-    });
+    console.log('Initializing data polling and API connections');
     
-    socket.on('disconnect', function() {
-        console.log('Disconnected from server');
-        showToast('Connection lost. Reconnecting...', 'warning');
-    });
+    // This function name is kept for backward compatibility
+    // Socket.IO is no longer used - setting up REST API polling instead
+    startDataPolling();
+}
+
+/**
+ * Start polling for data updates at regular intervals
+ */
+function startDataPolling() {
+    // Initial data fetch
+    fetchAllData();
     
-    socket.on('price_update', function(data) {
-        console.log('Price update:', data);
-        updatePrices(data);
-    });
+    // Set up polling timers
+    setInterval(function() {
+        fetchMarketData();
+    }, refreshInterval);
     
-    socket.on('position_update', function(data) {
-        console.log('Position update:', data);
-        updatePositions(data);
-    });
+    setInterval(function() {
+        fetchAccountData();
+    }, refreshInterval * 2); // Longer interval for account data
     
-    socket.on('trade_update', function(data) {
-        console.log('Trade update:', data);
-        updateTrades(data);
-        showToast(`Trade ${data.action}: ${data.symbol} ${data.type}`, 'info');
-    });
+    setInterval(function() {
+        fetchSignalsData();
+    }, refreshInterval * 3); // Even longer interval for signals
     
-    socket.on('account_update', function(data) {
-        console.log('Account update:', data);
-        updateAccount(data);
-    });
-    
-    socket.on('signal_update', function(data) {
-        console.log('Signal update:', data);
-        updateSignals(data);
-    });
-    
-    socket.on('bot_status', function(data) {
-        console.log('Bot status update:', data);
-        updateBotStatus(data);
-    });
-    
-    socket.on('backtest_results', function(data) {
-        console.log('Backtest results:', data);
-        displayBacktestResults(data);
-    });
-    
-    socket.on('api_test_result', function(data) {
-        console.log('API test result:', data);
-        showToast(data.message, data.success ? 'success' : 'danger');
-    });
-    
-    socket.on('telegram_test_result', function(data) {
-        console.log('Telegram test result:', data);
-        showToast(data.message, data.success ? 'success' : 'danger');
-    });
-    
-    socket.on('email_test_result', function(data) {
-        console.log('Email test result:', data);
-        showToast(data.message, data.success ? 'success' : 'danger');
-    });
+    setInterval(function() {
+        fetchBotStatus();
+    }, refreshInterval);
+}
+
+/**
+ * Fetch all initial data for the dashboard
+ */
+function fetchAllData() {
+    fetchMarketData();
+    fetchAccountData();
+    fetchSignalsData();
+    fetchBotStatus();
+}
+
+/**
+ * Fetch market data from API
+ */
+function fetchMarketData() {
+    fetch(API_ENDPOINTS.MARKET)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Market data:', data);
+            updatePrices(data);
+        })
+        .catch(error => {
+            console.error('Error fetching market data:', error);
+        });
+}
+
+/**
+ * Fetch account data from API
+ */
+function fetchAccountData() {
+    fetch(API_ENDPOINTS.ACCOUNT)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Account data:', data);
+            updateAccount(data);
+            
+            // Update positions and trades if included in the response
+            if (data.positions) {
+                updatePositions(data.positions);
+            }
+            
+            if (data.trades) {
+                updateTrades(data.trades);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching account data:', error);
+        });
+}
+
+/**
+ * Fetch signals data from API
+ */
+function fetchSignalsData() {
+    fetch(API_ENDPOINTS.SIGNALS)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Signal data:', data);
+            updateSignals(data);
+        })
+        .catch(error => {
+            console.error('Error fetching signal data:', error);
+        });
+}
+
+/**
+ * Fetch bot status from API
+ */
+function fetchBotStatus() {
+    fetch(API_ENDPOINTS.BOT_STATUS)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Bot status:', data);
+            updateBotStatus(data);
+        })
+        .catch(error => {
+            console.error('Error fetching bot status:', error);
+        });
 }
 
 /**
@@ -216,21 +266,21 @@ function initializeEventListeners() {
     const startBot = document.getElementById('start-bot');
     if (startBot) {
         startBot.addEventListener('click', function() {
-            socket.emit('bot_control', { action: 'start' });
+            controlBot('start');
         });
     }
     
     const stopBot = document.getElementById('stop-bot');
     if (stopBot) {
         stopBot.addEventListener('click', function() {
-            socket.emit('bot_control', { action: 'stop' });
+            controlBot('stop');
         });
     }
     
     const restartBot = document.getElementById('restart-bot');
     if (restartBot) {
         restartBot.addEventListener('click', function() {
-            socket.emit('bot_control', { action: 'restart' });
+            controlBot('restart');
         });
     }
     
@@ -238,7 +288,7 @@ function initializeEventListeners() {
     document.querySelectorAll('.close-position-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const positionId = this.getAttribute('data-position-id');
-            socket.emit('close_position', { position_id: positionId });
+            closePosition(positionId);
         });
     });
     
@@ -269,21 +319,21 @@ function initializeEventListeners() {
     const testApiBtn = document.getElementById('test-api-btn');
     if (testApiBtn) {
         testApiBtn.addEventListener('click', function() {
-            socket.emit('test_api');
+            testApiConnection();
         });
     }
     
     const testTelegramBtn = document.getElementById('test-telegram-btn');
     if (testTelegramBtn) {
         testTelegramBtn.addEventListener('click', function() {
-            socket.emit('test_telegram');
+            testTelegramConnection();
         });
     }
     
     const testEmailBtn = document.getElementById('test-email-btn');
     if (testEmailBtn) {
         testEmailBtn.addEventListener('click', function() {
-            socket.emit('test_email');
+            testEmailConnection();
         });
     }
     
@@ -294,13 +344,6 @@ function initializeEventListeners() {
             e.preventDefault();
             const form = this;
             const formData = new FormData(form);
-            const params = {};
-            
-            for (let [key, value] of formData.entries()) {
-                params[key] = value;
-            }
-            
-            socket.emit('run_backtest', params);
             
             // Show loading state
             const backtestResults = document.getElementById('backtest-results');
@@ -314,6 +357,27 @@ function initializeEventListeners() {
                     </div>
                 `;
             }
+            
+            // Send the request to the API endpoint
+            fetch(API_ENDPOINTS.RUN_BACKTEST, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Backtest results:', data);
+                displayBacktestResults(data);
+            })
+            .catch(error => {
+                console.error('Error running backtest:', error);
+                if (backtestResults) {
+                    backtestResults.innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            Error running backtest. Please try again.
+                        </div>
+                    `;
+                }
+            });
         });
     }
     
@@ -336,9 +400,126 @@ function initializeEventListeners() {
     document.querySelectorAll('.report-card button').forEach(btn => {
         btn.addEventListener('click', function() {
             const reportType = this.closest('.report-card').querySelector('h5').textContent;
-            socket.emit('generate_report', { type: reportType });
-            showToast(`Generating ${reportType}...`, 'info');
+            generateReport(reportType);
         });
+    });
+}
+
+/**
+ * Control bot (start/stop/restart)
+ */
+function controlBot(action) {
+    fetch(API_ENDPOINTS.BOT_CONTROL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Bot control response:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+        // Refresh bot status after action
+        fetchBotStatus();
+    })
+    .catch(error => {
+        console.error('Error controlling bot:', error);
+        showToast('Error controlling bot. Please try again.', 'danger');
+    });
+}
+
+/**
+ * Close a trading position
+ */
+function closePosition(positionId) {
+    fetch(API_ENDPOINTS.CLOSE_POSITION, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ position_id: positionId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Close position response:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+        // Refresh account data to reflect changes
+        fetchAccountData();
+    })
+    .catch(error => {
+        console.error('Error closing position:', error);
+        showToast('Error closing position. Please try again.', 'danger');
+    });
+}
+
+/**
+ * Test API connection
+ */
+function testApiConnection() {
+    fetch(API_ENDPOINTS.TEST_API)
+    .then(response => response.json())
+    .then(data => {
+        console.log('API test result:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+    })
+    .catch(error => {
+        console.error('Error testing API:', error);
+        showToast('Error testing API connection', 'danger');
+    });
+}
+
+/**
+ * Test Telegram connection
+ */
+function testTelegramConnection() {
+    fetch(API_ENDPOINTS.TEST_TELEGRAM)
+    .then(response => response.json())
+    .then(data => {
+        console.log('Telegram test result:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+    })
+    .catch(error => {
+        console.error('Error testing Telegram:', error);
+        showToast('Error testing Telegram connection', 'danger');
+    });
+}
+
+/**
+ * Test Email connection
+ */
+function testEmailConnection() {
+    fetch(API_ENDPOINTS.TEST_EMAIL)
+    .then(response => response.json())
+    .then(data => {
+        console.log('Email test result:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+    })
+    .catch(error => {
+        console.error('Error testing Email:', error);
+        showToast('Error testing Email connection', 'danger');
+    });
+}
+
+/**
+ * Generate a report
+ */
+function generateReport(reportType) {
+    fetch(API_ENDPOINTS.GENERATE_REPORT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: reportType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Generate report response:', data);
+        showToast(data.message, data.success ? 'success' : 'danger');
+    })
+    .catch(error => {
+        console.error('Error generating report:', error);
+        showToast('Error generating report', 'danger');
     });
 }
 
@@ -346,7 +527,10 @@ function initializeEventListeners() {
  * Fetch initial dashboard data
  */
 function fetchDashboardData() {
-    socket.emit('get_dashboard_data');
+    // Initial data is now fetched by fetchAllData() in startDataPolling()
+    // This function is kept for backward compatibility
+    console.log('Fetching initial dashboard data...');
+    fetchAllData();
 }
 
 /**
@@ -777,10 +961,23 @@ function saveAllSettings() {
         risk: riskSettings
     };
     
-    // Send to server
-    socket.emit('save_settings', allSettings);
-    
-    showToast('Settings saved successfully!', 'success');
+    // Send to server using REST API
+    fetch(API_ENDPOINTS.SAVE_SETTINGS, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(allSettings)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Settings saved:', data);
+        showToast(data.message || 'Settings saved successfully!', data.success ? 'success' : 'danger');
+    })
+    .catch(error => {
+        console.error('Error saving settings:', error);
+        showToast('Error saving settings. Please try again.', 'danger');
+    });
 }
 
 /**
