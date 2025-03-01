@@ -949,31 +949,39 @@ def create_all_features(df: pd.DataFrame) -> pd.DataFrame:
     
     return result
 
-def process_and_enhance_dataset(input_file: str, output_file: str, 
+def process_and_enhance_dataset(input_data: Union[str, pd.DataFrame], output_file: str = None, 
                             basic_only: bool = False,
                             exclude_patterns: bool = False,
                             exclude_time: bool = False,
                             exclude_liquidity: bool = False,
-                            exclude_interactions: bool = False) -> str:
+                            exclude_interactions: bool = False,
+                            max_nan_ratio: float = 0.3) -> Union[pd.DataFrame, str]:
     """
     Xử lý và nâng cao dataset, thêm các đặc trưng ML nâng cao
     
     Args:
-        input_file (str): Đường dẫn đến file CSV dữ liệu đầu vào
-        output_file (str): Đường dẫn đến file CSV dữ liệu đầu ra
+        input_data (Union[str, pd.DataFrame]): Đường dẫn đến file CSV hoặc DataFrame chứa dữ liệu đầu vào
+        output_file (str, optional): Đường dẫn đến file CSV dữ liệu đầu ra, nếu None chỉ trả về DataFrame
         basic_only (bool): Chỉ tạo đặc trưng cơ bản
         exclude_patterns (bool): Không tạo đặc trưng mẫu hình giá
         exclude_time (bool): Không tạo đặc trưng thời gian
         exclude_liquidity (bool): Không tạo đặc trưng thanh khoản
         exclude_interactions (bool): Không tạo tương tác đặc trưng
+        max_nan_ratio (float): Tỷ lệ tối đa giá trị NaN cho phép trong một cột (0.0-1.0)
         
     Returns:
-        str: Đường dẫn đến file dữ liệu đã xử lý
+        Union[pd.DataFrame, str]: DataFrame đã xử lý hoặc đường dẫn đến file kết quả
     """
     try:
-        # Đọc file đầu vào
-        logger.info(f"Đọc dữ liệu từ {input_file}")
-        input_df = pd.read_csv(input_file)
+        # Xác định nguồn dữ liệu đầu vào
+        if isinstance(input_data, str):
+            # Đọc từ file
+            logger.info(f"Đọc dữ liệu từ file: {input_data}")
+            input_df = pd.read_csv(input_data)
+        else:
+            # Đã cung cấp DataFrame
+            logger.info(f"Sử dụng DataFrame với {len(input_data)} dòng")
+            input_df = input_data.copy()
         
         # Chuyển đổi cột timestamp nếu có
         if 'timestamp' in input_df.columns:
@@ -986,7 +994,10 @@ def process_and_enhance_dataset(input_file: str, output_file: str,
             logger.info("Chỉ tạo đặc trưng cơ bản")
             output_df = add_technical_indicators(input_df)
         else:
+            logger.info("Đang tạo đặc trưng cơ bản...")
             output_df = add_technical_indicators(input_df)
+            
+            logger.info("Đang tạo đặc trưng nâng cao...")
             output_df = add_advanced_indicators(output_df)
             
             if not exclude_patterns:
@@ -1043,73 +1054,25 @@ if __name__ == "__main__":
     parser.add_argument('--exclude_time', action='store_true', help='Không tạo đặc trưng thời gian')
     parser.add_argument('--exclude_liquidity', action='store_true', help='Không tạo đặc trưng thanh khoản')
     parser.add_argument('--exclude_interactions', action='store_true', help='Không tạo tương tác đặc trưng')
+    parser.add_argument('--max_nan_ratio', type=float, default=0.3, help='Tỷ lệ tối đa giá trị NaN cho phép trong một cột (0.0-1.0)')
     
     args = parser.parse_args()
     
     try:
         # Gọi hàm xử lý và nâng cao dataset
         process_and_enhance_dataset(
-            args.input_file, 
-            args.output_file,
-            args.basic_only,
-            args.exclude_patterns,
-            args.exclude_time,
-            args.exclude_liquidity,
-            args.exclude_interactions
+            input_data=args.input_file, 
+            output_file=args.output_file,
+            basic_only=args.basic_only,
+            exclude_patterns=args.exclude_patterns,
+            exclude_time=args.exclude_time,
+            exclude_liquidity=args.exclude_liquidity,
+            exclude_interactions=args.exclude_interactions,
+            max_nan_ratio=args.max_nan_ratio
         )
         
-        # Chuyển đổi cột timestamp nếu có
-        if 'timestamp' in input_df.columns:
-            input_df['timestamp'] = pd.to_datetime(input_df['timestamp'])
-            input_df.set_index('timestamp', inplace=True)
-        
-        # Tạo đặc trưng
-        if args.basic_only:
-            result_df = add_technical_indicators(input_df)
-        else:
-            # Tạo đặc trưng cơ bản và nâng cao
-            result_df = add_technical_indicators(input_df)
-            result_df = add_advanced_indicators(result_df)
-            
-            # Tạo các đặc trưng tùy chọn
-            if not args.exclude_patterns:
-                result_df = add_price_pattern_features(result_df)
-            
-            if not args.exclude_time:
-                result_df = add_time_features(result_df)
-            
-            if not args.exclude_liquidity:
-                result_df = add_liquidity_features(result_df)
-            
-            if not args.exclude_interactions:
-                result_df = create_feature_interactions(result_df)
-            
-        # Loại bỏ các giá trị NaN
-        result_df = result_df.replace([np.inf, -np.inf], np.nan)
-        
-        # Đếm số lượng giá trị NaN trong mỗi cột
-        na_counts = result_df.isna().sum()
-        
-        # Loại bỏ các cột có quá nhiều NaN (>30% của dữ liệu)
-        threshold = len(result_df) * 0.3
-        cols_to_drop = na_counts[na_counts > threshold].index
-        
-        if len(cols_to_drop) > 0:
-            logger.info(f"Loại bỏ {len(cols_to_drop)} cột có quá nhiều giá trị NaN")
-            result_df = result_df.drop(columns=cols_to_drop)
-        
-        # Điền các giá trị NaN còn lại
-        num_na = result_df.isna().sum().sum()
-        if num_na > 0:
-            logger.info(f"Điền {num_na} giá trị NaN còn lại")
-            result_df = result_df.fillna(method='ffill').fillna(method='bfill').fillna(0)
-        
-        # Lưu file đầu ra
-        logger.info(f"Lưu {len(result_df)} dòng dữ liệu với {len(result_df.columns)} cột vào {args.output_file}")
-        result_df.to_csv(args.output_file)
-        
-        logger.info("Hoàn thành!")
+        logger.info("Hoàn thành quá trình tạo đặc trưng nâng cao!")
         
     except Exception as e:
-        logger.error(f"Lỗi: {str(e)}")
+        logger.error(f"Lỗi khi xử lý dữ liệu: {str(e)}")
         raise
