@@ -1,0 +1,446 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Phân tích hiệu suất ML - Dự đoán xu hướng</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1, h2, h3 { color: #333; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .card { border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; }
+                .positive { color: green; }
+                .negative { color: red; }
+                .chart { margin: 20px 0; max-width: 100%; }
+                .tabs { display: flex; margin-bottom: 10px; }
+                .tab { padding: 8px 16px; background-color: #f2f2f2; cursor: pointer; border: 1px solid #ddd; border-bottom: none; }
+                .tab.active { background-color: #fff; border-bottom: 1px solid #fff; }
+                .tab-content { display: none; border: 1px solid #ddd; padding: 15px; }
+                .tab-content.active { display: block; }
+            </style>
+            <script>
+                function openTab(evt, tabName) {
+                    var i, tabcontent, tablinks;
+                    tabcontent = document.getElementsByClassName("tab-content");
+                    for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+                    }
+                    tablinks = document.getElementsByClassName("tab");
+                    for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].className = tablinks[i].className.replace(" active", "");
+                    }
+                    document.getElementById(tabName).className += " active";
+                    evt.currentTarget.className += " active";
+                }
+            </script>
+        </head>
+        <body>
+            <h1>Phân tích hiệu suất ML - Dự đoán xu hướng</h1>
+            <p>Thời gian: 2025-03-01T16:00:58.788888</p>
+            
+            <div class="card">
+                <h2>Tổng quan</h2>
+                <p>Báo cáo này phân tích hiệu suất của các mô hình ML trên nhiều khoảng thời gian và mục tiêu dự đoán khác nhau.</p>
+                <table>
+                    <tr>
+                        <th>Tổng số coins</th>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <th>Coins</th>
+                        <td>ETHUSDT, BTCUSDT</td>
+                    </tr>
+                    <tr>
+                        <th>Khung thời gian</th>
+                        <td>1h</td>
+                    </tr>
+                    <tr>
+                        <th>Khoảng thời gian</th>
+                        <td>3m, 1m</td>
+                    </tr>
+                    <tr>
+                        <th>Mục tiêu dự đoán (ngày)</th>
+                        <td>1, 3</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="openTab(event, 'periodTab')">So sánh khoảng thời gian</button>
+                <button class="tab" onclick="openTab(event, 'targetTab')">So sánh mục tiêu dự đoán</button>
+                <button class="tab" onclick="openTab(event, 'bestModelsTab')">Mô hình tốt nhất</button>
+                <button class="tab" onclick="openTab(event, 'featureTab')">Feature Importance</button>
+            </div>
+            
+            <div id="periodTab" class="tab-content active">
+                <h2>So sánh hiệu suất theo khoảng thời gian</h2>
+                <img src="../ml_charts/period_comparison.png" class="chart" alt="So sánh khoảng thời gian">
+                <h3>Hiệu suất trung bình theo khoảng thời gian</h3>
+                <table>
+                    <tr>
+                        <th>Khoảng thời gian</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                        <th>Số lượng báo cáo</th>
+                    </tr>
+        
+                    <tr>
+                        <td>3m</td>
+                        <td>0.5163</td>
+                        <td>0.3874</td>
+                        <td>0.5227</td>
+                        <td>0.3676</td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>1m</td>
+                        <td>0.5163</td>
+                        <td>0.3874</td>
+                        <td>0.5227</td>
+                        <td>0.3676</td>
+                        <td>1</td>
+                    </tr>
+            
+                </table>
+            </div>
+            
+            <div id="targetTab" class="tab-content">
+                <h2>So sánh hiệu suất theo mục tiêu dự đoán</h2>
+                <img src="../ml_charts/target_comparison.png" class="chart" alt="So sánh mục tiêu dự đoán">
+                <h3>Hiệu suất trung bình theo mục tiêu dự đoán</h3>
+                <table>
+                    <tr>
+                        <th>Mục tiêu (ngày)</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                        <th>Số lượng báo cáo</th>
+                    </tr>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>0.5163</td>
+                        <td>0.2391</td>
+                        <td>0.5000</td>
+                        <td>0.3235</td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>0.5163</td>
+                        <td>0.5357</td>
+                        <td>0.5455</td>
+                        <td>0.4118</td>
+                        <td>1</td>
+                    </tr>
+            
+                </table>
+            </div>
+            
+            <div id="bestModelsTab" class="tab-content">
+                <h2>Mô hình tốt nhất</h2>
+                
+                <h3>Mô hình tốt nhất tổng thể</h3>
+                <table>
+                    <tr>
+                        <th>Chỉ số</th>
+                        <th>Mô hình</th>
+                        <th>Giá trị</th>
+                        <th>Coin</th>
+                        <th>Khoảng thời gian</th>
+                        <th>Mục tiêu (ngày)</th>
+                    </tr>
+        
+                    <tr>
+                        <td>Accuracy</td>
+                        <td>BTCUSDT_1h_1m_target1d</td>
+                        <td>0.5543</td>
+                        <td>BTCUSDT</td>
+                        <td>1m</td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>Precision</td>
+                        <td>BTCUSDT_1h_1m_target3d</td>
+                        <td>0.5714</td>
+                        <td>BTCUSDT</td>
+                        <td>1m</td>
+                        <td>3</td>
+                    </tr>
+            
+                    <tr>
+                        <td>Recall</td>
+                        <td>ETHUSDT_1h_1m_target1d</td>
+                        <td>1.0000</td>
+                        <td>ETHUSDT</td>
+                        <td>1m</td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>F1</td>
+                        <td>ETHUSDT_1h_1m_target3d</td>
+                        <td>0.6667</td>
+                        <td>ETHUSDT</td>
+                        <td>1m</td>
+                        <td>3</td>
+                    </tr>
+            
+                </table>
+                
+                <h3>Mô hình tốt nhất theo coin (F1-Score)</h3>
+                <table>
+                    <tr>
+                        <th>Coin</th>
+                        <th>Mô hình tốt nhất</th>
+                        <th>F1-Score</th>
+                        <th>Khoảng thời gian</th>
+                        <th>Mục tiêu (ngày)</th>
+                    </tr>
+        
+                    <tr>
+                        <td>BTCUSDT</td>
+                        <td>BTCUSDT_1h_1m_target3d</td>
+                        <td>0.1569</td>
+                        <td>1m</td>
+                        <td>3</td>
+                    </tr>
+            
+                    <tr>
+                        <td>ETHUSDT</td>
+                        <td>ETHUSDT_1h_1m_target3d</td>
+                        <td>0.6667</td>
+                        <td>1m</td>
+                        <td>3</td>
+                    </tr>
+            
+                </table>
+                
+                <h3>Mô hình tốt nhất theo khoảng thời gian (F1-Score)</h3>
+                <table>
+                    <tr>
+                        <th>Khoảng thời gian</th>
+                        <th>Mô hình tốt nhất</th>
+                        <th>F1-Score</th>
+                        <th>Coin</th>
+                        <th>Mục tiêu (ngày)</th>
+                    </tr>
+        
+                    <tr>
+                        <td>1m</td>
+                        <td>ETHUSDT_1h_1m_target3d</td>
+                        <td>0.6667</td>
+                        <td>ETHUSDT</td>
+                        <td>3</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3m</td>
+                        <td>ETHUSDT_1h_3m_target3d</td>
+                        <td>0.6667</td>
+                        <td>ETHUSDT</td>
+                        <td>3</td>
+                    </tr>
+            
+                </table>
+                
+                <h3>Mô hình tốt nhất theo mục tiêu dự đoán (F1-Score)</h3>
+                <table>
+                    <tr>
+                        <th>Mục tiêu (ngày)</th>
+                        <th>Mô hình tốt nhất</th>
+                        <th>F1-Score</th>
+                        <th>Coin</th>
+                        <th>Khoảng thời gian</th>
+                    </tr>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>ETHUSDT_1h_1m_target1d</td>
+                        <td>0.6471</td>
+                        <td>ETHUSDT</td>
+                        <td>1m</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>ETHUSDT_1h_1m_target3d</td>
+                        <td>0.6667</td>
+                        <td>ETHUSDT</td>
+                        <td>1m</td>
+                    </tr>
+            
+                </table>
+            </div>
+            
+            <div id="featureTab" class="tab-content">
+                <h2>Feature Importance</h2>
+                <img src="../ml_charts/top_features.png" class="chart" alt="Top Feature Importance">
+                
+                <h3>Top 20 Features</h3>
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Importance trung bình</th>
+                        <th>Số lượng mô hình</th>
+                    </tr>
+        
+                    <tr>
+                        <td>price_sma50_ratio</td>
+                        <td>0.048187</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>macd</td>
+                        <td>0.047250</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>sma100</td>
+                        <td>0.043107</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>daily_return</td>
+                        <td>0.041129</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>macd_signal</td>
+                        <td>0.039514</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>volume_sma5</td>
+                        <td>0.039075</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>close</td>
+                        <td>0.039041</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>price_sma20_ratio</td>
+                        <td>0.037383</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>bb_upper</td>
+                        <td>0.037059</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>volume_ratio</td>
+                        <td>0.036960</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>rsi</td>
+                        <td>0.036087</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>volume</td>
+                        <td>0.035842</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>sma50</td>
+                        <td>0.035711</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>weekly_return</td>
+                        <td>0.035563</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>ema50</td>
+                        <td>0.035095</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>volatility</td>
+                        <td>0.034759</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>bb_lower</td>
+                        <td>0.034234</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>ema5</td>
+                        <td>0.032849</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>macd_hist</td>
+                        <td>0.032337</td>
+                        <td>8</td>
+                    </tr>
+            
+                    <tr>
+                        <td>high</td>
+                        <td>0.031928</td>
+                        <td>8</td>
+                    </tr>
+            
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Kết luận</h2>
+                <p>Dựa trên phân tích hiệu suất các mô hình ML, chúng ta có thể đưa ra các khuyến nghị sau:</p>
+                <ul>
+        
+                    <li>Khoảng thời gian <strong>3m</strong> cho hiệu suất dự đoán tốt nhất với F1-score trung bình 0.3676</li>
+            
+                    <li>Mục tiêu dự đoán <strong>3 ngày</strong> cho hiệu suất dự đoán tốt nhất với F1-score trung bình 0.4118</li>
+            
+                    <li>Coin <strong>ETHUSDT</strong> có hiệu suất dự đoán tốt nhất với F1-score 0.6667 từ mô hình ETHUSDT_1h_1m_target3d</li>
+            
+                    <li>Các đặc trưng quan trọng nhất cho dự đoán là: <strong>price_sma50_ratio</strong>, <strong>macd</strong>, <strong>sma100</strong>, <strong>daily_return</strong>, <strong>macd_signal</strong></li>
+            
+                </ul>
+                
+                <p>Khuyến nghị:</p>
+                <ul>
+        
+                    <li>Sử dụng mô hình <strong>ETHUSDT_1h_1m_target3d</strong> cho dự đoán xu hướng với F1-score 0.6667</li>
+            
+                    <li>Tập trung huấn luyện mô hình trên khoảng thời gian <strong>3m</strong> để có hiệu suất tốt nhất</li>
+            
+                    <li>Tập trung vào dự đoán xu hướng <strong>3 ngày</strong> để có độ chính xác cao nhất</li>
+            
+                </ul>
+            </div>
+        </body>
+        </html>
+        
