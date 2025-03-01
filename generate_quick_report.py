@@ -237,8 +237,8 @@ class QuickReportGenerator:
                 strategy_counts = {}
                 
                 for regime, count in regime_counts.items():
-                    if regime in self.strategy_mapping:
-                        for strategy, weight in self.strategy_mapping[regime].items():
+                    if regime in strategy_mapping:
+                        for strategy, weight in strategy_mapping[regime].items():
                             strategy_count = count * weight
                             if strategy in strategy_counts:
                                 strategy_counts[strategy] += strategy_count
@@ -263,6 +263,15 @@ class QuickReportGenerator:
         logger.info("Đang ước tính hiệu suất...")
         
         self.performance_metrics = {}
+        
+        # Ánh xạ chiến lược cho từng chế độ thị trường
+        strategy_mapping = {
+            'trending': {'ema_cross': 0.5, 'macd': 0.3, 'adx': 0.2},
+            'ranging': {'rsi': 0.4, 'bbands': 0.4, 'stochastic': 0.2},
+            'volatile': {'bbands': 0.3, 'atr': 0.4, 'adx': 0.3},
+            'quiet': {'bbands': 0.5, 'rsi': 0.3, 'stochastic': 0.2},
+            'unknown': {'rsi': 0.33, 'macd': 0.33, 'bbands': 0.34}
+        }
         
         # Hiệu suất đã biết của các chiến lược trong mỗi chế độ thị trường
         strategy_effectiveness = {
