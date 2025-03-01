@@ -1,0 +1,93 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Báo cáo dự đoán xu hướng</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1, h2 { color: #333; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .positive { color: green; }
+                .negative { color: red; }
+                .chart { margin: 20px 0; max-width: 100%; }
+                pre { background-color: #f5f5f5; padding: 10px; overflow-x: auto; }
+            </style>
+        </head>
+        <body>
+            <h1>Báo cáo dự đoán xu hướng BTC</h1>
+            <p>Thời gian: 2025-03-01 15:43:54</p>
+            
+            <h2>Tổng quan mô hình</h2>
+            <table>
+                <tr>
+                    <th>Độ chính xác (Accuracy)</th>
+                    <td>10.68%</td>
+                </tr>
+                <tr>
+                    <th>Mô hình</th>
+                    <td>Random Forest (100 cây)</td>
+                </tr>
+                <tr>
+                    <th>Số lượng đặc trưng</th>
+                    <td>13</td>
+                </tr>
+            </table>
+            
+            <h2>Chi tiết đánh giá</h2>
+            <pre>              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00        92
+           1       0.11      1.00      0.19        11
+
+    accuracy                           0.11       103
+   macro avg       0.05      0.50      0.10       103
+weighted avg       0.01      0.11      0.02       103
+</pre>
+            
+            <h2>Dự đoán gần nhất</h2>
+            <table>
+                <tr>
+                    <th>Ngày giờ</th>
+                    <td>2025-03-01 00:00:00</td>
+                </tr>
+                <tr>
+                    <th>Giá hiện tại</th>
+                    <td>$83878.78</td>
+                </tr>
+                <tr>
+                    <th>Dự đoán 24h tới</th>
+                    <td class="positive">Tăng</td>
+                </tr>
+                <tr>
+                    <th>Xác suất tăng</th>
+                    <td>96.00%</td>
+                </tr>
+                <tr>
+                    <th>Xác suất giảm</th>
+                    <td>4.00%</td>
+                </tr>
+            </table>
+            
+            <h2>Đặc trưng quan trọng nhất</h2>
+            <table>
+                <tr>
+                    <th>Đặc trưng</th>
+                    <th>Mức độ quan trọng</th>
+                </tr>
+                <tr><td>sma50</td><td>0.1597</td></tr><tr><td>close_sma50_ratio</td><td>0.1075</td></tr><tr><td>ema5</td><td>0.0939</td></tr><tr><td>ema10</td><td>0.0888</td></tr><tr><td>close_sma20_ratio</td><td>0.0883</td></tr>
+            </table>
+            
+            <h2>Biểu đồ dự đoán</h2>
+            <div class="chart">
+                <img src="../test_charts/btc_ml_prediction.png" alt="BTC Prediction Chart" width="800">
+            </div>
+            
+            <h2>Tầm quan trọng của đặc trưng</h2>
+            <div class="chart">
+                <img src="../test_charts/btc_feature_importance.png" alt="Feature Importance Chart" width="800">
+            </div>
+        </body>
+        </html>
+        
