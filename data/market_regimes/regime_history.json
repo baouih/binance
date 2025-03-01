@@ -2030,6 +2030,30 @@
   {
     "regime": "ranging",
     "start_time": "2025-03-01T08:30:27.986949",
+    "end_time": "2025-03-01T08:33:02.781551",
+    "duration": 2.5799101500000003
+  },
+  {
+    "regime": "volatile",
+    "start_time": "2025-03-01T08:33:02.781565",
+    "end_time": "2025-03-01T08:33:04.328721",
+    "duration": 0.02578605
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-03-01T08:33:04.328736",
+    "end_time": "2025-03-01T08:33:04.716827",
+    "duration": 0.006468283333333334
+  },
+  {
+    "regime": "volatile",
+    "start_time": "2025-03-01T08:33:04.716839",
+    "end_time": "2025-03-01T08:33:05.121425",
+    "duration": 0.006743216666666666
+  },
+  {
+    "regime": "ranging",
+    "start_time": "2025-03-01T08:33:05.121439",
     "end_time": null,
     "duration": 0
   }
