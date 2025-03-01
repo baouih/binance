@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo tín hiệu thị trường</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .signal-badge {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 85%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .signal-buy {
+            background-color: rgba(40, 167, 69, 0.8);
+            color: white;
+        }
+        .signal-sell {
+            background-color: rgba(220, 53, 69, 0.8);
+            color: white;
+        }
+        .signal-neutral {
+            background-color: rgba(108, 117, 125, 0.8);
+            color: white;
+        }
+        .sentiment-bullish {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sentiment-bearish {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sentiment-neutral {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chart-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .indicator-progress {
+            height: 8px;
+            margin-bottom: 10px;
+        }
+        .indicator-value {
+            font-size: 0.85rem;
+            margin-top: -5px;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1>Báo cáo tín hiệu thị trường</h1>
+            <p class="text-muted">{{DATE}}</p>
+        </div>
+        
+        <div class="sentiment-{{MARKET_SENTIMENT}}">
+            <h3>Tâm lý thị trường: {{MARKET_SENTIMENT_TEXT}}</h3>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-success">{{BUY_SIGNALS}}</h4>
+                        <p class="card-text">Tín hiệu mua</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-danger">{{SELL_SIGNALS}}</h4>
+                        <p class="card-text">Tín hiệu bán</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-secondary">{{NEUTRAL_SIGNALS}}</h4>
+                        <p class="card-text">Trung tính</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4>{{STRONG_SIGNALS}}</h4>
+                        <p class="card-text">Tín hiệu mạnh</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="text-center mb-3">Phân bố tín hiệu</h5>
+                    <img src="{{DISTRIBUTION_CHART}}" alt="Phân bố tín hiệu" class="chart-image">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="text-center mb-3">Độ tin cậy của tín hiệu</h5>
+                    <img src="{{CONFIDENCE_CHART}}" alt="Độ tin cậy của tín hiệu" class="chart-image">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Top cặp giao dịch</div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Mã</th>
+                                        <th>Tín hiệu</th>
+                                        <th>Độ tin cậy</th>
+                                        <th>Chế độ thị trường</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{TOP_ASSETS_TABLE}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Chi tiết tín hiệu mạnh</div>
+                    <div class="card-body">
+                        <div class="row">
+                            {{STRONG_SIGNALS_CARDS}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Nhận định tổng thể</div>
+                    <div class="card-body">
+                        <p>{{SUMMARY_TEXT}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Tất cả các cặp giao dịch</div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Mã</th>
+                                        <th>Tín hiệu</th>
+                                        <th>Độ tin cậy</th>
+                                        <th>Chế độ thị trường</th>
+                                        <th>Xu hướng</th>
+                                        <th>Chỉ báo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{ALL_ASSETS_TABLE}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-muted mt-4">
+            <p>Báo cáo này được tạo tự động bởi Bot Trading vào {{GENERATED_TIME}}.</p>
+            <p>© 2025 Crypto Trading Bot. Mọi quyền được bảo lưu.</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

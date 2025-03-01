@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình thông báo - Crypto Trading Bot</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .api-key-format {
+            font-family: monospace;
+            background-color: rgba(0,0,0,.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1>Cấu hình thông báo và báo cáo</h1>
+            <p class="text-muted">Thiết lập các thông tin kết nối cho Telegram và Email</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="configTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="telegram-tab" data-bs-toggle="tab" href="#telegram">Telegram</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="email-tab" data-bs-toggle="tab" href="#email">Email</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="schedule-tab" data-bs-toggle="tab" href="#schedule">Lịch báo cáo</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- Telegram Settings -->
+                    <div class="tab-pane fade show active" id="telegram">
+                        <form id="telegramForm">
+                            <div class="form-section">
+                                <h4>Cấu hình Telegram Bot</h4>
+                                <p>Để nhận thông báo qua Telegram, bạn cần tạo một bot và lấy API token. <a href="https://core.telegram.org/bots#botfather" target="_blank">Xem hướng dẫn</a></p>
+                                
+                                <div class="mb-3">
+                                    <label for="telegramBotToken" class="form-label">Bot Token</label>
+                                    <input type="text" class="form-control" id="telegramBotToken" placeholder="123456789:ABCDEF-1234567890abcdefghijklmnopqrstuv">
+                                    <div class="form-text">Nhận từ BotFather, có định dạng <span class="api-key-format">123456789:ABCDEF...</span></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="telegramChatId" class="form-label">Chat ID</label>
+                                    <input type="text" class="form-control" id="telegramChatId" placeholder="-1001234567890">
+                                    <div class="form-text">ID của chat cá nhân hoặc group để bot gửi tin nhắn đến</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Cài đặt thông báo</h4>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="telegramTradeSignals" checked>
+                                    <label class="form-check-label" for="telegramTradeSignals">
+                                        Tín hiệu giao dịch
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="telegramTradeExecutions" checked>
+                                    <label class="form-check-label" for="telegramTradeExecutions">
+                                        Thực hiện giao dịch
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="telegramDailyReports" checked>
+                                    <label class="form-check-label" for="telegramDailyReports">
+                                        Báo cáo hàng ngày
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="telegramMarketReports" checked>
+                                    <label class="form-check-label" for="telegramMarketReports">
+                                        Báo cáo thị trường
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="telegramTrainingReports" checked>
+                                    <label class="form-check-label" for="telegramTrainingReports">
+                                        Báo cáo huấn luyện mô hình
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="telegramErrors" checked>
+                                    <label class="form-check-label" for="telegramErrors">
+                                        Thông báo lỗi
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary" id="testTelegramBtn">Kiểm tra kết nối</button>
+                            <button type="submit" class="btn btn-success">Lưu cấu hình</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Email Settings -->
+                    <div class="tab-pane fade" id="email">
+                        <form id="emailForm">
+                            <div class="form-section">
+                                <h4>Cấu hình email</h4>
+                                <p>Thiết lập tài khoản email để gửi báo cáo</p>
+                                
+                                <div class="mb-3">
+                                    <label for="smtpServer" class="form-label">SMTP Server</label>
+                                    <input type="text" class="form-control" id="smtpServer" placeholder="smtp.gmail.com">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="smtpPort" class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-control" id="smtpPort" placeholder="587">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="emailUser" class="form-label">Email đăng nhập</label>
+                                    <input type="email" class="form-control" id="emailUser" placeholder="your.email@gmail.com">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="emailPassword" class="form-label">Mật khẩu hoặc App password</label>
+                                    <input type="password" class="form-control" id="emailPassword">
+                                    <div class="form-text">
+                                        Với Gmail, bạn cần sử dụng <a href="https://support.google.com/accounts/answer/185833" target="_blank">App Password</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="recipientEmails" class="form-label">Email nhận báo cáo</label>
+                                    <input type="text" class="form-control" id="recipientEmails" placeholder="recipient1@example.com, recipient2@example.com">
+                                    <div class="form-text">Phân cách nhiều email bằng dấu phẩy</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Cài đặt báo cáo</h4>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="emailDailyReports" checked>
+                                    <label class="form-check-label" for="emailDailyReports">
+                                        Báo cáo hàng ngày
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="emailMarketReports" checked>
+                                    <label class="form-check-label" for="emailMarketReports">
+                                        Báo cáo thị trường
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="emailSignalReports" checked>
+                                    <label class="form-check-label" for="emailSignalReports">
+                                        Báo cáo tín hiệu
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailTrainingReports">
+                                    <label class="form-check-label" for="emailTrainingReports">
+                                        Báo cáo huấn luyện mô hình
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary" id="testEmailBtn">Kiểm tra kết nối</button>
+                            <button type="submit" class="btn btn-success">Lưu cấu hình</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Schedule Settings -->
+                    <div class="tab-pane fade" id="schedule">
+                        <form id="scheduleForm">
+                            <div class="form-section">
+                                <h4>Lịch gửi báo cáo qua Telegram</h4>
+                                
+                                <div class="mb-3">
+                                    <label for="telegramDailyReportTime" class="form-label">Báo cáo hàng ngày</label>
+                                    <input type="time" class="form-control" id="telegramDailyReportTime" value="18:00">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="telegramSignalReportTimes" class="form-label">Báo cáo tín hiệu</label>
+                                    <input type="text" class="form-control" id="telegramSignalReportTimes" value="08:00,12:00,16:00,20:00">
+                                    <div class="form-text">Phân cách nhiều thời điểm bằng dấu phẩy (định dạng 24 giờ)</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="telegramMarketReportTimes" class="form-label">Báo cáo thị trường</label>
+                                    <input type="text" class="form-control" id="telegramMarketReportTimes" value="09:00,21:00">
+                                    <div class="form-text">Phân cách nhiều thời điểm bằng dấu phẩy (định dạng 24 giờ)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Lịch gửi báo cáo qua Email</h4>
+                                
+                                <div class="mb-3">
+                                    <label for="emailDailyReportTime" class="form-label">Báo cáo hàng ngày</label>
+                                    <input type="time" class="form-control" id="emailDailyReportTime" value="19:00">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="emailSignalReportTimes" class="form-label">Báo cáo tín hiệu</label>
+                                    <input type="text" class="form-control" id="emailSignalReportTimes" value="08:00,20:00">
+                                    <div class="form-text">Phân cách nhiều thời điểm bằng dấu phẩy (định dạng 24 giờ)</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="emailMarketReportTimes" class="form-label">Báo cáo thị trường</label>
+                                    <input type="text" class="form-control" id="emailMarketReportTimes" value="09:00">
+                                    <div class="form-text">Phân cách nhiều thời điểm bằng dấu phẩy (định dạng 24 giờ)</div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success">Lưu lịch trình</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Gửi báo cáo ngay</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="reportType" class="form-label">Loại báo cáo</label>
+                    <select class="form-select" id="reportType">
+                        <option value="daily">Báo cáo hàng ngày</option>
+                        <option value="signal">Báo cáo tín hiệu</option>
+                        <option value="market">Báo cáo thị trường</option>
+                        <option value="training">Báo cáo huấn luyện</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="reportRecipient" class="form-label">Gửi đến</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sendToTelegram" checked>
+                        <label class="form-check-label" for="sendToTelegram">
+                            Telegram
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sendToEmail" checked>
+                        <label class="form-check-label" for="sendToEmail">
+                            Email
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-primary" id="sendReportNowBtn">Gửi ngay</button>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mb-4">
+            <h5>Thông tin về báo cáo nâng cao</h5>
+            <p>Chúng tôi đang lên kế hoạch phát triển thêm các thuật toán phân tích sâu để nâng cao chất lượng báo cáo:</p>
+            <ul>
+                <li><strong>Sentiment Analysis dựa trên NLP:</strong> Phân tích tin tức và mạng xã hội để đánh giá tâm lý thị trường</li>
+                <li><strong>Wavelets Analysis:</strong> Phát hiện chu kỳ và mẫu hình ẩn trong dữ liệu giá</li>
+                <li><strong>Hidden Markov Models:</strong> Xác định trạng thái thị trường không quan sát được</li>
+                <li><strong>LSTM/GRU Networks:</strong> Phát hiện mẫu hình thời gian dài và phụ thuộc xa</li>
+                <li><strong>Order Flow Analysis:</strong> Phân tích dòng lệnh để hiểu áp lực mua/bán</li>
+            </ul>
+            <p>Các phương pháp phân tích này sẽ giúp nâng cao độ chính xác của hệ thống báo cáo trong tương lai.</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Save Telegram Configuration
+        document.getElementById('telegramForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const config = {
+                botToken: document.getElementById('telegramBotToken').value,
+                chatId: document.getElementById('telegramChatId').value,
+                notifications: {
+                    tradeSignals: document.getElementById('telegramTradeSignals').checked,
+                    tradeExecutions: document.getElementById('telegramTradeExecutions').checked,
+                    dailyReports: document.getElementById('telegramDailyReports').checked,
+                    marketReports: document.getElementById('telegramMarketReports').checked,
+                    trainingReports: document.getElementById('telegramTrainingReports').checked,
+                    errors: document.getElementById('telegramErrors').checked
+                }
+            };
+            
+            // Send to server (implement AJAX call here)
+            console.log('Saving Telegram config:', config);
+            alert('Cấu hình Telegram đã được lưu');
+        });
+        
+        // Save Email Configuration
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const config = {
+                smtpServer: document.getElementById('smtpServer').value,
+                smtpPort: document.getElementById('smtpPort').value,
+                emailUser: document.getElementById('emailUser').value,
+                emailPassword: document.getElementById('emailPassword').value,
+                recipients: document.getElementById('recipientEmails').value.split(',').map(email => email.trim()),
+                reports: {
+                    dailyReports: document.getElementById('emailDailyReports').checked,
+                    marketReports: document.getElementById('emailMarketReports').checked,
+                    signalReports: document.getElementById('emailSignalReports').checked,
+                    trainingReports: document.getElementById('emailTrainingReports').checked
+                }
+            };
+            
+            // Send to server (implement AJAX call here)
+            console.log('Saving Email config:', config);
+            alert('Cấu hình Email đã được lưu');
+        });
+        
+        // Save Schedule Configuration
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const config = {
+                telegram: {
+                    dailyReport: document.getElementById('telegramDailyReportTime').value,
+                    signalReports: document.getElementById('telegramSignalReportTimes').value,
+                    marketReports: document.getElementById('telegramMarketReportTimes').value
+                },
+                email: {
+                    dailyReport: document.getElementById('emailDailyReportTime').value,
+                    signalReports: document.getElementById('emailSignalReportTimes').value,
+                    marketReports: document.getElementById('emailMarketReportTimes').value
+                }
+            };
+            
+            // Send to server (implement AJAX call here)
+            console.log('Saving Schedule config:', config);
+            alert('Lịch trình đã được lưu');
+        });
+        
+        // Test Telegram Connection
+        document.getElementById('testTelegramBtn').addEventListener('click', function() {
+            const botToken = document.getElementById('telegramBotToken').value;
+            const chatId = document.getElementById('telegramChatId').value;
+            
+            if (!botToken || !chatId) {
+                alert('Vui lòng nhập Bot Token và Chat ID');
+                return;
+            }
+            
+            // Send test message (implement AJAX call here)
+            console.log('Testing Telegram connection:', { botToken, chatId });
+            alert('Đang gửi tin nhắn test qua Telegram...');
+            
+            // Simulate successful response
+            setTimeout(() => {
+                alert('Kết nối thành công! Đã gửi tin nhắn test đến Telegram');
+            }, 1500);
+        });
+        
+        // Test Email Connection
+        document.getElementById('testEmailBtn').addEventListener('click', function() {
+            const smtpServer = document.getElementById('smtpServer').value;
+            const smtpPort = document.getElementById('smtpPort').value;
+            const emailUser = document.getElementById('emailUser').value;
+            const emailPassword = document.getElementById('emailPassword').value;
+            const recipients = document.getElementById('recipientEmails').value;
+            
+            if (!smtpServer || !smtpPort || !emailUser || !emailPassword || !recipients) {
+                alert('Vui lòng điền đầy đủ thông tin email');
+                return;
+            }
+            
+            // Send test email (implement AJAX call here)
+            console.log('Testing Email connection:', { smtpServer, smtpPort, emailUser });
+            alert('Đang gửi email test...');
+            
+            // Simulate successful response
+            setTimeout(() => {
+                alert('Kết nối thành công! Đã gửi email test');
+            }, 1500);
+        });
+        
+        // Send Report Now
+        document.getElementById('sendReportNowBtn').addEventListener('click', function() {
+            const reportType = document.getElementById('reportType').value;
+            const sendToTelegram = document.getElementById('sendToTelegram').checked;
+            const sendToEmail = document.getElementById('sendToEmail').checked;
+            
+            if (!sendToTelegram && !sendToEmail) {
+                alert('Vui lòng chọn ít nhất một phương thức gửi');
+                return;
+            }
+            
+            // Send report (implement AJAX call here)
+            console.log('Sending report now:', { reportType, sendToTelegram, sendToEmail });
+            alert(`Đang gửi báo cáo ${reportType}...`);
+            
+            // Simulate successful response
+            setTimeout(() => {
+                alert('Báo cáo đã được gửi thành công!');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

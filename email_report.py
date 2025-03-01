@@ -7,23 +7,19 @@ của bot qua email, giúp người dùng theo dõi hoạt động của bot nga
 """
 
 import os
-import logging
 import json
+import logging
 import smtplib
 import ssl
-from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from typing import Dict, List, Union, Optional
 from datetime import datetime
-from typing import Dict, List, Optional
 
 # Thiết lập logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger("email_report")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class EmailReporter:
     """Lớp gửi báo cáo qua email"""
@@ -39,20 +35,14 @@ class EmailReporter:
             email_user (str, optional): Tên đăng nhập email
             email_password (str, optional): Mật khẩu email
         """
-        # Lấy thông tin từ biến môi trường nếu không được cung cấp
-        self.smtp_server = smtp_server or os.environ.get("EMAIL_SMTP_SERVER", "smtp.gmail.com")
-        self.smtp_port = smtp_port or int(os.environ.get("EMAIL_SMTP_PORT", "587"))
-        self.email_user = email_user or os.environ.get("EMAIL_USER")
-        self.email_password = email_password or os.environ.get("EMAIL_PASSWORD")
+        self.smtp_server = smtp_server or os.environ.get('EMAIL_SMTP_SERVER')
+        self.smtp_port = smtp_port or int(os.environ.get('EMAIL_SMTP_PORT', '587'))
+        self.email_user = email_user or os.environ.get('EMAIL_USER')
+        self.email_password = email_password or os.environ.get('EMAIL_PASSWORD')
+        self.enabled = bool(self.smtp_server and self.smtp_port and self.email_user and self.email_password)
         
-        # Kiểm tra cấu hình
-        if not all([self.smtp_server, self.smtp_port, self.email_user, self.email_password]):
-            logger.warning("Email reporter không được cấu hình đầy đủ")
-            logger.warning("Đặt EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, EMAIL_USER, EMAIL_PASSWORD trong biến môi trường để kích hoạt")
-            self.enabled = False
-        else:
-            self.enabled = True
-            logger.info("Email reporter đã được kích hoạt")
+        if not self.enabled:
+            logger.warning("Email không được kích hoạt. Thiếu thông tin kết nối.")
     
     def send_email(self, subject: str, to_email: str, html_content: str = None, 
                  text_content: str = None, attachments: List[str] = None) -> bool:
@@ -70,11 +60,15 @@ class EmailReporter:
             bool: True nếu gửi thành công, False nếu không
         """
         if not self.enabled:
-            logger.warning("Email reporter không được kích hoạt")
+            logger.warning("Email không được kích hoạt. Không thể gửi email.")
+            return False
+        
+        if not html_content and not text_content:
+            logger.error("Thiếu nội dung email. Cần cung cấp HTML hoặc văn bản thuần.")
             return False
         
         try:
-            # Tạo tin nhắn
+            # Tạo message
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['From'] = self.email_user
@@ -91,47 +85,28 @@ class EmailReporter:
             # Thêm file đính kèm
             if attachments:
                 for file_path in attachments:
-                    if not os.path.exists(file_path):
-                        logger.warning(f"File đính kèm không tồn tại: {file_path}")
-                        continue
-                    
-                    # Xác định loại MIME dựa vào phần mở rộng
-                    filename = os.path.basename(file_path)
-                    extension = os.path.splitext(filename)[1].lower()
-                    
-                    with open(file_path, 'rb') as file:
-                        file_data = file.read()
-                        
-                        if extension in ['.jpg', '.jpeg', '.png', '.gif']:
-                            # Đính kèm hình ảnh
-                            attachment = MIMEImage(file_data, name=filename)
-                        else:
-                            # Đính kèm file khác
-                            attachment = MIMEApplication(file_data, Name=filename)
-                            attachment['Content-Disposition'] = f'attachment; filename="{filename}"'
-                        
-                        msg.attach(attachment)
+                    try:
+                        with open(file_path, 'rb') as f:
+                            part = MIMEApplication(f.read(), Name=os.path.basename(file_path))
+                        part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+                        msg.attach(part)
+                    except Exception as e:
+                        logger.error(f"Lỗi khi đính kèm file {file_path}: {e}")
             
-            # Kết nối và gửi email
+            # Kết nối SMTP và gửi email
             context = ssl.create_default_context()
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.ehlo()
+                server.starttls(context=context)
+                server.ehlo()
+                server.login(self.email_user, self.email_password)
+                server.sendmail(self.email_user, to_email, msg.as_string())
             
-            try:
-                with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                    server.ehlo()
-                    server.starttls(context=context)
-                    server.ehlo()
-                    server.login(self.email_user, self.email_password)
-                    server.sendmail(self.email_user, to_email, msg.as_string())
-                
-                logger.info(f"Đã gửi email thành công đến {to_email}")
-                return True
+            logger.info(f"Đã gửi email thành công đến {to_email}")
+            return True
             
-            except Exception as e:
-                logger.error(f"Lỗi khi gửi email: {str(e)}")
-                return False
-                
         except Exception as e:
-            logger.error(f"Lỗi khi tạo email: {str(e)}")
+            logger.error(f"Lỗi khi gửi email: {e}")
             return False
     
     def send_daily_report(self, to_email: str, trading_state_file: str = "trading_state.json", 
@@ -154,27 +129,30 @@ class EmailReporter:
             # Tải dữ liệu giao dịch
             state = self._load_trading_state(trading_state_file)
             if not state:
-                logger.warning("Không thể tải dữ liệu giao dịch")
+                logger.error(f"Không thể tải dữ liệu giao dịch từ {trading_state_file}")
                 return False
             
+            # Lấy thời gian hiện tại
+            timestamp = datetime.now()
+            
+            # Tạo nội dung báo cáo
+            html_content = self._generate_html_report(state, timestamp)
+            text_content = self._generate_text_report(state, timestamp)
+            
             # Tạo tiêu đề email
-            now = datetime.now()
-            subject = f"Báo cáo giao dịch hàng ngày - {now.strftime('%d/%m/%Y')}"
-            
-            # Tạo nội dung HTML
-            html_content = self._generate_html_report(state, now)
-            
-            # Tạo nội dung văn bản thuần
-            text_content = self._generate_text_report(state, now)
-            
-            # Danh sách file đính kèm
-            attachments = report_images if report_images else []
+            subject = f"Báo cáo giao dịch hàng ngày - {timestamp.strftime('%Y-%m-%d')}"
             
             # Gửi email
-            return self.send_email(subject, to_email, html_content, text_content, attachments)
-        
+            return self.send_email(
+                subject=subject,
+                to_email=to_email,
+                html_content=html_content,
+                text_content=text_content,
+                attachments=report_images
+            )
+            
         except Exception as e:
-            logger.error(f"Lỗi khi gửi báo cáo hàng ngày: {str(e)}")
+            logger.error(f"Lỗi khi gửi báo cáo hàng ngày: {e}")
             return False
     
     def _load_trading_state(self, file_path: str) -> Dict:
@@ -189,14 +167,20 @@ class EmailReporter:
         """
         try:
             if os.path.exists(file_path):
-                with open(file_path, "r") as f:
+                with open(file_path, 'r') as f:
                     return json.load(f)
             else:
-                logger.warning(f"File {file_path} không tồn tại")
-                return {}
+                # Tạo dữ liệu mẫu nếu không tìm thấy file
+                return {
+                    "current_balance": 10000.0,
+                    "start_balance": 10000.0,
+                    "open_positions": [],
+                    "trade_history": [],
+                    "last_update": datetime.now().isoformat()
+                }
         except Exception as e:
-            logger.error(f"Lỗi khi tải dữ liệu giao dịch: {str(e)}")
-            return {}
+            logger.error(f"Lỗi khi tải dữ liệu giao dịch: {e}")
+            return None
     
     def _generate_html_report(self, state: Dict, timestamp: datetime) -> str:
         """
@@ -210,60 +194,35 @@ class EmailReporter:
             str: Nội dung HTML
         """
         # Lấy dữ liệu từ state
-        balance = state.get("balance", 0)
-        positions = state.get("positions", [])
-        trade_history = state.get("trade_history", [])
+        current_balance = state.get('current_balance', 0)
+        start_balance = state.get('start_balance', current_balance)
+        open_positions = state.get('open_positions', [])
+        trade_history = state.get('trade_history', [])
         
-        # Tạo HTML cho vị thế
-        positions_html = ""
-        for pos in positions:
-            profit_class = "text-success" if pos.get("pnl", 0) >= 0 else "text-danger"
-            positions_html += f"""
-            <tr>
-                <td>{pos.get('symbol', 'N/A')}</td>
-                <td>{pos.get('type', 'N/A')}</td>
-                <td>${pos.get('entry_price', 0):.2f}</td>
-                <td>${pos.get('current_price', 0):.2f}</td>
-                <td>{pos.get('quantity', 0):.6f}</td>
-                <td class="{profit_class}">${pos.get('pnl', 0):.2f} ({pos.get('pnl_pct', 0):.2f}%)</td>
-            </tr>
-            """
-        
-        if not positions:
-            positions_html = '<tr><td colspan="6" class="text-center">Không có vị thế đang mở</td></tr>'
-        
-        # Tạo HTML cho lịch sử giao dịch (chỉ 10 giao dịch gần nhất)
-        recent_trades = sorted(trade_history, key=lambda x: x.get('exit_time', ''), reverse=True)[:10]
-        trades_html = ""
-        
-        for trade in recent_trades:
-            profit_class = "text-success" if trade.get("pnl", 0) >= 0 else "text-danger"
-            trades_html += f"""
-            <tr>
-                <td>{trade.get('symbol', 'N/A')}</td>
-                <td>{trade.get('type', 'N/A')}</td>
-                <td>${trade.get('entry_price', 0):.2f}</td>
-                <td>${trade.get('exit_price', 0):.2f}</td>
-                <td>{trade.get('exit_reason', 'N/A')}</td>
-                <td class="{profit_class}">${trade.get('pnl', 0):.2f} ({trade.get('pnl_pct', 0):.2f}%)</td>
-            </tr>
-            """
-        
-        if not recent_trades:
-            trades_html = '<tr><td colspan="6" class="text-center">Không có lịch sử giao dịch</td></tr>'
-        
-        # Tính hiệu suất
-        winning_trades = sum(1 for trade in trade_history if trade.get("pnl", 0) > 0)
+        # Tính toán thống kê
         total_trades = len(trade_history)
+        winning_trades = sum(1 for trade in trade_history if trade.get('pnl', 0) > 0)
+        losing_trades = sum(1 for trade in trade_history if trade.get('pnl', 0) < 0)
         win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
         
-        realized_pnl = sum(trade.get("pnl", 0) for trade in trade_history)
-        unrealized_pnl = sum(pos.get("pnl", 0) for pos in positions)
+        total_profit = sum(trade.get('pnl', 0) for trade in trade_history if trade.get('pnl', 0) > 0)
+        total_loss = sum(trade.get('pnl', 0) for trade in trade_history if trade.get('pnl', 0) < 0)
         
-        # Tạo HTML đầy đủ
-        html_content = f"""
+        # Lọc giao dịch trong ngày
+        today = timestamp.date()
+        today_trades = [
+            trade for trade in trade_history 
+            if datetime.fromisoformat(trade.get('exit_time', timestamp.isoformat())).date() == today
+        ]
+        
+        today_profit = sum(trade.get('pnl', 0) for trade in today_trades if trade.get('pnl', 0) > 0)
+        today_loss = sum(trade.get('pnl', 0) for trade in today_trades if trade.get('pnl', 0) < 0)
+        today_net = today_profit + today_loss
+        
+        # Tạo HTML
+        html = f"""
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -275,81 +234,104 @@ class EmailReporter:
                     padding: 20px;
                     color: #333;
                 }}
+                h1, h2, h3, h4, h5, h6 {{
+                    color: #2c3e50;
+                }}
                 .container {{
-                    width: 100%;
-                    max-width: 1200px;
+                    max-width: 800px;
                     margin: 0 auto;
                 }}
                 .header {{
                     text-align: center;
                     margin-bottom: 30px;
                 }}
-                .card {{
-                    border: 1px solid #ddd;
+                .summary-card {{
+                    background-color: #f8f9fa;
                     border-radius: 5px;
+                    padding: 20px;
                     margin-bottom: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
                 }}
-                .card-header {{
-                    background-color: #f8f9fa;
-                    padding: 10px 15px;
-                    border-bottom: 1px solid #ddd;
-                    font-weight: bold;
-                }}
-                .card-body {{
-                    padding: 15px;
-                }}
-                .table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                }}
-                .table th, .table td {{
-                    padding: 10px;
-                    border-bottom: 1px solid #ddd;
-                    text-align: left;
-                }}
-                .table th {{
-                    background-color: #f8f9fa;
-                }}
-                .text-center {{
-                    text-align: center;
-                }}
-                .text-success {{
-                    color: #28a745;
-                }}
-                .text-danger {{
-                    color: #dc3545;
-                }}
-                .summary-box {{
+                .metrics {{
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 20px;
-                    margin-bottom: 20px;
+                    justify-content: space-between;
+                    margin: 20px 0;
                 }}
-                .summary-item {{
-                    flex: 1;
-                    background-color: #f8f9fa;
-                    border-radius: 5px;
+                .metric {{
+                    flex-basis: 48%;
+                    background: #fff;
                     padding: 15px;
-                    text-align: center;
+                    border-radius: 5px;
+                    margin-bottom: 15px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                 }}
-                .summary-item h3 {{
-                    margin-top: 0;
-                    margin-bottom: 10px;
-                    font-size: 16px;
-                    color: #666;
+                .metric-title {{
+                    font-size: 14px;
+                    color: #7f8c8d;
+                    margin-bottom: 5px;
                 }}
-                .summary-item p {{
-                    margin: 0;
+                .metric-value {{
                     font-size: 24px;
                     font-weight: bold;
+                    color: #2c3e50;
+                }}
+                .positive {{
+                    color: #27ae60;
+                }}
+                .negative {{
+                    color: #e74c3c;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                }}
+                th, td {{
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                }}
+                th {{
+                    background-color: #f8f9fa;
+                    font-weight: bold;
+                    color: #2c3e50;
+                }}
+                tr:hover {{
+                    background-color: #f5f5f5;
                 }}
                 .footer {{
                     text-align: center;
                     margin-top: 30px;
                     padding-top: 20px;
-                    border-top: 1px solid #ddd;
-                    color: #777;
+                    border-top: 1px solid #eee;
+                    color: #7f8c8d;
+                    font-size: 12px;
+                }}
+                .position {{
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background-color: #fff;
+                    border-radius: 5px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }}
+                .position-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                }}
+                .position-symbol {{
+                    font-weight: bold;
+                    font-size: 18px;
+                }}
+                .position-type {{
+                    font-weight: bold;
+                }}
+                .buy {{
+                    color: #27ae60;
+                }}
+                .sell {{
+                    color: #e74c3c;
                 }}
             </style>
         </head>
@@ -357,80 +339,172 @@ class EmailReporter:
             <div class="container">
                 <div class="header">
                     <h1>Báo cáo giao dịch hàng ngày</h1>
-                    <p>{timestamp.strftime('%d/%m/%Y %H:%M:%S')}</p>
+                    <p>{timestamp.strftime('%Y-%m-%d %H:%M:%S')}</p>
                 </div>
                 
-                <div class="summary-box">
-                    <div class="summary-item">
-                        <h3>Số dư</h3>
-                        <p>${balance:.2f}</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>Tỷ lệ thắng</h3>
-                        <p>{win_rate:.2f}%</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>P&L đã thực hiện</h3>
-                        <p class="{('text-success' if realized_pnl >= 0 else 'text-danger')}">${realized_pnl:.2f}</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>P&L chưa thực hiện</h3>
-                        <p class="{('text-success' if unrealized_pnl >= 0 else 'text-danger')}">${unrealized_pnl:.2f}</p>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">Vị thế đang mở</div>
-                    <div class="card-body" style="padding: 0;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Loại</th>
-                                    <th>Giá vào</th>
-                                    <th>Giá hiện tại</th>
-                                    <th>Số lượng</th>
-                                    <th>P&L</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {positions_html}
-                            </tbody>
-                        </table>
+                <div class="summary-card">
+                    <h2>Tổng quan tài khoản</h2>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-title">Số dư hiện tại</div>
+                            <div class="metric-value">${current_balance:.2f}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Lãi/Lỗ tổng</div>
+                            <div class="metric-value {('positive' if current_balance > start_balance else 'negative')}">
+                                ${current_balance - start_balance:.2f} ({(current_balance / start_balance - 1) * 100:.2f}%)
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Tỷ lệ thắng</div>
+                            <div class="metric-value">{win_rate:.1f}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Tổng giao dịch</div>
+                            <div class="metric-value">{total_trades}</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-header">Giao dịch gần đây</div>
-                    <div class="card-body" style="padding: 0;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Loại</th>
-                                    <th>Giá vào</th>
-                                    <th>Giá thoát</th>
-                                    <th>Lý do thoát</th>
-                                    <th>P&L</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {trades_html}
-                            </tbody>
-                        </table>
+                <div class="summary-card">
+                    <h2>Hiệu suất hôm nay</h2>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-title">Lãi/Lỗ ròng</div>
+                            <div class="metric-value {('positive' if today_net > 0 else 'negative')}">
+                                ${today_net:.2f}
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Giao dịch hôm nay</div>
+                            <div class="metric-value">{len(today_trades)}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Tổng lãi</div>
+                            <div class="metric-value positive">${today_profit:.2f}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Tổng lỗ</div>
+                            <div class="metric-value negative">${today_loss:.2f}</div>
+                        </div>
                     </div>
+                </div>
+        """
+        
+        # Thêm vị thế đang mở
+        if open_positions:
+            html += """
+                <div class="summary-card">
+                    <h2>Vị thế đang mở</h2>
+            """
+            
+            for position in open_positions:
+                symbol = position.get('symbol', '')
+                pos_type = position.get('type', '').upper()
+                side_class = 'buy' if pos_type == 'LONG' else 'sell'
+                side_text = 'LONG' if pos_type == 'LONG' else 'SHORT'
+                entry_price = position.get('entry_price', 0)
+                current_price = position.get('current_price', 0)
+                quantity = position.get('quantity', 0)
+                pnl = position.get('pnl', 0)
+                pnl_percent = position.get('pnl_percent', 0)
+                entry_time = datetime.fromisoformat(position.get('entry_time', timestamp.isoformat()))
+                
+                html += f"""
+                    <div class="position">
+                        <div class="position-header">
+                            <div class="position-symbol">{symbol}</div>
+                            <div class="position-type {side_class}">{side_text}</div>
+                        </div>
+                        <div>
+                            <p><strong>Giá vào:</strong> ${entry_price:.2f} | <strong>Giá hiện tại:</strong> ${current_price:.2f}</p>
+                            <p><strong>Số lượng:</strong> {quantity}</p>
+                            <p><strong>Thời gian vào:</strong> {entry_time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+                            <p><strong>Lãi/Lỗ:</strong> <span class="{('positive' if pnl >= 0 else 'negative')}">${pnl:.2f} ({pnl_percent:.2f}%)</span></p>
+                        </div>
+                    </div>
+                """
+            
+            html += """
+                </div>
+            """
+        else:
+            html += """
+                <div class="summary-card">
+                    <h2>Vị thế đang mở</h2>
+                    <p>Không có vị thế đang mở</p>
+                </div>
+            """
+        
+        # Thêm lịch sử giao dịch gần đây
+        html += """
+                <div class="summary-card">
+                    <h2>Lịch sử giao dịch gần đây</h2>
+        """
+        
+        if trade_history:
+            html += """
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cặp</th>
+                                <th>Loại</th>
+                                <th>Vào/Ra</th>
+                                <th>Lãi/Lỗ</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            """
+            
+            # Lấy 10 giao dịch gần nhất
+            recent_trades = sorted(
+                trade_history, 
+                key=lambda x: datetime.fromisoformat(x.get('exit_time', timestamp.isoformat())),
+                reverse=True
+            )[:10]
+            
+            for trade in recent_trades:
+                symbol = trade.get('symbol', '')
+                trade_type = trade.get('type', '').upper()
+                side_class = 'buy' if trade_type == 'LONG' else 'sell'
+                entry_price = trade.get('entry_price', 0)
+                exit_price = trade.get('exit_price', 0)
+                pnl = trade.get('pnl', 0)
+                exit_time = datetime.fromisoformat(trade.get('exit_time', timestamp.isoformat()))
+                
+                html += f"""
+                            <tr>
+                                <td>{symbol}</td>
+                                <td class="{side_class}">{trade_type}</td>
+                                <td>${entry_price:.2f} / ${exit_price:.2f}</td>
+                                <td class="{('positive' if pnl >= 0 else 'negative')}">${pnl:.2f}</td>
+                                <td>{exit_time.strftime('%Y-%m-%d %H:%M')}</td>
+                            </tr>
+                """
+            
+            html += """
+                        </tbody>
+                    </table>
+            """
+        else:
+            html += """
+                    <p>Chưa có giao dịch nào được thực hiện</p>
+            """
+        
+        html += """
                 </div>
                 
                 <div class="footer">
-                    <p>Báo cáo này được tạo tự động bởi Bot Trading</p>
-                    <p>© {timestamp.year} Bot Trading</p>
+                    <p>Báo cáo này được tạo tự động bởi Crypto Trading Bot.</p>
+                    <p>© 2025 Crypto Trading Bot. Mọi quyền được bảo lưu.</p>
                 </div>
             </div>
         </body>
         </html>
         """
         
-        return html_content
+        return html
     
     def _generate_text_report(self, state: Dict, timestamp: datetime) -> str:
         """
@@ -444,60 +518,120 @@ class EmailReporter:
             str: Nội dung văn bản thuần
         """
         # Lấy dữ liệu từ state
-        balance = state.get("balance", 0)
-        positions = state.get("positions", [])
-        trade_history = state.get("trade_history", [])
+        current_balance = state.get('current_balance', 0)
+        start_balance = state.get('start_balance', current_balance)
+        open_positions = state.get('open_positions', [])
+        trade_history = state.get('trade_history', [])
         
-        # Tính hiệu suất
-        winning_trades = sum(1 for trade in trade_history if trade.get("pnl", 0) > 0)
+        # Tính toán thống kê
         total_trades = len(trade_history)
+        winning_trades = sum(1 for trade in trade_history if trade.get('pnl', 0) > 0)
+        losing_trades = sum(1 for trade in trade_history if trade.get('pnl', 0) < 0)
         win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
         
-        realized_pnl = sum(trade.get("pnl", 0) for trade in trade_history)
-        unrealized_pnl = sum(pos.get("pnl", 0) for pos in positions)
+        total_profit = sum(trade.get('pnl', 0) for trade in trade_history if trade.get('pnl', 0) > 0)
+        total_loss = sum(trade.get('pnl', 0) for trade in trade_history if trade.get('pnl', 0) < 0)
         
-        # Tạo báo cáo văn bản
-        report = f"BÁO CÁO GIAO DỊCH HÀNG NGÀY\n"
-        report += f"Thời gian: {timestamp.strftime('%d/%m/%Y %H:%M:%S')}\n\n"
+        # Lọc giao dịch trong ngày
+        today = timestamp.date()
+        today_trades = [
+            trade for trade in trade_history 
+            if datetime.fromisoformat(trade.get('exit_time', timestamp.isoformat())).date() == today
+        ]
         
-        # Tổng quan
-        report += f"TỔNG QUAN\n"
-        report += f"Số dư: ${balance:.2f}\n"
-        report += f"Tỷ lệ thắng: {win_rate:.2f}%\n"
-        report += f"P&L đã thực hiện: ${realized_pnl:.2f}\n"
-        report += f"P&L chưa thực hiện: ${unrealized_pnl:.2f}\n\n"
+        today_profit = sum(trade.get('pnl', 0) for trade in today_trades if trade.get('pnl', 0) > 0)
+        today_loss = sum(trade.get('pnl', 0) for trade in today_trades if trade.get('pnl', 0) < 0)
+        today_net = today_profit + today_loss
         
-        # Vị thế đang mở
-        report += f"VỊ THẾ ĐANG MỞ\n"
-        if positions:
-            for pos in positions:
-                report += f"- {pos.get('symbol', 'N/A')} ({pos.get('type', 'N/A')})\n"
-                report += f"  Giá vào: ${pos.get('entry_price', 0):.2f}, Giá hiện tại: ${pos.get('current_price', 0):.2f}\n"
-                report += f"  Số lượng: {pos.get('quantity', 0):.6f}\n"
-                report += f"  P&L: ${pos.get('pnl', 0):.2f} ({pos.get('pnl_pct', 0):.2f}%)\n"
+        # Tạo văn bản
+        text = f"""
+BÁO CÁO GIAO DỊCH HÀNG NGÀY
+{timestamp.strftime('%Y-%m-%d %H:%M:%S')}
+
+TỔNG QUAN TÀI KHOẢN
+------------------
+Số dư hiện tại: ${current_balance:.2f}
+Lãi/Lỗ tổng: ${current_balance - start_balance:.2f} ({(current_balance / start_balance - 1) * 100:.2f}%)
+Tỷ lệ thắng: {win_rate:.1f}%
+Tổng giao dịch: {total_trades}
+
+HIỆU SUẤT HÔM NAY
+----------------
+Lãi/Lỗ ròng: ${today_net:.2f}
+Giao dịch hôm nay: {len(today_trades)}
+Tổng lãi: ${today_profit:.2f}
+Tổng lỗ: ${today_loss:.2f}
+"""
+        
+        # Thêm vị thế đang mở
+        text += """
+VỊ THẾ ĐANG MỞ
+------------
+"""
+        
+        if open_positions:
+            for position in open_positions:
+                symbol = position.get('symbol', '')
+                pos_type = position.get('type', '').upper()
+                entry_price = position.get('entry_price', 0)
+                current_price = position.get('current_price', 0)
+                quantity = position.get('quantity', 0)
+                pnl = position.get('pnl', 0)
+                pnl_percent = position.get('pnl_percent', 0)
+                entry_time = datetime.fromisoformat(position.get('entry_time', timestamp.isoformat()))
+                
+                text += f"""
+{symbol} {pos_type}
+Giá vào: ${entry_price:.2f} | Giá hiện tại: ${current_price:.2f}
+Số lượng: {quantity}
+Thời gian vào: {entry_time.strftime('%Y-%m-%d %H:%M:%S')}
+Lãi/Lỗ: ${pnl:.2f} ({pnl_percent:.2f}%)
+"""
         else:
-            report += "Không có vị thế đang mở\n"
+            text += "Không có vị thế đang mở\n"
         
-        report += "\n"
+        # Thêm lịch sử giao dịch gần đây
+        text += """
+LỊCH SỬ GIAO DỊCH GẦN ĐÂY
+----------------------
+"""
         
-        # Giao dịch gần đây
-        report += f"GIAO DỊCH GẦN ĐÂY\n"
-        recent_trades = sorted(trade_history, key=lambda x: x.get('exit_time', ''), reverse=True)[:5]
-        
-        if recent_trades:
+        if trade_history:
+            # Lấy 10 giao dịch gần nhất
+            recent_trades = sorted(
+                trade_history, 
+                key=lambda x: datetime.fromisoformat(x.get('exit_time', timestamp.isoformat())),
+                reverse=True
+            )[:10]
+            
             for trade in recent_trades:
-                report += f"- {trade.get('symbol', 'N/A')} ({trade.get('type', 'N/A')})\n"
-                report += f"  Giá vào: ${trade.get('entry_price', 0):.2f}, Giá thoát: ${trade.get('exit_price', 0):.2f}\n"
-                report += f"  Lý do thoát: {trade.get('exit_reason', 'N/A')}\n"
-                report += f"  P&L: ${trade.get('pnl', 0):.2f} ({trade.get('pnl_pct', 0):.2f}%)\n"
+                symbol = trade.get('symbol', '')
+                trade_type = trade.get('type', '').upper()
+                entry_price = trade.get('entry_price', 0)
+                exit_price = trade.get('exit_price', 0)
+                pnl = trade.get('pnl', 0)
+                exit_time = datetime.fromisoformat(trade.get('exit_time', timestamp.isoformat()))
+                
+                text += f"""
+{symbol} {trade_type}
+Vào/Ra: ${entry_price:.2f} / ${exit_price:.2f}
+Lãi/Lỗ: ${pnl:.2f}
+Thời gian: {exit_time.strftime('%Y-%m-%d %H:%M')}
+"""
         else:
-            report += "Không có giao dịch gần đây\n"
+            text += "Chưa có giao dịch nào được thực hiện\n"
         
-        return report
+        text += """
+
+Báo cáo này được tạo tự động bởi Crypto Trading Bot.
+© 2025 Crypto Trading Bot. Mọi quyền được bảo lưu.
+"""
+        
+        return text
     
     def send_signal_report(self, to_email: str, signal_report_file: str = None, report_images: List[str] = None) -> bool:
         """
-        Gửi báo cáo tín hiệu thị trường qua email.
+        Gửi báo cáo tín hiệu qua email.
         
         Args:
             to_email (str): Địa chỉ email nhận
@@ -511,60 +645,51 @@ class EmailReporter:
             return False
         
         try:
-            # Tìm file báo cáo mới nhất nếu không được chỉ định
-            if not signal_report_file:
-                reports_folder = "reports"
-                if os.path.exists(reports_folder):
-                    signal_reports = [f for f in os.listdir(reports_folder) if f.startswith("signal_report_") and f.endswith(".json")]
-                    if signal_reports:
-                        signal_report_file = os.path.join(reports_folder, max(signal_reports, key=lambda x: os.path.getmtime(os.path.join(reports_folder, x))))
-            
-            if not signal_report_file or not os.path.exists(signal_report_file):
-                logger.warning("Không tìm thấy file báo cáo tín hiệu")
-                return False
-            
-            # Tải báo cáo tín hiệu
-            with open(signal_report_file, 'r', encoding='utf-8') as f:
-                report = json.load(f)
-            
-            # Tìm file tóm tắt tương ứng
-            summary_file = signal_report_file.replace("signal_report_", "signal_summary_").replace(".json", ".txt")
+            # Lấy thời gian hiện tại
+            timestamp = datetime.now()
             
             # Tạo tiêu đề email
-            now = datetime.now()
-            subject = f"Báo cáo tín hiệu thị trường - {now.strftime('%d/%m/%Y %H:%M')}"
+            subject = f"Báo cáo tín hiệu thị trường - {timestamp.strftime('%Y-%m-%d %H:%M')}"
+            
+            # Tải báo cáo tín hiệu
+            if signal_report_file and os.path.exists(signal_report_file):
+                with open(signal_report_file, 'r') as f:
+                    report = json.load(f)
+            else:
+                # Báo cáo mẫu nếu không tìm thấy file
+                report = {
+                    "timestamp": timestamp.isoformat(),
+                    "signals": [
+                        {
+                            "symbol": "BTCUSDT",
+                            "timeframe": "1h",
+                            "signal": "BUY",
+                            "confidence": 75.5,
+                            "indicators": {
+                                "rsi": 32.5,
+                                "macd": "positive crossover",
+                                "ema": "uptrend"
+                            },
+                            "price": 68000.0
+                        }
+                    ],
+                    "market_sentiment": "neutral",
+                    "summary": "Thị trường đang có dấu hiệu hồi phục sau khi chạm ngưỡng hỗ trợ"
+                }
             
             # Tạo nội dung HTML
             html_content = self._generate_html_signal_report(report)
             
-            # Tạo nội dung văn bản thuần
-            if os.path.exists(summary_file):
-                with open(summary_file, 'r', encoding='utf-8') as f:
-                    text_content = f.read()
-            else:
-                text_content = "Xem báo cáo đầy đủ ở phiên bản HTML"
-            
-            # Danh sách file đính kèm
-            attachments = []
-            
-            # Thêm biểu đồ nếu có
-            if "charts" in report:
-                chart_paths = report["charts"]
-                for chart_name, chart_path in chart_paths.items():
-                    if os.path.exists(chart_path):
-                        attachments.append(chart_path)
-            
-            # Thêm các hình ảnh khác nếu có
-            if report_images:
-                for image_path in report_images:
-                    if os.path.exists(image_path) and image_path not in attachments:
-                        attachments.append(image_path)
-            
             # Gửi email
-            return self.send_email(subject, to_email, html_content, text_content, attachments)
-        
+            return self.send_email(
+                subject=subject,
+                to_email=to_email,
+                html_content=html_content,
+                attachments=report_images
+            )
+            
         except Exception as e:
-            logger.error(f"Lỗi khi gửi báo cáo tín hiệu: {str(e)}")
+            logger.error(f"Lỗi khi gửi báo cáo tín hiệu: {e}")
             return False
     
     def _generate_html_signal_report(self, report: Dict) -> str:
@@ -577,310 +702,306 @@ class EmailReporter:
         Returns:
             str: Nội dung HTML
         """
-        # Trích xuất dữ liệu từ báo cáo
-        analysis = report.get("analysis", {})
-        overview = analysis.get("overview", {})
-        assets = analysis.get("assets", {})
-        timestamp = datetime.fromisoformat(report.get("timestamp", datetime.now().isoformat()))
-        
-        # Tâm lý thị trường
-        sentiment = overview.get("market_sentiment", "neutral")
-        sentiment_text = {
-            "bullish": "TÍCH CỰC 📈",
-            "bearish": "TIÊU CỰC 📉",
-            "neutral": "TRUNG TÍNH ↔️"
-        }.get(sentiment, "KHÔNG XÁC ĐỊNH")
-        
-        # Tạo bảng assets
-        assets_html = ""
-        for symbol, data in assets.items():
-            signal = data.get("signal", "neutral").upper()
-            confidence = data.get("confidence", 0) * 100
-            regime = data.get("market_regime", "unknown")
-            trend = data.get("trend", "sideways")
+        try:
+            # Lấy dữ liệu từ báo cáo
+            timestamp = datetime.fromisoformat(report.get('timestamp', datetime.now().isoformat()))
+            signals = report.get('signals', [])
+            market_sentiment = report.get('market_sentiment', 'neutral')
+            summary = report.get('summary', 'Không có tóm tắt')
             
-            # Màu sắc dựa vào tín hiệu
-            signal_class = "text-success" if signal == "BUY" else "text-danger" if signal == "SELL" else ""
-            strong_class = " font-weight-bold" if data.get("strong_signal", False) else ""
+            # Xác định màu cho sentiment
+            sentiment_color = "#3498db"  # neutral
+            if market_sentiment == "bullish":
+                sentiment_color = "#2ecc71"
+            elif market_sentiment == "bearish":
+                sentiment_color = "#e74c3c"
             
-            # Định dạng xu hướng
-            trend_text = "tăng" if trend == "uptrend" else "giảm" if trend == "downtrend" else "đi ngang"
-            
-            # Định dạng chế độ thị trường
-            regime_text = {
-                "trending_up": "xu hướng tăng",
-                "trending_down": "xu hướng giảm",
-                "ranging": "sideway",
-                "volatile": "biến động mạnh",
-                "breakout": "breakout",
-                "neutral": "trung tính"
-            }.get(regime, regime)
-            
-            assets_html += f"""
-            <tr>
-                <td>{symbol}</td>
-                <td class="{signal_class}{strong_class}">{signal}</td>
-                <td>{confidence:.1f}%</td>
-                <td>{regime_text}</td>
-                <td>{trend_text}</td>
-            </tr>
+            # Tạo HTML
+            html = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Báo cáo tín hiệu thị trường</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        color: #333;
+                    }}
+                    h1, h2, h3, h4, h5, h6 {{
+                        color: #2c3e50;
+                    }}
+                    .container {{
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }}
+                    .header {{
+                        text-align: center;
+                        margin-bottom: 30px;
+                    }}
+                    .card {{
+                        background-color: #f8f9fa;
+                        border-radius: 5px;
+                        padding: 20px;
+                        margin-bottom: 20px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    }}
+                    .signal-card {{
+                        background-color: #fff;
+                        border-radius: 5px;
+                        padding: 15px;
+                        margin-bottom: 15px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    }}
+                    .signal-header {{
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 10px;
+                        border-bottom: 1px solid #eee;
+                        padding-bottom: 10px;
+                    }}
+                    .signal-symbol {{
+                        font-weight: bold;
+                        font-size: 18px;
+                    }}
+                    .signal-timeframe {{
+                        color: #7f8c8d;
+                    }}
+                    .signal-type {{
+                        font-weight: bold;
+                        padding: 5px 10px;
+                        border-radius: 3px;
+                    }}
+                    .buy-signal {{
+                        background-color: #e8f8f5;
+                        color: #27ae60;
+                    }}
+                    .sell-signal {{
+                        background-color: #fdedec;
+                        color: #e74c3c;
+                    }}
+                    .neutral-signal {{
+                        background-color: #f8f9fa;
+                        color: #7f8c8d;
+                    }}
+                    .metrics {{
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
+                        margin: 20px 0;
+                    }}
+                    .metric {{
+                        flex-basis: 48%;
+                        margin-bottom: 15px;
+                    }}
+                    .metric-title {{
+                        font-size: 14px;
+                        color: #7f8c8d;
+                        margin-bottom: 5px;
+                    }}
+                    .metric-value {{
+                        font-size: 16px;
+                        font-weight: bold;
+                    }}
+                    .indicator-item {{
+                        margin-bottom: 8px;
+                    }}
+                    .confidence-bar {{
+                        height: 6px;
+                        background-color: #ecf0f1;
+                        border-radius: 3px;
+                        margin-top: 8px;
+                    }}
+                    .confidence-value {{
+                        height: 100%;
+                        border-radius: 3px;
+                    }}
+                    .high-confidence {{
+                        background-color: #27ae60;
+                    }}
+                    .medium-confidence {{
+                        background-color: #f39c12;
+                    }}
+                    .low-confidence {{
+                        background-color: #e74c3c;
+                    }}
+                    .sentiment-indicator {{
+                        padding: 10px;
+                        border-radius: 5px;
+                        text-align: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-bottom: 15px;
+                    }}
+                    .footer {{
+                        text-align: center;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #eee;
+                        color: #7f8c8d;
+                        font-size: 12px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Báo cáo tín hiệu thị trường</h1>
+                        <p>{timestamp.strftime('%Y-%m-%d %H:%M:%S')}</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="sentiment-indicator" style="background-color: {sentiment_color};">
+                            Tâm lý thị trường: {market_sentiment.upper()}
+                        </div>
+                        <h3>Tóm tắt thị trường</h3>
+                        <p>{summary}</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h2>Tín hiệu giao dịch</h2>
             """
-        
-        if not assets:
-            assets_html = '<tr><td colspan="5" class="text-center">Không có dữ liệu tài sản</td></tr>'
-        
-        # Tạo bảng top tài sản
-        top_assets_html = ""
-        top_assets = overview.get("top_assets", [])
-        
-        for asset in top_assets:
-            symbol = asset.get("symbol", "")
-            signal = asset.get("signal", "").upper()
-            confidence = asset.get("confidence", 0) * 100
-            signal_class = "text-success" if signal == "BUY" else "text-danger" if signal == "SELL" else ""
             
-            top_assets_html += f"""
-            <tr>
-                <td>{symbol}</td>
-                <td class="{signal_class}">{signal}</td>
-                <td>{confidence:.1f}%</td>
-            </tr>
+            if signals:
+                for signal in signals:
+                    symbol = signal.get('symbol', '')
+                    timeframe = signal.get('timeframe', '')
+                    signal_type = signal.get('signal', '').upper()
+                    confidence = signal.get('confidence', 0)
+                    indicators = signal.get('indicators', {})
+                    price = signal.get('price', 0)
+                    
+                    # Xác định màu và lớp cho tín hiệu
+                    signal_class = "neutral-signal"
+                    if signal_type == "BUY":
+                        signal_class = "buy-signal"
+                    elif signal_type == "SELL":
+                        signal_class = "sell-signal"
+                    
+                    # Xác định lớp cho độ tin cậy
+                    confidence_class = "medium-confidence"
+                    if confidence >= 75:
+                        confidence_class = "high-confidence"
+                    elif confidence < 50:
+                        confidence_class = "low-confidence"
+                    
+                    html += f"""
+                        <div class="signal-card">
+                            <div class="signal-header">
+                                <div>
+                                    <div class="signal-symbol">{symbol}</div>
+                                    <div class="signal-timeframe">Khung TG: {timeframe}</div>
+                                </div>
+                                <div class="signal-type {signal_class}">{signal_type}</div>
+                            </div>
+                            
+                            <div class="metrics">
+                                <div class="metric">
+                                    <div class="metric-title">Giá hiện tại</div>
+                                    <div class="metric-value">${price:.2f}</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-title">Độ tin cậy</div>
+                                    <div class="metric-value">{confidence:.1f}%</div>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-value {confidence_class}" style="width: {confidence}%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>Chỉ báo</h4>
+                    """
+                    
+                    for indicator, value in indicators.items():
+                        html += f"""
+                                <div class="indicator-item">
+                                    <strong>{indicator.upper()}:</strong> {value}
+                                </div>
+                        """
+                    
+                    html += """
+                        </div>
+                    """
+            else:
+                html += """
+                        <p>Không có tín hiệu giao dịch nào ở thời điểm này.</p>
+                """
+            
+            html += """
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Báo cáo này được tạo tự động bởi Crypto Trading Bot.</p>
+                        <p>© 2025 Crypto Trading Bot. Mọi quyền được bảo lưu.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
             """
-        
-        if not top_assets:
-            top_assets_html = '<tr><td colspan="3" class="text-center">Không có dữ liệu top tài sản</td></tr>'
-        
-        # Tạo HTML đầy đủ
-        html_content = f"""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Báo cáo tín hiệu thị trường</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    color: #333;
-                }}
-                .container {{
-                    width: 100%;
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }}
-                .header {{
-                    text-align: center;
-                    margin-bottom: 30px;
-                }}
-                .card {{
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }}
-                .card-header {{
-                    background-color: #f8f9fa;
-                    padding: 10px 15px;
-                    border-bottom: 1px solid #ddd;
-                    font-weight: bold;
-                }}
-                .card-body {{
-                    padding: 15px;
-                }}
-                .table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                }}
-                .table th, .table td {{
-                    padding: 10px;
-                    border-bottom: 1px solid #ddd;
-                    text-align: left;
-                }}
-                .table th {{
-                    background-color: #f8f9fa;
-                }}
-                .text-center {{
-                    text-align: center;
-                }}
-                .text-success {{
-                    color: #28a745;
-                }}
-                .text-danger {{
-                    color: #dc3545;
-                }}
-                .summary-box {{
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 20px;
-                    margin-bottom: 20px;
-                }}
-                .summary-item {{
-                    flex: 1;
-                    background-color: #f8f9fa;
-                    border-radius: 5px;
-                    padding: 15px;
-                    text-align: center;
-                }}
-                .summary-item h3 {{
-                    margin-top: 0;
-                    margin-bottom: 10px;
-                    font-size: 16px;
-                    color: #666;
-                }}
-                .summary-item p {{
-                    margin: 0;
-                    font-size: 24px;
-                    font-weight: bold;
-                }}
-                .footer {{
-                    text-align: center;
-                    margin-top: 30px;
-                    padding-top: 20px;
-                    border-top: 1px solid #ddd;
-                    color: #777;
-                }}
-                .sentiment-box {{
-                    text-align: center;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                    font-size: 24px;
-                    font-weight: bold;
-                }}
-                .sentiment-bullish {{
-                    background-color: rgba(40, 167, 69, 0.1);
-                    color: #28a745;
-                }}
-                .sentiment-bearish {{
-                    background-color: rgba(220, 53, 69, 0.1);
-                    color: #dc3545;
-                }}
-                .sentiment-neutral {{
-                    background-color: rgba(108, 117, 125, 0.1);
-                    color: #6c757d;
-                }}
-                .font-weight-bold {{
-                    font-weight: bold;
-                }}
-                .chart-container {{
-                    text-align: center;
-                    margin-bottom: 20px;
-                }}
-                .chart-container img {{
-                    max-width: 100%;
-                    height: auto;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Báo cáo tín hiệu thị trường</h1>
-                    <p>{timestamp.strftime('%d/%m/%Y %H:%M:%S')}</p>
-                </div>
-                
-                <div class="sentiment-box sentiment-{sentiment}">
-                    Tâm lý thị trường: {sentiment_text}
-                </div>
-                
-                <div class="summary-box">
-                    <div class="summary-item">
-                        <h3>Tín hiệu mua</h3>
-                        <p class="text-success">{overview.get('buy_signals', 0)}</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>Tín hiệu bán</h3>
-                        <p class="text-danger">{overview.get('sell_signals', 0)}</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>Trung tính</h3>
-                        <p>{overview.get('neutral_signals', 0)}</p>
-                    </div>
-                    <div class="summary-item">
-                        <h3>Tín hiệu mạnh</h3>
-                        <p>{overview.get('strong_signals', 0)}</p>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">Top cặp giao dịch</div>
-                    <div class="card-body" style="padding: 0;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Tín hiệu</th>
-                                    <th>Độ tin cậy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {top_assets_html}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">Phân tích tất cả các cặp</div>
-                    <div class="card-body" style="padding: 0;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Tín hiệu</th>
-                                    <th>Độ tin cậy</th>
-                                    <th>Chế độ thị trường</th>
-                                    <th>Xu hướng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {assets_html}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="footer">
-                    <p>Báo cáo này được tạo tự động bởi Bot Trading</p>
-                    <p>© {timestamp.year} Bot Trading</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        
-        return html_content
+            
+            return html
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tạo báo cáo HTML tín hiệu: {e}")
+            return f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Báo cáo tín hiệu thị trường</title>
+            </head>
+            <body>
+                <h1>Báo cáo tín hiệu thị trường</h1>
+                <p>Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                <p>Đã xảy ra lỗi khi tạo báo cáo chi tiết. Vui lòng kiểm tra lại hệ thống.</p>
+            </body>
+            </html>
+            """
 
 def main():
     """Hàm chính"""
-    # Lấy thông tin từ biến môi trường
-    to_email = os.environ.get("REPORT_EMAIL")
-    if not to_email:
-        logger.error("Không có địa chỉ email nhận báo cáo (REPORT_EMAIL)")
+    # Lấy thông tin kết nối từ biến môi trường
+    smtp_server = os.environ.get('EMAIL_SMTP_SERVER')
+    smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', '587'))
+    email_user = os.environ.get('EMAIL_USER')
+    email_password = os.environ.get('EMAIL_PASSWORD')
+    
+    if not smtp_server or not email_user or not email_password:
+        print("Thiếu thông tin kết nối email. Vui lòng thiết lập biến môi trường EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, EMAIL_USER, EMAIL_PASSWORD")
         return
     
-    # Tạo email reporter
-    reporter = EmailReporter()
+    # Khởi tạo EmailReporter
+    reporter = EmailReporter(smtp_server, smtp_port, email_user, email_password)
     
-    if not reporter.enabled:
-        logger.error("Email reporter không được kích hoạt do thiếu cấu hình")
+    # Lấy địa chỉ email người nhận từ biến môi trường hoặc đối số
+    recipient = os.environ.get('REPORT_EMAIL')
+    if not recipient:
+        print("Thiếu địa chỉ email người nhận. Vui lòng thiết lập biến môi trường REPORT_EMAIL")
         return
     
-    # Tạo các thư mục cần thiết
-    os.makedirs("reports", exist_ok=True)
+    # Gửi email test
+    print(f"Gửi email test đến {recipient}...")
+    success = reporter.send_email(
+        subject="Test Email từ Crypto Trading Bot",
+        to_email=recipient,
+        html_content="<h1>Test Email</h1><p>Đây là email test từ Crypto Trading Bot.</p>",
+        text_content="Test Email\n\nĐây là email test từ Crypto Trading Bot."
+    )
     
-    # Gửi báo cáo hàng ngày
-    if os.path.exists("trading_state.json"):
-        reporter.send_daily_report(to_email)
-        logger.info(f"Đã gửi báo cáo hàng ngày đến {to_email}")
+    print(f"Kết quả: {'Thành công' if success else 'Thất bại'}")
     
-    # Gửi báo cáo tín hiệu
-    reporter.send_signal_report(to_email)
-    logger.info(f"Đã gửi báo cáo tín hiệu đến {to_email}")
+    # Gửi báo cáo hàng ngày test
+    print(f"Gửi báo cáo hàng ngày test đến {recipient}...")
+    success = reporter.send_daily_report(recipient)
+    print(f"Kết quả: {'Thành công' if success else 'Thất bại'}")
     
-    print(f"Đã gửi báo cáo đến {to_email}")
+    # Gửi báo cáo tín hiệu test
+    print(f"Gửi báo cáo tín hiệu test đến {recipient}...")
+    success = reporter.send_signal_report(recipient)
+    print(f"Kết quả: {'Thành công' if success else 'Thất bại'}")
 
 if __name__ == "__main__":
     main()

@@ -22,6 +22,14 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Import Blueprint cho cấu hình
+try:
+    from config_route import config_bp
+    app.register_blueprint(config_bp)
+    logger.info("Đã đăng ký blueprint cho cấu hình")
+except ImportError:
+    logger.warning("Không thể import config_route blueprint")
+
 # Các giá trị mẫu cho các biểu đồ và bảng
 sample_prices = {
     "BTCUSDT": 80000 + random.uniform(-2000, 2000),
