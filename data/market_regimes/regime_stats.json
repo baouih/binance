@@ -1,26 +1,21 @@
 {
   "trending_up": {
-    "count": 29,
+    "count": 26,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "neutral": {
-    "count": 129,
+    "count": 107,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "ranging": {
-    "count": 67,
+    "count": 58,
     "total_duration": 0,
     "avg_duration": 0.0
   },
   "volatile": {
-    "count": 61,
-    "total_duration": 0,
-    "avg_duration": 0.0
-  },
-  "trending_down": {
-    "count": 1,
+    "count": 52,
     "total_duration": 0,
     "avg_duration": 0.0
   }
