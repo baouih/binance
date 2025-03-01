@@ -1,352 +1,305 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade History - Crypto Trading Bot</title>
-    <!-- Bootstrap Dark Theme CSS -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Dashboard</a>
+{% extends 'layout.html' %}
+
+{% block title %}Giao dịch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-exchange-alt me-2"></i>Lịch sử giao dịch</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="input-group me-2">
+                <input type="text" class="form-control" placeholder="Tìm kiếm..." id="trade-search">
+                <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i>
+                    Bộ lọc
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><h6 class="dropdown-header">Loại giao dịch</h6></li>
+                    <li>
+                        <div class="form-check ms-2">
+                            <input class="form-check-input" type="checkbox" value="" id="filter-long" checked>
+                            <label class="form-check-label" for="filter-long">Long</label>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/strategies">Strategies</a>
+                    <li>
+                        <div class="form-check ms-2">
+                            <input class="form-check-input" type="checkbox" value="" id="filter-short" checked>
+                            <label class="form-check-label" for="filter-short">Short</label>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/backtest">Backtest</a>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Kết quả</h6></li>
+                    <li>
+                        <div class="form-check ms-2">
+                            <input class="form-check-input" type="checkbox" value="" id="filter-profit" checked>
+                            <label class="form-check-label" for="filter-profit">Lãi</label>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/trades">Trade History</a>
+                    <li>
+                        <div class="form-check ms-2">
+                            <input class="form-check-input" type="checkbox" value="" id="filter-loss" checked>
+                            <label class="form-check-label" for="filter-loss">Lỗ</label>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings">Settings</a>
-                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" id="apply-filters">Áp dụng</a></li>
                 </ul>
-                <div class="d-flex">
-                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
-                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
-                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                    <i class="fas fa-download me-1"></i>
+                    CSV
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="download-pdf">
+                    <i class="fas fa-file-pdf me-1"></i>
+                    PDF
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col">
-                <h2>Trade History</h2>
-                <p class="text-muted">View and analyze your trading history and performance metrics</p>
+    <!-- Trading Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Tổng giao dịch</h5>
+                    <h2 class="mb-0">{{ total_trades }}</h2>
+                    <div class="d-flex align-items-center mt-2">
+                        <div class="d-flex align-items-center me-3">
+                            <span class="dot bg-success me-1"></span>
+                            <small>{{ winning_trades }} thắng</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="dot bg-danger me-1"></span>
+                            <small>{{ losing_trades }} thua</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Tỷ lệ thắng</h5>
+                    <h2 class="mb-0">{{ win_rate }}%</h2>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ win_rate }}%" aria-valuenow="{{ win_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Lợi nhuận gộp</h5>
+                    <h2 class="mb-0 {{ 'text-success' if total_profit > 0 else 'text-danger' }}">
+                        {{ '$' + total_profit|string if total_profit >= 0 else '-$' + (total_profit|abs)|string }}
+                    </h2>
+                    <small class="text-muted">Bao gồm phí giao dịch</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Profit Factor</h5>
+                    <h2 class="mb-0">{{ profit_factor }}</h2>
+                    <small class="text-muted">Tổng lãi / Tổng lỗ</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="row mb-4">
-            <!-- Trading Performance Summary -->
-            <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title">Performance Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Win Rate</h6>
-                                    <h3 id="win-rate" class="mb-0">68%</h3>
-                                    <small class="text-muted">34/50 trades</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Profit Factor</h6>
-                                    <h3 id="profit-factor" class="mb-0">2.1</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Total Profit</h6>
-                                    <h3 id="total-profit" class="text-success mb-0">+$3,245</h3>
-                                    <small class="text-success">+32.45%</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Max Drawdown</h6>
-                                    <h3 id="max-drawdown" class="text-danger mb-0">12.3%</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Avg Win</h6>
-                                    <h4 id="avg-win" class="text-success mb-0">2.8%</h4>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-1">Avg Loss</h6>
-                                    <h4 id="avg-loss" class="text-danger mb-0">-1.2%</h4>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Trades Distribution Chart -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Phân phối giao dịch</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary active chart-period" data-period="1w">1W</button>
+                        <button type="button" class="btn btn-outline-secondary chart-period" data-period="1m">1M</button>
+                        <button type="button" class="btn btn-outline-secondary chart-period" data-period="3m">3M</button>
+                        <button type="button" class="btn btn-outline-secondary chart-period" data-period="all">Tất cả</button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Equity Curve -->
-            <div class="col-md-8 mb-3">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title">Equity Curve</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="position: relative; height: 250px;">
-                            <canvas id="equity-chart"></canvas>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <canvas id="tradesDistributionChart" height="250"></canvas>
                 </div>
             </div>
         </div>
-
-        <!-- Trade History Filters -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title">Filters</h5>
-            </div>
-            <div class="card-body">
-                <form id="filter-form" class="row g-3">
-                    <div class="col-md-3">
-                        <label for="date-range" class="form-label">Date Range</label>
-                        <select class="form-select" id="date-range">
-                            <option value="7d">Last 7 days</option>
-                            <option value="30d" selected>Last 30 days</option>
-                            <option value="90d">Last 90 days</option>
-                            <option value="180d">Last 180 days</option>
-                            <option value="365d">Last 365 days</option>
-                            <option value="all">All time</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="symbol-filter" class="form-label">Symbol</label>
-                        <select class="form-select" id="symbol-filter">
-                            <option value="all" selected>All</option>
-                            <option value="BTCUSDT">BTC/USDT</option>
-                            <option value="ETHUSDT">ETH/USDT</option>
-                            <option value="BNBUSDT">BNB/USDT</option>
-                            <option value="SOLUSDT">SOL/USDT</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="strategy-filter" class="form-label">Strategy</label>
-                        <select class="form-select" id="strategy-filter">
-                            <option value="all" selected>All</option>
-                            <option value="rsi">RSI</option>
-                            <option value="macd">MACD</option>
-                            <option value="ml">Machine Learning</option>
-                            <option value="composite">Composite</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="result-filter" class="form-label">Result</label>
-                        <select class="form-select" id="result-filter">
-                            <option value="all" selected>All</option>
-                            <option value="profit">Profit</option>
-                            <option value="loss">Loss</option>
-                        </select>
-                    </div>
-                    <div class="col-12 text-end">
-                        <button type="button" class="btn btn-primary" id="apply-filters">Apply Filters</button>
-                        <button type="button" class="btn btn-outline-secondary" id="reset-filters">Reset</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Trade History Table -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Trade History</h5>
-                <button class="btn btn-sm btn-outline-primary" id="export-trades">Export CSV</button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Symbol</th>
-                                <th>Type</th>
-                                <th>Entry Price</th>
-                                <th>Exit Price</th>
-                                <th>Quantity</th>
-                                <th>PnL (USDT)</th>
-                                <th>PnL (%)</th>
-                                <th>Duration</th>
-                                <th>Strategy</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="trades-table">
-                            <!-- Example trade data -->
-                            <tr class="trade-row profit-row">
-                                <td>2025-02-26 14:32</td>
-                                <td>BTC/USDT</td>
-                                <td class="text-success">LONG</td>
-                                <td>$82,456.12</td>
-                                <td>$84,210.35</td>
-                                <td>0.025</td>
-                                <td class="text-success">+$43.85</td>
-                                <td class="text-success">+2.13%</td>
-                                <td>4h 23m</td>
-                                <td>ML Strategy</td>
-                                <td>
-                                    <button class="btn btn-sm btn-action btn-outline-info view-trade" data-trade-id="1">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="trade-row loss-row">
-                                <td>2025-02-25 10:15</td>
-                                <td>ETH/USDT</td>
-                                <td class="text-danger">SHORT</td>
-                                <td>$2,280.45</td>
-                                <td>$2,315.20</td>
-                                <td>0.35</td>
-                                <td class="text-danger">-$12.16</td>
-                                <td class="text-danger">-1.52%</td>
-                                <td>2h 10m</td>
-                                <td>RSI Strategy</td>
-                                <td>
-                                    <button class="btn btn-sm btn-action btn-outline-info view-trade" data-trade-id="2">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="trade-row profit-row">
-                                <td>2025-02-24 22:08</td>
-                                <td>SOL/USDT</td>
-                                <td class="text-success">LONG</td>
-                                <td>$124.32</td>
-                                <td>$129.58</td>
-                                <td>2.5</td>
-                                <td class="text-success">+$13.15</td>
-                                <td class="text-success">+4.23%</td>
-                                <td>8h 45m</td>
-                                <td>Composite Strategy</td>
-                                <td>
-                                    <button class="btn btn-sm btn-action btn-outline-info view-trade" data-trade-id="3">
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Phân tích giao dịch</h5>
                 </div>
-            </div>
-            <div class="card-footer">
-                <nav aria-label="Trade history pagination">
-                    <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        
-        <!-- Trade Distribution Analysis -->
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title">Trade Distribution by Symbol</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="position: relative; height: 250px;">
-                            <canvas id="symbols-chart"></canvas>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Theo loại</h6>
+                        <div class="progress mb-2" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">Long (65%)</div>
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">Short (35%)</div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title">Win/Loss by Strategy</h5>
+                    <div class="mb-3">
+                        <h6>Theo thời gian</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <canvas id="tradesTimeChart" height="150"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="position: relative; height: 250px;">
-                            <canvas id="strategies-chart"></canvas>
+                    <div>
+                        <h6>Theo cặp tiền</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <canvas id="tradePairsChart" height="150"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Trade History Table -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Chi tiết giao dịch</h5>
+            <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="auto-refresh-trades" checked>
+                <label class="form-check-label" for="auto-refresh-trades">Tự động làm mới</label>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0" id="trades-table">
+                    <thead>
+                        <tr>
+                            <th><a href="#" class="table-sort" data-sort="id">ID <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="symbol">Cặp <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="type">Loại <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="entry_price">Giá vào <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="exit_price">Giá ra <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="quantity">Số lượng <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="pnl">Lợi nhuận <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="entry_time">Thời gian vào <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="exit_time">Thời gian ra <i class="fas fa-sort"></i></a></th>
+                            <th><a href="#" class="table-sort" data-sort="exit_reason">Lý do thoát <i class="fas fa-sort"></i></a></th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                        <tr class="{{ 'table-success' if trade.pnl >= 0 else 'table-danger' }}">
+                            <td>{{ trade.id }}</td>
+                            <td>{{ trade.symbol }}</td>
+                            <td>
+                                <span class="badge {{ 'bg-success' if trade.type == 'LONG' else 'bg-danger' }}">
+                                    {{ trade.type }}
+                                </span>
+                            </td>
+                            <td>${{ trade.entry_price }}</td>
+                            <td>${{ trade.exit_price }}</td>
+                            <td>{{ trade.quantity }}</td>
+                            <td class="{{ 'text-success' if trade.pnl >= 0 else 'text-danger' }}">
+                                {{ '$' + trade.pnl|string if trade.pnl >= 0 else '-$' + (trade.pnl|abs)|string }}
+                                ({{ trade.pnl_percent }}%)
+                            </td>
+                            <td>{{ trade.entry_time }}</td>
+                            <td>{{ trade.exit_time }}</td>
+                            <td>
+                                <span class="badge {{ 
+                                    'bg-success' if trade.exit_reason == 'take_profit' 
+                                    else 'bg-danger' if trade.exit_reason == 'stop_loss'
+                                    else 'bg-info' }}">
+                                    {{ trade.exit_reason }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary view-trade-details" data-trade-id="{{ trade.id }}">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Trước</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
     <!-- Trade Details Modal -->
     <div class="modal fade" id="tradeDetailsModal" tabindex="-1" aria-labelledby="tradeDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tradeDetailsModalLabel">Trade Details</h5>
+                    <h5 class="modal-title" id="tradeDetailsModalLabel">Chi tiết giao dịch</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <h6>Trade Information</h6>
+                                <h6>Thông tin giao dịch</h6>
                                 <table class="table table-sm">
-                                    <tbody>
+                                    <tbody id="trade-details-table">
                                         <tr>
-                                            <td><strong>ID:</strong></td>
-                                            <td id="trade-id">12345</td>
+                                            <td>ID</td>
+                                            <td id="detail-id">trade10</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Symbol:</strong></td>
-                                            <td id="trade-symbol">BTC/USDT</td>
+                                            <td>Cặp</td>
+                                            <td id="detail-symbol">BTCUSDT</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Direction:</strong></td>
-                                            <td id="trade-direction">LONG</td>
+                                            <td>Loại</td>
+                                            <td id="detail-type"><span class="badge bg-success">LONG</span></td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Strategy:</strong></td>
-                                            <td id="trade-strategy">ML Strategy</td>
+                                            <td>Giá vào</td>
+                                            <td id="detail-entry">$65,000.00</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Entry Date:</strong></td>
-                                            <td id="trade-entry-date">2025-02-26 14:32:15</td>
+                                            <td>Giá ra</td>
+                                            <td id="detail-exit">$69,000.00</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Exit Date:</strong></td>
-                                            <td id="trade-exit-date">2025-02-26 18:55:42</td>
+                                            <td>Số lượng</td>
+                                            <td id="detail-quantity">0.1</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Duration:</strong></td>
-                                            <td id="trade-duration">4h 23m 27s</td>
+                                            <td>Đòn bẩy</td>
+                                            <td id="detail-leverage">5x</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lợi nhuận</td>
+                                            <td id="detail-pnl" class="text-success">$400.00 (6.15%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Thời gian giao dịch</td>
+                                            <td id="detail-duration">10 giờ 45 phút</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lý do thoát</td>
+                                            <td id="detail-reason"><span class="badge bg-success">take_profit</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -354,133 +307,431 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <h6>Financial Details</h6>
-                                <table class="table table-sm">
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Entry Price:</strong></td>
-                                            <td id="trade-entry-price">$82,456.12</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Exit Price:</strong></td>
-                                            <td id="trade-exit-price">$84,210.35</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Quantity:</strong></td>
-                                            <td id="trade-quantity">0.025 BTC</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Position Size:</strong></td>
-                                            <td id="trade-position-size">$2,061.40</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Profit/Loss:</strong></td>
-                                            <td id="trade-pnl" class="text-success">+$43.85 (+2.13%)</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Fees:</strong></td>
-                                            <td id="trade-fees">$4.12</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Net Profit:</strong></td>
-                                            <td id="trade-net-profit" class="text-success">+$39.73</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <h6>Biểu đồ giao dịch</h6>
+                                <canvas id="tradeChartDetail" height="200"></canvas>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6>Trade Chart</h6>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="trade-chart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6>Signal Analysis</h6>
-                        <div class="p-3 border rounded bg-dark">
-                            <table class="table table-sm mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Indicator</th>
-                                        <th>Value</th>
-                                        <th>Signal</th>
-                                        <th>Confidence</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="signal-analysis-table">
-                                    <tr>
-                                        <td>RSI</td>
-                                        <td>28.5</td>
-                                        <td class="text-success">BUY</td>
-                                        <td>
-                                            <div class="progress" style="height: 5px;">
-                                                <div class="progress-bar bg-success" style="width: 85%"></div>
-                                            </div>
-                                            <small>85%</small>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>MACD</td>
-                                        <td>+0.023</td>
-                                        <td class="text-success">BUY</td>
-                                        <td>
-                                            <div class="progress" style="height: 5px;">
-                                                <div class="progress-bar bg-success" style="width: 75%"></div>
-                                            </div>
-                                            <small>75%</small>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>BB</td>
-                                        <td>Lower band</td>
-                                        <td class="text-success">BUY</td>
-                                        <td>
-                                            <div class="progress" style="height: 5px;">
-                                                <div class="progress-bar bg-success" style="width: 80%"></div>
-                                            </div>
-                                            <small>80%</small>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>ML Prediction</td>
-                                        <td>Uptrend</td>
-                                        <td class="text-success">BUY</td>
-                                        <td>
-                                            <div class="progress" style="height: 5px;">
-                                                <div class="progress-bar bg-success" style="width: 82%"></div>
-                                            </div>
-                                            <small>82%</small>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h6>Trade Notes</h6>
-                        <div class="p-3 border rounded bg-dark">
-                            <p id="trade-notes" class="mb-0">
-                                Entry based on strong oversold RSI signal confirmed by MACD crossover. 
-                                Market sentiment was improving with increased volume. Exit triggered by 
-                                take profit level after Bitcoin broke through resistance at $84,000.
-                            </p>
+                            <div>
+                                <h6>Chỉ báo</h6>
+                                <ul class="list-group" id="trade-indicators">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        RSI
+                                        <span class="badge bg-success">32 (Mua)</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        MACD
+                                        <span class="badge bg-success">Tín hiệu tăng</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Bollinger Bands
+                                        <span class="badge bg-success">Nến đóng trên band dưới</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="export-trade-detail">
+                        <i class="fas fa-download me-1"></i> Xuất báo cáo
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="/static/js/trades.js"></script>
-</body>
-</html>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Trades Distribution Chart
+        const ctx = document.getElementById('tradesDistributionChart').getContext('2d');
+        const tradesDistributionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Giao dịch thắng',
+                        data: [5, 7, 3, 8, 6, 4, 7, 9, 8, 10, 8, 12],
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Giao dịch thua',
+                        data: [3, 2, 4, 2, 3, 3, 2, 3, 4, 2, 3, 4],
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true
+                    }
+                }
+            }
+        });
+
+        // Time of day chart
+        const timeCtx = document.getElementById('tradesTimeChart').getContext('2d');
+        new Chart(timeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['00-06', '06-12', '12-18', '18-24'],
+                datasets: [{
+                    data: [10, 35, 30, 25],
+                    backgroundColor: [
+                        'rgba(108, 117, 125, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(13, 110, 253, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(108, 117, 125, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(13, 110, 253, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Pairs chart
+        const pairsCtx = document.getElementById('tradePairsChart').getContext('2d');
+        new Chart(pairsCtx, {
+            type: 'pie',
+            data: {
+                labels: ['BTC', 'ETH', 'BNB', 'SOL', 'Others'],
+                datasets: [{
+                    data: [45, 25, 10, 15, 5],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // View trade details
+        const tradeDetailsModal = new bootstrap.Modal(document.getElementById('tradeDetailsModal'));
+        
+        document.querySelectorAll('.view-trade-details').forEach(button => {
+            button.addEventListener('click', function() {
+                const tradeId = this.getAttribute('data-trade-id');
+                
+                // Find trade data in table
+                const row = this.closest('tr');
+                
+                if (row) {
+                    const cells = row.getElementsByTagName('td');
+                    
+                    // Update modal with trade information
+                    document.getElementById('detail-id').textContent = cells[0].textContent;
+                    document.getElementById('detail-symbol').textContent = cells[1].textContent;
+                    
+                    // Type with badge
+                    const typeText = cells[2].textContent.trim();
+                    document.getElementById('detail-type').innerHTML = `<span class="badge ${typeText === 'LONG' ? 'bg-success' : 'bg-danger'}">${typeText}</span>`;
+                    
+                    document.getElementById('detail-entry').textContent = cells[3].textContent;
+                    document.getElementById('detail-exit').textContent = cells[4].textContent;
+                    document.getElementById('detail-quantity').textContent = cells[5].textContent;
+                    document.getElementById('detail-pnl').textContent = cells[6].textContent;
+                    document.getElementById('detail-pnl').className = cells[6].className;
+                    
+                    // Calculate duration (dummy data)
+                    document.getElementById('detail-duration').textContent = '8 giờ 30 phút';
+                    
+                    // Exit reason with badge
+                    const reasonText = cells[9].textContent.trim();
+                    let badgeClass = 'bg-info';
+                    
+                    if (reasonText.includes('take_profit')) {
+                        badgeClass = 'bg-success';
+                    } else if (reasonText.includes('stop_loss')) {
+                        badgeClass = 'bg-danger';
+                    }
+                    
+                    document.getElementById('detail-reason').innerHTML = `<span class="badge ${badgeClass}">${reasonText}</span>`;
+                    
+                    // Initialize trade detail chart
+                    const tradeChart = document.getElementById('tradeChartDetail').getContext('2d');
+                    const detailChart = new Chart(tradeChart, {
+                        type: 'line',
+                        data: {
+                            labels: ['Entry', '1h', '2h', '3h', '4h', '5h', '6h', '7h', '8h', 'Exit'],
+                            datasets: [{
+                                label: 'Price',
+                                data: generateRandomPriceData(typeText === 'LONG'),
+                                borderColor: '#0d6efd',
+                                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                annotation: {
+                                    annotations: {
+                                        line1: {
+                                            type: 'line',
+                                            yMin: parseFloat(cells[3].textContent.replace('$', '')),
+                                            yMax: parseFloat(cells[3].textContent.replace('$', '')),
+                                            borderColor: 'rgba(255, 99, 132, 0.5)',
+                                            borderWidth: 2,
+                                            label: {
+                                                content: 'Entry',
+                                                enabled: true
+                                            }
+                                        },
+                                        line2: {
+                                            type: 'line',
+                                            yMin: parseFloat(cells[4].textContent.replace('$', '')),
+                                            yMax: parseFloat(cells[4].textContent.replace('$', '')),
+                                            borderColor: 'rgba(54, 162, 235, 0.5)',
+                                            borderWidth: 2,
+                                            label: {
+                                                content: 'Exit',
+                                                enabled: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                tradeDetailsModal.show();
+            });
+        });
+        
+        // Generate random price data for trade detail chart
+        function generateRandomPriceData(isLong) {
+            const length = 10;
+            const startPrice = 65000;
+            const endPrice = isLong ? 69000 : 62000;
+            
+            return Array(length).fill(0).map((_, i) => {
+                if (i === 0) return startPrice;
+                if (i === length - 1) return endPrice;
+                
+                // Create a curve toward the end price
+                const progress = i / (length - 1);
+                const randomFactor = Math.random() * 200 - 100; // Random fluctuation
+                
+                return startPrice + (endPrice - startPrice) * (isLong ? 
+                    (Math.pow(progress, 2) + randomFactor) : 
+                    (Math.pow(progress, 0.5) + randomFactor));
+            });
+        }
+        
+        // Handle time period selection for the chart
+        document.querySelectorAll('.chart-period').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.chart-period').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                const period = this.getAttribute('data-period');
+                let data;
+                
+                switch(period) {
+                    case '1w':
+                        data = [3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                        break;
+                    case '1m':
+                        data = [5, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                        break;
+                    case '3m':
+                        data = [5, 7, 3, 8, 6, 4, 0, 0, 0, 0, 0, 0];
+                        break;
+                    case 'all':
+                    default:
+                        data = [5, 7, 3, 8, 6, 4, 7, 9, 8, 10, 8, 12];
+                }
+                
+                // Update data
+                tradesDistributionChart.data.datasets[0].data = data;
+                
+                // Generate losing trades as around 30% of winning trades
+                const losingData = data.map(val => Math.round(val * 0.3));
+                tradesDistributionChart.data.datasets[1].data = losingData;
+                
+                tradesDistributionChart.update();
+            });
+        });
+        
+        // Table sorting
+        document.querySelectorAll('.table-sort').forEach(header => {
+            header.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const sortBy = this.getAttribute('data-sort');
+                const table = document.getElementById('trades-table');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                
+                // Get current direction from icon
+                const icon = this.querySelector('i');
+                const isAscending = icon.classList.contains('fa-sort') || icon.classList.contains('fa-sort-down');
+                
+                // Update all icons to default
+                document.querySelectorAll('.table-sort i').forEach(i => {
+                    i.className = 'fas fa-sort';
+                });
+                
+                // Update clicked header icon
+                icon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                
+                // Sort rows
+                rows.sort((a, b) => {
+                    let aValue = a.cells[Array.from(a.parentNode.parentNode.querySelector('thead tr').cells).findIndex(cell => cell.querySelector(`[data-sort="${sortBy}"]`))].textContent.trim();
+                    let bValue = b.cells[Array.from(b.parentNode.parentNode.querySelector('thead tr').cells).findIndex(cell => cell.querySelector(`[data-sort="${sortBy}"]`))].textContent.trim();
+                    
+                    // Handle numeric values
+                    if (sortBy === 'entry_price' || sortBy === 'exit_price' || sortBy === 'pnl') {
+                        aValue = parseFloat(aValue.replace(/[^\d.-]/g, ''));
+                        bValue = parseFloat(bValue.replace(/[^\d.-]/g, ''));
+                    }
+                    
+                    // Handle dates
+                    if (sortBy === 'entry_time' || sortBy === 'exit_time') {
+                        aValue = new Date(aValue);
+                        bValue = new Date(bValue);
+                    }
+                    
+                    if (isAscending) {
+                        return aValue > bValue ? 1 : -1;
+                    } else {
+                        return aValue < bValue ? 1 : -1;
+                    }
+                });
+                
+                // Reappend rows in sorted order
+                rows.forEach(row => {
+                    tbody.appendChild(row);
+                });
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', function() {
+            const searchTerm = document.getElementById('trade-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#trades-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+        
+        // Reset search when search box is cleared
+        document.getElementById('trade-search').addEventListener('input', function() {
+            if (this.value === '') {
+                document.querySelectorAll('#trades-table tbody tr').forEach(row => {
+                    row.style.display = '';
+                });
+            }
+        });
+        
+        // Apply filters
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            const filterLong = document.getElementById('filter-long').checked;
+            const filterShort = document.getElementById('filter-short').checked;
+            const filterProfit = document.getElementById('filter-profit').checked;
+            const filterLoss = document.getElementById('filter-loss').checked;
+            
+            document.querySelectorAll('#trades-table tbody tr').forEach(row => {
+                const type = row.querySelector('td:nth-child(3)').textContent.trim();
+                const isLong = type.includes('LONG');
+                const isProfit = row.classList.contains('table-success');
+                
+                const typeMatch = (isLong && filterLong) || (!isLong && filterShort);
+                const resultMatch = (isProfit && filterProfit) || (!isProfit && filterLoss);
+                
+                row.style.display = typeMatch && resultMatch ? '' : 'none';
+            });
+        });
+        
+        // Download CSV
+        document.getElementById('download-csv').addEventListener('click', function() {
+            const table = document.getElementById('trades-table');
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => {
+                const sortLink = th.querySelector('.table-sort');
+                return sortLink ? sortLink.getAttribute('data-sort') : 'action';
+            });
+            
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                return Array.from(row.querySelectorAll('td')).map(cell => {
+                    return `"${cell.textContent.trim().replace(/"/g, '""')}"`;
+                }).join(',');
+            });
+            
+            const csv = [headers.join(','), ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'trades.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+        
+        // Pagination (dummy)
+        document.querySelectorAll('.pagination .page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (this.textContent !== 'Trước' && this.textContent !== 'Sau') {
+                    document.querySelectorAll('.pagination .page-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    this.parentNode.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

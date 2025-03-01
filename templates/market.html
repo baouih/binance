@@ -1,0 +1,523 @@
+{% extends 'layout.html' %}
+
+{% block title %}Thị trường{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-chart-bar me-2"></i>Tổng quan thị trường</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-market">
+                    <i class="fas fa-sync me-1"></i> Làm mới
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-download me-1"></i> Xuất
+                </button>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-calendar me-1"></i>
+                    <span id="timeframe-text">24 giờ</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item timeframe-option" data-value="1h">1 giờ</a></li>
+                    <li><a class="dropdown-item timeframe-option" data-value="4h">4 giờ</a></li>
+                    <li><a class="dropdown-item timeframe-option" data-value="24h">24 giờ</a></li>
+                    <li><a class="dropdown-item timeframe-option" data-value="7d">7 ngày</a></li>
+                    <li><a class="dropdown-item timeframe-option" data-value="30d">30 ngày</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title text-primary">BTC/USDT</h5>
+                        <span class="badge bg-success">
+                            <i class="fas fa-arrow-up"></i> 2.5%
+                        </span>
+                    </div>
+                    <h2 class="mb-0" id="btc-price">$73,250.00</h2>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Vol: $1.2B</small>
+                        <small class="text-success">24h: +2.5%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title text-primary">ETH/USDT</h5>
+                        <span class="badge bg-success">
+                            <i class="fas fa-arrow-up"></i> 3.1%
+                        </span>
+                    </div>
+                    <h2 class="mb-0" id="eth-price">$3,150.00</h2>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Vol: $450M</small>
+                        <small class="text-success">24h: +3.1%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title text-primary">SOL/USDT</h5>
+                        <span class="badge bg-success">
+                            <i class="fas fa-arrow-up"></i> 5.2%
+                        </span>
+                    </div>
+                    <h2 class="mb-0" id="sol-price">$137.50</h2>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Vol: $280M</small>
+                        <small class="text-success">24h: +5.2%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title text-primary">BNB/USDT</h5>
+                        <span class="badge bg-danger">
+                            <i class="fas fa-arrow-down"></i> 1.5%
+                        </span>
+                    </div>
+                    <h2 class="mb-0" id="bnb-price">$410.00</h2>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">Vol: $150M</small>
+                        <small class="text-danger">24h: -1.5%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Charts -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">BTC/USDT Price Chart</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary active chart-type" data-type="line">Line</button>
+                        <button type="button" class="btn btn-outline-secondary chart-type" data-type="candle">Candle</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="marketChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Market Sentiment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Fear & Greed Index</span>
+                            <span class="text-warning fw-bold">65 - Greed</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Retail Sentiment</span>
+                            <span class="text-success fw-bold">Bullish</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1" style="height: 8px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="ms-2">
+                                <small>35% 🔴</small>
+                            </div>
+                            <div class="ms-2">
+                                <small>65% 🟢</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>BTC Dominance</span>
+                            <span class="text-primary fw-bold">52.4%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 52.4%" aria-valuenow="52.4" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-3">Market Regime</h6>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="regime-indicator">
+                                <div class="indicator-dot trending text-center">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <small>Trending</small>
+                                </div>
+                            </div>
+                            <div class="regime-indicator">
+                                <div class="indicator-dot ranging">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <small>Ranging</small>
+                                </div>
+                            </div>
+                            <div class="regime-indicator">
+                                <div class="indicator-dot volatile">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <small>Volatile</small>
+                                </div>
+                            </div>
+                            <div class="regime-indicator">
+                                <div class="indicator-dot quiet">
+                                    <i class="fas fa-moon"></i>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <small>Quiet</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Data Tables -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Top Gainers (24h)</h5>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="auto-refresh" checked>
+                        <label class="form-check-label" for="auto-refresh">Auto Refresh</label>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Coin</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>Volume</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">SOL</div>
+                                            <div>Solana</div>
+                                        </div>
+                                    </td>
+                                    <td>$137.50</td>
+                                    <td class="text-success">+5.2%</td>
+                                    <td>$280M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">AVAX</div>
+                                            <div>Avalanche</div>
+                                        </div>
+                                    </td>
+                                    <td>$35.20</td>
+                                    <td class="text-success">+4.8%</td>
+                                    <td>$120M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">DOT</div>
+                                            <div>Polkadot</div>
+                                        </div>
+                                    </td>
+                                    <td>$7.85</td>
+                                    <td class="text-success">+4.2%</td>
+                                    <td>$95M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">LINK</div>
+                                            <div>Chainlink</div>
+                                        </div>
+                                    </td>
+                                    <td>$18.45</td>
+                                    <td class="text-success">+3.9%</td>
+                                    <td>$78M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">ETH</div>
+                                            <div>Ethereum</div>
+                                        </div>
+                                    </td>
+                                    <td>$3,150.00</td>
+                                    <td class="text-success">+3.1%</td>
+                                    <td>$450M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Top Losers (24h)</h5>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i> Export
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Coin</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>Volume</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">DOGE</div>
+                                            <div>Dogecoin</div>
+                                        </div>
+                                    </td>
+                                    <td>$0.14</td>
+                                    <td class="text-danger">-6.7%</td>
+                                    <td>$185M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">XRP</div>
+                                            <div>Ripple</div>
+                                        </div>
+                                    </td>
+                                    <td>$0.57</td>
+                                    <td class="text-danger">-4.3%</td>
+                                    <td>$110M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">ADA</div>
+                                            <div>Cardano</div>
+                                        </div>
+                                    </td>
+                                    <td>$0.58</td>
+                                    <td class="text-danger">-3.8%</td>
+                                    <td>$75M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">ATOM</div>
+                                            <div>Cosmos</div>
+                                        </div>
+                                    </td>
+                                    <td>$9.65</td>
+                                    <td class="text-danger">-2.9%</td>
+                                    <td>$45M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol-icon me-2">BNB</div>
+                                            <div>Binance Coin</div>
+                                        </div>
+                                    </td>
+                                    <td>$410.00</td>
+                                    <td class="text-danger">-1.5%</td>
+                                    <td>$150M</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Trade</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Market Chart
+        const marketCtx = document.getElementById('marketChart').getContext('2d');
+        const marketChart = new Chart(marketCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'BTC/USDT',
+                    data: [42000, 44500, 43000, 48000, 47000, 53000, 57000, 62000, 58000, 67000, 69000, 73000],
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#0d6efd',
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+
+        // Handle timeframe selection
+        document.querySelectorAll('.timeframe-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                document.getElementById('timeframe-text').textContent = this.textContent;
+                
+                // Here you would fetch new data based on the selected timeframe
+                // For now, we'll just simulate it with random data
+                const newData = Array(12).fill(0).map(() => Math.random() * 30000 + 40000);
+                marketChart.data.datasets[0].data = newData;
+                marketChart.update();
+            });
+        });
+
+        // Handle chart type toggle
+        document.querySelectorAll('.chart-type').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.chart-type').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                const type = this.getAttribute('data-type');
+                if (type === 'line') {
+                    marketChart.config.type = 'line';
+                    marketChart.data.datasets[0].fill = true;
+                } else if (type === 'candle') {
+                    marketChart.config.type = 'bar';
+                    marketChart.data.datasets[0].fill = false;
+                }
+                marketChart.update();
+            });
+        });
+
+        // Refresh market data button
+        document.getElementById('refresh-market').addEventListener('click', function() {
+            // Simulate refreshing data
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+            
+            setTimeout(() => {
+                // Update price displays with random fluctuations
+                const btcPrice = parseFloat(document.getElementById('btc-price').textContent.replace('$', '').replace(',', ''));
+                const ethPrice = parseFloat(document.getElementById('eth-price').textContent.replace('$', '').replace(',', ''));
+                const solPrice = parseFloat(document.getElementById('sol-price').textContent.replace('$', '').replace(',', ''));
+                const bnbPrice = parseFloat(document.getElementById('bnb-price').textContent.replace('$', '').replace(',', ''));
+                
+                document.getElementById('btc-price').textContent = '$' + (btcPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                document.getElementById('eth-price').textContent = '$' + (ethPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                document.getElementById('sol-price').textContent = '$' + (solPrice * (1 + (Math.random() * 0.03 - 0.015))).toFixed(2);
+                document.getElementById('bnb-price').textContent = '$' + (bnbPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                
+                // Update chart with new data point
+                const lastValue = marketChart.data.datasets[0].data[marketChart.data.datasets[0].data.length - 1];
+                const newValue = lastValue * (1 + (Math.random() * 0.04 - 0.02));
+                
+                marketChart.data.datasets[0].data.push(newValue);
+                marketChart.data.datasets[0].data.shift();
+                marketChart.update();
+                
+                this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
+            }, 1000);
+        });
+
+        // Handle auto-refresh toggle
+        document.getElementById('auto-refresh').addEventListener('change', function() {
+            console.log('Auto-refresh ' + (this.checked ? 'enabled' : 'disabled'));
+            // Here you would start/stop an interval that refreshes data
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trading Bot Dashboard{% endblock %}</title>
+    <!-- Replit style Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Custom head content -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 d-md-block sidebar p-0">
+                <div class="position-sticky">
+                    <div class="d-flex flex-column p-3 text-white sidebar-menu">
+                        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo" width="32" height="32" class="me-2">
+                            <span class="fs-4">Trading Bot</span>
+                        </a>
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item">
+                                <a href="/" class="nav-link {{ 'active' if request.path == '/' else 'text-white' }}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/market" class="nav-link {{ 'active' if request.path == '/market' else 'text-white' }}">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    Thị trường
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/trades" class="nav-link {{ 'active' if request.path == '/trades' else 'text-white' }}">
+                                    <i class="fas fa-exchange-alt me-2"></i>
+                                    Giao dịch
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/positions" class="nav-link {{ 'active' if request.path == '/positions' else 'text-white' }}">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Vị thế
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/backtest" class="nav-link {{ 'active' if request.path == '/backtest' else 'text-white' }}">
+                                    <i class="fas fa-flask me-2"></i>
+                                    Backtest
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/reports" class="nav-link {{ 'active' if request.path == '/reports' else 'text-white' }}">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    Báo cáo
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/strategies" class="nav-link {{ 'active' if request.path == '/strategies' else 'text-white' }}">
+                                    <i class="fas fa-chess me-2"></i>
+                                    Chiến lược
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/settings" class="nav-link {{ 'active' if request.path == '/settings' else 'text-white' }}">
+                                    <i class="fas fa-cog me-2"></i>
+                                    Cài đặt
+                                </a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <div class="bot-status-container">
+                            <span class="status-label">Trạng thái:</span>
+                            <div class="status-indicator d-flex align-items-center">
+                                <span class="status-dot {% if bot_running %}active{% endif %}"></span>
+                                <span class="status-text ms-2">{{ 'Đang chạy' if bot_running else 'Đã dừng' }}</span>
+                            </div>
+                            <div class="bot-controls mt-3">
+                                <button id="start-bot" class="btn btn-success btn-sm me-1" {% if bot_running %}disabled{% endif %}>
+                                    <i class="fas fa-play"></i> Bắt đầu
+                                </button>
+                                <button id="stop-bot" class="btn btn-danger btn-sm me-1" {% if not bot_running %}disabled{% endif %}>
+                                    <i class="fas fa-stop"></i> Dừng
+                                </button>
+                                <button id="restart-bot" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-sync-alt"></i> Khởi động lại
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-10 ms-sm-auto px-md-4 py-4 main-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

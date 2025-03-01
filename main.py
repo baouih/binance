@@ -291,7 +291,161 @@ def backtest():
 @app.route('/trades')
 def trades():
     """Trang lịch sử giao dịch"""
-    return render_template('trades.html')
+    # Sample data
+    total_trades = 20
+    winning_trades = 13
+    losing_trades = 7
+    win_rate = 65
+    total_profit = 755.50
+    profit_factor = 2.3
+    
+    # Sample closed trades
+    trades = [
+        {
+            "id": "trade10",
+            "symbol": "SHIBUSDT",
+            "type": "LONG",
+            "entry_price": 0.00,
+            "exit_price": 0.00,
+            "quantity": 5000000.0000,
+            "pnl": 10.00,
+            "pnl_percent": 10.00,
+            "entry_time": "2025-02-28 07:30",
+            "exit_time": "2025-02-28 08:15",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade9",
+            "symbol": "XRPUSDT",
+            "type": "LONG",
+            "entry_price": 0.80,
+            "exit_price": 0.78,
+            "quantity": 500.0000,
+            "pnl": -10.00,
+            "pnl_percent": -2.50,
+            "entry_time": "2025-02-27 14:00",
+            "exit_time": "2025-02-27 15:45",
+            "exit_reason": "stop_loss"
+        },
+        {
+            "id": "trade8",
+            "symbol": "ADAUSDT",
+            "type": "SHORT",
+            "entry_price": 0.65,
+            "exit_price": 0.62,
+            "quantity": 500.0000,
+            "pnl": 15.00,
+            "pnl_percent": 4.62,
+            "entry_time": "2025-02-27 10:15",
+            "exit_time": "2025-02-27 13:30",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade7",
+            "symbol": "ETHUSDT",
+            "type": "LONG",
+            "entry_price": 3150.00,
+            "exit_price": 3300.00,
+            "quantity": 0.2000,
+            "pnl": 30.00,
+            "pnl_percent": 4.76,
+            "entry_time": "2025-02-27 08:45",
+            "exit_time": "2025-02-27 10:30",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade6",
+            "symbol": "BTCUSDT",
+            "type": "LONG",
+            "entry_price": 66000.00,
+            "exit_price": 69500.00,
+            "quantity": 0.1000,
+            "pnl": 350.00,
+            "pnl_percent": 5.30,
+            "entry_time": "2025-02-26 22:30",
+            "exit_time": "2025-02-27 09:00",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade5",
+            "symbol": "DOGEUSDT",
+            "type": "SHORT",
+            "entry_price": 0.15,
+            "exit_price": 0.16,
+            "quantity": 5000.0000,
+            "pnl": -50.00,
+            "pnl_percent": -6.67,
+            "entry_time": "2025-02-26 14:30",
+            "exit_time": "2025-02-26 16:45",
+            "exit_reason": "stop_loss"
+        },
+        {
+            "id": "trade4",
+            "symbol": "SOLUSDT",
+            "type": "LONG",
+            "entry_price": 110.00,
+            "exit_price": 125.00,
+            "quantity": 1.0000,
+            "pnl": 15.00,
+            "pnl_percent": 13.64,
+            "entry_time": "2025-02-26 10:15",
+            "exit_time": "2025-02-26 14:00",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade3",
+            "symbol": "BNBUSDT",
+            "type": "SHORT",
+            "entry_price": 450.00,
+            "exit_price": 420.00,
+            "quantity": 0.5000,
+            "pnl": 15.00,
+            "pnl_percent": 6.67,
+            "entry_time": "2025-02-26 09:00",
+            "exit_time": "2025-02-26 11:30",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade2",
+            "symbol": "ETHUSDT",
+            "type": "LONG",
+            "entry_price": 3200.00,
+            "exit_price": 3100.00,
+            "quantity": 0.2000,
+            "pnl": -20.00,
+            "pnl_percent": -3.12,
+            "entry_time": "2025-02-25 08:30",
+            "exit_time": "2025-02-25 10:45",
+            "exit_reason": "stop_loss"
+        },
+        {
+            "id": "trade1",
+            "symbol": "BTCUSDT",
+            "type": "LONG",
+            "entry_price": 65000.00,
+            "exit_price": 69000.00,
+            "quantity": 0.1000,
+            "pnl": 400.00,
+            "pnl_percent": 6.15,
+            "entry_time": "2025-02-25 05:30",
+            "exit_time": "2025-02-25 09:15",
+            "exit_reason": "take_profit"
+        }
+    ]
+    
+    # Check if bot is running
+    result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+    bot_running = bool(result)
+    
+    return render_template('trades.html',
+                          trades=trades,
+                          total_trades=total_trades,
+                          winning_trades=winning_trades,
+                          losing_trades=losing_trades,
+                          win_rate=win_rate,
+                          total_profit=total_profit,
+                          profit_factor=profit_factor,
+                          bot_running=bot_running)
 
 @app.route('/settings')
 def settings():
