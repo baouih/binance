@@ -639,7 +639,7 @@ class QuickReportGenerator:
             html_content.append("                <tr>")
             html_content.append(f"                    <td>{regime}</td>")
             
-            if regime in strategy_mapping:
+            if regime in self.strategy_mapping:
                 # Sắp xếp các chiến lược theo trọng số
                 strategies = [(s, w) for s, w in strategy_mapping[regime].items()]
                 strategies.sort(key=lambda x: x[1], reverse=True)
@@ -650,7 +650,7 @@ class QuickReportGenerator:
                 expected_win_rate = 0.0
                 total_weight = 0.0
                 
-                for strategy, weight in strategy_mapping[regime].items():
+                for strategy, weight in self.strategy_mapping[regime].items():
                     if regime in strategy_effectiveness and strategy in strategy_effectiveness[regime]:
                         expected_win_rate += strategy_effectiveness[regime][strategy] * weight
                         total_weight += weight
@@ -993,7 +993,7 @@ class QuickReportGenerator:
         for regime in market_regimes:
             report_lines.append(f"Chế độ thị trường: {regime}")
             
-            if regime in strategy_mapping:
+            if regime in self.strategy_mapping:
                 # Sắp xếp các chiến lược theo trọng số
                 strategies = [(s, w) for s, w in strategy_mapping[regime].items()]
                 strategies.sort(key=lambda x: x[1], reverse=True)
@@ -1006,7 +1006,7 @@ class QuickReportGenerator:
                 expected_win_rate = 0.0
                 total_weight = 0.0
                 
-                for strategy, weight in strategy_mapping[regime].items():
+                for strategy, weight in self.strategy_mapping[regime].items():
                     if regime in strategy_effectiveness and strategy in strategy_effectiveness[regime]:
                         expected_win_rate += strategy_effectiveness[regime][strategy] * weight
                         total_weight += weight
