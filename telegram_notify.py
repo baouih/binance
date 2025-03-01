@@ -319,6 +319,29 @@ class TelegramNotifier:
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo lỗi qua Telegram: {e}")
             return False
+            
+    def send_startup_notification(self) -> bool:
+        """
+        Gửi thông báo khởi động hệ thống qua Telegram.
+        
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled:
+            return False
+        
+        try:
+            # Tạo tin nhắn
+            message = f"<b>🚀 BOT GIAO DỊCH ĐÃ KHỞI ĐỘNG</b>\n\n"
+            message += f"Hệ thống giao dịch tự động đã khởi động và đang hoạt động.\n"
+            message += f"Bạn sẽ nhận được thông báo khi có tín hiệu hoặc giao dịch mới.\n\n"
+            message += f"<i>Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>"
+            
+            return self.send_message(message)
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo khởi động qua Telegram: {e}")
+            return False
 
 # Khởi tạo một instance toàn cục
 telegram_notifier = TelegramNotifier()
