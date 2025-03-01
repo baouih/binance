@@ -495,9 +495,9 @@ class StrategySelector:
                 'atr': {'weight': 0.5, 'active': True},
             },
             'quiet': {
-                'bbands': {'weight': 0.4, 'active': True},
+                'bbands': {'weight': 0.5, 'active': True},
                 'rsi': {'weight': 0.3, 'active': True},
-                'stochastic': {'weight': 0.3, 'active': True},
+                'stochastic': {'weight': 0.2, 'active': True},
             }
         }
         
@@ -524,10 +524,10 @@ class StrategySelector:
                 'atr': {'atr_period': 14, 'atr_multiplier': 1.5, 'use_atr_stops': True},
             },
             'quiet': {
-                'bbands': {'bb_period': 20, 'bb_std': 1.2, 'use_bb_squeeze': True},
-                'rsi': {'overbought': 60, 'oversold': 40, 'use_trend_filter': False},
-                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 70, 'oversold': 30},
-                'atr': {'atr_period': 14, 'atr_multiplier': 0.8, 'use_atr_stops': True},
+                'bbands': {'bb_period': 20, 'bb_std': 1.0, 'use_bb_squeeze': True},
+                'rsi': {'overbought': 55, 'oversold': 45, 'use_trend_filter': False},
+                'stochastic': {'k_period': 14, 'd_period': 3, 'overbought': 65, 'oversold': 35},
+                'atr': {'atr_period': 14, 'atr_multiplier': 0.7, 'use_atr_stops': True},
             }
         }
         
@@ -782,17 +782,17 @@ class RSIStrategy(Strategy):
             bb_width = (df['bb_upper'].iloc[-1] - df['bb_lower'].iloc[-1]) / df['bb_middle'].iloc[-1]
             
             # So sánh với ngưỡng hẹp để xác định thị trường yên tĩnh
-            if bb_width < 0.02:  # 2% width là rất hẹp, thị trường yên tĩnh
+            if bb_width < 0.03:  # 3% width là khá hẹp, thị trường yên tĩnh
                 is_quiet_market = True
         
         # Bổ sung logic đặc biệt cho thị trường yên tĩnh
         if is_quiet_market:
             # Trong thị trường yên tĩnh, sử dụng ngưỡng RSI gần trung tâm hơn
-            if current_rsi < oversold + 5 and previous_rsi < current_rsi and current_rsi > previous_rsi + 2:
-                # Tín hiệu mua khi RSI dưới ngưỡng oversold+5 và đang tăng mạnh
+            if current_rsi < oversold + 10 and previous_rsi < current_rsi and current_rsi > previous_rsi + 1.5:
+                # Tín hiệu mua khi RSI dưới ngưỡng oversold+10 và đang tăng
                 signal = 1
-            elif current_rsi > overbought - 5 and previous_rsi > current_rsi and previous_rsi > current_rsi + 2:
-                # Tín hiệu bán khi RSI trên ngưỡng overbought-5 và đang giảm mạnh
+            elif current_rsi > overbought - 10 and previous_rsi > current_rsi and previous_rsi > current_rsi + 1.5:
+                # Tín hiệu bán khi RSI trên ngưỡng overbought-10 và đang giảm
                 signal = -1
         else:
             # Logic thông thường cho các thị trường khác
