@@ -119,7 +119,164 @@ def load_multi_coin_config():
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
-    return render_template('dashboard.html')
+    # Generate sample data for dashboard
+    current_balance = 12500.0
+    initial_balance = 10000.0
+    profit_percentage = ((current_balance / initial_balance) - 1) * 100
+    
+    win_rate = 65
+    winning_trades = 13
+    total_trades = 20
+    
+    risk_reward_ratio = 1.8
+    profit_factor = 2.3
+    
+    max_drawdown_percent = 12.5
+    recovery_factor = 2.1
+    
+    market_regime = "Trending"
+    volatility = "Medium"
+    trend_strength = 75
+    
+    composite_score = 0.7
+    
+    # Sample open positions
+    open_positions = [
+        {
+            "id": "pos1",
+            "symbol": "BTCUSDT",
+            "type": "LONG",
+            "entry_price": 72000.00,
+            "current_price": 75000.00,
+            "quantity": 0.1000,
+            "pnl": 300.00,
+            "pnl_percent": 4.17,
+            "leverage": 5,
+            "stop_loss": 69500.00,
+            "take_profit": 78000.00,
+            "entry_time": "2025-02-28 18:30"
+        },
+        {
+            "id": "pos2",
+            "symbol": "SOLUSDT",
+            "type": "LONG",
+            "entry_price": 125.00,
+            "current_price": 137.50,
+            "quantity": 1.0000,
+            "pnl": 12.50,
+            "pnl_percent": 10.00,
+            "leverage": 3,
+            "stop_loss": 115.00,
+            "take_profit": 150.00,
+            "entry_time": "2025-02-28 20:10"
+        },
+        {
+            "id": "pos3",
+            "symbol": "BNBUSDT",
+            "type": "SHORT",
+            "entry_price": 410.00,
+            "current_price": 420.00,
+            "quantity": 0.2000,
+            "pnl": -2.00,
+            "pnl_percent": -2.44,
+            "leverage": 2,
+            "stop_loss": 430.00,
+            "take_profit": 390.00,
+            "entry_time": "2025-02-28 22:05"
+        }
+    ]
+    
+    # Sample closed positions
+    closed_positions = [
+        {
+            "id": "trade10",
+            "symbol": "SHIBUSDT",
+            "type": "LONG",
+            "entry_price": 0.00,
+            "exit_price": 0.00,
+            "quantity": 5000000.0000,
+            "pnl": 10.00,
+            "pnl_percent": 10.00,
+            "entry_time": "2025-02-28 07:30",
+            "exit_time": "2025-02-28 08:15",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade9",
+            "symbol": "XRPUSDT",
+            "type": "LONG",
+            "entry_price": 0.80,
+            "exit_price": 0.78,
+            "quantity": 500.0000,
+            "pnl": -10.00,
+            "pnl_percent": -2.50,
+            "entry_time": "2025-02-27 14:00",
+            "exit_time": "2025-02-27 15:45",
+            "exit_reason": "stop_loss"
+        },
+        {
+            "id": "trade8",
+            "symbol": "ADAUSDT",
+            "type": "SHORT",
+            "entry_price": 0.65,
+            "exit_price": 0.62,
+            "quantity": 500.0000,
+            "pnl": 15.00,
+            "pnl_percent": 4.62,
+            "entry_time": "2025-02-27 10:15",
+            "exit_time": "2025-02-27 13:30",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade7",
+            "symbol": "ETHUSDT",
+            "type": "LONG",
+            "entry_price": 3150.00,
+            "exit_price": 3300.00,
+            "quantity": 0.2000,
+            "pnl": 30.00,
+            "pnl_percent": 4.76,
+            "entry_time": "2025-02-27 08:45",
+            "exit_time": "2025-02-27 10:30",
+            "exit_reason": "take_profit"
+        },
+        {
+            "id": "trade6",
+            "symbol": "BTCUSDT",
+            "type": "LONG",
+            "entry_price": 66000.00,
+            "exit_price": 69500.00,
+            "quantity": 0.1000,
+            "pnl": 350.00,
+            "pnl_percent": 5.30,
+            "entry_time": "2025-02-26 22:30",
+            "exit_time": "2025-02-27 09:00",
+            "exit_reason": "take_profit"
+        }
+    ]
+    
+    # Check if bot is running
+    result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
+    bot_running = bool(result)
+    
+    return render_template('dashboard.html',
+                          current_balance=current_balance,
+                          initial_balance=initial_balance,
+                          profit_percentage=profit_percentage,
+                          win_rate=win_rate,
+                          winning_trades=winning_trades,
+                          total_trades=total_trades,
+                          risk_reward_ratio=risk_reward_ratio,
+                          profit_factor=profit_factor,
+                          max_drawdown_percent=max_drawdown_percent,
+                          recovery_factor=recovery_factor,
+                          market_regime=market_regime,
+                          volatility=volatility,
+                          trend_strength=trend_strength,
+                          composite_score=composite_score,
+                          open_positions=open_positions,
+                          closed_positions=closed_positions,
+                          bot_running=bot_running)
 
 @app.route('/strategies')
 def strategies():

@@ -46,7 +46,7 @@ case "$command" in
         ;;
     trades)
         count=${1:-10}
-        python cli_controller.py -t "$count"
+        python cli_controller.py -t
         ;;
     positions)
         python cli_controller.py -p
