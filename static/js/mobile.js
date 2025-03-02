@@ -100,8 +100,11 @@ function checkMobileLayout() {
                               navigator.maxTouchPoints > 0 || 
                               navigator.msMaxTouchPoints > 0;
     
+    // Để khắc phục lỗi biết trước trên iOS, giả sử mọi thiết bị di động
+    const forceMobile = true;
+    
     // Combine all detection methods for maximum reliability
-    const isMobile = isSmallScreen || isUserAgentMobile || isSafariMobile || isAspectRatioMobile;
+    const isMobile = forceMobile || isSmallScreen || isUserAgentMobile || isSafariMobile || isAspectRatioMobile;
     
     // Orientation detection
     const isPortrait = window.innerHeight > window.innerWidth;
@@ -112,6 +115,7 @@ function checkMobileLayout() {
     
     console.log("Device detection:", { 
         isMobile: isMobile, 
+        forceMobile: forceMobile,
         innerWidth: window.innerWidth,
         aspectRatio: aspectRatio,
         isSmallScreen: isSmallScreen,

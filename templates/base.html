@@ -2,7 +2,9 @@
 <html lang="vi" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="BinanceTrader Bot - Nền tảng giao dịch tự động Bitcoin và Altcoins">
     <title>{% block title %}BinanceTrader Bot{% endblock %}</title>
     
@@ -89,6 +91,9 @@
     
     <!-- Main JS -->
     <script src="/static/js/main.js"></script>
+    
+    <!-- Mobile support JS -->
+    <script src="/static/js/mobile.js"></script>
     
     <!-- Bot control JS -->
     <script src="/static/js/bot_control.js"></script>
