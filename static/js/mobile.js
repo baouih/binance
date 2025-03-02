@@ -78,12 +78,23 @@ function toggleMobileMenu() {
  * Check and adjust layout based on device orientation and screen size
  */
 function checkMobileLayout() {
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isPortrait = window.innerHeight > window.innerWidth;
+    
+    console.log("Device detection:", { 
+        isMobile: isMobile, 
+        innerWidth: window.innerWidth,
+        userAgent: navigator.userAgent,
+        isPortrait: isPortrait 
+    });
     
     if (isMobile) {
         // Apply mobile-specific adjustments
         document.body.classList.add('mobile-view');
+        console.log("Mobile view applied");
+        
+        // Ensure mobile navigation is properly set up
+        setupMobileNavigation();
         
         // Add specific class for portrait orientation
         if (isPortrait) {
@@ -112,6 +123,79 @@ function checkMobileLayout() {
         if (menuBtn) {
             menuBtn.style.display = 'none';
         }
+    }
+}
+
+/**
+ * Set up mobile navigation and ensure click handlers are properly attached
+ */
+function setupMobileNavigation() {
+    // Ensure bottom navigation works correctly
+    const mobileNavButtons = document.querySelectorAll('.nav-mobile-btn');
+    
+    mobileNavButtons.forEach(btn => {
+        // Remove existing event listeners to prevent duplicates
+        const clonedBtn = btn.cloneNode(true);
+        if (btn.parentNode) {
+            btn.parentNode.replaceChild(clonedBtn, btn);
+        }
+        
+        // Add click event listener
+        clonedBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get tab ID from data attribute or href
+            let tabId = this.getAttribute('data-bs-target');
+            if (tabId) {
+                tabId = tabId.replace('#', '');
+            } else if (this.getAttribute('href')) {
+                tabId = this.getAttribute('href').replace('#', '');
+            } else {
+                tabId = this.id.replace('-mobile-btn', '');
+            }
+            
+            console.log("Mobile navigation clicked:", tabId);
+            
+            // Handle direct link cases
+            if (this.getAttribute('href') && this.getAttribute('href').startsWith('/')) {
+                console.log("Direct navigation to:", this.getAttribute('href'));
+                window.location.href = this.getAttribute('href');
+                return;
+            }
+            
+            // Handle special cases
+            if (tabId === 'settings') {
+                console.log("Settings navigation triggered");
+                window.location.href = '/settings';
+                return;
+            }
+            
+            // Otherwise use the standard tab activation
+            activateMobileTab(this, tabId);
+        });
+    });
+    
+    // Ensure mobile bot toggle button works
+    const mobileBotToggle = document.getElementById('mobileBotToggle');
+    if (mobileBotToggle) {
+        // Remove existing event listeners
+        const clonedToggle = mobileBotToggle.cloneNode(true);
+        if (mobileBotToggle.parentNode) {
+            mobileBotToggle.parentNode.replaceChild(clonedToggle, mobileBotToggle);
+        }
+        
+        // Add new event listener
+        clonedToggle.addEventListener('click', function() {
+            console.log("Mobile bot toggle clicked");
+            if (typeof fakeStartBot === 'function') {
+                fakeStartBot();
+            } else {
+                console.error("fakeStartBot function not found");
+                alert("Lỗi: Không thể kết nối với hàm điều khiển bot");
+            }
+        });
+    } else {
+        console.log("Mobile bot toggle button not found");
     }
 }
 

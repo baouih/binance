@@ -30,5 +30,12 @@
     "max_daily_trades": "20",
     "max_drawdown": "10",
     "auto_restart_enabled": true,
-    "log_ip_activity": true
+    "log_ip_activity": true,
+    "telegram_enabled": true,
+    "telegram_bot_token": "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM",
+    "telegram_chat_id": "1834332146",
+    "notify_new_trades": true,
+    "notify_closed_trades": true,
+    "notify_error_status": true,
+    "notify_daily_summary": true
 }
