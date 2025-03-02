@@ -312,6 +312,35 @@ def index():
                           account_data=account_data,
                           market_data=market_data)
 
+@app.route('/market')
+def market():
+    """Trang phân tích thị trường"""
+    # Tạo dữ liệu mẫu cho market_data nếu cần
+    market_data = {
+        'btc_price': sample_prices.get('BTCUSDT', 80000),
+        'eth_price': sample_prices.get('ETHUSDT', 2300),
+        'bnb_price': sample_prices.get('BNBUSDT', 380),
+        'sol_price': sample_prices.get('SOLUSDT', 140),
+        'btc_change_24h': random.uniform(-5, 5),
+        'eth_change_24h': random.uniform(-7, 7),
+        'bnb_change_24h': random.uniform(-4, 4),
+        'sol_change_24h': random.uniform(-10, 10),
+        'sentiment': {
+            'value': random.randint(30, 70),
+            'state': random.choice(['success', 'danger', 'warning', 'info']),
+            'change': random.uniform(-5, 5),
+            'trend': 'neutral'
+        },
+        'market_regime': {
+            'BTCUSDT': 'Trending',
+            'ETHUSDT': 'Ranging',
+            'BNBUSDT': 'Volatile',
+            'SOLUSDT': 'Ranging'
+        }
+    }
+    
+    return render_template('market.html', market_data=market_data)
+
 @app.route('/strategies')
 def strategies():
     """Trang quản lý chiến lược"""
@@ -628,6 +657,15 @@ def get_realtime_market():
 def get_realtime_signals():
     """API lấy tín hiệu giao dịch theo thời gian thực"""
     return jsonify({"signals": sample_signals})
+
+@app.route('/api/language', methods=['POST'])
+def change_language():
+    """Thay đổi ngôn ngữ"""
+    language = request.json.get('language')
+    if language in ['en', 'vi']:
+        session['language'] = language
+        return jsonify({"status": "success", "message": "Language changed successfully"})
+    return jsonify({"status": "error", "message": "Invalid language"})
 
 def get_account_from_state(state):
     """Tạo dữ liệu tài khoản từ trạng thái"""

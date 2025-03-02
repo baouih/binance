@@ -269,24 +269,31 @@ function initializeLanguageSwitcher() {
         item.addEventListener('click', function(event) {
             event.preventDefault();
             const language = event.currentTarget.dataset.language;
+            const languageCode = language === 'en' ? 'en' : 'vi';
+            
+            console.log('Changing language to:', languageCode);
+            
             fetch('/api/language', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ language: language }),
+                body: JSON.stringify({ language: languageCode }),
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    console.log('Language changed successfully, reloading page');
                     // Refresh the page to apply the new language
                     window.location.reload();
                 } else {
                     console.error('Error changing language:', data.message);
+                    showToast('Error changing language', 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error changing language:', error);
+                showToast('Error connecting to server', 'danger');
             });
         });
     });
