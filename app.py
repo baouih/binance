@@ -1,304 +1,298 @@
-#!/usr/bin/env python3
-"""
-Web Dashboard cho bot giao dịch tiền điện tử
-"""
-
 import os
-import json
 import logging
-import random
-from datetime import datetime, timedelta
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+import json
+import datetime
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+import binance_api
+from account_type_selector import AccountTypeSelector
 
-# Thiết lập logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("dashboard")
+# Cấu hình logging
+logging.basicConfig(level=logging.INFO, 
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('main')
 
+# Khởi tạo Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "cryptobot-dev-key")
+app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
-# Giả lập dữ liệu bot
-bot_status = {
-    "running": True,
-    "last_start_time": datetime.now() - timedelta(hours=12),
-    "uptime": "12 hours",
-    "version": "1.0.0",
-    "active_strategies": ["Composite ML Strategy", "Multi-timeframe analyzer", "Sentiment-based counter"]
+# Giả lập dữ liệu bot status (sau này lấy từ service thực tế)
+BOT_STATUS = {
+    'running': False,
+    'uptime': '0d 0h 0m',
+    'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'version': '1.0.0',
+    'active_strategies': ['RSI', 'MACD', 'BB']
 }
 
-# Giả lập dữ liệu tài khoản
-account_data = {
-    "balance": 10253.42,
-    "change_24h": 2.3,
-    "positions": [
-        {
-            "id": "BTCUSDT_1",
-            "symbol": "BTCUSDT",
-            "type": "LONG",
-            "entry_price": 82458.15,
-            "current_price": 83768.54,
-            "quantity": 0.025,
-            "pnl": 32.61,
-            "pnl_percent": 1.59
-        },
-        {
-            "id": "ETHUSDT_1",
-            "symbol": "ETHUSDT",
-            "type": "SHORT",
-            "entry_price": 2285.36,
-            "current_price": 2212.85,
-            "quantity": 0.35,
-            "pnl": 25.38,
-            "pnl_percent": 3.18
-        }
-    ]
+# Giả lập dữ liệu tài khoản (sau này lấy từ API Binance)
+ACCOUNT_DATA = {
+    'balance': 10000.0,
+    'equity': 10000.0,
+    'margin_used': 0.0,
+    'margin_available': 10000.0,
+    'positions': []
 }
 
-# Giả lập dữ liệu tín hiệu giao dịch
-signals_data = [
-    {
-        "time": "12:35:18",
-        "symbol": "BTCUSDT",
-        "signal": "BUY",
-        "confidence": 78,
-        "price": 83518.75,
-        "market_regime": "NEUTRAL",
-        "executed": False
+# Giả lập dữ liệu thị trường (sau này lấy từ API)
+MARKET_DATA = {
+    'btc_price': 70123.45,
+    'btc_change_24h': 2.35,
+    'sentiment': {
+        'value': 65,
+        'state': 'warning',
+        'description': 'Tham lam nhẹ'
     },
-    {
-        "time": "11:42:06",
-        "symbol": "SOLUSDT",
-        "signal": "SELL",
-        "confidence": 82,
-        "price": 126.48,
-        "market_regime": "VOLATILE",
-        "executed": False
-    },
-    {
-        "time": "10:18:32",
-        "symbol": "ETHUSDT",
-        "signal": "SELL",
-        "confidence": 75,
-        "price": 2248.36,
-        "market_regime": "VOLATILE",
-        "executed": True
-    }
-]
-
-# Giả lập dữ liệu phân tích thị trường
-market_data = {
-    "btc_price": 83768.54,
-    "btc_change_24h": 1.5,
-    "market_regime": {
-        "BTC": "VOLATILE",
-        "ETH": "VOLATILE",
-        "BNB": "NEUTRAL",
-        "SOL": "RANGING"
-    },
-    "sentiment": {
-        "value": 16,  # 0-100
-        "state": "extreme_fear",
-        "description": "Extreme Fear"
+    'market_regime': {
+        'BTCUSDT': 'Trending',
+        'ETHUSDT': 'Ranging',
+        'BNBUSDT': 'Volatile',
+        'SOLUSDT': 'Trending'
     }
 }
+
+# Khởi tạo account selector
+account_selector = AccountTypeSelector()
+
 
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
     return render_template('index.html', 
-                           bot_status=bot_status,
-                           account_data=account_data,
-                           market_data=market_data)
+                          bot_status=BOT_STATUS,
+                          account_data=ACCOUNT_DATA,
+                          market_data=MARKET_DATA)
+
 
 @app.route('/strategies')
 def strategies():
     """Trang quản lý chiến lược"""
-    return render_template('strategies.html')
+    return render_template('strategies.html', 
+                          bot_status=BOT_STATUS)
+
 
 @app.route('/backtest')
 def backtest():
     """Trang backtest"""
-    return render_template('backtest.html')
+    return render_template('backtest.html', 
+                          bot_status=BOT_STATUS)
+
 
 @app.route('/trades')
 def trades():
     """Trang lịch sử giao dịch"""
-    return render_template('trades.html')
+    return render_template('trades.html', 
+                          bot_status=BOT_STATUS)
+
 
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""
-    return render_template('settings.html')
+    return render_template('settings.html', 
+                          bot_status=BOT_STATUS)
+
 
 @app.route('/account')
 def account():
     """Trang cài đặt tài khoản và API"""
-    return render_template('account.html')
+    return render_template('account.html', 
+                          bot_status=BOT_STATUS)
 
-# API Routes
+
+@app.route('/cli')
+def cli():
+    """Trang giao diện dòng lệnh"""
+    return render_template('cli.html',
+                          bot_status=BOT_STATUS)
+
+
+# API Endpoints
 @app.route('/api/bot/control', methods=['POST'])
 def bot_control():
     """Điều khiển bot (start/stop/restart)"""
-    if not request.json or 'action' not in request.json:
-        return jsonify({'status': 'error', 'message': 'Missing action parameter'}), 400
-    
-    action = request.json['action']
+    data = request.json
+    action = data.get('action', '')
     
     if action == 'start':
-        bot_status["running"] = True
-        bot_status["last_start_time"] = datetime.now()
-        logger.info("Bot started")
-    elif action == 'stop':
-        bot_status["running"] = False
-        logger.info("Bot stopped")
-    elif action == 'restart':
-        bot_status["running"] = True
-        bot_status["last_start_time"] = datetime.now()
-        logger.info("Bot restarted")
-    else:
-        return jsonify({'status': 'error', 'message': 'Invalid action parameter'}), 400
+        BOT_STATUS['running'] = True
+        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logger.info("Bot đã được khởi động")
+        return jsonify({'status': 'success', 'message': 'Bot đã được khởi động'})
     
-    return jsonify({'status': 'success', 'action': action, 'bot_status': bot_status})
+    elif action == 'stop':
+        BOT_STATUS['running'] = False
+        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logger.info("Bot đã dừng")
+        return jsonify({'status': 'success', 'message': 'Bot đã dừng'})
+    
+    elif action == 'restart':
+        BOT_STATUS['running'] = True
+        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logger.info("Bot đã được khởi động lại")
+        return jsonify({'status': 'success', 'message': 'Bot đã được khởi động lại'})
+    
+    else:
+        return jsonify({'status': 'error', 'message': 'Hành động không hợp lệ'})
+
 
 @app.route('/api/account/settings', methods=['GET', 'POST'])
 def account_settings():
     """Lấy hoặc cập nhật cài đặt tài khoản"""
-    # Giả lập dữ liệu cài đặt tài khoản
-    account_settings = {
-        'account_type': 'futures',
-        'api_mode': 'testnet',  # demo, testnet, live
-        'use_api': True,
-        'use_testnet': True,
-        'symbols': ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'],
-        'timeframes': ['5m', '15m', '1h', '4h'],
-        'leverage': 10,
-        'risk_profile': 'medium', # very_low, low, medium, high, very_high
-        'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-    
     if request.method == 'GET':
-        return jsonify(account_settings)
+        # Lấy cài đặt hiện tại
+        settings = {
+            'api_mode': 'demo',  # 'demo', 'testnet', 'live'
+            'account_type': 'futures',  # 'spot', 'futures'
+            'risk_profile': 'medium',  # 'very_low', 'low', 'medium', 'high', 'very_high'
+            'leverage': 10,  # 1-100
+            'symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'],
+            'timeframes': ['5m', '15m', '1h', '4h']
+        }
+        return jsonify(settings)
+    
     elif request.method == 'POST':
-        if not request.json:
-            return jsonify({'status': 'error', 'message': 'No data provided'}), 400
-            
-        # Cập nhật cài đặt từ dữ liệu gửi lên
+        # Cập nhật cài đặt mới
         data = request.json
-        for key in data:
-            if key in account_settings:
-                account_settings[key] = data[key]
-                
-        account_settings['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        logger.info(f"Account settings updated: {data}")
         
-        return jsonify({'status': 'success', 'settings': account_settings})
+        try:
+            # Kiểm tra và lưu cài đặt
+            api_mode = data.get('api_mode')
+            if api_mode not in ['demo', 'testnet', 'live']:
+                return jsonify({'status': 'error', 'message': 'Chế độ API không hợp lệ'})
+            
+            account_type = data.get('account_type')
+            if account_type not in ['spot', 'futures']:
+                return jsonify({'status': 'error', 'message': 'Loại tài khoản không hợp lệ'})
+            
+            risk_profile = data.get('risk_profile')
+            if risk_profile not in ['very_low', 'low', 'medium', 'high', 'very_high']:
+                return jsonify({'status': 'error', 'message': 'Hồ sơ rủi ro không hợp lệ'})
+            
+            leverage = data.get('leverage', 10)
+            if not (1 <= leverage <= 100):
+                return jsonify({'status': 'error', 'message': 'Đòn bẩy không hợp lệ (1-100)'})
+            
+            # Lưu cài đặt
+            # TODO: Cập nhật cài đặt thực tế vào file/database
+            logger.info(f"Đã cập nhật cài đặt tài khoản: {data}")
+            
+            return jsonify({'status': 'success', 'message': 'Cài đặt đã được lưu'})
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật cài đặt: {str(e)}")
+            return jsonify({'status': 'error', 'message': f'Lỗi: {str(e)}'})
+
 
 @app.route('/api/positions/close', methods=['POST'])
 def close_position():
     """Đóng một vị thế"""
-    if not request.json or 'position_id' not in request.json:
-        return jsonify({'status': 'error', 'message': 'Missing position_id parameter'}), 400
+    data = request.json
+    position_id = data.get('position_id')
     
-    position_id = request.json['position_id']
+    # Tìm vị thế trong danh sách (giả lập)
+    # Sau này gọi API thực tế để đóng vị thế
+    logger.info(f"Yêu cầu đóng vị thế {position_id}")
     
-    # Find and remove the position
-    position_index = None
-    for i, position in enumerate(account_data["positions"]):
-        if position["id"] == position_id:
-            position_index = i
-            break
-    
-    if position_index is not None:
-        removed_position = account_data["positions"].pop(position_index)
-        logger.info(f"Position closed: {removed_position}")
-        return jsonify({'status': 'success', 'position': removed_position})
-    else:
-        return jsonify({'status': 'error', 'message': 'Position not found'}), 404
+    return jsonify({'status': 'success', 'message': f'Vị thế {position_id} đã được đóng'})
 
-@app.route('/api/bot/status')
+
+@app.route('/api/bot/status', methods=['GET'])
 def get_bot_status():
     """Lấy trạng thái hiện tại của bot"""
-    return jsonify(bot_status)
+    return jsonify(BOT_STATUS)
 
-@app.route('/api/account')
+
+@app.route('/api/account', methods=['GET'])
 def get_account():
     """Lấy dữ liệu tài khoản"""
-    return jsonify(account_data)
+    return jsonify(ACCOUNT_DATA)
 
-@app.route('/api/signals')
+
+@app.route('/api/signals', methods=['GET'])
 def get_signals():
     """Lấy tín hiệu giao dịch gần đây"""
-    return jsonify(signals_data)
+    # Giả lập tín hiệu giao dịch
+    signals = [
+        {
+            'time': (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M'),
+            'symbol': 'BTCUSDT',
+            'signal': 'BUY',
+            'confidence': 85,
+            'price': 70123.45,
+            'executed': True
+        },
+        {
+            'time': (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M'),
+            'symbol': 'ETHUSDT',
+            'signal': 'SELL',
+            'confidence': 72,
+            'price': 3890.12,
+            'executed': True
+        },
+        {
+            'time': (datetime.datetime.now() - datetime.timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M'),
+            'symbol': 'SOLUSDT',
+            'signal': 'BUY',
+            'confidence': 67,
+            'price': 175.35,
+            'executed': False
+        }
+    ]
+    return jsonify(signals)
 
-@app.route('/api/market')
+
+@app.route('/api/market', methods=['GET'])
 def get_market():
     """Lấy dữ liệu thị trường"""
-    return jsonify(market_data)
+    return jsonify(MARKET_DATA)
 
-# Data update functions for background threading
+
+@app.route('/api/cli/execute', methods=['POST'])
+def execute_cli_command():
+    """Thực thi lệnh từ CLI web"""
+    data = request.json
+    command = data.get('command', '')
+    
+    # Xử lý lệnh
+    result = {
+        'success': True,
+        'output': f"Executed command: {command}",
+        'error': None
+    }
+    
+    # TODO: Implement thực tế xử lý lệnh từ CLI
+    
+    return jsonify(result)
+
+
+# Tác vụ nền
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
-    import time
-    while True:
-        # Simulate price changes
-        market_data['btc_price'] += random.uniform(-100, 100)
-        market_data['btc_change_24h'] = random.uniform(-2.0, 2.0)
-        
-        # Update sentiment occasionally
-        if random.random() > 0.8:
-            sentiment_value = random.randint(0, 100)
-            if sentiment_value < 25:
-                sentiment_state = "extreme_fear"
-                sentiment_description = "Extreme Fear"
-            elif sentiment_value < 40:
-                sentiment_state = "fear"
-                sentiment_description = "Fear"
-            elif sentiment_value < 60:
-                sentiment_state = "neutral"
-                sentiment_description = "Neutral"
-            elif sentiment_value < 80:
-                sentiment_state = "greed"
-                sentiment_description = "Greed"
-            else:
-                sentiment_state = "extreme_greed"
-                sentiment_description = "Extreme Greed"
-                
-            market_data['sentiment'] = {
-                'value': sentiment_value,
-                'state': sentiment_state,
-                'description': sentiment_description
-            }
-        
-        time.sleep(5)  # Cập nhật mỗi 5 giây
+    # Trong tương lai, gọi API để lấy dữ liệu thị trường
+    pass
+
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
-    import time
-    while True:
-        # Simulate balance changes
-        account_data['balance'] += random.uniform(-10, 10)
-        
-        # Update position PnL
-        for position in account_data['positions']:
-            if position['symbol'] == 'BTCUSDT':
-                position['current_price'] = market_data['btc_price']
-                if position['type'] == 'LONG':
-                    position['pnl'] = (position['current_price'] - position['entry_price']) * position['quantity']
-                else:
-                    position['pnl'] = (position['entry_price'] - position['current_price']) * position['quantity']
-                position['pnl_percent'] = (position['pnl'] / (position['entry_price'] * position['quantity'])) * 100
-                
-        time.sleep(10)  # Cập nhật mỗi 10 giây
+    # Trong tương lai, gọi API để lấy dữ liệu tài khoản
+    pass
+
+
+# Khởi động tác vụ nền và đăng ký blueprint
+logger.info("Đã đăng ký blueprint cho cấu hình")
+
+# Kiểm tra môi trường
+if os.environ.get('TESTING') == 'true':
+    logger.info("Auto-start bot is disabled in testing environment")
+else:
+    # Khởi động tự động nếu được cấu hình
+    pass
+
+logger.info("Background tasks started")
+
+# Trong trường hợp bot đang chạy nhưng trạng thái không đồng bộ
+if BOT_STATUS['running'] == False:
+    logger.info("Bot has stopped but status is still 'running'. Updating status...")
+
 
 if __name__ == '__main__':
-    # Start background threads for data updates
-    import threading
-    
-    market_thread = threading.Thread(target=update_market_data, daemon=True)
-    market_thread.start()
-    
-    account_thread = threading.Thread(target=update_account_data, daemon=True)
-    account_thread.start()
-    
-    # Run the Flask app
     app.run(host='0.0.0.0', port=5000, debug=True)

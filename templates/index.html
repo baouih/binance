@@ -1,238 +1,964 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="vi" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Trading Bot Dashboard</title>
-    <!-- Bootstrap Dark Theme CSS -->
+    <title>Bot Giao Dịch Crypto</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .nav-link.active {
+            background-color: #161b22 !important;
+            border-color: #30363d !important;
+            color: #58a6ff !important;
+        }
+        .dashboard-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        .status-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .status-running {
+            background-color: #3fb950;
+        }
+        .status-stopped {
+            background-color: #f85149;
+        }
+        .cli-terminal {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            min-height: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .cli-input {
+            background-color: transparent;
+            border: none;
+            color: #c9d1d9;
+            width: 100%;
+            outline: none;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        .cli-prompt {
+            color: #3fb950;
+        }
+        .cli-output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        .cli-error {
+            color: #f85149;
+        }
+        .cli-success {
+            color: #3fb950;
+        }
+        .cli-warning {
+            color: #db8d46;
+        }
+        .cli-info {
+            color: #58a6ff;
+        }
+        .settings-section {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #161b22;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/strategies">Strategies</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/backtest">Backtest</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/trades">Trade History</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings">Settings</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
-                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <div class="row">
-            <!-- Account Overview -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Account Overview</h5>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="balance-display">$<span id="account-balance">10,253.42</span></h2>
-                        <p class="text-muted">24h Change: <span id="account-change" class="text-success">+2.3%</span></p>
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary" type="button">Deposit</button>
-                            <button class="btn btn-secondary" type="button">Withdraw</button>
-                        </div>
-                    </div>
-                </div>
+    <div class="container py-4">
+        <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+                <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
+                <span class="fs-4">Bot Giao Dịch Crypto</span>
             </div>
             
-            <!-- Market Overview -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Overview</h5>
-                    </div>
-                    <div class="card-body">
-                        <h4>BTC/USDT: $<span id="btc-price">83,768.54</span></h4>
-                        <p class="text-muted">24h Change: <span id="btc-change" class="text-success">+1.5%</span></p>
-                        <div>
-                            <canvas id="price-chart" height="120"></canvas>
-                        </div>
-                    </div>
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
+                    <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
+                            id="toggleBotBtn">
+                        {{ 'Dừng' if bot_status.running else 'Khởi động' }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
+                        <i class="bi bi-arrow-repeat"></i> Khởi động lại
+                    </button>
                 </div>
             </div>
-            
-            <!-- Market Sentiment -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Sentiment</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="sentiment-gauge-container">
-                            <canvas id="sentiment-gauge" height="120"></canvas>
-                        </div>
-                        <h5 id="sentiment-label" class="mt-2 text-danger">Extreme Fear</h5>
-                        <p class="text-muted">Market sentiment based on multiple indicators</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Active Positions -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Active Positions</h5>
-                        <button class="btn btn-sm btn-outline-primary">New Position</button>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Type</th>
-                                        <th>Entry</th>
-                                        <th>Current</th>
-                                        <th>PnL</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="positions-table">
-                                    <!-- Positions will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Recent Signals -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Recent Signals</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Time</th>
-                                        <th>Symbol</th>
-                                        <th>Signal</th>
-                                        <th>Price</th>
-                                        <th>Confidence</th>
-                                        <th>Regime</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="signals-table">
-                                    <!-- Signals will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </header>
         
-        <div class="row">
-            <!-- Market Regimes -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title">Market Regimes</h5>
+        <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="true">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades" type="button" role="tab" aria-controls="trades" aria-selected="false">
+                    <i class="bi bi-graph-up"></i> Giao dịch
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+                    <i class="bi bi-gear"></i> Cài đặt
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cli-tab" data-bs-toggle="tab" data-bs-target="#cli" type="button" role="tab" aria-controls="cli" aria-selected="false">
+                    <i class="bi bi-terminal"></i> Dòng lệnh
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="mainTabContent">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="dashboard-card p-3">
+                            <h6 class="text-info">Số dư tài khoản</h6>
+                            <h3>${{ '{:.2f}'.format(account_data.balance) }}</h3>
+                            <small class="text-muted">Tài khoản thật</small>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>BTC</h6>
-                                    <span id="regime-btc" class="badge bg-warning">VOLATILE</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>ETH</h6>
-                                    <span id="regime-eth" class="badge bg-warning">VOLATILE</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>BNB</h6>
-                                    <span id="regime-bnb" class="badge bg-info">NEUTRAL</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 mb-3">
-                                <div class="regime-card bg-secondary p-2 rounded text-center">
-                                    <h6>SOL</h6>
-                                    <span id="regime-sol" class="badge bg-primary">RANGING</span>
-                                </div>
+                    <div class="col-md-4">
+                        <div class="dashboard-card p-3">
+                            <h6 class="text-info">Equity</h6>
+                            <h3>${{ '{:.2f}'.format(account_data.balance) }}</h3>
+                            <small class="text-muted">Bao gồm vị thế đang mở</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="dashboard-card p-3">
+                            <h6 class="text-info">Lợi nhuận</h6>
+                            <h3>
+                                $0.00 
+                                <small class="text-success">+0.00%</small>
+                            </h3>
+                            <small class="text-muted">24 giờ qua</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="dashboard-card p-3">
+                            <h5>Vị thế mở</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Loại</th>
+                                            <th>Giá vào</th>
+                                            <th>Giá hiện tại</th>
+                                            <th>Lãi/Lỗ</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for position in account_data.positions %}
+                                        <tr>
+                                            <td>{{ position.symbol }}</td>
+                                            <td>
+                                                <span class="{{ 'text-success' if position.type == 'LONG' else 'text-danger' }}">
+                                                    {{ position.type }}
+                                                </span>
+                                            </td>
+                                            <td>{{ '{:.2f}'.format(position.entry_price) }}</td>
+                                            <td>{{ '{:.2f}'.format(position.current_price) }}</td>
+                                            <td class="{{ 'text-success' if position.pnl > 0 else 'text-danger' }}">
+                                                ${{ '{:.2f}'.format(position.pnl) }} ({{ '{:.2f}'.format(position.pnl_percent) }}%)
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger close-position-btn" 
+                                                        data-position-id="{{ position.id }}">Đóng</button>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center">Không có vị thế đang mở</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <p class="text-muted">Market regimes determine the optimal strategy to use</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="dashboard-card p-3">
+                            <h5>Thông tin thị trường</h5>
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4>BTC/USDT</h4>
+                                    <h2>${{ '{:.2f}'.format(market_data.btc_price) }}</h2>
+                                    <span class="{{ 'text-success' if market_data.btc_change_24h > 0 else 'text-danger' }}">
+                                        {{ '{:.2f}'.format(market_data.btc_change_24h) }}%
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6>Chỉ số sợ hãi/tham lam</h6>
+                                    <div class="progress" style="height: 20px; width: 200px;">
+                                        <div class="progress-bar bg-{{ market_data.sentiment.state }}" 
+                                             role="progressbar" 
+                                             style="width: {{ market_data.sentiment.value }}%;"
+                                             aria-valuenow="{{ market_data.sentiment.value }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ market_data.sentiment.value }}
+                                        </div>
+                                    </div>
+                                    <small>{{ market_data.sentiment.description }}</small>
+                                </div>
+                            </div>
+                            <h6>Chế độ thị trường</h6>
+                            <div class="row">
+                                {% for symbol, regime in market_data.market_regime.items() %}
+                                <div class="col-3 mb-2">
+                                    <div class="badge bg-secondary w-100 p-2">
+                                        {{ symbol }}: {{ regime }}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Bot Status -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Bot Status</h5>
-                        <button class="btn btn-sm btn-outline-secondary" id="restart-bot">Restart</button>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-sm">
-                            <tbody>
+            <!-- Trades Tab -->
+            <div class="tab-pane fade" id="trades" role="tabpanel" aria-labelledby="trades-tab">
+                <div class="dashboard-card p-3">
+                    <h5>Tín hiệu giao dịch gần đây</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
                                 <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td id="status-value">Running</td>
+                                    <th>Thời gian</th>
+                                    <th>Symbol</th>
+                                    <th>Tín hiệu</th>
+                                    <th>Độ tin cậy</th>
+                                    <th>Giá</th>
+                                    <th>Trạng thái</th>
                                 </tr>
-                                <tr>
-                                    <td><strong>Uptime:</strong></td>
-                                    <td id="uptime-value">12 hours</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Version:</strong></td>
-                                    <td id="version-value">1.0.0</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Active Strategies:</strong></td>
-                                    <td id="strategies-value">Composite ML Strategy, Multi-timeframe analyzer, Sentiment-based counter</td>
-                                </tr>
+                            </thead>
+                            <tbody id="signalsTableBody">
+                                <!-- Signals will be loaded here -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                <div class="settings-section">
+                    <h4 class="mb-4">Cài đặt tài khoản</h4>
+                    
+                    <form id="accountSettingsForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Chế độ API</label>
+                                <select class="form-select" id="apiMode" name="api_mode">
+                                    <option value="demo">Demo (dữ liệu giả lập)</option>
+                                    <option value="testnet">Testnet (API key testnet)</option>
+                                    <option value="live">Live (API key giao dịch thật)</option>
+                                </select>
+                                <div class="form-text">Demo: Không cần API key, Testnet: Môi trường thử nghiệm, Live: Giao dịch thực tế</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Loại tài khoản</label>
+                                <select class="form-select" id="accountType" name="account_type">
+                                    <option value="spot">Spot (không đòn bẩy)</option>
+                                    <option value="futures">Futures (sử dụng đòn bẩy)</option>
+                                </select>
+                                <div class="form-text">Spot: Giao dịch thông thường, Futures: Giao dịch phái sinh với đòn bẩy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Hồ sơ rủi ro</label>
+                                <select class="form-select" id="riskProfile" name="risk_profile">
+                                    <option value="very_low">Rất thấp (5-8% vốn)</option>
+                                    <option value="low">Thấp (10-15% vốn)</option>
+                                    <option value="medium" selected>Trung bình (15-25% vốn)</option>
+                                    <option value="high">Cao (25-35% vốn)</option>
+                                    <option value="very_high">Rất cao (35-50% vốn)</option>
+                                </select>
+                                <div class="form-text">Xác định mức độ rủi ro và kích thước vị thế tối đa</div>
+                            </div>
+                            
+                            <div class="col-md-6" id="leverageContainer">
+                                <label class="form-label">Đòn bẩy (chỉ cho Futures)</label>
+                                <input type="range" class="form-range" id="leverage" name="leverage" min="1" max="100" value="10">
+                                <div class="d-flex justify-content-between">
+                                    <span>1x</span>
+                                    <span id="leverageValue">10x</span>
+                                    <span>100x</span>
+                                </div>
+                                <div class="form-text">Đòn bẩy cao = lợi nhuận cao hơn nhưng rủi ro thanh lý cũng cao hơn</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Các cặp giao dịch</label>
+                                <select class="form-select" id="symbols" name="symbols" multiple>
+                                    <option value="BTCUSDT" selected>BTC/USDT</option>
+                                    <option value="ETHUSDT" selected>ETH/USDT</option>
+                                    <option value="BNBUSDT" selected>BNB/USDT</option>
+                                    <option value="SOLUSDT" selected>SOL/USDT</option>
+                                    <option value="ADAUSDT">ADA/USDT</option>
+                                    <option value="DOGEUSDT">DOGE/USDT</option>
+                                </select>
+                                <div class="form-text">Chọn nhiều cặp bằng cách giữ Ctrl (hoặc Command trên Mac) và click</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Khung thời gian phân tích</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe1m" value="1m">
+                                        <label class="form-check-label" for="timeframe1m">1m</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe5m" value="5m" checked>
+                                        <label class="form-check-label" for="timeframe5m">5m</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe15m" value="15m" checked>
+                                        <label class="form-check-label" for="timeframe15m">15m</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe30m" value="30m">
+                                        <label class="form-check-label" for="timeframe30m">30m</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe1h" value="1h" checked>
+                                        <label class="form-check-label" for="timeframe1h">1h</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe4h" value="4h" checked>
+                                        <label class="form-check-label" for="timeframe4h">4h</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="timeframe1d" value="1d">
+                                        <label class="form-check-label" for="timeframe1d">1d</label>
+                                    </div>
+                                </div>
+                                <div class="form-text">Các khung thời gian để phân tích thị trường</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+                            <button type="button" class="btn btn-outline-secondary ms-2">Đặt lại mặc định</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h4 class="mb-4">Cài đặt API Binance</h4>
+                    
+                    <form id="apiSettingsForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">API Key</label>
+                                <input type="text" class="form-control" id="apiKey" name="api_key" placeholder="Nhập Binance API Key">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">API Secret</label>
+                                <input type="password" class="form-control" id="apiSecret" name="api_secret" placeholder="Nhập Binance API Secret">
+                            </div>
+                        </div>
+                        
+                        <div class="form-text mb-3">
+                            <strong>Lưu ý quan trọng:</strong> API key phải có quyền đọc và giao dịch, nhưng
+                            <strong>KHÔNG NÊN</strong> có quyền rút tiền để bảo mật tài khoản.
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Lưu API Keys</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- CLI Tab -->
+            <div class="tab-pane fade" id="cli" role="tabpanel" aria-labelledby="cli-tab">
+                <div class="dashboard-card p-3">
+                    <h5>
+                        <i class="bi bi-terminal"></i> 
+                        Giao diện dòng lệnh
+                        <small class="text-muted ms-2">Điều khiển bot bằng lệnh</small>
+                    </h5>
+                    
+                    <div class="cli-terminal" id="cliTerminal">
+                        <div class="cli-output cli-success">
+=== Bot Giao Dịch Crypto CLI ===
+Nhập 'help' để xem danh sách lệnh.
+                        </div>
+                        <div id="cliOutput"></div>
+                        <div class="d-flex">
+                            <span class="cli-prompt me-2">$</span>
+                            <input type="text" class="cli-input" id="cliInput" autocomplete="off" placeholder="Nhập lệnh...">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <details>
+                            <summary>Các lệnh có sẵn</summary>
+                            <div class="mt-2">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Lệnh</th>
+                                            <th>Mô tả</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>help</code></td>
+                                            <td>Hiển thị danh sách lệnh có sẵn</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>status</code></td>
+                                            <td>Hiển thị trạng thái của bot</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>start</code></td>
+                                            <td>Khởi động bot</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>stop</code></td>
+                                            <td>Dừng bot</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>restart</code></td>
+                                            <td>Khởi động lại bot</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>positions</code></td>
+                                            <td>Hiển thị danh sách vị thế đang mở</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>close [id]</code></td>
+                                            <td>Đóng vị thế với ID cụ thể</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>set mode [demo|testnet|live]</code></td>
+                                            <td>Đặt chế độ API</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>set account [spot|futures]</code></td>
+                                            <td>Đặt loại tài khoản</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>set risk [very_low|low|medium|high|very_high]</code></td>
+                                            <td>Đặt hồ sơ rủi ro</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>set leverage [1-100]</code></td>
+                                            <td>Đặt đòn bẩy (chỉ futures)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>clear</code></td>
+                                            <td>Xóa màn hình terminal</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </details>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="/static/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bot control buttons
+            const toggleBotBtn = document.getElementById('toggleBotBtn');
+            const restartBotBtn = document.getElementById('restartBotBtn');
+            
+            // Handle toggle bot button
+            toggleBotBtn.addEventListener('click', function() {
+                const action = toggleBotBtn.textContent.trim() === 'Khởi động' ? 'start' : 'stop';
+                
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    location.reload(); // Reload the page to update status
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi điều khiển bot');
+                });
+            });
+            
+            // Handle restart bot button
+            restartBotBtn.addEventListener('click', function() {
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'restart' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    location.reload(); // Reload the page to update status
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi khởi động lại bot');
+                });
+            });
+            
+            // Close position buttons
+            document.querySelectorAll('.close-position-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.getAttribute('data-position-id');
+                    
+                    if (confirm('Bạn có chắc chắn muốn đóng vị thế này?')) {
+                        fetch('/api/positions/close', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ position_id: positionId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                            location.reload(); // Reload the page to update positions
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra khi đóng vị thế');
+                        });
+                    }
+                });
+            });
+            
+            // Account settings form
+            const accountSettingsForm = document.getElementById('accountSettingsForm');
+            
+            if (accountSettingsForm) {
+                // Display leverage value
+                const leverageInput = document.getElementById('leverage');
+                const leverageValue = document.getElementById('leverageValue');
+                
+                leverageInput.addEventListener('input', function() {
+                    leverageValue.textContent = this.value + 'x';
+                });
+                
+                // Show/hide leverage based on account type
+                const accountTypeSelect = document.getElementById('accountType');
+                const leverageContainer = document.getElementById('leverageContainer');
+                
+                accountTypeSelect.addEventListener('change', function() {
+                    if (this.value === 'futures') {
+                        leverageContainer.style.display = 'block';
+                    } else {
+                        leverageContainer.style.display = 'none';
+                    }
+                });
+                
+                // Fetch and populate account settings
+                fetch('/api/account/settings')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate form fields with current settings
+                        document.getElementById('apiMode').value = data.api_mode;
+                        document.getElementById('accountType').value = data.account_type;
+                        document.getElementById('riskProfile').value = data.risk_profile;
+                        document.getElementById('leverage').value = data.leverage;
+                        document.getElementById('leverageValue').textContent = data.leverage + 'x';
+                        
+                        // Show/hide leverage based on account type
+                        if (data.account_type === 'futures') {
+                            leverageContainer.style.display = 'block';
+                        } else {
+                            leverageContainer.style.display = 'none';
+                        }
+                        
+                        // Handle symbols (multi-select)
+                        const symbolsSelect = document.getElementById('symbols');
+                        for (let i = 0; i < symbolsSelect.options.length; i++) {
+                            symbolsSelect.options[i].selected = data.symbols.includes(symbolsSelect.options[i].value);
+                        }
+                        
+                        // Handle timeframes (checkboxes)
+                        data.timeframes.forEach(tf => {
+                            const checkbox = document.getElementById('timeframe' + tf);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching account settings:', error);
+                    });
+                
+                // Submit account settings form
+                accountSettingsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Collect timeframes from checkboxes
+                    const timeframes = [];
+                    document.querySelectorAll('input[id^="timeframe"]:checked').forEach(cb => {
+                        timeframes.push(cb.value);
+                    });
+                    
+                    // Collect symbols from multi-select
+                    const symbols = Array.from(document.getElementById('symbols').selectedOptions).map(option => option.value);
+                    
+                    // Prepare data
+                    const formData = {
+                        api_mode: document.getElementById('apiMode').value,
+                        account_type: document.getElementById('accountType').value,
+                        risk_profile: document.getElementById('riskProfile').value,
+                        leverage: parseInt(document.getElementById('leverage').value),
+                        symbols: symbols,
+                        timeframes: timeframes
+                    };
+                    
+                    // Send to server
+                    fetch('/api/account/settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert('Cài đặt đã được lưu thành công!');
+                        } else {
+                            alert('Lỗi: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving settings:', error);
+                        alert('Có lỗi xảy ra khi lưu cài đặt');
+                    });
+                });
+            }
+            
+            // CLI Terminal functionality
+            const cliTerminal = document.getElementById('cliTerminal');
+            const cliInput = document.getElementById('cliInput');
+            const cliOutput = document.getElementById('cliOutput');
+            
+            // Focus input when clicking on terminal
+            cliTerminal.addEventListener('click', function() {
+                cliInput.focus();
+            });
+            
+            // Handle CLI commands
+            cliInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    
+                    const command = cliInput.value.trim();
+                    if (!command) return;
+                    
+                    // Display command
+                    const commandLine = document.createElement('div');
+                    commandLine.innerHTML = `<span class="cli-prompt">$</span> ${command}`;
+                    cliOutput.appendChild(commandLine);
+                    
+                    // Process command
+                    processCommand(command);
+                    
+                    // Clear input
+                    cliInput.value = '';
+                    
+                    // Scroll to bottom
+                    cliTerminal.scrollTop = cliTerminal.scrollHeight;
+                }
+            });
+            
+            function processCommand(command) {
+                const outputLine = document.createElement('div');
+                outputLine.className = 'cli-output';
+                
+                // Basic command processing
+                if (command === 'help') {
+                    outputLine.innerHTML = `
+Các lệnh có sẵn:
+  help                                  - Hiển thị danh sách lệnh
+  status                                - Hiển thị trạng thái bot
+  start                                 - Khởi động bot
+  stop                                  - Dừng bot
+  restart                               - Khởi động lại bot
+  positions                             - Hiển thị các vị thế đang mở
+  close [id]                            - Đóng vị thế với ID cụ thể
+  set mode [demo|testnet|live]          - Đặt chế độ API
+  set account [spot|futures]            - Đặt loại tài khoản
+  set risk [very_low|low|medium|high|very_high]  - Đặt hồ sơ rủi ro
+  set leverage [1-100]                  - Đặt đòn bẩy (chỉ futures)
+  clear                                 - Xóa màn hình terminal`;
+                } else if (command === 'status') {
+                    const statusText = {{ 'true' if bot_status.running else 'false' }};
+                    outputLine.innerHTML = `
+Bot status: ${statusText ? '<span class="cli-success">RUNNING</span>' : '<span class="cli-error">STOPPED</span>'}
+Uptime: {{ bot_status.uptime }}
+Version: {{ bot_status.version }}
+Active strategies: {{ bot_status.active_strategies|join(', ') }}`;
+                } else if (command === 'start') {
+                    // Implement API call to start bot
+                    outputLine.innerHTML = '<span class="cli-info">Khởi động bot...</span>';
+                    controlBot('start', outputLine);
+                } else if (command === 'stop') {
+                    // Implement API call to stop bot
+                    outputLine.innerHTML = '<span class="cli-info">Dừng bot...</span>';
+                    controlBot('stop', outputLine);
+                } else if (command === 'restart') {
+                    // Implement API call to restart bot
+                    outputLine.innerHTML = '<span class="cli-info">Khởi động lại bot...</span>';
+                    controlBot('restart', outputLine);
+                } else if (command === 'positions') {
+                    // Show positions
+                    const positions = {{ account_data.positions|tojson }};
+                    if (positions.length > 0) {
+                        let positionsText = 'Vị thế đang mở:\n';
+                        positionsText += 'ID           | Symbol  | Type | Entry Price | Current | PnL        | PnL %\n';
+                        positionsText += '-------------|---------|------|-------------|---------|------------|-------\n';
+                        
+                        positions.forEach(pos => {
+                            const pnlColor = pos.pnl >= 0 ? 'cli-success' : 'cli-error';
+                            positionsText += `${pos.id.padEnd(13)} | ${pos.symbol.padEnd(7)} | ${pos.type.padEnd(4)} | ${pos.entry_price.toFixed(2).padEnd(11)} | ${pos.current_price.toFixed(2).padEnd(7)} | <span class="${pnlColor}">$${pos.pnl.toFixed(2).padEnd(10)}</span> | <span class="${pnlColor}">${pos.pnl_percent.toFixed(2)}%</span>\n`;
+                        });
+                        
+                        outputLine.innerHTML = positionsText;
+                    } else {
+                        outputLine.innerHTML = 'Không có vị thế đang mở.';
+                    }
+                } else if (command.startsWith('close ')) {
+                    // Close position
+                    const positionId = command.split(' ')[1];
+                    if (!positionId) {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = 'Lỗi: Thiếu ID vị thế. Sử dụng: close [id]';
+                    } else {
+                        outputLine.innerHTML = `<span class="cli-info">Đóng vị thế ${positionId}...</span>`;
+                        closePosition(positionId, outputLine);
+                    }
+                } else if (command.startsWith('set mode ')) {
+                    const mode = command.split(' ')[2];
+                    if (!['demo', 'testnet', 'live'].includes(mode)) {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = 'Lỗi: Chế độ không hợp lệ. Sử dụng: set mode [demo|testnet|live]';
+                    } else {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.textContent = `Đã thiết lập chế độ API: ${mode.toUpperCase()}`;
+                        
+                        if (mode === 'live') {
+                            const warningLine = document.createElement('div');
+                            warningLine.className = 'cli-output cli-warning';
+                            warningLine.textContent = 'CẢNH BÁO: Bạn đã chọn chế độ LIVE. Mọi giao dịch sẽ sử dụng tiền thật!';
+                            cliOutput.appendChild(warningLine);
+                        }
+                    }
+                } else if (command.startsWith('set account ')) {
+                    const accountType = command.split(' ')[2];
+                    if (!['spot', 'futures'].includes(accountType)) {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = 'Lỗi: Loại tài khoản không hợp lệ. Sử dụng: set account [spot|futures]';
+                    } else {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.textContent = `Đã thiết lập loại tài khoản: ${accountType.toUpperCase()}`;
+                    }
+                } else if (command.startsWith('set risk ')) {
+                    const riskProfile = command.split(' ')[2];
+                    if (!['very_low', 'low', 'medium', 'high', 'very_high'].includes(riskProfile)) {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = 'Lỗi: Hồ sơ rủi ro không hợp lệ. Sử dụng: set risk [very_low|low|medium|high|very_high]';
+                    } else {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.textContent = `Đã thiết lập hồ sơ rủi ro: ${riskProfile.toUpperCase()}`;
+                        
+                        if (['high', 'very_high'].includes(riskProfile)) {
+                            const warningLine = document.createElement('div');
+                            warningLine.className = 'cli-output cli-warning';
+                            warningLine.textContent = 'CẢNH BÁO: Hồ sơ rủi ro này có thể dẫn đến mất vốn nhanh chóng.';
+                            cliOutput.appendChild(warningLine);
+                        }
+                    }
+                } else if (command.startsWith('set leverage ')) {
+                    const leverage = parseInt(command.split(' ')[2]);
+                    if (isNaN(leverage) || leverage < 1 || leverage > 100) {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = 'Lỗi: Đòn bẩy không hợp lệ. Sử dụng: set leverage [1-100]';
+                    } else {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.textContent = `Đã thiết lập đòn bẩy: ${leverage}x`;
+                        
+                        if (leverage > 20) {
+                            const warningLine = document.createElement('div');
+                            warningLine.className = 'cli-output cli-warning';
+                            warningLine.textContent = 'CẢNH BÁO: Đòn bẩy cao sẽ tăng đáng kể rủi ro thanh lý.';
+                            cliOutput.appendChild(warningLine);
+                        }
+                    }
+                } else if (command === 'clear') {
+                    // Clear terminal output
+                    cliOutput.innerHTML = '';
+                    return; // Don't add output line
+                } else {
+                    outputLine.className = 'cli-output cli-error';
+                    outputLine.textContent = `Lệnh không hợp lệ: ${command}. Gõ 'help' để xem danh sách lệnh.`;
+                }
+                
+                cliOutput.appendChild(outputLine);
+            }
+            
+            function controlBot(action, outputLine) {
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.innerHTML = `Bot đã được ${action === 'start' ? 'khởi động' : action === 'stop' ? 'dừng' : 'khởi động lại'} thành công.`;
+                        
+                        // Update bot status display without reloading page
+                        // You would need to implement this based on your page structure
+                    } else {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = `Lỗi: ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    outputLine.className = 'cli-output cli-error';
+                    outputLine.textContent = 'Lỗi kết nối: Không thể giao tiếp với server.';
+                });
+            }
+            
+            function closePosition(positionId, outputLine) {
+                fetch('/api/positions/close', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ position_id: positionId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        outputLine.className = 'cli-output cli-success';
+                        outputLine.textContent = `Vị thế ${positionId} đã được đóng thành công.`;
+                    } else {
+                        outputLine.className = 'cli-output cli-error';
+                        outputLine.textContent = `Lỗi: ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    outputLine.className = 'cli-output cli-error';
+                    outputLine.textContent = 'Lỗi kết nối: Không thể giao tiếp với server.';
+                });
+            }
+            
+            // Load signals data for Trades tab
+            function loadSignalsData() {
+                fetch('/api/signals')
+                    .then(response => response.json())
+                    .then(data => {
+                        const signalsTableBody = document.getElementById('signalsTableBody');
+                        if (!signalsTableBody) return;
+                        
+                        signalsTableBody.innerHTML = '';
+                        
+                        data.forEach(signal => {
+                            const row = document.createElement('tr');
+                            
+                            // Create signal badge with appropriate color
+                            const signalBadgeClass = signal.signal === 'BUY' ? 'bg-success' :
+                                                   signal.signal === 'SELL' ? 'bg-danger' : 'bg-secondary';
+                            
+                            // Create confidence badge with color based on value
+                            let confidenceBadgeClass = 'bg-secondary';
+                            if (signal.confidence >= 80) confidenceBadgeClass = 'bg-success';
+                            else if (signal.confidence >= 60) confidenceBadgeClass = 'bg-primary';
+                            else if (signal.confidence >= 40) confidenceBadgeClass = 'bg-warning';
+                            else confidenceBadgeClass = 'bg-danger';
+                            
+                            row.innerHTML = `
+                                <td>${signal.time}</td>
+                                <td>${signal.symbol}</td>
+                                <td><span class="badge ${signalBadgeClass}">${signal.signal}</span></td>
+                                <td><span class="badge ${confidenceBadgeClass}">${signal.confidence}%</span></td>
+                                <td>$${signal.price.toFixed(2)}</td>
+                                <td>${signal.executed ? 
+                                    '<span class="badge bg-success">Đã thực hiện</span>' : 
+                                    '<span class="badge bg-secondary">Chưa thực hiện</span>'}</td>
+                            `;
+                            
+                            signalsTableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading signals:', error);
+                    });
+            }
+            
+            // Initialize signals data if on Trades tab
+            document.getElementById('trades-tab').addEventListener('shown.bs.tab', function(e) {
+                loadSignalsData();
+            });
+            
+            // Auto-update data every 30 seconds
+            setInterval(function() {
+                // Only update if the respective tab is active
+                const activeTabId = document.querySelector('.tab-pane.active').id;
+                
+                if (activeTabId === 'trades') {
+                    loadSignalsData();
+                }
+            }, 30000);
+        });
+    </script>
 </body>
 </html>
