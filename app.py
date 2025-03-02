@@ -91,9 +91,45 @@ def trades():
 @app.route('/market')
 def market():
     """Trang phân tích thị trường"""
-    return render_template('market.html', 
-                          bot_status=BOT_STATUS,
-                          market_data=MARKET_DATA)
+    try:
+        # Tạo dữ liệu giả lập cập nhật
+        current_market_data = MARKET_DATA.copy()
+        
+        # Cập nhật giá hiện tại cho phiên làm việc hiện tại
+        current_market_data['btc_price'] = 71250.45
+        current_market_data['btc_change_24h'] = 3.15
+        
+        # Thêm dữ liệu chi tiết cho biểu đồ
+        current_market_data['chart_data'] = {
+            'labels': ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
+            'prices': [69842, 70123, 71505, 71250, 70980, 71100, 71250],
+            'volumes': [125.5, 142.3, 189.7, 165.2, 138.6, 142.1, 159.8]
+        }
+        
+        # Thêm dữ liệu top gainers và losers
+        current_market_data['top_gainers'] = [
+            {'symbol': 'SOL', 'name': 'Solana', 'price': 137.50, 'change': 5.2, 'volume': 280},
+            {'symbol': 'AVAX', 'name': 'Avalanche', 'price': 35.20, 'change': 4.8, 'volume': 120},
+            {'symbol': 'DOT', 'name': 'Polkadot', 'price': 7.85, 'change': 4.2, 'volume': 95},
+            {'symbol': 'LINK', 'name': 'Chainlink', 'price': 18.45, 'change': 3.9, 'volume': 78},
+            {'symbol': 'ETH', 'name': 'Ethereum', 'price': 3150.00, 'change': 3.1, 'volume': 450}
+        ]
+        
+        current_market_data['top_losers'] = [
+            {'symbol': 'DOGE', 'name': 'Dogecoin', 'price': 0.12, 'change': -2.8, 'volume': 110},
+            {'symbol': 'BNB', 'name': 'Binance Coin', 'price': 410.00, 'change': -1.5, 'volume': 150},
+            {'symbol': 'XRP', 'name': 'Ripple', 'price': 0.48, 'change': -1.2, 'volume': 95},
+            {'symbol': 'ADA', 'name': 'Cardano', 'price': 0.42, 'change': -0.9, 'volume': 85},
+            {'symbol': 'MATIC', 'name': 'Polygon', 'price': 0.68, 'change': -0.7, 'volume': 65}
+        ]
+        
+        return render_template('market.html', 
+                             bot_status=BOT_STATUS,
+                             market_data=current_market_data)
+    except Exception as e:
+        logger.error(f"Lỗi khi hiển thị trang thị trường: {str(e)}")
+        return render_template('error.html', 
+                             error_message="Không thể tải dữ liệu thị trường. Vui lòng thử lại sau.")
 
 
 @app.route('/settings')
