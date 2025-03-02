@@ -387,6 +387,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="badge bg-secondary me-2">Demo</span>
                             <span>Chế độ Demo đang hoạt động với dữ liệu giả lập</span>
                         </div>
+                        <div class="mt-2 small text-muted">
+                            <i class="fas fa-info-circle me-1"></i> Không cần API key khi sử dụng chế độ Demo
+                        </div>
                     `;
                     
                     // Cập nhật badge toàn cục

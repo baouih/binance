@@ -185,7 +185,9 @@ def control_bot(bot_id):
                 if not account_config.get('api_key') or not account_config.get('api_secret'):
                     return jsonify({
                         'success': False, 
-                        'message': f'Không tìm thấy API key/secret cho chế độ {api_mode}. Vui lòng cấu hình API trước.'
+                        'message': f'Không tìm thấy API key/secret cho chế độ {api_mode}.',
+                        'error_type': 'missing_api_config',
+                        'redirect_url': '/settings'
                     }), 400
                     
             # Khởi động bot thực tế ở đây
