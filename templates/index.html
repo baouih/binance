@@ -1027,39 +1027,104 @@ Nhập 'help' để xem danh sách lệnh.
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Bot control buttons
+            // Get all button elements
             const toggleBotBtn = document.getElementById('toggleBotBtn');
             const restartBotBtn = document.getElementById('restartBotBtn');
             const mobileBotToggle = document.getElementById('mobileBotToggle');
             
-            // Mobile button event listener
-            if (mobileBotToggle) {
-                mobileBotToggle.addEventListener('click', function() {
-                    console.log("Mobile bot toggle clicked");
-                    // Kiểm tra xem API đã được thiết lập chưa
-                    fetch('/api/account/settings')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("API settings:", data);
-                        if (data.api_mode === 'testnet' || data.api_mode === 'live') {
-                            if (!data.api_key || !data.api_secret) {
-                                // Chưa có API key
-                                console.log("API keys not set, redirecting to settings");
-                                window.location.href = '/settings';
-                                return;
-                            }
-                            // Gọi API khởi động bot
-                            toggleBotStatus();
-                        } else {
-                            // Đang ở chế độ demo, giả lập khởi động
-                            toggleBotStatus();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error checking API settings:", error);
-                        alert("Lỗi khi kiểm tra cài đặt API. Vui lòng thử lại.");
+            // Initialize the bot controls with proper event listeners
+            function setupBotControls() {
+                console.log("Setting up bot controls...");
+                
+                // Initialize mobile control button
+                if (mobileBotToggle) {
+                    console.log("Mobile bot toggle button found");
+                    // Remove any existing event listeners
+                    const newMobileToggle = mobileBotToggle.cloneNode(true);
+                    mobileBotToggle.parentNode.replaceChild(newMobileToggle, mobileBotToggle);
+                    
+                    // Add click event
+                    newMobileToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log("Mobile bot toggle clicked");
+                        checkAPIAndToggleBot();
                     });
+                } else {
+                    console.warn("Mobile bot toggle button not found");
+                }
+                
+                // Initialize desktop control buttons
+                if (toggleBotBtn) {
+                    console.log("Desktop toggle button found");
+                    // Remove any existing event listeners
+                    const newToggleBtn = toggleBotBtn.cloneNode(true);
+                    toggleBotBtn.parentNode.replaceChild(newToggleBtn, toggleBotBtn);
+                    
+                    // Add click event
+                    newToggleBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log("Desktop toggle button clicked");
+                        checkAPIAndToggleBot();
+                    });
+                }
+                
+                if (restartBotBtn) {
+                    console.log("Restart button found");
+                    // Remove any existing event listeners
+                    const newRestartBtn = restartBotBtn.cloneNode(true);
+                    restartBotBtn.parentNode.replaceChild(newRestartBtn, restartBotBtn);
+                    
+                    // Add click event
+                    newRestartBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log("Restart button clicked");
+                        restartBot();
+                    });
+                }
+            }
+            
+            // Check API settings before toggling bot state
+            function checkAPIAndToggleBot() {
+                console.log("Checking API settings before toggling bot...");
+                document.body.classList.add('processing'); // Show loading spinner
+                
+                fetch('/api/account/settings')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("API settings:", data);
+                    if (data.api_mode === 'testnet' || data.api_mode === 'live') {
+                        if (!data.api_key || !data.api_secret) {
+                            // API keys missing
+                            document.body.classList.remove('processing');
+                            console.log("API keys not set, redirecting to settings");
+                            // Show modal on desktop, redirect on mobile
+                            if (localStorage.getItem('isMobileDevice') === 'true') {
+                                window.location.href = '/settings';
+                            } else {
+                                showRedirectToast('error', 'Cấu hình API thiếu', 
+                                    'Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.',
+                                    '/settings');
+                            }
+                            return;
+                        }
+                    }
+                    // API is configured or in demo mode, proceed with toggle
+                    toggleBotStatus();
+                })
+                .catch(error => {
+                    document.body.classList.remove('processing');
+                    console.error("Error checking API settings:", error);
+                    showToast('error', "Lỗi khi kiểm tra cài đặt API: " + error.message);
                 });
             }
+            
+            // Call setup function to initialize controls
+            setupBotControls();
             
             // Mobile tab navigation
             const dashboardMobileBtn = document.getElementById('dashboard-mobile-btn');
@@ -1112,42 +1177,64 @@ Nhập 'help' để xem danh sách lệnh.
                 }
             }
             
-            // Handle toggle bot button (desktop)
-            toggleBotBtn.addEventListener('click', function() {
-                const action = toggleBotBtn.textContent.trim() === 'Khởi động' ? 'start' : 'stop';
-                
-                // Hiển thị loading trước khi gửi request
+            // NOTE: The desktop toggle button event listener is now managed by setupBotControls()
+            // This old event handler is removed to avoid duplicate event bindings
+            
+            // Helper function to restart the bot
+            function restartBot() {
+                // Show loading spinner
                 document.body.classList.add('processing');
                 
+                // Send restart command to API
                 fetch('/api/bot/control', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ action: action })
+                    body: JSON.stringify({ action: 'restart' })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     document.body.classList.remove('processing');
                     
                     if (data.success) {
-                        console.log('Success:', data);
-                        location.reload(); // Reload the page to update status
-                    } else {
-                        console.error('Error:', data);
+                        console.log('Bot restart successful:', data);
+                        showToast('success', 'Bot đang được khởi động lại. Vui lòng đợi trong giây lát...');
                         
-                        if (data.error_type === 'missing_api_config') {
-                            // Tạo modal cảnh báo với nút redirect đến settings
-                            const modalId = 'apiConfigMissingModal';
-                            
-                            // Kiểm tra và xóa modal cũ nếu tồn tại
-                            let oldModal = document.getElementById(modalId);
-                            if (oldModal) {
-                                oldModal.remove();
-                            }
-                            
-                            // Tạo modal mới
-                            const modalHTML = `
+                        // Reload the page after a short delay
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    } else {
+                        console.error('Bot restart failed:', data);
+                        showToast('error', 'Lỗi khởi động lại: ' + (data.message || 'Không thể khởi động lại bot'));
+                    }
+                })
+                .catch(error => {
+                    document.body.classList.remove('processing');
+                    console.error('Error restarting bot:', error);
+                    showToast('error', 'Lỗi kết nối: ' + error.message);
+                });
+            }
+            
+            // For compatibility with older code:
+            const createApiConfigMissingModal = () => {
+                // Tạo modal cảnh báo với nút redirect đến settings
+                const modalId = 'apiConfigMissingModal';
+                
+                // Kiểm tra và xóa modal cũ nếu tồn tại
+                let oldModal = document.getElementById(modalId);
+                if (oldModal) {
+                    oldModal.remove();
+                }
+                
+                // Tạo modal mới
+                const modalHTML = `
                                 <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content bg-dark">
