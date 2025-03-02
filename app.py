@@ -1776,51 +1776,70 @@ def get_account():
         # Chế độ hoạt động từ session hoặc giá trị mặc định
         mode = BOT_STATUS.get('mode', 'testnet')
         
-        # Chỉ khi ở chế độ testnet hoặc live thì mới kết nối API Binance
-        if mode in ['testnet', 'live']:
-            # Khởi tạo API client với thông tin API key từ biến môi trường
-            api_key = os.environ.get('BINANCE_API_KEY', '')
-            api_secret = os.environ.get('BINANCE_API_SECRET', '')
-            
-            # Log thông tin kết nối (che dấu API secret)
-            logger.info(f"Đang kết nối Binance API với key: {api_key[:5]}...{api_key[-5:] if len(api_key) > 10 else ''}")
-            logger.info(f"Chế độ Testnet: {mode == 'testnet'}")
-            
-            binance_client = binance_api.BinanceAPI(
-                api_key=api_key,
-                api_secret=api_secret,
-                testnet=(mode == 'testnet')
-            )
-            
-            # Lấy dữ liệu tài khoản từ Binance
-            account_info = {}
-            positions = []
-            
-            try:
-                # Lấy thông tin tài khoản
-                if BOT_STATUS.get('account_type') == 'futures':
-                    account_info = binance_client.get_futures_account()
-                    # Lấy thông tin vị thế
-                    position_risk = binance_client.get_futures_position_risk()
+        # Khởi tạo API client với thông tin API key từ biến môi trường
+        api_key = os.environ.get('BINANCE_API_KEY', '')
+        api_secret = os.environ.get('BINANCE_API_SECRET', '')
+        
+        # Dù ở chế độ nào cũng kết nối để kiểm tra dữ liệu API, nếu demo thì vẫn có API
+        logger.info(f"Đang kết nối Binance API với key: {api_key[:5]}...{api_key[-5:] if len(api_key) > 10 else ''}")
+        logger.info(f"Chế độ Testnet: {mode == 'testnet'}")
+        
+        binance_client = binance_api.BinanceAPI(
+            api_key=api_key,
+            api_secret=api_secret,
+            testnet=(mode == 'testnet')
+        )
+        
+        # Lấy dữ liệu tài khoản từ Binance
+        account_info = {}
+        positions = []
+        use_real_data = True  # Cờ để xác định sử dụng dữ liệu thực hay giả lập
+        
+        try:
+            # Lấy thông tin tài khoản
+            if BOT_STATUS.get('account_type') == 'futures':
+                account_info = binance_client.get_futures_account()
+                
+                # Kiểm tra nếu có lỗi trong dữ liệu tài khoản
+                if isinstance(account_info, str) or (isinstance(account_info, dict) and account_info.get('error')):
+                    logger.error(f"Lỗi API: {account_info if isinstance(account_info, str) else account_info.get('error')}")
+                    if mode == 'demo':
+                        use_real_data = False
+                        logger.info("Chuyển sang sử dụng dữ liệu giả lập do lỗi API và đang trong chế độ demo")
                     
+                # Lấy thông tin vị thế
+                position_risk = binance_client.get_futures_position_risk()
+                
+                # Kiểm tra nếu position_risk không phải list hoặc rỗng
+                if not isinstance(position_risk, list):
+                    logger.error(f"Lỗi API khi lấy vị thế: {position_risk}")
+                    if mode == 'demo':
+                        use_real_data = False
+                
+                # Nếu vẫn sử dụng dữ liệu thực, xử lý dữ liệu từ API
+                if use_real_data:
                     # Chuyển đổi dữ liệu vị thế
                     for pos in position_risk:
-                        # Chỉ thêm vị thế có số lượng khác 0
-                        if float(pos.get('positionAmt', 0)) != 0:
-                            positions.append({
-                                'id': f"pos_{pos['symbol']}",
-                                'symbol': pos['symbol'],
-                                'type': 'LONG' if float(pos.get('positionAmt', 0)) > 0 else 'SHORT',
-                                'entry_price': float(pos.get('entryPrice', 0)),
-                                'current_price': float(pos.get('markPrice', 0)),
-                                'quantity': abs(float(pos.get('positionAmt', 0))),
-                                'leverage': int(pos.get('leverage', 1)),
-                                'pnl': float(pos.get('unRealizedProfit', 0)),
-                                'pnl_percent': float(pos.get('unRealizedProfit', 0)) / (float(pos.get('isolatedWallet', 1)) or 1) * 100 if float(pos.get('isolatedWallet', 0)) > 0 else 0,
-                                'entry_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # API không cung cấp thời gian vào lệnh
-                                'stop_loss': 0,  # API không cung cấp thông tin này
-                                'take_profit': 0  # API không cung cấp thông tin này
-                            })
+                        try:
+                            # Chỉ thêm vị thế có số lượng khác 0
+                            position_amt = float(pos.get('positionAmt', 0))
+                            if abs(position_amt) > 0:
+                                positions.append({
+                                    'id': f"pos_{pos.get('symbol', 'unknown')}",
+                                    'symbol': pos.get('symbol', 'UNKNOWN'),
+                                    'type': 'LONG' if position_amt > 0 else 'SHORT',
+                                    'entry_price': float(pos.get('entryPrice', 0)),
+                                    'current_price': float(pos.get('markPrice', 0)),
+                                    'quantity': abs(position_amt),
+                                    'leverage': int(float(pos.get('leverage', 1))),
+                                    'pnl': float(pos.get('unRealizedProfit', 0)),
+                                    'pnl_percent': float(pos.get('unRealizedProfit', 0)) / (float(pos.get('isolatedWallet', 1)) or 1) * 100 if float(pos.get('isolatedWallet', 0)) > 0 else 0,
+                                    'entry_time': datetime.datetime.fromtimestamp(int(pos.get('updateTime', datetime.datetime.now().timestamp() * 1000)) / 1000).strftime('%Y-%m-%d %H:%M:%S') if pos.get('updateTime') else datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                    'stop_loss': 0,
+                                    'take_profit': 0
+                                })
+                        except Exception as e:
+                            logger.error(f"Lỗi khi xử lý vị thế {pos.get('symbol', 'unknown')}: {str(e)}")
                 else:  # spot
                     account_info = binance_client.get_account()
                     # Spot không có vị thế, chỉ có tài sản
@@ -1943,61 +1962,103 @@ def get_market():
         # Chế độ hoạt động từ session hoặc giá trị mặc định
         mode = BOT_STATUS.get('mode', 'testnet')
         
-        # Chỉ khi ở chế độ testnet hoặc live thì mới kết nối API Binance
-        if mode in ['testnet', 'live']:
-            try:
-                # Khởi tạo API client với thông tin API key từ biến môi trường
-                api_key = os.environ.get('BINANCE_API_KEY', '')
-                api_secret = os.environ.get('BINANCE_API_SECRET', '')
-                
-                binance_client = binance_api.BinanceAPI(
-                    api_key=api_key,
-                    api_secret=api_secret,
-                    testnet=(mode == 'testnet')
-                )
-                
-                # Lấy giá hiện tại của các cặp tiền
-                btc_ticker = binance_client.get_symbol_ticker(symbol='BTCUSDT')
-                eth_ticker = binance_client.get_symbol_ticker(symbol='ETHUSDT')
-                bnb_ticker = binance_client.get_symbol_ticker(symbol='BNBUSDT')
-                sol_ticker = binance_client.get_symbol_ticker(symbol='SOLUSDT')
-                
-                # Lấy thông tin 24h ticker để có thông tin thay đổi giá
-                btc_24h = binance_client.get_24h_ticker(symbol='BTCUSDT')
-                eth_24h = binance_client.get_24h_ticker(symbol='ETHUSDT')
-                bnb_24h = binance_client.get_24h_ticker(symbol='BNBUSDT')
-                sol_24h = binance_client.get_24h_ticker(symbol='SOLUSDT')
-                
-                # Tạo dữ liệu thị trường từ API
-                market_data = {
-                    'btc_price': float(btc_ticker.get('price', 0)),
-                    'eth_price': float(eth_ticker.get('price', 0)),
-                    'bnb_price': float(bnb_ticker.get('price', 0)),
-                    'sol_price': float(sol_ticker.get('price', 0)),
-                    'btc_change_24h': float(btc_24h.get('priceChangePercent', 0)),
-                    'eth_change_24h': float(eth_24h.get('priceChangePercent', 0)),
-                    'bnb_change_24h': float(bnb_24h.get('priceChangePercent', 0)),
-                    'sol_change_24h': float(sol_24h.get('priceChangePercent', 0)),
-                    'sentiment': {
-                        'value': int(50 + float(btc_24h.get('priceChangePercent', 0))),  # Giá trị tạm thời
-                        'state': 'success' if float(btc_24h.get('priceChangePercent', 0)) > 0 else 'danger',
-                        'change': float(btc_24h.get('priceChangePercent', 0)),
-                        'description': 'Tham lam' if float(btc_24h.get('priceChangePercent', 0)) > 0 else 'Sợ hãi'
-                    },
-                    'market_regime': {
-                        'BTCUSDT': 'Trending' if abs(float(btc_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
-                        'ETHUSDT': 'Trending' if abs(float(eth_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
-                        'BNBUSDT': 'Trending' if abs(float(bnb_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
-                        'SOLUSDT': 'Trending' if abs(float(sol_24h.get('priceChangePercent', 0))) > 2 else 'Ranging'
-                    }
-                }
-                
-                logger.info(f"Đã lấy dữ liệu thị trường thành công từ Binance API")
-                return jsonify(market_data)
+        # Luôn thử kết nối API Binance trước, kể cả trong chế độ demo
+        try:
+            # Khởi tạo API client với thông tin API key từ biến môi trường
+            api_key = os.environ.get('BINANCE_API_KEY', '')
+            api_secret = os.environ.get('BINANCE_API_SECRET', '')
             
-            except Exception as e:
-                logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
-                # Trả về dữ liệu giả lập nếu có lỗi
+            binance_client = binance_api.BinanceAPI(
+                api_key=api_key,
+                api_secret=api_secret,
+                testnet=(mode == 'testnet')
+            )
+            
+            # Dữ liệu giá và thay đổi mặc định để tránh lỗi
+            market_data_real = {
+                'btc_price': 0,
+                'eth_price': 0,
+                'bnb_price': 0, 
+                'sol_price': 0,
+                'btc_change_24h': 0,
+                'eth_change_24h': 0,
+                'bnb_change_24h': 0,
+                'sol_change_24h': 0
+            }
+            
+            use_real_data = True
+            symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']
+            tickers = {}
+            tickers_24h = {}
+            
+            # Lấy giá hiện tại và dữ liệu 24h
+            for symbol in symbols:
+                try:
+                    ticker = binance_client.get_symbol_ticker(symbol=symbol)
+                    if not isinstance(ticker, dict) or 'price' not in ticker:
+                        logger.error(f"Lỗi dữ liệu ticker không đúng định dạng cho {symbol}: {ticker}")
+                        use_real_data = False if mode == 'demo' else True
+                        break
+                    tickers[symbol] = ticker
+                    
+                    ticker_24h = binance_client.get_24h_ticker(symbol=symbol)
+                    if not isinstance(ticker_24h, dict) or 'priceChangePercent' not in ticker_24h:
+                        logger.error(f"Lỗi dữ liệu ticker 24h không đúng định dạng cho {symbol}: {ticker_24h}")
+                        use_real_data = False if mode == 'demo' else True
+                        break
+                    tickers_24h[symbol] = ticker_24h
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy dữ liệu {symbol}: {str(e)}")
+                    use_real_data = False if mode == 'demo' else True
+                    break
+            
+            # Nếu vẫn sử dụng dữ liệu thực, xử lý dữ liệu từ API
+            if use_real_data and len(tickers) == len(symbols):
+                try:
+                    # Cập nhật dữ liệu giá
+                    market_data_real['btc_price'] = float(tickers['BTCUSDT'].get('price', 0))
+                    market_data_real['eth_price'] = float(tickers['ETHUSDT'].get('price', 0))
+                    market_data_real['bnb_price'] = float(tickers['BNBUSDT'].get('price', 0))
+                    market_data_real['sol_price'] = float(tickers['SOLUSDT'].get('price', 0))
+                    
+                    # Cập nhật dữ liệu thay đổi 24h
+                    market_data_real['btc_change_24h'] = float(tickers_24h['BTCUSDT'].get('priceChangePercent', 0))
+                    market_data_real['eth_change_24h'] = float(tickers_24h['ETHUSDT'].get('priceChangePercent', 0))
+                    market_data_real['bnb_change_24h'] = float(tickers_24h['BNBUSDT'].get('priceChangePercent', 0))
+                    market_data_real['sol_change_24h'] = float(tickers_24h['SOLUSDT'].get('priceChangePercent', 0))
+                    
+                    # Tạo dữ liệu thị trường từ API
+                    market_data = {
+                        'btc_price': market_data_real['btc_price'],
+                        'eth_price': market_data_real['eth_price'],
+                        'bnb_price': market_data_real['bnb_price'],
+                        'sol_price': market_data_real['sol_price'],
+                        'btc_change_24h': market_data_real['btc_change_24h'],
+                        'eth_change_24h': market_data_real['eth_change_24h'],
+                        'bnb_change_24h': market_data_real['bnb_change_24h'],
+                        'sol_change_24h': market_data_real['sol_change_24h'],
+                        'sentiment': {
+                            'value': int(50 + market_data_real['btc_change_24h']),  # Giá trị tạm thời
+                            'state': 'success' if market_data_real['btc_change_24h'] > 0 else 'danger',
+                            'change': market_data_real['btc_change_24h'],
+                            'description': 'Tham lam' if market_data_real['btc_change_24h'] > 0 else 'Sợ hãi'
+                        },
+                        'market_regime': {
+                            'BTCUSDT': 'Trending' if abs(market_data_real['btc_change_24h']) > 2 else 'Ranging',
+                            'ETHUSDT': 'Trending' if abs(market_data_real['eth_change_24h']) > 2 else 'Ranging',
+                            'BNBUSDT': 'Trending' if abs(market_data_real['bnb_change_24h']) > 2 else 'Ranging',
+                            'SOLUSDT': 'Trending' if abs(market_data_real['sol_change_24h']) > 2 else 'Ranging'
+                        }
+                    }
+                    
+                    logger.info(f"Đã lấy dữ liệu thị trường thành công từ Binance API")
+                    return jsonify(market_data)
+                except Exception as e:
+                    logger.error(f"Lỗi khi xử lý dữ liệu thị trường: {str(e)}")
+                    # Sẽ tiếp tục sử dụng dữ liệu giả lập nếu có lỗi
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
+            # Trả về dữ liệu giả lập nếu có lỗi
         
         # Trả về dữ liệu giả lập cho chế độ demo hoặc khi lỗi
         logger.info("Sử dụng dữ liệu thị trường giả lập")
