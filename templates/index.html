@@ -18,6 +18,20 @@
             overflow-x: hidden; /* Prevent horizontal scrolling on mobile */
         }
         
+        .switch-to-cli-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 1000;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
         /* Responsive layout for mobile */
         .row {
             margin-right: 0;
@@ -211,6 +225,23 @@
             <div class="text-center mt-1" style="font-size: 12px; color: white; text-shadow: 0 0 3px rgba(0,0,0,0.7);">
                 {{ 'Dừng Bot' if bot_status.running else 'Chạy Bot' }}
             </div>
+        </div>
+        
+        <!-- Float button to switch to CLI interface -->
+        <div class="d-block d-md-none" style="position: fixed; bottom: 85px; left: 20px; z-index: 1050;">
+            <a href="/cli" class="btn btn-info rounded-circle shadow" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-terminal fs-3"></i>
+            </a>
+            <div class="text-center mt-1" style="font-size: 12px; color: white; text-shadow: 0 0 3px rgba(0,0,0,0.7);">
+                CLI Mode
+            </div>
+        </div>
+        
+        <!-- Float button for desktop to switch to CLI interface -->
+        <div class="d-none d-md-block">
+            <a href="/cli" class="btn btn-dark switch-to-cli-btn">
+                <i class="bi bi-terminal"></i>
+            </a>
         </div>
         
         <!-- Mobile bottom navigation -->

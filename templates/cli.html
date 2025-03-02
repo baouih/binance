@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>CLI Mode - Crypto Trading Bot</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            padding-bottom: 10px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .cli-terminal {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            min-height: 600px;
+            max-height: 75vh;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .cli-input-container {
+            display: flex;
+            align-items: center;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 15px;
+        }
+        
+        .cli-input {
+            background-color: transparent;
+            border: none;
+            color: #c9d1d9;
+            width: 100%;
+            outline: none;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            padding: 5px;
+        }
+        
+        .cli-prompt {
+            color: #3fb950;
+            margin-right: 10px;
+            user-select: none;
+        }
+        
+        .cli-output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        
+        .cli-error {
+            color: #f85149;
+        }
+        
+        .cli-success {
+            color: #3fb950;
+        }
+        
+        .cli-warning {
+            color: #db8d46;
+        }
+        
+        .cli-info {
+            color: #58a6ff;
+        }
+        
+        .help-panel {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .help-panel h5 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+        }
+        
+        .command-group {
+            margin-bottom: 15px;
+        }
+        
+        .command-name {
+            color: #3fb950;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        
+        .back-to-ui {
+            margin-bottom: 20px;
+        }
+        
+        .status-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        .status-running {
+            background-color: #3fb950;
+        }
+        
+        .status-stopped {
+            background-color: #f85149;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+                <i class="bi bi-terminal fs-3 me-2"></i>
+                <span class="fs-4">CLI Mode - Bot Giao Dịch Crypto</span>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
+                    <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
+                            id="toggleBotBtn">
+                        {{ 'Dừng' if bot_status.running else 'Khởi động' }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
+                        <i class="bi bi-arrow-repeat"></i> Khởi động lại
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="back-to-ui">
+                    <a href="/" class="btn btn-outline-info">
+                        <i class="bi bi-arrow-left"></i> Quay lại giao diện đồ họa
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="cli-terminal" id="cliTerminal">
+                    <div class="cli-output cli-info">Welcome to Crypto Trading Bot CLI v2.0</div>
+                    <div class="cli-output cli-info">Type 'help' for a list of available commands</div>
+                    <div class="cli-output">
+                        <span class="cli-prompt">bot@trading:~$</span> <span id="lastCommand"></span>
+                    </div>
+                </div>
+                
+                <div class="cli-input-container">
+                    <span class="cli-prompt">bot@trading:~$</span>
+                    <input type="text" class="cli-input" id="cliInput" placeholder="Enter command..." autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="help-panel">
+                    <h5><i class="bi bi-question-circle"></i> Trợ giúp nhanh</h5>
+                    
+                    <div class="command-group">
+                        <div><span class="command-name">help</span> - Hiển thị danh sách lệnh</div>
+                        <div><span class="command-name">status</span> - Kiểm tra trạng thái bot</div>
+                        <div><span class="command-name">start</span> - Khởi động bot</div>
+                        <div><span class="command-name">stop</span> - Dừng bot</div>
+                        <div><span class="command-name">restart</span> - Khởi động lại bot</div>
+                    </div>
+                    
+                    <div class="command-group">
+                        <div><span class="command-name">account</span> - Thông tin tài khoản</div>
+                        <div><span class="command-name">positions</span> - Vị thế đang mở</div>
+                        <div><span class="command-name">close [id]</span> - Đóng vị thế</div>
+                        <div><span class="command-name">market [symbol]</span> - Thông tin thị trường</div>
+                    </div>
+                    
+                    <div class="command-group">
+                        <div><span class="command-name">signals</span> - Tín hiệu giao dịch</div>
+                        <div><span class="command-name">strategy [name]</span> - Thông tin chiến lược</div>
+                        <div><span class="command-name">backtest [args]</span> - Chạy backtest</div>
+                        <div><span class="command-name">logs [lines=20]</span> - Xem log gần đây</div>
+                    </div>
+                    
+                    <div class="command-group">
+                        <div><span class="command-name">clear</span> - Xóa màn hình</div>
+                        <div><span class="command-name">exit</span> - Quay lại giao diện đồ họa</div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> <strong>Mẹo:</strong> Sử dụng phím mũi tên lên/xuống để duyệt qua lệnh đã gõ trước đó.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cliTerminal = document.getElementById('cliTerminal');
+            const cliInput = document.getElementById('cliInput');
+            const lastCommand = document.getElementById('lastCommand');
+            const toggleBotBtn = document.getElementById('toggleBotBtn');
+            const restartBotBtn = document.getElementById('restartBotBtn');
+            
+            let commandHistory = [];
+            let historyIndex = -1;
+            
+            // Focus the input when the page loads
+            cliInput.focus();
+            
+            // Command handler
+            cliInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const command = cliInput.value.trim();
+                    
+                    if (command) {
+                        // Add command to history
+                        commandHistory.push(command);
+                        historyIndex = commandHistory.length;
+                        
+                        // Display the command
+                        lastCommand.textContent = command;
+                        
+                        // Process command
+                        processCommand(command);
+                        
+                        // Clear input
+                        cliInput.value = '';
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        cliInput.value = commandHistory[historyIndex];
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        cliInput.value = commandHistory[historyIndex];
+                    } else {
+                        historyIndex = commandHistory.length;
+                        cliInput.value = '';
+                    }
+                }
+            });
+            
+            // Keep focus on input
+            document.addEventListener('click', function() {
+                cliInput.focus();
+            });
+            
+            // Process commands
+            function processCommand(command) {
+                const cmd = command.toLowerCase().split(' ')[0];
+                const args = command.split(' ').slice(1);
+                
+                // Add new command prompt line
+                addOutput(`<span class="cli-prompt">bot@trading:~$</span> ${command}`);
+                
+                // Process command
+                switch (cmd) {
+                    case 'help':
+                        showHelp();
+                        break;
+                    case 'status':
+                        showStatus();
+                        break;
+                    case 'start':
+                        startBot();
+                        break;
+                    case 'stop':
+                        stopBot();
+                        break;
+                    case 'restart':
+                        restartBot();
+                        break;
+                    case 'account':
+                        showAccount();
+                        break;
+                    case 'positions':
+                        showPositions();
+                        break;
+                    case 'close':
+                        closePosition(args[0]);
+                        break;
+                    case 'market':
+                        showMarket(args[0]);
+                        break;
+                    case 'signals':
+                        showSignals();
+                        break;
+                    case 'clear':
+                        clearTerminal();
+                        break;
+                    case 'exit':
+                        window.location.href = '/';
+                        break;
+                    default:
+                        addOutput(`<span class="cli-error">Command not found: ${cmd}</span>`);
+                        addOutput(`<span class="cli-info">Type 'help' for a list of available commands</span>`);
+                }
+                
+                // Scroll to bottom
+                cliTerminal.scrollTop = cliTerminal.scrollHeight;
+            }
+            
+            // Command implementations
+            function showHelp() {
+                addOutput(`<span class="cli-info">Available commands:</span>`);
+                addOutput(`<span class="cli-info">  help           - Display this help message</span>`);
+                addOutput(`<span class="cli-info">  status         - Check bot status</span>`);
+                addOutput(`<span class="cli-info">  start          - Start the bot</span>`);
+                addOutput(`<span class="cli-info">  stop           - Stop the bot</span>`);
+                addOutput(`<span class="cli-info">  restart        - Restart the bot</span>`);
+                addOutput(`<span class="cli-info">  account        - Show account information</span>`);
+                addOutput(`<span class="cli-info">  positions      - Show open positions</span>`);
+                addOutput(`<span class="cli-info">  close [id]     - Close a position by ID</span>`);
+                addOutput(`<span class="cli-info">  market [symbol] - Show market information (default: BTCUSDT)</span>`);
+                addOutput(`<span class="cli-info">  signals        - Show recent trading signals</span>`);
+                addOutput(`<span class="cli-info">  clear          - Clear the screen</span>`);
+                addOutput(`<span class="cli-info">  exit           - Return to graphical UI</span>`);
+            }
+            
+            function showStatus() {
+                fetch('/api/bot/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        const status = data.running ? `<span class="cli-success">RUNNING</span>` : `<span class="cli-error">STOPPED</span>`;
+                        addOutput(`<span class="cli-info">Bot status: ${status}</span>`);
+                        addOutput(`<span class="cli-info">Last update: ${data.last_update}</span>`);
+                        addOutput(`<span class="cli-info">Uptime: ${data.uptime}</span>`);
+                        addOutput(`<span class="cli-info">Version: ${data.version}</span>`);
+                        addOutput(`<span class="cli-info">Active strategies: ${data.active_strategies.join(', ')}</span>`);
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error fetching status: ${error}</span>`);
+                    });
+            }
+            
+            function startBot() {
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'start' }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            addOutput(`<span class="cli-success">${data.message}</span>`);
+                            toggleBotBtn.classList.remove('btn-outline-success');
+                            toggleBotBtn.classList.add('btn-outline-danger');
+                            toggleBotBtn.textContent = 'Dừng';
+                        } else {
+                            addOutput(`<span class="cli-error">${data.message}</span>`);
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error starting bot: ${error}</span>`);
+                    });
+            }
+            
+            function stopBot() {
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'stop' }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            addOutput(`<span class="cli-success">${data.message}</span>`);
+                            toggleBotBtn.classList.remove('btn-outline-danger');
+                            toggleBotBtn.classList.add('btn-outline-success');
+                            toggleBotBtn.textContent = 'Khởi động';
+                        } else {
+                            addOutput(`<span class="cli-error">${data.message}</span>`);
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error stopping bot: ${error}</span>`);
+                    });
+            }
+            
+            function restartBot() {
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'restart' }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            addOutput(`<span class="cli-success">${data.message}</span>`);
+                            toggleBotBtn.classList.remove('btn-outline-success');
+                            toggleBotBtn.classList.add('btn-outline-danger');
+                            toggleBotBtn.textContent = 'Dừng';
+                        } else {
+                            addOutput(`<span class="cli-error">${data.message}</span>`);
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error restarting bot: ${error}</span>`);
+                    });
+            }
+            
+            function showAccount() {
+                fetch('/api/account')
+                    .then(response => response.json())
+                    .then(data => {
+                        addOutput(`<span class="cli-info">Account Information:</span>`);
+                        addOutput(`<span class="cli-info">  Balance: $${data.balance.toFixed(2)}</span>`);
+                        addOutput(`<span class="cli-info">  Equity: $${data.equity.toFixed(2)}</span>`);
+                        addOutput(`<span class="cli-info">  Margin Used: $${data.margin_used.toFixed(2)}</span>`);
+                        addOutput(`<span class="cli-info">  Margin Available: $${data.margin_available.toFixed(2)}</span>`);
+                        addOutput(`<span class="cli-info">  Open Positions: ${data.positions.length}</span>`);
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error fetching account: ${error}</span>`);
+                    });
+            }
+            
+            function showPositions() {
+                fetch('/api/account')
+                    .then(response => response.json())
+                    .then(data => {
+                        const positions = data.positions;
+                        addOutput(`<span class="cli-info">Open Positions (${positions.length}):</span>`);
+                        
+                        if (positions.length === 0) {
+                            addOutput(`<span class="cli-info">  No open positions</span>`);
+                        } else {
+                            addOutput(`<span class="cli-info">  ID | Symbol | Type | Entry | Current | PNL</span>`);
+                            addOutput(`<span class="cli-info">  ------------------------------------------</span>`);
+                            
+                            positions.forEach(pos => {
+                                const pnlColor = pos.pnl >= 0 ? 'cli-success' : 'cli-error';
+                                const typeColor = pos.type === 'LONG' ? 'cli-success' : 'cli-error';
+                                addOutput(`<span class="cli-info">  ${pos.id} | ${pos.symbol} | <span class="${typeColor}">${pos.type}</span> | $${pos.entry_price.toFixed(2)} | $${pos.current_price.toFixed(2)} | <span class="${pnlColor}">$${pos.pnl.toFixed(2)} (${pos.pnl_percent.toFixed(2)}%)</span></span>`);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error fetching positions: ${error}</span>`);
+                    });
+            }
+            
+            function closePosition(positionId) {
+                if (!positionId) {
+                    addOutput(`<span class="cli-error">Position ID required</span>`);
+                    return;
+                }
+                
+                fetch('/api/positions/close', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ position_id: positionId }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            addOutput(`<span class="cli-success">${data.message}</span>`);
+                        } else {
+                            addOutput(`<span class="cli-error">${data.message}</span>`);
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error closing position: ${error}</span>`);
+                    });
+            }
+            
+            function showMarket(symbol = 'BTCUSDT') {
+                fetch('/api/market')
+                    .then(response => response.json())
+                    .then(data => {
+                        addOutput(`<span class="cli-info">Market Information:</span>`);
+                        addOutput(`<span class="cli-info">  BTC Price: $${data.btc_price.toFixed(2)}</span>`);
+                        
+                        const changeColor = data.btc_change_24h >= 0 ? 'cli-success' : 'cli-error';
+                        const changeSymbol = data.btc_change_24h >= 0 ? '+' : '';
+                        
+                        addOutput(`<span class="cli-info">  24h Change: <span class="${changeColor}">${changeSymbol}${data.btc_change_24h.toFixed(2)}%</span></span>`);
+                        addOutput(`<span class="cli-info">  Sentiment: ${data.sentiment.value} (${data.sentiment.description})</span>`);
+                        
+                        addOutput(`<span class="cli-info">  Market Regimes:</span>`);
+                        Object.entries(data.market_regime).forEach(([sym, regime]) => {
+                            addOutput(`<span class="cli-info">    ${sym}: ${regime}</span>`);
+                        });
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error fetching market data: ${error}</span>`);
+                    });
+            }
+            
+            function showSignals() {
+                fetch('/api/signals')
+                    .then(response => response.json())
+                    .then(data => {
+                        addOutput(`<span class="cli-info">Recent Trading Signals:</span>`);
+                        
+                        if (data.length === 0) {
+                            addOutput(`<span class="cli-info">  No recent signals</span>`);
+                        } else {
+                            addOutput(`<span class="cli-info">  Time | Symbol | Signal | Confidence | Price | Executed</span>`);
+                            addOutput(`<span class="cli-info">  --------------------------------------------------------</span>`);
+                            
+                            data.forEach(signal => {
+                                const signalColor = signal.signal === 'BUY' ? 'cli-success' : 'cli-error';
+                                const executedText = signal.executed ? 'Yes' : 'No';
+                                addOutput(`<span class="cli-info">  ${signal.time} | ${signal.symbol} | <span class="${signalColor}">${signal.signal}</span> | ${signal.confidence}% | $${signal.price.toFixed(2)} | ${executedText}</span>`);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        addOutput(`<span class="cli-error">Error fetching signals: ${error}</span>`);
+                    });
+            }
+            
+            function clearTerminal() {
+                while (cliTerminal.firstChild) {
+                    cliTerminal.removeChild(cliTerminal.firstChild);
+                }
+                
+                addOutput(`<span class="cli-info">Terminal cleared</span>`);
+                addOutput(`<span class="cli-info">Type 'help' for a list of available commands</span>`);
+            }
+            
+            // Toggle bot button
+            toggleBotBtn.addEventListener('click', function() {
+                const isBotRunning = toggleBotBtn.classList.contains('btn-outline-danger');
+                
+                if (isBotRunning) {
+                    stopBot();
+                } else {
+                    startBot();
+                }
+            });
+            
+            // Restart bot button
+            restartBotBtn.addEventListener('click', function() {
+                restartBot();
+            });
+            
+            // Helper function to add output to terminal
+            function addOutput(html) {
+                const output = document.createElement('div');
+                output.className = 'cli-output';
+                output.innerHTML = html;
+                cliTerminal.appendChild(output);
+            }
+        });
+    </script>
+</body>
+</html>
