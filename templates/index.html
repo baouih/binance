@@ -850,27 +850,8 @@ Nhập 'help' để xem danh sách lệnh.
             toggleBotBtn.addEventListener('click', function() {
                 const action = toggleBotBtn.textContent.trim() === 'Khởi động' ? 'start' : 'stop';
                 
-                fetch('/api/bot/control', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ action: action })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    location.reload(); // Reload the page to update status
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi điều khiển bot');
-                });
-            });
-            
-            // Handle toggle bot button (mobile floating button)
-            mobileBotToggle.addEventListener('click', function() {
-                const action = mobileBotToggle.querySelector('i').classList.contains('bi-play-fill') ? 'start' : 'stop';
+                // Hiển thị loading trước khi gửi request
+                document.body.classList.add('processing');
                 
                 fetch('/api/bot/control', {
                     method: 'POST',
@@ -881,12 +862,145 @@ Nhập 'help' để xem danh sách lệnh.
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
-                    location.reload(); // Reload the page to update status
+                    document.body.classList.remove('processing');
+                    
+                    if (data.success) {
+                        console.log('Success:', data);
+                        location.reload(); // Reload the page to update status
+                    } else {
+                        console.error('Error:', data);
+                        
+                        if (data.error_type === 'missing_api_config') {
+                            // Tạo modal cảnh báo với nút redirect đến settings
+                            const modalId = 'apiConfigMissingModal';
+                            
+                            // Kiểm tra và xóa modal cũ nếu tồn tại
+                            let oldModal = document.getElementById(modalId);
+                            if (oldModal) {
+                                oldModal.remove();
+                            }
+                            
+                            // Tạo modal mới
+                            const modalHTML = `
+                                <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content bg-dark">
+                                            <div class="modal-header bg-warning text-dark">
+                                                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Cần cấu hình API</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.</p>
+                                                <ol class="mt-3">
+                                                    <li>Truy cập trang cài đặt API</li>
+                                                    <li>Nhập API Key và API Secret</li> 
+                                                    <li>Lưu cài đặt và thử lại</li>
+                                                </ol>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                <a href="/settings" class="btn btn-primary">Đi đến cài đặt API</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Thêm modal vào body
+                            document.body.insertAdjacentHTML('beforeend', modalHTML);
+                            
+                            // Hiển thị modal
+                            const modal = new bootstrap.Modal(document.getElementById(modalId));
+                            modal.show();
+                        } else {
+                            // Hiển thị thông báo lỗi thông thường
+                            alert('Có lỗi xảy ra: ' + (data.message || 'Không thể điều khiển bot'));
+                        }
+                    }
                 })
                 .catch(error => {
+                    document.body.classList.remove('processing');
                     console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi điều khiển bot');
+                    alert('Có lỗi kết nối: ' + error.message);
+                });
+            });
+            
+            // Handle toggle bot button (mobile floating button)
+            mobileBotToggle.addEventListener('click', function() {
+                const action = mobileBotToggle.querySelector('i').classList.contains('bi-play-fill') ? 'start' : 'stop';
+                
+                // Hiển thị loading trước khi gửi request
+                document.body.classList.add('processing');
+                
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.body.classList.remove('processing');
+                    
+                    if (data.success) {
+                        console.log('Success:', data);
+                        location.reload(); // Reload the page to update status
+                    } else {
+                        console.error('Error:', data);
+                        
+                        if (data.error_type === 'missing_api_config') {
+                            // Tạo modal cảnh báo với nút redirect đến settings
+                            const modalId = 'apiConfigMissingModal';
+                            
+                            // Kiểm tra và xóa modal cũ nếu tồn tại
+                            let oldModal = document.getElementById(modalId);
+                            if (oldModal) {
+                                oldModal.remove();
+                            }
+                            
+                            // Tạo modal mới
+                            const modalHTML = `
+                                <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content bg-dark">
+                                            <div class="modal-header bg-warning text-dark">
+                                                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Cần cấu hình API</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.</p>
+                                                <ol class="mt-3">
+                                                    <li>Truy cập trang cài đặt API</li>
+                                                    <li>Nhập API Key và API Secret</li> 
+                                                    <li>Lưu cài đặt và thử lại</li>
+                                                </ol>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                <a href="/settings" class="btn btn-primary">Đi đến cài đặt API</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Thêm modal vào body
+                            document.body.insertAdjacentHTML('beforeend', modalHTML);
+                            
+                            // Hiển thị modal
+                            const modal = new bootstrap.Modal(document.getElementById(modalId));
+                            modal.show();
+                        } else {
+                            // Hiển thị thông báo lỗi thông thường
+                            alert('Có lỗi xảy ra: ' + (data.message || 'Không thể điều khiển bot'));
+                        }
+                    }
+                })
+                .catch(error => {
+                    document.body.classList.remove('processing');
+                    console.error('Error:', error);
+                    alert('Có lỗi kết nối: ' + error.message);
                 });
             });
             
