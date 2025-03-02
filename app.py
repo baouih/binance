@@ -22,18 +22,19 @@ BOT_STATUS = {
     'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'version': '1.0.0',
     'active_strategies': ['RSI', 'MACD', 'BB'],
-    'mode': 'demo',           # 'demo', 'testnet', 'live'
+    'mode': 'testnet',        # 'demo', 'testnet', 'live'
     'account_type': 'futures', # 'spot', 'futures'
     'strategy_mode': 'auto',   # 'auto', 'manual'
-    'last_action': 'Bot stopped unexpectedly'
+    'last_action': 'Bot đang dừng'
 }
 
 # Giả lập dữ liệu tài khoản (sau này lấy từ API Binance)
 ACCOUNT_DATA = {
-    'balance': 12345.67,
-    'equity': 12845.67,
-    'margin_used': 500.0,
-    'margin_available': 11845.67,
+    'balance': 10000.00,
+    'equity': 10000.00,
+    'margin_used': 0.0,
+    'margin_available': 10000.00,
+    'free_balance': 10000.00,
     'positions': []
 }
 

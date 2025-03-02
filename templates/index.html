@@ -226,7 +226,7 @@
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
                 <div class="ms-3">
-                    <span class="mode-badge mode-demo">Chế độ Demo</span>
+                    <span class="mode-badge mode-{{ bot_status.mode }}">Chế độ {{ 'Demo' if bot_status.mode == 'demo' else 'Testnet' if bot_status.mode == 'testnet' else 'Live' }}</span>
                 </div>
             </div>
             
