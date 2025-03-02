@@ -1289,8 +1289,12 @@ Nhập 'help' để xem danh sách lệnh.
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === 'success') {
+                        if (data.success === true) {
                             alert('Cài đặt đã được lưu thành công!');
+                            // Làm mới trang sau khi lưu thành công
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
                         } else {
                             alert('Lỗi: ' + data.message);
                         }
