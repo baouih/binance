@@ -88,6 +88,14 @@ def trades():
                           bot_status=BOT_STATUS)
 
 
+@app.route('/market')
+def market():
+    """Trang phân tích thị trường"""
+    return render_template('market.html', 
+                          bot_status=BOT_STATUS,
+                          market_data=MARKET_DATA)
+
+
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""

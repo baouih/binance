@@ -273,8 +273,12 @@ const backtestManager = {
         // In a real implementation, this would use actual data from the API
         // For now, we'll use simulated data
         
+        // Get initial balance from the form
+        const initialBalance = parseFloat(document.getElementById('initialBalance').value);
+        const finalBalance = (initialBalance * 1.2345).toFixed(2); // 23.45% profit
+        
         // Update summary metrics
-        document.getElementById('finalBalance').textContent = '$12,345.67';
+        document.getElementById('finalBalance').textContent = '$' + finalBalance;
         document.getElementById('totalProfit').textContent = '+23.45%';
         document.getElementById('winRate').textContent = '68.5%';
         document.getElementById('maxDrawdown').textContent = '12.3%';
