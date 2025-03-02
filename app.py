@@ -1718,88 +1718,25 @@ def bot_control():
         return jsonify({'success': False, 'message': 'Hành động không hợp lệ'})
 
 
-@app.route('/api/account/settings', methods=['GET', 'POST'])
-def account_settings():
-    """Lấy hoặc cập nhật cài đặt tài khoản"""
-    if request.method == 'GET':
-        # Lấy cài đặt hiện tại
-        settings = {
-            'api_mode': BOT_STATUS.get('mode', 'testnet'),  # 'demo', 'testnet', 'live'
-            'account_type': BOT_STATUS.get('account_type', 'futures'),  # 'spot', 'futures'
-            'risk_profile': 'medium',  # 'very_low', 'low', 'medium', 'high', 'very_high'
-            'leverage': 10,  # 1-100
-            'symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'],
-            'timeframes': ['5m', '15m', '1h', '4h']
-        }
-        return jsonify(settings)
+# Sửa lỗi xung đột với Blueprint config_route.py
+# Bỏ đường dẫn này vì đã được xử lý trong config_route.py
+# @app.route('/api/account/settings', methods=['GET', 'POST'])
+# def account_settings():
+#     """Lấy hoặc cập nhật cài đặt tài khoản"""
+#     if request.method == 'GET':
+#         # Lấy cài đặt hiện tại
+#         settings = {
+#             'api_mode': BOT_STATUS.get('mode', 'testnet'),  # 'demo', 'testnet', 'live'
+#             'account_type': BOT_STATUS.get('account_type', 'futures'),  # 'spot', 'futures'
+#             'risk_profile': 'medium',  # 'very_low', 'low', 'medium', 'high', 'very_high'
+#             'leverage': 10,  # 1-100
+#             'symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'],
+#             'timeframes': ['5m', '15m', '1h', '4h']
+#         }
+#         return jsonify(settings)
     
-    elif request.method == 'POST':
-        # Cập nhật cài đặt mới
-        data = request.json
-        
-        try:
-            # Kiểm tra và lưu cài đặt
-            api_mode = data.get('api_mode')
-            if api_mode not in ['demo', 'testnet', 'live']:
-                return jsonify({'status': 'error', 'message': 'Chế độ API không hợp lệ'})
-                
-            # Cập nhật BOT_STATUS
-            BOT_STATUS['mode'] = api_mode
-            logger.info(f"Đã cập nhật chế độ API: {api_mode}")
-                
-            # Nếu chuyển sang chế độ testnet hoặc live, kiểm tra API key
-            if api_mode in ['testnet', 'live']:
-                api_key = os.environ.get('BINANCE_API_KEY', '')
-                api_secret = os.environ.get('BINANCE_API_SECRET', '')
-                
-                if not api_key or not api_secret:
-                    return jsonify({
-                        'status': 'error', 
-                        'message': 'Thiếu API key hoặc API secret. Vui lòng cấu hình trong file .env'
-                    })
-                
-                # Kiểm tra kết nối API
-                try:
-                    binance_client = binance_api.BinanceAPI(
-                        api_key=api_key,
-                        api_secret=api_secret,
-                        testnet=(api_mode == 'testnet')
-                    )
-                    
-                    # Thử lấy dữ liệu ticker để kiểm tra kết nối
-                    ticker = binance_client.get_symbol_ticker(symbol='BTCUSDT')
-                    if not ticker or 'price' not in ticker:
-                        raise Exception("Không thể lấy dữ liệu giá")
-                    
-                    logger.info(f"Kết nối API Binance thành công trong chế độ {api_mode}")
-                except Exception as e:
-                    logger.error(f"Lỗi kết nối API Binance: {str(e)}")
-                    return jsonify({
-                        'status': 'error', 
-                        'message': f'Không thể kết nối đến Binance API: {str(e)}'
-                    })
-            
-            account_type = data.get('account_type')
-            if account_type not in ['spot', 'futures']:
-                return jsonify({'status': 'error', 'message': 'Loại tài khoản không hợp lệ'})
-            
-            risk_profile = data.get('risk_profile')
-            if risk_profile not in ['very_low', 'low', 'medium', 'high', 'very_high']:
-                return jsonify({'status': 'error', 'message': 'Hồ sơ rủi ro không hợp lệ'})
-            
-            leverage = data.get('leverage', 10)
-            if not (1 <= leverage <= 100):
-                return jsonify({'status': 'error', 'message': 'Đòn bẩy không hợp lệ (1-100)'})
-            
-            # Lưu cài đặt
-            # TODO: Cập nhật cài đặt thực tế vào file/database
-            logger.info(f"Đã cập nhật cài đặt tài khoản: {data}")
-            
-            return jsonify({'status': 'success', 'message': 'Cài đặt đã được lưu'})
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi cập nhật cài đặt: {str(e)}")
-            return jsonify({'status': 'error', 'message': f'Lỗi: {str(e)}'})
+# Xóa phần POST để tránh xung đột với config_route.py
+# Các phần xung đột đã được xử lý trong file config_route.py
 
 
 @app.route('/api/positions/close', methods=['POST'])
