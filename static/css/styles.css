@@ -1,287 +1,157 @@
-/* Custom styles for Trading Bot Dashboard */
+/* Custom styles for the BinanceTrader Bot */
 
-/* Sidebar */
-.sidebar {
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    background-color: var(--bs-dark);
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+/* Body styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.sidebar-menu {
-    height: 100%;
+/* Content wrapper */
+.content-wrapper {
+    flex: 1;
 }
 
-/* Bot status indicator */
-.bot-status-container {
-    padding: 10px 0;
+/* Mode badges */
+.mode-badge {
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
-.status-indicator {
-    margin-top: 5px;
-}
-
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #dc3545;
-    display: inline-block;
-}
-
-.status-dot.active {
-    background-color: #28a745;
-}
-
-/* Cards and elements */
-.card {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    margin-bottom: 1.5rem;
-}
-
-.card-header {
-    background-color: rgba(0, 0, 0, 0.03);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Market regime indicator */
-.market-regime-indicator {
-    padding: 6px 12px;
-    border-radius: 20px;
-    display: inline-block;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.market-regime-indicator.trending {
-    background-color: rgba(25, 135, 84, 0.2);
-    color: #19875e;
-}
-
-.market-regime-indicator.ranging {
-    background-color: rgba(13, 110, 253, 0.2);
-    color: #0d6efd;
-}
-
-.market-regime-indicator.volatile {
-    background-color: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
-}
-
-.market-regime-indicator.quiet {
-    background-color: rgba(108, 117, 125, 0.2);
+.mode-demo {
     color: #6c757d;
 }
 
-.market-regime-indicator.neutral {
-    background-color: rgba(255, 193, 7, 0.2);
+.mode-testnet {
     color: #ffc107;
 }
 
-/* Position cards */
-.position-card {
-    transition: transform 0.2s;
-    border-left: 3px solid transparent;
+.mode-live {
+    color: #dc3545;
 }
 
-.position-card:hover {
+/* Status cards for bots */
+.bot-status-card {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(33, 37, 41, 0.1);
+}
+
+.status-running {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.status-stopped {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+.status-error {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.status-restarting {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* Bot control buttons */
+.bot-control-button:focus {
+    box-shadow: none;
+}
+
+/* Custom table styles */
+.table-hover tbody tr:hover {
+    background-color: rgba(33, 37, 41, 0.05);
+}
+
+/* Dashboard card hover effect */
+.dashboard-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.position-card.border-success {
-    border-left-color: var(--bs-success);
+/* Custom chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
 }
 
-.position-card.border-danger {
-    border-left-color: var(--bs-danger);
+/* Market data cards */
+.market-card {
+    border-left: 4px solid transparent;
 }
 
-/* Signal list styles */
-.signal-list .list-group-item {
-    background-color: transparent;
-    border-color: rgba(255, 255, 255, 0.1);
+.market-card.up {
+    border-left-color: #198754;
 }
 
-/* Report cards */
-.report-card {
-    transition: all 0.3s ease;
+.market-card.down {
+    border-left-color: #dc3545;
 }
 
-.report-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+/* Responsiveness for small screens */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+    
+    .hide-on-mobile {
+        display: none;
+    }
 }
 
-/* Table adjustments */
-.table-responsive {
-    overflow-x: auto;
+/* Animation for loading states */
+@keyframes fade {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
 }
 
-.table th {
-    font-weight: 600;
-    border-top: none;
+.loading {
+    animation: fade 1.5s infinite;
 }
 
-/* Custom scrollbar for tables */
-.table-responsive::-webkit-scrollbar {
+/* Animation for row removal */
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+/* Toast positioning */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* Custom scroll bar */
+::-webkit-scrollbar {
+    width: 8px;
     height: 8px;
 }
 
-.table-responsive::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+::-webkit-scrollbar-track {
+    background: #2c3034;
 }
 
-.table-responsive::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
+::-webkit-scrollbar-thumb {
+    background: #495057;
+    border-radius: 4px;
 }
 
-.table-responsive::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Backtest results styles */
-#backtest-results {
-    min-height: 300px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 767.98px) {
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 1020;
-        width: 250px;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0 !important;
-        padding: 10px !important;
-    }
-    
-    /* Cải thiện hiển thị trên điện thoại */
-    .card {
-        margin-bottom: 1rem;
-    }
-    
-    .table-responsive {
-        font-size: 0.9rem;
-    }
-    
-    /* Hiển thị menu để mở sidebar trên điện thoại */
-    .mobile-menu-toggle {
-        display: block;
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1030;
-        background: var(--bs-primary);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    
-    .mobile-menu-toggle:focus {
-        outline: none;
-    }
-    
-    /* Hiển thị dạng tab/card cho các form */
-    .row > [class*="col-"] {
-        margin-bottom: 15px;
-    }
-    
-    /* Làm cho các bảng và form có thể cuộn khi cần */
-    .overflow-auto-mobile {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-    
-    /* Fixed navbar position and consistency */
-    .navbar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        z-index: 1010 !important;
-    }
-    
-    /* Ensure content is properly positioned below navbar */
-    body {
-        padding-top: 56px !important; /* Height of the navbar */
-    }
-}
-
-/* Cải thiện hiển thị cho điện thoại ở chế độ dọc */
-@media (max-width: 576px) {
-    .container-fluid, .container {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    h1, .h1 {
-        font-size: 1.75rem;
-    }
-    
-    h2, .h2 {
-        font-size: 1.5rem;
-    }
-    
-    .card-title {
-        font-size: 1.25rem;
-    }
-    
-    /* Làm cho các phần tử trong form xếp dọc */
-    .form-row > [class*="col-"] {
-        padding-right: 0;
-        padding-left: 0;
-    }
-    
-    /* Thêm padding cho nút */
-    .btn {
-        padding: 0.375rem 0.5rem;
-    }
-    
-    /* Giảm kích thước chữ trong bảng để vừa màn hình */
-    .table {
-        font-size: 0.8rem;
-    }
-    
-    /* Làm cho sidebar chiếm toàn bộ màn hình */
-    .sidebar.show {
-        width: 100%;
-    }
-}
-
-/* Dark theme enhancements */
-.nav-link {
-    color: rgba(255, 255, 255, 0.75);
-}
-
-.nav-link:hover {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.nav-link.active {
-    font-weight: 600;
-}
-
-.text-muted {
-    color: rgba(255, 255, 255, 0.5) !important;
+::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
 }

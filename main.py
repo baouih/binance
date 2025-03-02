@@ -640,6 +640,52 @@ def settings():
     
     return render_template('settings.html', bot_status=bot_status)
 
+@app.route('/bot-management')
+def bot_management():
+    """Trang quản lý bot"""
+    # Tạo dữ liệu mẫu cho bot_status để tránh lỗi template
+    account_config = {}
+    try:
+        if os.path.exists("account_config.json"):
+            with open("account_config.json", "r") as f:
+                account_config = json.load(f)
+    except Exception as e:
+        logger.error(f"Lỗi khi tải cấu hình tài khoản: {e}")
+    
+    bot_status = {
+        'running': False,
+        'mode': account_config.get('api_mode', 'testnet'),
+        'account_type': account_config.get('account_type', 'futures'),
+        'strategy_mode': 'auto'
+    }
+    
+    # Lấy danh sách bot từ API
+    try:
+        with open("bots_config.json", "r") as f:
+            bots = json.load(f)
+    except Exception as e:
+        logger.error(f"Lỗi khi tải danh sách bot: {e}")
+        bots = []
+    
+    # Thống kê
+    total_bots = len(bots)
+    running_bots = sum(1 for bot in bots if bot["status"] == "running")
+    stopped_bots = total_bots - running_bots
+    
+    # Tính tổng lợi nhuận
+    total_profit = 0
+    for bot in bots:
+        if "stats" in bot and "profit_pct" in bot["stats"]:
+            total_profit += bot["stats"]["profit_pct"]
+    
+    return render_template('bot_management.html', 
+                         bot_status=bot_status,
+                         bots=bots,
+                         total_bots=total_bots,
+                         running_bots=running_bots,
+                         stopped_bots=stopped_bots,
+                         total_profit=total_profit)
+
 @app.route('/report')
 def report():
     """Trang báo cáo giao dịch"""
