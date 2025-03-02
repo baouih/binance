@@ -26,7 +26,7 @@ BOT_STATUS = {
     'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'version': '1.0.0',
     'active_strategies': ['RSI', 'MACD', 'BB'],
-    'mode': 'testnet',        # 'demo', 'testnet', 'live'
+    'mode': 'testnet',        # 'demo', 'testnet', 'live' - LƯU Ý: Bắt buộc phải sử dụng testnet không phải demo
     'account_type': 'futures', # 'spot', 'futures'
     'strategy_mode': 'auto',   # 'auto', 'manual'
     'last_action': 'Bot đang dừng'
@@ -43,10 +43,16 @@ ACCOUNT_DATA = {
     'leverage': 5
 }
 
-# Giả lập dữ liệu thị trường (sau này lấy từ API)
+# Giả lập dữ liệu thị trường (sau này lấy từ API Binance thực)
 MARKET_DATA = {
-    'btc_price': 70123.45,
+    'btc_price': 85000.00,   # Giá BTC hiện tại sẽ được cập nhật từ API Binance
+    'eth_price': 2200.00,    # Giá ETH hiện tại sẽ được cập nhật từ API Binance
+    'bnb_price': 410.00,     # Giá BNB hiện tại sẽ được cập nhật từ API Binance
+    'sol_price': 137.50,     # Giá SOL hiện tại sẽ được cập nhật từ API Binance
     'btc_change_24h': 2.35,
+    'eth_change_24h': 3.1,
+    'bnb_change_24h': -1.5,
+    'sol_change_24h': 5.2,
     'sentiment': {
         'value': 65,
         'state': 'warning',

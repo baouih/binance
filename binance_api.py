@@ -616,7 +616,7 @@ class BinanceAPI:
             
     def _generate_demo_futures_account(self) -> Dict:
         """Tạo dữ liệu tài khoản futures giả lập cho trường hợp testnet không khả dụng"""
-        return {
+        demo_account = {
             "feeTier": 0,
             "canTrade": True,
             "canDeposit": True,
@@ -651,6 +651,36 @@ class BinanceAPI:
             ],
             "positions": []
         }
+        
+        # Cập nhật dữ liệu vị thế giả lập dựa trên thông tin từ ảnh của ứng dụng
+        if hasattr(self, '_demo_positions') and self._demo_positions:
+            for pos in self._demo_positions:
+                if abs(float(pos.get('positionAmt', 0))) > 0:
+                    # Nếu có vị thế giả lập, cập nhật tài khoản tương ứng
+                    pos_value = abs(float(pos.get('positionAmt', 0))) * float(pos.get('entryPrice', 0))
+                    
+                    # Cập nhật margin đã sử dụng
+                    initial_margin = pos_value / float(pos.get('leverage', 5))
+                    
+                    # Cập nhật các giá trị tài khoản tương ứng
+                    demo_account["totalPositionInitialMargin"] = str(initial_margin)
+                    demo_account["totalInitialMargin"] = str(initial_margin)
+                    
+                    # Cập nhật số dư khả dụng
+                    available_balance = float(demo_account["totalWalletBalance"]) - initial_margin
+                    demo_account["availableBalance"] = str(available_balance)
+                    
+                    # Cập nhật lợi nhuận
+                    unrealized_profit = float(pos.get('unRealizedProfit', 0))
+                    demo_account["totalUnrealizedProfit"] = str(unrealized_profit)
+                    
+                    # Cập nhật margin balance (wallet + profit)
+                    margin_balance = float(demo_account["totalWalletBalance"]) + unrealized_profit
+                    demo_account["totalMarginBalance"] = str(margin_balance)
+                    
+                    break  # Chỉ lấy vị thế đầu tiên để cập nhật
+        
+        return demo_account
         
     def get_futures_position_risk(self, symbol: str = None) -> List[Dict]:
         """
@@ -688,22 +718,22 @@ class BinanceAPI:
     
     def _generate_demo_positions(self) -> List[Dict]:
         """Tạo dữ liệu vị thế futures giả lập cho trường hợp testnet không khả dụng"""
-        # Tạo danh sách vị thế trống
-        return [
+        # Tạo danh sách vị thế theo dữ liệu CLI
+        positions = [
             {
                 "symbol": "BTCUSDT",
-                "positionAmt": "0",
-                "entryPrice": "0.0",
-                "markPrice": "85000.0",
-                "unRealizedProfit": "0.0",
-                "liquidationPrice": "0",
-                "leverage": "5",
+                "positionAmt": "0.01", # Lượng BTC nắm giữ theo chụp ảnh
+                "entryPrice": "47250.50", # Giá vào theo chụp ảnh
+                "markPrice": "47823.45", # Giá hiện tại theo chụp ảnh
+                "unRealizedProfit": "57.29", # Lợi nhuận 1.21% theo chụp ảnh
+                "liquidationPrice": "40000.0", # Giá thanh lý ước tính
+                "leverage": "5", # Đòn bẩy
                 "maxNotionalValue": "1000000",
                 "marginType": "cross",
                 "isolatedMargin": "0.0",
                 "isAutoAddMargin": "false",
                 "positionSide": "BOTH",
-                "notional": "0.0",
+                "notional": "478.23", # Giá trị vị thế
                 "isolatedWallet": "0.0",
                 "updateTime": int(time.time() * 1000),
                 "isolated": "false"
@@ -727,6 +757,11 @@ class BinanceAPI:
                 "isolated": "false"
             }
         ]
+        
+        # Lưu lại vị thế demo để sử dụng ở nơi khác
+        self._demo_positions = positions
+        
+        return positions
         
     def futures_change_leverage(self, symbol: str, leverage: int) -> Dict:
         """
