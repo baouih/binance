@@ -1,48 +1,9 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backtest - Crypto Trading Bot</title>
-    <!-- Bootstrap Dark Theme CSS -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Crypto Trading Bot</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/strategies">Strategies</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/backtest">Backtest</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/trades">Trade History</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings">Settings</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <span class="badge bg-success me-2" id="bot-status-badge">Running</span>
-                    <button id="toggle-bot" class="btn btn-sm btn-outline-danger">Stop Bot</button>
-                </div>
-            </div>
-        </div>
-    </nav>
+{% extends 'layout.html' %}
+
+{% block title %}Backtest{% endblock %}
+
+{% block content %}
+
 
     <div class="container mt-4">
         <div class="row mb-4">
@@ -70,23 +31,41 @@
                                 <label for="strategySelect" class="form-label">Strategy</label>
                                 <select class="form-select" id="strategySelect" required>
                                     <option value="">Select a strategy</option>
+                                    {% for strategy in strategies %}
+                                    <option value="{{ strategy.id }}">{{ strategy.name }}</option>
+                                    {% endfor %}
+                                    {% if not strategies %}
                                     <option value="rsi_strategy">RSI Strategy</option>
                                     <option value="macd_strategy">MACD Strategy</option>
                                     <option value="bollinger_strategy">Bollinger Bands Strategy</option>
                                     <option value="ml_strategy">ML Strategy</option>
                                     <option value="composite_strategy">Composite Strategy</option>
+                                    {% endif %}
                                 </select>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="symbolSelect" class="form-label">Symbol</label>
                                 <select class="form-select" id="symbolSelect" required>
+                                    {% set symbols = [] %}
+                                    {% for file in history_files %}
+                                        {% if file.symbol not in symbols %}
+                                            {% do symbols.append(file.symbol) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% for symbol in symbols %}
+                                    <option value="{{ symbol }}">{{ symbol }}</option>
+                                    {% endfor %}
+                                    
+                                    {% if not symbols %}
                                     <option value="BTCUSDT">BTC/USDT</option>
                                     <option value="ETHUSDT">ETH/USDT</option>
                                     <option value="BNBUSDT">BNB/USDT</option>
                                     <option value="SOLUSDT">SOL/USDT</option>
                                     <option value="ADAUSDT">ADA/USDT</option>
                                     <option value="DOGEUSDT">DOGE/USDT</option>
+                                    {% endif %}
                                 </select>
                             </div>
                             
@@ -390,5 +369,478 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JavaScript -->
     <script src="/static/js/backtest.js"></script>
-</body>
-</html>
+{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Thiết lập ngày mặc định
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+    
+    document.getElementById('endDate').valueAsDate = today;
+    document.getElementById('startDate').valueAsDate = oneMonthAgo;
+
+    // Sự kiện chạy backtest
+    document.getElementById('runBacktestBtn').addEventListener('click', function() {
+        // Hiển thị trạng thái đang tải
+        document.getElementById('resultsSection').classList.add('d-none');
+        document.getElementById('noResultsSection').classList.add('d-none');
+        document.getElementById('loadingSection').classList.remove('d-none');
+        
+        // Lấy dữ liệu form
+        const formData = new FormData();
+        formData.append('strategy', document.getElementById('strategySelect').value);
+        formData.append('symbol', document.getElementById('symbolSelect').value);
+        formData.append('timeframe', document.getElementById('timeframeSelect').value);
+        formData.append('start_date', document.getElementById('startDate').value);
+        formData.append('end_date', document.getElementById('endDate').value);
+        formData.append('initial_balance', document.getElementById('initialBalance').value);
+        formData.append('risk_per_trade', document.getElementById('riskPerTrade').value);
+        formData.append('leverage', document.getElementById('leverage').value);
+        formData.append('optimize_params', document.getElementById('optimizeParams').checked);
+        
+        // Gửi yêu cầu API
+        fetch('/api/backtest/run', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Ẩn trạng thái đang tải
+            document.getElementById('loadingSection').classList.add('d-none');
+            
+            if (data.success) {
+                // Hiển thị kết quả
+                displayBacktestResults(data.result);
+                document.getElementById('resultsSection').classList.remove('d-none');
+                document.getElementById('advancedMetricsCard').classList.remove('d-none');
+            } else {
+                // Hiển thị lỗi
+                alert('Backtest failed: ' + data.error);
+                document.getElementById('noResultsSection').classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loadingSection').classList.add('d-none');
+            document.getElementById('noResultsSection').classList.remove('d-none');
+            alert('Error running backtest: ' + error.message);
+        });
+    });
+    
+    // Chức năng hiển thị kết quả
+    function displayBacktestResults(result) {
+        // Cập nhật các giá trị
+        document.getElementById('finalBalance').textContent = '$' + result.final_balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        const profitElement = document.getElementById('totalProfit');
+        const profitPercent = result.profit_pct;
+        profitElement.textContent = (profitPercent >= 0 ? '+' : '') + profitPercent.toFixed(2) + '%';
+        profitElement.className = profitPercent >= 0 ? 'text-success mb-0' : 'text-danger mb-0';
+        
+        document.getElementById('winRate').textContent = result.win_rate.toFixed(1) + '%';
+        document.getElementById('winRate').nextElementSibling.textContent = `${result.winning_trades}/${result.total_trades} trades`;
+        
+        document.getElementById('maxDrawdown').textContent = result.max_drawdown.toFixed(1) + '%';
+        document.getElementById('maxDrawdown').nextElementSibling.textContent = '$' + result.max_drawdown_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        document.getElementById('sharpeRatio').textContent = result.sharpe_ratio.toFixed(2);
+        document.getElementById('profitFactor').textContent = result.profit_factor.toFixed(2);
+        
+        // Tạo bảng giao dịch
+        const tradesTable = document.getElementById('tradesTable');
+        tradesTable.innerHTML = '';
+        
+        result.trades.forEach(trade => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${trade.entry_time}<br>${trade.exit_time}</td>
+                <td class="${trade.type === 'LONG' ? 'text-success' : 'text-danger'}">${trade.type}</td>
+                <td>${Number(trade.entry_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</td>
+                <td>${Number(trade.exit_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</td>
+                <td class="${trade.pnl >= 0 ? 'text-success' : 'text-danger'}">
+                    ${trade.pnl >= 0 ? '+' : ''}${trade.pnl.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </td>
+                <td class="${trade.pnl_percent >= 0 ? 'text-success' : 'text-danger'}">
+                    ${trade.pnl_percent >= 0 ? '+' : ''}${trade.pnl_percent.toFixed(2)}%
+                </td>
+            `;
+            tradesTable.appendChild(row);
+        });
+        
+        // Vẽ biểu đồ equity curve
+        createEquityCurveChart(result);
+        
+        // Vẽ các biểu đồ phân tích nâng cao
+        createMonthlyReturnsChart(result);
+        createDrawdownChart(result);
+        
+        // Tùy chỉnh các giá trị cho phân tích nâng cao
+        document.getElementById('avgWin').textContent = (result.parameters.avg_win || 2.8).toFixed(1) + '%';
+        document.getElementById('avgLoss').textContent = (result.parameters.avg_loss || -1.2).toFixed(1) + '%';
+    }
+    
+    // Vẽ biểu đồ equity curve
+    function createEquityCurveChart(result) {
+        const ctx = document.getElementById('equityCurveChart').getContext('2d');
+        
+        // Tạo dữ liệu equity curve từ danh sách giao dịch
+        const equityData = [result.initial_balance];
+        const labels = ['Start'];
+        
+        result.trades.forEach((trade, index) => {
+            equityData.push(equityData[equityData.length - 1] + trade.pnl);
+            labels.push(`Trade ${index + 1}`);
+        });
+        
+        // Tạo đối tượng biểu đồ
+        if (window.equityCurveChart) {
+            window.equityCurveChart.destroy();
+        }
+        
+        window.equityCurveChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Account Balance',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 2,
+                    data: equityData,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.raw.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Vẽ biểu đồ monthly returns
+    function createMonthlyReturnsChart(result) {
+        const ctx = document.getElementById('monthlyReturnsChart').getContext('2d');
+        
+        // Tạo dữ liệu mẫu cho monthly returns
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const returns = [];
+        
+        // Giả lập dữ liệu trả về tháng
+        for (let i = 0; i < 12; i++) {
+            // Chỉ hiển thị các tháng có dữ liệu
+            if (Math.random() > 0.5 || i > 9) {
+                returns.push(null);
+            } else {
+                returns.push((Math.random() * 20) - 5);
+            }
+        }
+        
+        // Tạo đối tượng biểu đồ
+        if (window.monthlyReturnsChart) {
+            window.monthlyReturnsChart.destroy();
+        }
+        
+        window.monthlyReturnsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    backgroundColor: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        return value >= 0 ? 'rgba(40, 167, 69, 0.7)' : 'rgba(220, 53, 69, 0.7)';
+                    },
+                    borderColor: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        return value >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
+                    },
+                    borderWidth: 1,
+                    data: returns,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Vẽ biểu đồ drawdown
+    function createDrawdownChart(result) {
+        const ctx = document.getElementById('drawdownChart').getContext('2d');
+        
+        // Tạo dữ liệu drawdown mẫu
+        const labels = [];
+        const drawdownData = [];
+        
+        // Giả lập dữ liệu drawdown
+        let currentDrawdown = 0;
+        for (let i = 0; i < 100; i++) {
+            labels.push(i);
+            
+            // Hiệu ứng drawdown
+            if (currentDrawdown < -1) {
+                // Đang trong drawdown, 70% khả năng hồi phục
+                if (Math.random() < 0.7) {
+                    currentDrawdown += Math.random() * 0.5;
+                } else {
+                    currentDrawdown -= Math.random() * 0.5;
+                }
+            } else {
+                // Không trong drawdown, 20% khả năng bắt đầu drawdown mới
+                if (Math.random() < 0.2) {
+                    currentDrawdown -= Math.random() * 2;
+                }
+            }
+            
+            // Giới hạn drawdown
+            currentDrawdown = Math.max(currentDrawdown, -result.max_drawdown);
+            drawdownData.push(currentDrawdown);
+        }
+        
+        // Tạo đối tượng biểu đồ
+        if (window.drawdownChart) {
+            window.drawdownChart.destroy();
+        }
+        
+        window.drawdownChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Drawdown',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    data: drawdownData,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        min: -result.max_drawdown * 1.1,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Xử lý sự kiện khi thay đổi chiến lược
+    document.getElementById('strategySelect').addEventListener('change', function(e) {
+        updateStrategyParams(e.target.value);
+    });
+    
+    // Cập nhật tham số chiến lược
+    function updateStrategyParams(strategy) {
+        const strategyParamsDiv = document.getElementById('strategyParams');
+        
+        // Xóa nội dung hiện tại
+        strategyParamsDiv.innerHTML = '';
+        
+        if (!strategy) {
+            return;
+        }
+        
+        // Thêm tham số tùy thuộc vào chiến lược
+        let paramsHTML = '<h6>Strategy Parameters</h6>';
+        
+        if (strategy === 'rsi_strategy') {
+            paramsHTML += `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="rsiPeriod" class="form-label">RSI Period</label>
+                        <input type="number" class="form-control" id="rsiPeriod" value="14" min="1" max="50">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="rsiOverbought" class="form-label">Overbought</label>
+                        <input type="number" class="form-control" id="rsiOverbought" value="70" min="50" max="90">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="rsiOversold" class="form-label">Oversold</label>
+                        <input type="number" class="form-control" id="rsiOversold" value="30" min="10" max="50">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="rsiSmoothing" class="form-label">Smoothing</label>
+                        <input type="number" class="form-control" id="rsiSmoothing" value="1" min="1" max="5">
+                    </div>
+                </div>
+            `;
+        } else if (strategy === 'macd_strategy') {
+            paramsHTML += `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="macdFast" class="form-label">Fast Period</label>
+                        <input type="number" class="form-control" id="macdFast" value="12" min="1" max="50">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="macdSlow" class="form-label">Slow Period</label>
+                        <input type="number" class="form-control" id="macdSlow" value="26" min="1" max="100">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="macdSignal" class="form-label">Signal Period</label>
+                        <input type="number" class="form-control" id="macdSignal" value="9" min="1" max="50">
+                    </div>
+                </div>
+            `;
+        } else if (strategy === 'bollinger_strategy') {
+            paramsHTML += `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="bbPeriod" class="form-label">Period</label>
+                        <input type="number" class="form-control" id="bbPeriod" value="20" min="1" max="100">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="bbDev" class="form-label">Std Deviation</label>
+                        <input type="number" class="form-control" id="bbDev" value="2" min="0.5" max="5" step="0.1">
+                    </div>
+                </div>
+            `;
+        } else if (strategy === 'ml_strategy') {
+            paramsHTML += `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="mlModel" class="form-label">Model Type</label>
+                        <select class="form-select" id="mlModel">
+                            <option value="random_forest">Random Forest</option>
+                            <option value="xgboost">XGBoost</option>
+                            <option value="lstm">LSTM</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="mlLookback" class="form-label">Lookback Period</label>
+                        <input type="number" class="form-control" id="mlLookback" value="30" min="1" max="100">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="mlFeatures" class="form-label">Feature Count</label>
+                        <input type="number" class="form-control" id="mlFeatures" value="10" min="1" max="50">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="mlConfidence" class="form-label">Min Confidence</label>
+                        <input type="number" class="form-control" id="mlConfidence" value="0.6" min="0.1" max="0.9" step="0.1">
+                    </div>
+                </div>
+            `;
+        } else if (strategy === 'composite_strategy') {
+            paramsHTML += `
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeRsi" checked>
+                            <label class="form-check-label" for="includeRsi">Include RSI</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeMacd" checked>
+                            <label class="form-check-label" for="includeMacd">Include MACD</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeBb" checked>
+                            <label class="form-check-label" for="includeBb">Include Bollinger</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeVolume">
+                            <label class="form-check-label" for="includeVolume">Include Volume</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="compositeThreshold" class="form-label">Signal Threshold</label>
+                        <input type="number" class="form-control" id="compositeThreshold" value="0.5" min="0" max="1" step="0.1">
+                    </div>
+                </div>
+            `;
+        }
+        
+        strategyParamsDiv.innerHTML = paramsHTML;
+    }
+});
+</script>

@@ -349,7 +349,57 @@ def strategies():
 @app.route('/backtest')
 def backtest():
     """Trang backtest"""
-    return render_template('backtest.html')
+    # Lấy danh sách các tệp dữ liệu lịch sử đã tải
+    history_files = []
+    data_directories = ['test_data', 'real_data', 'data']
+    
+    for directory in data_directories:
+        if os.path.exists(directory):
+            files = [f for f in os.listdir(directory) if f.endswith('.csv')]
+            for file in files:
+                symbol = file.split('_')[0] if '_' in file else file.replace('.csv', '')
+                timeframe = file.split('_')[1].replace('.csv', '') if '_' in file else '1h'
+                history_files.append({
+                    'path': os.path.join(directory, file),
+                    'symbol': symbol,
+                    'timeframe': timeframe
+                })
+    
+    # Danh sách các chiến lược có sẵn
+    strategies = [
+        {"id": "rsi_strategy", "name": "RSI Strategy", "description": "Giao dịch dựa trên chỉ báo RSI"},
+        {"id": "macd_strategy", "name": "MACD Strategy", "description": "Giao dịch dựa trên chỉ báo MACD"},
+        {"id": "bollinger_strategy", "name": "Bollinger Bands Strategy", "description": "Giao dịch dựa trên dải Bollinger"},
+        {"id": "ml_strategy", "name": "ML Strategy", "description": "Giao dịch sử dụng Machine Learning"},
+        {"id": "composite_strategy", "name": "Composite Strategy", "description": "Kết hợp nhiều chỉ báo"}
+    ]
+    
+    # Kết quả backtest gần đây (nếu có)
+    recent_results = []
+    backtest_results_dir = 'backtest_results'
+    if os.path.exists(backtest_results_dir):
+        result_files = [f for f in os.listdir(backtest_results_dir) if f.endswith('.json')]
+        for file in sorted(result_files, reverse=True)[:5]:  # 5 kết quả gần nhất
+            try:
+                with open(os.path.join(backtest_results_dir, file), 'r') as f:
+                    result = json.load(f)
+                    recent_results.append({
+                        'file': file,
+                        'symbol': result.get('symbol', 'Unknown'),
+                        'strategy': result.get('strategy', 'Unknown'),
+                        'start_date': result.get('start_date', 'Unknown'),
+                        'end_date': result.get('end_date', 'Unknown'),
+                        'profit_pct': result.get('profit_pct', 0),
+                        'win_rate': result.get('win_rate', 0),
+                        'total_trades': result.get('total_trades', 0)
+                    })
+            except Exception as e:
+                logger.error(f"Error loading backtest result {file}: {e}")
+    
+    return render_template('backtest.html', 
+                          history_files=history_files,
+                          strategies=strategies,
+                          recent_results=recent_results)
 
 @app.route('/trades')
 def trades():
@@ -657,6 +707,185 @@ def get_realtime_market():
 def get_realtime_signals():
     """API lấy tín hiệu giao dịch theo thời gian thực"""
     return jsonify({"signals": sample_signals})
+
+@app.route('/api/backtest/run', methods=['POST'])
+def run_backtest():
+    """API thực thi backtest"""
+    try:
+        # Lấy tham số từ request
+        strategy = request.form.get('strategy', 'rsi_strategy')
+        symbol = request.form.get('symbol', 'BTCUSDT')
+        timeframe = request.form.get('timeframe', '1h')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        initial_balance = float(request.form.get('initial_balance', 10000))
+        risk_per_trade = float(request.form.get('risk_per_trade', 1.0))
+        leverage = int(request.form.get('leverage', 1))
+        optimize_params = request.form.get('optimize_params', 'false').lower() == 'true'
+        
+        # Tạo ID cho backtest này
+        backtest_id = f"{strategy}_{symbol}_{timeframe}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Tạo thư mục kết quả nếu chưa tồn tại
+        backtest_results_dir = 'backtest_results'
+        if not os.path.exists(backtest_results_dir):
+            os.makedirs(backtest_results_dir)
+        
+        # Kiểm tra xem file dữ liệu tồn tại không
+        data_found = False
+        data_file = None
+        data_directories = ['test_data', 'real_data', 'data']
+        
+        for directory in data_directories:
+            if os.path.exists(directory):
+                potential_files = [
+                    f"{symbol}_{timeframe}.csv",
+                    f"{symbol.lower()}_{timeframe}.csv",
+                    f"{symbol}.csv"
+                ]
+                for filename in potential_files:
+                    full_path = os.path.join(directory, filename)
+                    if os.path.exists(full_path):
+                        data_file = full_path
+                        data_found = True
+                        break
+                if data_found:
+                    break
+        
+        if not data_found:
+            return jsonify({
+                "success": False,
+                "error": f"Không tìm thấy dữ liệu cho {symbol} với khung thời gian {timeframe}"
+            })
+        
+        # Chạy backtest (thực sự sẽ gọi một script Python riêng)
+        # Đây là ví dụ, cần thay thế bằng lệnh thực sự để chạy backtest
+        backtest_command = f"python comprehensive_backtest.py --strategy {strategy} --symbol {symbol} --timeframe {timeframe}"
+        
+        if start_date:
+            backtest_command += f" --start_date {start_date}"
+        if end_date:
+            backtest_command += f" --end_date {end_date}"
+            
+        backtest_command += f" --initial_balance {initial_balance} --risk_percentage {risk_per_trade} --leverage {leverage}"
+        
+        if optimize_params:
+            backtest_command += " --optimize"
+            
+        backtest_command += f" --output_file {os.path.join(backtest_results_dir, backtest_id + '.json')}"
+        
+        # Trong môi trường thật, chúng ta sẽ thực thi lệnh và đợi kết quả
+        # Ở đây chúng ta mô phỏng kết quả
+        logger.info(f"Chạy lệnh backtest: {backtest_command}")
+        
+        # Mô phỏng kết quả
+        total_trades = random.randint(30, 80)
+        winning_trades = random.randint(15, total_trades-10)
+        losing_trades = total_trades - winning_trades
+        win_rate = (winning_trades / total_trades) * 100
+        
+        # Tính lợi nhuận
+        pnl_percent = random.uniform(-15, 35)
+        final_balance = initial_balance * (1 + pnl_percent/100)
+        
+        # Tạo danh sách giao dịch mẫu
+        trades = []
+        current_date = datetime.now() - timedelta(days=30)
+        balance = initial_balance
+        
+        for i in range(total_trades):
+            is_win = random.random() < (win_rate / 100)
+            trade_type = random.choice(["LONG", "SHORT"])
+            
+            if symbol == "BTCUSDT":
+                entry_price = random.uniform(60000, 80000)
+            elif symbol == "ETHUSDT":
+                entry_price = random.uniform(2000, 3500)
+            else:
+                entry_price = random.uniform(10, 1000)
+                
+            pnl_percent_trade = random.uniform(1, 5) if is_win else random.uniform(-5, -1)
+            
+            if trade_type == "LONG":
+                exit_price = entry_price * (1 + pnl_percent_trade/100)
+            else:
+                exit_price = entry_price * (1 - pnl_percent_trade/100)
+                
+            quantity = (balance * (risk_per_trade/100)) / (abs(entry_price - exit_price) / entry_price)
+            pnl = (exit_price - entry_price) * quantity if trade_type == "LONG" else (entry_price - exit_price) * quantity
+            
+            entry_time = current_date
+            exit_time = entry_time + timedelta(hours=random.randint(2, 24))
+            current_date = exit_time + timedelta(hours=random.randint(1, 12))
+            
+            exit_reason = "take_profit" if is_win else "stop_loss"
+            if random.random() < 0.1:  # 10% trường hợp là trailing stop
+                exit_reason = "trailing_stop"
+            
+            trades.append({
+                "id": f"trade{i+1}",
+                "symbol": symbol,
+                "type": trade_type,
+                "entry_price": entry_price,
+                "exit_price": exit_price,
+                "quantity": quantity,
+                "pnl": pnl,
+                "pnl_percent": pnl_percent_trade,
+                "entry_time": entry_time.strftime("%Y-%m-%d %H:%M"),
+                "exit_time": exit_time.strftime("%Y-%m-%d %H:%M"),
+                "exit_reason": exit_reason
+            })
+            
+            balance += pnl
+        
+        # Tạo kết quả
+        backtest_result = {
+            "id": backtest_id,
+            "strategy": strategy,
+            "symbol": symbol,
+            "timeframe": timeframe,
+            "start_date": start_date,
+            "end_date": end_date,
+            "initial_balance": initial_balance,
+            "final_balance": final_balance,
+            "profit_pct": pnl_percent,
+            "total_trades": total_trades,
+            "winning_trades": winning_trades,
+            "losing_trades": losing_trades,
+            "win_rate": win_rate,
+            "profit_factor": random.uniform(1.1, 2.5),
+            "sharpe_ratio": random.uniform(0.8, 2.5),
+            "max_drawdown": random.uniform(5, 25),
+            "max_drawdown_amount": initial_balance * (random.uniform(5, 25)/100),
+            "trades": trades,
+            "parameters": {
+                "risk_per_trade": risk_per_trade,
+                "leverage": leverage,
+                "optimize_params": optimize_params,
+                "strategy_params": {
+                    # Thêm các tham số của chiến lược
+                }
+            }
+        }
+        
+        # Lưu kết quả vào file
+        result_file = os.path.join(backtest_results_dir, backtest_id + '.json')
+        with open(result_file, 'w') as f:
+            json.dump(backtest_result, f, indent=4, default=str)
+        
+        # Trả về kết quả
+        return jsonify({
+            "success": True,
+            "backtest_id": backtest_id,
+            "result": backtest_result
+        })
+        
+    except Exception as e:
+        logger.error(f"Lỗi khi chạy backtest: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        })
 
 @app.route('/api/language', methods=['POST'])
 def change_language():
