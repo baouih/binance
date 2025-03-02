@@ -116,15 +116,41 @@ const settingsManager = {
             return;
         }
         
-        // In a real implementation, this would send a request to the server to test the Telegram API
-        console.log('Testing Telegram API connection...');
-        console.log('Bot Token:', botToken);
-        console.log('Chat ID:', chatId);
+        // Hiển thị đang xử lý
+        const testButton = document.getElementById('test-telegram-api');
+        const originalText = testButton.innerText;
+        testButton.innerText = 'Đang gửi...';
+        testButton.disabled = true;
         
-        // Simulate API test
-        setTimeout(() => {
-            alert('Telegram notification sent successfully! Check your Telegram app.');
-        }, 1000);
+        // Gửi yêu cầu đến server để test Telegram API thực tế
+        fetch('/api/telegram/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: botToken,
+                chat_id: chatId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Telegram test response:', data);
+            if (data.status === 'success') {
+                alert(data.message);
+            } else {
+                alert('Lỗi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error testing Telegram API:', error);
+            alert('Lỗi kết nối đến Telegram API: ' + error);
+        })
+        .finally(() => {
+            // Khôi phục trạng thái nút
+            testButton.innerText = originalText;
+            testButton.disabled = false;
+        });
     },
     
     // Save API settings
@@ -370,11 +396,55 @@ const settingsManager = {
             }
         };
         
-        // In a real implementation, this would send the settings to the server
-        console.log('Saving system settings:', settings);
+        // Hiển thị đang xử lý
+        const saveButton = document.getElementById('save-system-settings');
+        const originalText = saveButton.innerText;
+        saveButton.innerText = 'Đang lưu...';
+        saveButton.disabled = true;
         
-        // Show success message
-        alert('System settings saved successfully!');
+        // Thay đổi ngôn ngữ
+        if (language) {
+            // Gửi yêu cầu thay đổi ngôn ngữ
+            fetch('/api/language', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    language: language
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Language change response:', data);
+                if (data.status === 'success') {
+                    console.log('Language changed successfully');
+                    // Reload trang để áp dụng ngôn ngữ mới
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    alert('Lỗi: ' + data.message);
+                    // Khôi phục nút
+                    saveButton.innerText = originalText;
+                    saveButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error changing language:', error);
+                alert('Lỗi khi thay đổi ngôn ngữ: ' + error);
+                // Khôi phục nút
+                saveButton.innerText = originalText;
+                saveButton.disabled = false;
+            });
+        } else {
+            // Không thay đổi ngôn ngữ, chỉ lưu các cài đặt khác
+            console.log('Saving system settings:', settings);
+            alert('Cài đặt hệ thống đã được lưu!');
+            // Khôi phục trạng thái nút
+            saveButton.innerText = originalText;
+            saveButton.disabled = false;
+        }
     },
     
     // Clear cache
