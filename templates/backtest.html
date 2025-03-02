@@ -47,18 +47,15 @@
                             <div class="mb-3">
                                 <label for="symbolSelect" class="form-label">Symbol</label>
                                 <select class="form-select" id="symbolSelect" required>
-                                    {% set symbols = [] %}
-                                    {% for file in history_files %}
-                                        {% if file.symbol not in symbols %}
-                                            {% do symbols.append(file.symbol) %}
+                                        {% for file in history_files %}
+                                        {% if loop.first or file.symbol not in history_files[:loop.index-1]|map(attribute='symbol')|list %}
+                                    <option value="{{ file.symbol }}">{{ file.symbol }}</option>
                                         {% endif %}
                                     {% endfor %}
+
+                                    {# Default options if no files found #}
                                     
-                                    {% for symbol in symbols %}
-                                    <option value="{{ symbol }}">{{ symbol }}</option>
-                                    {% endfor %}
-                                    
-                                    {% if not symbols %}
+                                    {% if history_files|length == 0 %}
                                     <option value="BTCUSDT">BTC/USDT</option>
                                     <option value="ETHUSDT">ETH/USDT</option>
                                     <option value="BNBUSDT">BNB/USDT</option>
