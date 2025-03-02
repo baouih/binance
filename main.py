@@ -439,7 +439,14 @@ def trades():
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""
-    return render_template('settings.html')
+    # Tạo dữ liệu mẫu cho bot_status để tránh lỗi template
+    bot_status = {
+        'running': False,
+        'mode': 'demo',
+        'account_type': 'futures',
+        'strategy_mode': 'auto'
+    }
+    return render_template('settings.html', bot_status=bot_status)
 
 @app.route('/report')
 def report():
