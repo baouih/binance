@@ -123,11 +123,13 @@ def index():
     max_drawdown_percent = 12.5
     recovery_factor = 2.1
     
-    market_regime = "Trending"
-    volatility = "Medium"
-    trend_strength = 75
-    
-    composite_score = 0.7
+    # Tạo dữ liệu mẫu cho bot_status để tránh lỗi template
+    bot_status = {
+        'running': False,
+        'mode': 'demo',
+        'account_type': 'futures',
+        'strategy_mode': 'auto'
+    }
     
     # Sample open positions
     open_positions = [
@@ -174,6 +176,46 @@ def index():
             "entry_time": "2025-02-28 22:05"
         }
     ]
+    
+    # Tạo dữ liệu mẫu cho account_data
+    account_data = {
+        'balance': 10400,
+        'equity': 10710.5,
+        'free_balance': 10400,
+        'margin': 0,
+        'leverage': 3,
+        'positions': open_positions
+    }
+    
+    # Tạo dữ liệu thị trường
+    market_data = {
+        'btc_price': sample_prices.get('BTCUSDT', 80000),
+        'eth_price': sample_prices.get('ETHUSDT', 2300),
+        'bnb_price': sample_prices.get('BNBUSDT', 380),
+        'sol_price': sample_prices.get('SOLUSDT', 140),
+        'btc_change_24h': random.uniform(-5, 5),
+        'eth_change_24h': random.uniform(-7, 7),
+        'bnb_change_24h': random.uniform(-4, 4),
+        'sol_change_24h': random.uniform(-10, 10),
+        'sentiment': {
+            'value': random.randint(30, 70),
+            'state': random.choice(['success', 'danger', 'warning', 'info']),
+            'change': random.uniform(-5, 5),
+            'trend': 'neutral'
+        },
+        'market_regime': {
+            'BTCUSDT': 'Trending',
+            'ETHUSDT': 'Ranging',
+            'BNBUSDT': 'Volatile',
+            'SOLUSDT': 'Ranging'
+        }
+    }
+    
+    market_regime = "Trending"
+    volatility = "Medium"
+    trend_strength = 75
+    
+    composite_score = 0.7
     
     # Sample closed positions
     closed_positions = [
@@ -248,7 +290,7 @@ def index():
     result = os.popen("ps aux | grep 'python multi_coin_bot.py' | grep -v grep").read()
     bot_running = bool(result)
     
-    return render_template('dashboard.html',
+    return render_template('index.html',
                           current_balance=current_balance,
                           initial_balance=initial_balance,
                           profit_percentage=profit_percentage,
@@ -265,7 +307,10 @@ def index():
                           composite_score=composite_score,
                           open_positions=open_positions,
                           closed_positions=closed_positions,
-                          bot_running=bot_running)
+                          bot_status=bot_status,
+                          bot_running=bot_running,
+                          account_data=account_data,
+                          market_data=market_data)
 
 @app.route('/strategies')
 def strategies():
