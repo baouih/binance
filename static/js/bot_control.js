@@ -22,12 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Các chức năng khác
     function startBot(botId) {
         // Gửi request tới API
-        fetch(`/api/bots/${botId}/control`, {
+        fetch('/api/bot/control', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ action: 'start' })
+            body: JSON.stringify({ 
+                action: 'start',
+                strategy_mode: 'auto'
+            })
         })
         .then(response => response.json())
         .then(data => {

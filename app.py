@@ -1671,27 +1671,28 @@ def bot_control():
     
     # Kiểm tra cấu hình API trước khi thực hiện các thao tác với bot trong mode không phải demo
     try:
-        with open(ACCOUNT_CONFIG_PATH, 'r') as f:
-            config = json.load(f)
+        # Kiểm tra trạng thái hiện tại
+        api_mode = BOT_STATUS.get('mode', 'demo')
         
-        api_mode = config.get('api_mode', 'demo')
-        api_key = config.get('api_key', '')
-        api_secret = config.get('api_secret', '')
-        
-        # Nếu không phải mode demo và thiếu API key
-        if api_mode != 'demo' and (not api_key or not api_secret):
-            logger.warning(f"Cố gắng chạy bot trong chế độ {api_mode} nhưng chưa cấu hình API")
-            return jsonify({
-                'success': False,
-                'error_type': 'missing_api_config',
-                'message': f'Cần cấu hình API key để sử dụng chế độ {api_mode}'
-            })
+        # Nếu không phải mode demo, kiểm tra API key trong biến môi trường
+        if api_mode != 'demo':
+            api_key = os.environ.get('BINANCE_API_KEY', '')
+            api_secret = os.environ.get('BINANCE_API_SECRET', '')
+            
+            if not api_key or not api_secret:
+                logger.warning(f"Cố gắng chạy bot trong chế độ {api_mode} nhưng chưa cấu hình API")
+                return jsonify({
+                    'success': False,
+                    'error_type': 'missing_api_config',
+                    'message': f'Cần cấu hình API key để sử dụng chế độ {api_mode}',
+                    'redirect_url': '/settings'
+                })
     except Exception as e:
-        logger.error(f"Lỗi khi kiểm tra cấu hình API: {e}")
+        logger.error(f"Lỗi khi kiểm tra API: {e}")
         return jsonify({
             'success': False,
-            'error_type': 'config_error',
-            'message': f'Lỗi cấu hình: {str(e)}'
+            'error_type': 'api_error',
+            'message': f'Lỗi khi kiểm tra API: {str(e)}'
         })
     
     if action == 'start':
