@@ -430,13 +430,13 @@
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Số dư tài khoản</h6>
                             <h3>${{ '{:.2f}'.format(account_data.balance) }}</h3>
-                            <small class="text-muted">Tài khoản thật</small>
+                            <small class="text-muted">Tài khoản {{ 'demo' if bot_status.mode == 'demo' else 'thật' if bot_status.mode == 'live' else 'testnet' }}</small>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Equity</h6>
-                            <h3>${{ '{:.2f}'.format(account_data.balance) }}</h3>
+                            <h3>${{ '{:.2f}'.format(account_data.equity) }}</h3>
                             <small class="text-muted">Bao gồm vị thế đang mở</small>
                         </div>
                     </div>
@@ -444,10 +444,12 @@
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Lợi nhuận</h6>
                             <h3>
-                                $0.00 
-                                <small class="text-success">+0.00%</small>
+                                ${{ '{:.2f}'.format(account_data.equity - account_data.balance) }} 
+                                <small class="{{ 'text-success' if account_data.equity >= account_data.balance else 'text-danger' }}">
+                                    {{ '+' if account_data.equity >= account_data.balance else '' }}{{ '{:.2f}'.format((account_data.equity - account_data.balance) / account_data.balance * 100) }}%
+                                </small>
                             </h3>
-                            <small class="text-muted">24 giờ qua</small>
+                            <small class="text-muted">Lợi nhuận vị thế hiện tại</small>
                         </div>
                     </div>
                 </div>
@@ -527,7 +529,7 @@
                             <div class="row">
                                 {% for symbol, regime in market_data.market_regime.items() %}
                                 <div class="col-3 mb-2">
-                                    <div class="badge bg-secondary w-100 p-2">
+                                    <div class="badge {{ 'bg-success' if regime == 'trending' else 'bg-warning' if regime == 'ranging' else 'bg-danger' if regime == 'volatile' else 'bg-info' }} w-100 p-2">
                                         {{ symbol }}: {{ regime }}
                                     </div>
                                 </div>
