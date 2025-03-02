@@ -78,26 +78,47 @@ function toggleMobileMenu() {
  * Check and adjust layout based on device orientation and screen size
  */
 function checkMobileLayout() {
-    // Vấn đề là Safari iOS không hiển thị đúng userAgent, check bổ sung
-    const isMobile = window.innerWidth < 768 || 
-                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                    (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome") && window.innerWidth < 1000);
+    // Enhanced device detection for maximum compatibility across browsers
+    
+    // 1. Screen size detection - most reliable cross-browser method
+    const isSmallScreen = window.innerWidth < 768;
+    
+    // 2. User agent detection - traditional but sometimes unreliable
+    const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // 3. Safari specific detection - iOS Safari often needs special handling
+    const isSafariMobile = navigator.userAgent.includes("Safari") && 
+                          !navigator.userAgent.includes("Chrome") && 
+                          window.innerWidth < 1000;
+    
+    // 4. Aspect ratio check - helps detect tablets and unusual viewport sizes
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const isAspectRatioMobile = aspectRatio < 1.3 && window.innerWidth < 1000;
+    
+    // 5. Touch capability check - most mobile devices have touch
+    const hasTouchCapability = 'ontouchstart' in window || 
+                              navigator.maxTouchPoints > 0 || 
+                              navigator.msMaxTouchPoints > 0;
+    
+    // Combine all detection methods for maximum reliability
+    const isMobile = isSmallScreen || isUserAgentMobile || isSafariMobile || isAspectRatioMobile;
+    
+    // Orientation detection
     const isPortrait = window.innerHeight > window.innerWidth;
     
-    // Theo dõi tỷ lệ màn hình để phát hiện thiết bị di động
-    const aspectRatio = window.innerWidth / window.innerHeight;
-    const isProbablyMobile = aspectRatio < 1.3 && window.innerWidth < 1000;
-    
-    // Lưu thông tin phát hiện thiết bị
-    if (isProbablyMobile || isMobile) {
-        localStorage.setItem('isMobileDevice', 'true');
-    }
+    // Save detection information in localStorage for consistency across pages
+    localStorage.setItem('isMobileDevice', isMobile ? 'true' : 'false');
+    localStorage.setItem('hasTouchCapability', hasTouchCapability ? 'true' : 'false');
     
     console.log("Device detection:", { 
         isMobile: isMobile, 
         innerWidth: window.innerWidth,
         aspectRatio: aspectRatio,
-        isProbablyMobile: isProbablyMobile,
+        isSmallScreen: isSmallScreen,
+        isUserAgentMobile: isUserAgentMobile,
+        isSafariMobile: isSafariMobile,
+        isAspectRatioMobile: isAspectRatioMobile,
+        hasTouchCapability: hasTouchCapability,
         userAgent: navigator.userAgent,
         isPortrait: isPortrait 
     });
