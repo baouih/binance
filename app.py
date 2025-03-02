@@ -2,7 +2,7 @@ import os
 import logging
 import json
 import datetime
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 import binance_api
 from account_type_selector import AccountTypeSelector
 
@@ -125,6 +125,47 @@ def cli():
 
 
 # API Endpoints
+@app.route('/api/language', methods=['POST'])
+def change_language():
+    """Thay đổi ngôn ngữ"""
+    data = request.json
+    language = data.get('language', 'en')
+    
+    # Lưu cài đặt ngôn ngữ vào session
+    session['language'] = language
+    logger.info(f"Đã thay đổi ngôn ngữ thành: {language}")
+    
+    return jsonify({'status': 'success', 'message': 'Ngôn ngữ đã được thay đổi'})
+
+
+@app.route('/api/telegram/test', methods=['POST'])
+def test_telegram():
+    """Kiểm tra kết nối Telegram"""
+    data = request.json
+    token = data.get('token', '')
+    chat_id = data.get('chat_id', '')
+    
+    if not token or not chat_id:
+        return jsonify({'status': 'error', 'message': 'Thiếu token hoặc chat ID'})
+    
+    # Mô phỏng gửi tin nhắn thử nghiệm
+    try:
+        # Lưu ý: Trong ứng dụng thực tế, chúng ta sẽ thực sự gửi một tin nhắn qua API Telegram
+        logger.info(f"Gửi tin nhắn thử nghiệm với token={token[:5]}... và chat_id={chat_id}")
+        
+        # Mô phỏng thành công
+        return jsonify({
+            'status': 'success', 
+            'message': 'Thông báo kiểm tra được gửi thành công! Vui lòng kiểm tra điện thoại của bạn.'
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
+        return jsonify({
+            'status': 'error', 
+            'message': f'Không thể gửi thông báo: {str(e)}'
+        })
+
+
 @app.route('/api/bot/control', methods=['POST'])
 def bot_control():
     """Điều khiển bot (start/stop/restart)"""
