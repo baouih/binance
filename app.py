@@ -61,14 +61,64 @@ account_selector = AccountTypeSelector()
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
-    # Thêm timestamp vào dữ liệu để tránh cache
-    now = datetime.datetime.now()
-    version = f"v{now.hour}{now.minute}{now.second}"
-    return render_template('index.html', 
-                          bot_status=BOT_STATUS,
-                          account_data=ACCOUNT_DATA,
-                          market_data=MARKET_DATA,
-                          version=version)
+    try:
+        # Thêm timestamp vào dữ liệu để tránh cache
+        now = datetime.datetime.now()
+        version = f"v{now.hour}{now.minute}{now.second}"
+        
+        # Đảm bảo thông tin trạng thái bot có đầy đủ thông tin chế độ
+        current_bot_status = BOT_STATUS.copy()
+        if 'mode' not in current_bot_status:
+            current_bot_status['mode'] = 'demo'  # 'demo', 'testnet', 'live'
+        if 'account_type' not in current_bot_status:
+            current_bot_status['account_type'] = 'futures'  # 'spot', 'futures'
+        if 'strategy_mode' not in current_bot_status:
+            current_bot_status['strategy_mode'] = 'auto'  # 'auto', 'manual'
+        
+        # Đảm bảo dữ liệu tài khoản có đầy đủ thông tin vị thế
+        current_account_data = ACCOUNT_DATA.copy()
+        if 'positions' not in current_account_data or not current_account_data['positions']:
+            # Thêm dữ liệu vị thế giả lập nếu không có
+            current_account_data['positions'] = [
+                {
+                    'id': 'pos1',
+                    'symbol': 'BTCUSDT',
+                    'type': 'LONG',
+                    'entry_price': 72000,
+                    'current_price': 75000,
+                    'quantity': 0.1,
+                    'leverage': 1,
+                    'pnl': 300,
+                    'pnl_percent': 4.17,
+                    'entry_time': '2025-02-28 18:30:00',
+                    'stop_loss': 68000,
+                    'take_profit': 80000
+                },
+                {
+                    'id': 'pos2',
+                    'symbol': 'SOLUSDT',
+                    'type': 'LONG',
+                    'entry_price': 125,
+                    'current_price': 137.5,
+                    'quantity': 1,
+                    'leverage': 1,
+                    'pnl': 12.5,
+                    'pnl_percent': 10,
+                    'entry_time': '2025-02-28 20:10:00',
+                    'stop_loss': 115,
+                    'take_profit': 150
+                }
+            ]
+        
+        return render_template('index.html', 
+                            bot_status=current_bot_status,
+                            account_data=current_account_data,
+                            market_data=MARKET_DATA,
+                            version=version)
+    except Exception as e:
+        logger.error(f"Lỗi khi hiển thị trang chủ: {str(e)}")
+        return render_template('error.html', 
+                            error_message="Không thể tải trang chủ. Vui lòng thử lại sau.")
 
 
 @app.route('/strategies')
@@ -314,8 +364,13 @@ def position():
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""
-    return render_template('settings.html', 
-                          bot_status=BOT_STATUS)
+    try:
+        return render_template('settings.html', 
+                            bot_status=BOT_STATUS)
+    except Exception as e:
+        logger.error(f"Lỗi khi hiển thị trang cài đặt: {str(e)}")
+        return render_template('error.html', 
+                            error_message="Không thể tải trang cài đặt. Vui lòng thử lại sau.")
 
 
 @app.route('/account')
