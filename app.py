@@ -110,6 +110,13 @@ def account():
                           bot_status=BOT_STATUS)
 
 
+@app.route('/trading_report')
+def trading_report():
+    """Trang báo cáo giao dịch"""
+    return render_template('trading_report.html',
+                          bot_status=BOT_STATUS)
+
+
 @app.route('/cli')
 def cli():
     """Trang giao diện dòng lệnh"""
