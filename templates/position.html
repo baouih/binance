@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Vị thế - Bot Giao Dịch Crypto</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Thanh điều hướng bên trái -->
+            <div class="col-md-2 sidebar py-3">
+                <div class="d-flex flex-column align-items-center mb-4">
+                    <h3 class="h5 text-center">Crypto Trader Bot</h3>
+                    <div class="badge rounded-pill 
+                        {% if bot_status.mode == 'demo' %}bg-info{% elif bot_status.mode == 'testnet' %}bg-warning{% else %}bg-danger{% endif %}
+                        text-white p-2 mt-2 mb-3">
+                        <i class="bi {% if bot_status.mode == 'demo' %}bi-layers{% elif bot_status.mode == 'testnet' %}bi-bug{% else %}bi-broadcast{% endif %} me-1"></i>
+                        {% if bot_status.mode == 'demo' %}Chế độ Demo{% elif bot_status.mode == 'testnet' %}Testnet{% else %}Live{% endif %}
+                    </div>
+                </div>
+                <div class="list-group rounded-3">
+                    <a href="/" class="list-group-item list-group-item-action">
+                        <i class="bi bi-speedometer2 me-2"></i> Trang chủ
+                    </a>
+                    <a href="/strategies" class="list-group-item list-group-item-action">
+                        <i class="bi bi-shuffle me-2"></i> Chiến lược
+                    </a>
+                    <a href="/backtest" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bar-chart-line me-2"></i> Backtest
+                    </a>
+                    <a href="/market" class="list-group-item list-group-item-action">
+                        <i class="bi bi-graph-up me-2"></i> Thị trường
+                    </a>
+                    <a href="/trades" class="list-group-item list-group-item-action">
+                        <i class="bi bi-clipboard-data me-2"></i> Giao dịch
+                    </a>
+                    <a href="/position" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-arrow-left-right me-2"></i> Vị thế
+                    </a>
+                    <a href="/settings" class="list-group-item list-group-item-action">
+                        <i class="bi bi-gear me-2"></i> Cài đặt
+                    </a>
+                    <a href="/account" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person me-2"></i> Tài khoản
+                    </a>
+                    <a href="/trading_report" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-earmark-text me-2"></i> Báo cáo
+                    </a>
+                    <a href="/cli" class="list-group-item list-group-item-action">
+                        <i class="bi bi-terminal me-2"></i> CLI
+                    </a>
+                </div>
+                <div class="mt-auto pt-4 text-center">
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <button class="btn btn-sm btn-outline-secondary language-btn" data-lang="vi">
+                            <img src="{{ url_for('static', filename='img/vi.svg') }}" alt="Tiếng Việt" width="20">
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary language-btn" data-lang="en">
+                            <img src="{{ url_for('static', filename='img/en.svg') }}" alt="English" width="20">
+                        </button>
+                    </div>
+                    <div class="bot-status small">
+                        <span class="badge {{ 'bg-success' if bot_status.running else 'bg-danger' }}">
+                            <i class="bi {{ 'bi-play-fill' if bot_status.running else 'bi-stop-fill' }}"></i>
+                            {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
+                        </span>
+                        <div class="text-muted mt-1 small last-update">
+                            Cập nhật: {{ bot_status.last_update }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung chính -->
+            <div class="col-md-10 main-content bg-dark">
+                <!-- Phần trên - tiêu đề trang và các nút điều khiển -->
+                <div class="row page-header align-items-center mb-4">
+                    <div class="col-md-6">
+                        <h1 class="h2">Quản lý Vị thế</h1>
+                        <p class="text-muted">Theo dõi và quản lý các vị thế giao dịch hiện tại</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <button class="btn btn-primary" id="newPositionBtn">
+                            <i class="bi bi-plus-circle"></i> Vị thế mới
+                        </button>
+                        <button class="btn btn-outline-secondary" id="refreshPositionsBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Phần thông tin tổng quan vị thế -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-dark border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-wallet2"></i> Tổng vị thế</h5>
+                                <h2 class="text-primary">{{ positions|length }}</h2>
+                                <div class="text-muted">Tổng giá trị: ${{ performance_data.total_profit }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-dark border-success">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-graph-up-arrow"></i> Tỷ lệ thắng</h5>
+                                <h2 class="text-success">{{ performance_data.win_rate }}%</h2>
+                                <div class="text-muted">Thắng: {{ performance_data.winning_trades }} / Thua: {{ performance_data.losing_trades }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-dark border-info">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-currency-exchange"></i> Profit Factor</h5>
+                                <h2 class="text-info">{{ performance_data.profit_factor }}</h2>
+                                <div class="text-muted">Expectancy: {{ performance_data.expectancy }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-dark border-warning">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-arrow-down-right"></i> Drawdown Max</h5>
+                                <h2 class="text-warning">{{ performance_data.max_drawdown }}%</h2>
+                                <div class="text-muted">Thời gian giữ TB: {{ performance_data.avg_holding_time }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab điều hướng giữa vị thế hiện tại và lịch sử -->
+                <ul class="nav nav-tabs mb-4" id="positionTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-positions" type="button" role="tab" aria-controls="active-positions" aria-selected="true">
+                            <i class="bi bi-lightning-charge"></i> Vị thế hiện tại
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#position-history" type="button" role="tab" aria-controls="position-history" aria-selected="false">
+                            <i class="bi bi-clock-history"></i> Lịch sử vị thế
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Nội dung các tab -->
+                <div class="tab-content" id="positionTabContent">
+                    <!-- Tab vị thế hiện tại -->
+                    <div class="tab-pane fade show active" id="active-positions" role="tabpanel" aria-labelledby="active-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover position-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Loại</th>
+                                        <th>Giá Vào</th>
+                                        <th>Giá Hiện tại</th>
+                                        <th>Số lượng</th>
+                                        <th>Đòn bẩy</th>
+                                        <th>P/L</th>
+                                        <th>P/L %</th>
+                                        <th>SL/TP</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position in positions %}
+                                    <tr>
+                                        <td class="fw-bold">{{ position.symbol }}</td>
+                                        <td>
+                                            <span class="badge {{ 'bg-success' if position.type == 'LONG' else 'bg-danger' }}">
+                                                {{ position.type }}
+                                            </span>
+                                        </td>
+                                        <td>${{ position.entry_price }}</td>
+                                        <td>${{ position.current_price }}</td>
+                                        <td>{{ position.quantity }}</td>
+                                        <td>{{ position.leverage }}x</td>
+                                        <td class="{{ 'text-success' if position.pnl >= 0 else 'text-danger' }}">
+                                            ${{ position.pnl }}
+                                        </td>
+                                        <td class="{{ 'text-success' if position.pnl_percent >= 0 else 'text-danger' }}">
+                                            {{ position.pnl_percent }}%
+                                        </td>
+                                        <td>
+                                            <small>SL: ${{ position.stop_loss }}</small><br>
+                                            <small>TP: ${{ position.take_profit }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ position.status }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-danger close-position-btn" data-position-id="{{ position.id }}">
+                                                    <i class="bi bi-x-circle"></i> Đóng
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary edit-position-btn" data-position-id="{{ position.id }}">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab lịch sử vị thế -->
+                    <div class="tab-pane fade" id="position-history" role="tabpanel" aria-labelledby="history-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Loại</th>
+                                        <th>Giá Vào</th>
+                                        <th>Giá Ra</th>
+                                        <th>Số lượng</th>
+                                        <th>Đòn bẩy</th>
+                                        <th>P/L</th>
+                                        <th>P/L %</th>
+                                        <th>Thời gian giữ</th>
+                                        <th>Lý do thoát</th>
+                                        <th>Chiến lược</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position in closed_positions %}
+                                    <tr>
+                                        <td class="fw-bold">{{ position.symbol }}</td>
+                                        <td>
+                                            <span class="badge {{ 'bg-success' if position.type == 'LONG' else 'bg-danger' }}">
+                                                {{ position.type }}
+                                            </span>
+                                        </td>
+                                        <td>${{ position.entry_price }}</td>
+                                        <td>${{ position.exit_price }}</td>
+                                        <td>{{ position.quantity }}</td>
+                                        <td>{{ position.leverage }}x</td>
+                                        <td class="{{ 'text-success' if position.pnl >= 0 else 'text-danger' }}">
+                                            ${{ position.pnl }}
+                                        </td>
+                                        <td class="{{ 'text-success' if position.pnl_percent >= 0 else 'text-danger' }}">
+                                            {{ position.pnl_percent }}%
+                                        </td>
+                                        <td>{{ position.duration }}</td>
+                                        <td>
+                                            <span class="badge {{ 'bg-success' if position.exit_reason == 'take_profit' else 'bg-danger' if position.exit_reason == 'stop_loss' else 'bg-secondary' }}">
+                                                {{ position.exit_reason }}
+                                            </span>
+                                        </td>
+                                        <td>{{ position.strategy }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal đóng vị thế -->
+    <div class="modal fade" id="closePositionModal" tabindex="-1" aria-labelledby="closePositionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title" id="closePositionModalLabel">Xác nhận đóng vị thế</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn đóng vị thế <span id="positionSymbol" class="fw-bold"></span>?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i> Hành động này sẽ đóng vị thế với giá thị trường hiện tại.
+                    </div>
+                    <input type="hidden" id="positionIdToClose">
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmCloseBtn">Đóng vị thế</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa vị thế -->
+    <div class="modal fade" id="editPositionModal" tabindex="-1" aria-labelledby="editPositionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title" id="editPositionModalLabel">Chỉnh sửa vị thế</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPositionForm">
+                        <input type="hidden" id="editPositionId">
+                        <div class="mb-3">
+                            <label for="editStopLoss" class="form-label">Stop Loss</label>
+                            <input type="number" class="form-control" id="editStopLoss" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTakeProfit" class="form-label">Take Profit</label>
+                            <input type="number" class="form-control" id="editTakeProfit" step="0.01">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="editTrailingStop">
+                            <label class="form-check-label" for="editTrailingStop">Trailing Stop</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTrailingStopAmount" class="form-label">Khoảng cách Trailing Stop (%)</label>
+                            <input type="number" class="form-control" id="editTrailingStopAmount" min="0.1" step="0.1" value="1.0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="savePositionChangesBtn">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý sự kiện khi nút đóng vị thế được nhấn
+            document.querySelectorAll('.close-position-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.getAttribute('data-position-id');
+                    const positionRow = this.closest('tr');
+                    const symbol = positionRow.querySelector('td:first-child').textContent;
+                    
+                    // Hiển thị modal xác nhận
+                    document.getElementById('positionSymbol').textContent = symbol;
+                    document.getElementById('positionIdToClose').value = positionId;
+                    const closeModal = new bootstrap.Modal(document.getElementById('closePositionModal'));
+                    closeModal.show();
+                });
+            });
+            
+            // Xử lý sự kiện khi nút chỉnh sửa vị thế được nhấn
+            document.querySelectorAll('.edit-position-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.getAttribute('data-position-id');
+                    // Trong một ứng dụng thực tế, bạn sẽ lấy dữ liệu thực tế từ server
+                    // Ở đây chúng ta sẽ sử dụng dữ liệu giả lập cho demo
+                    
+                    // Tìm vị thế trong bảng
+                    const positionRow = this.closest('tr');
+                    const stopLossText = positionRow.querySelector('td:nth-child(9) small:first-child').textContent;
+                    const takeProfitText = positionRow.querySelector('td:nth-child(9) small:last-child').textContent;
+                    
+                    // Trích xuất giá trị
+                    const stopLoss = parseFloat(stopLossText.replace('SL: $', ''));
+                    const takeProfit = parseFloat(takeProfitText.replace('TP: $', ''));
+                    
+                    // Điền thông tin vào form
+                    document.getElementById('editPositionId').value = positionId;
+                    document.getElementById('editStopLoss').value = stopLoss;
+                    document.getElementById('editTakeProfit').value = takeProfit;
+                    
+                    // Hiển thị modal chỉnh sửa
+                    const editModal = new bootstrap.Modal(document.getElementById('editPositionModal'));
+                    editModal.show();
+                });
+            });
+            
+            // Xử lý sự kiện khi nút xác nhận đóng vị thế được nhấn
+            document.getElementById('confirmCloseBtn').addEventListener('click', function() {
+                const positionId = document.getElementById('positionIdToClose').value;
+                
+                // Gọi API để đóng vị thế
+                fetch('/api/positions/close', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ position_id: positionId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Ẩn modal
+                        bootstrap.Modal.getInstance(document.getElementById('closePositionModal')).hide();
+                        
+                        // Xóa vị thế khỏi bảng hoặc làm mới trang
+                        const positionRow = document.querySelector(`button[data-position-id="${positionId}"]`).closest('tr');
+                        positionRow.remove();
+                        
+                        // Hiển thị thông báo thành công
+                        alert('Vị thế đã được đóng thành công!');
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi đóng vị thế');
+                });
+            });
+            
+            // Xử lý sự kiện khi nút lưu thay đổi được nhấn
+            document.getElementById('savePositionChangesBtn').addEventListener('click', function() {
+                const positionId = document.getElementById('editPositionId').value;
+                const stopLoss = document.getElementById('editStopLoss').value;
+                const takeProfit = document.getElementById('editTakeProfit').value;
+                const trailingStop = document.getElementById('editTrailingStop').checked;
+                const trailingStopAmount = document.getElementById('editTrailingStopAmount').value;
+                
+                // Giả lập cập nhật thành công
+                // Ẩn modal
+                bootstrap.Modal.getInstance(document.getElementById('editPositionModal')).hide();
+                
+                // Cập nhật giá trị hiển thị trong bảng
+                const positionRow = document.querySelector(`button[data-position-id="${positionId}"]`).closest('tr');
+                positionRow.querySelector('td:nth-child(9) small:first-child').textContent = `SL: $${stopLoss}`;
+                positionRow.querySelector('td:nth-child(9) small:last-child').textContent = `TP: $${takeProfit}`;
+                
+                // Hiển thị thông báo thành công
+                alert('Vị thế đã được cập nhật thành công!');
+            });
+            
+            // Xử lý sự kiện khi nút làm mới được nhấn
+            document.getElementById('refreshPositionsBtn').addEventListener('click', function() {
+                // Giả lập làm mới bằng cách tải lại trang
+                window.location.reload();
+            });
+            
+            // Xử lý sự kiện khi nút vị thế mới được nhấn
+            document.getElementById('newPositionBtn').addEventListener('click', function() {
+                alert('Tính năng này đang được phát triển. Vui lòng thử lại sau!');
+            });
+            
+            // Khởi tạo các nút thay đổi ngôn ngữ
+            document.querySelectorAll('.language-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                });
+            });
+            
+            // Hàm thay đổi ngôn ngữ
+            function changeLanguage(lang) {
+                fetch('/api/language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ language: lang })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Làm mới trang để áp dụng ngôn ngữ mới
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

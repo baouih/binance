@@ -21,7 +21,11 @@ BOT_STATUS = {
     'uptime': '0d 0h 0m',
     'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'version': '1.0.0',
-    'active_strategies': ['RSI', 'MACD', 'BB']
+    'active_strategies': ['RSI', 'MACD', 'BB'],
+    'mode': 'demo',           # 'demo', 'testnet', 'live'
+    'account_type': 'futures', # 'spot', 'futures'
+    'strategy_mode': 'auto',   # 'auto', 'manual'
+    'last_action': 'Bot stopped unexpectedly'
 }
 
 # Giả lập dữ liệu tài khoản (sau này lấy từ API Binance)
@@ -132,6 +136,181 @@ def market():
                              error_message="Không thể tải dữ liệu thị trường. Vui lòng thử lại sau.")
 
 
+@app.route('/position')
+def position():
+    """Trang quản lý vị thế"""
+    try:
+        # Tạo dữ liệu giả lập cho vị thế
+        positions = [
+            {
+                'id': 'pos1',
+                'symbol': 'BTCUSDT',
+                'type': 'LONG',
+                'entry_price': 72000,
+                'current_price': 75000,
+                'quantity': 0.1,
+                'leverage': 5,
+                'pnl': 300,
+                'pnl_percent': 4.17,
+                'entry_time': '2025-02-28 18:30:00',
+                'duration': '1d 12h 26m',
+                'stop_loss': 68000,
+                'take_profit': 80000,
+                'status': 'active',
+                'risk_reward': 2.5,
+                'strategy': 'RSI + BB',
+                'tags': ['trend-following', 'medium-term']
+            },
+            {
+                'id': 'pos2',
+                'symbol': 'SOLUSDT',
+                'type': 'LONG',
+                'entry_price': 125,
+                'current_price': 137.5,
+                'quantity': 1,
+                'leverage': 3,
+                'pnl': 12.5,
+                'pnl_percent': 10,
+                'entry_time': '2025-02-28 20:10:00',
+                'duration': '1d 10h 46m',
+                'stop_loss': 115,
+                'take_profit': 150,
+                'status': 'active',
+                'risk_reward': 2.5,
+                'strategy': 'Support Level',
+                'tags': ['support-bounce', 'short-term']
+            },
+            {
+                'id': 'pos3',
+                'symbol': 'BNBUSDT',
+                'type': 'SHORT',
+                'entry_price': 410,
+                'current_price': 420,
+                'quantity': 0.2,
+                'leverage': 2,
+                'pnl': -2,
+                'pnl_percent': -2.44,
+                'entry_time': '2025-02-28 22:05:00',
+                'duration': '1d 8h 51m',
+                'stop_loss': 430,
+                'take_profit': 380,
+                'status': 'active',
+                'risk_reward': 1.5,
+                'strategy': 'Resistance Level',
+                'tags': ['resistance-rejection', 'medium-term']
+            }
+        ]
+        
+        # Dữ liệu lịch sử vị thế đã đóng
+        closed_positions = [
+            {
+                'id': 'pos_hist_1',
+                'symbol': 'ETHUSDT',
+                'type': 'LONG',
+                'entry_price': 3000,
+                'exit_price': 3150,
+                'quantity': 0.5,
+                'leverage': 2,
+                'pnl': 75,
+                'pnl_percent': 5.0,
+                'entry_time': '2025-02-25 14:30:00',
+                'exit_time': '2025-02-27 09:15:00',
+                'duration': '1d 18h 45m',
+                'exit_reason': 'take_profit',
+                'strategy': 'MACD Cross',
+                'successful': True
+            },
+            {
+                'id': 'pos_hist_2',
+                'symbol': 'DOGEUSDT',
+                'type': 'LONG',
+                'entry_price': 0.12,
+                'exit_price': 0.115,
+                'quantity': 1000,
+                'leverage': 1,
+                'pnl': -5,
+                'pnl_percent': -4.17,
+                'entry_time': '2025-02-26 10:20:00',
+                'exit_time': '2025-02-27 16:45:00',
+                'duration': '1d 6h 25m',
+                'exit_reason': 'stop_loss',
+                'strategy': 'Breakout',
+                'successful': False
+            },
+            {
+                'id': 'pos_hist_3',
+                'symbol': 'ADAUSDT',
+                'type': 'SHORT',
+                'entry_price': 0.45,
+                'exit_price': 0.42,
+                'quantity': 500,
+                'leverage': 2,
+                'pnl': 3,
+                'pnl_percent': 6.67,
+                'entry_time': '2025-02-24 18:30:00',
+                'exit_time': '2025-02-26 21:10:00',
+                'duration': '2d 2h 40m',
+                'exit_reason': 'manual',
+                'strategy': 'Fibonacci Retracement',
+                'successful': True
+            }
+        ]
+        
+        # Dữ liệu hiệu suất tổng thể
+        performance_data = {
+            'total_trades': 25,
+            'winning_trades': 17,
+            'losing_trades': 8,
+            'win_rate': 68.0,
+            'average_win': 12.5,
+            'average_loss': -7.8,
+            'profit_factor': 2.72,
+            'expectancy': 5.87,
+            'max_drawdown': 15.3,
+            'avg_holding_time': '1d 14h',
+            'best_trade': 45.2,
+            'worst_trade': -18.6,
+            'total_profit': 580.5,
+            'total_profit_percent': 5.8
+        }
+        
+        # Thông tin thị trường cho các cặp có vị thế
+        market_data = {
+            'BTCUSDT': {
+                'price': 75000,
+                'change_24h': 2.5,
+                'volume': 1500000000,
+                'market_regime': 'Trending',
+                'volatility': 'Medium'
+            },
+            'SOLUSDT': {
+                'price': 137.5,
+                'change_24h': 5.2,
+                'volume': 280000000,
+                'market_regime': 'Trending',
+                'volatility': 'High'
+            },
+            'BNBUSDT': {
+                'price': 420,
+                'change_24h': -1.5,
+                'volume': 150000000,
+                'market_regime': 'Ranging',
+                'volatility': 'Low'
+            }
+        }
+        
+        return render_template('position.html',
+                             bot_status=BOT_STATUS,
+                             positions=positions,
+                             closed_positions=closed_positions,
+                             performance_data=performance_data,
+                             market_data=market_data)
+    except Exception as e:
+        logger.error(f"Lỗi khi hiển thị trang vị thế: {str(e)}")
+        return render_template('error.html', 
+                             error_message="Không thể tải dữ liệu vị thế. Vui lòng thử lại sau.")
+
+
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""
@@ -207,12 +386,17 @@ def bot_control():
     """Điều khiển bot (start/stop/restart)"""
     data = request.json
     action = data.get('action', '')
+    strategy_mode = data.get('strategy_mode', 'auto')  # 'auto' hoặc 'manual'
     
     if action == 'start':
         BOT_STATUS['running'] = True
         BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info("Bot đã được khởi động")
-        return jsonify({'status': 'success', 'message': 'Bot đã được khởi động'})
+        BOT_STATUS['strategy_mode'] = strategy_mode
+        logger.info(f"Bot đã được khởi động với chế độ chiến lược: {strategy_mode}")
+        return jsonify({
+            'status': 'success', 
+            'message': f'Bot đã được khởi động với chế độ {strategy_mode}'
+        })
     
     elif action == 'stop':
         BOT_STATUS['running'] = False
@@ -223,8 +407,20 @@ def bot_control():
     elif action == 'restart':
         BOT_STATUS['running'] = True
         BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info("Bot đã được khởi động lại")
-        return jsonify({'status': 'success', 'message': 'Bot đã được khởi động lại'})
+        BOT_STATUS['strategy_mode'] = strategy_mode
+        logger.info(f"Bot đã được khởi động lại với chế độ chiến lược: {strategy_mode}")
+        return jsonify({
+            'status': 'success', 
+            'message': f'Bot đã được khởi động lại với chế độ {strategy_mode}'
+        })
+    
+    elif action == 'switch_mode':
+        BOT_STATUS['strategy_mode'] = strategy_mode
+        logger.info(f"Đã chuyển chế độ chiến lược sang: {strategy_mode}")
+        return jsonify({
+            'status': 'success', 
+            'message': f'Đã chuyển chế độ chiến lược sang {strategy_mode}'
+        })
     
     else:
         return jsonify({'status': 'error', 'message': 'Hành động không hợp lệ'})
