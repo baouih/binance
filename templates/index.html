@@ -14,6 +14,14 @@
             background-color: #0d1117;
             color: #c9d1d9;
             padding-bottom: 70px; /* Add padding for mobile navigation */
+            max-width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scrolling on mobile */
+        }
+        
+        /* Responsive layout for mobile */
+        .row {
+            margin-right: 0;
+            margin-left: 0;
         }
         .nav-link.active {
             background-color: #161b22 !important;
@@ -134,12 +142,25 @@
 <body>
     <div class="container py-4">
         <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
-            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+            <!-- Mobile header - simplified for mobile view -->
+            <div class="d-flex d-md-none align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-currency-bitcoin fs-4 me-2"></i>
+                    <span class="fs-5">Bot Crypto</span>
+                </div>
+                <div>
+                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
+                    <span class="small">{{ 'ON' if bot_status.running else 'OFF' }}</span>
+                </div>
+            </div>
+            
+            <!-- Desktop header -->
+            <div class="d-none d-md-flex align-items-center mb-3 mb-md-0 me-md-auto">
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
             </div>
             
-            <div class="d-flex align-items-center">
+            <div class="d-none d-md-flex align-items-center">
                 <div class="me-3">
                     <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
                     <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
@@ -155,6 +176,14 @@
                 </div>
             </div>
         </header>
+        
+        <!-- Float button to toggle on/off -->
+        <div class="d-block d-md-none" style="position: fixed; bottom: 70px; right: 20px; z-index: 1000;">
+            <button class="btn btn-sm {{ 'btn-danger' if bot_status.running else 'btn-success' }} rounded-circle shadow" style="width: 48px; height: 48px;"
+                    id="mobileBotToggle">
+                <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} fs-4"></i>
+            </button>
+        </div>
         
         <!-- Mobile bottom navigation -->
         <div class="fixed-bottom bg-dark d-block d-md-none pb-2">
@@ -586,6 +615,7 @@ Nhập 'help' để xem danh sách lệnh.
             // Bot control buttons
             const toggleBotBtn = document.getElementById('toggleBotBtn');
             const restartBotBtn = document.getElementById('restartBotBtn');
+            const mobileBotToggle = document.getElementById('mobileBotToggle');
             
             // Mobile tab navigation
             const dashboardMobileBtn = document.getElementById('dashboard-mobile-btn');
@@ -627,9 +657,31 @@ Nhập 'help' để xem danh sách lệnh.
                 }
             }
             
-            // Handle toggle bot button
+            // Handle toggle bot button (desktop)
             toggleBotBtn.addEventListener('click', function() {
                 const action = toggleBotBtn.textContent.trim() === 'Khởi động' ? 'start' : 'stop';
+                
+                fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    location.reload(); // Reload the page to update status
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi điều khiển bot');
+                });
+            });
+            
+            // Handle toggle bot button (mobile floating button)
+            mobileBotToggle.addEventListener('click', function() {
+                const action = mobileBotToggle.querySelector('i').classList.contains('bi-play-fill') ? 'start' : 'stop';
                 
                 fetch('/api/bot/control', {
                     method: 'POST',
