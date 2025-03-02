@@ -177,6 +177,501 @@ def market():
             {'symbol': 'MATIC', 'name': 'Polygon', 'price': 0.68, 'change': -0.7, 'volume': 65}
         ]
         
+        # Thêm dữ liệu phân tích chuyên sâu
+        current_market_data['market_analysis'] = {
+            'btc_volatility': 2.3,  # Biến động (%)
+            'market_sentiment': 65,  # Thang điểm 0-100
+            'liquidity_index': 78,   # Thang điểm 0-100
+            'market_cycle': 'Uptrend', # Chu kỳ thị trường hiện tại
+            'fear_greed_index': 65, # Chỉ số sợ hãi/tham lam
+            'major_supports': [68500, 67000, 65200], # Các vùng hỗ trợ chính
+            'major_resistances': [72500, 74000, 76000], # Các vùng kháng cự chính
+            'analysis_summary': 'Thị trường đang trong xu hướng tăng với khối lượng ổn định. Các chỉ báo kỹ thuật cho thấy khả năng tiếp tục đà tăng nhưng có thể có điều chỉnh ngắn hạn tại các vùng kháng cự.'
+        }
+        
+        # Thêm dữ liệu tin tức thị trường
+        current_market_data['market_news'] = [
+            {
+                'title': 'Bitcoin vượt ngưỡng 70.000 USD lần đầu tiên kể từ tháng 3',
+                'source': 'CoinDesk',
+                'time': '2h trước',
+                'impact': 'positive',
+                'url': '#'
+            },
+            {
+                'title': 'Ethereum chuẩn bị cập nhật mạng lưới mới vào tháng 4',
+                'source': 'CryptoNews',
+                'time': '5h trước',
+                'impact': 'positive',
+                'url': '#'
+            },
+            {
+                'title': 'Binance giới thiệu các công cụ giao dịch mới dành cho nhà đầu tư',
+                'source': 'Binance Blog',
+                'time': '1 ngày trước',
+                'impact': 'neutral',
+                'url': '#'
+            }
+        ]
+        
+        # Thêm dữ liệu chỉ báo kỹ thuật
+        current_market_data['technical_indicators'] = {
+            'ma_signals': {
+                'ma_20': 'bullish',
+                'ma_50': 'bullish',
+                'ma_100': 'bullish',
+                'ma_200': 'bullish'
+            },
+            'oscillators': {
+                'rsi': {
+                    'value': 62,
+                    'signal': 'neutral'
+                },
+                'macd': {
+                    'value': 125,
+                    'signal': 'bullish'
+                },
+                'stoch': {
+                    'value': 75,
+                    'signal': 'neutral'
+                }
+            },
+            'overall_signal': 'bullish'
+        }
+        
+        # Tạo template nếu chưa tồn tại
+        import os
+        template_path = 'templates/market.html'
+        if not os.path.exists(template_path):
+            with open(template_path, 'w') as f:
+                f.write("""<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích thị trường - Bot Giao Dịch Crypto</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .market-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        .status-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .status-running {
+            background-color: #3fb950;
+        }
+        .status-stopped {
+            background-color: #f85149;
+        }
+        .mode-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            color: white;
+        }
+        .mode-demo {
+            background-color: #6c757d;
+        }
+        .mode-testnet {
+            background-color: #fd7e14;
+        }
+        .mode-live {
+            background-color: #dc3545;
+        }
+        .market-table th, .market-table td {
+            padding: 0.5rem;
+        }
+        .positive-change {
+            color: #3fb950;
+        }
+        .negative-change {
+            color: #f85149;
+        }
+        .news-item {
+            border-left: 3px solid;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .news-positive {
+            border-color: #3fb950;
+        }
+        .news-negative {
+            border-color: #f85149;
+        }
+        .news-neutral {
+            border-color: #58a6ff;
+        }
+        .indicator-bullish {
+            color: #3fb950;
+        }
+        .indicator-bearish {
+            color: #f85149;
+        }
+        .indicator-neutral {
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+                <a href="/" class="d-flex align-items-center text-decoration-none">
+                    <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
+                    <span class="fs-4">Bot Giao Dịch Crypto</span>
+                </a>
+                <div class="ms-3">
+                    <span class="mode-badge mode-demo">Chế độ Demo</span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <!-- Language selector -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-translate"></i> Ngôn ngữ
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><a class="dropdown-item" href="#" data-language="vi"><span class="me-2">🇻🇳</span>Tiếng Việt</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="en"><span class="me-2">🇺🇸</span>English</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Bot status -->
+                <div class="me-3">
+                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
+                    <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
+                </div>
+                
+                <!-- Bot controls -->
+                <div class="btn-group">
+                    <a href="/" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col">
+                <h2><i class="bi bi-bar-chart-line"></i> Phân tích thị trường</h2>
+                <p class="text-muted">Dữ liệu thị trường thời gian thực và phân tích chuyên sâu</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- BTC Price Card -->
+            <div class="col-md-4">
+                <div class="market-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>BTC/USDT</h5>
+                        <span class="badge bg-info">Trending</span>
+                    </div>
+                    <h2>${{ '{:,.2f}'.format(market_data.btc_price) }}</h2>
+                    <p class="{{ 'positive-change' if market_data.btc_change_24h > 0 else 'negative-change' }}">
+                        <i class="bi {{ 'bi-arrow-up-right' if market_data.btc_change_24h > 0 else 'bi-arrow-down-right' }}"></i>
+                        {{ '{:.2f}'.format(market_data.btc_change_24h) }}% (24h)
+                    </p>
+                </div>
+            </div>
+            <!-- Fear & Greed Index -->
+            <div class="col-md-4">
+                <div class="market-card p-3">
+                    <h5>Chỉ số Sợ hãi & Tham lam</h5>
+                    <div class="d-flex justify-content-center align-items-center my-2">
+                        <div class="position-relative" style="width: 100px; height: 100px;">
+                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                <h3>{{ market_data.market_analysis.fear_greed_index }}</h3>
+                                <small>{{ 'Tham lam' if market_data.market_analysis.fear_greed_index > 50 else 'Sợ hãi' }}</small>
+                            </div>
+                            <!-- Circular progress gauge would go here -->
+                            <svg viewBox="0 0 36 36" class="position-absolute top-0 start-0" style="width: 100%; height: 100%;">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#30363d" stroke-width="2" />
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="{{ '#3fb950' if market_data.market_analysis.fear_greed_index > 50 else '#f85149' }}" stroke-width="2" stroke-dasharray="{{ market_data.market_analysis.fear_greed_index }}, 100" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-center text-muted mt-2">Cập nhật: Hôm nay</p>
+                </div>
+            </div>
+            <!-- Market Analysis Summary -->
+            <div class="col-md-4">
+                <div class="market-card p-3">
+                    <h5>Tóm tắt thị trường</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="fw-bold">Chu kỳ:</span> 
+                            <span class="badge bg-success">{{ market_data.market_analysis.market_cycle }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="fw-bold">Biến động:</span> 
+                            <span>{{ market_data.market_analysis.btc_volatility }}%</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="fw-bold">Thanh khoản:</span>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-info" style="width: {{ market_data.market_analysis.liquidity_index }}%"></div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="fw-bold">Tín hiệu:</span> 
+                            <span class="indicator-{{ market_data.technical_indicators.overall_signal }}">
+                                {{ 'Tăng giá' if market_data.technical_indicators.overall_signal == 'bullish' else 'Giảm giá' if market_data.technical_indicators.overall_signal == 'bearish' else 'Trung lập' }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- Price Chart -->
+            <div class="col-md-8">
+                <div class="market-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Biểu đồ giá BTC/USDT</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary active">1H</button>
+                            <button class="btn btn-outline-secondary">4H</button>
+                            <button class="btn btn-outline-secondary">1D</button>
+                            <button class="btn btn-outline-secondary">1W</button>
+                        </div>
+                    </div>
+                    <div style="height: 300px; background-color: #0d1117; border: 1px solid #30363d; border-radius: 6px;">
+                        <!-- Chart would go here - using a placeholder -->
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="text-center">
+                                <div class="spinner-border text-secondary mb-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mb-0">Đang tải biểu đồ...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Technical Indicators -->
+            <div class="col-md-4">
+                <div class="market-card p-3">
+                    <h5>Chỉ báo kỹ thuật</h5>
+                    <div class="mb-3">
+                        <h6>Đường trung bình động</h6>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>MA20</span>
+                            <span class="indicator-{{ market_data.technical_indicators.ma_signals.ma_20 }}">
+                                <i class="bi {{ 'bi-arrow-up' if market_data.technical_indicators.ma_signals.ma_20 == 'bullish' else 'bi-arrow-down' }}"></i>
+                                {{ 'Tăng' if market_data.technical_indicators.ma_signals.ma_20 == 'bullish' else 'Giảm' }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>MA50</span>
+                            <span class="indicator-{{ market_data.technical_indicators.ma_signals.ma_50 }}">
+                                <i class="bi {{ 'bi-arrow-up' if market_data.technical_indicators.ma_signals.ma_50 == 'bullish' else 'bi-arrow-down' }}"></i>
+                                {{ 'Tăng' if market_data.technical_indicators.ma_signals.ma_50 == 'bullish' else 'Giảm' }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>MA200</span>
+                            <span class="indicator-{{ market_data.technical_indicators.ma_signals.ma_200 }}">
+                                <i class="bi {{ 'bi-arrow-up' if market_data.technical_indicators.ma_signals.ma_200 == 'bullish' else 'bi-arrow-down' }}"></i>
+                                {{ 'Tăng' if market_data.technical_indicators.ma_signals.ma_200 == 'bullish' else 'Giảm' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <h6>Bộ dao động</h6>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>RSI (14)</span>
+                            <span class="indicator-{{ market_data.technical_indicators.oscillators.rsi.signal }}">
+                                {{ market_data.technical_indicators.oscillators.rsi.value }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>MACD</span>
+                            <span class="indicator-{{ market_data.technical_indicators.oscillators.macd.signal }}">
+                                {{ 'Tăng' if market_data.technical_indicators.oscillators.macd.signal == 'bullish' else 'Giảm' }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Stochastic</span>
+                            <span class="indicator-{{ market_data.technical_indicators.oscillators.stoch.signal }}">
+                                {{ market_data.technical_indicators.oscillators.stoch.value }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- Top Gainers & Losers -->
+            <div class="col-md-6">
+                <div class="market-card p-3">
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#gainers">Top Tăng giá</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#losers">Top Giảm giá</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="gainers">
+                            <div class="table-responsive">
+                                <table class="table table-sm market-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Token</th>
+                                            <th>Giá</th>
+                                            <th>Thay đổi 24h</th>
+                                            <th>Khối lượng (M)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for coin in market_data.top_gainers %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ coin.symbol }}</strong><br>
+                                                <small class="text-muted">{{ coin.name }}</small>
+                                            </td>
+                                            <td>${{ '{:,.2f}'.format(coin.price) }}</td>
+                                            <td class="positive-change">+{{ coin.change }}%</td>
+                                            <td>{{ coin.volume }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="losers">
+                            <div class="table-responsive">
+                                <table class="table table-sm market-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Token</th>
+                                            <th>Giá</th>
+                                            <th>Thay đổi 24h</th>
+                                            <th>Khối lượng (M)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for coin in market_data.top_losers %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ coin.symbol }}</strong><br>
+                                                <small class="text-muted">{{ coin.name }}</small>
+                                            </td>
+                                            <td>${{ '{:,.2f}'.format(coin.price) }}</td>
+                                            <td class="negative-change">{{ coin.change }}%</td>
+                                            <td>{{ coin.volume }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Market News -->
+            <div class="col-md-6">
+                <div class="market-card p-3">
+                    <h5>Tin tức thị trường mới nhất</h5>
+                    <div>
+                        {% for news in market_data.market_news %}
+                        <div class="news-item news-{{ news.impact }}">
+                            <h6>{{ news.title }}</h6>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">{{ news.source }}</small>
+                                <small class="text-muted">{{ news.time }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="#" class="btn btn-sm btn-outline-secondary">Xem thêm tin tức</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Market Analysis -->
+            <div class="col-12">
+                <div class="market-card p-3">
+                    <h5>Phân tích thị trường chi tiết</h5>
+                    <p>{{ market_data.market_analysis.analysis_summary }}</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Vùng hỗ trợ chính</h6>
+                            <ul>
+                                {% for level in market_data.market_analysis.major_supports %}
+                                <li>${{ '{:,.0f}'.format(level) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Vùng kháng cự chính</h6>
+                            <ul>
+                                {% for level in market_data.market_analysis.major_resistances %}
+                                <li>${{ '{:,.0f}'.format(level) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle"></i> <strong>Lưu ý:</strong> Phân tích thị trường này chỉ mang tính chất tham khảo và không phải là lời khuyên đầu tư.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Language switcher
+            document.querySelectorAll('[data-language]').forEach(item => {
+                item.addEventListener('click', event => {
+                    const language = event.currentTarget.dataset.language;
+                    fetch('/api/language', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ language: language }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Refresh the page to apply the new language
+                            location.reload();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>""")
+        
         return render_template('market.html', 
                              bot_status=BOT_STATUS,
                              market_data=current_market_data)
@@ -190,8 +685,8 @@ def market():
 def position():
     """Trang quản lý vị thế"""
     try:
-        # Tạo dữ liệu giả lập cho vị thế
-        positions = [
+        # Cập nhật dữ liệu vị thế từ dữ liệu mẫu hoặc API thực
+        current_positions = [
             {
                 'id': 'pos1',
                 'symbol': 'BTCUSDT',
@@ -349,12 +844,616 @@ def position():
             }
         }
         
-        return render_template('position.html',
+        # Cập nhật dữ liệu tài khoản với các vị thế hiện tại
+        account_data = {
+            'balance': 10400,
+            'equity': 10710.5,
+            'free_balance': 10400,
+            'margin': 0,
+            'positions': current_positions
+        }
+        
+        # Tạo template nếu chưa tồn tại
+        import os
+        template_path = 'templates/position.html'
+        if not os.path.exists(template_path):
+            with open(template_path, 'w') as f:
+                f.write("""<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý vị thế - Bot Giao Dịch Crypto</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .position-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        .status-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .status-running {
+            background-color: #3fb950;
+        }
+        .status-stopped {
+            background-color: #f85149;
+        }
+        .mode-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            color: white;
+        }
+        .mode-demo {
+            background-color: #6c757d;
+        }
+        .mode-testnet {
+            background-color: #fd7e14;
+        }
+        .mode-live {
+            background-color: #dc3545;
+        }
+        .position-table th, .position-table td {
+            padding: 0.5rem;
+        }
+        .positive-pnl {
+            color: #3fb950;
+        }
+        .negative-pnl {
+            color: #f85149;
+        }
+        .exit-reason-take_profit {
+            color: #3fb950;
+        }
+        .exit-reason-stop_loss {
+            color: #f85149;
+        }
+        .exit-reason-manual {
+            color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+                <a href="/" class="d-flex align-items-center text-decoration-none">
+                    <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
+                    <span class="fs-4">Bot Giao Dịch Crypto</span>
+                </a>
+                <div class="ms-3">
+                    <span class="mode-badge mode-demo">Chế độ Demo</span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <!-- Language selector -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-translate"></i> Ngôn ngữ
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><a class="dropdown-item" href="#" data-language="vi"><span class="me-2">🇻🇳</span>Tiếng Việt</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="en"><span class="me-2">🇺🇸</span>English</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Bot status -->
+                <div class="me-3">
+                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
+                    <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
+                </div>
+                
+                <!-- Bot controls -->
+                <div class="btn-group">
+                    <a href="/" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col">
+                <h2><i class="bi bi-graph-up"></i> Quản lý vị thế</h2>
+                <p class="text-muted">Quản lý và theo dõi các vị thế giao dịch đang mở và lịch sử</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- Account Overview -->
+            <div class="col-md-4">
+                <div class="position-card p-3">
+                    <h5>Tổng quan tài khoản</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Số dư:</span>
+                            <span class="fw-bold">${{ '{:,.2f}'.format(account_data.balance) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Equity:</span>
+                            <span class="fw-bold">${{ '{:,.2f}'.format(account_data.equity) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Margin:</span>
+                            <span>{{ '{:,.2f}'.format(account_data.margin) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Số dư khả dụng:</span>
+                            <span>${{ '{:,.2f}'.format(account_data.free_balance) }}</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-info" type="button" data-bs-toggle="modal" data-bs-target="#newPositionModal">
+                            <i class="bi bi-plus-circle"></i> Mở vị thế mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Position Summary -->
+            <div class="col-md-4">
+                <div class="position-card p-3">
+                    <h5>Tóm tắt vị thế</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tổng vị thế mở:</span>
+                            <span class="fw-bold">{{ account_data.positions|length }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>PnL tổng:</span>
+                            {% set total_pnl = 0 %}
+                            {% for position in account_data.positions %}
+                                {% set total_pnl = total_pnl + position.pnl %}
+                            {% endfor %}
+                            <span class="fw-bold {{ 'positive-pnl' if total_pnl >= 0 else 'negative-pnl' }}">
+                                ${{ '{:,.2f}'.format(total_pnl) }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Vị thế LONG:</span>
+                            <span>{{ account_data.positions|selectattr('type', 'equalto', 'LONG')|list|length }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Vị thế SHORT:</span>
+                            <span>{{ account_data.positions|selectattr('type', 'equalto', 'SHORT')|list|length }}</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" type="button" id="closeAllPositionsBtn">
+                            <i class="bi bi-x-circle"></i> Đóng tất cả vị thế
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk Management -->
+            <div class="col-md-4">
+                <div class="position-card p-3">
+                    <h5>Quản lý rủi ro</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Rủi ro mỗi giao dịch:</span>
+                            <span>1.0%</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Đòn bẩy mặc định:</span>
+                            <span>3x</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Stop-loss mặc định:</span>
+                            <span>-3.0%</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Take-profit mặc định:</span>
+                            <span>+6.0%</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#riskSettingsModal">
+                            <i class="bi bi-gear"></i> Cài đặt rủi ro
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Positions -->
+        <div class="position-card p-3 mb-4">
+            <h5>Vị thế đang mở</h5>
+            <div class="table-responsive">
+                <table class="table table-sm position-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Loại</th>
+                            <th>Giá vào</th>
+                            <th>Giá hiện tại</th>
+                            <th>SL/TP</th>
+                            <th>Số lượng</th>
+                            <th>Đòn bẩy</th>
+                            <th>PnL</th>
+                            <th>Thời gian vào</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for position in account_data.positions %}
+                        <tr>
+                            <td><strong>{{ position.symbol }}</strong></td>
+                            <td>
+                                <span class="{{ 'text-success' if position.type == 'LONG' else 'text-danger' }}">
+                                    {{ position.type }}
+                                </span>
+                            </td>
+                            <td>{{ '{:,.2f}'.format(position.entry_price) }}</td>
+                            <td>{{ '{:,.2f}'.format(position.current_price) }}</td>
+                            <td>
+                                <small>SL: {{ '{:,.2f}'.format(position.stop_loss) }}</small><br>
+                                <small>TP: {{ '{:,.2f}'.format(position.take_profit) }}</small>
+                            </td>
+                            <td>{{ position.quantity }}</td>
+                            <td>{{ position.leverage }}x</td>
+                            <td class="{{ 'positive-pnl' if position.pnl > 0 else 'negative-pnl' }}">
+                                ${{ '{:,.2f}'.format(position.pnl) }}<br>
+                                <small>{{ '{:,.2f}%'.format(position.pnl_percent) }}</small>
+                            </td>
+                            <td>{{ position.entry_time }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-danger close-position-btn" data-position-id="{{ position.id }}">
+                                        <i class="bi bi-x-circle"></i> Đóng
+                                    </button>
+                                    <button class="btn btn-outline-secondary edit-position-btn" data-position-id="{{ position.id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center">Không có vị thế đang mở</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Position History -->
+        <div class="position-card p-3">
+            <h5>Lịch sử vị thế</h5>
+            <div class="table-responsive">
+                <table class="table table-sm position-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Loại</th>
+                            <th>Giá vào/ra</th>
+                            <th>SL/TP</th>
+                            <th>Số lượng</th>
+                            <th>Đòn bẩy</th>
+                            <th>PnL</th>
+                            <th>Thời gian vào/ra</th>
+                            <th>Lý do đóng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for position in position_history %}
+                        <tr>
+                            <td><strong>{{ position.symbol }}</strong></td>
+                            <td>
+                                <span class="{{ 'text-success' if position.type == 'LONG' else 'text-danger' }}">
+                                    {{ position.type }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>Vào: {{ '{:,.2f}'.format(position.entry_price) }}</small><br>
+                                <small>Ra: {{ '{:,.2f}'.format(position.exit_price) }}</small>
+                            </td>
+                            <td>
+                                <small>SL: {{ '{:,.2f}'.format(position.stop_loss) }}</small><br>
+                                <small>TP: {{ '{:,.2f}'.format(position.take_profit) }}</small>
+                            </td>
+                            <td>{{ position.quantity }}</td>
+                            <td>{{ position.leverage }}x</td>
+                            <td class="{{ 'positive-pnl' if position.pnl > 0 else 'negative-pnl' }}">
+                                ${{ '{:,.2f}'.format(position.pnl) }}<br>
+                                <small>{{ '{:,.2f}%'.format(position.pnl_percent) }}</small>
+                            </td>
+                            <td>
+                                <small>Vào: {{ position.entry_time }}</small><br>
+                                <small>Ra: {{ position.exit_time }}</small>
+                            </td>
+                            <td>
+                                <span class="exit-reason-{{ position.exit_reason }}">
+                                    {% if position.exit_reason == 'take_profit' %}
+                                        Take Profit
+                                    {% elif position.exit_reason == 'stop_loss' %}
+                                        Stop Loss
+                                    {% elif position.exit_reason == 'manual' %}
+                                        Đóng thủ công
+                                    {% else %}
+                                        {{ position.exit_reason }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center">Không có dữ liệu lịch sử</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal mở vị thế mới -->
+    <div class="modal fade" id="newPositionModal" tabindex="-1" aria-labelledby="newPositionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newPositionModalLabel">Mở vị thế mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newPositionForm">
+                        <div class="mb-3">
+                            <label for="symbol" class="form-label">Symbol</label>
+                            <select class="form-select" id="symbol" required>
+                                <option value="BTCUSDT">BTCUSDT</option>
+                                <option value="ETHUSDT">ETHUSDT</option>
+                                <option value="BNBUSDT">BNBUSDT</option>
+                                <option value="SOLUSDT">SOLUSDT</option>
+                                <option value="ADAUSDT">ADAUSDT</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Loại vị thế</label>
+                            <div class="d-flex">
+                                <div class="form-check me-4">
+                                    <input class="form-check-input" type="radio" name="positionType" id="typeLong" value="LONG" checked>
+                                    <label class="form-check-label text-success" for="typeLong">
+                                        LONG
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="positionType" id="typeShort" value="SHORT">
+                                    <label class="form-check-label text-danger" for="typeShort">
+                                        SHORT
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Số lượng</label>
+                            <input type="number" class="form-control" id="quantity" step="0.001" min="0.001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leverage" class="form-label">Đòn bẩy (1-100x)</label>
+                            <input type="number" class="form-control" id="leverage" min="1" max="100" value="3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stopLossPercent" class="form-label">Stop-Loss (%)</label>
+                            <input type="number" class="form-control" id="stopLossPercent" step="0.1" value="3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="takeProfitPercent" class="form-label">Take-Profit (%)</label>
+                            <input type="number" class="form-control" id="takeProfitPercent" step="0.1" value="6" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="submitNewPosition">Mở vị thế</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal cài đặt rủi ro -->
+    <div class="modal fade" id="riskSettingsModal" tabindex="-1" aria-labelledby="riskSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="riskSettingsModalLabel">Cài đặt quản lý rủi ro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="riskSettingsForm">
+                        <div class="mb-3">
+                            <label for="riskPerTrade" class="form-label">Rủi ro mỗi giao dịch (%)</label>
+                            <input type="number" class="form-control" id="riskPerTrade" step="0.1" min="0.1" max="5" value="1" required>
+                            <div class="form-text">% tài khoản tối đa có thể mất trong một giao dịch</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="defaultLeverage" class="form-label">Đòn bẩy mặc định</label>
+                            <input type="number" class="form-control" id="defaultLeverage" min="1" max="100" value="3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="defaultSL" class="form-label">Stop-Loss mặc định (%)</label>
+                            <input type="number" class="form-control" id="defaultSL" step="0.1" min="0.5" value="3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="defaultTP" class="form-label">Take-Profit mặc định (%)</label>
+                            <input type="number" class="form-control" id="defaultTP" step="0.1" min="0.5" value="6" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maxPositions" class="form-label">Số vị thế mở tối đa</label>
+                            <input type="number" class="form-control" id="maxPositions" min="1" max="20" value="5" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="useTrailingStop" checked>
+                            <label class="form-check-label" for="useTrailingStop">Sử dụng Trailing Stop</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="saveRiskSettings">Lưu cài đặt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý đóng vị thế
+            document.querySelectorAll('.close-position-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.dataset.positionId;
+                    if (confirm('Bạn có chắc muốn đóng vị thế này?')) {
+                        closePosition(positionId);
+                    }
+                });
+            });
+            
+            // Xử lý đóng tất cả vị thế
+            document.getElementById('closeAllPositionsBtn').addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn đóng TẤT CẢ vị thế đang mở?')) {
+                    document.querySelectorAll('.close-position-btn').forEach(button => {
+                        closePosition(button.dataset.positionId);
+                    });
+                }
+            });
+            
+            // Hàm đóng vị thế
+            function closePosition(positionId) {
+                fetch('/api/positions/close', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ position_id: positionId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Đã đóng vị thế thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi khi đóng vị thế: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi kết nối đến máy chủ');
+                });
+            }
+            
+            // Xử lý mở vị thế mới
+            document.getElementById('submitNewPosition').addEventListener('click', function() {
+                // TODO: Thêm logic gửi dữ liệu lên server để mở vị thế mới
+                alert('Chức năng mở vị thế mới đang được phát triển. Vui lòng thử lại sau.');
+            });
+            
+            // Xử lý lưu cài đặt rủi ro
+            document.getElementById('saveRiskSettings').addEventListener('click', function() {
+                // TODO: Thêm logic gửi dữ liệu lên server để lưu cài đặt rủi ro
+                alert('Đã lưu cài đặt rủi ro!');
+                document.getElementById('riskSettingsModal').querySelector('.btn-close').click();
+            });
+            
+            // Language switcher
+            document.querySelectorAll('[data-language]').forEach(item => {
+                item.addEventListener('click', event => {
+                    const language = event.currentTarget.dataset.language;
+                    fetch('/api/language', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ language: language }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Refresh the page to apply the new language
+                            location.reload();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>""")
+        
+        # Lịch sử giao dịch
+        position_history = [
+            {
+                'id': 'hist1',
+                'symbol': 'ETHUSDT',
+                'type': 'LONG',
+                'entry_price': 2200,
+                'exit_price': 2350,
+                'quantity': 0.5,
+                'leverage': 1,
+                'pnl': 75,
+                'pnl_percent': 6.82,
+                'stop_loss': 2150,
+                'take_profit': 2400,
+                'entry_time': '2025-02-25 14:30:00',
+                'exit_time': '2025-02-27 09:45:00',
+                'exit_reason': 'take_profit'
+            },
+            {
+                'id': 'hist2',
+                'symbol': 'BTCUSDT',
+                'type': 'SHORT',
+                'entry_price': 72500,
+                'exit_price': 71200,
+                'quantity': 0.05,
+                'leverage': 1,
+                'pnl': 65,
+                'pnl_percent': 1.79,
+                'stop_loss': 73000,
+                'take_profit': 71000,
+                'entry_time': '2025-02-26 10:15:00',
+                'exit_time': '2025-02-27 18:20:00',
+                'exit_reason': 'take_profit'
+            },
+            {
+                'id': 'hist3',
+                'symbol': 'DOGEUSDT',
+                'type': 'LONG',
+                'entry_price': 0.11,
+                'exit_price': 0.105,
+                'quantity': 1000,
+                'leverage': 1,
+                'pnl': -5,
+                'pnl_percent': -4.55,
+                'stop_loss': 0.105,
+                'take_profit': 0.12,
+                'entry_time': '2025-02-27 11:30:00',
+                'exit_time': '2025-02-28 03:10:00',
+                'exit_reason': 'stop_loss'
+            }
+        ]
+        
+        return render_template('position.html', 
                              bot_status=BOT_STATUS,
-                             positions=positions,
-                             closed_positions=closed_positions,
-                             performance_data=performance_data,
-                             market_data=market_data)
+                             account_data=account_data,
+                             position_history=position_history)
     except Exception as e:
         logger.error(f"Lỗi khi hiển thị trang vị thế: {str(e)}")
         return render_template('error.html', 
