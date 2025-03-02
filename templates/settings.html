@@ -236,4 +236,35 @@
 
 {% block scripts %}
 <script src="/static/js/settings.js"></script>
+<script>
+    // Kiểm tra xem người dùng đến từ thiết bị mobile hay không (từ localStorage)
+    document.addEventListener('DOMContentLoaded', function() {
+        const isMobileDevice = localStorage.getItem('isMobileDevice') === 'true';
+        
+        // Thêm nút quay lại trang chủ cho mobile nếu cần
+        if (isMobileDevice) {
+            console.log("Mobile device detected on settings page");
+            
+            // Tạo nút quay lại nếu chưa tồn tại
+            if (!document.getElementById('mobile-back-btn')) {
+                const backBtn = document.createElement('a');
+                backBtn.id = 'mobile-back-btn';
+                backBtn.href = '/';
+                backBtn.className = 'btn btn-outline-secondary position-fixed';
+                backBtn.style.top = '10px';
+                backBtn.style.left = '10px';
+                backBtn.style.zIndex = '1030';
+                backBtn.innerHTML = '<i class="bi bi-arrow-left"></i> Trang chủ';
+                
+                // Đảm bảo rằng khi quay về trang chủ, chế độ mobile được duy trì
+                backBtn.addEventListener('click', function(e) {
+                    // Không cần e.preventDefault() vì chúng ta muốn chuyển hướng
+                    localStorage.setItem('isMobileDevice', 'true');
+                });
+                
+                document.body.appendChild(backBtn);
+            }
+        }
+    });
+</script>
 {% endblock %}

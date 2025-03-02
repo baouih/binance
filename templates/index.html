@@ -935,7 +935,29 @@ Nhập 'help' để xem danh sách lệnh.
             if (mobileBotToggle) {
                 mobileBotToggle.addEventListener('click', function() {
                     console.log("Mobile bot toggle clicked");
-                    fakeStartBot();
+                    // Kiểm tra xem API đã được thiết lập chưa
+                    fetch('/api/account/settings')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("API settings:", data);
+                        if (data.api_mode === 'testnet' || data.api_mode === 'live') {
+                            if (!data.api_key || !data.api_secret) {
+                                // Chưa có API key
+                                console.log("API keys not set, redirecting to settings");
+                                window.location.href = '/settings';
+                                return;
+                            }
+                            // Gọi API khởi động bot
+                            toggleBotStatus();
+                        } else {
+                            // Đang ở chế độ demo, giả lập khởi động
+                            toggleBotStatus();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error checking API settings:", error);
+                        alert("Lỗi khi kiểm tra cài đặt API. Vui lòng thử lại.");
+                    });
                 });
             }
             

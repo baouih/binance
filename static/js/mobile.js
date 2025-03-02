@@ -114,6 +114,9 @@ function checkMobileLayout() {
             menuBtn.style.left = '10px';
             menuBtn.style.top = '10px';
         }
+        
+        // Save mobile detection state to localStorage
+        localStorage.setItem('isMobileDevice', 'true');
     } else {
         // Reset to desktop view
         document.body.classList.remove('mobile-view', 'portrait-view', 'landscape-view');
@@ -123,6 +126,9 @@ function checkMobileLayout() {
         if (menuBtn) {
             menuBtn.style.display = 'none';
         }
+        
+        // Update localStorage
+        localStorage.setItem('isMobileDevice', 'false');
     }
 }
 
