@@ -901,6 +901,17 @@ Nhập 'help' để xem danh sách lệnh.
                 if (tabEl) {
                     var tab = new bootstrap.Tab(tabEl);
                     tab.show();
+                    console.log(`Activated tab: ${tabId}`);
+                } else {
+                    // Nếu không tìm thấy tab (có thể đây là trang riêng biệt), chuyển đến trang đó
+                    console.log(`Tab element not found for ${tabId}, checking for separate page`);
+                    
+                    // Xử lý trường hợp đặc biệt
+                    if (tabId === 'settings') {
+                        console.log('Redirecting to settings page');
+                        window.location.href = '/settings';
+                        return;
+                    }
                 }
             }
             
