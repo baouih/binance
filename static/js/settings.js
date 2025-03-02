@@ -221,6 +221,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Hàm cập nhật badge toàn cục (trên navbar)
+    function updateGlobalModeBadge(mode, text) {
+        // Cập nhật header badge
+        const headerBadge = document.querySelector('.navbar .mode-badge');
+        if (headerBadge) {
+            // Xóa các class cũ
+            headerBadge.classList.remove('mode-demo', 'mode-testnet', 'mode-live');
+            
+            // Thêm class mới
+            headerBadge.classList.add(`mode-${mode}`);
+            
+            // Cập nhật text
+            headerBadge.textContent = text;
+        }
+        
+        // Cập nhật botCrypto title badge nếu có
+        const titleBadge = document.querySelector('.bot-crypto-title .badge');
+        if (titleBadge) {
+            // Xóa các class cũ
+            titleBadge.classList.remove('bg-secondary', 'bg-warning', 'bg-danger');
+            
+            // Thêm class mới dựa trên mode
+            if (mode === 'demo') {
+                titleBadge.classList.add('bg-secondary');
+                titleBadge.textContent = 'Chế độ Demo';
+            } else if (mode === 'testnet') {
+                titleBadge.classList.add('bg-warning');
+                titleBadge.textContent = 'Chế độ Testnet';
+            } else if (mode === 'live') {
+                titleBadge.classList.add('bg-danger');
+                titleBadge.textContent = 'Chế độ Live';
+            }
+        }
+    }
+    
     function testConnectionStatus() {
         if (apiConnectionStatus) {
             // Show loading state
@@ -245,20 +280,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span>Chế độ Demo đang hoạt động với dữ liệu giả lập</span>
                         </div>
                     `;
+                    
+                    // Cập nhật badge toàn cục
+                    updateGlobalModeBadge('demo', 'Chế độ Demo');
+                    
                 } else if (selectedMode === 'testnet') {
                     apiConnectionStatus.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <span class="badge bg-success me-2">Kết nối OK</span>
+                            <span class="badge bg-warning me-2">Testnet</span>
                             <span>Đã kết nối thành công đến Binance Testnet API</span>
                         </div>
                         <div class="mt-2">
                             <small class="text-muted">Balance: 1000 USDT | Endpoint: testnet.binance.vision</small>
                         </div>
                     `;
+                    
+                    // Cập nhật badge toàn cục
+                    updateGlobalModeBadge('testnet', 'Chế độ Testnet');
+                    
                 } else if (selectedMode === 'live') {
                     apiConnectionStatus.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <span class="badge bg-success me-2">Kết nối OK</span>
+                            <span class="badge bg-danger me-2">Live</span>
                             <span>Đã kết nối thành công đến Binance API thực</span>
                         </div>
                         <div class="mt-2 text-warning">
@@ -266,6 +309,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small>Chú ý: Đây là API thực tế với tiền thật!</small>
                         </div>
                     `;
+                    
+                    // Cập nhật badge toàn cục
+                    updateGlobalModeBadge('live', 'Chế độ Live');
+                };
                 }
             }, 1500);
         }

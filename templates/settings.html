@@ -1,867 +1,239 @@
-<!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cài Đặt - Bot Giao Dịch Crypto</title>
-    <!-- Bootstrap Dark Theme CSS -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <style>
-        /* Badge hiển thị chế độ hoạt động hiện tại (demo/testnet/live) */
-        .mode-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-right: 10px;
-            color: white;
-        }
-        .mode-demo {
-            background-color: #6c757d;
-        }
-        .mode-testnet {
-            background-color: #fd7e14;
-        }
-        .mode-live {
-            background-color: #dc3545;
-        }
-        
-        .settings-tab-content {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 0 0 6px 6px;
-            padding: 20px;
-        }
-        
-        .btn-nav {
-            color: #8b949e;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            border-radius: 0;
-            padding: 10px 15px;
-            margin-right: 5px;
-            transition: all 0.3s;
-        }
-        
-        .btn-nav:hover {
-            color: #c9d1d9;
-            background: rgba(56, 139, 253, 0.1);
-        }
-        
-        .btn-nav.active {
-            color: #58a6ff;
-            border-bottom: 2px solid #58a6ff;
-            font-weight: bold;
-        }
-        
-        .status-badge {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        
-        .status-running {
-            background-color: #3fb950;
-        }
-        
-        .status-stopped {
-            background-color: #f85149;
-        }
-    </style>
-</head>
-<body>
-    <div class="container-fluid px-0">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="/">
-                    <i class="bi bi-currency-bitcoin fs-4 me-2"></i>
-                    <span>Bot Giao Dịch Crypto</span>
-                    <span class="mode-badge mode-demo ms-2">Demo</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/market"><i class="bi bi-bar-chart-line me-1"></i>Thị Trường</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/position"><i class="bi bi-graph-up me-1"></i>Vị Thế</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/backtest"><i class="bi bi-lightning-charge me-1"></i>Backtest</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/strategies"><i class="bi bi-gear-wide-connected me-1"></i>Chiến Lược</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/trading_report"><i class="bi bi-file-earmark-bar-graph me-1"></i>Báo Cáo</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/settings"><i class="bi bi-sliders me-1"></i>Cài Đặt</a>
-                        </li>
-                    </ul>
-                    
-                    <!-- Language selector -->
-                    <div class="dropdown me-3">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-translate"></i> Ngôn ngữ
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-                            <li><a class="dropdown-item" href="#" data-language="vi">Tiếng Việt</a></li>
-                            <li><a class="dropdown-item" href="#" data-language="en">English</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="d-flex">
-                        <div class="me-3">
-                            <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
-                            <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
-                                    id="toggleBotBtn">
-                                {{ 'Dừng' if bot_status.running else 'Khởi động' }}
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
-                                <i class="bi bi-arrow-repeat"></i> Khởi động lại
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
+{% extends 'base.html' %}
 
-    <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col">
-                <h2>Bot Settings</h2>
-                <p class="text-muted">Configure your trading bot parameters and API connections</p>
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> <strong>Hướng dẫn chung:</strong> Trang cài đặt này cho phép bạn cấu hình toàn bộ hệ thống, bao gồm kết nối API, chiến lược giao dịch, quản lý rủi ro và thông báo. Hãy đọc kỹ từng mục trước khi thay đổi cài đặt.
+{% block title %}Cài đặt | BinanceTrader Bot{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Cài đặt</h2>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-header bg-dark border-secondary">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-key me-2"></i> Cài đặt API
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="api-settings-form">
+                        <div class="mb-3">
+                            <label class="form-label">Chế độ API</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="api-mode" id="api-mode-demo" value="demo">
+                                <label class="form-check-label" for="api-mode-demo">
+                                    <span class="badge bg-secondary me-1">Demo</span> Giả lập (không dùng API key)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="api-mode" id="api-mode-testnet" value="testnet">
+                                <label class="form-check-label" for="api-mode-testnet">
+                                    <span class="badge bg-warning text-dark me-1">Testnet</span> Môi trường thử nghiệm
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="api-mode" id="api-mode-live" value="live">
+                                <label class="form-check-label" for="api-mode-live">
+                                    <span class="badge bg-danger me-1">Live</span> Thị trường thực tế
+                                </label>
+                            </div>
+                            <small class="form-text text-muted mt-2">
+                                Demo: Không cần API key, Testnet: Môi trường thử nghiệm, Live: Giao dịch thực tế
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="binance-api-key" class="form-label">Binance API Key</label>
+                            <input type="text" class="form-control" id="binance-api-key" placeholder="Nhập API Key">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="binance-api-secret" class="form-label">Binance API Secret</label>
+                            <input type="password" class="form-control" id="binance-api-secret" placeholder="Nhập API Secret">
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" id="test-api-button">
+                                <i class="fas fa-check-circle me-1"></i> Kiểm tra kết nối
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3 p-2 border border-secondary rounded" id="api-connection-status">
+                            <div class="text-muted small">Trạng thái kết nối sẽ hiển thị ở đây</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-dark border-secondary">
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success" id="save-api-button">
+                            <i class="fas fa-save me-1"></i> Lưu cài đặt API
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <!-- Settings Navigation -->
-            <div class="col-md-3 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Settings Menu</h5>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <a href="#api-settings" class="list-group-item list-group-item-action active" data-bs-toggle="list">API Connections</a>
-                        <a href="#trading-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Trading Parameters</a>
-                        <a href="#risk-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Risk Management</a>
-                        <a href="#notification-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Notifications</a>
-                        <a href="#system-settings" class="list-group-item list-group-item-action" data-bs-toggle="list">System Settings</a>
-                        <a href="#backup-restore" class="list-group-item list-group-item-action" data-bs-toggle="list">Backup & Restore</a>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-header bg-dark border-secondary">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bell me-2"></i> Thông báo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="notification-settings-form">
+                        <div class="mb-3">
+                            <label class="form-label">Cài đặt thông báo Telegram</label>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-telegram-notifications">
+                                <label class="form-check-label" for="enable-telegram-notifications">
+                                    Bật thông báo Telegram
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="telegram-bot-token" class="form-label">Telegram Bot Token</label>
+                            <input type="text" class="form-control" id="telegram-bot-token" placeholder="Nhập Bot Token">
+                            <small class="form-text text-muted">
+                                Tạo bot qua <a href="https://t.me/BotFather" target="_blank">BotFather</a> và lấy token
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="telegram-chat-id" class="form-label">Telegram Chat ID</label>
+                            <input type="text" class="form-control" id="telegram-chat-id" placeholder="Nhập Chat ID">
+                            <small class="form-text text-muted">
+                                Chat ID của người nhận hoặc nhóm
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tùy chọn thông báo</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-new-trades" checked>
+                                <label class="form-check-label" for="notify-new-trades">
+                                    Thông báo giao dịch mới
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-closed-trades" checked>
+                                <label class="form-check-label" for="notify-closed-trades">
+                                    Thông báo đóng giao dịch
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="notify-error-status" checked>
+                                <label class="form-check-label" for="notify-error-status">
+                                    Thông báo lỗi hệ thống
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notify-daily-summary">
+                                <label class="form-check-label" for="notify-daily-summary">
+                                    Báo cáo tổng kết hàng ngày
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" id="test-telegram-button">
+                                <i class="fab fa-telegram me-1"></i> Gửi tin nhắn test
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-dark border-secondary">
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success" id="save-notification-button">
+                            <i class="fas fa-save me-1"></i> Lưu cài đặt thông báo
+                        </button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Settings Content -->
-            <div class="col-md-9 mb-4">
-                <div class="tab-content">
-                    <!-- API Connections -->
-                    <div class="tab-pane fade show active" id="api-settings">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">API Connections</h5>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-header bg-dark border-secondary">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-shield-alt me-2"></i> Cài đặt bảo mật
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="security-settings-form">
+                        <div class="mb-3">
+                            <label class="form-label">Quản lý rủi ro</label>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-stop-loss" checked>
+                                <label class="form-check-label" for="enable-stop-loss">
+                                    Luôn sử dụng Stop Loss
+                                </label>
                             </div>
-                            <div class="card-body">
-                                <form id="api-form">
-                                    <div class="mb-4">
-                                        <h6>Cài đặt Binance API</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="alert alert-info">
-                                                <i class="bi bi-info-circle"></i> Hiện tại đang sử dụng API key từ biến môi trường. API keys được lưu an toàn.
-                                            </div>
-                                            
-                                            <div class="mb-4">
-                                                <label class="form-label fw-bold">Chế độ API</label>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-demo" value="demo">
-                                                        <label class="form-check-label" for="api-mode-demo">
-                                                            <span class="badge bg-secondary">Demo</span>
-                                                            <small class="d-block text-muted">Sử dụng dữ liệu giả lập</small>
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-testnet" value="testnet" checked>
-                                                        <label class="form-check-label" for="api-mode-testnet">
-                                                            <span class="badge bg-warning">Testnet</span>
-                                                            <small class="d-block text-muted">Kết nối Binance Testnet</small>
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-live" value="live">
-                                                        <label class="form-check-label" for="api-mode-live">
-                                                            <span class="badge bg-danger">Live</span>
-                                                            <small class="d-block text-muted">Kết nối Binance thực tế</small>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mb-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <label class="form-label fw-bold mb-0">Trạng thái kết nối API</label>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="test-binance-api">
-                                                        <i class="bi bi-arrow-repeat"></i> Kiểm tra kết nối
-                                                    </button>
-                                                </div>
-                                                <div id="api-connection-status" class="border rounded p-3 bg-dark">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                                                            <span class="visually-hidden">Đang kiểm tra...</span>
-                                                        </div>
-                                                        <span>Đang kiểm tra kết nối API...</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="d-flex justify-content-end mt-3">
-                                                <button type="button" class="btn btn-sm btn-outline-success" id="save-api-mode">
-                                                    <i class="bi bi-check-lg"></i> Lưu chế độ API
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Thông báo qua Telegram</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="form-check form-switch mb-3">
-                                                <input class="form-check-input" type="checkbox" id="enable-telegram" checked>
-                                                <label class="form-check-label" for="enable-telegram">
-                                                    Bật thông báo Telegram
-                                                </label>
-                                            </div>
-                                            
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="telegram-bot-token" class="form-label">Bot Token</label>
-                                                    <div class="input-group">
-                                                        <input type="password" class="form-control" id="telegram-bot-token" placeholder="Nhập Token Bot" value="8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM">
-                                                        <button class="btn btn-outline-secondary" type="button" id="toggle-token-visibility">
-                                                            <i class="bi bi-eye"></i>
-                                                        </button>
-                                                    </div>
-                                                    <small class="text-muted">Có thể được lấy từ @BotFather trên Telegram</small>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="telegram-chat-id" class="form-label">Chat ID</label>
-                                                    <input type="text" class="form-control" id="telegram-chat-id" placeholder="Nhập Chat ID" value="1834332146">
-                                                    <small class="text-muted">ID của bạn hoặc nhóm nhận thông báo</small>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Loại thông báo</label>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-signals" checked>
-                                                            <label class="form-check-label" for="notify-signals">
-                                                                Tín hiệu giao dịch
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-positions" checked>
-                                                            <label class="form-check-label" for="notify-positions">
-                                                                Mở/Đóng vị thế
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-profit-loss" checked>
-                                                            <label class="form-check-label" for="notify-profit-loss">
-                                                                Lãi/Lỗ lớn
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-system" checked>
-                                                            <label class="form-check-label" for="notify-system">
-                                                                Thông báo hệ thống
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <button type="button" class="btn btn-sm btn-outline-success" id="save-telegram-settings">
-                                                    <i class="bi bi-check-lg"></i> Lưu cài đặt
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" id="test-telegram-api">
-                                                    <i class="bi bi-send"></i> Gửi tin nhắn test
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary" id="save-api-settings">Save API Settings</button>
-                                    </div>
-                                </form>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-take-profit" checked>
+                                <label class="form-check-label" for="enable-take-profit">
+                                    Luôn sử dụng Take Profit
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable-trailing-stop">
+                                <label class="form-check-label" for="enable-trailing-stop">
+                                    Sử dụng Trailing Stop
+                                </label>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Trading Parameters -->
-                    <div class="tab-pane fade" id="trading-settings">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Trading Parameters</h5>
+                        
+                        <div class="mb-3">
+                            <label for="max-open-positions" class="form-label">Số lượng vị thế mở tối đa</label>
+                            <input type="number" class="form-control" id="max-open-positions" min="1" max="10" value="5">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="max-daily-trades" class="form-label">Số lượng giao dịch tối đa mỗi ngày</label>
+                            <input type="number" class="form-control" id="max-daily-trades" min="0" max="100" value="20">
+                            <small class="form-text text-muted">
+                                Đặt 0 để không giới hạn
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="max-drawdown" class="form-label">Rút vốn tối đa cho phép (%)</label>
+                            <input type="number" class="form-control" id="max-drawdown" min="1" max="50" value="10">
+                            <small class="form-text text-muted">
+                                Bot sẽ dừng khi rút vốn vượt ngưỡng này
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Các biện pháp bảo mật</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="auto-restart-enabled" checked>
+                                <label class="form-check-label" for="auto-restart-enabled">
+                                    Tự động khởi động lại khi bị lỗi
+                                </label>
                             </div>
-                            <div class="card-body">
-                                <form id="trading-form">
-                                    <div class="mb-4">
-                                        <h6>Trading Pairs</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <label for="trading-pairs" class="form-label">Trading Pairs</label>
-                                                <select class="form-select" id="trading-pairs" multiple>
-                                                    <option value="BTCUSDT" selected>BTC/USDT</option>
-                                                    <option value="ETHUSDT" selected>ETH/USDT</option>
-                                                    <option value="BNBUSDT">BNB/USDT</option>
-                                                    <option value="SOLUSDT">SOL/USDT</option>
-                                                    <option value="ADAUSDT">ADA/USDT</option>
-                                                    <option value="DOGEUSDT">DOGE/USDT</option>
-                                                    <option value="XRPUSDT">XRP/USDT</option>
-                                                    <option value="DOTUSDT">DOT/USDT</option>
-                                                </select>
-                                                <div class="form-text">Hold Ctrl or Cmd to select multiple pairs</div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <button type="button" class="btn btn-sm btn-outline-primary" id="add-pair-btn">Add Custom Pair</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Timeframes</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Timeframes to Analyze</label>
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-1m">
-                                                            <label class="form-check-label" for="timeframe-1m">1 minute</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-5m">
-                                                            <label class="form-check-label" for="timeframe-5m">5 minutes</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-15m" checked>
-                                                            <label class="form-check-label" for="timeframe-15m">15 minutes</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-30m">
-                                                            <label class="form-check-label" for="timeframe-30m">30 minutes</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row mt-2">
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-1h" checked>
-                                                            <label class="form-check-label" for="timeframe-1h">1 hour</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-4h" checked>
-                                                            <label class="form-check-label" for="timeframe-4h">4 hours</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-1d" checked>
-                                                            <label class="form-check-label" for="timeframe-1d">1 day</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="timeframe-1w">
-                                                            <label class="form-check-label" for="timeframe-1w">1 week</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="primary-timeframe" class="form-label">Primary Timeframe</label>
-                                                <select class="form-select" id="primary-timeframe">
-                                                    <option value="15m">15 minutes</option>
-                                                    <option value="1h" selected>1 hour</option>
-                                                    <option value="4h">4 hours</option>
-                                                    <option value="1d">1 day</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Advanced Settings</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="order-update-interval" class="form-label">Order Update Interval (sec)</label>
-                                                    <input type="number" class="form-control" id="order-update-interval" value="5" min="1" max="60">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="market-scan-interval" class="form-label">Market Scan Interval (min)</label>
-                                                    <input type="number" class="form-control" id="market-scan-interval" value="15" min="1" max="60">
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="auto-restart" checked>
-                                                    <label class="form-check-label" for="auto-restart">
-                                                        Auto-restart bot on critical errors
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="log-debug-info">
-                                                    <label class="form-check-label" for="log-debug-info">
-                                                        Log detailed debug information
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-secondary me-2" id="reset-trading-settings">Reset to Defaults</button>
-                                        <button type="button" class="btn btn-primary" id="save-trading-settings">Save Trading Settings</button>
-                                    </div>
-                                </form>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="log-ip-activity" checked>
+                                <label class="form-check-label" for="log-ip-activity">
+                                    Ghi nhật ký hoạt động truy cập
+                                </label>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Risk Management -->
-                    <div class="tab-pane fade" id="risk-settings">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Risk Management</h5>
-                            </div>
-                            <div class="card-body">
-                                <form id="risk-form">
-                                    <div class="mb-4">
-                                        <h6>Position Sizing</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="risk-per-trade" class="form-label">Risk Per Trade (%)</label>
-                                                    <input type="number" class="form-control" id="risk-per-trade" value="1.0" min="0.1" max="10" step="0.1">
-                                                    <div class="form-text">Percentage of account balance risked per trade</div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="max-open-positions" class="form-label">Max Open Positions</label>
-                                                    <input type="number" class="form-control" id="max-open-positions" value="3" min="1" max="10">
-                                                    <div class="form-text">Maximum number of open positions allowed</div>
-                                                </div>
-                                            </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="leverage" class="form-label">Default Leverage</label>
-                                                    <select class="form-select" id="leverage">
-                                                        <option value="1">1x (No leverage)</option>
-                                                        <option value="2">2x</option>
-                                                        <option value="3" selected>3x</option>
-                                                        <option value="5">5x</option>
-                                                        <option value="10">10x</option>
-                                                        <option value="20">20x</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="margin-type" class="form-label">Margin Type</label>
-                                                    <select class="form-select" id="margin-type">
-                                                        <option value="isolated" selected>Isolated</option>
-                                                        <option value="cross">Cross</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="automatic-position-sizing" checked>
-                                                    <label class="form-check-label" for="automatic-position-sizing">
-                                                        Use automatic position sizing
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Take Profit & Stop Loss</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="take-profit" class="form-label">Take Profit (%)</label>
-                                                    <input type="number" class="form-control" id="take-profit" value="2.5" min="0.5" max="100" step="0.5">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="stop-loss" class="form-label">Stop Loss (%)</label>
-                                                    <input type="number" class="form-control" id="stop-loss" value="1.5" min="0.5" max="50" step="0.5">
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="use-trailing-stop" checked>
-                                                    <label class="form-check-label" for="use-trailing-stop">
-                                                        Use trailing stop
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3" id="trailing-stop-params">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <label for="trailing-start" class="form-label">Activation Threshold (%)</label>
-                                                        <input type="number" class="form-control" id="trailing-start" value="1.0" min="0.1" max="10" step="0.1">
-                                                        <div class="form-text">Profit % to activate trailing stop</div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label for="trailing-distance" class="form-label">Trailing Distance (%)</label>
-                                                        <input type="number" class="form-control" id="trailing-distance" value="0.5" min="0.1" max="5" step="0.1">
-                                                        <div class="form-text">Distance to maintain from price</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Risk Limits</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="daily-loss-limit" class="form-label">Daily Loss Limit (%)</label>
-                                                    <input type="number" class="form-control" id="daily-loss-limit" value="5" min="1" max="50">
-                                                    <div class="form-text">Stop trading when daily loss exceeds this %</div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="weekly-loss-limit" class="form-label">Weekly Loss Limit (%)</label>
-                                                    <input type="number" class="form-control" id="weekly-loss-limit" value="10" min="1" max="50">
-                                                    <div class="form-text">Stop trading when weekly loss exceeds this %</div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="reset-limits-after-profit" checked>
-                                                    <label class="form-check-label" for="reset-limits-after-profit">
-                                                        Reset loss limits after profitable day/week
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-secondary me-2" id="reset-risk-settings">Reset to Defaults</button>
-                                        <button type="button" class="btn btn-primary" id="save-risk-settings">Save Risk Settings</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Notifications -->
-                    <div class="tab-pane fade" id="notification-settings">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Notification Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <form id="notification-form">
-                                    <div class="mb-4">
-                                        <h6>Telegram Notifications</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <label class="form-label">Notification Events</label>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-trades" checked>
-                                                            <label class="form-check-label" for="notify-trades">
-                                                                Trade Executions
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-signals" checked>
-                                                            <label class="form-check-label" for="notify-signals">
-                                                                Trading Signals
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row mt-2">
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-errors" checked>
-                                                            <label class="form-check-label" for="notify-errors">
-                                                                Error Alerts
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="notify-daily-summary" checked>
-                                                            <label class="form-check-label" for="notify-daily-summary">
-                                                                Daily Performance Summary
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="minimal-notifications">
-                                                    <label class="form-check-label" for="minimal-notifications">
-                                                        Use minimal notifications (reduce frequency)
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Email Notifications</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="enable-email">
-                                                    <label class="form-check-label" for="enable-email">
-                                                        Enable email notifications
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="email-address" class="form-label">Email Address</label>
-                                                    <input type="email" class="form-control" id="email-address" placeholder="Enter your email address">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="email-frequency" class="form-label">Email Frequency</label>
-                                                    <select class="form-select" id="email-frequency">
-                                                        <option value="realtime">Real-time</option>
-                                                        <option value="hourly">Hourly Digest</option>
-                                                        <option value="daily" selected>Daily Digest</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary" id="save-notification-settings">Save Notification Settings</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- System Settings -->
-                    <div class="tab-pane fade" id="system-settings">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">System Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <form id="system-form">
-                                    <div class="mb-4">
-                                        <h6>User Interface</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <label for="refresh-interval" class="form-label">UI Refresh Interval (seconds)</label>
-                                                <input type="number" class="form-control" id="refresh-interval" value="5" min="1" max="60">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="language" class="form-label">Language</label>
-                                                <select class="form-select" id="language">
-                                                    <option value="en">English</option>
-                                                    <option value="vi">Vietnamese (Tiếng Việt)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>System Resources</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="mb-3">
-                                                <label for="log-level" class="form-label">Log Level</label>
-                                                <select class="form-select" id="log-level">
-                                                    <option value="error">Error</option>
-                                                    <option value="warning">Warning</option>
-                                                    <option value="info" selected>Info</option>
-                                                    <option value="debug">Debug</option>
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="log-retention" class="form-label">Log Retention (days)</label>
-                                                <input type="number" class="form-control" id="log-retention" value="7" min="1" max="30">
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="optimize-memory" checked>
-                                                    <label class="form-check-label" for="optimize-memory">
-                                                        Optimize memory usage
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h6>Maintenance</h6>
-                                        <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-6">
-                                                    <button type="button" class="btn btn-outline-warning w-100" id="clear-cache-btn">
-                                                        Clear Cache
-                                                    </button>
-                                                </div>
-                                                <div class="col-6">
-                                                    <button type="button" class="btn btn-outline-danger w-100" id="reset-system-btn">
-                                                        Reset System
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary" id="save-system-settings">Save System Settings</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Backup & Restore -->
-                    <div class="tab-pane fade" id="backup-restore">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Backup & Restore</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-4">
-                                    <h6>Backup Settings</h6>
-                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                        <p class="mb-3">Backup all your bot settings, strategies, and configurations to a file.</p>
-                                        <div class="mb-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="include-trade-history" checked>
-                                                <label class="form-check-label" for="include-trade-history">
-                                                    Include trade history
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="include-api-keys">
-                                                <label class="form-check-label" for="include-api-keys">
-                                                    Include API keys (not recommended)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-grid">
-                                            <button type="button" class="btn btn-primary" id="create-backup-btn">
-                                                Create Backup
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <h6>Auto Backup</h6>
-                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                        <div class="mb-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="enable-auto-backup" checked>
-                                                <label class="form-check-label" for="enable-auto-backup">
-                                                    Enable automatic backups
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="backup-frequency" class="form-label">Backup Frequency</label>
-                                            <select class="form-select" id="backup-frequency">
-                                                <option value="daily" selected>Daily</option>
-                                                <option value="weekly">Weekly</option>
-                                                <option value="monthly">Monthly</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="max-backups" class="form-label">Maximum Backups to Keep</label>
-                                            <input type="number" class="form-control" id="max-backups" value="7" min="1" max="30">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <h6>Restore from Backup</h6>
-                                    <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                        <p class="mb-3">Restore your bot settings from a previous backup file.</p>
-                                        <div class="mb-3">
-                                            <label for="backup-file" class="form-label">Select Backup File</label>
-                                            <input class="form-control" type="file" id="backup-file">
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="overwrite-existing" checked>
-                                                <label class="form-check-label" for="overwrite-existing">
-                                                    Overwrite existing settings
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="d-grid">
-                                            <button type="button" class="btn btn-warning" id="restore-backup-btn" disabled>
-                                                Restore from Backup
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-dark border-secondary">
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success" id="save-security-button">
+                            <i class="fas fa-save me-1"></i> Lưu cài đặt bảo mật
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Bootstrap JavaScript Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="/static/js/settings.js"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="/static/js/settings.js"></script>
+{% endblock %}

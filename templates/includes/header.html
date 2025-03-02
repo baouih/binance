@@ -1,0 +1,40 @@
+<!-- Navbar Header cho Bot Trading -->
+<div class="container-fluid bg-dark py-2 border-bottom border-secondary">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="d-flex align-items-center bot-crypto-title">
+                <h4 class="text-white mb-0 me-2">
+                    <i class="fab fa-bitcoin text-warning me-2"></i> Bot Crypto
+                </h4>
+                <span class="badge bg-warning text-dark">Chế độ Testnet</span>
+            </div>
+        </div>
+        <div class="col text-end">
+            <div class="d-flex justify-content-end align-items-center">
+                <div class="me-3">
+                    <span class="badge bg-dark text-warning border border-warning">
+                        <i class="fas fa-wallet me-1"></i> Balance: <span id="account-balance">1000.00</span> USDT
+                    </span>
+                </div>
+                <div class="me-3 d-none d-md-block">
+                    <span class="badge bg-dark text-info border border-info">
+                        <i class="fas fa-exchange-alt me-1"></i> <span id="open-positions-count">0</span> vị thế mở
+                    </span>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-success" id="startBotBtn">
+                            <i class="fas fa-play me-1"></i> Khởi động
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="stopBotBtn">
+                            <i class="fas fa-stop me-1"></i> Dừng
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info" id="restartBotBtn">
+                            <i class="fas fa-sync me-1"></i> Khởi động lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
