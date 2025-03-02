@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize event listeners
     initializeEventListeners();
     
+    // Initialize language switcher
+    initializeLanguageSwitcher();
+    
     // Initial data fetch
     fetchDashboardData();
 });
@@ -255,6 +258,38 @@ function initializeCharts() {
             }
         });
     }
+}
+
+/**
+ * Initialize language switcher
+ */
+function initializeLanguageSwitcher() {
+    // Add event listeners to language selector links
+    document.querySelectorAll('[data-language]').forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.preventDefault();
+            const language = event.currentTarget.dataset.language;
+            fetch('/api/language', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ language: language }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Refresh the page to apply the new language
+                    window.location.reload();
+                } else {
+                    console.error('Error changing language:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error changing language:', error);
+            });
+        });
+    });
 }
 
 /**
