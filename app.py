@@ -96,10 +96,14 @@ def index():
         now = datetime.datetime.now()
         version = f"v{now.hour}{now.minute}{now.second}"
         
+        # Cập nhật BOT_STATUS từ cấu hình tài khoản mới nhất
+        BOT_STATUS.update(get_bot_status_from_config())
+        logger.info(f"Trang chủ - Chế độ API hiện tại: {BOT_STATUS.get('mode', 'testnet')}")
+        
         # Đảm bảo thông tin trạng thái bot có đầy đủ thông tin chế độ
         current_bot_status = BOT_STATUS.copy()
         if 'mode' not in current_bot_status:
-            current_bot_status['mode'] = 'demo'  # 'demo', 'testnet', 'live'
+            current_bot_status['mode'] = 'testnet'  # 'demo', 'testnet', 'live'
         if 'account_type' not in current_bot_status:
             current_bot_status['account_type'] = 'futures'  # 'spot', 'futures'
         if 'strategy_mode' not in current_bot_status:
@@ -1706,10 +1710,13 @@ def bot_control():
         action = data.get('action', '')
         strategy_mode = data.get('strategy_mode', 'auto')  # 'auto' hoặc 'manual'
         
-        # Đặt BOT_STATUS['mode'] luôn là 'demo' để tránh lỗi pattern hoàn toàn
-        BOT_STATUS['mode'] = 'demo'
+        # Cập nhật BOT_STATUS từ cấu hình hiện tại
+        BOT_STATUS.update(get_bot_status_from_config())
         
-        logger.info(f"Bot control: action={action}, strategy_mode={strategy_mode}, mode={BOT_STATUS['mode']}")
+        # Xác định mode hiện tại từ cấu hình
+        mode = BOT_STATUS.get('mode', 'testnet')  # Mặc định testnet nếu không tìm thấy
+        
+        logger.info(f"Bot control: action={action}, strategy_mode={strategy_mode}, mode={mode}")
     except Exception as e:
         logger.error(f"Lỗi trong bot_control: {str(e)}")
         # Trả về thành công luôn, bất kể lỗi gì
