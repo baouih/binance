@@ -29,19 +29,21 @@ class PythagoreanPositionSizer(BasePositionSizer):
     giữa tần suất thắng và mức lợi nhuận trung bình.
     """
     
-    def __init__(self, trade_history: List[Dict] = None, max_risk_percentage: float = 1.0,
+    def __init__(self, trade_history: List[Dict] = None, account_balance: float = 10000.0, risk_percentage: float = 1.0,
                 lookback_trades: int = 30):
         """
         Khởi tạo Pythagorean Position Sizer.
         
         Args:
             trade_history (List[Dict], optional): Lịch sử giao dịch
-            max_risk_percentage (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
+            account_balance (float): Số dư tài khoản
+            risk_percentage (float): Phần trăm rủi ro tối đa trên mỗi giao dịch
             lookback_trades (int): Số giao dịch gần nhất để phân tích
         """
-        super().__init__(max_risk_percentage=max_risk_percentage)
+        super().__init__(account_balance=account_balance, risk_percentage=risk_percentage)
         self.trade_history = trade_history or []
         self.lookback_trades = lookback_trades
+        self.max_risk_percentage = risk_percentage  # Lưu lại để sử dụng sau này
         
     def calculate_position_size(self, current_price: float, account_balance: float = None, 
                               leverage: int = 1, volatility: float = None, market_data: Dict = None,
@@ -354,7 +356,8 @@ def create_enhanced_position_sizer(sizer_type: str, account_balance: float, **kw
     if sizer_type.lower() == 'pythagorean':
         return PythagoreanPositionSizer(
             trade_history=kwargs.get('trade_history', []),
-            max_risk_percentage=kwargs.get('max_risk_percentage', 1.0),
+            account_balance=account_balance,
+            risk_percentage=kwargs.get('risk_percentage', 1.0),
             lookback_trades=kwargs.get('lookback_trades', 30)
         )
     else:
@@ -383,7 +386,8 @@ def test_position_sizing():
     print("=== Kiểm tra PythagoreanPositionSizer ===")
     pythag_sizer = PythagoreanPositionSizer(
         trade_history=test_trade_history,
-        max_risk_percentage=1.0
+        account_balance=10000,
+        risk_percentage=1.0
     )
     
     # Tính toán kích thước vị thế
