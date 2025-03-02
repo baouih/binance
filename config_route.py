@@ -182,12 +182,34 @@ def test_telegram():
         chat_id = data['chat_id']
         message = data.get('message', '🔔 Đây là tin nhắn kiểm tra từ BinanceTrader Bot')
         
-        # TODO: Triển khai gửi tin nhắn thật tới Telegram
-        # Hiện tại chỉ giả lập thành công
+        # Thực sự gửi tin nhắn tới Telegram
+        try:
+            import requests
+            telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            payload = {
+                'chat_id': chat_id,
+                'text': message,
+                'parse_mode': 'HTML'
+            }
+            response = requests.post(telegram_api_url, json=payload, timeout=10)
+            
+            if response.status_code == 200:
+                logger.info(f"Đã gửi tin nhắn test đến Telegram chat ID: {chat_id}")
+                return jsonify({'success': True, 'message': 'Đã gửi tin nhắn test thành công'})
+            else:
+                logger.error(f"Lỗi gửi tin nhắn Telegram: {response.text}")
+                return jsonify({
+                    'success': False, 
+                    'message': f'Lỗi Telegram API: {response.status_code} - {response.text}'
+                }), 400
         
-        logger.info(f"Đã gửi tin nhắn test đến Telegram chat ID: {chat_id}")
+        except Exception as telegram_error:
+            logger.error(f"Lỗi kết nối Telegram: {str(telegram_error)}")
+            return jsonify({
+                'success': False, 
+                'message': f'Lỗi kết nối Telegram: {str(telegram_error)}'
+            }), 500
         
-        return jsonify({'success': True, 'message': 'Đã gửi tin nhắn test thành công'})
     except Exception as e:
         logger.error(f"Lỗi khi kiểm tra Telegram: {str(e)}")
         return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500

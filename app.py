@@ -34,12 +34,13 @@ BOT_STATUS = {
 
 # Giả lập dữ liệu tài khoản (sau này lấy từ API Binance)
 ACCOUNT_DATA = {
-    'balance': 10000.00,
-    'equity': 10000.00,
+    'balance': 1000.00,
+    'equity': 1000.00,
     'margin_used': 0.0,
-    'margin_available': 10000.00,
-    'free_balance': 10000.00,
-    'positions': []
+    'margin_available': 1000.00,
+    'free_balance': 1000.00,
+    'positions': [],
+    'leverage': 5
 }
 
 # Giả lập dữ liệu thị trường (sau này lấy từ API)
