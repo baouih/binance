@@ -165,8 +165,30 @@ def control_bot(bot_id):
         if bot_index is None:
             return jsonify({'success': False, 'message': 'Bot không tồn tại'}), 404
         
+        # Lấy thông tin API key/secret từ cấu hình tài khoản 
+        api_mode = bots[bot_index].get('api_mode', 'demo')
+        
+        # Kiểm tra xem API key/secret đã được cấu hình chưa (ngoại trừ chế độ demo)
         if action == 'start':
-            # TODO: Khởi động bot thực tế ở đây
+            if api_mode != 'demo':
+                # Đọc cấu hình tài khoản để kiểm tra API key/secret
+                account_config = {}
+                if os.path.exists('account_config.json'):
+                    with open('account_config.json', 'r') as f:
+                        try:
+                            account_config = json.load(f)
+                        except json.JSONDecodeError:
+                            logger.error("File cấu hình tài khoản không đúng định dạng JSON")
+                            return jsonify({'success': False, 'message': 'Lỗi cấu hình tài khoản'}), 500
+                
+                # Kiểm tra API key và secret đã được cấu hình chưa
+                if not account_config.get('api_key') or not account_config.get('api_secret'):
+                    return jsonify({
+                        'success': False, 
+                        'message': f'Không tìm thấy API key/secret cho chế độ {api_mode}. Vui lòng cấu hình API trước.'
+                    }), 400
+                    
+            # Khởi động bot thực tế ở đây
             bots[bot_index]['status'] = 'running'
             bots[bot_index]['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             message = 'Bot đã được khởi động thành công'

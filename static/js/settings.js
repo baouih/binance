@@ -56,8 +56,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get values
         const selectedMode = document.querySelector('input[name="api-mode"]:checked').value;
-        const apiKey = binanceApiKey.value.trim();
-        const apiSecret = binanceApiSecret.value.trim();
+        
+        // Kiểm tra xem có dữ liệu mới hay giữ nguyên dữ liệu cũ
+        let apiKey = binanceApiKey.value.trim();
+        let apiSecret = binanceApiSecret.value.trim();
+        
+        // Nếu input chứa dấu *, có nghĩa là đang sử dụng giá trị đã lưu trước đó
+        // Chỉ gửi giá trị mới nếu người dùng đã thay đổi (không còn dấu *)
+        if (binanceApiKey.dataset.hasValue === 'true' && apiKey.includes('*')) {
+            // Giữ nguyên giá trị cũ (gửi null để server giữ giá trị cũ)
+            apiKey = null;
+        }
+        
+        if (binanceApiSecret.dataset.hasValue === 'true' && apiSecret.includes('*')) {
+            // Giữ nguyên giá trị cũ (gửi null để server giữ giá trị cũ)
+            apiSecret = null;
+        }
         
         // Prepare data for API
         const data = {
@@ -423,13 +437,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     apiModeRadio.checked = true;
                 }
                 
-                // Set API key and secret if available
+                // Set API key and secret if available - with masking for security
                 if (data.api_key && binanceApiKey) {
-                    binanceApiKey.value = data.api_key;
+                    // Kiểm tra xem API key có phải là chuỗi trống không
+                    if (data.api_key.trim() !== '') {
+                        // Hiển thị 6 ký tự đầu và 4 ký tự cuối, còn lại thay bằng dấu *
+                        const firstChars = data.api_key.substring(0, 6);
+                        const lastChars = data.api_key.substring(data.api_key.length - 4);
+                        const maskedLength = data.api_key.length - 10;
+                        const maskedPart = '*'.repeat(maskedLength > 0 ? maskedLength : 0);
+                        binanceApiKey.value = firstChars + maskedPart + lastChars;
+                        
+                        // Lưu trạng thái đã có API key
+                        binanceApiKey.dataset.hasValue = 'true';
+                    } else {
+                        binanceApiKey.value = '';
+                        binanceApiKey.dataset.hasValue = 'false';
+                    }
                 }
                 
                 if (data.api_secret && binanceApiSecret) {
-                    binanceApiSecret.value = data.api_secret;
+                    // Kiểm tra xem API secret có phải là chuỗi trống không
+                    if (data.api_secret.trim() !== '') {
+                        // Hiển thị chỉ dấu * với số lượng tương đương độ dài thực
+                        binanceApiSecret.value = '*'.repeat(data.api_secret.length);
+                        
+                        // Lưu trạng thái đã có API secret
+                        binanceApiSecret.dataset.hasValue = 'true';
+                    } else {
+                        binanceApiSecret.value = '';
+                        binanceApiSecret.dataset.hasValue = 'false';
+                    }
                 }
                 
                 // Update global indicators to match saved settings

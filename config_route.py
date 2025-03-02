@@ -76,7 +76,11 @@ def update_account_settings():
         
         # Cập nhật cấu hình với dữ liệu mới
         for key, value in data.items():
-            config[key] = value
+            # Nếu api_key hoặc api_secret là None, có nghĩa là giữ nguyên giá trị cũ
+            if (key == 'api_key' or key == 'api_secret') and value is None:
+                continue  # Bỏ qua, giữ nguyên giá trị cũ
+            else:
+                config[key] = value
         
         # Lưu cấu hình mới
         with open(ACCOUNT_CONFIG_PATH, 'w') as f:
