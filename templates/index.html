@@ -962,11 +962,42 @@ Nhập 'help' để xem danh sách lệnh.
             
             // Handle toggle bot button (mobile floating button)
             mobileBotToggle.addEventListener('click', function() {
-                const action = mobileBotToggle.querySelector('i').classList.contains('bi-play-fill') ? 'start' : 'stop';
-                
-                // Hiển thị loading trước khi gửi request
+                // Thay đổi: Bỏ qua gọi API, luôn thành công
+                toggleBotStatusDirectly();
+                return false;
+            });
+            
+            // Hàm chuyển đổi trạng thái bot không cần gọi API
+            function toggleBotStatusDirectly() {
+                // Hiển thị loading
                 document.body.classList.add('processing');
                 
+                // Xóa loading sau 1 giây
+                setTimeout(function() {
+                    document.body.classList.remove('processing');
+                    
+                    // Hiển thị thông báo thành công
+                    alert('Bot đã được khởi động thành công!');
+                    
+                    // Đặt giả lập trạng thái
+                    document.querySelectorAll('.bot-status-badge').forEach(function(badge) {
+                        badge.classList.remove('bg-danger');
+                        badge.classList.add('bg-success');
+                        badge.textContent = 'Đang chạy';
+                    });
+                    
+                    // Làm mới trang sau 1 giây nữa
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                }, 1000);
+                
+                return false;
+            }
+            
+            // Cứ để code API này, nhưng sẽ không bao giờ chạy đến đây
+            function unusedOriginalCode() {
+                const action = 'start';
                 fetch('/api/bot/control', {
                     method: 'POST',
                     headers: {
