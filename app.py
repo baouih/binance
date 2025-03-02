@@ -1833,12 +1833,40 @@ def get_account():
                         total_leverage = sum(pos.get('leverage', 1) for pos in positions)
                         avg_leverage = total_leverage // len(positions)
                     
+                    # Xử lý an toàn các giá trị tài khoản để tránh lỗi
+                    balance = 0
+                    try:
+                        balance = float(account_info.get('totalWalletBalance', 0))
+                    except (TypeError, ValueError):
+                        logger.error("Lỗi khi chuyển đổi totalWalletBalance")
+                    
+                    equity = 0
+                    try:
+                        equity = float(account_info.get('totalMarginBalance', 0))
+                    except (TypeError, ValueError):
+                        logger.error("Lỗi khi chuyển đổi totalMarginBalance")
+                        equity = balance  # Fallback to balance
+                    
+                    margin_used = 0
+                    try:
+                        margin_used = float(account_info.get('totalPositionInitialMargin', 0))
+                    except (TypeError, ValueError):
+                        logger.error("Lỗi khi chuyển đổi totalPositionInitialMargin")
+                    
+                    margin_available = 0
+                    try:
+                        margin_available = float(account_info.get('availableBalance', 0))
+                    except (TypeError, ValueError):
+                        logger.error("Lỗi khi chuyển đổi availableBalance")
+                        margin_available = balance - margin_used  # Calculate if not available
+                    
+                    # Đóng gói dữ liệu tài khoản
                     balance_data = {
-                        'balance': float(account_info.get('totalWalletBalance', 0)),
-                        'equity': float(account_info.get('totalMarginBalance', 0)),
-                        'margin_used': float(account_info.get('totalPositionInitialMargin', 0)),
-                        'margin_available': float(account_info.get('availableBalance', 0)),
-                        'free_balance': float(account_info.get('availableBalance', 0)),
+                        'balance': balance,
+                        'equity': equity,
+                        'margin_used': margin_used,
+                        'margin_available': margin_available,
+                        'free_balance': margin_available,  # Same as available margin
                         'positions': positions,
                         'leverage': avg_leverage
                     }
