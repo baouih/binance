@@ -215,9 +215,15 @@
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-outline-light me-2" id="mobile-language-toggle">
-                        <i class="bi bi-translate"></i>
-                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle me-2" type="button" id="mobileLangDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileLangDropdown">
+                            <li><a class="dropdown-item" href="#" data-language="vi"><span class="me-2">🇻🇳</span>Tiếng Việt</a></li>
+                            <li><a class="dropdown-item" href="#" data-language="en"><span class="me-2">🇺🇸</span>English</a></li>
+                        </ul>
+                    </div>
                     <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
                     <span class="small">{{ 'ON' if bot_status.running else 'OFF' }}</span>
                 </div>
