@@ -89,10 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Refresh connection status display
                 testConnectionStatus();
                 
-                // Redirect to bot management after successful configuration
+                // Không chuyển hướng tự động mà chỉ cập nhật trạng thái
                 setTimeout(() => {
-                    window.location.href = '/bots';
-                }, 2000);
+                    // Cập nhật trạng thái giao diện
+                    updateGlobalModeBadge(selectedMode, getModeLabelText(selectedMode));
+                }, 500);
             } else {
                 // Show error message
                 showToast('error', 'Lỗi: ' + data.message);
