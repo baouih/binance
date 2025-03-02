@@ -1465,8 +1465,131 @@ def position():
 def settings():
     """Trang cài đặt bot"""
     try:
+        # Tạo dữ liệu cài đặt hiện tại
+        current_settings = {
+            'api_key': '••••••••••••••••',
+            'api_secret': '••••••••••••••••••••••••••••••••',
+            'api_mode': BOT_STATUS['mode'],  # 'demo', 'testnet', 'live'
+            'account_type': BOT_STATUS['account_type'],  # 'spot', 'futures'
+            'risk_profile': 'medium',  # 'very_low', 'low', 'medium', 'high', 'very_high'
+            'risk_per_trade': 1.0,  # Phần trăm rủi ro trên mỗi giao dịch
+            'max_positions': 5,  # Số lượng vị thế tối đa
+            'leverage': 5,  # Đòn bẩy mặc định (1-100)
+            'enable_auto_bot': True,  # Tự động điều chỉnh chiến lược
+            'telegram_enabled': False,  # Kích hoạt thông báo Telegram
+            'telegram_token': '',
+            'telegram_chat_id': '',
+            'strategy_mode': BOT_STATUS['strategy_mode'],  # 'auto', 'manual'
+            'active_symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'DOGEUSDT'],
+            'timeframes': ['15m', '1h', '4h', '1d'],
+            'auto_restart': True,  # Tự động khởi động lại khi bot bị crash
+            'language': 'vi'  # 'vi', 'en'
+        }
+        
+        # Tạo dữ liệu chiến lược hiện tại
+        current_strategies = [
+            {
+                'id': 'rsi_strategy',
+                'name': 'RSI Strategy',
+                'enabled': True,
+                'timeframes': ['1h', '4h'],
+                'default_for': ['trending', 'volatile'],
+                'params': {
+                    'rsi_period': 14,
+                    'rsi_overbought': 70,
+                    'rsi_oversold': 30,
+                    'use_ma_filter': True,
+                    'ma_period': 200
+                }
+            },
+            {
+                'id': 'macd_strategy',
+                'name': 'MACD Strategy',
+                'enabled': True,
+                'timeframes': ['1h', '4h', '1d'],
+                'default_for': ['trending'],
+                'params': {
+                    'fast_period': 12,
+                    'slow_period': 26,
+                    'signal_period': 9,
+                    'use_histogram': True
+                }
+            },
+            {
+                'id': 'bb_strategy',
+                'name': 'Bollinger Bands',
+                'enabled': True,
+                'timeframes': ['15m', '1h', '4h'],
+                'default_for': ['ranging'],
+                'params': {
+                    'bb_period': 20,
+                    'bb_std': 2.0,
+                    'use_confirmation': True
+                }
+            },
+            {
+                'id': 'sr_strategy',
+                'name': 'Support/Resistance',
+                'enabled': True,
+                'timeframes': ['1h', '4h', '1d'],
+                'default_for': ['ranging', 'volatile'],
+                'params': {
+                    'num_levels': 5,
+                    'lookback_period': 30,
+                    'zone_width_percent': 1.0
+                }
+            },
+            {
+                'id': 'auto_strategy',
+                'name': 'Auto Strategy (AI)',
+                'enabled': True,
+                'timeframes': ['15m', '1h', '4h', '1d'],
+                'default_for': ['all'],
+                'params': {
+                    'market_regime_detection': True,
+                    'adaptive_parameters': True,
+                    'use_ml_prediction': True,
+                    'optimization_frequency': 'daily'
+                }
+            }
+        ]
+        
+        # Tạo dữ liệu cài đặt rủi ro
+        risk_settings = {
+            'risk_profiles': {
+                'very_low': {
+                    'risk_percent': 0.5,
+                    'max_positions': 3,
+                    'max_leverage': 2
+                },
+                'low': {
+                    'risk_percent': 1.0,
+                    'max_positions': 5,
+                    'max_leverage': 5
+                },
+                'medium': {
+                    'risk_percent': 2.0,
+                    'max_positions': 7,
+                    'max_leverage': 10
+                },
+                'high': {
+                    'risk_percent': 3.0,
+                    'max_positions': 10,
+                    'max_leverage': 20
+                },
+                'very_high': {
+                    'risk_percent': 5.0,
+                    'max_positions': 15,
+                    'max_leverage': 50
+                }
+            }
+        }
+        
         return render_template('settings.html', 
-                            bot_status=BOT_STATUS)
+                            bot_status=BOT_STATUS,
+                            settings=current_settings,
+                            strategies=current_strategies,
+                            risk_settings=risk_settings)
     except Exception as e:
         logger.error(f"Lỗi khi hiển thị trang cài đặt: {str(e)}")
         return render_template('error.html', 

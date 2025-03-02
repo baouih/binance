@@ -209,7 +209,9 @@
                     <i class="bi bi-currency-bitcoin fs-4 me-2"></i>
                     <span class="fs-5">Bot Crypto</span>
                     <div class="ms-2">
-                        <span class="mode-badge mode-demo">Demo</span>
+                        <span class="mode-badge mode-{{ bot_status.mode|default('demo') }}">
+                            {{ 'Chế độ Demo' if bot_status.mode == 'demo' or not bot_status.mode else 'Chế độ Testnet' if bot_status.mode == 'testnet' else 'Chế độ Live' }}
+                        </span>
                     </div>
                 </div>
                 <div>
