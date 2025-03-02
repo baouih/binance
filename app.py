@@ -57,10 +57,14 @@ account_selector = AccountTypeSelector()
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
+    # Thêm timestamp vào dữ liệu để tránh cache
+    now = datetime.datetime.now()
+    version = f"v{now.hour}{now.minute}{now.second}"
     return render_template('index.html', 
                           bot_status=BOT_STATUS,
                           account_data=ACCOUNT_DATA,
-                          market_data=MARKET_DATA)
+                          market_data=MARKET_DATA,
+                          version=version)
 
 
 @app.route('/strategies')
