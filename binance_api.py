@@ -32,6 +32,14 @@ class BinanceAPI:
             api_secret (str, optional): API Secret Binance
             testnet (bool): Sử dụng testnet hay mainnet
         """
+        # Lưu cấu hình
+        self.testnet = testnet
+        
+        # Log trạng thái môi trường
+        if testnet:
+            logger.info("Kết nối đến môi trường TESTNET Binance")
+        else:
+            logger.info("Kết nối đến môi trường THỰC TẾ Binance")
         # Lấy API keys từ biến môi trường nếu không được cung cấp
         self.api_key = api_key or os.environ.get('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.environ.get('BINANCE_API_SECRET', '')

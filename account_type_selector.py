@@ -71,6 +71,12 @@ class AccountTypeSelector:
         self.current_config = self._load_or_create_default()
         
         logger.info(f"Đã khởi tạo AccountTypeSelector, sử dụng file cấu hình: {config_path}")
+        
+        # Log loại tài khoản hiện tại
+        account_type = self.current_config.get("account_type", "futures")
+        account_settings = DEFAULT_ACCOUNT_TYPES[account_type]
+        env_type = "thực tế" if not self.current_config.get("use_testnet", True) else "testnet"
+        logger.info(f"Loại tài khoản hiện tại: {account_settings['name']} ({env_type})")
     
     def _load_or_create_default(self) -> Dict:
         """
@@ -91,6 +97,7 @@ class AccountTypeSelector:
         # Tạo cấu hình mặc định
         default_config = {
             "account_type": "futures",     # Mặc định là futures
+            "use_testnet": True,           # Mặc định sử dụng testnet (môi trường thử nghiệm)
             "custom_settings": None,       # Cài đặt tùy chỉnh: None
             "symbols": DEFAULT_ACCOUNT_TYPES["futures"]["default_symbols"],
             "timeframes": DEFAULT_ACCOUNT_TYPES["futures"]["default_timeframes"],
@@ -167,6 +174,43 @@ class AccountTypeSelector:
             self.current_config["leverage"] = account_settings["default_leverage"]
         elif account_type == "spot":
             self.current_config["leverage"] = 1  # Không có đòn bẩy cho spot
+            
+        self.current_config["last_updated"] = get_current_timestamp()
+        
+        return self._save_config(self.current_config)
+        
+    def set_api_mode(self, mode: str) -> bool:
+        """
+        Đặt chế độ API (demo, testnet, live)
+        
+        Args:
+            mode (str): Chế độ API ('demo', 'testnet', 'live')
+            
+        Returns:
+            bool: True nếu cập nhật thành công
+        """
+        valid_modes = ['demo', 'testnet', 'live']
+        if mode not in valid_modes:
+            logger.error(f"Chế độ API không hợp lệ: {mode}. Phải là một trong {valid_modes}")
+            return False
+            
+        # Nếu chế độ là demo, không cần API key
+        if mode == 'demo':
+            self.current_config['use_api'] = False
+            self.current_config['use_testnet'] = True
+            logger.info("Đặt chế độ DEMO (không cần API key)")
+        
+        # Nếu chế độ là testnet, cần API key và sử dụng testnet
+        elif mode == 'testnet':
+            self.current_config['use_api'] = True
+            self.current_config['use_testnet'] = True
+            logger.info("Đặt chế độ TESTNET API (cần testnet API key)")
+        
+        # Nếu chế độ là live, cần API key và sử dụng môi trường thực
+        elif mode == 'live':
+            self.current_config['use_api'] = True
+            self.current_config['use_testnet'] = False
+            logger.info("Đặt chế độ LIVE API - THỰC TẾ (cần API key thực)")
             
         self.current_config["last_updated"] = get_current_timestamp()
         
