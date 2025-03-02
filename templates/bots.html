@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý Bot | BinanceTrader Bot{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Quản lý Bot</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBotModal">
+            <i class="fas fa-plus me-1"></i> Tạo Bot mới
+        </button>
+    </div>
+    
+    <!-- Bot status cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Tổng số Bot</h6>
+                            <h3 class="mb-0" id="total-bots-count">0</h3>
+                        </div>
+                        <div class="bot-status-card">
+                            <i class="fas fa-robot text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Bot đang chạy</h6>
+                            <h3 class="mb-0" id="running-bots-count">0</h3>
+                        </div>
+                        <div class="bot-status-card status-running">
+                            <i class="fas fa-play text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Bot đã dừng</h6>
+                            <h3 class="mb-0" id="stopped-bots-count">0</h3>
+                        </div>
+                        <div class="bot-status-card status-stopped">
+                            <i class="fas fa-stop text-secondary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Bot bị lỗi</h6>
+                            <h3 class="mb-0" id="error-bots-count">0</h3>
+                        </div>
+                        <div class="bot-status-card status-error">
+                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Mode Reminder -->
+    <div class="alert alert-info mb-4" id="api-mode-alert">
+        <i class="fas fa-info-circle me-2"></i>
+        <span id="api-mode-message">Bạn đang sử dụng chế độ Testnet. Bot sẽ chạy trên môi trường thử nghiệm.</span>
+        <a href="/settings" class="alert-link ms-2">Thay đổi cài đặt</a>
+    </div>
+    
+    <!-- Bots table -->
+    <div class="card bg-dark mb-4">
+        <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Danh sách Bot</h5>
+            <div class="input-group" style="max-width: 250px">
+                <input type="text" class="form-control" id="search-bot" placeholder="Tìm kiếm...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tên Bot</th>
+                            <th>Cặp giao dịch</th>
+                            <th>Chiến lược</th>
+                            <th>Trạng thái</th>
+                            <th>Thời gian hoạt động</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bots-table-body">
+                        <!-- Bots will be loaded here -->
+                        <tr class="text-center">
+                            <td colspan="6" class="py-3">
+                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                                <span>Đang tải danh sách bot...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-dark">
+            <small class="text-muted">Cập nhật lần cuối: <span id="last-update-time">-</span></small>
+        </div>
+    </div>
+</div>
+
+<!-- Create Bot Modal -->
+<div class="modal fade" id="createBotModal" tabindex="-1" aria-labelledby="createBotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBotModalLabel">Tạo Bot mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-bot-form">
+                    <div class="mb-3">
+                        <label for="bot-name" class="form-label">Tên Bot</label>
+                        <input type="text" class="form-control" id="bot-name" required placeholder="Nhập tên bot">
+                        <small class="form-text text-muted">Tên dễ nhớ để phân biệt các bot</small>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="trading-pair" class="form-label">Cặp giao dịch</label>
+                            <select class="form-select" id="trading-pair" required>
+                                <option value="">-- Chọn cặp giao dịch --</option>
+                                <option value="BTCUSDT">BTCUSDT</option>
+                                <option value="ETHUSDT">ETHUSDT</option>
+                                <option value="SOLUSDT">SOLUSDT</option>
+                                <option value="DOGEUSDT">DOGEUSDT</option>
+                                <option value="BNBUSDT">BNBUSDT</option>
+                                <option value="ADAUSDT">ADAUSDT</option>
+                                <option value="XRPUSDT">XRPUSDT</option>
+                                <option value="AVAXUSDT">AVAXUSDT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="timeframe" class="form-label">Khung thời gian</label>
+                            <select class="form-select" id="timeframe" required>
+                                <option value="">-- Chọn khung thời gian --</option>
+                                <option value="1m">1 phút</option>
+                                <option value="5m">5 phút</option>
+                                <option value="15m">15 phút</option>
+                                <option value="30m">30 phút</option>
+                                <option value="1h">1 giờ</option>
+                                <option value="4h">4 giờ</option>
+                                <option value="1d">1 ngày</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="strategy" class="form-label">Chiến lược giao dịch</label>
+                            <select class="form-select" id="strategy" required>
+                                <option value="">-- Chọn chiến lược --</option>
+                                <option value="RSI">RSI (Relative Strength Index)</option>
+                                <option value="MACD">MACD (Moving Average Convergence Divergence)</option>
+                                <option value="Bollinger">Bollinger Bands</option>
+                                <option value="EMA_Cross">EMA Cross (Exponential Moving Average)</option>
+                                <option value="Grid">Grid Trading (Giao dịch lưới)</option>
+                                <option value="DCA">DCA (Dollar Cost Averaging)</option>
+                                <option value="Custom">Tùy chỉnh</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="risk-level" class="form-label">Mức độ rủi ro</label>
+                            <select class="form-select" id="risk-level" required>
+                                <option value="">-- Chọn mức độ rủi ro --</option>
+                                <option value="low">Thấp (1x - 3x)</option>
+                                <option value="medium">Trung bình (5x - 10x)</option>
+                                <option value="high">Cao (15x - 20x)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="position-size" class="form-label">Kích thước vị thế (% số dư)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="position-size" min="1" max="100" value="10" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <small class="form-text text-muted">Phần trăm số dư tài khoản sử dụng cho mỗi giao dịch</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tùy chọn bổ sung</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="auto-start" checked>
+                            <label class="form-check-label" for="auto-start">
+                                Tự động khởi động sau khi tạo
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="auto-adjust-params" checked>
+                            <label class="form-check-label" for="auto-adjust-params">
+                                Tự động điều chỉnh tham số theo thị trường
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enable-notifications" checked>
+                            <label class="form-check-label" for="enable-notifications">
+                                Nhận thông báo về hoạt động của bot này
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="create-bot-btn">Tạo Bot</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bot Details Modal -->
+<div class="modal fade" id="botDetailsModal" tabindex="-1" aria-labelledby="botDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botDetailsModalLabel">Chi tiết Bot</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bot-details-content">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-2">Đang tải thông tin chi tiết...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="edit-bot-btn">Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/bot_management.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cập nhật thông báo về chế độ API
+        const apiModeAlert = document.getElementById('api-mode-alert');
+        const apiModeMessage = document.getElementById('api-mode-message');
+        
+        // Lấy thông tin chế độ API từ server
+        fetch('/api/account/settings')
+            .then(response => response.json())
+            .then(data => {
+                const apiMode = data.api_mode || 'demo';
+                
+                // Cập nhật màu sắc và thông báo dựa trên chế độ
+                if (apiMode === 'demo') {
+                    apiModeAlert.classList.replace('alert-info', 'alert-secondary');
+                    apiModeMessage.textContent = 'Bạn đang sử dụng chế độ Demo. Bot sẽ chạy với dữ liệu giả lập, không có giao dịch thực.';
+                } else if (apiMode === 'testnet') {
+                    apiModeAlert.classList.replace('alert-info', 'alert-warning');
+                    apiModeMessage.textContent = 'Bạn đang sử dụng chế độ Testnet. Bot sẽ chạy trên môi trường thử nghiệm của Binance.';
+                } else if (apiMode === 'live') {
+                    apiModeAlert.classList.replace('alert-info', 'alert-danger');
+                    apiModeMessage.textContent = 'Bạn đang sử dụng chế độ Live. Bot sẽ thực hiện giao dịch thực tế với tiền thật!';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching API mode:', error);
+            });
+    });
+</script>
+{% endblock %}

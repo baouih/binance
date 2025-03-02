@@ -1,202 +1,276 @@
-// Settings Page JavaScript Code
+// JavaScript for settings page
+
 document.addEventListener('DOMContentLoaded', function() {
-    // API Mode Selection
-    const apiModeRadios = document.querySelectorAll('input[name="api-mode"]');
-    const saveApiModeBtn = document.getElementById('save-api-mode');
+    // DOM elements
+    const apiSettingsForm = document.getElementById('api-settings-form');
+    const binanceApiKey = document.getElementById('binance-api-key');
+    const binanceApiSecret = document.getElementById('binance-api-secret');
+    const testApiButton = document.getElementById('test-api-button');
+    const saveApiButton = document.getElementById('save-api-button');
     const apiConnectionStatus = document.getElementById('api-connection-status');
-    const testBinanceApiBtn = document.getElementById('test-binance-api');
     
-    // Telegram Settings
-    const enableTelegramSwitch = document.getElementById('enable-telegram');
+    // Notification settings elements
+    const enableTelegramNotifications = document.getElementById('enable-telegram-notifications');
     const telegramBotToken = document.getElementById('telegram-bot-token');
     const telegramChatId = document.getElementById('telegram-chat-id');
-    const saveTelegramSettingsBtn = document.getElementById('save-telegram-settings');
-    const testTelegramApiBtn = document.getElementById('test-telegram-api');
-    const toggleTokenVisibilityBtn = document.getElementById('toggle-token-visibility');
+    const testTelegramButton = document.getElementById('test-telegram-button');
+    const saveNotificationButton = document.getElementById('save-notification-button');
     
-    // Save API Mode
-    if (saveApiModeBtn) {
-        saveApiModeBtn.addEventListener('click', function() {
-            const selectedMode = document.querySelector('input[name="api-mode"]:checked').value;
-            
-            // Show loading state
-            saveApiModeBtn.disabled = true;
-            saveApiModeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
-            
-            // Call API to update settings
-            fetch('/api/account/settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    api_mode: selectedMode
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Show success message
-                    const toast = new bootstrap.Toast(document.getElementById('success-toast'));
-                    document.getElementById('toast-message').textContent = 'Đã lưu chế độ API thành công!';
-                    toast.show();
-                    
-                    // Update badge in navbar
-                    updateApiModeBadge(selectedMode);
-                    
-                    // Update connection status - fake checking
-                    testConnectionStatus();
-                } else {
-                    // Show error message
-                    const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                    document.getElementById('toast-error-message').textContent = data.message || 'Lỗi khi lưu cài đặt';
-                    toast.show();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                document.getElementById('toast-error-message').textContent = 'Lỗi kết nối đến máy chủ';
-                toast.show();
-            })
-            .finally(() => {
-                // Reset button
-                saveApiModeBtn.disabled = false;
-                saveApiModeBtn.innerHTML = '<i class="bi bi-check-lg"></i> Lưu chế độ API';
-            });
-        });
+    // Security settings elements
+    const saveSecurityButton = document.getElementById('save-security-button');
+    
+    // Add event listeners
+    if (testApiButton) {
+        testApiButton.addEventListener('click', testConnectionStatus);
     }
     
-    // Test Binance API Connection
-    if (testBinanceApiBtn) {
-        testBinanceApiBtn.addEventListener('click', function() {
+    if (saveApiButton) {
+        saveApiButton.addEventListener('click', saveApiSettings);
+    }
+    
+    if (testTelegramButton) {
+        testTelegramButton.addEventListener('click', testTelegramNotification);
+    }
+    
+    if (saveNotificationButton) {
+        saveNotificationButton.addEventListener('click', saveNotificationSettings);
+    }
+    
+    if (saveSecurityButton) {
+        saveSecurityButton.addEventListener('click', saveSecuritySettings);
+    }
+    
+    // API mode radio buttons
+    const apiModeRadios = document.querySelectorAll('input[name="api-mode"]');
+    apiModeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateApiModeBadge(this.value);
             testConnectionStatus();
         });
-    }
+    });
     
-    // Toggle token visibility
-    if (toggleTokenVisibilityBtn) {
-        toggleTokenVisibilityBtn.addEventListener('click', function() {
-            const tokenInput = telegramBotToken;
-            const eyeIcon = toggleTokenVisibilityBtn.querySelector('i');
+    // Functions
+    function saveApiSettings() {
+        // Show loading
+        window.showLoading();
+        
+        // Get values
+        const selectedMode = document.querySelector('input[name="api-mode"]:checked').value;
+        const apiKey = binanceApiKey.value.trim();
+        const apiSecret = binanceApiSecret.value.trim();
+        
+        // Prepare data for API
+        const data = {
+            api_mode: selectedMode,
+            api_key: apiKey,
+            api_secret: apiSecret
+        };
+        
+        // Send data to server
+        fetch('/api/account/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading
+            window.hideLoading();
             
-            if (tokenInput.type === 'password') {
-                tokenInput.type = 'text';
-                eyeIcon.classList.remove('bi-eye');
-                eyeIcon.classList.add('bi-eye-slash');
+            if (data.success) {
+                // Show success message
+                showToast('success', 'Đã lưu cài đặt API thành công!');
+                
+                // Update global badge and status indicators
+                updateGlobalModeBadge(selectedMode, getModeLabelText(selectedMode));
+                
+                // Refresh connection status display
+                testConnectionStatus();
+                
+                // Redirect to bot management after successful configuration
+                setTimeout(() => {
+                    window.location.href = '/bots';
+                }, 2000);
             } else {
-                tokenInput.type = 'password';
-                eyeIcon.classList.remove('bi-eye-slash');
-                eyeIcon.classList.add('bi-eye');
+                // Show error message
+                showToast('error', 'Lỗi: ' + data.message);
             }
+        })
+        .catch(error => {
+            // Hide loading
+            window.hideLoading();
+            
+            // Show error message
+            showToast('error', 'Lỗi kết nối: ' + error.message);
         });
     }
     
-    // Test Telegram API
-    if (testTelegramApiBtn) {
-        testTelegramApiBtn.addEventListener('click', function() {
-            if (!telegramBotToken.value || !telegramChatId.value) {
-                alert('Vui lòng nhập cả Bot Token và Chat ID');
-                return;
+    function testTelegramNotification() {
+        // Check if Telegram notifications are enabled
+        if (!enableTelegramNotifications.checked) {
+            showToast('error', 'Vui lòng bật thông báo Telegram trước!');
+            return;
+        }
+        
+        // Get values
+        const botToken = telegramBotToken.value.trim();
+        const chatId = telegramChatId.value.trim();
+        
+        // Validate
+        if (!botToken || !chatId) {
+            showToast('error', 'Vui lòng nhập Bot Token và Chat ID!');
+            return;
+        }
+        
+        // Show loading
+        window.showLoading();
+        
+        // Prepare data for API
+        const data = {
+            bot_token: botToken,
+            chat_id: chatId,
+            message: '🧪 Đây là tin nhắn test từ BinanceTrader Bot! ✅'
+        };
+        
+        // Send data to server
+        fetch('/api/telegram/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading
+            window.hideLoading();
+            
+            if (data.success) {
+                // Show success message
+                showToast('success', 'Đã gửi tin nhắn test thành công!');
+            } else {
+                // Show error message
+                showToast('error', 'Lỗi: ' + data.message);
             }
+        })
+        .catch(error => {
+            // Hide loading
+            window.hideLoading();
             
-            // Show loading state
-            testTelegramApiBtn.disabled = true;
-            testTelegramApiBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang gửi...';
-            
-            // Call API to test Telegram
-            fetch('/api/test/telegram', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    botToken: telegramBotToken.value,
-                    chatId: telegramChatId.value
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const toast = new bootstrap.Toast(document.getElementById('success-toast'));
-                    document.getElementById('toast-message').textContent = 'Tin nhắn đã được gửi thành công!';
-                    toast.show();
-                } else {
-                    const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                    document.getElementById('toast-error-message').textContent = data.message || 'Lỗi khi gửi tin nhắn';
-                    toast.show();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                document.getElementById('toast-error-message').textContent = 'Lỗi kết nối đến máy chủ';
-                toast.show();
-            })
-            .finally(() => {
-                // Reset button
-                testTelegramApiBtn.disabled = false;
-                testTelegramApiBtn.innerHTML = '<i class="bi bi-send"></i> Gửi tin nhắn test';
-            });
+            // Show error message
+            showToast('error', 'Lỗi kết nối: ' + error.message);
         });
     }
     
-    // Save Telegram Settings
-    if (saveTelegramSettingsBtn) {
-        saveTelegramSettingsBtn.addEventListener('click', function() {
-            if (enableTelegramSwitch.checked && (!telegramBotToken.value || !telegramChatId.value)) {
-                alert('Vui lòng nhập cả Bot Token và Chat ID');
-                return;
+    function saveNotificationSettings() {
+        // Show loading
+        window.showLoading();
+        
+        // Get values
+        const enableTelegram = enableTelegramNotifications.checked;
+        const botToken = telegramBotToken.value.trim();
+        const chatId = telegramChatId.value.trim();
+        const notifyNewTrades = document.getElementById('notify-new-trades').checked;
+        const notifyClosedTrades = document.getElementById('notify-closed-trades').checked;
+        const notifyErrorStatus = document.getElementById('notify-error-status').checked;
+        const notifyDailySummary = document.getElementById('notify-daily-summary').checked;
+        
+        // Prepare data for API
+        const data = {
+            telegram_enabled: enableTelegram,
+            telegram_bot_token: botToken,
+            telegram_chat_id: chatId,
+            notify_new_trades: notifyNewTrades,
+            notify_closed_trades: notifyClosedTrades,
+            notify_error_status: notifyErrorStatus,
+            notify_daily_summary: notifyDailySummary
+        };
+        
+        // Send data to server
+        fetch('/api/notification/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading
+            window.hideLoading();
+            
+            if (data.success) {
+                // Show success message
+                showToast('success', 'Đã lưu cài đặt thông báo thành công!');
+            } else {
+                // Show error message
+                showToast('error', 'Lỗi: ' + data.message);
             }
+        })
+        .catch(error => {
+            // Hide loading
+            window.hideLoading();
             
-            // Show loading state
-            saveTelegramSettingsBtn.disabled = true;
-            saveTelegramSettingsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
+            // Show error message
+            showToast('error', 'Lỗi kết nối: ' + error.message);
+        });
+    }
+    
+    function saveSecuritySettings() {
+        // Show loading
+        window.showLoading();
+        
+        // Get values
+        const enableStopLoss = document.getElementById('enable-stop-loss').checked;
+        const enableTakeProfit = document.getElementById('enable-take-profit').checked;
+        const enableTrailingStop = document.getElementById('enable-trailing-stop').checked;
+        const maxOpenPositions = document.getElementById('max-open-positions').value;
+        const maxDailyTrades = document.getElementById('max-daily-trades').value;
+        const maxDrawdown = document.getElementById('max-drawdown').value;
+        const autoRestartEnabled = document.getElementById('auto-restart-enabled').checked;
+        const logIpActivity = document.getElementById('log-ip-activity').checked;
+        
+        // Prepare data for API
+        const data = {
+            enable_stop_loss: enableStopLoss,
+            enable_take_profit: enableTakeProfit,
+            enable_trailing_stop: enableTrailingStop,
+            max_open_positions: maxOpenPositions,
+            max_daily_trades: maxDailyTrades,
+            max_drawdown: maxDrawdown,
+            auto_restart_enabled: autoRestartEnabled,
+            log_ip_activity: logIpActivity
+        };
+        
+        // Send data to server
+        fetch('/api/security/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading
+            window.hideLoading();
             
-            // Gather notification types
-            const notifications = {
-                signals: document.getElementById('notify-signals').checked,
-                positions: document.getElementById('notify-positions').checked,
-                profitLoss: document.getElementById('notify-profit-loss').checked,
-                system: document.getElementById('notify-system').checked
-            };
+            if (data.success) {
+                // Show success message
+                showToast('success', 'Đã lưu cài đặt bảo mật thành công!');
+            } else {
+                // Show error message
+                showToast('error', 'Lỗi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            // Hide loading
+            window.hideLoading();
             
-            // Call API to save settings
-            fetch('/api/config/telegram', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    enabled: enableTelegramSwitch.checked,
-                    botToken: telegramBotToken.value,
-                    chatId: telegramChatId.value,
-                    notifications: notifications
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const toast = new bootstrap.Toast(document.getElementById('success-toast'));
-                    document.getElementById('toast-message').textContent = 'Cài đặt Telegram đã được lưu!';
-                    toast.show();
-                } else {
-                    const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                    document.getElementById('toast-error-message').textContent = data.message || 'Lỗi khi lưu cài đặt';
-                    toast.show();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const toast = new bootstrap.Toast(document.getElementById('error-toast'));
-                document.getElementById('toast-error-message').textContent = 'Lỗi kết nối đến máy chủ';
-                toast.show();
-            })
-            .finally(() => {
-                // Reset button
-                saveTelegramSettingsBtn.disabled = false;
-                saveTelegramSettingsBtn.innerHTML = '<i class="bi bi-check-lg"></i> Lưu cài đặt';
-            });
+            // Show error message
+            showToast('error', 'Lỗi kết nối: ' + error.message);
         });
     }
     
@@ -211,13 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
             modeBadge.classList.add(`mode-${mode}`);
             
             // Update text
-            if (mode === 'demo') {
-                modeBadge.textContent = 'Chế độ Demo';
-            } else if (mode === 'testnet') {
-                modeBadge.textContent = 'Chế độ Testnet';
-            } else if (mode === 'live') {
-                modeBadge.textContent = 'Chế độ Live';
-            }
+            modeBadge.textContent = getModeLabelText(mode);
         }
     }
     
@@ -256,6 +324,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function getModeLabelText(mode) {
+        if (mode === 'demo') {
+            return 'Chế độ Demo';
+        } else if (mode === 'testnet') {
+            return 'Chế độ Testnet';
+        } else if (mode === 'live') {
+            return 'Chế độ Live';
+        }
+        return '';
+    }
+    
+    function showToast(type, message) {
+        const toastId = type === 'success' ? 'success-toast' : 'error-toast';
+        const messageId = type === 'success' ? 'toast-message' : 'toast-error-message';
+        
+        const toastElement = document.getElementById(toastId);
+        const messageElement = document.getElementById(messageId);
+        
+        if (toastElement && messageElement) {
+            messageElement.textContent = message;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    }
+    
     function testConnectionStatus() {
         if (apiConnectionStatus) {
             // Show loading state
@@ -287,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (selectedMode === 'testnet') {
                     apiConnectionStatus.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <span class="badge bg-warning me-2">Testnet</span>
+                            <span class="badge bg-warning text-dark me-2">Testnet</span>
                             <span>Đã kết nối thành công đến Binance Testnet API</span>
                         </div>
                         <div class="mt-2">
@@ -312,7 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Cập nhật badge toàn cục
                     updateGlobalModeBadge('live', 'Chế độ Live');
-                };
                 }
             }, 1500);
         }
@@ -324,17 +416,93 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 // Set API mode radio button
-                const apiMode = data.api_mode || 'testnet';
+                const apiMode = data.api_mode || 'demo';
                 const apiModeRadio = document.getElementById(`api-mode-${apiMode}`);
                 if (apiModeRadio) {
                     apiModeRadio.checked = true;
                 }
                 
+                // Set API key and secret if available
+                if (data.api_key && binanceApiKey) {
+                    binanceApiKey.value = data.api_key;
+                }
+                
+                if (data.api_secret && binanceApiSecret) {
+                    binanceApiSecret.value = data.api_secret;
+                }
+                
+                // Update global indicators to match saved settings
+                updateGlobalModeBadge(apiMode, getModeLabelText(apiMode));
+                
                 // Test connection status
                 testConnectionStatus();
+                
+                // Set notification settings if available
+                if (data.telegram_enabled !== undefined && enableTelegramNotifications) {
+                    enableTelegramNotifications.checked = data.telegram_enabled;
+                }
+                
+                if (data.telegram_bot_token && telegramBotToken) {
+                    telegramBotToken.value = data.telegram_bot_token;
+                }
+                
+                if (data.telegram_chat_id && telegramChatId) {
+                    telegramChatId.value = data.telegram_chat_id;
+                }
+                
+                // Set notification options
+                if (data.notify_new_trades !== undefined) {
+                    document.getElementById('notify-new-trades').checked = data.notify_new_trades;
+                }
+                
+                if (data.notify_closed_trades !== undefined) {
+                    document.getElementById('notify-closed-trades').checked = data.notify_closed_trades;
+                }
+                
+                if (data.notify_error_status !== undefined) {
+                    document.getElementById('notify-error-status').checked = data.notify_error_status;
+                }
+                
+                if (data.notify_daily_summary !== undefined) {
+                    document.getElementById('notify-daily-summary').checked = data.notify_daily_summary;
+                }
+                
+                // Set security settings if available
+                if (data.enable_stop_loss !== undefined) {
+                    document.getElementById('enable-stop-loss').checked = data.enable_stop_loss;
+                }
+                
+                if (data.enable_take_profit !== undefined) {
+                    document.getElementById('enable-take-profit').checked = data.enable_take_profit;
+                }
+                
+                if (data.enable_trailing_stop !== undefined) {
+                    document.getElementById('enable-trailing-stop').checked = data.enable_trailing_stop;
+                }
+                
+                if (data.max_open_positions) {
+                    document.getElementById('max-open-positions').value = data.max_open_positions;
+                }
+                
+                if (data.max_daily_trades) {
+                    document.getElementById('max-daily-trades').value = data.max_daily_trades;
+                }
+                
+                if (data.max_drawdown) {
+                    document.getElementById('max-drawdown').value = data.max_drawdown;
+                }
+                
+                if (data.auto_restart_enabled !== undefined) {
+                    document.getElementById('auto-restart-enabled').checked = data.auto_restart_enabled;
+                }
+                
+                if (data.log_ip_activity !== undefined) {
+                    document.getElementById('log-ip-activity').checked = data.log_ip_activity;
+                }
             })
             .catch(error => {
                 console.error('Error fetching account settings:', error);
+                showToast('error', 'Lỗi tải cài đặt: ' + error.message);
             });
     }
     
