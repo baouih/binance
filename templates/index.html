@@ -10,6 +10,7 @@
         body {
             background-color: #0d1117;
             color: #c9d1d9;
+            padding-bottom: 70px; /* Add padding for mobile navigation */
         }
         .nav-link.active {
             background-color: #161b22 !important;
@@ -80,6 +81,51 @@
             border-radius: 6px;
             border: 1px solid #30363d;
         }
+        
+        /* Mobile navigation styling */
+        .fixed-bottom {
+            border-top: 1px solid #30363d;
+            padding-top: 8px;
+        }
+        .nav-mobile-btn {
+            color: #8b949e;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.8rem;
+        }
+        .nav-mobile-btn.active {
+            color: #58a6ff;
+        }
+        .nav-mobile-btn:hover, .nav-mobile-btn:focus {
+            color: #c9d1d9;
+        }
+        .nav-mobile-btn i {
+            margin-bottom: 4px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .dashboard-card {
+                padding: 10px !important;
+            }
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            h3, h2 {
+                font-size: 1.5rem;
+            }
+            .table {
+                font-size: 0.8rem;
+            }
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            .progress {
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -107,7 +153,38 @@
             </div>
         </header>
         
-        <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
+        <!-- Mobile bottom navigation -->
+        <div class="fixed-bottom bg-dark d-block d-md-none pb-2">
+            <div class="row text-center gx-0">
+                <div class="col">
+                    <button class="btn btn-link nav-mobile-btn active" id="dashboard-mobile-btn" data-bs-toggle="tab" data-bs-target="#dashboard">
+                        <i class="bi bi-speedometer2 d-block fs-4"></i>
+                        <small>Dashboard</small>
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-link nav-mobile-btn" id="trades-mobile-btn" data-bs-toggle="tab" data-bs-target="#trades">
+                        <i class="bi bi-graph-up d-block fs-4"></i>
+                        <small>Giao dịch</small>
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-link nav-mobile-btn" id="settings-mobile-btn" data-bs-toggle="tab" data-bs-target="#settings">
+                        <i class="bi bi-gear d-block fs-4"></i>
+                        <small>Cài đặt</small>
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-link nav-mobile-btn" id="cli-mobile-btn" data-bs-toggle="tab" data-bs-target="#cli">
+                        <i class="bi bi-terminal d-block fs-4"></i>
+                        <small>CLI</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop tabs -->
+        <ul class="nav nav-tabs mb-4 d-none d-md-flex" id="mainTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="true">
                     <i class="bi bi-speedometer2"></i> Dashboard
@@ -506,6 +583,46 @@ Nhập 'help' để xem danh sách lệnh.
             // Bot control buttons
             const toggleBotBtn = document.getElementById('toggleBotBtn');
             const restartBotBtn = document.getElementById('restartBotBtn');
+            
+            // Mobile tab navigation
+            const dashboardMobileBtn = document.getElementById('dashboard-mobile-btn');
+            const tradesMobileBtn = document.getElementById('trades-mobile-btn');
+            const settingsMobileBtn = document.getElementById('settings-mobile-btn');
+            const cliMobileBtn = document.getElementById('cli-mobile-btn');
+            
+            // Mobile buttons click handlers
+            dashboardMobileBtn.addEventListener('click', function() {
+                activateMobileTab(this, 'dashboard');
+            });
+            
+            tradesMobileBtn.addEventListener('click', function() {
+                activateMobileTab(this, 'trades');
+            });
+            
+            settingsMobileBtn.addEventListener('click', function() {
+                activateMobileTab(this, 'settings');
+            });
+            
+            cliMobileBtn.addEventListener('click', function() {
+                activateMobileTab(this, 'cli');
+            });
+            
+            function activateMobileTab(button, tabId) {
+                // Remove active class from all buttons
+                document.querySelectorAll('.nav-mobile-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Activate corresponding tab
+                var tabEl = document.querySelector(`button[data-bs-target="#${tabId}"]`);
+                if (tabEl) {
+                    var tab = new bootstrap.Tab(tabEl);
+                    tab.show();
+                }
+            }
             
             // Handle toggle bot button
             toggleBotBtn.addEventListener('click', function() {
