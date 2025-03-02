@@ -105,7 +105,10 @@ market_data = {
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
-    return render_template('index.html')
+    return render_template('index.html', 
+                           bot_status=bot_status,
+                           account_data=account_data,
+                           market_data=market_data)
 
 @app.route('/strategies')
 def strategies():
@@ -126,6 +129,11 @@ def trades():
 def settings():
     """Trang cài đặt bot"""
     return render_template('settings.html')
+
+@app.route('/account')
+def account():
+    """Trang cài đặt tài khoản và API"""
+    return render_template('account.html')
 
 # API Routes
 @app.route('/api/bot/control', methods=['POST'])
@@ -151,6 +159,39 @@ def bot_control():
         return jsonify({'status': 'error', 'message': 'Invalid action parameter'}), 400
     
     return jsonify({'status': 'success', 'action': action, 'bot_status': bot_status})
+
+@app.route('/api/account/settings', methods=['GET', 'POST'])
+def account_settings():
+    """Lấy hoặc cập nhật cài đặt tài khoản"""
+    # Giả lập dữ liệu cài đặt tài khoản
+    account_settings = {
+        'account_type': 'futures',
+        'api_mode': 'testnet',  # demo, testnet, live
+        'use_api': True,
+        'use_testnet': True,
+        'symbols': ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'],
+        'timeframes': ['5m', '15m', '1h', '4h'],
+        'leverage': 10,
+        'risk_profile': 'medium', # very_low, low, medium, high, very_high
+        'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    if request.method == 'GET':
+        return jsonify(account_settings)
+    elif request.method == 'POST':
+        if not request.json:
+            return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+            
+        # Cập nhật cài đặt từ dữ liệu gửi lên
+        data = request.json
+        for key in data:
+            if key in account_settings:
+                account_settings[key] = data[key]
+                
+        account_settings['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        logger.info(f"Account settings updated: {data}")
+        
+        return jsonify({'status': 'success', 'settings': account_settings})
 
 @app.route('/api/positions/close', methods=['POST'])
 def close_position():
