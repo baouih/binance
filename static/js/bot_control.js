@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             } catch (e) {
                 console.error("Error parsing JSON:", e);
-                return { success: true, message: "Bot đã được khởi động (không thể phân tích JSON)" };
+                return { success: false, error_type: 'parse_error', message: "Không thể phân tích phản hồi từ máy chủ" };
             }
         })
         .then(data => {
@@ -46,20 +46,35 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ẩn loading
             window.hideLoading();
             
-            // Luôn coi là thành công
-            BOT_STATUS = { running: true };
-            
-            // Hiển thị thông báo
-            showToast('success', 'Bot đã được khởi động');
-            
-            // Cập nhật giao diện trạng thái bot
-            updateBotStatus(botId, 'running');
-            
-            // Tự động làm mới trang sau 2 giây
-            setTimeout(function() {
-                console.log("Reloading page...");
-                window.location.reload();
-            }, 2000);
+            if (data.success) {
+                // Thành công thực sự
+                BOT_STATUS = { running: true };
+                
+                // Hiển thị thông báo thành công
+                showToast('success', 'Bot đã được khởi động thành công');
+                
+                // Cập nhật giao diện trạng thái bot
+                updateBotStatus(botId, 'running');
+                
+                // Tự động làm mới trang sau 2 giây
+                setTimeout(function() {
+                    console.log("Reloading page...");
+                    window.location.reload();
+                }, 2000);
+            } else {
+                console.error('Bot không thể khởi động:', data);
+                
+                // Kiểm tra nguyên nhân lỗi
+                if (data.error_type === 'missing_api_config') {
+                    // Hiển thị thông báo cấu hình API
+                    showRedirectToast('error', 'Cần cấu hình API', 
+                        'Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.', 
+                        '/settings');
+                } else {
+                    // Hiển thị thông báo lỗi thông thường
+                    showToast('error', 'Lỗi: ' + (data.message || 'Không thể khởi động bot'));
+                }
+            }
         })
         .catch(error => {
             // Ẩn loading

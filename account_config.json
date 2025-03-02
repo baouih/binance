@@ -1,5 +1,5 @@
 {
-    "api_mode": "demo",
+    "api_mode": "testnet",
     "account_type": "futures",
     "symbols": [
         "BTCUSDT",
@@ -20,5 +20,15 @@
     "leverage": 10,
     "risk_per_trade": 1.0,
     "strategy_mode": "auto",
-    "risk_profile": "medium"
+    "risk_profile": "medium",
+    "api_key": "3d53f46cd9e83920b8104fc1106a12ceed12fae904b2299068a586a10ed34c30",
+    "api_secret": "289fb54917bee9d5dd43a14dd2ed62716c66a6f7b60c283cb15867abc7d2bb8b",
+    "enable_stop_loss": true,
+    "enable_take_profit": true,
+    "enable_trailing_stop": true,
+    "max_open_positions": "5",
+    "max_daily_trades": "20",
+    "max_drawdown": "10",
+    "auto_restart_enabled": true,
+    "log_ip_activity": true
 }
