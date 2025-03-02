@@ -32,4 +32,5 @@ dependencies = [
     "scipy>=1.15.2",
     "seaborn>=0.13.2",
     "binance>=0.3",
+    "openai>=1.65.2",
 ]
