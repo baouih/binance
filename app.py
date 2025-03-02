@@ -1710,8 +1710,8 @@ def account_settings():
     if request.method == 'GET':
         # Lấy cài đặt hiện tại
         settings = {
-            'api_mode': 'demo',  # 'demo', 'testnet', 'live'
-            'account_type': 'futures',  # 'spot', 'futures'
+            'api_mode': BOT_STATUS.get('mode', 'testnet'),  # 'demo', 'testnet', 'live'
+            'account_type': BOT_STATUS.get('account_type', 'futures'),  # 'spot', 'futures'
             'risk_profile': 'medium',  # 'very_low', 'low', 'medium', 'high', 'very_high'
             'leverage': 10,  # 1-100
             'symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'],
@@ -1728,6 +1728,42 @@ def account_settings():
             api_mode = data.get('api_mode')
             if api_mode not in ['demo', 'testnet', 'live']:
                 return jsonify({'status': 'error', 'message': 'Chế độ API không hợp lệ'})
+                
+            # Cập nhật BOT_STATUS
+            BOT_STATUS['mode'] = api_mode
+            logger.info(f"Đã cập nhật chế độ API: {api_mode}")
+                
+            # Nếu chuyển sang chế độ testnet hoặc live, kiểm tra API key
+            if api_mode in ['testnet', 'live']:
+                api_key = os.environ.get('BINANCE_API_KEY', '')
+                api_secret = os.environ.get('BINANCE_API_SECRET', '')
+                
+                if not api_key or not api_secret:
+                    return jsonify({
+                        'status': 'error', 
+                        'message': 'Thiếu API key hoặc API secret. Vui lòng cấu hình trong file .env'
+                    })
+                
+                # Kiểm tra kết nối API
+                try:
+                    binance_client = binance_api.BinanceAPI(
+                        api_key=api_key,
+                        api_secret=api_secret,
+                        testnet=(api_mode == 'testnet')
+                    )
+                    
+                    # Thử lấy dữ liệu ticker để kiểm tra kết nối
+                    ticker = binance_client.get_symbol_ticker(symbol='BTCUSDT')
+                    if not ticker or 'price' not in ticker:
+                        raise Exception("Không thể lấy dữ liệu giá")
+                    
+                    logger.info(f"Kết nối API Binance thành công trong chế độ {api_mode}")
+                except Exception as e:
+                    logger.error(f"Lỗi kết nối API Binance: {str(e)}")
+                    return jsonify({
+                        'status': 'error', 
+                        'message': f'Không thể kết nối đến Binance API: {str(e)}'
+                    })
             
             account_type = data.get('account_type')
             if account_type not in ['spot', 'futures']:
@@ -1774,7 +1810,101 @@ def get_bot_status():
 @app.route('/api/account', methods=['GET'])
 def get_account():
     """Lấy dữ liệu tài khoản"""
-    return jsonify(ACCOUNT_DATA)
+    try:
+        # Chế độ hoạt động từ session hoặc giá trị mặc định
+        mode = BOT_STATUS.get('mode', 'testnet')
+        
+        # Chỉ khi ở chế độ testnet hoặc live thì mới kết nối API Binance
+        if mode in ['testnet', 'live']:
+            # Khởi tạo API client với thông tin API key từ biến môi trường
+            api_key = os.environ.get('BINANCE_API_KEY', '')
+            api_secret = os.environ.get('BINANCE_API_SECRET', '')
+            
+            # Log thông tin kết nối (che dấu API secret)
+            logger.info(f"Đang kết nối Binance API với key: {api_key[:5]}...{api_key[-5:] if len(api_key) > 10 else ''}")
+            logger.info(f"Chế độ Testnet: {mode == 'testnet'}")
+            
+            binance_client = binance_api.BinanceAPI(
+                api_key=api_key,
+                api_secret=api_secret,
+                testnet=(mode == 'testnet')
+            )
+            
+            # Lấy dữ liệu tài khoản từ Binance
+            account_info = {}
+            positions = []
+            
+            try:
+                # Lấy thông tin tài khoản
+                if BOT_STATUS.get('account_type') == 'futures':
+                    account_info = binance_client.get_futures_account()
+                    # Lấy thông tin vị thế
+                    position_risk = binance_client.get_futures_position_risk()
+                    
+                    # Chuyển đổi dữ liệu vị thế
+                    for pos in position_risk:
+                        # Chỉ thêm vị thế có số lượng khác 0
+                        if float(pos.get('positionAmt', 0)) != 0:
+                            positions.append({
+                                'id': f"pos_{pos['symbol']}",
+                                'symbol': pos['symbol'],
+                                'type': 'LONG' if float(pos.get('positionAmt', 0)) > 0 else 'SHORT',
+                                'entry_price': float(pos.get('entryPrice', 0)),
+                                'current_price': float(pos.get('markPrice', 0)),
+                                'quantity': abs(float(pos.get('positionAmt', 0))),
+                                'leverage': int(pos.get('leverage', 1)),
+                                'pnl': float(pos.get('unRealizedProfit', 0)),
+                                'pnl_percent': float(pos.get('unRealizedProfit', 0)) / (float(pos.get('isolatedWallet', 1)) or 1) * 100 if float(pos.get('isolatedWallet', 0)) > 0 else 0,
+                                'entry_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # API không cung cấp thời gian vào lệnh
+                                'stop_loss': 0,  # API không cung cấp thông tin này
+                                'take_profit': 0  # API không cung cấp thông tin này
+                            })
+                else:  # spot
+                    account_info = binance_client.get_account()
+                    # Spot không có vị thế, chỉ có tài sản
+                
+                # Thiết lập dữ liệu tài khoản
+                if BOT_STATUS.get('account_type') == 'futures':
+                    balance_data = {
+                        'balance': float(account_info.get('totalWalletBalance', 0)),
+                        'equity': float(account_info.get('totalMarginBalance', 0)),
+                        'margin_used': float(account_info.get('totalPositionInitialMargin', 0)),
+                        'margin_available': float(account_info.get('availableBalance', 0)),
+                        'free_balance': float(account_info.get('availableBalance', 0)),
+                        'positions': positions,
+                        'leverage': 3  # Mặc định, có thể cập nhật từ dữ liệu thực tế
+                    }
+                else:  # spot
+                    # Tính tổng giá trị tài sản USDT
+                    total_usdt = 0
+                    for asset in account_info.get('balances', []):
+                        if asset['asset'] == 'USDT':
+                            total_usdt = float(asset['free']) + float(asset['locked'])
+                    
+                    balance_data = {
+                        'balance': total_usdt,
+                        'equity': total_usdt,
+                        'margin_used': 0,
+                        'margin_available': total_usdt,
+                        'free_balance': total_usdt,
+                        'positions': [],  # Spot không có vị thế
+                        'leverage': 1
+                    }
+                
+                logger.info(f"Đã lấy dữ liệu tài khoản thành công: {len(positions)} vị thế")
+                return jsonify(balance_data)
+            
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy dữ liệu từ Binance API: {str(e)}")
+                # Trả về dữ liệu giả lập nếu có lỗi
+        
+        # Trả về dữ liệu giả lập cho chế độ demo hoặc khi lỗi
+        logger.info("Sử dụng dữ liệu tài khoản giả lập trong chế độ demo")
+        return jsonify(ACCOUNT_DATA)
+    
+    except Exception as e:
+        logger.error(f"Lỗi khi xử lý API account: {str(e)}")
+        return jsonify(ACCOUNT_DATA)
 
 
 @app.route('/api/signals', methods=['GET'])
@@ -1813,7 +1943,73 @@ def get_signals():
 @app.route('/api/market', methods=['GET'])
 def get_market():
     """Lấy dữ liệu thị trường"""
-    return jsonify(MARKET_DATA)
+    try:
+        # Chế độ hoạt động từ session hoặc giá trị mặc định
+        mode = BOT_STATUS.get('mode', 'testnet')
+        
+        # Chỉ khi ở chế độ testnet hoặc live thì mới kết nối API Binance
+        if mode in ['testnet', 'live']:
+            try:
+                # Khởi tạo API client với thông tin API key từ biến môi trường
+                api_key = os.environ.get('BINANCE_API_KEY', '')
+                api_secret = os.environ.get('BINANCE_API_SECRET', '')
+                
+                binance_client = binance_api.BinanceAPI(
+                    api_key=api_key,
+                    api_secret=api_secret,
+                    testnet=(mode == 'testnet')
+                )
+                
+                # Lấy giá hiện tại của các cặp tiền
+                btc_ticker = binance_client.get_symbol_ticker(symbol='BTCUSDT')
+                eth_ticker = binance_client.get_symbol_ticker(symbol='ETHUSDT')
+                bnb_ticker = binance_client.get_symbol_ticker(symbol='BNBUSDT')
+                sol_ticker = binance_client.get_symbol_ticker(symbol='SOLUSDT')
+                
+                # Lấy thông tin 24h ticker để có thông tin thay đổi giá
+                btc_24h = binance_client.get_24h_ticker(symbol='BTCUSDT')
+                eth_24h = binance_client.get_24h_ticker(symbol='ETHUSDT')
+                bnb_24h = binance_client.get_24h_ticker(symbol='BNBUSDT')
+                sol_24h = binance_client.get_24h_ticker(symbol='SOLUSDT')
+                
+                # Tạo dữ liệu thị trường từ API
+                market_data = {
+                    'btc_price': float(btc_ticker.get('price', 0)),
+                    'eth_price': float(eth_ticker.get('price', 0)),
+                    'bnb_price': float(bnb_ticker.get('price', 0)),
+                    'sol_price': float(sol_ticker.get('price', 0)),
+                    'btc_change_24h': float(btc_24h.get('priceChangePercent', 0)),
+                    'eth_change_24h': float(eth_24h.get('priceChangePercent', 0)),
+                    'bnb_change_24h': float(bnb_24h.get('priceChangePercent', 0)),
+                    'sol_change_24h': float(sol_24h.get('priceChangePercent', 0)),
+                    'sentiment': {
+                        'value': int(50 + float(btc_24h.get('priceChangePercent', 0))),  # Giá trị tạm thời
+                        'state': 'success' if float(btc_24h.get('priceChangePercent', 0)) > 0 else 'danger',
+                        'change': float(btc_24h.get('priceChangePercent', 0)),
+                        'description': 'Tham lam' if float(btc_24h.get('priceChangePercent', 0)) > 0 else 'Sợ hãi'
+                    },
+                    'market_regime': {
+                        'BTCUSDT': 'Trending' if abs(float(btc_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
+                        'ETHUSDT': 'Trending' if abs(float(eth_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
+                        'BNBUSDT': 'Trending' if abs(float(bnb_24h.get('priceChangePercent', 0))) > 2 else 'Ranging',
+                        'SOLUSDT': 'Trending' if abs(float(sol_24h.get('priceChangePercent', 0))) > 2 else 'Ranging'
+                    }
+                }
+                
+                logger.info(f"Đã lấy dữ liệu thị trường thành công từ Binance API")
+                return jsonify(market_data)
+            
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
+                # Trả về dữ liệu giả lập nếu có lỗi
+        
+        # Trả về dữ liệu giả lập cho chế độ demo hoặc khi lỗi
+        logger.info("Sử dụng dữ liệu thị trường giả lập")
+        return jsonify(MARKET_DATA)
+    
+    except Exception as e:
+        logger.error(f"Lỗi khi xử lý API market: {str(e)}")
+        return jsonify(MARKET_DATA)
 
 
 @app.route('/api/cli/execute', methods=['POST'])
