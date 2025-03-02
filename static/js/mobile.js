@@ -78,12 +78,26 @@ function toggleMobileMenu() {
  * Check and adjust layout based on device orientation and screen size
  */
 function checkMobileLayout() {
-    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Vấn đề là Safari iOS không hiển thị đúng userAgent, check bổ sung
+    const isMobile = window.innerWidth < 768 || 
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome") && window.innerWidth < 1000);
     const isPortrait = window.innerHeight > window.innerWidth;
+    
+    // Theo dõi tỷ lệ màn hình để phát hiện thiết bị di động
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const isProbablyMobile = aspectRatio < 1.3 && window.innerWidth < 1000;
+    
+    // Lưu thông tin phát hiện thiết bị
+    if (isProbablyMobile || isMobile) {
+        localStorage.setItem('isMobileDevice', 'true');
+    }
     
     console.log("Device detection:", { 
         isMobile: isMobile, 
         innerWidth: window.innerWidth,
+        aspectRatio: aspectRatio,
+        isProbablyMobile: isProbablyMobile,
         userAgent: navigator.userAgent,
         isPortrait: isPortrait 
     });
@@ -193,12 +207,29 @@ function setupMobileNavigation() {
         // Add new event listener
         clonedToggle.addEventListener('click', function() {
             console.log("Mobile bot toggle clicked");
-            if (typeof fakeStartBot === 'function') {
-                fakeStartBot();
-            } else {
-                console.error("fakeStartBot function not found");
-                alert("Lỗi: Không thể kết nối với hàm điều khiển bot");
-            }
+            // Kiểm tra xem API đã được thiết lập chưa
+            fetch('/api/account/settings')
+            .then(response => response.json())
+            .then(data => {
+                console.log("API settings:", data);
+                if (data.api_mode === 'testnet' || data.api_mode === 'live') {
+                    if (!data.api_key || !data.api_secret) {
+                        // Chưa có API key
+                        console.log("API keys not set, redirecting to settings");
+                        window.location.href = '/settings';
+                        return;
+                    }
+                    // Gọi API khởi động bot
+                    toggleBotStatus();
+                } else {
+                    // Đang ở chế độ demo, giả lập khởi động
+                    toggleBotStatus();
+                }
+            })
+            .catch(error => {
+                console.error("Error checking API settings:", error);
+                alert("Lỗi khi kiểm tra cài đặt API. Vui lòng thử lại.");
+            });
         });
     } else {
         console.log("Mobile bot toggle button not found");

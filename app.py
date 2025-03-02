@@ -691,6 +691,16 @@ def market():
 def position():
     """Trang quản lý vị thế"""
     try:
+        # Khởi tạo dữ liệu hiệu suất cho template
+        performance_data = {
+            'total_profit': 312.5,
+            'win_rate': 68.5,
+            'average_profit': 125.8,
+            'largest_win': 450.0,
+            'largest_loss': -200.0,
+            'profit_factor': 2.34
+        }
+        
         # Cập nhật dữ liệu vị thế từ dữ liệu mẫu hoặc API thực
         current_positions = [
             {
