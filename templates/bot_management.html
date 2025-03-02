@@ -1,0 +1,452 @@
+{% extends 'layout.html' %}
+
+{% block title %}Quản lý Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded mb-4">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-robot me-2"></i> Quản lý Bot Giao Dịch
+                    </h5>
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createBotModal">
+                        <i class="fas fa-plus me-1"></i> Tạo Bot Mới
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-robot text-primary fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Tổng số Bot</h6>
+                                            <h3 class="mb-0" id="total-bots-counter">3</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-play-circle text-success fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Đang Chạy</h6>
+                                            <h3 class="mb-0">2</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-stop-circle text-danger fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Đã Dừng</h6>
+                                            <h3 class="mb-0">1</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-chart-line text-info fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Lợi Nhuận</h6>
+                                            <h3 class="mb-0 text-success">+3.2%</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px">#</th>
+                                    <th style="width: 180px">Bot</th>
+                                    <th>Trạng thái</th>
+                                    <th>Chiến lược</th>
+                                    <th>Cặp giao dịch</th>
+                                    <th>Khung thời gian</th>
+                                    <th>Thống kê</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Bot 1 -->
+                                <tr data-bot-id="bot-001">
+                                    <td>1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bot-status-card status-running me-2" data-bot-id="bot-001">
+                                                <i class="fas fa-circle-notch fa-spin text-success status-icon"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">BTC Trend Follower</h6>
+                                                <span class="badge bg-success status-badge">Đang chạy</span>
+                                                <small class="text-muted d-block">ID: BOT-001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <div class="bg-success bg-opacity-10 rounded-circle p-1">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                </div>
+                                            </div>
+                                            <span>Online</span>
+                                        </div>
+                                        <small class="text-muted">Hoạt động từ 12 giờ trước</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">Trend Following</span>
+                                        <small class="d-block text-muted">RSI + MA Cross</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">BTCUSDT</span>
+                                    </td>
+                                    <td>
+                                        <span>1h</span>
+                                    </td>
+                                    <td class="bot-info" data-bot-id="bot-001">
+                                        <div class="d-flex flex-column">
+                                            <div class="mb-1">
+                                                <small class="text-muted">Lợi nhuận:</small>
+                                                <span class="ms-1 bot-profit text-success">+2.8%</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <small class="text-muted">Vị thế:</small>
+                                                <span class="ms-1 positions-count">1</span>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Giao dịch cuối:</small>
+                                                <span class="ms-1 last-trade-time">18:30:25</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary bot-control-button" data-bot-id="bot-001" data-action="view" title="Xem Chi Tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger bot-control-button" data-bot-id="bot-001" data-action="stop" title="Dừng Bot">
+                                                <i class="fas fa-stop"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning bot-control-button" data-bot-id="bot-001" data-action="edit" title="Chỉnh Sửa Cài Đặt">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info bot-control-button" data-bot-id="bot-001" data-action="restart" title="Khởi động lại">
+                                                <i class="fas fa-sync"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Bot 2 -->
+                                <tr data-bot-id="bot-002">
+                                    <td>2</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bot-status-card status-running me-2" data-bot-id="bot-002">
+                                                <i class="fas fa-circle-notch fa-spin text-success status-icon"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">ETH Oscillator</h6>
+                                                <span class="badge bg-success status-badge">Đang chạy</span>
+                                                <small class="text-muted d-block">ID: BOT-002</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <div class="bg-success bg-opacity-10 rounded-circle p-1">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                </div>
+                                            </div>
+                                            <span>Online</span>
+                                        </div>
+                                        <small class="text-muted">Hoạt động từ 6 giờ trước</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">Mean Reversion</span>
+                                        <small class="d-block text-muted">Bollinger Bands</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">ETHUSDT</span>
+                                    </td>
+                                    <td>
+                                        <span>4h</span>
+                                    </td>
+                                    <td class="bot-info" data-bot-id="bot-002">
+                                        <div class="d-flex flex-column">
+                                            <div class="mb-1">
+                                                <small class="text-muted">Lợi nhuận:</small>
+                                                <span class="ms-1 bot-profit text-success">+4.1%</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <small class="text-muted">Vị thế:</small>
+                                                <span class="ms-1 positions-count">2</span>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Giao dịch cuối:</small>
+                                                <span class="ms-1 last-trade-time">14:15:40</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary bot-control-button" data-bot-id="bot-002" data-action="view" title="Xem Chi Tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger bot-control-button" data-bot-id="bot-002" data-action="stop" title="Dừng Bot">
+                                                <i class="fas fa-stop"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning bot-control-button" data-bot-id="bot-002" data-action="edit" title="Chỉnh Sửa Cài Đặt">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info bot-control-button" data-bot-id="bot-002" data-action="restart" title="Khởi động lại">
+                                                <i class="fas fa-sync"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Bot 3 -->
+                                <tr data-bot-id="bot-003">
+                                    <td>3</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bot-status-card status-stopped me-2" data-bot-id="bot-003">
+                                                <i class="fas fa-stop-circle text-secondary status-icon"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">BNB Multi-Strategy</h6>
+                                                <span class="badge bg-secondary status-badge">Đã dừng</span>
+                                                <small class="text-muted d-block">ID: BOT-003</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <div class="bg-secondary bg-opacity-10 rounded-circle p-1">
+                                                    <i class="fas fa-times-circle text-secondary"></i>
+                                                </div>
+                                            </div>
+                                            <span>Offline</span>
+                                        </div>
+                                        <small class="text-muted">Dừng từ 2 giờ trước</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">Composite</span>
+                                        <small class="d-block text-muted">Multi-strategy</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">BNBUSDT</span>
+                                    </td>
+                                    <td>
+                                        <span>1d</span>
+                                    </td>
+                                    <td class="bot-info" data-bot-id="bot-003">
+                                        <div class="d-flex flex-column">
+                                            <div class="mb-1">
+                                                <small class="text-muted">Lợi nhuận:</small>
+                                                <span class="ms-1 bot-profit text-danger">-0.8%</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <small class="text-muted">Vị thế:</small>
+                                                <span class="ms-1 positions-count">0</span>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Giao dịch cuối:</small>
+                                                <span class="ms-1 last-trade-time">09:45:12</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary bot-control-button" data-bot-id="bot-003" data-action="view" title="Xem Chi Tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-success bot-control-button" data-bot-id="bot-003" data-action="start" title="Khởi động Bot">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning bot-control-button" data-bot-id="bot-003" data-action="edit" title="Chỉnh Sửa Cài Đặt">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger bot-control-button" data-bot-id="bot-003" data-action="delete" title="Xóa Bot">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Bot Modal -->
+<div class="modal fade" id="createBotModal" tabindex="-1" aria-labelledby="createBotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBotModalLabel">Tạo Bot Giao Dịch Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-bot-form">
+                    <div class="mb-3">
+                        <label for="bot-name" class="form-label">Tên Bot</label>
+                        <input type="text" class="form-control" id="bot-name" name="bot-name" placeholder="Nhập tên bot (ví dụ: BTC Trend Follower)" required>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="bot-strategy" class="form-label">Chiến lược</label>
+                            <select class="form-select" id="bot-strategy" name="bot-strategy" required>
+                                <option value="" selected disabled>Chọn chiến lược...</option>
+                                <option value="trend_following">Trend Following (RSI + MA Cross)</option>
+                                <option value="mean_reversion">Mean Reversion (Bollinger Bands)</option>
+                                <option value="breakout">Breakout Trading</option>
+                                <option value="composite">Composite Strategy</option>
+                                <option value="ml_adaptive">ML Adaptive Strategy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bot-timeframe" class="form-label">Khung thời gian</label>
+                            <select class="form-select" id="bot-timeframe" name="bot-timeframe" required>
+                                <option value="1m">1 phút</option>
+                                <option value="5m">5 phút</option>
+                                <option value="15m">15 phút</option>
+                                <option value="30m">30 phút</option>
+                                <option value="1h" selected>1 giờ</option>
+                                <option value="4h">4 giờ</option>
+                                <option value="1d">1 ngày</option>
+                                <option value="1w">1 tuần</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bot-pairs" class="form-label">Cặp giao dịch</label>
+                        <select class="form-select" id="bot-pairs" name="bot-pairs" multiple required>
+                            <option value="BTCUSDT">BTC/USDT</option>
+                            <option value="ETHUSDT">ETH/USDT</option>
+                            <option value="BNBUSDT">BNB/USDT</option>
+                            <option value="ADAUSDT">ADA/USDT</option>
+                            <option value="SOLUSDT">SOL/USDT</option>
+                            <option value="XRPUSDT">XRP/USDT</option>
+                            <option value="DOGEUSDT">DOGE/USDT</option>
+                            <option value="DOTUSDT">DOT/USDT</option>
+                        </select>
+                        <div class="form-text">Giữ Ctrl hoặc Cmd để chọn nhiều cặp giao dịch</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mức độ rủi ro</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="bot-risk-level" id="risk-low" value="low" checked>
+                                <label class="form-check-label" for="risk-low">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-1">Thấp</span>
+                                        <small>0.5-1% mỗi giao dịch</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="bot-risk-level" id="risk-medium" value="medium">
+                                <label class="form-check-label" for="risk-medium">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-warning me-1">Trung bình</span>
+                                        <small>1-2% mỗi giao dịch</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="bot-risk-level" id="risk-high" value="high">
+                                <label class="form-check-label" for="risk-high">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-danger me-1">Cao</span>
+                                        <small>2-5% mỗi giao dịch</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="bot-notifications" name="bot-notifications" checked>
+                            <label class="form-check-label" for="bot-notifications">Gửi thông báo Telegram</label>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Sau khi tạo, bạn có thể tùy chỉnh thêm các tham số chiến lược trong phần cài đặt nâng cao.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="create-bot-form" class="btn btn-primary">Tạo Bot</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast thông báo thành công -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="success-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-message">
+                Thao tác thành công!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast thông báo lỗi -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="error-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-error-message">
+                Đã xảy ra lỗi!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bot_management.js') }}"></script>
+{% endblock %}

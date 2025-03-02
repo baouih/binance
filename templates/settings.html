@@ -184,47 +184,133 @@
                             <div class="card-body">
                                 <form id="api-form">
                                     <div class="mb-4">
-                                        <h6>Binance API</h6>
+                                        <h6>Cài đặt Binance API</h6>
                                         <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="binance-api-key" class="form-label">API Key</label>
-                                                    <input type="password" class="form-control" id="binance-api-key" placeholder="Enter Binance API Key">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="binance-api-secret" class="form-label">API Secret</label>
-                                                    <input type="password" class="form-control" id="binance-api-secret" placeholder="Enter Binance API Secret">
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-info-circle"></i> Hiện tại đang sử dụng API key từ biến môi trường. API keys được lưu an toàn.
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">Chế độ API</label>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-demo" value="demo">
+                                                        <label class="form-check-label" for="api-mode-demo">
+                                                            <span class="badge bg-secondary">Demo</span>
+                                                            <small class="d-block text-muted">Sử dụng dữ liệu giả lập</small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-testnet" value="testnet" checked>
+                                                        <label class="form-check-label" for="api-mode-testnet">
+                                                            <span class="badge bg-warning">Testnet</span>
+                                                            <small class="d-block text-muted">Kết nối Binance Testnet</small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="api-mode" id="api-mode-live" value="live">
+                                                        <label class="form-check-label" for="api-mode-live">
+                                                            <span class="badge bg-danger">Live</span>
+                                                            <small class="d-block text-muted">Kết nối Binance thực tế</small>
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            
                                             <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="use-testnet" checked>
-                                                    <label class="form-check-label" for="use-testnet">
-                                                        Use Binance Testnet (recommended for testing)
-                                                    </label>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label fw-bold mb-0">Trạng thái kết nối API</label>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="test-binance-api">
+                                                        <i class="bi bi-arrow-repeat"></i> Kiểm tra kết nối
+                                                    </button>
+                                                </div>
+                                                <div id="api-connection-status" class="border rounded p-3 bg-dark">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                                            <span class="visually-hidden">Đang kiểm tra...</span>
+                                                        </div>
+                                                        <span>Đang kiểm tra kết nối API...</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-outline-primary" id="test-binance-api">Test Connection</button>
+                                            
+                                            <div class="d-flex justify-content-end mt-3">
+                                                <button type="button" class="btn btn-sm btn-outline-success" id="save-api-mode">
+                                                    <i class="bi bi-check-lg"></i> Lưu chế độ API
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="mb-4">
-                                        <h6>Telegram Notifications</h6>
+                                        <h6>Thông báo qua Telegram</h6>
                                         <div class="p-3 border rounded bg-secondary bg-opacity-10 mb-3">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="enable-telegram" checked>
+                                                <label class="form-check-label" for="enable-telegram">
+                                                    Bật thông báo Telegram
+                                                </label>
+                                            </div>
+                                            
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label for="telegram-bot-token" class="form-label">Bot Token</label>
-                                                    <input type="password" class="form-control" id="telegram-bot-token" placeholder="Enter Telegram Bot Token">
+                                                    <div class="input-group">
+                                                        <input type="password" class="form-control" id="telegram-bot-token" placeholder="Nhập Token Bot" value="8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM">
+                                                        <button class="btn btn-outline-secondary" type="button" id="toggle-token-visibility">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-muted">Có thể được lấy từ @BotFather trên Telegram</small>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label for="telegram-chat-id" class="form-label">Chat ID</label>
-                                                    <input type="text" class="form-control" id="telegram-chat-id" placeholder="Enter Telegram Chat ID">
+                                                    <input type="text" class="form-control" id="telegram-chat-id" placeholder="Nhập Chat ID" value="1834332146">
+                                                    <small class="text-muted">ID của bạn hoặc nhóm nhận thông báo</small>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-outline-primary" id="test-telegram-api">Test Notification</button>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Loại thông báo</label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-signals" checked>
+                                                            <label class="form-check-label" for="notify-signals">
+                                                                Tín hiệu giao dịch
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-positions" checked>
+                                                            <label class="form-check-label" for="notify-positions">
+                                                                Mở/Đóng vị thế
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-profit-loss" checked>
+                                                            <label class="form-check-label" for="notify-profit-loss">
+                                                                Lãi/Lỗ lớn
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="notify-system" checked>
+                                                            <label class="form-check-label" for="notify-system">
+                                                                Thông báo hệ thống
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <button type="button" class="btn btn-sm btn-outline-success" id="save-telegram-settings">
+                                                    <i class="bi bi-check-lg"></i> Lưu cài đặt
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" id="test-telegram-api">
+                                                    <i class="bi bi-send"></i> Gửi tin nhắn test
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

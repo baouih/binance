@@ -33,4 +33,6 @@ dependencies = [
     "seaborn>=0.13.2",
     "binance>=0.3",
     "openai>=1.65.2",
+    "flask-login>=0.6.3",
+    "flask-wtf>=1.2.2",
 ]
