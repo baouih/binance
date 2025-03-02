@@ -1,0 +1,61 @@
+{
+  "timestamp": "20250302_151702",
+  "account_data": null,
+  "market_data": {
+    "BTCUSDT": {
+      "price": 85210.67,
+      "price_change_24h": 469.15,
+      "price_change_percent_24h": 0.554,
+      "high_24h": 86995.09,
+      "low_24h": 20000.0,
+      "volume_24h": 3564.9208,
+      "quote_volume_24h": 305507539.5308867
+    },
+    "ETHUSDT": {
+      "price": 2202.38,
+      "price_change_24h": 30.58,
+      "price_change_percent_24h": 1.408,
+      "high_24h": 2450.21,
+      "low_24h": 2055.42,
+      "volume_24h": 146188.9164,
+      "quote_volume_24h": 323921261.446804
+    },
+    "BNBUSDT": {
+      "price": 602.96,
+      "price_change_24h": 2.38,
+      "price_change_percent_24h": 0.396,
+      "high_24h": 611.46,
+      "low_24h": 599.47,
+      "volume_24h": 205260.524,
+      "quote_volume_24h": 124617618.3573
+    },
+    "SOLUSDT": {
+      "price": 140.98,
+      "price_change_24h": 1.16,
+      "price_change_percent_24h": 0.83,
+      "high_24h": 145.86,
+      "low_24h": 138.92,
+      "volume_24h": 898006.456,
+      "quote_volume_24h": 128044864.70372
+    },
+    "DOGEUSDT": {
+      "price": 0.20222,
+      "price_change_24h": 0.00126,
+      "price_change_percent_24h": 0.627,
+      "high_24h": 0.25344,
+      "low_24h": 0.2,
+      "volume_24h": 155140092.0,
+      "quote_volume_24h": 31866352.91884
+    },
+    "XRPUSDT": {
+      "price": 2.2318,
+      "price_change_24h": 0.0818,
+      "price_change_percent_24h": 3.805,
+      "high_24h": 2.3026,
+      "low_24h": 2.1365,
+      "volume_24h": 73958321.0,
+      "quote_volume_24h": 164292184.845
+    }
+  },
+  "trades_data": null
+}
