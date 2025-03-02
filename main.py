@@ -23,10 +23,6 @@ logging.getLogger('werkzeug').setLevel(logging.WARNING)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 
-# Loại bỏ Socket.IO để cải thiện hiệu suất 
-# và giảm thiểu lỗi kết nối
-# Thay vào đó sử dụng AJAX hoặc fetch API để cập nhật dữ liệu
-
 # Import Blueprint cho cấu hình
 try:
     from config_route import config_bp
@@ -34,6 +30,14 @@ try:
     logger.info("Đã đăng ký blueprint cho cấu hình")
 except ImportError:
     logger.warning("Không thể import config_route blueprint")
+    
+# Import Blueprint cho API Bot
+try:
+    from bot_api_routes import bot_api
+    app.register_blueprint(bot_api)
+    logger.info("Đã đăng ký blueprint cho API Bot")
+except ImportError:
+    logger.warning("Không thể import bot_api blueprint")
 
 # Các giá trị mẫu cho các biểu đồ và bảng
 sample_prices = {
@@ -617,13 +621,23 @@ def trades():
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""
+    # Lấy cấu hình tài khoản từ file
+    account_config = {}
+    try:
+        if os.path.exists("account_config.json"):
+            with open("account_config.json", "r") as f:
+                account_config = json.load(f)
+    except Exception as e:
+        logger.error(f"Lỗi khi tải cấu hình tài khoản: {e}")
+    
     # Tạo dữ liệu mẫu cho bot_status để tránh lỗi template
     bot_status = {
         'running': False,
-        'mode': 'demo',
-        'account_type': 'futures',
+        'mode': account_config.get('api_mode', 'testnet'),
+        'account_type': account_config.get('account_type', 'futures'),
         'strategy_mode': 'auto'
     }
+    
     return render_template('settings.html', bot_status=bot_status)
 
 @app.route('/report')
