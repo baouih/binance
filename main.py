@@ -108,12 +108,114 @@ def load_multi_coin_config():
 @app.route('/')
 def index():
     """Trang chủ Dashboard"""
-    try:
-        # Không dùng dữ liệu mẫu nữa - chuyển hướng toàn bộ request API đến app.py
-        return redirect('/app', code=302)
-    except Exception as e:
-        logger.error(f"Error redirecting to app: {e}")
-        return "Đang chuyển hướng đến hệ thống thực tế..."
+    # Generate sample data for dashboard
+    current_balance = 12500.0
+    initial_balance = 10000.0
+    profit_percentage = ((current_balance / initial_balance) - 1) * 100
+    
+    win_rate = 65
+    winning_trades = 13
+    total_trades = 20
+    
+    risk_reward_ratio = 1.8
+    profit_factor = 2.3
+    
+    max_drawdown_percent = 12.5
+    recovery_factor = 2.1
+    
+    # Tạo dữ liệu mẫu cho bot_status để tránh lỗi template
+    bot_status = {
+        'running': False,
+        'mode': 'demo',
+        'account_type': 'futures',
+        'strategy_mode': 'auto'
+    }
+    
+    # Sample open positions
+    open_positions = [
+        {
+            "id": "pos1",
+            "symbol": "BTCUSDT",
+            "type": "LONG",
+            "entry_price": 72000.00,
+            "current_price": 75000.00,
+            "quantity": 0.1000,
+            "pnl": 300.00,
+            "pnl_percent": 4.17,
+            "leverage": 5,
+            "stop_loss": 69500.00,
+            "take_profit": 78000.00,
+            "entry_time": "2025-02-28 18:30"
+        },
+        {
+            "id": "pos2",
+            "symbol": "SOLUSDT",
+            "type": "LONG",
+            "entry_price": 125.00,
+            "current_price": 137.50,
+            "quantity": 1.0000,
+            "pnl": 12.50,
+            "pnl_percent": 10.00,
+            "leverage": 3,
+            "stop_loss": 115.00,
+            "take_profit": 150.00,
+            "entry_time": "2025-02-28 20:10"
+        },
+        {
+            "id": "pos3",
+            "symbol": "BNBUSDT",
+            "type": "SHORT",
+            "entry_price": 410.00,
+            "current_price": 420.00,
+            "quantity": 0.2000,
+            "pnl": -2.00,
+            "pnl_percent": -2.44,
+            "leverage": 2,
+            "stop_loss": 430.00,
+            "take_profit": 390.00,
+            "entry_time": "2025-02-28 22:05"
+        }
+    ]
+    
+    # Tạo dữ liệu mẫu cho account_data
+    account_data = {
+        'balance': 10400,
+        'equity': 10710.5,
+        'free_balance': 10400,
+        'margin': 0,
+        'leverage': 3,
+        'positions': open_positions
+    }
+    
+    # Tạo dữ liệu thị trường
+    market_data = {
+        'btc_price': sample_prices.get('BTCUSDT', 80000),
+        'eth_price': sample_prices.get('ETHUSDT', 2300),
+        'bnb_price': sample_prices.get('BNBUSDT', 380),
+        'sol_price': sample_prices.get('SOLUSDT', 140),
+        'btc_change_24h': random.uniform(-5, 5),
+        'eth_change_24h': random.uniform(-7, 7),
+        'bnb_change_24h': random.uniform(-4, 4),
+        'sol_change_24h': random.uniform(-10, 10),
+        'sentiment': {
+            'value': random.randint(30, 70),
+            'state': random.choice(['success', 'danger', 'warning', 'info']),
+            'change': random.uniform(-5, 5),
+            'trend': 'neutral'
+        },
+        'market_regime': {
+            'BTCUSDT': 'Trending',
+            'ETHUSDT': 'Ranging',
+            'BNBUSDT': 'Volatile',
+            'SOLUSDT': 'Ranging'
+        }
+    }
+    
+    market_regime = "Trending"
+    volatility = "Medium"
+    trend_strength = 75
+    
+    composite_score = 0.7
     
     # Sample closed positions
     closed_positions = [
