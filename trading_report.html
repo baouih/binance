@@ -1,0 +1,143 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Báo cáo giao dịch hàng ngày</title>
+        <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+        <style>
+            body {
+                padding: 20px;
+            }
+            .performance-chart {
+                width: 100%;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body data-bs-theme="dark">
+        <div class="container">
+            <h1 class="text-center mb-4">Báo cáo giao dịch bot tự động</h1>
+            <p class="text-center text-muted">Thời gian báo cáo: 02/03/2025 00:01:14</p>
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Tổng quan tài khoản</div>
+                        <div class="card-body">
+                            <h2 class="card-title">$0.00</h2>
+                            <p class="card-text">
+                                P&L đã thực hiện: $<span class="text-success">0.00</span><br>
+                                P&L chưa thực hiện: $<span class="text-success">0.00</span><br>
+                                Tổng P&L: $<span class="text-success">0.00</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Hiệu suất giao dịch</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Tỷ lệ thắng: 0.00%</h4>
+                            <p class="card-text">
+                                Tổng giao dịch đã đóng: 0<br>
+                                P&L trung bình/giao dịch: $0.00<br>
+                                Vị thế đang mở: 0
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Trạng thái Bot</div>
+                        <div class="card-body">
+                            <h4 class="card-title text-success">Đang chạy</h4>
+                            <p class="card-text">
+                                Bot đang hoạt động và huấn luyện<br>
+                                Chu kỳ huấn luyện: 4 giờ<br>
+                                Báo cáo tiếp theo: 24 giờ
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Biểu đồ hiệu suất</div>
+                        <div class="card-body text-center">
+                            <img src="trading_performance.png" class="performance-chart img-fluid" alt="Biểu đồ hiệu suất">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                
+                
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Vị thế đang mở</div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Loại</th>
+                                            <th>Giá vào</th>
+                                            <th>Giá hiện tại</th>
+                                            <th>Số lượng</th>
+                                            <th>P&L</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="6" class="text-center">Không có vị thế đang mở</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">Giao dịch gần đây</div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Loại</th>
+                                            <th>Giá vào</th>
+                                            <th>Giá thoát</th>
+                                            <th>Lý do thoát</th>
+                                            <th>P&L</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="6" class="text-center">Không có lịch sử giao dịch</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-muted mt-4">
+                <p>Báo cáo này được tạo tự động bởi Bot Trading</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    
