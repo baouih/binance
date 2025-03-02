@@ -6,6 +6,9 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 import binance_api
 from account_type_selector import AccountTypeSelector
 
+# Đường dẫn file cấu hình tài khoản
+ACCOUNT_CONFIG_PATH = 'account_config.json'
+
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO, 
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
