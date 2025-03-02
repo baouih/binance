@@ -19,18 +19,36 @@ logger = logging.getLogger('main')
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
-# Giả lập dữ liệu bot status (sau này lấy từ service thực tế)
-BOT_STATUS = {
-    'running': False,
-    'uptime': '0d 0h 0m',
-    'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'version': '1.0.0',
-    'active_strategies': ['RSI', 'MACD', 'BB'],
-    'mode': 'testnet',        # 'demo', 'testnet', 'live' - LƯU Ý: Bắt buộc phải sử dụng testnet không phải demo
-    'account_type': 'futures', # 'spot', 'futures'
-    'strategy_mode': 'auto',   # 'auto', 'manual'
-    'last_action': 'Bot đang dừng'
-}
+# Hàm để lấy trạng thái bot từ cấu hình tài khoản
+def get_bot_status_from_config():
+    """Đọc trạng thái bot từ cấu hình tài khoản"""
+    status = {
+        'running': False,
+        'uptime': '0d 0h 0m',
+        'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'version': '1.0.0',
+        'active_strategies': ['RSI', 'MACD', 'BB'],
+        'mode': 'testnet',  # mặc định 'testnet' - sẽ được cập nhật từ cấu hình
+        'account_type': 'futures',  # mặc định 'futures' - sẽ được cập nhật từ cấu hình
+        'strategy_mode': 'auto',  # mặc định 'auto' - sẽ được cập nhật từ cấu hình
+        'last_action': 'Bot đang dừng'
+    }
+    
+    try:
+        if os.path.exists('account_config.json'):
+            with open('account_config.json', 'r') as f:
+                config = json.load(f)
+                
+                # Cập nhật mode từ cấu hình
+                if 'api_mode' in config:
+                    status['mode'] = config['api_mode']
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc cấu hình bot: {str(e)}")
+    
+    return status
+
+# Khởi tạo trạng thái bot
+BOT_STATUS = get_bot_status_from_config()
 
 # Giả lập dữ liệu tài khoản (sau này lấy từ API Binance)
 ACCOUNT_DATA = {
@@ -1779,7 +1797,10 @@ def get_bot_status():
 def get_account():
     """Lấy dữ liệu tài khoản"""
     try:
-        # Chế độ hoạt động từ session hoặc giá trị mặc định
+        # Lấy thông tin cấu hình tài khoản mới nhất
+        BOT_STATUS.update(get_bot_status_from_config())
+        
+        # Chế độ hoạt động từ cấu hình cập nhật
         mode = BOT_STATUS.get('mode', 'testnet')
         
         # Khởi tạo API client với thông tin API key từ biến môi trường
@@ -1788,7 +1809,7 @@ def get_account():
         
         # Dù ở chế độ nào cũng kết nối để kiểm tra dữ liệu API, nếu demo thì vẫn có API
         logger.info(f"Đang kết nối Binance API với key: {api_key[:5]}...{api_key[-5:] if len(api_key) > 10 else ''}")
-        logger.info(f"Chế độ Testnet: {mode == 'testnet'}")
+        logger.info(f"Chế độ API: {mode}, Testnet: {mode == 'testnet'}")
         
         binance_client = binance_api.BinanceAPI(
             api_key=api_key,
@@ -1965,8 +1986,12 @@ def get_signals():
 def get_market():
     """Lấy dữ liệu thị trường"""
     try:
-        # Chế độ hoạt động từ session hoặc giá trị mặc định
+        # Lấy thông tin cấu hình tài khoản mới nhất
+        BOT_STATUS.update(get_bot_status_from_config())
+        
+        # Chế độ hoạt động từ cấu hình cập nhật
         mode = BOT_STATUS.get('mode', 'testnet')
+        logger.info(f"Chế độ API hiện tại: {mode}")
         
         # Luôn thử kết nối API Binance trước, kể cả trong chế độ demo
         try:
