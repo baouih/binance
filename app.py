@@ -1817,6 +1817,12 @@ def get_account():
                 
                 # Thiết lập dữ liệu tài khoản
                 if BOT_STATUS.get('account_type') == 'futures':
+                    # Lấy thông tin leverage từ tài khoản nếu có
+                    avg_leverage = 5  # Mặc định
+                    if positions:
+                        total_leverage = sum(pos.get('leverage', 1) for pos in positions)
+                        avg_leverage = total_leverage // len(positions)
+                    
                     balance_data = {
                         'balance': float(account_info.get('totalWalletBalance', 0)),
                         'equity': float(account_info.get('totalMarginBalance', 0)),
@@ -1824,7 +1830,7 @@ def get_account():
                         'margin_available': float(account_info.get('availableBalance', 0)),
                         'free_balance': float(account_info.get('availableBalance', 0)),
                         'positions': positions,
-                        'leverage': 3  # Mặc định, có thể cập nhật từ dữ liệu thực tế
+                        'leverage': avg_leverage
                     }
                 else:  # spot
                     # Tính tổng giá trị tài sản USDT
