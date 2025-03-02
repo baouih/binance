@@ -353,17 +353,71 @@ def backtest():
     history_files = []
     data_directories = ['test_data', 'real_data', 'data']
     
+    # Tìm kiếm trong tất cả các thư mục để xác định các tệp dữ liệu có sẵn
     for directory in data_directories:
         if os.path.exists(directory):
+            # Tìm kiếm tệp CSV trong thư mục gốc
             files = [f for f in os.listdir(directory) if f.endswith('.csv')]
             for file in files:
-                symbol = file.split('_')[0] if '_' in file else file.replace('.csv', '')
-                timeframe = file.split('_')[1].replace('.csv', '') if '_' in file else '1h'
+                parts = file.split('_')
+                if len(parts) >= 2:
+                    symbol = parts[0]
+                    # Xử lý trường hợp có '_sample' trong tên tệp
+                    if parts[1].endswith('sample.csv'):
+                        timeframe = parts[1][:-11]  # Loại bỏ '.sample.csv'
+                    else:
+                        timeframe = parts[1].replace('.csv', '')
+                else:
+                    symbol = file.replace('.csv', '')
+                    timeframe = '1h'  # Mặc định
+                
                 history_files.append({
                     'path': os.path.join(directory, file),
                     'symbol': symbol,
                     'timeframe': timeframe
                 })
+            
+            # Tìm kiếm trong các thư mục con theo cặp giao dịch
+            subdirectories = [d for d in os.listdir(directory) 
+                             if os.path.isdir(os.path.join(directory, d)) 
+                             and not d.startswith('.')]
+            
+            for subdir in subdirectories:
+                subdir_path = os.path.join(directory, subdir)
+                
+                # Kiểm tra nếu là thư mục cặp giao dịch (VD: BTCUSDT, ETHUSDT, v.v.)
+                if subdir.endswith('USDT') or subdir in ['1_month', '3_months', '6_months']:
+                    subdir_files = [f for f in os.listdir(subdir_path) if f.endswith('.csv')]
+                    
+                    for file in subdir_files:
+                        if subdir.endswith('USDT'):  # Thư mục theo cặp giao dịch
+                            symbol = subdir
+                            if '_' in file:
+                                timeframe = file.split('_')[0]
+                            else:
+                                timeframe = file.replace('.csv', '')
+                        else:  # Thư mục theo thời gian (1_month, 3_months, 6_months)
+                            parts = file.split('_')
+                            if len(parts) >= 2:
+                                symbol = parts[0]
+                                timeframe = parts[1].replace('.csv', '').replace('sample', '')
+                            else:
+                                continue  # Bỏ qua nếu không đúng định dạng
+                        
+                        history_files.append({
+                            'path': os.path.join(subdir_path, file),
+                            'symbol': symbol,
+                            'timeframe': timeframe
+                        })
+    
+    # Xóa các mục trùng lặp
+    seen = set()
+    unique_history_files = []
+    for file in history_files:
+        key = f"{file['symbol']}_{file['timeframe']}"
+        if key not in seen:
+            seen.add(key)
+            unique_history_files.append(file)
     
     # Danh sách các chiến lược có sẵn
     strategies = [
@@ -397,7 +451,7 @@ def backtest():
                 logger.error(f"Error loading backtest result {file}: {e}")
     
     return render_template('backtest.html', 
-                          history_files=history_files,
+                          history_files=unique_history_files,
                           strategies=strategies,
                           recent_results=recent_results)
 
@@ -723,6 +777,25 @@ def run_backtest():
         leverage = int(request.form.get('leverage', 1))
         optimize_params = request.form.get('optimize_params', 'false').lower() == 'true'
         
+        # Lấy tham số chiến lược từ form nếu có
+        strategy_params = {}
+        for key, value in request.form.items():
+            if key not in ['strategy', 'symbol', 'timeframe', 'start_date', 'end_date', 
+                         'initial_balance', 'risk_per_trade', 'leverage', 'optimize_params']:
+                try:
+                    # Cố gắng chuyển đổi giá trị thành số nếu có thể
+                    if value.replace('.', '').isdigit():
+                        if '.' in value:
+                            strategy_params[key] = float(value)
+                        else:
+                            strategy_params[key] = int(value)
+                    elif value.lower() in ['true', 'false']:
+                        strategy_params[key] = value.lower() == 'true'
+                    else:
+                        strategy_params[key] = value
+                except:
+                    strategy_params[key] = value
+        
         # Tạo ID cho backtest này
         backtest_id = f"{strategy}_{symbol}_{timeframe}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
@@ -731,15 +804,18 @@ def run_backtest():
         if not os.path.exists(backtest_results_dir):
             os.makedirs(backtest_results_dir)
         
-        # Kiểm tra xem file dữ liệu tồn tại không
+        # Tìm kiếm toàn diện file dữ liệu từ tất cả các thư mục
         data_found = False
         data_file = None
         data_directories = ['test_data', 'real_data', 'data']
         
+        # Kiểm tra tệp tin trực tiếp
         for directory in data_directories:
             if os.path.exists(directory):
+                # Danh sách các định dạng tên file có thể
                 potential_files = [
                     f"{symbol}_{timeframe}.csv",
+                    f"{symbol}_{timeframe}_sample.csv",
                     f"{symbol.lower()}_{timeframe}.csv",
                     f"{symbol}.csv"
                 ]
@@ -748,14 +824,50 @@ def run_backtest():
                     if os.path.exists(full_path):
                         data_file = full_path
                         data_found = True
+                        logger.info(f"Tìm thấy file dữ liệu: {full_path}")
                         break
+                
+                # Kiểm tra trong thư mục con theo cặp giao dịch
+                if not data_found and os.path.exists(os.path.join(directory, symbol)):
+                    symbol_dir = os.path.join(directory, symbol)
+                    potential_files = [
+                        f"{timeframe}.csv",
+                        f"{symbol}_{timeframe}.csv",
+                        f"{symbol}_{timeframe}_sample.csv"
+                    ]
+                    for filename in potential_files:
+                        full_path = os.path.join(symbol_dir, filename)
+                        if os.path.exists(full_path):
+                            data_file = full_path
+                            data_found = True
+                            logger.info(f"Tìm thấy file dữ liệu trong thư mục con: {full_path}")
+                            break
+                
+                # Kiểm tra trong thư mục theo thời gian (1_month, 3_months, 6_months)
+                time_subdirs = ['1_month', '3_months', '6_months']
+                if not data_found:
+                    for time_dir in time_subdirs:
+                        if os.path.exists(os.path.join(directory, time_dir)):
+                            time_path = os.path.join(directory, time_dir)
+                            potential_files = [
+                                f"{symbol}_{timeframe}.csv",
+                                f"{symbol}_{timeframe}_sample.csv"
+                            ]
+                            for filename in potential_files:
+                                full_path = os.path.join(time_path, filename)
+                                if os.path.exists(full_path):
+                                    data_file = full_path
+                                    data_found = True
+                                    logger.info(f"Tìm thấy file dữ liệu trong thư mục thời gian: {full_path}")
+                                    break
+                
                 if data_found:
                     break
         
         if not data_found:
             return jsonify({
                 "success": False,
-                "error": f"Không tìm thấy dữ liệu cho {symbol} với khung thời gian {timeframe}"
+                "error": f"Không tìm thấy dữ liệu cho {symbol} với khung thời gian {timeframe}. Vui lòng tải dữ liệu trước."
             })
         
         # Chạy backtest (thực sự sẽ gọi một script Python riêng)
