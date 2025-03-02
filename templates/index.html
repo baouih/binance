@@ -374,17 +374,19 @@
                             <div class="d-flex flex-wrap align-items-center mb-2">
                                 <div class="me-4 mb-2">
                                     <strong>Chế độ:</strong> 
-                                    <span class="mode-badge mode-demo">Demo</span>
+                                    <span class="mode-badge mode-{{ bot_status.mode|default('demo') }}">
+                                        {{ 'Chế độ Demo' if bot_status.mode == 'demo' or not bot_status.mode else 'Chế độ Testnet' if bot_status.mode == 'testnet' else 'Chế độ Live' }}
+                                    </span>
                                 </div>
                                 <div class="me-4 mb-2">
-                                    <strong>Tài khoản:</strong> Futures
+                                    <strong>Tài khoản:</strong> {{ 'Spot' if bot_status.account_type == 'spot' else 'Futures' }}
                                 </div>
                                 <div class="me-4 mb-2">
-                                    <strong>Đòn bẩy:</strong> 3x
+                                    <strong>Đòn bẩy:</strong> {{ account_data.leverage|default(3) }}x
                                 </div>
                                 <div class="me-4 mb-2">
                                     <strong>Chiến lược:</strong>
-                                    <span class="badge bg-info">Auto</span>
+                                    <span class="badge bg-info">{{ 'Tự động' if bot_status.strategy_mode == 'auto' else 'Thủ công' }}</span>
                                 </div>
                             </div>
                             <div>
