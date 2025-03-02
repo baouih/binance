@@ -1666,13 +1666,38 @@ def bot_control():
     action = data.get('action', '')
     strategy_mode = data.get('strategy_mode', 'auto')  # 'auto' hoặc 'manual'
     
+    # Kiểm tra cấu hình API trước khi thực hiện các thao tác với bot trong mode không phải demo
+    try:
+        with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+            config = json.load(f)
+        
+        api_mode = config.get('api_mode', 'demo')
+        api_key = config.get('api_key', '')
+        api_secret = config.get('api_secret', '')
+        
+        # Nếu không phải mode demo và thiếu API key
+        if api_mode != 'demo' and (not api_key or not api_secret):
+            logger.warning(f"Cố gắng chạy bot trong chế độ {api_mode} nhưng chưa cấu hình API")
+            return jsonify({
+                'success': False,
+                'error_type': 'missing_api_config',
+                'message': f'Cần cấu hình API key để sử dụng chế độ {api_mode}'
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra cấu hình API: {e}")
+        return jsonify({
+            'success': False,
+            'error_type': 'config_error',
+            'message': f'Lỗi cấu hình: {str(e)}'
+        })
+    
     if action == 'start':
         BOT_STATUS['running'] = True
         BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         BOT_STATUS['strategy_mode'] = strategy_mode
         logger.info(f"Bot đã được khởi động với chế độ chiến lược: {strategy_mode}")
         return jsonify({
-            'status': 'success', 
+            'success': True, 
             'message': f'Bot đã được khởi động với chế độ {strategy_mode}'
         })
     
@@ -1680,7 +1705,7 @@ def bot_control():
         BOT_STATUS['running'] = False
         BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logger.info("Bot đã dừng")
-        return jsonify({'status': 'success', 'message': 'Bot đã dừng'})
+        return jsonify({'success': True, 'message': 'Bot đã dừng'})
     
     elif action == 'restart':
         BOT_STATUS['running'] = True
@@ -1688,7 +1713,7 @@ def bot_control():
         BOT_STATUS['strategy_mode'] = strategy_mode
         logger.info(f"Bot đã được khởi động lại với chế độ chiến lược: {strategy_mode}")
         return jsonify({
-            'status': 'success', 
+            'success': True, 
             'message': f'Bot đã được khởi động lại với chế độ {strategy_mode}'
         })
     
@@ -1696,12 +1721,12 @@ def bot_control():
         BOT_STATUS['strategy_mode'] = strategy_mode
         logger.info(f"Đã chuyển chế độ chiến lược sang: {strategy_mode}")
         return jsonify({
-            'status': 'success', 
+            'success': True, 
             'message': f'Đã chuyển chế độ chiến lược sang {strategy_mode}'
         })
     
     else:
-        return jsonify({'status': 'error', 'message': 'Hành động không hợp lệ'})
+        return jsonify({'success': False, 'message': 'Hành động không hợp lệ'})
 
 
 @app.route('/api/account/settings', methods=['GET', 'POST'])
