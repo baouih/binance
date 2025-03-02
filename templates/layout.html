@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Trading Bot Dashboard{% endblock %}</title>
     <!-- Replit style Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
@@ -16,6 +16,11 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    <!-- Mobile menu toggle button (visible only on small screens) -->
+    <button class="mobile-menu-toggle d-md-none" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -113,6 +118,7 @@
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mobile.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

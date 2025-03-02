@@ -168,6 +168,89 @@
     
     .main-content {
         margin-left: 0 !important;
+        padding: 10px !important;
+    }
+    
+    /* Cải thiện hiển thị trên điện thoại */
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    /* Hiển thị menu để mở sidebar trên điện thoại */
+    .mobile-menu-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 101;
+        background: var(--bs-primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .mobile-menu-toggle:focus {
+        outline: none;
+    }
+    
+    /* Hiển thị dạng tab/card cho các form */
+    .row > [class*="col-"] {
+        margin-bottom: 15px;
+    }
+    
+    /* Làm cho các bảng và form có thể cuộn khi cần */
+    .overflow-auto-mobile {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+}
+
+/* Cải thiện hiển thị cho điện thoại ở chế độ dọc */
+@media (max-width: 576px) {
+    .container-fluid, .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    h1, .h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+    }
+    
+    /* Làm cho các phần tử trong form xếp dọc */
+    .form-row > [class*="col-"] {
+        padding-right: 0;
+        padding-left: 0;
+    }
+    
+    /* Thêm padding cho nút */
+    .btn {
+        padding: 0.375rem 0.5rem;
+    }
+    
+    /* Giảm kích thước chữ trong bảng để vừa màn hình */
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    /* Làm cho sidebar chiếm toàn bộ màn hình */
+    .sidebar.show {
+        width: 100%;
     }
 }
 
