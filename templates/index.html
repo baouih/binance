@@ -18,6 +18,26 @@
             overflow-x: hidden; /* Prevent horizontal scrolling on mobile */
         }
         
+        /* Badge hiển thị chế độ hoạt động hiện tại (demo/testnet/live) */
+        .mode-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            color: white;
+        }
+        .mode-demo {
+            background-color: #6c757d;
+        }
+        .mode-testnet {
+            background-color: #fd7e14;
+        }
+        .mode-live {
+            background-color: #dc3545;
+        }
+        
         .switch-to-cli-btn {
             position: fixed;
             bottom: 80px;
@@ -186,8 +206,14 @@
                 <div class="d-flex align-items-center">
                     <i class="bi bi-currency-bitcoin fs-4 me-2"></i>
                     <span class="fs-5">Bot Crypto</span>
+                    <div class="ms-2">
+                        <span class="mode-badge mode-demo">Demo</span>
+                    </div>
                 </div>
                 <div>
+                    <button class="btn btn-sm btn-outline-light me-2" id="mobile-language-toggle">
+                        <i class="bi bi-translate"></i>
+                    </button>
                     <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
                     <span class="small">{{ 'ON' if bot_status.running else 'OFF' }}</span>
                 </div>
@@ -197,13 +223,30 @@
             <div class="d-none d-md-flex align-items-center mb-3 mb-md-0 me-md-auto">
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
+                <div class="ms-3">
+                    <span class="mode-badge mode-demo">Chế độ Demo</span>
+                </div>
             </div>
             
             <div class="d-none d-md-flex align-items-center">
+                <!-- Language selector -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-translate"></i> Ngôn ngữ
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><a class="dropdown-item" href="#" data-language="vi">Tiếng Việt</a></li>
+                        <li><a class="dropdown-item" href="#" data-language="en">English</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Bot status -->
                 <div class="me-3">
                     <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
                     <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
                 </div>
+                
+                <!-- Bot controls -->
                 <div class="btn-group">
                     <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
                             id="toggleBotBtn">
@@ -319,6 +362,63 @@
         <div class="tab-content" id="mainTabContent">
             <!-- Dashboard Tab -->
             <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <!-- Bot Mode Summary -->
+                <div class="dashboard-card p-3 mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Cấu hình hiện tại</h5>
+                            <div class="d-flex flex-wrap align-items-center mb-2">
+                                <div class="me-4 mb-2">
+                                    <strong>Chế độ:</strong> 
+                                    <span class="mode-badge mode-demo">Demo</span>
+                                </div>
+                                <div class="me-4 mb-2">
+                                    <strong>Tài khoản:</strong> Futures
+                                </div>
+                                <div class="me-4 mb-2">
+                                    <strong>Đòn bẩy:</strong> 3x
+                                </div>
+                                <div class="me-4 mb-2">
+                                    <strong>Chiến lược:</strong>
+                                    <span class="badge bg-info">Auto</span>
+                                </div>
+                            </div>
+                            <div>
+                                <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i> 
+                                Hệ thống đang tự động điều chỉnh chiến lược dựa trên điều kiện thị trường.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Tổng quan chiến lược</h5>
+                            <div class="mb-2">
+                                <small>
+                                <strong>BTCUSDT:</strong> RSI + Bollinger (Trending)
+                                </small>
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <small>
+                                <strong>ETHUSDT:</strong> MACD + EMA Cross (Ranging)
+                                </small>
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <small>
+                                <strong>SOLUSDT:</strong> Support/Resistance (Volatile)
+                                </small>
+                                <div class="progress mb-0" style="height: 10px;">
+                                    <div class="progress-bar bg-info" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="dashboard-card p-3">
