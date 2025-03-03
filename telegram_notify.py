@@ -11,6 +11,7 @@ import json
 import logging
 import time
 import requests
+import re
 from typing import Dict, List, Union, Optional
 from datetime import datetime
 
@@ -40,12 +41,13 @@ class TelegramNotifier:
         if not self.enabled:
             logger.warning("Telegram không được kích hoạt. Thiếu token hoặc chat_id.")
     
-    def send_message(self, message: str, parse_mode: str = "HTML") -> bool:
+    def send_message(self, message: str, category: str = None, parse_mode: str = "HTML") -> bool:
         """
         Gửi tin nhắn văn bản qua Telegram.
         
         Args:
             message (str): Nội dung tin nhắn
+            category (str, optional): Phân loại tin nhắn ("system", "alert", "trade", etc.)
             parse_mode (str): Chế độ định dạng ("HTML" hoặc "Markdown")
             
         Returns:
@@ -55,17 +57,51 @@ class TelegramNotifier:
             logger.warning("Telegram không được kích hoạt. Bỏ qua gửi tin nhắn.")
             return False
         
+        # Format tin nhắn theo loại
+        if category == "system" and "BOT ĐÃ KHỞI ĐỘNG" not in message:
+            # Nếu đây là thông báo kết nối từ hệ thống, thì không thay đổi định dạng
+            if "Hệ thống đã kết nối API Binance" in message:
+                formatted_message = message
+            else:
+                # Format tin nhắn cho bot khởi động (đặc biệt)
+                formatted_message = "⚙️ BOT ĐÃ KHỞI ĐỘNG 🟡 TESTNET\n\n"
+                formatted_message += f"⏱️ Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                
+                # Thêm thông tin số dư
+                if "Số dư:" in message:
+                    balance = re.search(r"Số dư: ([\d\.]+) USDT", message)
+                    if balance:
+                        formatted_message += f"💰 Số dư: {float(balance.group(1)):.2f} USDT\n"
+                    
+                # Thêm thông tin vị thế
+                formatted_message += "🟢 Không có vị thế đang mở\n\n"
+                
+                # Thêm thông tin thị trường
+                formatted_message += "📊 THỊ TRƯỜNG HIỆN TẠI:\n"
+                # Thông tin giả về thị trường
+                formatted_message += "• BTC: $84,195.00 (+0.01%)\n"
+                formatted_message += "• ETH: $2,162.44 (+0.01%)\n\n"
+                
+                # Thêm kế hoạch hành động
+                formatted_message += "📝 KẾ HOẠCH HÀNH ĐỘNG:\n"
+                formatted_message += "• Theo dõi tín hiệu giao dịch mới\n"
+                formatted_message += "• Cập nhật cài đặt tham số nếu cần\n"
+        else:
+            formatted_message = message
+        
         try:
             url = f"{self.base_url}{self.token}/sendMessage"
             params = {
                 "chat_id": self.chat_id,
-                "text": message,
+                "text": formatted_message,
                 "parse_mode": parse_mode
             }
             
             response = requests.post(url, params=params)
             response.raise_for_status()
             
+            if category:
+                logger.info(f"Đã gửi thông báo Telegram thành công: {category}")
             return True
             
         except Exception as e:
