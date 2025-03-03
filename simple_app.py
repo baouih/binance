@@ -1045,6 +1045,127 @@ def get_status():
     
     return jsonify(status_data)
 
+@app.route('/api/telegram/config', methods=['POST'])
+def update_telegram_config():
+    """API cập nhật cấu hình Telegram"""
+    try:
+        # Lấy thông tin từ request
+        config_data = request.json
+        
+        # Kiểm tra dữ liệu đầu vào
+        if 'enabled' not in config_data:
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu trường enabled'
+            }), 400
+            
+        # Cập nhật trạng thái bật/tắt
+        telegram_config['enabled'] = config_data['enabled']
+        
+        # Cập nhật token và chat_id nếu có
+        if 'bot_token' in config_data:
+            telegram_config['bot_token'] = config_data['bot_token']
+            
+        if 'chat_id' in config_data:
+            telegram_config['chat_id'] = config_data['chat_id']
+            
+        if 'min_interval' in config_data:
+            try:
+                interval = int(config_data['min_interval'])
+                if interval < 1:
+                    interval = 1
+                telegram_config['min_interval'] = interval
+            except:
+                pass
+        
+        # Lưu cấu hình vào file
+        try:
+            with open('telegram_config.json', 'w') as f:
+                json.dump({
+                    'enabled': telegram_config['enabled'],
+                    'bot_token': telegram_config['bot_token'],
+                    'chat_id': telegram_config['chat_id'],
+                    'min_interval': telegram_config['min_interval']
+                }, f)
+            logger.info("Đã lưu cấu hình Telegram")
+        except Exception as e:
+            logger.error(f"Lỗi lưu cấu hình Telegram: {str(e)}")
+        
+        # Kiểm tra kết nối nếu được bật
+        status_msg = ""
+        if telegram_config['enabled'] and telegram_config['bot_token'] and telegram_config['chat_id']:
+            # Gửi tin nhắn kiểm tra
+            test_message = "🔄 <b>Kiểm tra kết nối Telegram</b>\n\nĐây là tin nhắn kiểm tra kết nối từ Bot Giao Dịch. Nếu bạn nhận được tin nhắn này, cấu hình Telegram đã hoạt động."
+            success = send_telegram_message(test_message)
+            
+            if success:
+                status_msg = "Kết nối Telegram thành công!"
+                add_message(status_msg, "success")
+            else:
+                status_msg = "Kết nối Telegram thất bại, vui lòng kiểm tra token và chat_id"
+                add_message(status_msg, "error")
+        else:
+            status_msg = "Đã lưu cấu hình Telegram"
+            if telegram_config['enabled']:
+                status_msg += " (được bật)"
+            else:
+                status_msg += " (bị tắt)"
+            add_message(status_msg, "info")
+        
+        return jsonify({
+            'success': True,
+            'message': status_msg,
+            'config': {
+                'enabled': telegram_config['enabled'],
+                'has_token': bool(telegram_config['bot_token']),
+                'has_chat_id': bool(telegram_config['chat_id']),
+                'min_interval': telegram_config['min_interval']
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Lỗi cập nhật cấu hình Telegram: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi: {str(e)}'
+        }), 500
+
+@app.route('/api/telegram/test', methods=['POST'])
+def test_telegram():
+    """API kiểm tra kết nối Telegram"""
+    try:
+        if not telegram_config['bot_token'] or not telegram_config['chat_id']:
+            return jsonify({
+                'success': False,
+                'message': 'Chưa cấu hình Telegram bot_token hoặc chat_id'
+            }), 400
+            
+        # Gửi tin nhắn kiểm tra
+        test_message = "✅ <b>Kiểm tra kết nối Telegram</b>\n\nĐây là tin nhắn kiểm tra. Nếu bạn nhận được tin nhắn này, cấu hình Telegram đã hoạt động.\n\nThời gian gửi: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        success = send_telegram_message(test_message)
+        
+        if success:
+            msg = "Đã gửi tin nhắn kiểm tra thành công!"
+            add_message(msg, "success")
+            return jsonify({
+                'success': True,
+                'message': msg
+            })
+        else:
+            msg = "Không thể gửi tin nhắn kiểm tra, vui lòng kiểm tra token và chat_id"
+            add_message(msg, "error")
+            return jsonify({
+                'success': False,
+                'message': msg
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Lỗi kiểm tra Telegram: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi: {str(e)}'
+        }), 500
+
 @app.route('/api/crypto/toggle', methods=['POST'])
 def toggle_crypto():
     """API bật/tắt đồng tiền trong danh sách giao dịch"""
@@ -1392,14 +1513,61 @@ def load_crypto_config():
     except Exception as e:
         logger.error(f"Lỗi tải cấu hình đồng tiền: {str(e)}", exc_info=True)
 
+# Hàm tải cấu hình Telegram từ file
+def load_telegram_config():
+    """Tải cấu hình Telegram từ file"""
+    global telegram_config
+    try:
+        if os.path.exists('telegram_config.json'):
+            with open('telegram_config.json', 'r') as f:
+                saved_config = json.load(f)
+                
+                # Cập nhật cấu hình Telegram
+                if 'enabled' in saved_config:
+                    telegram_config['enabled'] = saved_config['enabled']
+                    
+                if 'bot_token' in saved_config:
+                    telegram_config['bot_token'] = saved_config['bot_token']
+                    
+                if 'chat_id' in saved_config:
+                    telegram_config['chat_id'] = saved_config['chat_id']
+                    
+                if 'min_interval' in saved_config:
+                    telegram_config['min_interval'] = saved_config['min_interval']
+                
+                logger.info("Đã tải cấu hình Telegram từ file")
+                status = "được bật" if telegram_config['enabled'] else "bị tắt"
+                add_message(f"Đã tải cấu hình Telegram ({status})", "info")
+                
+                # Kiểm tra cấu hình Telegram nếu được bật
+                if telegram_config['enabled'] and telegram_config['bot_token'] and telegram_config['chat_id']:
+                    logger.info("Telegram notifications are enabled")
+                else:
+                    logger.info("Telegram notifications are disabled or not fully configured")
+                    
+        else:
+            logger.info("Không tìm thấy file cấu hình Telegram, sử dụng mặc định")
+    except Exception as e:
+        logger.error(f"Lỗi tải cấu hình Telegram: {str(e)}", exc_info=True)
+
 if __name__ == "__main__":
     try:
         # Tải cấu hình đồng tiền
         load_crypto_config()
         
+        # Tải cấu hình Telegram
+        load_telegram_config()
+        
         # Thêm thông báo khởi động
         add_message('Hệ thống đã khởi động', 'info')
         add_message('Vui lòng kết nối API để bắt đầu', 'warning')
+        
+        # Gửi thông báo khởi động qua Telegram nếu đã cấu hình
+        if telegram_config['enabled'] and telegram_config['bot_token'] and telegram_config['chat_id']:
+            startup_message = "🚀 <b>Bot Giao Dịch đã khởi động</b>\n\n" \
+                              f"⏰ Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n" \
+                              f"📊 Cấu hình: {len([c for c in top_crypto_list if c['enabled']])} đồng tiền được kích hoạt"
+            send_telegram_message(startup_message)
         
         # Khởi chạy thread giả lập dữ liệu
         simulation_thread.start()
