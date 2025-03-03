@@ -357,6 +357,8 @@ def control_bot_general():
     try:
         # Kiểm tra dữ liệu từ request
         data = request.json
+        logger.info(f"Nhận request điều khiển bot: {data}")
+        
         if not data:
             return jsonify({
                 'success': False,
@@ -364,6 +366,7 @@ def control_bot_general():
             }), 400
             
         action = data.get('action', '')
+        logger.info(f"Thực hiện hành động điều khiển bot: {action}")
         
         if not action or action not in ['start', 'stop', 'restart']:
             return jsonify({
@@ -445,7 +448,7 @@ def control_bot_general():
             def set_running():
                 bot_status['status'] = 'running'
                 bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                app.logger.info(f"Bot #{bot_id} is now running after restart")
+                logger.info("Bot is now running after restart")
                 
             timer = threading.Timer(2.0, set_running)
             timer.daemon = True
