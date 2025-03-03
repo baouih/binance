@@ -14,7 +14,7 @@
             "BTCUSDT"
         ],
         "timeframe": "1h",
-        "status": "running",
+        "status": "stopped",
         "created_at": "2025-02-28T12:00:00Z",
         "last_updated": "2025-03-02T08:15:30Z",
         "risk_level": "low",
@@ -27,7 +27,7 @@
             "loss_count": 5,
             "last_trade_time": "18:30:25"
         },
-        "last_update": "2025-03-03 00:04:32"
+        "last_update": "2025-03-03 00:16:24"
     },
     {
         "id": "bot-002",
