@@ -777,34 +777,42 @@ class BinanceAPI:
                 params['symbol'] = symbol
             
             if self.testnet:
+                # Trong môi trường testnet, các endpoint vị thế có thể không khả dụng hoặc không ổn định
+                # Thử kết nối đến positionRisk API
                 try:
                     logger.info("Gửi yêu cầu đến Binance Testnet Futures API (positionRisk)")
+                    # Thử sử dụng version 2 trước
                     positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v2')
                     
                     # Kiểm tra xem dữ liệu trả về có phải là lỗi không
                     if positions_data and not positions_data.get('error'):
-                        logger.info(f"Đã lấy thông tin vị thế từ Testnet Futures API: {len(positions_data) if isinstance(positions_data, list) else 'Không phải danh sách'}")
+                        logger.info(f"Đã lấy thông tin vị thế từ Testnet Futures API v2")
                         return positions_data
-                    else:
-                        logger.warning(f"Lỗi từ Testnet Futures API: {positions_data.get('error') if positions_data else 'Không có dữ liệu'}")
-                        
                 except Exception as e1:
                     logger.error(f"Lỗi khi truy vấn testnet futures v2 API positionRisk: {str(e1)}")
+                
+                # Thử với v1 endpoint
+                try:
+                    logger.info("Thử lại với Binance Testnet Futures API v1 (positionRisk)")
+                    positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v1') 
                     
-                    try:
-                        logger.info("Thử lại với Binance Testnet Futures API v1 (positionRisk)")
-                        positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v1')
-                        
-                        if positions_data and not positions_data.get('error'):
-                            logger.info("Đã lấy thông tin vị thế từ Testnet Futures API v1")
-                            return positions_data
-                        else:
-                            logger.warning(f"Lỗi từ Testnet Futures API v1: {positions_data.get('error') if positions_data else 'Không có dữ liệu'}")
-                            
-                    except Exception as e2:
-                        logger.error(f"Lỗi khi truy vấn testnet futures v1 API positionRisk: {str(e2)}")
-                        
-                # Trả về dữ liệu giả lập nếu cả hai phiên bản API đều không hoạt động
+                    if positions_data and not positions_data.get('error'):
+                        logger.info("Đã lấy thông tin vị thế từ Testnet Futures API v1")
+                        return positions_data
+                except Exception as e2:
+                    logger.error(f"Lỗi khi truy vấn testnet futures v1 API positionRisk: {str(e2)}")
+
+                # Thử tải thông tin vị thế từ account API
+                try:
+                    logger.info("Thử lấy thông tin vị thế từ account API")
+                    account_data = self.get_futures_account()
+                    if account_data and account_data.get('positions'):
+                        logger.info("Đã lấy thông tin vị thế từ account API")
+                        return account_data.get('positions', [])
+                except Exception as e3:
+                    logger.error(f"Lỗi khi truy xuất vị thế từ account API: {str(e3)}")
+                
+                # Trả về dữ liệu giả lập nếu tất cả các phương pháp đều không hoạt động
                 logger.warning("Không thể kết nối đến Binance Testnet Futures API, chuyển sang sử dụng dữ liệu giả lập")
                 return self._generate_demo_positions()
             else:
