@@ -75,13 +75,23 @@ class BinanceAPI:
         self.api_key = api_key or os.environ.get('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.environ.get('BINANCE_API_SECRET', '')
         
-        # Endpoint URLs cho Futures API (quan trọng: sửa endpoint cho đúng)
+        # Endpoint URLs tương ứng với loại tài khoản và môi trường
         if self.testnet:
-            self.base_url = 'https://testnet.binancefuture.com/fapi'
-            self.stream_url = 'wss://testnet.binance.vision/ws'
+            # URLs cho Testnet
+            if account_type == 'futures':
+                self.base_url = 'https://testnet.binancefuture.com/fapi'
+                self.stream_url = 'wss://stream.binancefuture.com/ws'
+            else:  # Spot
+                self.base_url = 'https://testnet.binance.vision/api'
+                self.stream_url = 'wss://testnet.binance.vision/ws'
         else:
-            self.base_url = 'https://api.binance.com/api'
-            self.stream_url = 'wss://stream.binance.com:9443/ws'
+            # URLs cho Mainnet (thực tế)
+            if account_type == 'futures':
+                self.base_url = 'https://fapi.binance.com/fapi'
+                self.stream_url = 'wss://fstream.binance.com/ws'
+            else:  # Spot
+                self.base_url = 'https://api.binance.com/api'
+                self.stream_url = 'wss://stream.binance.com:9443/ws'
             
         self.session = requests.Session()
         self.session.headers.update({
@@ -623,24 +633,38 @@ class BinanceAPI:
         Returns:
             Dict: Thông tin tài khoản futures
         """
+        # Nếu không có API key hoặc API secret, trả về dữ liệu giả lập
+        if not self.api_key or not self.api_secret:
+            logger.warning("Không có API keys, sử dụng dữ liệu giả lập cho tài khoản futures")
+            return self._generate_demo_futures_account()
+            
         try:
-            # Thử với endpoints khác nhau, vì Binance thường xuyên thay đổi APIs
+            # Xác định URL endpoint dựa trên loại tài khoản & môi trường
             if self.testnet:
                 try:
-                    return self._request('GET', 'account', signed=True, version='v1')
+                    logger.info("Gửi yêu cầu đến Binance Testnet Futures API")
+                    account_data = self._request('GET', 'account', signed=True, version='v2')
+                    if account_data and not account_data.get('error'):
+                        logger.info("Đã lấy thành công dữ liệu từ Testnet Futures API")
+                    return account_data
                 except Exception as e1:
-                    logging.error(f"Lỗi khi truy vấn testnet futures v1 API: {str(e1)}")
+                    logger.error(f"Lỗi khi truy vấn Testnet Futures v2 API: {str(e1)}")
                     try:
-                        return self._request('GET', 'account', signed=True, version='v2')
+                        account_data = self._request('GET', 'account', signed=True, version='v1')
+                        if account_data and not account_data.get('error'):
+                            logger.info("Đã lấy thành công dữ liệu từ Testnet Futures API v1")
+                        return account_data
                     except Exception as e2:
-                        logging.error(f"Lỗi khi truy vấn testnet futures v2 API: {str(e2)}")
-                        # Trả về dữ liệu giả lập cho testnet nếu không lấy được dữ liệu thực
+                        logger.error(f"Lỗi khi truy vấn Testnet Futures v1 API: {str(e2)}")
+                        logger.warning("Đã xảy ra lỗi khi kết nối tới Testnet Futures API, chuyển sang sử dụng dữ liệu giả lập")
                         return self._generate_demo_futures_account()
             else:
-                # Mainnet API
+                # Mainnet API (thực tế)
+                logger.info("Gửi yêu cầu đến Binance Mainnet Futures API")
                 return self._request('GET', 'account', signed=True, version='v2')
         except Exception as e:
-            logging.error(f"Lỗi khi lấy thông tin tài khoản futures: {str(e)}")
+            logger.error(f"Lỗi khi lấy thông tin tài khoản futures: {str(e)}")
+            logger.warning("Sử dụng dữ liệu giả lập do không thể kết nối đến Binance API")
             # Trả về dữ liệu giả lập nếu có lỗi
             return self._generate_demo_futures_account()
             
