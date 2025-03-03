@@ -919,11 +919,7 @@ def start_background_tasks():
     thread.start()
     logger.info("Background tasks started")
 
-if __name__ == '__main__':
-    # Khởi động các tác vụ nền
-    start_background_tasks()
+# Khởi động các tác vụ nền
+start_background_tasks()
     
-    # Khởi động ứng dụng
-    # Sử dụng gunicorn cho môi trường production
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
-    # app.run(host='0.0.0.0', port=5000, debug=True)
+# Không chạy ứng dụng ở đây - được quản lý bởi gunicorn
