@@ -119,9 +119,14 @@ def control_bot():
         if action == 'start':
             bot_status['running'] = True
             add_message('Bot đã được khởi động', 'success')
+            add_message('Đang phân tích thị trường...', 'info')
+            add_message('Bot đang theo dõi các cặp tiền: BTCUSDT, ETHUSDT, SOLUSDT', 'info')
+            add_message('Đang chờ tín hiệu giao dịch...', 'info')
         else:
             bot_status['running'] = False
             add_message('Bot đã được dừng lại', 'warning')
+            add_message('Đã hủy tất cả các lệnh đang chờ', 'warning')
+            add_message('Hệ thống đã tạm dừng hoàn toàn', 'info')
 
         bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -181,6 +186,9 @@ if __name__ == "__main__":
     # Thêm thông báo khởi động
     try:
         add_message('Hệ thống đã khởi động', 'info')
+        add_message('Bot đang ở trạng thái dừng', 'warning')
+        add_message('Sẵn sàng nhận lệnh điều khiển', 'info')
+
         # Chạy ứng dụng với eventlet WSGI server
         socketio.run(
             app,
