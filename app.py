@@ -22,16 +22,44 @@ app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 # Hàm để lấy trạng thái bot từ cấu hình tài khoản
 def get_bot_status_from_config():
     """Đọc trạng thái bot từ cấu hình tài khoản"""
+    # Đọc trạng thái bot từ file hoặc process
+    bot_running = False
+    try:
+        # Kiểm tra xem bot có đang chạy không (kiểm tra PID hoặc trạng thái khác)
+        # File này được cập nhật bởi bot khi khởi động/dừng
+        if os.path.exists('bot_status.json'):
+            with open('bot_status.json', 'r') as f:
+                saved_status = json.load(f)
+                bot_running = saved_status.get('running', False)
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
+    
+    # Tính uptime nếu bot đang chạy
+    uptime = '0d 0h 0m'
+    if bot_running and os.path.exists('bot_start_time.txt'):
+        try:
+            with open('bot_start_time.txt', 'r') as f:
+                start_time_str = f.read().strip()
+                start_time = datetime.datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
+                now = datetime.datetime.now()
+                delta = now - start_time
+                days = delta.days
+                hours, remainder = divmod(delta.seconds, 3600)
+                minutes, _ = divmod(remainder, 60)
+                uptime = f"{days}d {hours}h {minutes}m"
+        except Exception as e:
+            logger.error(f"Lỗi khi tính uptime: {str(e)}")
+    
     status = {
-        'status': 'stopped',
-        'uptime': '0d 0h 0m',
+        'status': 'running' if bot_running else 'stopped',
+        'uptime': uptime,
         'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'version': '1.0.0',
         'active_strategies': ['RSI', 'MACD', 'BB'],
         'mode': 'testnet',  # mặc định 'testnet' - sẽ được cập nhật từ cấu hình
         'account_type': 'futures',  # mặc định 'futures' - sẽ được cập nhật từ cấu hình
         'strategy_mode': 'auto',  # mặc định 'auto' - sẽ được cập nhật từ cấu hình
-        'last_action': 'Bot đang dừng'
+        'last_action': 'Bot đang chạy' if bot_running else 'Bot đang dừng'
     }
     
     try:

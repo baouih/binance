@@ -1,0 +1,11 @@
+{
+    "running": true,
+    "start_time": "2025-03-03 08:11:00",
+    "active_strategies": ["trend_following", "mean_reversion"],
+    "version": "1.0.0",
+    "mode": "testnet",
+    "account_type": "futures",
+    "strategy_mode": "auto",
+    "last_action": "Bot đã được khởi động với chế độ chiến lược: auto",
+    "last_update": "2025-03-03 08:13:35"
+}
