@@ -1,0 +1,497 @@
+{% extends 'layout.html' %}
+
+{% block title %}Giám sát bot{% endblock %}
+
+{% block additional_css %}
+<style>
+    .activity-log {
+        height: 400px;
+        overflow-y: auto;
+        background-color: var(--bs-dark-bg-subtle);
+        border-radius: 5px;
+        padding: 10px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 0.9rem;
+    }
+    
+    .log-item {
+        padding: 6px 0;
+        border-bottom: 1px solid var(--bs-dark-border-subtle);
+    }
+    
+    .log-item:last-child {
+        border-bottom: none;
+    }
+    
+    .log-timestamp {
+        color: var(--bs-info);
+        margin-right: 8px;
+    }
+    
+    .log-category {
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-right: 8px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+    
+    .log-analysis {
+        background-color: var(--bs-info-bg-subtle);
+        color: var(--bs-info-text);
+    }
+    
+    .log-decision {
+        background-color: var(--bs-warning-bg-subtle);
+        color: var(--bs-warning-text);
+    }
+    
+    .log-action {
+        background-color: var(--bs-success-bg-subtle);
+        color: var(--bs-success-text);
+    }
+    
+    .log-error {
+        background-color: var(--bs-danger-bg-subtle);
+        color: var(--bs-danger-text);
+    }
+
+    .log-market {
+        background-color: var(--bs-primary-bg-subtle);
+        color: var(--bs-primary-text);
+    }
+    
+    .bot-stats-card {
+        transition: all 0.3s ease;
+    }
+    
+    .bot-stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .trade-decision-card {
+        border-left: 4px solid transparent;
+    }
+    
+    .trade-decision-buy {
+        border-left-color: var(--bs-success);
+    }
+    
+    .trade-decision-sell {
+        border-left-color: var(--bs-danger);
+    }
+    
+    .trade-decision-hold {
+        border-left-color: var(--bs-warning);
+    }
+    
+    .market-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    
+    .trend-up {
+        background-color: var(--bs-success);
+    }
+    
+    .trend-down {
+        background-color: var(--bs-danger);
+    }
+    
+    .trend-sideways {
+        background-color: var(--bs-warning);
+    }
+    
+    .bot-control-btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .reason-item {
+        margin-bottom: 5px;
+        padding-left: 15px;
+        position: relative;
+    }
+    
+    .reason-item:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--bs-info);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-robot me-2"></i>Giám sát hoạt động bot</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-monitor">
+                    <i class="fas fa-sync me-1"></i> Làm mới
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="download-log">
+                    <i class="fas fa-download me-1"></i> Tải logs
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="botDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-microchip me-1"></i>
+                    <span id="selected-bot-name">Tất cả các bot</span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="botDropdown" id="bot-selector">
+                    <li><a class="dropdown-item active" href="#" data-bot-id="all">Tất cả các bot</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <!-- Danh sách bot sẽ được thêm vào đây bằng JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Status & Controls -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="alert" id="bot-status-alert" role="alert">
+                <div class="d-flex align-items-center">
+                    <div id="bot-status-icon" class="me-3">
+                        <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                    </div>
+                    <div>
+                        <h4 class="alert-heading" id="bot-status-heading">Bot đang hoạt động</h4>
+                        <p class="mb-0" id="bot-status-text">Bot đang phân tích thị trường và tìm kiếm cơ hội giao dịch.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Điều khiển bot</h5>
+                </div>
+                <div class="card-body">
+                    <button id="start-bot-btn" class="btn btn-success bot-control-btn">
+                        <i class="fas fa-play me-1"></i> Khởi động bot
+                    </button>
+                    <button id="stop-bot-btn" class="btn btn-danger bot-control-btn">
+                        <i class="fas fa-stop me-1"></i> Dừng bot
+                    </button>
+                    <button id="restart-bot-btn" class="btn btn-warning bot-control-btn">
+                        <i class="fas fa-redo me-1"></i> Khởi động lại bot
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Stats & Market Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm bot-stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Phân tích thị trường</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>BTC:</span>
+                        <span><i class="market-indicator" id="btc-trend-indicator"></i> <span id="btc-trend-text">--</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>ETH:</span>
+                        <span><i class="market-indicator" id="eth-trend-indicator"></i> <span id="eth-trend-text">--</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>SOL:</span>
+                        <span><i class="market-indicator" id="sol-trend-indicator"></i> <span id="sol-trend-text">--</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>BNB:</span>
+                        <span><i class="market-indicator" id="bnb-trend-indicator"></i> <span id="bnb-trend-text">--</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bot-stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Tâm lý thị trường</h5>
+                    <div class="text-center">
+                        <div class="display-6 mb-2" id="sentiment-value">--</div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" id="sentiment-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div id="sentiment-description">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bot-stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Tín hiệu hiện tại</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>BTC:</span>
+                        <span id="btc-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>ETH:</span>
+                        <span id="eth-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>SOL:</span>
+                        <span id="sol-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>BNB:</span>
+                        <span id="bnb-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bot-stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Thống kê hoạt động</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Thời gian chạy:</span>
+                        <span id="bot-uptime">--</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Phân tích hoàn thành:</span>
+                        <span id="analysis-count">--</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Quyết định giao dịch:</span>
+                        <span id="decision-count">--</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Lệnh thực thi:</span>
+                        <span id="order-count">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Decision & Activity Log -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Quyết định giao dịch gần đây</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="recent-decisions">
+                        <!-- Decision cards will be inserted here -->
+                        <div class="trade-decision-card trade-decision-buy p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">BTCUSDT</h6>
+                                <div>
+                                    <span class="badge bg-success me-1">MUA</span>
+                                    <small class="text-muted">12:45:30</small>
+                                </div>
+                            </div>
+                            <p class="mb-2">Điểm vào lệnh: 83,250 USDT</p>
+                            <p class="mb-2">Take profit: 85,500 USDT (+2.7%)</p>
+                            <p class="mb-2">Stop loss: 82,150 USDT (-1.32%)</p>
+                            <p class="mb-0"><strong>Lý do:</strong></p>
+                            <div class="reason-item">RSI vượt ngưỡng 30 từ dưới lên</div>
+                            <div class="reason-item">Giá đang nằm trên MA50</div>
+                            <div class="reason-item">Khối lượng giao dịch tăng</div>
+                        </div>
+                        
+                        <div class="trade-decision-card trade-decision-sell p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">ETHUSDT</h6>
+                                <div>
+                                    <span class="badge bg-danger me-1">BÁN</span>
+                                    <small class="text-muted">11:30:15</small>
+                                </div>
+                            </div>
+                            <p class="mb-2">Điểm vào lệnh: 4,120 USDT</p>
+                            <p class="mb-2">Take profit: 3,950 USDT (+4.1%)</p>
+                            <p class="mb-2">Stop loss: 4,220 USDT (-2.4%)</p>
+                            <p class="mb-0"><strong>Lý do:</strong></p>
+                            <div class="reason-item">MACD đường chính cắt xuống đường tín hiệu</div>
+                            <div class="reason-item">Giá chạm kháng cự mạnh</div>
+                            <div class="reason-item">Đồng thời phân kỳ âm</div>
+                        </div>
+                        
+                        <div class="trade-decision-card trade-decision-hold p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">SOLUSDT</h6>
+                                <div>
+                                    <span class="badge bg-warning me-1">GIỮ</span>
+                                    <small class="text-muted">10:15:42</small>
+                                </div>
+                            </div>
+                            <p class="mb-0"><strong>Lý do:</strong></p>
+                            <div class="reason-item">Thị trường đang biến động cao</div>
+                            <div class="reason-item">Chưa có tín hiệu vào lệnh rõ ràng</div>
+                            <div class="reason-item">Chờ giá ổn định trước khi ra quyết định</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Nhật ký hoạt động</h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary active log-filter" data-filter="all">Tất cả</button>
+                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="analysis">Phân tích</button>
+                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="decision">Quyết định</button>
+                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="action">Hành động</button>
+                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="market">Thị trường</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="activity-log" id="activity-log">
+                        <!-- Logs will be inserted here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Market Conditions & Active Positions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Điều kiện thị trường hiện tại</h5>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-market">
+                        <i class="fas fa-sync me-1"></i> Làm mới
+                    </button>
+                </div>
+                <div class="card-body" id="market-conditions">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>BTC/USDT</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Giá:</span>
+                                <span id="btc-price">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>RSI (14):</span>
+                                <span id="btc-rsi">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>MACD:</span>
+                                <span id="btc-macd">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Xu hướng:</span>
+                                <span id="btc-trend">--</span>
+                            </div>
+                            
+                            <h6>ETH/USDT</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Giá:</span>
+                                <span id="eth-price">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>RSI (14):</span>
+                                <span id="eth-rsi">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>MACD:</span>
+                                <span id="eth-macd">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Xu hướng:</span>
+                                <span id="eth-trend">--</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>SOL/USDT</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Giá:</span>
+                                <span id="sol-price">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>RSI (14):</span>
+                                <span id="sol-rsi">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>MACD:</span>
+                                <span id="sol-macd">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Xu hướng:</span>
+                                <span id="sol-trend">--</span>
+                            </div>
+                            
+                            <h6>BNB/USDT</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Giá:</span>
+                                <span id="bnb-price">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>RSI (14):</span>
+                                <span id="bnb-rsi">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>MACD:</span>
+                                <span id="bnb-macd">--</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Xu hướng:</span>
+                                <span id="bnb-trend">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Vị thế đang mở</h5>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="auto-refresh-monitor-positions" checked>
+                        <label class="form-check-label" for="auto-refresh-monitor-positions">Tự động làm mới</label>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Cặp</th>
+                                    <th>Loại</th>
+                                    <th>Giá vào</th>
+                                    <th>Giá hiện tại</th>
+                                    <th>P&L</th>
+                                    <th>Take Profit</th>
+                                    <th>Stop Loss</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monitor-positions-table">
+                                <!-- Positions will be inserted here -->
+                                <tr id="no-monitor-positions-row">
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-exchange-alt mb-3" style="font-size: 2rem;"></i>
+                                            <h5>Không có vị thế đang mở</h5>
+                                            <p class="text-muted">Khi bot mở vị thế mới, chúng sẽ hiển thị ở đây.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/bot_monitor.js') }}"></script>
+{% endblock %}
