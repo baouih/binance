@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Giao dịch Crypto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        
+        .info-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-running {
+            background-color: #3fb950;
+        }
+        
+        .status-stopped {
+            background-color: #f85149;
+        }
+        
+        .top-bar {
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar py-2">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3"><i class="bi bi-robot"></i> Bot Giao dịch Crypto</h5>
+                    <div id="connection-status"><span class="badge bg-warning">Đang kết nối...</span></div>
+                </div>
+                <button id="bot-control-btn" class="btn btn-success" data-action="start">
+                    <i class="bi bi-play-circle"></i> Khởi động Bot
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row">
+            <!-- Thông tin trạng thái -->
+            <div class="col-lg-6 mb-4">
+                <div class="info-card">
+                    <h5 class="mb-3">Trạng thái Bot</h5>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Trạng thái</div>
+                            <div class="info-value" id="bot-status">
+                                <span class="badge bg-danger">Đã dừng</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Môi trường</div>
+                            <div class="info-value">
+                                <span class="badge bg-info">Testnet</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Cập nhật lần cuối</div>
+                            <div class="info-value" id="bot-last-updated">N/A</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Mức rủi ro hiện tại</div>
+                            <div class="info-value" id="bot-risk">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin thị trường -->
+                <div class="info-card">
+                    <h5 class="mb-3">Thông tin thị trường</h5>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="info-label">BTC/USDT</div>
+                            <div class="info-value" id="btc-price">$0.00</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">ETH/USDT</div>
+                            <div class="info-value" id="eth-price">$0.00</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">SOL/USDT</div>
+                            <div class="info-value" id="sol-price">$0.00</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">BNB/USDT</div>
+                            <div class="info-value" id="bnb-price">$0.00</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-label">Cập nhật lần cuối</div>
+                            <div class="info-value" id="market-last-updated">N/A</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin tài khoản và vị thế -->
+            <div class="col-lg-6 mb-4">
+                <div class="info-card">
+                    <h5 class="mb-3">Thông tin tài khoản</h5>
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <div class="info-label">Số dư</div>
+                            <div class="info-value" id="account-balance">$0.00</div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="info-label">Vốn</div>
+                            <div class="info-value" id="account-equity">$0.00</div>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <div class="info-label">Khả dụng</div>
+                            <div class="info-value" id="account-available">$0.00</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Drawdown</div>
+                            <div class="info-value" id="account-drawdown">0%</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="info-label">Cập nhật lần cuối</div>
+                            <div class="info-value" id="account-last-updated">N/A</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vị thế đang mở -->
+                <div class="info-card">
+                    <h5 class="mb-3">Vị thế đang mở</h5>
+                    <div id="positions-container">
+                        <div class="text-center text-muted">Không có vị thế nào đang mở</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Thông báo -->
+            <div class="col-lg-6 mb-4">
+                <div class="info-card" style="max-height: 300px; overflow-y: auto;">
+                    <h5 class="mb-3">Thông báo hệ thống</h5>
+                    <div id="messages-container">
+                        <div class="text-center text-muted">Không có thông báo nào</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cấu hình -->
+            <div class="col-lg-6 mb-4">
+                <div class="info-card">
+                    <h5 class="mb-3">Cấu hình Bot</h5>
+                    <form id="config-form">
+                        <div class="mb-3">
+                            <label class="form-label info-label">API Key</label>
+                            <input type="text" class="form-control" id="api-key" placeholder="Nhập API key">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label info-label">API Secret</label>
+                            <input type="password" class="form-control" id="api-secret" placeholder="Nhập API secret">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label info-label">Loại giao dịch</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trading-type" id="spot" value="spot">
+                                <label class="form-check-label" for="spot">Spot</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trading-type" id="futures" value="futures" checked>
+                                <label class="form-check-label" for="futures">Futures</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 mb-3">
+                                <label class="form-label info-label">Đòn bẩy</label>
+                                <input type="number" class="form-control" id="leverage" min="1" max="100" value="10">
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label info-label">Rủi ro mỗi lệnh (%)</label>
+                                <input type="number" class="form-control" id="risk-per-trade" min="0.1" max="10" step="0.1" value="2.5">
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label info-label">Số lệnh tối đa</label>
+                                <input type="number" class="form-control" id="max-positions" min="1" max="10" value="4">
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Lưu cấu hình</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- AJAX Bot Management ---
+        
+        // Khi trang đã sẵn sàng
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cập nhật trạng thái hiển thị ban đầu
+            document.getElementById('connection-status').innerHTML = '<span class="badge bg-success">Đã kết nối</span>';
+            
+            // Gắn sự kiện cho nút điều khiển bot
+            const botControlBtn = document.getElementById('bot-control-btn');
+            if (botControlBtn) {
+                botControlBtn.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    controlBot(action);
+                });
+            }
+            
+            // Gắn sự kiện cho form cấu hình
+            const configForm = document.getElementById('config-form');
+            if (configForm) {
+                configForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    updateConfig();
+                });
+            }
+            
+            // Bắt đầu cập nhật dữ liệu định kỳ
+            fetchStatus();
+            setInterval(fetchStatus, 5000); // Cập nhật mỗi 5 giây
+        });
+        
+        // Lấy trạng thái hệ thống
+        function fetchStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateBotStatus(data.bot_status);
+                    updateConnectionStatus(data.connection_status);
+                    updateAccountData(data.account_data);
+                    updateMarketData(data.market_data);
+                    updateMessages(data.messages);
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy trạng thái:', error);
+                    showToast('Lỗi kết nối với server', 'danger');
+                });
+        }
+        
+        // Điều khiển bot (start/stop)
+        function controlBot(action) {
+            fetch('/api/bot/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
+                    updateBotStatus(data.status);
+                    
+                    // Cập nhật ngay lập tức
+                    fetchStatus();
+                } else {
+                    showToast('Không thể điều khiển bot: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi điều khiển bot:', error);
+                showToast('Lỗi khi điều khiển bot', 'danger');
+            });
+        }
+        
+        // Cập nhật cấu hình
+        function updateConfig() {
+            // Lấy dữ liệu từ form
+            const apiKey = document.getElementById('api-key').value;
+            const apiSecret = document.getElementById('api-secret').value;
+            const tradingType = document.querySelector('input[name="trading-type"]:checked').value;
+            const leverage = document.getElementById('leverage').value;
+            const riskPerTrade = document.getElementById('risk-per-trade').value;
+            const maxPositions = document.getElementById('max-positions').value;
+            
+            // Gửi yêu cầu cập nhật
+            fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    api_secret: apiSecret,
+                    trading_type: tradingType,
+                    leverage: parseInt(leverage),
+                    risk_per_trade: parseFloat(riskPerTrade),
+                    max_positions: parseInt(maxPositions)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Cấu hình đã được cập nhật', 'success');
+                    
+                    // Cập nhật ngay lập tức
+                    fetchStatus();
+                } else {
+                    showToast('Không thể cập nhật cấu hình: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi cập nhật cấu hình:', error);
+                showToast('Lỗi khi cập nhật cấu hình', 'danger');
+            });
+        }
+        
+        // Đóng vị thế
+        function closePosition(positionId) {
+            fetch('/api/positions/close', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ position_id: positionId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast('Đã đóng vị thế thành công', 'success');
+                    
+                    // Cập nhật ngay lập tức
+                    fetchStatus();
+                } else {
+                    showToast('Không thể đóng vị thế: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi đóng vị thế:', error);
+                showToast('Lỗi khi đóng vị thế', 'danger');
+            });
+        }
+        
+        // --- Cập nhật giao diện ---
+        
+        // Cập nhật trạng thái bot
+        function updateBotStatus(status) {
+            // Cập nhật nút điều khiển
+            const botControlBtn = document.getElementById('bot-control-btn');
+            if (botControlBtn) {
+                if (status.running) {
+                    botControlBtn.innerHTML = '<i class="bi bi-stop-circle"></i> Dừng Bot';
+                    botControlBtn.classList.remove('btn-success');
+                    botControlBtn.classList.add('btn-danger');
+                    botControlBtn.dataset.action = 'stop';
+                } else {
+                    botControlBtn.innerHTML = '<i class="bi bi-play-circle"></i> Khởi động Bot';
+                    botControlBtn.classList.remove('btn-danger');
+                    botControlBtn.classList.add('btn-success');
+                    botControlBtn.dataset.action = 'start';
+                }
+            }
+            
+            // Cập nhật trạng thái
+            const botStatusEl = document.getElementById('bot-status');
+            if (botStatusEl) {
+                if (status.running) {
+                    botStatusEl.innerHTML = '<span class="badge bg-success">Đang chạy</span>';
+                } else {
+                    botStatusEl.innerHTML = '<span class="badge bg-danger">Đã dừng</span>';
+                }
+            }
+            
+            // Cập nhật thông tin khác
+            if (document.getElementById('bot-last-updated')) {
+                document.getElementById('bot-last-updated').textContent = status.last_updated || 'N/A';
+            }
+            
+            if (document.getElementById('bot-risk')) {
+                document.getElementById('bot-risk').textContent = (status.current_risk ? status.current_risk.toFixed(2) + '%' : '0%');
+            }
+        }
+        
+        // Cập nhật trạng thái kết nối
+        function updateConnectionStatus(status) {
+            const connectionStatusEl = document.getElementById('connection-status');
+            if (connectionStatusEl) {
+                if (status.is_connected && status.is_authenticated) {
+                    connectionStatusEl.innerHTML = '<span class="badge bg-success">Đã kết nối API</span>';
+                } else if (status.is_connected) {
+                    connectionStatusEl.innerHTML = '<span class="badge bg-warning">Chưa xác thực API</span>';
+                } else {
+                    connectionStatusEl.innerHTML = '<span class="badge bg-danger">Chưa kết nối API</span>';
+                }
+            }
+        }
+        
+        // Cập nhật dữ liệu tài khoản
+        function updateAccountData(data) {
+            // Cập nhật số dư
+            if (document.getElementById('account-balance')) {
+                document.getElementById('account-balance').textContent = '$' + formatNumber(data.balance);
+            }
+            
+            // Cập nhật vốn
+            if (document.getElementById('account-equity')) {
+                document.getElementById('account-equity').textContent = '$' + formatNumber(data.equity);
+            }
+            
+            // Cập nhật số dư khả dụng
+            if (document.getElementById('account-available')) {
+                document.getElementById('account-available').textContent = '$' + formatNumber(data.available);
+            }
+            
+            // Cập nhật drawdown
+            if (document.getElementById('account-drawdown')) {
+                document.getElementById('account-drawdown').textContent = 
+                    (data.current_drawdown ? data.current_drawdown.toFixed(2) + '%' : '0%');
+            }
+            
+            // Cập nhật thời gian cập nhật
+            if (document.getElementById('account-last-updated')) {
+                document.getElementById('account-last-updated').textContent = data.last_updated || 'N/A';
+            }
+            
+            // Cập nhật danh sách vị thế
+            updatePositions(data.positions || []);
+        }
+        
+        // Cập nhật dữ liệu thị trường
+        function updateMarketData(data) {
+            // Cập nhật giá BTC
+            if (document.getElementById('btc-price')) {
+                document.getElementById('btc-price').textContent = '$' + formatNumber(data.btc_price);
+            }
+            
+            // Cập nhật giá ETH
+            if (document.getElementById('eth-price')) {
+                document.getElementById('eth-price').textContent = '$' + formatNumber(data.eth_price);
+            }
+            
+            // Cập nhật giá SOL
+            if (document.getElementById('sol-price')) {
+                document.getElementById('sol-price').textContent = '$' + formatNumber(data.sol_price);
+            }
+            
+            // Cập nhật giá BNB
+            if (document.getElementById('bnb-price')) {
+                document.getElementById('bnb-price').textContent = '$' + formatNumber(data.bnb_price);
+            }
+            
+            // Cập nhật thời gian cập nhật
+            if (document.getElementById('market-last-updated')) {
+                document.getElementById('market-last-updated').textContent = data.last_updated || 'N/A';
+            }
+        }
+        
+        // Cập nhật danh sách thông báo
+        function updateMessages(messages) {
+            const messagesContainer = document.getElementById('messages-container');
+            if (!messagesContainer) return;
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = '<div class="text-center text-muted">Không có thông báo nào</div>';
+                return;
+            }
+            
+            // Xóa các thông báo cũ
+            messagesContainer.innerHTML = '';
+            
+            // Thêm các thông báo mới (hiển thị theo thứ tự ngược lại - mới nhất lên đầu)
+            messages.slice().reverse().forEach(message => {
+                const messageEl = document.createElement('div');
+                messageEl.className = `alert alert-${message.level} mb-2`;
+                messageEl.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${message.content}</span>
+                        <small class="text-muted">${message.timestamp}</small>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageEl);
+            });
+        }
+        
+        // Cập nhật danh sách vị thế
+        function updatePositions(positions) {
+            const positionsContainer = document.getElementById('positions-container');
+            if (!positionsContainer) return;
+            
+            if (positions.length === 0) {
+                positionsContainer.innerHTML = '<div class="text-center text-muted">Không có vị thế nào đang mở</div>';
+                return;
+            }
+            
+            // Xóa các vị thế cũ
+            positionsContainer.innerHTML = '';
+            
+            // Thêm các vị thế mới
+            positions.forEach(position => {
+                const isProfitable = position.pnl > 0;
+                const positionEl = document.createElement('div');
+                positionEl.className = 'info-card';
+                positionEl.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="badge ${position.side === 'BUY' ? 'bg-success' : 'bg-danger'}">${position.side}</span>
+                            <strong>${position.symbol}</strong>
+                        </div>
+                        <div>
+                            <span class="badge ${isProfitable ? 'bg-success' : 'bg-danger'}">
+                                ${isProfitable ? '+' : ''}${formatNumber(position.pnl)} (${isProfitable ? '+' : ''}${position.pnl_percent.toFixed(2)}%)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <div class="info-label">Giá vào</div>
+                            <div class="info-value">$${formatNumber(position.entry_price)}</div>
+                        </div>
+                        <div>
+                            <div class="info-label">Giá hiện tại</div>
+                            <div class="info-value">$${formatNumber(position.current_price)}</div>
+                        </div>
+                        <div>
+                            <div class="info-label">Số lượng</div>
+                            <div class="info-value">${position.amount}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-sm btn-outline-danger close-position-btn" data-position-id="${position.id}">
+                            <i class="bi bi-x-circle"></i> Đóng vị thế
+                        </button>
+                    </div>
+                `;
+                
+                positionsContainer.appendChild(positionEl);
+            });
+            
+            // Thêm sự kiện cho các nút đóng vị thế
+            const closeButtons = document.querySelectorAll('.close-position-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = parseInt(this.dataset.positionId);
+                    closePosition(positionId);
+                });
+            });
+        }
+        
+        // --- Tiện ích ---
+        
+        // Format số thành dạng có dấu phẩy ngăn cách
+        function formatNumber(number) {
+            if (number === undefined || number === null) return 'N/A';
+            return parseFloat(number).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        // Hiển thị thông báo toast
+        function showToast(message, type) {
+            // Kiểm tra xem container đã tồn tại chưa
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Tạo toast mới
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="toast-header ${type === 'danger' ? 'bg-danger text-white' : type === 'success' ? 'bg-success text-white' : ''}">
+                    <strong class="me-auto">Thông báo</strong>
+                    <small>${new Date().toLocaleTimeString()}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            // Thêm toast vào container
+            toastContainer.appendChild(toast);
+            
+            // Khởi tạo và hiển thị toast
+            const bsToast = new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 5000
+            });
+            bsToast.show();
+            
+            // Xóa toast khỏi DOM sau khi đã ẩn đi
+            toast.addEventListener('hidden.bs.toast', function () {
+                toast.remove();
+            });
+        }
+    </script>
+</body>
+</html>
