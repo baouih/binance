@@ -820,7 +820,15 @@ def update_market_data():
             }
             socketio.emit('bot_log', log_data)
             
-            # Gửi thông báo qua Telegram
+            # Cập nhật chế độ API từ cấu hình
+            try:
+                with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+                    config = json.load(f)
+                api_mode = config.get('api_mode', 'demo')
+            except:
+                api_mode = 'demo'
+                
+            # Gửi thông báo qua Telegram với chế độ API
             if action == 'BUY':
                 telegram_notifier.send_trade_entry(
                     symbol=f"{coin}USDT",
@@ -829,7 +837,8 @@ def update_market_data():
                     quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
                     stop_loss=stop_loss,
                     take_profit=take_profit,
-                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
+                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}",
+                    mode=api_mode
                 )
             elif action == 'SELL':
                 telegram_notifier.send_trade_entry(
@@ -839,7 +848,8 @@ def update_market_data():
                     quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
                     stop_loss=stop_loss,
                     take_profit=take_profit,
-                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
+                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}",
+                    mode=api_mode
                 )
 
 def update_account_data():
@@ -869,6 +879,14 @@ def update_account_data():
                 exit_price = position['current_price']
                 entry_price = position['entry_price']
                 
+                # Cập nhật chế độ API từ cấu hình
+                try:
+                    with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+                        config = json.load(f)
+                    api_mode = config.get('api_mode', 'demo')
+                except:
+                    api_mode = 'demo'
+
                 # Gửi thông báo thoát lệnh qua Telegram
                 telegram_notifier.send_trade_exit(
                     symbol=position['symbol'],
@@ -878,7 +896,8 @@ def update_account_data():
                     quantity=position['size'],
                     profit_loss=position['pnl'],
                     profit_loss_percent=position['pnl_percent'],
-                    exit_reason="Đạt mức take profit" if is_profit else "Kích hoạt stop loss"
+                    exit_reason="Đạt mức take profit" if is_profit else "Kích hoạt stop loss",
+                    mode=api_mode
                 )
                 
                 # Gửi cảnh báo thị trường nếu có biến động lớn
