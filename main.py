@@ -258,7 +258,7 @@ def index():
             'current_risk': bot_status['current_risk']
         }
 
-        response = make_response(render_template('index.html',
+        response = make_response(render_template('index-simple.html',
                                              status=status,
                                              messages=messages[-50:],
                                              account_data=account_data,
@@ -299,7 +299,7 @@ def index():
             'last_updated': None
         }
         
-        response = make_response(render_template('index.html',
+        response = make_response(render_template('index-simple.html',
                                              status=default_status,
                                              messages=[],
                                              account_data=default_account_data,
