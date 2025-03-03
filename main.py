@@ -14,6 +14,12 @@ logger = logging.getLogger('main')
 
 # Khởi tạo ứng dụng Flask
 app = Flask(__name__)
+
+# Cấu hình session secret key
+if 'SESSION_SECRET' not in os.environ:
+    logger.warning("SESSION_SECRET not found in environment, generating a random one")
+    os.environ['SESSION_SECRET'] = os.urandom(24).hex()
+
 app.secret_key = os.environ.get("SESSION_SECRET")
 
 # Khởi tạo SocketIO với CORS và async mode
@@ -34,17 +40,21 @@ messages = []
 
 def add_message(content, level='info'):
     """Thêm thông báo mới vào danh sách"""
-    message = {
-        'content': content,
-        'level': level,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    messages.append(message)
-    # Giữ tối đa 100 tin nhắn gần nhất
-    while len(messages) > 100:
-        messages.pop(0)
-    # Gửi thông báo qua websocket
-    socketio.emit('new_message', message)
+    try:
+        message = {
+            'content': content,
+            'level': level,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        messages.append(message)
+        # Giữ tối đa 100 tin nhắn gần nhất
+        while len(messages) > 100:
+            messages.pop(0)
+        # Gửi thông báo qua websocket
+        socketio.emit('new_message', message)
+        logger.debug(f"Added and emitted new message: {content}")
+    except Exception as e:
+        logger.error(f"Error adding message: {str(e)}", exc_info=True)
 
 @app.context_processor
 def inject_global_vars():
@@ -84,6 +94,7 @@ def control_bot():
     """API điều khiển bot (start/stop)"""
     try:
         action = request.json.get('action')
+        logger.info(f"Received bot control action: {action}")
 
         if action not in ['start', 'stop']:
             return jsonify({
@@ -100,6 +111,9 @@ def control_bot():
 
         bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+        # Emit bot status update through WebSocket
+        socketio.emit('bot_status_update', bot_status)
+
         return jsonify({
             'success': True,
             'status': bot_status
@@ -115,18 +129,31 @@ def control_bot():
 @app.route('/api/messages')
 def get_messages():
     """API lấy danh sách thông báo"""
-    limit = request.args.get('limit', 50, type=int)
-    return jsonify(messages[-limit:])
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        return jsonify(messages[-limit:])
+    except Exception as e:
+        logger.error(f"Error getting messages: {str(e)}", exc_info=True)
+        return jsonify([])
 
 @socketio.on('connect')
 def handle_connect():
     """Xử lý khi client kết nối websocket"""
-    logger.info('Client connected')
-    # Gửi trạng thái hiện tại cho client mới
-    socketio.emit('bot_status', bot_status)
+    try:
+        logger.info('Client connected')
+        # Gửi trạng thái hiện tại cho client mới
+        socketio.emit('bot_status', bot_status)
+        # Gửi tin nhắn hiện tại
+        for msg in messages[-50:]:
+            socketio.emit('new_message', msg)
+    except Exception as e:
+        logger.error(f"Error handling socket connection: {str(e)}", exc_info=True)
 
 if __name__ == "__main__":
     # Thêm thông báo khởi động
-    add_message('Hệ thống đã khởi động', 'info')
-    # Chạy ứng dụng
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    try:
+        add_message('Hệ thống đã khởi động', 'info')
+        # Chạy ứng dụng
+        socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    except Exception as e:
+        logger.error(f"Error starting server: {str(e)}", exc_info=True)
