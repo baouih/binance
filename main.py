@@ -41,7 +41,9 @@ connection_status = {
 # Trạng thái bot và kết nối
 bot_status = {
     'running': False,
-    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'current_risk': 0,
+    'risk_limit_reached': False
 }
 
 # Cấu hình giao dịch
@@ -260,9 +262,38 @@ def index():
 
     except Exception as e:
         logger.error(f"Error loading dashboard: {str(e)}", exc_info=True)
+        # Tạo một phiên bản mặc định của các biến cần thiết
+        default_status = {
+            'running': False, 
+            'mode': 'testnet',
+            'is_connected': False,
+            'is_authenticated': False,
+            'trading_type': 'futures',
+            'current_risk': 0
+        }
+        default_account_data = {
+            'balance': 0,
+            'equity': 0,
+            'available': 0,
+            'positions': [],
+            'last_updated': None,
+            'initial_balance': 0,
+            'current_drawdown': 0
+        }
+        default_market_data = {
+            'btc_price': 0,
+            'eth_price': 0,
+            'sol_price': 0,
+            'bnb_price': 0,
+            'last_updated': None
+        }
+        
         response = make_response(render_template('index.html',
-                                             status={'running': False, 'mode': 'testnet'},
-                                             messages=[]))
+                                             status=default_status,
+                                             messages=[],
+                                             account_data=default_account_data,
+                                             market_data=default_market_data,
+                                             trading_config=trading_config))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
