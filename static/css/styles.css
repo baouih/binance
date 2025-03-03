@@ -73,6 +73,15 @@ body {
     touch-action: manipulation;
 }
 
+/* Button wrapper for increased touch area */
+.control-button-wrapper {
+    padding: 10px;
+    margin: -10px;
+    cursor: pointer;
+    position: relative;
+    z-index: 99;
+}
+
 /* Custom table styles */
 .table-hover tbody tr:hover {
     background-color: rgba(33, 37, 41, 0.05);
@@ -221,4 +230,32 @@ body {
 
 .mobile-trading-menu .mobile-nav-item:active {
     transform: scale(0.95);
+}
+
+/* Floating Control Button for Mobile */
+.floating-control-button {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #198754;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    font-size: 24px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.floating-control-button i {
+    font-size: 28px;
+}
+
+.floating-control-button.stop {
+    background-color: #dc3545;
 }
