@@ -380,18 +380,17 @@
                 </div>
                 
                 <!-- Bot Status -->
-                <div class="bot-status {{ 'running' if status.running else 'stopped' }}">
-                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }} me-2"></i>
-                    {{ 'Đang chạy' if status.running else 'Đã dừng' }}
+                <div class="bot-status {{ 'running' if bot_status.running else 'stopped' }}">
+                    <i class="bi {{ 'bi-play-circle-fill' if bot_status.running else 'bi-stop-circle-fill' }} me-2"></i>
+                    {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
                 </div>
 
                 <!-- Control Button -->
                 <button id="controlButton" type="button"
-                        class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
-                        onclick="handleControlButton(this)"
-                        {{ 'disabled' if not status.is_connected }}>
-                    <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
-                    <span class="button-text">{{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}</span>
+                        class="btn {{ 'btn-danger' if bot_status.running else 'btn-success' }} btn-lg"
+                        onclick="handleControlButton(this)">
+                    <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} me-2"></i>
+                    <span class="button-text">{{ 'Dừng Bot' if bot_status.running else 'Khởi động Bot' }}</span>
                     <div class="spinner-border spinner-border-sm d-none" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -798,8 +797,8 @@
 
         // State
         let state = {
-            isConnected: {{ 'true' if status.is_connected else 'false' }},
-            botRunning: {{ 'true' if status.running else 'false' }},
+            isConnected: true,
+            botRunning: {{ 'true' if bot_status.running else 'false' }},
             reconnectAttempts: 0,
             maxReconnectAttempts: 5
         };
