@@ -1,4 +1,65 @@
 {% extends 'layout.html' %}
+{% block additional_css %}
+<style>
+    /* Thêm CSS bổ sung cho trang thị trường */
+    .symbol-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: rgba(var(--bs-primary-rgb), 0.15);
+        color: var(--bs-primary);
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    
+    .indicator-dot {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.2rem;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+    
+    .indicator-dot:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    .trending {
+        background-color: #0d6efd;
+    }
+    
+    .ranging {
+        background-color: #6c757d;
+    }
+    
+    .volatile {
+        background-color: #fd7e14;
+    }
+    
+    .quiet {
+        background-color: #20c997;
+    }
+    
+    .regime-indicator {
+        text-align: center;
+    }
+    
+    .chart-type.active {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+</style>
+{% endblock %}
 
 {% block title %}Thị trường{% endblock %}
 
@@ -522,8 +583,8 @@
                         return;
                     }
                     
-                    // Lấy dữ liệu thị trường thực từ API
-                    fetch('/api/market/data', {
+                    // Lấy dữ liệu thị trường thực từ API - sử dụng endpoint cũ để tương thích
+                    fetch('/api/market', {
                         headers: {
                             'Cache-Control': 'no-cache',
                             'Pragma': 'no-cache'
