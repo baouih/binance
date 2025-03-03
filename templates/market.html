@@ -7,9 +7,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/market.css') }}">
 {% endblock %}
 
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/market.js') }}"></script>
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/market.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -426,17 +425,7 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Market Chart
-        const marketCtx = document.getElementById('marketChart').getContext('2d');
-        const marketChart = new Chart(marketCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'BTC/USDT',
+<!-- Removed duplicate block scripts -->
                     data: [42000, 44500, 43000, 48000, 47000, 53000, 57000, 62000, 58000, 67000, 69000, 73000],
                     borderColor: '#0d6efd',
                     backgroundColor: 'rgba(13, 110, 253, 0.1)',
