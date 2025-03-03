@@ -350,11 +350,10 @@ def test_telegram():
             'message': f'Lỗi: {str(e)}'
         })
 
-@app.route('/api/bot/control/<bot_id>', methods=['POST'])
-def control_bot(bot_id):
-    """API endpoint để điều khiển bot (start/stop/restart/delete)"""
-    global bot_status
-    
+@app.route('/api/bot/control', methods=['POST'])
+def control_bot_general():
+    """API endpoint để điều khiển bot (start/stop/restart) không cần chỉ định ID"""
+    # Cập nhật file bot_status.json và trạng thái toàn cục
     try:
         # Kiểm tra dữ liệu từ request
         data = request.json
@@ -366,17 +365,33 @@ def control_bot(bot_id):
             
         action = data.get('action', '')
         
-        if not action or action not in ['start', 'stop', 'restart', 'delete']:
+        if not action or action not in ['start', 'stop', 'restart']:
             return jsonify({
                 'success': False,
                 'message': f'Hành động không hợp lệ: {action}'
             }), 400
+        
+        # Đọc trạng thái hiện tại
+        bot_status = {}
+        try:
+            with open('bot_status.json', 'r', encoding='utf-8') as f:
+                bot_status = json.load(f)
+        except Exception as e:
+            logger.warning(f"Không thể đọc bot_status.json: {e}")
+            bot_status = {"running": False}
             
         # Xử lý các hành động
         if action == 'start':
-            app.logger.info(f"Starting bot #{bot_id}")
+            logger.info("Starting bot")
+            bot_status['running'] = True
             bot_status['status'] = 'running'
-            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Ghi thời gian bắt đầu nếu chưa có
+            if 'start_time' not in bot_status:
+                bot_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                with open('bot_start_time.txt', 'w') as f:
+                    f.write(bot_status['start_time'])
             
             # Gửi thông báo qua Telegram
             try:
@@ -385,18 +400,26 @@ def control_bot(bot_id):
                     category="system"
                 )
             except Exception as e:
-                app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+            
+            # Lưu trạng thái vào file
+            try:
+                with open('bot_status.json', 'w', encoding='utf-8') as f:
+                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
+            except Exception as e:
+                logger.error(f"Không thể lưu bot_status.json: {e}")
             
             return jsonify({
                 'success': True,
-                'message': f'Bot {bot_id} đã được khởi động',
+                'message': 'Bot đã được khởi động thành công',
                 'status': 'running'
             })
             
         elif action == 'stop':
-            app.logger.info(f"Stopping bot #{bot_id}")
+            logger.info("Stopping bot")
+            bot_status['running'] = False
             bot_status['status'] = 'stopped'
-            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             
             # Gửi thông báo qua Telegram
             try:
@@ -409,12 +432,13 @@ def control_bot(bot_id):
             
             return jsonify({
                 'success': True,
-                'message': f'Bot {bot_id} đã được dừng lại',
+                'message': 'Bot đã được dừng lại thành công',
                 'status': 'stopped'
             })
             
         elif action == 'restart':
-            app.logger.info(f"Restarting bot #{bot_id}")
+            logger.info("Restarting bot")
+            bot_status['running'] = False # Đầu tiên dừng bot
             bot_status['status'] = 'restarting'
             
             # Giả lập restart: Thay đổi trạng thái từ restarting -> running sau 2 giây
@@ -434,29 +458,52 @@ def control_bot(bot_id):
                     category="system"
                 )
             except Exception as e:
-                app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+                
+            # Sau 2 giây, bot sẽ khởi động lại
+            def start_bot_after_delay():
+                time.sleep(2)
+                # Cập nhật lại trạng thái của bot
+                try:
+                    with open('bot_status.json', 'r', encoding='utf-8') as f:
+                        current_status = json.load(f)
+                    
+                    current_status['running'] = True 
+                    current_status['status'] = 'running'
+                    current_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    with open('bot_status.json', 'w', encoding='utf-8') as f:
+                        json.dump(current_status, f, indent=4, ensure_ascii=False)
+                    
+                    logger.info("Bot đã khởi động lại thành công")
+                except Exception as e:
+                    logger.error(f"Không thể cập nhật trạng thái bot sau khi khởi động lại: {e}")
+            
+            # Lưu trạng thái restarting vào file
+            try:
+                with open('bot_status.json', 'w', encoding='utf-8') as f:
+                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
+            except Exception as e:
+                logger.error(f"Không thể lưu bot_status.json khi khởi động lại: {e}")
+            
+            # Chạy thread khởi động lại bot
+            restart_thread = threading.Thread(target=start_bot_after_delay)
+            restart_thread.daemon = True
+            restart_thread.start()
                 
             return jsonify({
                 'success': True,
-                'message': f'Bot {bot_id} đang được khởi động lại',
+                'message': 'Bot đang được khởi động lại',
                 'status': 'restarting'
             })
             
-        elif action == 'delete':
-            # Chỉ áp dụng với bot cụ thể, không với 'all'
-            if bot_id == 'all':
-                return jsonify({
-                    'success': False,
-                    'message': 'Không thể xóa tất cả các bot cùng lúc'
-                }), 400
-                
-            app.logger.info(f"Deleting bot #{bot_id}")
-            # TODO: Xử lý xóa bot (giả lập)
+        # Không xử lý lệnh delete trong phiên bản này
+        else:
+            # Lệnh không được hỗ trợ
             return jsonify({
-                'success': True,
-                'message': f'Bot {bot_id} đã được xóa',
-                'status': 'deleted'
-            })
+                'success': False,
+                'message': 'Lệnh không được hỗ trợ'
+            }), 400
     
     except Exception as e:
         app.logger.error(f"Lỗi khi điều khiển bot: {str(e)}")
