@@ -110,8 +110,8 @@ def check_risk_limits():
         risk_profile = risk_config.get('risk_profile', 'medium')
         risk_settings = config_high_risk.get_risk_profile(risk_profile)
 
-        current_equity = account_data['equity']
         max_account_risk = risk_settings['max_account_risk']
+        current_equity = account_data['equity']
         max_loss = account_data['initial_balance'] * (max_account_risk / 100)
         current_loss = account_data['initial_balance'] - current_equity
 
@@ -381,7 +381,6 @@ def update_config():
     """Cập nhật cấu hình bot"""
     try:
         config = request.json
-        logger.debug(f"Received config update: {config}")
 
         # Save API keys to environment
         if 'api_key' in config and 'api_secret' in config:
@@ -414,7 +413,7 @@ def update_config():
             connection_status['trading_type'] = config['trading_type']
 
         if 'risk_profile' in config:
-            # Validate risk profile
+            # Validate và set risk profile
             if not risk_manager.set_risk_profile(config['risk_profile']):
                 return jsonify({
                     'success': False,

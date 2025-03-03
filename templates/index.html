@@ -158,6 +158,16 @@
                 height: calc(100vh - 180px);
             }
         }
+
+        /*Added Styles for Risk Level Display*/
+        .risk-level-display {
+            display: flex;
+            align-items: center;
+        }
+
+        .risk-level-label {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -234,11 +244,14 @@
 
                     <div class="mb-3">
                         <label class="form-label">Mức độ rủi ro</label>
-                        <select class="form-select" id="riskLevel">
-                            <option value="low">Thấp (10-15% tài khoản)</option>
-                            <option value="medium" selected>Trung bình (20-30% tài khoản)</option>
-                            <option value="high">Cao (30-50% tài khoản)</option>
-                        </select>
+                        <div class="risk-level-display">
+                            <select class="form-select" id="riskLevel">
+                                <option value="low">Thấp (10-15% tài khoản)</option>
+                                <option value="medium" selected>Trung bình (20-30% tài khoản)</option>
+                                <option value="high">Cao (30-50% tài khoản)</option>
+                            </select>
+                            <span class="risk-level-label" id="riskLevelDisplay">Trung bình (20-30% tài khoản)</span>
+                        </div>
                         <small class="text-muted">
                             Bot sẽ tự điều chỉnh chiến lược giao dịch dựa trên mức độ rủi ro được chọn
                         </small>
@@ -344,6 +357,7 @@
         const maxAccountRisk = document.getElementById('maxAccountRisk');
         const maxAccountRiskValue = document.getElementById('maxAccountRiskValue');
         const riskLevel = document.getElementById('riskLevel');
+        const riskLevelDisplay = document.getElementById('riskLevelDisplay'); // Added for risk level display
 
         // Khởi tạo WebSocket
         const socket = io({
@@ -555,19 +569,24 @@
         // Cập nhật giá trị thanh trượt khi chọn mức độ rủi ro
         riskLevel.addEventListener('change', function() {
             let defaultRisk;
+            let riskLevelText;
             switch(this.value) {
                 case 'low':
                     defaultRisk = 15;
+                    riskLevelText = "Thấp (10-15% tài khoản)";
                     break;
                 case 'medium':
                     defaultRisk = 25;
+                    riskLevelText = "Trung bình (20-30% tài khoản)";
                     break;
                 case 'high':
                     defaultRisk = 40;
+                    riskLevelText = "Cao (30-50% tài khoản)";
                     break;
             }
             maxAccountRisk.value = defaultRisk;
             maxAccountRiskValue.textContent = `${defaultRisk}%`;
+            riskLevelDisplay.textContent = riskLevelText; // Update risk level display
         });
 
         // Lưu cấu hình
