@@ -53,6 +53,12 @@ market_data = {
     'eth_price': 0,
     'sol_price': 0,
     'bnb_price': 0,
+    'ada_price': 0,
+    'doge_price': 0,
+    'xrp_price': 0,
+    'dot_price': 0,
+    'matic_price': 0,
+    'avax_price': 0,
     'last_updated': None
 }
 
@@ -64,14 +70,61 @@ account_data = {
     'positions': [],
     'last_updated': None,
     'initial_balance': 0,
-    'current_drawdown': 0
+    'current_drawdown': 0,
+    'profit_history': [],  # Lịch sử lợi nhuận theo thời gian
+    'position_history': []  # Lịch sử vị thế đã đóng
+}
+
+# Cấu hình Telegram
+telegram_config = {
+    'enabled': False,
+    'bot_token': '',
+    'chat_id': '',
+    'last_message_time': datetime.now().timestamp(),
+    'min_interval': 5  # Khoảng thời gian tối thiểu giữa các tin nhắn (giây)
 }
 
 # Danh sách thông báo
 messages = []
 
-def add_message(content, level='info'):
-    """Thêm thông báo mới vào danh sách"""
+def send_telegram_message(message):
+    """Gửi tin nhắn đến Telegram"""
+    try:
+        if not telegram_config['enabled'] or not telegram_config['bot_token'] or not telegram_config['chat_id']:
+            return False
+        
+        # Kiểm tra giới hạn thời gian giữa các tin nhắn
+        current_time = datetime.now().timestamp()
+        if current_time - telegram_config['last_message_time'] < telegram_config['min_interval']:
+            logger.debug("Skipping Telegram message due to rate limit")
+            return False
+        
+        # Cập nhật thời gian gửi tin nhắn gần nhất
+        telegram_config['last_message_time'] = current_time
+        
+        # Gửi tin nhắn đến Telegram
+        url = f"https://api.telegram.org/bot{telegram_config['bot_token']}/sendMessage"
+        data = {
+            'chat_id': telegram_config['chat_id'],
+            'text': message,
+            'parse_mode': 'HTML'
+        }
+        
+        response = requests.post(url, data=data)
+        
+        if response.status_code == 200:
+            logger.debug(f"Telegram message sent successfully: {message[:50]}...")
+            return True
+        else:
+            logger.error(f"Failed to send Telegram message: {response.status_code} - {response.text}")
+            return False
+    
+    except Exception as e:
+        logger.error(f"Error sending Telegram message: {str(e)}", exc_info=True)
+        return False
+
+def add_message(content, level='info', send_to_telegram=False):
+    """Thêm thông báo mới vào danh sách và tùy chọn gửi đến Telegram"""
     try:
         message = {
             'content': content,
@@ -82,6 +135,23 @@ def add_message(content, level='info'):
         while len(messages) > 100:
             messages.pop(0)
         logger.debug(f"Added message: {content}")
+        
+        # Gửi tin nhắn đến Telegram nếu được yêu cầu
+        if send_to_telegram and telegram_config['enabled']:
+            # Thêm emoji tương ứng với mức độ
+            if level == 'success':
+                emoji = "✅ "
+            elif level == 'error':
+                emoji = "❌ "
+            elif level == 'warning':
+                emoji = "⚠️ "
+            else:  # info
+                emoji = "ℹ️ "
+            
+            # Định dạng tin nhắn và gửi đến Telegram
+            telegram_msg = f"{emoji} <b>Bot Thông Báo:</b>\n{content}"
+            send_telegram_message(telegram_msg)
+        
     except Exception as e:
         logger.error(f"Error adding message: {str(e)}", exc_info=True)
 
@@ -118,8 +188,16 @@ def check_risk_limits():
 def update_market_prices():
     """Lấy giá thị trường thực từ Binance API"""
     try:
-        # Danh sách các cặp cần lấy giá
-        symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+        # Danh sách các cặp cần lấy giá và phân tích
+        # Khi thêm cặp mới vào đây, cần update cả market_data để lưu trữ giá
+        trading_symbols = [
+            'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 
+            'DOGEUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT',
+            'LINKUSDT', 'LTCUSDT', 'UNIUSDT', 'NEARUSDT', 'APTUSDT',
+            'OPUSDT', 'ARBUSDT', 'SUIUSDT', 'FILUSDT', 'ATOMUSDT'
+            # 'PIUSDT'  # Sẽ thêm Pi Network khi được niêm yết trên Binance
+        ]
+        symbols = trading_symbols
         base_url = 'https://api.binance.com/api/v3/ticker/price'
         
         updated = False
