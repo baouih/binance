@@ -8,6 +8,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_socketio import SocketIO
 import eventlet
+from risk_config_manager import RiskConfigManager
 
 # Thiết lập logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -36,64 +37,8 @@ socketio = SocketIO(
     reconnection_delay_max=5000
 )
 
-# Các mức độ rủi ro
-RISK_LEVELS = {
-    'very_low': {
-        'name': 'Rất thấp',
-        'description': 'An toàn tối đa, lợi nhuận thấp',
-        'leverage': 1,
-        'position_size': 0.01,  # 1% tài khoản/lệnh
-        'stop_loss': 0.01,      # 1% stop loss
-        'take_profit': 0.02,    # 2% take profit
-        'max_positions': 3,      # Tối đa 3 lệnh cùng lúc
-        'risk_reward': 2.0,     # Tỷ lệ risk/reward
-        'daily_target': 0.005   # Target lợi nhuận ngày 0.5%
-    },
-    'low': {
-        'name': 'Thấp', 
-        'description': 'Rủi ro thấp, lợi nhuận ổn định',
-        'leverage': 2,
-        'position_size': 0.03,  # 3% tài khoản/lệnh
-        'stop_loss': 0.02,      # 2% stop loss
-        'take_profit': 0.04,    # 4% take profit
-        'max_positions': 4,      # Tối đa 4 lệnh cùng lúc
-        'risk_reward': 2.0,     # Tỷ lệ risk/reward
-        'daily_target': 0.01    # Target lợi nhuận ngày 1%
-    },
-    'medium': {
-        'name': 'Trung bình',
-        'description': 'Cân bằng giữa rủi ro và lợi nhuận',
-        'leverage': 5,
-        'position_size': 0.05,  # 5% tài khoản/lệnh
-        'stop_loss': 0.03,      # 3% stop loss 
-        'take_profit': 0.06,    # 6% take profit
-        'max_positions': 5,      # Tối đa 5 lệnh cùng lúc
-        'risk_reward': 2.0,     # Tỷ lệ risk/reward
-        'daily_target': 0.02    # Target lợi nhuận ngày 2%
-    },
-    'high': {
-        'name': 'Cao',
-        'description': 'Rủi ro cao, tiềm năng lợi nhuận lớn',
-        'leverage': 10,
-        'position_size': 0.10,  # 10% tài khoản/lệnh
-        'stop_loss': 0.05,      # 5% stop loss
-        'take_profit': 0.10,    # 10% take profit
-        'max_positions': 3,      # Tối đa 3 lệnh cùng lúc
-        'risk_reward': 2.0,     # Tỷ lệ risk/reward
-        'daily_target': 0.05    # Target lợi nhuận ngày 5%
-    },
-    'very_high': {
-        'name': 'Rất cao',
-        'description': 'Rủi ro rất cao, lợi nhuận tiềm năng rất lớn',
-        'leverage': 20,
-        'position_size': 0.20,  # 20% tài khoản/lệnh
-        'stop_loss': 0.10,      # 10% stop loss
-        'take_profit': 0.20,    # 20% take profit
-        'max_positions': 2,      # Tối đa 2 lệnh cùng lúc
-        'risk_reward': 2.0,     # Tỷ lệ risk/reward
-        'daily_target': 0.10    # Target lợi nhuận ngày 10%
-    }
-}
+# Khởi tạo risk manager
+risk_manager = RiskConfigManager()
 
 # Trạng thái kết nối và cấu hình
 connection_status = {
@@ -103,7 +48,8 @@ connection_status = {
     'initialized': False,
     'api_mode': 'testnet',
     'trading_type': 'futures',
-    'risk_level': 'medium',
+    'risk_profile': 'medium',
+    'max_account_risk': 25.0,  # % tài khoản tối đa có thể mất
     'telegram_enabled': False
 }
 
@@ -111,7 +57,9 @@ connection_status = {
 bot_status = {
     'running': False,
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'mode': 'testnet'
+    'mode': 'testnet',
+    'current_risk': 0.0,  # % rủi ro hiện tại của tài khoản
+    'risk_limit_reached': False
 }
 
 # Market data
@@ -129,7 +77,9 @@ account_data = {
     'equity': 0,
     'available': 0,
     'positions': [],
-    'last_updated': None
+    'last_updated': None,
+    'initial_balance': 0,  # Số dư ban đầu để tính % rủi ro
+    'current_drawdown': 0  # % giảm từ số dư cao nhất
 }
 
 # Danh sách thông báo
@@ -153,6 +103,33 @@ def add_message(content, level='info'):
             logger.error(f"Error emitting message: {str(e)}", exc_info=True)
     except Exception as e:
         logger.error(f"Error adding message: {str(e)}", exc_info=True)
+
+def check_risk_limits():
+    """Kiểm tra giới hạn rủi ro"""
+    try:
+        if not account_data['initial_balance']:
+            return False
+
+        current_equity = account_data['equity']
+        max_loss = account_data['initial_balance'] * (connection_status['max_account_risk'] / 100)
+        current_loss = account_data['initial_balance'] - current_equity
+
+        # Tính % rủi ro hiện tại
+        bot_status['current_risk'] = (current_loss / account_data['initial_balance']) * 100
+
+        # Kiểm tra nếu đạt giới hạn rủi ro
+        if current_loss >= max_loss:
+            bot_status['risk_limit_reached'] = True
+            if bot_status['running']:
+                add_message(f"Đã đạt giới hạn rủi ro {connection_status['max_account_risk']}% tài khoản!", "error")
+                add_message("Bot sẽ tự động dừng để bảo vệ tài khoản", "warning")
+                return True
+
+        return False
+
+    except Exception as e:
+        logger.error(f"Error checking risk limits: {str(e)}", exc_info=True)
+        return False
 
 def init_api_connection():
     """Khởi tạo kết nối API"""
@@ -193,16 +170,15 @@ def init_api_connection():
             # Cập nhật account data
             update_account_data(account)
 
-            risk_level = RISK_LEVELS[connection_status['risk_level']]
+            # Lấy cấu hình rủi ro hiện tại
+            risk_config = risk_manager.get_current_config()
+            risk_profile = risk_config.get('risk_profile', 'medium')
+
             add_message("Kết nối API thành công", "success")
             add_message(f"Chế độ: {connection_status['api_mode'].upper()}", "info")
             add_message(f"Loại giao dịch: {connection_status['trading_type'].upper()}", "info")
-            add_message(f"Mức độ rủi ro: {risk_level['name']}", "info")
-            add_message(f"Đòn bẩy: {risk_level['leverage']}x", "info")
-            add_message(f"Vốn mỗi lệnh: {risk_level['position_size']*100}% tài khoản", "info")
-            add_message(f"Stop loss: {risk_level['stop_loss']*100}%", "info")
-            add_message(f"Take profit: {risk_level['take_profit']*100}%", "info")
-            add_message(f"Số lệnh tối đa: {risk_level['max_positions']}", "info")
+            add_message(f"Hồ sơ rủi ro: {risk_profile.upper()}", "info")
+            add_message(f"Giới hạn rủi ro: {connection_status['max_account_risk']}% tài khoản", "info")
 
             return True
 
@@ -221,6 +197,10 @@ def update_account_data(account_info):
             # Update futures account data
             for asset in account_info.get('assets', []):
                 if asset.get('asset') == 'USDT':
+                    # Cập nhật số dư ban đầu nếu chưa có
+                    if not account_data['initial_balance']:
+                        account_data['initial_balance'] = float(asset.get('walletBalance', 0))
+
                     account_data.update({
                         'balance': float(asset.get('walletBalance', 0)),
                         'equity': float(asset.get('marginBalance', 0)),
@@ -229,14 +209,29 @@ def update_account_data(account_info):
                     break
         else:
             # Update spot account data  
+            balance = float(account_info.get('totalAssetOfBtc', 0))
+            # Cập nhật số dư ban đầu nếu chưa có
+            if not account_data['initial_balance']:
+                account_data['initial_balance'] = balance
+
             account_data.update({
-                'balance': float(account_info.get('totalAssetOfBtc', 0)),
-                'equity': float(account_info.get('totalAssetOfBtc', 0)),
+                'balance': balance,
+                'equity': balance,
                 'available': float(account_info.get('availableAsset', 0)),
             })
 
+        # Tính drawdown
+        if account_data['initial_balance'] > 0:
+            account_data['current_drawdown'] = ((account_data['initial_balance'] - account_data['equity']) / account_data['initial_balance']) * 100
+
         account_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         socketio.emit('account_update', account_data)
+
+        # Kiểm tra giới hạn rủi ro
+        if check_risk_limits() and bot_status['running']:
+            # Tự động dừng bot nếu đạt giới hạn
+            bot_status['running'] = False
+            socketio.emit('bot_status_update', bot_status)
 
     except Exception as e:
         logger.error(f"Error updating account data: {str(e)}", exc_info=True)
@@ -251,7 +246,9 @@ def index():
             'is_connected': connection_status['is_connected'],
             'is_authenticated': connection_status['is_authenticated'],
             'trading_type': connection_status['trading_type'],
-            'risk_level': connection_status['risk_level'],
+            'risk_profile': connection_status['risk_profile'],
+            'max_account_risk': connection_status['max_account_risk'],
+            'current_risk': bot_status['current_risk'],
             'telegram_enabled': connection_status['telegram_enabled']
         }
 
@@ -326,12 +323,18 @@ def control_bot():
                 'message': f'Hành động không hợp lệ: {action}'
             }), 400
 
+        # Kiểm tra giới hạn rủi ro trước khi start
+        if action == 'start' and bot_status['risk_limit_reached']:
+            return jsonify({
+                'success': False,
+                'message': 'Không thể khởi động bot: Đã đạt giới hạn rủi ro'
+            }), 400
+
         if action == 'start':
             bot_status['running'] = True
             add_message('Bot đã được khởi động', 'success')
             add_message('Đang phân tích thị trường...', 'info')
-            add_message(f'Mức độ rủi ro: {RISK_LEVELS[connection_status["risk_level"]]["name"]}', 'info')
-            add_message(f'Đòn bẩy: {RISK_LEVELS[connection_status["risk_level"]]["leverage"]}x', 'info')
+            add_message(f'Giới hạn rủi ro: {connection_status["max_account_risk"]}% tài khoản', 'info')
             add_message('Bot đang theo dõi các cặp tiền: BTCUSDT, ETHUSDT, SOLUSDT', 'info')
             add_message('Đang chờ tín hiệu giao dịch...', 'info')
         else:
@@ -397,21 +400,32 @@ def update_config():
                 }), 400
             connection_status['trading_type'] = config['trading_type']
 
-        if 'risk_level' in config:
-            if config['risk_level'] not in RISK_LEVELS:
+        if 'risk_profile' in config:
+            # Sử dụng RiskConfigManager để validate và set risk profile
+            if not risk_manager.set_risk_profile(config['risk_profile']):
                 return jsonify({
                     'success': False,
-                    'message': 'Mức độ rủi ro không hợp lệ'
+                    'message': 'Hồ sơ rủi ro không hợp lệ'
                 }), 400
-            connection_status['risk_level'] = config['risk_level']
+            connection_status['risk_profile'] = config['risk_profile']
+
+        if 'max_account_risk' in config:
+            max_risk = float(config['max_account_risk'])
+            if not (0 < max_risk <= 100):
+                return jsonify({
+                    'success': False,
+                    'message': 'Giới hạn rủi ro phải từ 0-100%'
+                }), 400
+            connection_status['max_account_risk'] = max_risk
 
         # Save config to file
         try:
             with open('bot_config.json', 'w') as f:
                 json.dump({
                     'api_mode': connection_status['api_mode'],
-                    'trading_type': connection_status['trading_type'], 
-                    'risk_level': connection_status['risk_level']
+                    'trading_type': connection_status['trading_type'],
+                    'risk_profile': connection_status['risk_profile'],
+                    'max_account_risk': connection_status['max_account_risk']
                 }, f)
         except Exception as e:
             logger.error(f"Error saving config file: {str(e)}", exc_info=True)
@@ -432,7 +446,8 @@ def update_config():
             'config': {
                 'api_mode': connection_status['api_mode'],
                 'trading_type': connection_status['trading_type'],
-                'risk_level': connection_status['risk_level'],
+                'risk_profile': connection_status['risk_profile'],
+                'max_account_risk': connection_status['max_account_risk'],
                 'is_connected': connection_status['is_connected']
             }
         })
