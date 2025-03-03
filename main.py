@@ -185,6 +185,18 @@ def get_bot_status():
     if 'api_mode' in session:
         bot_status['mode'] = session['api_mode']
     
+    # Kiểm tra xem có bot nào đang chạy không
+    try:
+        from bot_api_routes import load_bots_config
+        bots = load_bots_config()
+        if bots:
+            # Nếu có bot và bot đầu tiên đang chạy, cập nhật trạng thái
+            first_bot = bots[0]
+            bot_status['status'] = first_bot.get('status', 'stopped')
+            bot_status['last_updated'] = first_bot.get('last_update', bot_status['last_updated'])
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
+    
     return jsonify(bot_status)
 
 @app.route('/api/account')

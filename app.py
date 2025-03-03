@@ -1702,52 +1702,7 @@ def test_telegram():
         })
 
 
-@app.route('/api/bot/control', methods=['POST'])
-def bot_control():
-    """Điều khiển bot (start/stop/restart)"""
-    try:
-        data = request.json
-        action = data.get('action', '')
-        strategy_mode = data.get('strategy_mode', 'auto')  # 'auto' hoặc 'manual'
-        
-        # Cập nhật BOT_STATUS từ cấu hình hiện tại
-        BOT_STATUS.update(get_bot_status_from_config())
-        
-        # Xác định mode hiện tại từ cấu hình
-        mode = BOT_STATUS.get('mode', 'testnet')  # Mặc định testnet nếu không tìm thấy
-        
-        logger.info(f"Bot control: action={action}, strategy_mode={strategy_mode}, mode={mode}")
-    except Exception as e:
-        logger.error(f"Lỗi trong bot_control: {str(e)}")
-        # Trả về thành công luôn, bất kể lỗi gì
-        return jsonify({"success": True, "message": "Bot đã được điều khiển thành công"})
-    
-    if action == 'start':
-        BOT_STATUS['running'] = True
-        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        BOT_STATUS['strategy_mode'] = strategy_mode
-        logger.info(f"Bot đã được khởi động với chế độ chiến lược: {strategy_mode}")
-        return jsonify({
-            'success': True, 
-            'message': f'Bot đã được khởi động với chế độ {strategy_mode}'
-        })
-    
-    elif action == 'stop':
-        BOT_STATUS['running'] = False
-        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logger.info("Bot đã dừng")
-        return jsonify({'success': True, 'message': 'Bot đã dừng'})
-    
-    elif action == 'restart':
-        BOT_STATUS['running'] = True
-        BOT_STATUS['last_update'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        BOT_STATUS['strategy_mode'] = strategy_mode
-        logger.info(f"Bot đã được khởi động lại với chế độ chiến lược: {strategy_mode}")
-        return jsonify({
-            'success': True, 
-            'message': f'Bot đã được khởi động lại với chế độ {strategy_mode}'
-        })
-    
+# Route /api/bot/control đã được chuyển sang blueprint bot_api_routes.py
     elif action == 'switch_mode':
         BOT_STATUS['strategy_mode'] = strategy_mode
         logger.info(f"Đã chuyển chế độ chiến lược sang: {strategy_mode}")
