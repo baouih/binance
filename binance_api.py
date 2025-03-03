@@ -36,6 +36,10 @@ class BinanceAPI:
         import json
         import os.path
         
+        # Khởi tạo các thuộc tính mặc định
+        self.testnet = testnet
+        self.account_type = 'spot'  # Mặc định là spot
+        
         try:
             # Tìm đường dẫn account_config.json
             account_config_path = 'account_config.json'
@@ -46,6 +50,7 @@ class BinanceAPI:
                 with open(account_config_path, 'r') as f:
                     config = json.load(f)
                     config_mode = config.get('api_mode', '').lower()
+                    self.account_type = config.get('account_type', 'spot').lower()
                     
                     # api_mode trong config quyết định chế độ testnet
                     if config_mode == 'testnet':
@@ -53,17 +58,15 @@ class BinanceAPI:
                     elif config_mode == 'live':
                         self.testnet = False
                     else:
-                        # Giữ giá trị từ tham số
-                        self.testnet = testnet
+                        # Giữ giá trị từ tham số nhưng vẫn log
+                        logger.warning(f"Giá trị api_mode '{config_mode}' không hợp lệ trong config, sử dụng giá trị mặc định")
                         
-                logger.info(f"Đã tải cấu hình tài khoản từ {account_config_path}, chế độ API: {config_mode}")
+                logger.info(f"Đã tải cấu hình tài khoản từ {account_config_path}, chế độ API: {config_mode}, loại tài khoản: {self.account_type}")
             else:
                 logger.warning(f"Không tìm thấy file cấu hình tài khoản, sử dụng chế độ mặc định: {'testnet' if testnet else 'live'}")
-                self.testnet = testnet
                 
         except Exception as e:
             logger.warning(f"Lỗi khi tải cấu hình tài khoản, sử dụng cấu hình mặc định: {str(e)}")
-            self.testnet = testnet
         
         # Log trạng thái môi trường
         if self.testnet:
@@ -75,23 +78,31 @@ class BinanceAPI:
         self.api_key = api_key or os.environ.get('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.environ.get('BINANCE_API_SECRET', '')
         
+        # Kiểm tra API keys
+        if self.testnet and (not self.api_key or not self.api_secret):
+            logger.warning("CẢNH BÁO: API keys trống hoặc không hợp lệ cho chế độ testnet. Một số chức năng có thể không hoạt động.")
+        
         # Endpoint URLs tương ứng với loại tài khoản và môi trường
         if self.testnet:
             # URLs cho Testnet
-            if account_type == 'futures':
+            if self.account_type == 'futures':
                 self.base_url = 'https://testnet.binancefuture.com/fapi'
                 self.stream_url = 'wss://stream.binancefuture.com/ws'
+                logger.info("Sử dụng endpoints Binance Futures Testnet")
             else:  # Spot
                 self.base_url = 'https://testnet.binance.vision/api'
                 self.stream_url = 'wss://testnet.binance.vision/ws'
+                logger.info("Sử dụng endpoints Binance Spot Testnet")
         else:
             # URLs cho Mainnet (thực tế)
-            if account_type == 'futures':
+            if self.account_type == 'futures':
                 self.base_url = 'https://fapi.binance.com/fapi'
                 self.stream_url = 'wss://fstream.binance.com/ws'
+                logger.info("Sử dụng endpoints Binance Futures Mainnet")
             else:  # Spot
                 self.base_url = 'https://api.binance.com/api'
                 self.stream_url = 'wss://stream.binance.com:9443/ws'
+                logger.info("Sử dụng endpoints Binance Spot Mainnet")
             
         self.session = requests.Session()
         self.session.headers.update({
@@ -746,6 +757,11 @@ class BinanceAPI:
         Returns:
             List[Dict]: Thông tin rủi ro vị thế
         """
+        # Nếu không có API key hoặc API secret, trả về dữ liệu giả lập
+        if not self.api_key or not self.api_secret:
+            logger.warning("Không có API keys, sử dụng dữ liệu giả lập cho vị thế futures")
+            return self._generate_demo_positions()
+            
         try:
             params = {}
             if symbol:
@@ -753,20 +769,42 @@ class BinanceAPI:
             
             if self.testnet:
                 try:
-                    return self._request('GET', 'positionRisk', params, signed=True, version='v1')
+                    logger.info("Gửi yêu cầu đến Binance Testnet Futures API (positionRisk)")
+                    positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v2')
+                    
+                    # Kiểm tra xem dữ liệu trả về có phải là lỗi không
+                    if positions_data and not positions_data.get('error'):
+                        logger.info(f"Đã lấy thông tin vị thế từ Testnet Futures API: {len(positions_data) if isinstance(positions_data, list) else 'Không phải danh sách'}")
+                        return positions_data
+                    else:
+                        logger.warning(f"Lỗi từ Testnet Futures API: {positions_data.get('error') if positions_data else 'Không có dữ liệu'}")
+                        
                 except Exception as e1:
-                    logging.error(f"Lỗi khi truy vấn testnet futures v1 API positionRisk: {str(e1)}")
+                    logger.error(f"Lỗi khi truy vấn testnet futures v2 API positionRisk: {str(e1)}")
+                    
                     try:
-                        return self._request('GET', 'positionRisk', params, signed=True, version='v2')
+                        logger.info("Thử lại với Binance Testnet Futures API v1 (positionRisk)")
+                        positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v1')
+                        
+                        if positions_data and not positions_data.get('error'):
+                            logger.info("Đã lấy thông tin vị thế từ Testnet Futures API v1")
+                            return positions_data
+                        else:
+                            logger.warning(f"Lỗi từ Testnet Futures API v1: {positions_data.get('error') if positions_data else 'Không có dữ liệu'}")
+                            
                     except Exception as e2:
-                        logging.error(f"Lỗi khi truy vấn testnet futures v2 API positionRisk: {str(e2)}")
-                        # Trả về dữ liệu giả lập cho testnet nếu không lấy được dữ liệu thực
-                        return self._generate_demo_positions()
+                        logger.error(f"Lỗi khi truy vấn testnet futures v1 API positionRisk: {str(e2)}")
+                        
+                # Trả về dữ liệu giả lập nếu cả hai phiên bản API đều không hoạt động
+                logger.warning("Không thể kết nối đến Binance Testnet Futures API, chuyển sang sử dụng dữ liệu giả lập")
+                return self._generate_demo_positions()
             else:
-                # Mainnet API
+                # Mainnet API (thực tế)
+                logger.info("Gửi yêu cầu đến Binance Mainnet Futures API (positionRisk)")
                 return self._request('GET', 'positionRisk', params, signed=True, version='v2')
         except Exception as e:
-            logging.error(f"Lỗi khi lấy thông tin vị thế futures: {str(e)}")
+            logger.error(f"Lỗi khi lấy thông tin vị thế futures: {str(e)}")
+            logger.warning("Sử dụng dữ liệu giả lập do không thể kết nối đến Binance API")
             # Trả về dữ liệu giả lập nếu có lỗi
             return self._generate_demo_positions()
     
