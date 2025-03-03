@@ -84,6 +84,17 @@ telegram_config = {
     'min_interval': 5  # Khoảng thời gian tối thiểu giữa các tin nhắn (giây)
 }
 
+# Thông tin phân tích tiền điện tử
+crypto_analysis = {
+    'entry_points': {},   # Điểm vào lệnh cho từng đồng tiền
+    'strengths': {},      # Độ mạnh tín hiệu theo thang điểm 0-10
+    'trends': {},         # Xu hướng hiện tại (uptrend, downtrend, sideway)
+    'liquidity': {},      # Thanh khoản (volume giao dịch 24h)
+    'stability': {},      # Độ ổn định (biến động giá trung bình)
+    'tradable': {},       # Các đồng đủ điều kiện để giao dịch
+    'last_analyzed': None # Thời gian phân tích gần nhất
+}
+
 # Danh sách thông báo
 messages = []
 
@@ -185,6 +196,109 @@ def check_risk_limits():
         logger.error(f"Error checking risk limits: {str(e)}", exc_info=True)
         return False
 
+def analyze_liquidity(force_analyze=False):
+    """
+    Phân tích thanh khoản và độ ổn định của các đồng tiền để lựa chọn những đồng phù hợp giao dịch
+    
+    Args:
+        force_analyze (bool): Bắt buộc phân tích lại ngay cả khi đã phân tích gần đây
+        
+    Returns:
+        bool: True nếu phân tích thành công, False nếu không
+    """
+    try:
+        # Kiểm tra xem có cần phân tích lại không
+        if not force_analyze and crypto_analysis['last_analyzed']:
+            last_analyzed_time = datetime.fromisoformat(crypto_analysis['last_analyzed'])
+            time_since_analysis = (datetime.now() - last_analyzed_time).total_seconds() / 60
+            
+            # Chỉ phân tích lại sau mỗi 60 phút
+            if time_since_analysis < 60:
+                logger.debug(f"Skipping liquidity analysis, last analyzed {time_since_analysis:.1f} minutes ago")
+                return True
+        
+        # Danh sách các cặp cần phân tích
+        trading_symbols = [
+            'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 
+            'DOGEUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT',
+            'LINKUSDT', 'LTCUSDT', 'UNIUSDT', 'NEARUSDT', 'APTUSDT',
+            'OPUSDT', 'ARBUSDT', 'SUIUSDT', 'FILUSDT', 'ATOMUSDT'
+        ]
+        
+        # Lấy thông tin 24h ticker cho tất cả các cặp
+        ticker_url = "https://api.binance.com/api/v3/ticker/24hr"
+        logger.debug("Fetching 24h ticker data for all symbols...")
+        
+        try:
+            response = requests.get(ticker_url)
+            if response.status_code != 200:
+                logger.error(f"Error fetching 24h ticker: {response.status_code} - {response.text}")
+                return False
+            
+            all_tickers = response.json()
+            
+            # Lọc những ticker chúng ta quan tâm
+            our_tickers = [t for t in all_tickers if t.get('symbol') in trading_symbols]
+            
+            # Sắp xếp theo khối lượng giao dịch (đơn vị USD)
+            sorted_by_volume = sorted(our_tickers, key=lambda x: float(x.get('quoteVolume', 0)), reverse=True)
+            
+            # Lưu thông tin thanh khoản và độ ổn định
+            min_tradable_volume = 50000000  # 50 triệu USD khối lượng tối thiểu để giao dịch
+            tradable_symbols = []
+            
+            for ticker in sorted_by_volume:
+                symbol = ticker.get('symbol')
+                symbol_base = symbol.replace('USDT', '')
+                
+                # Tính toán các chỉ số
+                volume_24h = float(ticker.get('quoteVolume', 0))  # Khối lượng trong 24h tính theo USD
+                price_change_pct = float(ticker.get('priceChangePercent', 0))  # % thay đổi giá
+                price = float(ticker.get('lastPrice', 0))
+                count = int(ticker.get('count', 0))  # Số lượng giao dịch
+                
+                # Tính độ ổn định (giá trị thấp hơn = ổn định hơn)
+                stability = abs(price_change_pct)
+                
+                # Lưu thông tin
+                crypto_analysis['liquidity'][symbol] = volume_24h
+                crypto_analysis['stability'][symbol] = stability
+                
+                # Quyết định xem đồng này có đủ thanh khoản để giao dịch không
+                is_tradable = volume_24h >= min_tradable_volume and count > 10000
+                crypto_analysis['tradable'][symbol] = is_tradable
+                
+                if is_tradable:
+                    tradable_symbols.append(symbol)
+                
+                logger.debug(
+                    f"{symbol_base}: Volume=${volume_24h/1000000:.1f}M, Change={price_change_pct:.2f}%, "
+                    f"Trades={count}, Tradable={is_tradable}"
+                )
+            
+            # Cập nhật thời gian phân tích
+            crypto_analysis['last_analyzed'] = datetime.now().isoformat()
+            
+            # Thông báo tóm tắt
+            if tradable_symbols:
+                tradable_msg = f"Có {len(tradable_symbols)} đồng đủ thanh khoản để giao dịch: {', '.join([s.replace('USDT', '') for s in tradable_symbols[:5]])}"
+                if len(tradable_symbols) > 5:
+                    tradable_msg += f" và {len(tradable_symbols) - 5} đồng khác"
+                add_message(tradable_msg, "info", send_to_telegram=True)
+            else:
+                add_message("Không có đồng nào đủ thanh khoản để giao dịch!", "warning", send_to_telegram=True)
+            
+            logger.info(f"Liquidity analysis completed. Found {len(tradable_symbols)} tradable symbols.")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error during liquidity analysis: {str(e)}", exc_info=True)
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error in analyze_liquidity: {str(e)}", exc_info=True)
+        return False
+
 def update_market_prices():
     """Lấy giá thị trường thực từ Binance API"""
     try:
@@ -197,7 +311,22 @@ def update_market_prices():
             'OPUSDT', 'ARBUSDT', 'SUIUSDT', 'FILUSDT', 'ATOMUSDT'
             # 'PIUSDT'  # Sẽ thêm Pi Network khi được niêm yết trên Binance
         ]
-        symbols = trading_symbols
+        
+        # Lọc chỉ những đồng được phân tích là có thanh khoản tốt, nếu đã phân tích
+        if crypto_analysis['tradable'] and not connection_status['trading_type'] == 'spot':
+            tradable_symbols = [symbol for symbol, is_tradable in crypto_analysis['tradable'].items() if is_tradable]
+            if tradable_symbols:
+                # Nếu có các đồng được đánh dấu là có thanh khoản tốt, chỉ tập trung vào chúng
+                symbols = tradable_symbols
+                logger.debug(f"Using {len(symbols)} tradable symbols for price update")
+            else:
+                # Nếu không có đồng nào đủ thanh khoản, vẫn theo dõi tất cả
+                symbols = trading_symbols
+                logger.debug("No tradable symbols found, using all trading symbols for price update")
+        else:
+            # Nếu chưa phân tích hoặc tài khoản spot, sử dụng tất cả
+            symbols = trading_symbols
+        
         base_url = 'https://api.binance.com/api/v3/ticker/price'
         
         updated = False
