@@ -156,73 +156,196 @@ function updateConnectionStatus(connected) {
     const statusHeading = document.getElementById('bot-status-heading');
     const statusText = document.getElementById('bot-status-text');
     const statusIcon = document.getElementById('bot-status-icon');
-    
+    const connectionDot = document.getElementById('connection-status-dot');
+
     if (connected) {
-        statusAlert.className = 'alert alert-success';
-        statusIcon.innerHTML = '<i class="fas fa-circle-notch fa-spin fa-2x"></i>';
+        statusAlert.className = 'alert alert-success d-flex align-items-center';
+        statusIcon.innerHTML = '<i class="fas fa-circle-notch fa-spin fa-2x me-2"></i>';
         statusHeading.textContent = 'Đã kết nối với bot';
         statusText.textContent = 'Bot đang theo dõi thị trường và cập nhật dữ liệu trong thời gian thực.';
+        if (connectionDot) {
+            connectionDot.className = 'status-dot status-dot-connected';
+            connectionDot.title = 'Đã kết nối';
+        }
     } else {
-        statusAlert.className = 'alert alert-warning';
-        statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle fa-2x"></i>';
+        statusAlert.className = 'alert alert-warning d-flex align-items-center';
+        statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle fa-2x me-2"></i>';
         statusHeading.textContent = 'Mất kết nối với bot';
         statusText.textContent = 'Đang cố gắng kết nối lại. Một số dữ liệu có thể không được cập nhật.';
+        if (connectionDot) {
+            connectionDot.className = 'status-dot status-dot-disconnected';
+            connectionDot.title = 'Mất kết nối';
+        }
     }
 }
 
 // Cập nhật trạng thái bot
 function updateBotStatus(data) {
-    // Cập nhật trạng thái chung
     const statusAlert = document.getElementById('bot-status-alert');
     const statusHeading = document.getElementById('bot-status-heading');
     const statusText = document.getElementById('bot-status-text');
     const statusIcon = document.getElementById('bot-status-icon');
-    
+    const riskLevel = document.getElementById('risk-level');
+    const riskDescription = document.getElementById('risk-description');
+
+    // Update risk level display if available
+    if (data.risk_profile) {
+        const riskProfiles = {
+            'very_low': { color: 'success', text: 'Rất thấp (5-10%)', description: 'Chiến lược giao dịch cực kỳ thận trọng' },
+            'low': { color: 'info', text: 'Thấp (10-15%)', description: 'Chiến lược giao dịch thận trọng' },
+            'medium': { color: 'warning', text: 'Vừa phải (20-30%)', description: 'Chiến lược giao dịch cân bằng' },
+            'high': { color: 'orange', text: 'Cao (30-50%)', description: 'Chiến lược giao dịch mạo hiểm' },
+            'very_high': { color: 'danger', text: 'Rất cao (50-70%)', description: 'Chiến lược giao dịch cực kỳ mạo hiểm' }
+        };
+
+        const profile = riskProfiles[data.risk_profile] || riskProfiles.medium;
+        if (riskLevel) {
+            riskLevel.className = `badge bg-${profile.color}`;
+            riskLevel.textContent = profile.text;
+        }
+        if (riskDescription) {
+            riskDescription.textContent = profile.description;
+        }
+    }
+
+    // Add mini charts if available
+    if (data.price_data) {
+        updateMiniCharts(data.price_data);
+    }
+
     if (data.status === 'running') {
-        statusAlert.className = 'alert alert-success';
-        statusIcon.innerHTML = '<i class="fas fa-circle-notch fa-spin fa-2x"></i>';
+        statusAlert.className = 'alert alert-success d-flex align-items-center';
+        statusIcon.innerHTML = '<i class="fas fa-circle-notch fa-spin fa-2x me-2"></i>';
         statusHeading.textContent = 'Bot đang hoạt động';
-        statusText.textContent = 'Bot đang tích cực phân tích thị trường và tìm kiếm cơ hội giao dịch.';
-        
-        // Ẩn nút khởi động, hiện nút dừng
+        statusText.innerHTML = `
+            Bot đang tích cực theo dõi thị trường<br>
+            <small class="text-muted">
+                Cập nhật lần cuối: ${new Date().toLocaleTimeString()}
+            </small>
+        `;
+
         document.getElementById('start-bot-btn').classList.add('d-none');
         document.getElementById('stop-bot-btn').classList.remove('d-none');
     } else if (data.status === 'stopped') {
-        statusAlert.className = 'alert alert-secondary';
-        statusIcon.innerHTML = '<i class="fas fa-stop-circle fa-2x"></i>';
+        statusAlert.className = 'alert alert-secondary d-flex align-items-center';
+        statusIcon.innerHTML = '<i class="fas fa-stop-circle fa-2x me-2"></i>';
         statusHeading.textContent = 'Bot đã dừng';
-        statusText.textContent = 'Bot hiện đang không hoạt động. Nhấn "Khởi động bot" để bắt đầu giao dịch.';
-        
-        // Hiện nút khởi động, ẩn nút dừng
+        statusText.innerHTML = `
+            Bot hiện đang không hoạt động<br>
+            <small class="text-muted">
+                Nhấn "Khởi động bot" để bắt đầu giao dịch
+            </small>
+        `;
+
         document.getElementById('start-bot-btn').classList.remove('d-none');
         document.getElementById('stop-bot-btn').classList.add('d-none');
-    } else if (data.status === 'restarting') {
-        statusAlert.className = 'alert alert-warning';
-        statusIcon.innerHTML = '<i class="fas fa-sync fa-spin fa-2x"></i>';
-        statusHeading.textContent = 'Bot đang khởi động lại';
-        statusText.textContent = 'Bot đang được khởi động lại. Vui lòng đợi trong giây lát...';
-        
-        // Ẩn cả hai nút
-        document.getElementById('start-bot-btn').classList.add('d-none');
-        document.getElementById('stop-bot-btn').classList.add('d-none');
     } else if (data.status === 'error') {
-        statusAlert.className = 'alert alert-danger';
-        statusIcon.innerHTML = '<i class="fas fa-exclamation-circle fa-2x"></i>';
+        statusAlert.className = 'alert alert-danger d-flex align-items-center';
+        statusIcon.innerHTML = '<i class="fas fa-exclamation-circle fa-2x me-2"></i>';
         statusHeading.textContent = 'Bot gặp lỗi';
-        statusText.textContent = data.message || 'Bot gặp lỗi khi hoạt động. Vui lòng kiểm tra nhật ký để biết thêm chi tiết.';
-        
-        // Hiện nút khởi động lại, ẩn các nút khác
+        statusText.innerHTML = `
+            ${data.message || 'Bot gặp lỗi khi hoạt động'}<br>
+            <small class="text-muted">
+                Vui lòng kiểm tra nhật ký để biết thêm chi tiết
+            </small>
+        `;
+
         document.getElementById('start-bot-btn').classList.add('d-none');
         document.getElementById('stop-bot-btn').classList.add('d-none');
         document.getElementById('restart-bot-btn').classList.remove('d-none');
     }
-    
-    // Cập nhật thống kê bot
+
+    // Update statistics with animations
     if (data.stats) {
-        document.getElementById('bot-uptime').textContent = data.stats.uptime || '--';
-        document.getElementById('analysis-count').textContent = data.stats.analyses || '--';
-        document.getElementById('decision-count').textContent = data.stats.decisions || '--';
-        document.getElementById('order-count').textContent = data.stats.orders || '--';
+        animateValue('bot-uptime', data.stats.uptime || '--');
+        animateValue('analysis-count', data.stats.analyses || '--');
+        animateValue('decision-count', data.stats.decisions || '--');
+        animateValue('order-count', data.stats.orders || '--');
+
+        // Update performance metrics if available
+        if (data.stats.performance) {
+            updatePerformanceMetrics(data.stats.performance);
+        }
+    }
+}
+
+// Add new function for performance metrics
+function updatePerformanceMetrics(performance) {
+    const metrics = {
+        'total-pnl': performance.total_pnl || 0,
+        'win-rate': performance.win_rate || 0,
+        'avg-profit': performance.avg_profit || 0,
+        'max-drawdown': performance.max_drawdown || 0
+    };
+
+    Object.entries(metrics).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const isPositive = value > 0;
+            const formattedValue = typeof value === 'number' ? 
+                (id === 'win-rate' ? `${value.toFixed(1)}%` : `$${Math.abs(value).toFixed(2)}`) :
+                value.toString();
+
+            element.innerHTML = `
+                <span class="text-${isPositive ? 'success' : 'danger'}">
+                    ${isPositive ? '+' : '-'}${formattedValue}
+                </span>
+            `;
+        }
+    });
+}
+
+// Add new function for mini charts
+function updateMiniCharts(priceData) {
+    Object.entries(priceData).forEach(([symbol, data]) => {
+        const chartId = `${symbol.toLowerCase()}-mini-chart`;
+        const canvas = document.getElementById(chartId);
+
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.timestamps,
+                    datasets: [{
+                        data: data.prices,
+                        borderColor: data.trend === 'up' ? '#28a745' : '#dc3545',
+                        borderWidth: 1,
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Add new function for value animation
+function animateValue(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    if (typeof value === 'number') {
+        const start = parseInt(element.textContent) || 0;
+        const duration = 1000;
+        const step = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = Math.min((timestamp - start) / duration, 1);
+            element.textContent = Math.floor(progress * (value - start) + start);
+            if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    } else {
+        element.textContent = value;
     }
 }
 
