@@ -426,6 +426,10 @@ def close_position(position_id):
         data = request.get_json() or {}
         close_price = data.get('close_price')  # None nếu không được cung cấp
         
+        # Đảm bảo close_price là số nếu được cung cấp
+        if close_price is not None:
+            close_price = float(close_price)
+            
         result = position_manager.close_position(position_id, close_price)
         
         if not result.get('success', False):
