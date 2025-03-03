@@ -72,7 +72,16 @@ account_data = {
     'initial_balance': 0,
     'current_drawdown': 0,
     'profit_history': [],  # Lịch sử lợi nhuận theo thời gian
-    'position_history': []  # Lịch sử vị thế đã đóng
+    'position_history': [], # Lịch sử vị thế đã đóng
+    'performance': {
+        'daily': {'profit_loss': 0, 'percent': 0, 'start_balance': 0, 'updated': None},
+        'weekly': {'profit_loss': 0, 'percent': 0, 'start_balance': 0, 'updated': None},
+        'monthly': {'profit_loss': 0, 'percent': 0, 'start_balance': 0, 'updated': None},
+        'total': {'profit_loss': 0, 'percent': 0, 'start_balance': 0}
+    },
+    'wins': 0,
+    'losses': 0,
+    'win_rate': 0
 }
 
 # Cấu hình Telegram
@@ -178,6 +187,99 @@ def add_message(content, level='info', send_to_telegram=False):
         
     except Exception as e:
         logger.error(f"Error adding message: {str(e)}", exc_info=True)
+
+def update_performance_data():
+    """Cập nhật dữ liệu hiệu suất theo thời gian"""
+    try:
+        # Lấy thời gian hiện tại
+        now = datetime.now()
+        current_date = now.strftime('%Y-%m-%d')
+        
+        # Cập nhật hiệu suất trong ngày
+        if not account_data['performance']['daily']['updated'] or \
+           not current_date in account_data['performance']['daily']['updated']:
+            # Bắt đầu ngày mới, cập nhật số dư đầu ngày
+            account_data['performance']['daily']['start_balance'] = account_data['balance']
+            account_data['performance']['daily']['updated'] = current_date
+            account_data['performance']['daily']['profit_loss'] = 0
+            account_data['performance']['daily']['percent'] = 0
+            logger.info(f"Cập nhật số dư đầu ngày: {account_data['balance']}")
+        else:
+            # Tính lợi nhuận trong ngày
+            daily_pl = account_data['balance'] - account_data['performance']['daily']['start_balance']
+            daily_pct = 0
+            if account_data['performance']['daily']['start_balance'] > 0:
+                daily_pct = (daily_pl / account_data['performance']['daily']['start_balance']) * 100
+            
+            account_data['performance']['daily']['profit_loss'] = daily_pl
+            account_data['performance']['daily']['percent'] = daily_pct
+        
+        # Cập nhật hiệu suất tuần (bắt đầu từ thứ Hai)
+        current_weekday = now.weekday()  # 0 = thứ Hai, 6 = Chủ nhật
+        week_start = (now - timedelta(days=current_weekday)).strftime('%Y-%m-%d')
+        
+        if not account_data['performance']['weekly']['updated'] or \
+           account_data['performance']['weekly']['updated'] != week_start:
+            # Bắt đầu tuần mới
+            account_data['performance']['weekly']['start_balance'] = account_data['balance']
+            account_data['performance']['weekly']['updated'] = week_start
+            account_data['performance']['weekly']['profit_loss'] = 0
+            account_data['performance']['weekly']['percent'] = 0
+            logger.info(f"Cập nhật số dư đầu tuần: {account_data['balance']}")
+        else:
+            # Tính lợi nhuận trong tuần
+            weekly_pl = account_data['balance'] - account_data['performance']['weekly']['start_balance']
+            weekly_pct = 0
+            if account_data['performance']['weekly']['start_balance'] > 0:
+                weekly_pct = (weekly_pl / account_data['performance']['weekly']['start_balance']) * 100
+            
+            account_data['performance']['weekly']['profit_loss'] = weekly_pl
+            account_data['performance']['weekly']['percent'] = weekly_pct
+        
+        # Cập nhật hiệu suất tháng
+        current_month = now.strftime('%Y-%m')
+        month_start = f"{current_month}-01"
+        
+        if not account_data['performance']['monthly']['updated'] or \
+           not account_data['performance']['monthly']['updated'].startswith(current_month):
+            # Bắt đầu tháng mới
+            account_data['performance']['monthly']['start_balance'] = account_data['balance']
+            account_data['performance']['monthly']['updated'] = month_start
+            account_data['performance']['monthly']['profit_loss'] = 0
+            account_data['performance']['monthly']['percent'] = 0
+            logger.info(f"Cập nhật số dư đầu tháng: {account_data['balance']}")
+        else:
+            # Tính lợi nhuận trong tháng
+            monthly_pl = account_data['balance'] - account_data['performance']['monthly']['start_balance']
+            monthly_pct = 0
+            if account_data['performance']['monthly']['start_balance'] > 0:
+                monthly_pct = (monthly_pl / account_data['performance']['monthly']['start_balance']) * 100
+            
+            account_data['performance']['monthly']['profit_loss'] = monthly_pl
+            account_data['performance']['monthly']['percent'] = monthly_pct
+        
+        # Cập nhật hiệu suất tổng cộng
+        if account_data['performance']['total']['start_balance'] == 0:
+            account_data['performance']['total']['start_balance'] = account_data['initial_balance']
+        
+        total_pl = account_data['balance'] - account_data['performance']['total']['start_balance']
+        total_pct = 0
+        if account_data['performance']['total']['start_balance'] > 0:
+            total_pct = (total_pl / account_data['performance']['total']['start_balance']) * 100
+        
+        account_data['performance']['total']['profit_loss'] = total_pl
+        account_data['performance']['total']['percent'] = total_pct
+        
+        # Cập nhật tỷ lệ thắng/thua
+        total_trades = account_data['wins'] + account_data['losses']
+        if total_trades > 0:
+            account_data['win_rate'] = (account_data['wins'] / total_trades) * 100
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Lỗi cập nhật hiệu suất: {str(e)}", exc_info=True)
+        return False
 
 def check_risk_limits():
     """Kiểm tra giới hạn rủi ro"""
@@ -1000,14 +1102,59 @@ def close_position():
         # Đóng vị thế (xóa khỏi danh sách)
         position = account_data['positions'].pop(position_index)
         
-        # Tính lợi nhuận ngẫu nhiên
-        pnl = round(random.uniform(-100, 200), 2)
-        pnl_percent = round(random.uniform(-5, 10), 2)
+        # Tính lợi nhuận - giả lập nhưng dựa trên thời gian nắm giữ và biến động thị trường
+        entry_time = datetime.strptime(position['entry_time'], '%Y-%m-%d %H:%M:%S')
+        holding_hours = (datetime.now() - entry_time).total_seconds() / 3600
+        
+        # Tính toán lãi/lỗ dựa trên biến động thị trường và thời gian nắm giữ
+        volatility_factor = 0.01  # 1% biến động mỗi giờ
+        base_change = volatility_factor * holding_hours * position['size']
+        
+        # Thêm yếu tố ngẫu nhiên nhưng có xu hướng theo chiều vị thế
+        if position['side'] == 'BUY':
+            direction_factor = random.uniform(-0.5, 1.5)  # Thiên về tăng
+        else:
+            direction_factor = random.uniform(-1.5, 0.5)  # Thiên về giảm
+            
+        pnl = round(base_change * direction_factor, 2)
+        position_value = position['entry_price'] * position['size']
+        pnl_percent = round((pnl / position_value) * 100, 2)
+        
+        # Cập nhật số dư tài khoản
+        account_data['balance'] += pnl
+        account_data['equity'] += pnl
+        
+        # Cập nhật thống kê thắng/thua
+        if pnl > 0:
+            account_data['wins'] += 1
+        else:
+            account_data['losses'] += 1
+            
+        # Lưu vị thế vào lịch sử
+        closed_position = position.copy()
+        closed_position['exit_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        closed_position['pnl'] = pnl
+        closed_position['pnl_percent'] = pnl_percent
+        account_data['position_history'].append(closed_position)
+        
+        # Thêm điểm lợi nhuận vào lịch sử
+        account_data['profit_history'].append({
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'pnl': pnl,
+            'pnl_percent': pnl_percent,
+            'symbol': position['symbol'],
+            'balance': account_data['balance']
+        })
+        
+        # Cập nhật dữ liệu hiệu suất
+        update_performance_data()
         
         # Thêm thông báo
+        message = f"Đã đóng vị thế {position['side']} {position['symbol']} với P/L: ${pnl} ({pnl_percent}%)"
         add_message(
-            f"Đã đóng vị thế {position['side']} {position['symbol']} với P/L: ${pnl} ({pnl_percent}%)", 
-            'success' if pnl > 0 else 'warning'
+            message, 
+            'success' if pnl > 0 else 'warning',
+            send_to_telegram=True  # Gửi thông báo này đến Telegram
         )
         
         return jsonify({

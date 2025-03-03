@@ -1,1 +1,1 @@
-{"trading_type": "futures", "leverage": 10, "risk_per_trade": 2.5, "max_positions": 4}
+{"trading_type": "futures", "leverage": 100, "risk_per_trade": 10.0, "max_positions": 10}
