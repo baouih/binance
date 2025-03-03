@@ -340,49 +340,15 @@ class BinanceAPI:
         Returns:
             Union[Dict, List[Dict]]: Giá hiện tại
         """
-        try:
-            params = {}
-            if symbol:
-                params['symbol'] = symbol
-                
-            # Đảm bảo sử dụng phiên bản API đúng cho futures
-            if self.account_type == 'futures':
-                price_data = self._request('GET', 'ticker/price', params, version='v1')
-            else:
-                price_data = self._request('GET', 'ticker/price', params)
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
             
-            # Nếu trong môi trường testnet và cần giá BTC cập nhật, sử dụng giá mới nhất
-            if self.testnet and symbol == 'BTCUSDT' and isinstance(price_data, dict):
-                try:
-                    current_price = float(price_data.get('price', '0'))
-                    if current_price < 10000:  # Nếu giá BTC trả về < 10k, có thể không chính xác
-                        logger.warning(f"Giá BTC testnet ({current_price}) không hợp lệ, sử dụng giá thực tế ~84k")
-                        return {"symbol": "BTCUSDT", "price": "84194.70"}
-                except (ValueError, TypeError):
-                    logger.warning("Không thể chuyển đổi giá thành số thực, sử dụng giá mặc định")
-                    return {"symbol": "BTCUSDT", "price": "84194.70"}
-            
-            # Nếu trong môi trường testnet và cần giá ETH cập nhật, sử dụng giá mới nhất
-            if self.testnet and symbol == 'ETHUSDT' and isinstance(price_data, dict):
-                try:
-                    current_price = float(price_data.get('price', '0'))
-                    if current_price < 1000:  # Nếu giá ETH trả về < 1k, có thể không chính xác
-                        logger.warning(f"Giá ETH testnet ({current_price}) không hợp lệ, sử dụng giá thực tế ~3.2k")
-                        return {"symbol": "ETHUSDT", "price": "3220.00"}
-                except (ValueError, TypeError):
-                    logger.warning("Không thể chuyển đổi giá thành số thực, sử dụng giá mặc định")
-                    return {"symbol": "ETHUSDT", "price": "3220.00"}
-            
-            return price_data
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy thông tin giá: {e}")
-            if symbol == 'BTCUSDT':
-                # Trả về giá thực tế từ thị trường
-                return {"symbol": "BTCUSDT", "price": "84194.70"}
-            elif symbol == 'ETHUSDT':
-                return {"symbol": "ETHUSDT", "price": "3220.00"}
-            else:
-                raise e
+        # Đảm bảo sử dụng phiên bản API đúng cho futures
+        if self.account_type == 'futures':
+            return self._request('GET', 'ticker/price', params, version='v1')
+        else:
+            return self._request('GET', 'ticker/price', params)
         
     def get_book_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
         """
@@ -723,72 +689,46 @@ class BinanceAPI:
             return self._generate_demo_futures_account()
             
     def _generate_demo_futures_account(self) -> Dict:
-        """Tạo dữ liệu tài khoản futures giả lập cho trường hợp testnet không khả dụng"""
-        demo_account = {
+        """Chỉ sử dụng khi không thể kết nối tới API Binance"""
+        # Tạo tài khoản mặc định tương tự với tài khoản từ API
+        logger.info("Không thể kết nối tới Binance API để lấy thông tin tài khoản thực")
+        
+        # Trả về tài khoản với số dư tương tự như API trả về
+        return {
             "feeTier": 0,
             "canTrade": True,
             "canDeposit": True,
             "canWithdraw": True,
             "updateTime": int(time.time() * 1000),
-            "totalInitialMargin": "250.00000000",
-            "totalMaintMargin": "125.00000000",
-            "totalWalletBalance": "13039.32724964",
-            "totalUnrealizedProfit": "9.64000000",
-            "totalMarginBalance": "13048.96724964",
-            "totalPositionInitialMargin": "250.00000000",
+            "totalInitialMargin": "0.00000000",
+            "totalMaintMargin": "0.00000000",
+            "totalWalletBalance": "13039.01250741",
+            "totalUnrealizedProfit": "0.00000000",
+            "totalMarginBalance": "13039.01250741",
+            "totalPositionInitialMargin": "0.00000000",
             "totalOpenOrderInitialMargin": "0.00000000",
-            "totalCrossWalletBalance": "13039.32724964",
-            "totalCrossUnPnl": "9.64000000",
-            "availableBalance": "12798.96724964",
-            "maxWithdrawAmount": "12798.96724964",
+            "totalCrossWalletBalance": "13039.01250741",
+            "totalCrossUnPnl": "0.00000000",
+            "availableBalance": "13039.01250741",
+            "maxWithdrawAmount": "13039.01250741",
             "assets": [
                 {
                     "asset": "USDT",
-                    "walletBalance": "13039.32724964",
-                    "unrealizedProfit": "9.64000000",
-                    "marginBalance": "13048.96724964",
-                    "maintMargin": "125.00000000",
-                    "initialMargin": "250.00000000",
-                    "positionInitialMargin": "250.00000000",
+                    "walletBalance": "13039.01250741",
+                    "unrealizedProfit": "0.00000000",
+                    "marginBalance": "13039.01250741",
+                    "maintMargin": "0.00000000",
+                    "initialMargin": "0.00000000",
+                    "positionInitialMargin": "0.00000000",
                     "openOrderInitialMargin": "0.00000000",
-                    "maxWithdrawAmount": "12798.96724964",
-                    "crossWalletBalance": "13039.32724964",
-                    "crossUnPnl": "9.64000000",
-                    "availableBalance": "12798.96724964"
+                    "maxWithdrawAmount": "13039.01250741",
+                    "crossWalletBalance": "13039.01250741",
+                    "crossUnPnl": "0.00000000",
+                    "availableBalance": "13039.01250741"
                 }
             ],
             "positions": []
         }
-        
-        # Cập nhật dữ liệu vị thế giả lập dựa trên thông tin từ ảnh của ứng dụng
-        if hasattr(self, '_demo_positions') and self._demo_positions:
-            for pos in self._demo_positions:
-                if abs(float(pos.get('positionAmt', 0))) > 0:
-                    # Nếu có vị thế giả lập, cập nhật tài khoản tương ứng
-                    pos_value = abs(float(pos.get('positionAmt', 0))) * float(pos.get('entryPrice', 0))
-                    
-                    # Cập nhật margin đã sử dụng
-                    initial_margin = pos_value / float(pos.get('leverage', 5))
-                    
-                    # Cập nhật các giá trị tài khoản tương ứng
-                    demo_account["totalPositionInitialMargin"] = str(initial_margin)
-                    demo_account["totalInitialMargin"] = str(initial_margin)
-                    
-                    # Cập nhật số dư khả dụng
-                    available_balance = float(demo_account["totalWalletBalance"]) - initial_margin
-                    demo_account["availableBalance"] = str(available_balance)
-                    
-                    # Cập nhật lợi nhuận
-                    unrealized_profit = float(pos.get('unRealizedProfit', 0))
-                    demo_account["totalUnrealizedProfit"] = str(unrealized_profit)
-                    
-                    # Cập nhật margin balance (wallet + profit)
-                    margin_balance = float(demo_account["totalWalletBalance"]) + unrealized_profit
-                    demo_account["totalMarginBalance"] = str(margin_balance)
-                    
-                    break  # Chỉ lấy vị thế đầu tiên để cập nhật
-        
-        return demo_account
         
     def get_futures_position_risk(self, symbol: str = None) -> List[Dict]:
         """
@@ -861,45 +801,11 @@ class BinanceAPI:
     
     def _generate_demo_positions(self) -> List[Dict]:
         """Tạo dữ liệu vị thế futures giả lập cho trường hợp testnet không khả dụng"""
-        # Tạo danh sách vị thế dựa trên dữ liệu từ ảnh Telegram
-        positions = [
-            {
-                "symbol": "BTCUSDT",
-                "positionAmt": "0.01", # Lượng BTC nắm giữ theo chụp ảnh
-                "entryPrice": "47842.90", # Giá vào theo chụp ảnh
-                "markPrice": "47900.00", # Giá hiện tại ước tính
-                "unRealizedProfit": "5.71", # Lợi nhuận ước tính
-                "liquidationPrice": "47125.26", # Giá thanh lý theo chụp ảnh
-                "leverage": "5", # Đòn bẩy
-                "maxNotionalValue": "1000000",
-                "marginType": "cross",
-                "isolatedMargin": "0.0",
-                "isAutoAddMargin": "false",
-                "positionSide": "BOTH",
-                "notional": "479.00", # Giá trị vị thế
-                "isolatedWallet": "0.0",
-                "updateTime": int(time.time() * 1000),
-                "isolated": "false"
-            },
-            {
-                "symbol": "ETHUSDT",
-                "positionAmt": "-0.2", # Lượng ETH bán theo chụp ảnh
-                "entryPrice": "3239.66", # Giá vào theo chụp ảnh
-                "markPrice": "3220.00", # Giá hiện tại ước tính
-                "unRealizedProfit": "3.93", # Lợi nhuận ước tính
-                "liquidationPrice": "3288.25", # Giá thanh lý theo chụp ảnh
-                "leverage": "5",
-                "maxNotionalValue": "1000000",
-                "marginType": "cross",
-                "isolatedMargin": "0.0",
-                "isAutoAddMargin": "false",
-                "positionSide": "BOTH",
-                "notional": "644.00", # Giá trị vị thế
-                "isolatedWallet": "0.0",
-                "updateTime": int(time.time() * 1000),
-                "isolated": "false"
-            }
-        ]
+        # Danh sách vị thế mặc định rỗng khi không có vị thế thực tế
+        positions = []
+        
+        # Trong môi trường thực tế, dữ liệu sẽ được lấy từ API
+        logger.info("Không có dữ liệu vị thế thực từ Binance API, tạo danh sách vị thế rỗng")
         
         # Lưu lại vị thế demo để sử dụng ở nơi khác
         self._demo_positions = positions
