@@ -912,13 +912,18 @@ def update_config():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     """API lấy trạng thái hệ thống"""
-    return jsonify({
-        'bot_status': bot_status,
+    status_data = {
+        'bot_status': bot_status.copy(),  # Sử dụng copy() để không thay đổi giá trị gốc
         'connection_status': connection_status,
         'account_data': account_data,
         'market_data': market_data,
         'messages': messages[-10:]  # Chỉ trả về 10 tin nhắn gần nhất
-    })
+    }
+    
+    # Thêm danh sách đồng tiền vào trạng thái bot
+    status_data['bot_status']['crypto_list'] = top_crypto_list
+    
+    return jsonify(status_data)
 
 @app.route('/api/crypto/toggle', methods=['POST'])
 def toggle_crypto():

@@ -178,44 +178,64 @@
             <div class="col-lg-6 mb-4">
                 <div class="info-card">
                     <h5 class="mb-3">Cấu hình Bot</h5>
-                    <form id="config-form">
-                        <div class="mb-3">
-                            <label class="form-label info-label">API Key</label>
-                            <input type="text" class="form-control" id="api-key" placeholder="Nhập API key">
+                    <ul class="nav nav-tabs mb-3" id="configTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-tab-pane" type="button" role="tab" aria-selected="true">Cấu hình chung</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="crypto-tab" data-bs-toggle="tab" data-bs-target="#crypto-tab-pane" type="button" role="tab" aria-selected="false">Đồng tiền</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="configTabsContent">
+                        <div class="tab-pane fade show active" id="general-tab-pane" role="tabpanel" aria-labelledby="general-tab" tabindex="0">
+                            <form id="config-form">
+                                <div class="mb-3">
+                                    <label class="form-label info-label">API Key</label>
+                                    <input type="text" class="form-control" id="api-key" placeholder="Nhập API key">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label info-label">API Secret</label>
+                                    <input type="password" class="form-control" id="api-secret" placeholder="Nhập API secret">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label info-label">Loại giao dịch</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="trading-type" id="spot" value="spot">
+                                        <label class="form-check-label" for="spot">Spot</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="trading-type" id="futures" value="futures" checked>
+                                        <label class="form-check-label" for="futures">Futures</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4 mb-3">
+                                        <label class="form-label info-label">Đòn bẩy</label>
+                                        <input type="number" class="form-control" id="leverage" min="1" max="100" value="10">
+                                    </div>
+                                    <div class="col-4 mb-3">
+                                        <label class="form-label info-label">Rủi ro mỗi lệnh (%)</label>
+                                        <input type="number" class="form-control" id="risk-per-trade" min="0.1" max="10" step="0.1" value="2.5">
+                                    </div>
+                                    <div class="col-4 mb-3">
+                                        <label class="form-label info-label">Số lệnh tối đa</label>
+                                        <input type="number" class="form-control" id="max-positions" min="1" max="10" value="4">
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">Lưu cấu hình</button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label info-label">API Secret</label>
-                            <input type="password" class="form-control" id="api-secret" placeholder="Nhập API secret">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label info-label">Loại giao dịch</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="trading-type" id="spot" value="spot">
-                                <label class="form-check-label" for="spot">Spot</label>
+                        <div class="tab-pane fade" id="crypto-tab-pane" role="tabpanel" aria-labelledby="crypto-tab" tabindex="0">
+                            <div class="mb-3">
+                                <p class="text-muted">Chọn các đồng tiền bạn muốn giao dịch. Chúng tôi chỉ hỗ trợ các đồng tiền có thanh khoản cao để đảm bảo an toàn.</p>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="trading-type" id="futures" value="futures" checked>
-                                <label class="form-check-label" for="futures">Futures</label>
+                            <div id="crypto-list-container">
+                                <!-- Danh sách đồng tiền sẽ được thêm vào đây bằng JavaScript -->
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4 mb-3">
-                                <label class="form-label info-label">Đòn bẩy</label>
-                                <input type="number" class="form-control" id="leverage" min="1" max="100" value="10">
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label class="form-label info-label">Rủi ro mỗi lệnh (%)</label>
-                                <input type="number" class="form-control" id="risk-per-trade" min="0.1" max="10" step="0.1" value="2.5">
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label class="form-label info-label">Số lệnh tối đa</label>
-                                <input type="number" class="form-control" id="max-positions" min="1" max="10" value="4">
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary">Lưu cấu hình</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -247,6 +267,9 @@
                     updateConfig();
                 });
             }
+            
+            // Tải danh sách đồng tiền
+            renderCryptoList();
             
             // Bắt đầu cập nhật dữ liệu định kỳ
             fetchStatus();
@@ -572,6 +595,100 @@
                     const positionId = parseInt(this.dataset.positionId);
                     closePosition(positionId);
                 });
+            });
+        }
+        
+        // Hiển thị danh sách đồng tiền
+        function renderCryptoList() {
+            const cryptoListContainer = document.getElementById('crypto-list-container');
+            if (!cryptoListContainer) return;
+            
+            // Lấy danh sách đồng tiền từ API status
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.bot_status && data.bot_status.crypto_list) {
+                        const cryptoList = data.bot_status.crypto_list;
+                        
+                        // Xóa nội dung cũ
+                        cryptoListContainer.innerHTML = '';
+                        
+                        // Thêm danh sách đồng tiền
+                        cryptoList.forEach(crypto => {
+                            const row = document.createElement('div');
+                            row.className = 'row align-items-center py-2 border-bottom';
+                            row.innerHTML = `
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <strong>${crypto.name}</strong> 
+                                    <span class="badge bg-secondary ms-2">${crypto.symbol}</span>
+                                    <small class="text-muted ms-2">#${crypto.liquidity_rank}</small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input crypto-toggle" type="checkbox" role="switch" 
+                                               id="crypto-${crypto.symbol}" data-symbol="${crypto.symbol}" 
+                                               ${crypto.enabled ? 'checked' : ''}>
+                                        <label class="form-check-label" for="crypto-${crypto.symbol}">
+                                            ${crypto.enabled ? 'Đang hoạt động' : 'Bị tắt'}
+                                        </label>
+                                    </div>
+                                </div>
+                            `;
+                            cryptoListContainer.appendChild(row);
+                        });
+                        
+                        // Thêm sự kiện cho các toggle
+                        const toggles = document.querySelectorAll('.crypto-toggle');
+                        toggles.forEach(toggle => {
+                            toggle.addEventListener('change', function() {
+                                const symbol = this.dataset.symbol;
+                                const enabled = this.checked;
+                                toggleCrypto(symbol, enabled);
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách đồng tiền:', error);
+                    cryptoListContainer.innerHTML = '<div class="alert alert-danger">Không thể tải danh sách đồng tiền</div>';
+                });
+        }
+        
+        // Bật/tắt đồng tiền
+        function toggleCrypto(symbol, enabled) {
+            fetch('/api/crypto/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    symbol: symbol,
+                    enabled: enabled
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`Đã ${enabled ? 'bật' : 'tắt'} giao dịch đồng ${symbol.replace('USDT', '')}`, 'success');
+                    
+                    // Cập nhật label
+                    const label = document.querySelector(`label[for="crypto-${symbol}"]`);
+                    if (label) {
+                        label.textContent = enabled ? 'Đang hoạt động' : 'Bị tắt';
+                    }
+                } else {
+                    showToast(`Không thể ${enabled ? 'bật' : 'tắt'} đồng ${symbol}: ${data.message}`, 'danger');
+                    // Revert toggle
+                    const toggle = document.getElementById(`crypto-${symbol}`);
+                    if (toggle) toggle.checked = !enabled;
+                }
+            })
+            .catch(error => {
+                console.error(`Lỗi khi ${enabled ? 'bật' : 'tắt'} đồng ${symbol}:`, error);
+                showToast(`Lỗi khi ${enabled ? 'bật' : 'tắt'} đồng ${symbol}`, 'danger');
+                // Revert toggle
+                const toggle = document.getElementById(`crypto-${symbol}`);
+                if (toggle) toggle.checked = !enabled;
             });
         }
         
