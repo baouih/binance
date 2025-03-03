@@ -910,7 +910,7 @@ def update_market_data():
     log_data = {
         'timestamp': datetime.now().isoformat(),
         'category': 'market',
-        'message': f'Phân tích thị trường BTC: {market_data["market_regime"]["BTC"]}, RSI = {market_data["indicators"]["BTC"]["rsi"]}'
+        'message': f'Phân tích thị trường BTC: {market_data.get("market_regime", {}).get("BTC", "neutral")}, RSI = {market_data.get("indicators", {}).get("BTC", {}).get("rsi", 50)}'
     }
     socketio.emit('bot_log', log_data)
     
