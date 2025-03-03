@@ -35,7 +35,7 @@ BOTS_CONFIG_PATH = 'bots_config.json'
 bot_status = {
     'status': 'stopped',
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'mode': 'demo',
+    'mode': 'testnet',  # Khớp với cấu hình trong account_config.json
 }
 
 # Khởi tạo Telegram Notifier
@@ -707,21 +707,21 @@ def get_market_data():
             
         # Lấy dữ liệu ticker 24h cho BTC
         btc_24h = binance_client.get_24h_ticker('BTCUSDT')
-        if 'priceChangePercent' in btc_24h:
+        if isinstance(btc_24h, dict) and 'priceChangePercent' in btc_24h:
             market_data['btc_change_24h'] = float(btc_24h['priceChangePercent'])
         else:
             market_data['btc_change_24h'] = 0
             
         # Lấy dữ liệu ticker 24h cho ETH
         eth_24h = binance_client.get_24h_ticker('ETHUSDT')
-        if 'priceChangePercent' in eth_24h:
+        if isinstance(eth_24h, dict) and 'priceChangePercent' in eth_24h:
             market_data['eth_change_24h'] = float(eth_24h['priceChangePercent'])
         else:
             market_data['eth_change_24h'] = 0
             
         # Lấy dữ liệu ticker 24h cho SOL
         sol_24h = binance_client.get_24h_ticker('SOLUSDT')
-        if 'priceChangePercent' in sol_24h:
+        if isinstance(sol_24h, dict) and 'priceChangePercent' in sol_24h:
             market_data['sol_change_24h'] = float(sol_24h['priceChangePercent'])
         else:
             market_data['sol_change_24h'] = 0
@@ -813,11 +813,12 @@ def get_market_data():
 
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
+    # Biến market_data là phạm vi toàn cục
     global market_data
     
     # Khởi tạo market_data nếu chưa tồn tại
-    if 'market_data' not in globals():
-        market_data = {}
+    if not globals().get('market_data'):
+        market_data = EMPTY_MARKET_DATA.copy()
     
     # Lấy dữ liệu thị trường mới
     new_market_data = get_market_data()
