@@ -46,6 +46,11 @@
         .status-badge i {
             margin-right: 5px;
         }
+        
+        .status-badge.testnet {
+            background-color: #ff8800;
+            color: #000;
+        }
 
         .status-badge.connected {
             background-color: #238636;
@@ -79,18 +84,44 @@
         .message {
             padding: 10px;
             margin: 5px;
-            border-radius: 4px;
-            border-left: 4px solid;
+            border-radius: 6px;
+            background-color: rgba(30, 37, 46, 0.8);
+            transition: background-color 0.3s ease;
+        }
+        
+        .message:hover {
+            background-color: rgba(36, 44, 54, 0.8);
+        }
+        
+        .message-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .message-info { border-left-color: #0d6efd; }
-        .message-success { border-left-color: #198754; }
-        .message-warning { border-left-color: #ffc107; }
-        .message-error { border-left-color: #dc3545; }
+        .message-info { border-left: 2px solid #0d6efd; }
+        .message-success { border-left: 2px solid #198754; }
+        .message-warning { border-left: 2px solid #ffc107; }
+        .message-error { border-left: 2px solid #dc3545; }
+        
+        .bg-info { background-color: #0d6efd !important; }
+        .bg-success { background-color: #198754 !important; }
+        .bg-warning { background-color: #ffc107 !important; color: #000 !important; }
+        .bg-error { background-color: #dc3545 !important; }
+
+        .message-content {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
 
         .message-time {
-            font-size: 0.8em;
+            font-size: 0.75rem;
             color: #8b949e;
+            display: block;
         }
 
         /* Loading button state */
@@ -306,6 +337,28 @@
         .toast {
             min-width: 300px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Mini chart styles */
+        .mini-chart {
+            margin-bottom: 5px;
+        }
+        
+        .price-change {
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 2px 8px;
+        }
+        
+        .price-change.positive {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+        
+        .price-change.negative {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
         }
 
     </style>
@@ -618,18 +671,66 @@
                 <!-- System Log -->
                 <div class="info-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Nhật ký hệ thống</h5>
-                        <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary"
-                                onclick="clearLogs()">
-                            <i class="bi bi-trash me-1"></i>
-                            Xóa nhật ký
-                        </button>
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-journal-text me-2"></i>
+                            Nhật ký hệ thống
+                            <span class="badge bg-secondary rounded-pill ms-2" id="logCount">{{ messages|length }}</span>
+                        </h5>
+                        <div>
+                            <button id="filterLogsBtn" class="btn btn-sm btn-outline-primary me-2" 
+                                    data-bs-toggle="dropdown">
+                                <i class="bi bi-funnel me-1"></i>
+                                Lọc
+                            </button>
+                            <div class="dropdown-menu p-2">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showInfoLogs" checked>
+                                    <label class="form-check-label" for="showInfoLogs">
+                                        <span class="badge bg-primary">Thông tin</span>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showSuccessLogs" checked>
+                                    <label class="form-check-label" for="showSuccessLogs">
+                                        <span class="badge bg-success">Thành công</span>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showWarningLogs" checked>
+                                    <label class="form-check-label" for="showWarningLogs">
+                                        <span class="badge bg-warning text-dark">Cảnh báo</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showErrorLogs" checked>
+                                    <label class="form-check-label" for="showErrorLogs">
+                                        <span class="badge bg-danger">Lỗi</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary"
+                                    onclick="clearLogs()">
+                                <i class="bi bi-trash me-1"></i>
+                                Xóa nhật ký
+                            </button>
+                        </div>
                     </div>
                     <div class="messages-container" id="messages">
                         {% for message in messages %}
                         <div class="message message-{{ message.level }}">
-                            <span class="message-time">{{ message.timestamp }}</span>
-                            <div class="message-content">{{ message.content }}</div>
+                            <div class="d-flex">
+                                <span class="message-badge badge me-2 bg-{{ message.level }}">
+                                    <i class="bi {{ 'bi-info-circle' if message.level == 'info' 
+                                                  else ('bi-check-circle' if message.level == 'success'
+                                                  else ('bi-exclamation-triangle' if message.level == 'warning'
+                                                  else 'bi-x-circle')) }}"></i>
+                                </span>
+                                <div class="flex-grow-1">
+                                    <div class="message-content">{{ message.content }}</div>
+                                    <span class="message-time">{{ message.timestamp }}</span>
+                                </div>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
@@ -742,6 +843,26 @@
         socket.on('market_data', (data) => {
             debugLog('Received market data', data);
             updateMarketData(data);
+        });
+        
+        socket.on('new_message', (message) => {
+            debugLog('Received new message', message);
+            addMessage(message);
+            
+            // Kiểm tra nếu là thông báo giao dịch mới
+            if (message.content.includes('Lệnh mới') || message.content.includes('Đã mở vị thế')) {
+                notifyNewTrade(message);
+                document.getElementById('logCount').textContent = parseInt(document.getElementById('logCount').textContent || '0') + 1;
+            }
+        });
+        
+        socket.on('new_trade', (trade) => {
+            debugLog('Received new trade', trade);
+            notifyNewTrade({
+                content: `Lệnh mới: ${trade.symbol} ${trade.side} tại $${trade.entry_price}`,
+                level: 'success',
+                timestamp: new Date().toLocaleString()
+            });
         });
 
         // UI update functions
@@ -923,8 +1044,21 @@
         function addMessage(message) {
             const messageHTML = `
                 <div class="message message-${message.level}">
-                    <span class="message-time">${message.timestamp}</span>
-                    <div class="message-content">${message.content}</div>
+                    <div class="d-flex">
+                        <span class="message-badge badge me-2 bg-${message.level}">
+                            <i class="bi ${message.level === 'info' 
+                                ? 'bi-info-circle' 
+                                : (message.level === 'success'
+                                   ? 'bi-check-circle' 
+                                   : (message.level === 'warning'
+                                     ? 'bi-exclamation-triangle'
+                                     : 'bi-x-circle'))}"></i>
+                        </span>
+                        <div class="flex-grow-1">
+                            <div class="message-content">${message.content}</div>
+                            <span class="message-time">${message.timestamp}</span>
+                        </div>
+                    </div>
                 </div>
             `;
             elements.messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
@@ -942,6 +1076,33 @@
             document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
             document.getElementById('solPrice').textContent = `$${data.sol_price.toFixed(2)}`;
             document.getElementById('bnbPrice').textContent = `$${data.bnb_price.toFixed(2)}`;
+        }
+        
+        function notifyNewTrade(message) {
+            // Thêm thông báo âm thanh khi có giao dịch mới
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('Không thể phát âm thanh thông báo:', e));
+            
+            // Hiển thị thông báo desktop nếu được hỗ trợ
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Giao dịch mới", {
+                    body: message.content,
+                    icon: "https://cdn-icons-png.flaticon.com/512/5499/5499403.png"
+                });
+            } else if ("Notification" in window && Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("Giao dịch mới", {
+                            body: message.content,
+                            icon: "https://cdn-icons-png.flaticon.com/512/5499/5499403.png"
+                        });
+                    }
+                });
+            }
+            
+            // Hiển thị thông báo trong ứng dụng
+            showToast(message.content, 'success');
         }
 
         // Risk level changes
@@ -961,13 +1122,53 @@
             `;
         });
 
+        // Filter logs
+        document.getElementById('showInfoLogs').addEventListener('change', filterLogs);
+        document.getElementById('showSuccessLogs').addEventListener('change', filterLogs);
+        document.getElementById('showWarningLogs').addEventListener('change', filterLogs);
+        document.getElementById('showErrorLogs').addEventListener('change', filterLogs);
+        
+        function filterLogs() {
+            const showInfo = document.getElementById('showInfoLogs').checked;
+            const showSuccess = document.getElementById('showSuccessLogs').checked;
+            const showWarning = document.getElementById('showWarningLogs').checked;
+            const showError = document.getElementById('showErrorLogs').checked;
+            
+            const messages = elements.messagesContainer.querySelectorAll('.message');
+            
+            messages.forEach(message => {
+                if (message.classList.contains('message-info')) {
+                    message.style.display = showInfo ? 'block' : 'none';
+                } else if (message.classList.contains('message-success')) {
+                    message.style.display = showSuccess ? 'block' : 'none';
+                } else if (message.classList.contains('message-warning')) {
+                    message.style.display = showWarning ? 'block' : 'none';
+                } else if (message.classList.contains('message-error')) {
+                    message.style.display = showError ? 'block' : 'none';
+                }
+            });
+        }
+        
         // Initialize on load
         window.addEventListener('load', () => {
+            // Yêu cầu quyền thông báo
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+            
+            // Khởi tạo giao diện
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
             elements.riskLevel.dispatchEvent(new Event('change'));
             elements.leverage.dispatchEvent(new Event('input'));
             elements.riskPerTrade.dispatchEvent(new Event('input'));
             elements.maxPositions.dispatchEvent(new Event('input'));
+            
+            // Thêm sự kiện xem chi tiết vị thế
+            document.getElementById('viewPositionsLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Đây sẽ là nơi mở modal hiển thị chi tiết vị thế
+                showToast('Tính năng này đang được phát triển', 'info');
+            });
         });
     </script>
 </body>
