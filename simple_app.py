@@ -1045,10 +1045,23 @@ def get_status():
     
     return jsonify(status_data)
 
-@app.route('/api/telegram/config', methods=['POST'])
+@app.route('/api/telegram/config', methods=['GET', 'POST'])
 def update_telegram_config():
     """API cập nhật cấu hình Telegram"""
     try:
+        # Xử lý GET request - trả về cấu hình hiện tại
+        if request.method == 'GET':
+            return jsonify({
+                'success': True,
+                'data': {
+                    'enabled': telegram_config['enabled'],
+                    'bot_token': telegram_config['bot_token'],
+                    'chat_id': telegram_config['chat_id'],
+                    'min_interval': telegram_config['min_interval']
+                }
+            })
+        
+        # Xử lý POST request - cập nhật cấu hình
         # Lấy thông tin từ request
         config_data = request.json
         

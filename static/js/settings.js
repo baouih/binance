@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
         saveSecurityButton.addEventListener('click', saveSecuritySettings);
     }
     
+    // Load Telegram configuration on page load
+    loadTelegramConfig();
+    
     // API mode radio buttons
     const apiModeRadios = document.querySelectorAll('input[name="api-mode"]');
     apiModeRadios.forEach(radio => {
@@ -122,6 +125,57 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Hàm tải cấu hình Telegram hiện tại
+    function loadTelegramConfig() {
+        // Show loading
+        window.showLoading();
+        
+        // Gửi request lấy dữ liệu
+        fetch('/api/telegram/config', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(response => {
+            // Hide loading
+            window.hideLoading();
+            
+            if (response.success && response.data) {
+                const data = response.data;
+                
+                // Cập nhật UI với dữ liệu từ server
+                enableTelegramNotifications.checked = data.enabled;
+                
+                if (data.bot_token) {
+                    telegramBotToken.value = data.bot_token;
+                }
+                
+                if (data.chat_id) {
+                    telegramChatId.value = data.chat_id;
+                }
+                
+                if (data.min_interval) {
+                    const minIntervalInput = document.getElementById('notify-min-interval');
+                    if (minIntervalInput) {
+                        minIntervalInput.value = data.min_interval;
+                    }
+                }
+                
+                console.log('Đã tải cấu hình Telegram');
+            } else {
+                console.error('Lỗi tải cấu hình Telegram:', response.message);
+            }
+        })
+        .catch(error => {
+            // Hide loading
+            window.hideLoading();
+            
+            console.error('Lỗi kết nối khi tải cấu hình Telegram:', error);
+        });
+    }
+    
     function testTelegramNotification() {
         // Check if Telegram notifications are enabled
         if (!enableTelegramNotifications.checked) {
@@ -194,9 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Prepare data for API
         const data = {
-            telegram_enabled: enableTelegram,
-            telegram_bot_token: botToken,
-            telegram_chat_id: chatId,
+            enabled: enableTelegram,
+            bot_token: botToken,
+            chat_id: chatId,
             notify_new_trades: notifyNewTrades,
             notify_closed_trades: notifyClosedTrades,
             notify_error_status: notifyErrorStatus,
@@ -204,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // Send data to server
-        fetch('/api/notification/settings', {
+        fetch('/api/telegram/config', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
