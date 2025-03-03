@@ -5,7 +5,7 @@ import os
 import json
 import logging
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from flask_socketio import SocketIO
 import eventlet
 
@@ -228,16 +228,28 @@ def index():
             'risk_level': connection_status['risk_level'],
             'telegram_enabled': connection_status['telegram_enabled']
         }
-        return render_template('index.html',
-                            status=status,
-                            messages=messages[-50:],
-                            account_data=account_data,
-                            market_data=market_data)
+
+        # Thêm cache control headers
+        response = make_response(render_template('index.html',
+                                              status=status,
+                                              messages=messages[-50:],
+                                              account_data=account_data,
+                                              market_data=market_data))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
     except Exception as e:
         logger.error(f"Error loading dashboard: {str(e)}", exc_info=True)
-        return render_template('index.html',
-                            status={'running': False, 'mode': 'testnet'},
-                            messages=[])
+        # Fallback to default state with cache control
+        response = make_response(render_template('index.html',
+                                              status={'running': False, 'mode': 'testnet'},
+                                              messages=[]))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
 
 @app.route('/api/connect', methods=['POST'])
 def connect_api():
@@ -327,8 +339,22 @@ def update_config():
     """Cập nhật cấu hình bot"""
     try:
         config = request.json
+        logger.debug(f"Received config update: {config}")
 
-        # Validate config
+        # Save API keys to environment
+        if 'api_key' in config and 'api_secret' in config:
+            os.environ['BINANCE_API_KEY'] = config['api_key']
+            os.environ['BINANCE_API_SECRET'] = config['api_secret']
+            add_message("Đã lưu API keys", "success")
+
+        # Save Telegram settings
+        if 'telegram_token' in config and 'telegram_chat_id' in config:
+            if config['telegram_token'] and config['telegram_chat_id']:
+                os.environ['TELEGRAM_BOT_TOKEN'] = config['telegram_token']
+                os.environ['TELEGRAM_CHAT_ID'] = config['telegram_chat_id']
+                add_message("Đã lưu cấu hình Telegram", "success")
+
+        # Validate trading config
         if 'api_mode' in config:
             if config['api_mode'] not in ['testnet', 'live']:
                 return jsonify({
@@ -353,22 +379,35 @@ def update_config():
                 }), 400
             connection_status['risk_level'] = config['risk_level']
 
-        # Save config
-        with open('bot_config.json', 'w') as f:
-            json.dump({
-                'api_mode': connection_status['api_mode'],
-                'trading_type': connection_status['trading_type'], 
-                'risk_level': connection_status['risk_level']
-            }, f)
+        # Save config to file
+        try:
+            with open('bot_config.json', 'w') as f:
+                json.dump({
+                    'api_mode': connection_status['api_mode'],
+                    'trading_type': connection_status['trading_type'], 
+                    'risk_level': connection_status['risk_level']
+                }, f)
+        except Exception as e:
+            logger.error(f"Error saving config file: {str(e)}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'message': 'Không thể lưu file cấu hình'
+            }), 500
 
-        add_message(f"Đã cập nhật cấu hình: {config}", "success")
+        # Try to connect with new config
+        if 'api_key' in config and 'api_secret' in config:
+            if init_api_connection():
+                add_message("Đã kết nối lại với cấu hình mới", "success")
+            else:
+                add_message("Không thể kết nối với cấu hình mới", "error")
 
         return jsonify({
             'success': True,
             'config': {
                 'api_mode': connection_status['api_mode'],
                 'trading_type': connection_status['trading_type'],
-                'risk_level': connection_status['risk_level']
+                'risk_level': connection_status['risk_level'],
+                'is_connected': connection_status['is_connected']
             }
         })
 
