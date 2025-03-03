@@ -4,7 +4,15 @@
         <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="/static/img/logo.svg" alt="Bot Trading" height="30" class="me-2">
             <span>BinanceTrader</span>
-            <span class="mode-badge ms-2 badge rounded-pill bg-warning text-dark">Chế độ Testnet</span>
+            {% if bot_status and bot_status.mode %}
+                {% if bot_status.mode == 'demo' %}
+                <span class="mode-badge ms-2 badge rounded-pill bg-info text-dark">Chế độ Demo</span>
+                {% elif bot_status.mode == 'testnet' %}
+                <span class="mode-badge ms-2 badge rounded-pill bg-warning text-dark">Chế độ Testnet</span>
+                {% elif bot_status.mode == 'live' %}
+                <span class="mode-badge ms-2 badge rounded-pill bg-danger text-white">Chế độ Live</span>
+                {% endif %}
+            {% endif %}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -42,6 +50,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/settings" id="nav-settings">
+                        <i class="fas fa-cog me-1"></i> Cài đặt
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/cli" id="nav-cli">
                         <i class="fas fa-terminal me-1"></i> CLI
                     </a>
@@ -53,11 +66,27 @@
                         <i class="fas fa-robot me-1"></i> Bot
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="botMenu">
-                        <li><a class="dropdown-item" href="/bots"><i class="fas fa-list me-1"></i> Quản lý Bot</a></li>
-                        <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-1"></i> Cài đặt</a></li>
+                        {% if bot_status and bot_status.running %}
+                        <li><a class="dropdown-item stop-bot-btn" href="#" data-bot-id="default">
+                            <i class="fas fa-stop-circle text-danger me-1"></i> Dừng Bot
+                        </a></li>
+                        {% else %}
+                        <li><a class="dropdown-item start-bot-btn" href="#" data-bot-id="default">
+                            <i class="fas fa-play-circle text-success me-1"></i> Chạy Bot
+                        </a></li>
+                        {% endif %}
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" id="toggleTheme"><i class="fas fa-adjust me-1"></i> <span id="themeText">Chế độ sáng</span></a></li>
                     </ul>
+                </li>
+                
+                <li class="nav-item ms-3">
+                    <div class="d-flex align-items-center h-100">
+                        <span class="badge {% if bot_status and bot_status.running %}bg-success{% else %}bg-danger{% endif %} py-2">
+                            <i class="fas {% if bot_status and bot_status.running %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
+                            {% if bot_status and bot_status.running %}Đang chạy{% else %}Đã dừng{% endif %}
+                        </span>
+                    </div>
                 </li>
             </ul>
         </div>

@@ -26,44 +26,51 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-chart-line me-1"></i> Dashboard</a>
+                        <a class="nav-link" href="/"><i class="fas fa-tachometer-alt me-1"></i> Tổng quan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/bot-management"><i class="fas fa-robot me-1"></i> Quản lý Bot</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/market"><i class="fas fa-globe me-1"></i> Thị trường</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bot-monitor"><i class="fas fa-desktop me-1"></i> Giám sát Bot</a>
+                        <a class="nav-link" href="/strategies"><i class="fas fa-chart-line me-1"></i> Chiến lược</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/backtest"><i class="fas fa-vial me-1"></i> Backtest</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/trades"><i class="fas fa-exchange-alt me-1"></i> Lịch sử giao dịch</a>
+                        <a class="nav-link" href="/trades"><i class="fas fa-exchange-alt me-1"></i> Giao dịch</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market"><i class="fas fa-globe-asia me-1"></i> Thị trường</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/position"><i class="fas fa-wallet me-1"></i> Vị thế</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/settings"><i class="fas fa-cog me-1"></i> Cài đặt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cli"><i class="fas fa-terminal me-1"></i> CLI</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <div class="me-3">
                         <span class="badge d-flex align-items-center p-1 pe-2 text-info-emphasis bg-info-subtle border border-info-subtle rounded-pill">
                             <img class="rounded-circle me-1" width="24" height="24" src="{{ url_for('static', filename='img/binance_icon.png') }}" alt="Binance">
-                            <span class="mode-badge mode-{{ bot_status.mode }}">
-                                {% if bot_status.mode == 'demo' %}
-                                    Chế độ Demo
-                                {% elif bot_status.mode == 'testnet' %}
-                                    Chế độ Testnet
-                                {% elif bot_status.mode == 'live' %}
-                                    Chế độ Live
+                            <span class="mode-badge">
+                                {% if bot_status and bot_status.mode %}
+                                    {% if bot_status.mode == 'demo' %}
+                                        <span class="text-info">Chế độ Demo</span>
+                                    {% elif bot_status.mode == 'testnet' %}
+                                        <span class="text-warning">Chế độ Testnet</span>
+                                    {% elif bot_status.mode == 'live' %}
+                                        <span class="text-danger">Chế độ Live</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Chưa kết nối</span>
                                 {% endif %}
                             </span>
                         </span>
                     </div>
                     <div class="bot-status-indicator me-3">
-                        {% if bot_status.status == 'running' %}
+                        {% if bot_status and bot_status.running %}
                         <span class="badge rounded-pill text-bg-success">
                             <i class="fas fa-circle-notch fa-spin me-1"></i> Đang chạy
                         </span>
@@ -73,12 +80,29 @@
                         </span>
                         {% endif %}
                     </div>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="dropdown ms-2">
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="botActions" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-robot me-1"></i> Bot
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="botActions">
+                            {% if bot_status and bot_status.running %}
+                            <li><a class="dropdown-item stop-bot-btn" href="#" data-bot-id="default">
+                                <i class="fas fa-stop-circle text-danger me-1"></i> Dừng Bot
+                            </a></li>
+                            {% else %}
+                            <li><a class="dropdown-item start-bot-btn" href="#" data-bot-id="default">
+                                <i class="fas fa-play-circle text-success me-1"></i> Chạy Bot
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i> Cài đặt Bot</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown ms-2">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user-circle"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
                             <li><a class="dropdown-item" href="/api-docs"><i class="fas fa-book me-2"></i> API Docs</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="toggleTheme"><i class="fas fa-moon me-2"></i> <span id="themeText">Chế độ sáng</span></a></li>
