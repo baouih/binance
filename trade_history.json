@@ -6,3 +6,7 @@
 {"timestamp": "2025-03-03T03:29:39.485208", "symbol": "BTCUSDT", "action": "BUY", "price": 84102.0, "quantity": 0.01, "mode": "testnet", "success": true, "error": null, "order_id": 4096032361}
 {"timestamp": "2025-03-03T03:32:18.844169", "symbol": "ETHUSDT", "action": "SELL", "price": 2162.44, "quantity": 0.2, "mode": "testnet", "success": true, "error": null, "order_id": 1503384452}
 {"timestamp": "2025-03-03T03:33:11.014527", "symbol": "ETHUSDT", "action": "SELL", "price": 2162.44, "quantity": 0.2, "mode": "testnet", "success": true, "error": null, "order_id": 1503384617}
+{"timestamp": "2025-03-03T03:36:06.936301", "symbol": "BTCUSDT", "action": "BUY", "price": 84056.0, "quantity": 0.01, "mode": "testnet", "success": true, "error": null, "order_id": 4096033564}
+{"timestamp": "2025-03-03T03:36:45.177400", "symbol": "BTCUSDT", "action": "BUY", "price": 84111.3, "quantity": 0.01, "mode": "testnet", "success": true, "error": null, "order_id": 4096033714}
+{"timestamp": "2025-03-03T03:38:26.768985", "symbol": "BTCUSDT", "action": "BUY", "price": 84056.0, "quantity": 0.01, "mode": "testnet", "success": true, "error": null, "order_id": 4096034007}
+{"timestamp": "2025-03-03T03:39:06.850781", "symbol": "ETHUSDT", "action": "SELL", "price": 2158.45, "quantity": 0.2, "mode": "testnet", "success": true, "error": null, "order_id": 1503385795}
