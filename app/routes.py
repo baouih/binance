@@ -5,10 +5,22 @@ Routes cho ứng dụng web của bot giao dịch tiền điện tử
 
 import json
 import random
+import logging
 from datetime import datetime, timedelta
 
 from flask import render_template, request, jsonify, redirect, url_for, session
-from . import app, socketio, logger
+from . import app, socketio
+
+# Thiết lập logging
+logger = logging.getLogger("routes")
+
+# Hàm để đăng ký các routes
+def register_routes(flask_app):
+    """Register all routes with the Flask application"""
+    # Sử dụng lại tất cả các routes bên dưới nhưng đăng ký vào flask_app
+    global app
+    app = flask_app
+    return flask_app
 
 # Giả lập dữ liệu bot
 bot_status = {

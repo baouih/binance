@@ -4,12 +4,20 @@
 import os
 import json
 import logging
-import threading
 import random
 import time
+import threading
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, make_response
-from flask_socketio import SocketIO
+
+try:
+    from flask import Flask, render_template, request, jsonify, make_response
+    from flask_socketio import SocketIO
+    import eventlet
+    eventlet.monkey_patch()
+    print("Successfully imported Flask and dependencies")
+except ImportError as e:
+    print(f"Error importing Flask dependencies: {e}")
+    raise
 
 # Thiết lập logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -17,7 +25,7 @@ logger = logging.getLogger('main')
 
 # Khởi tạo ứng dụng Flask
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
+app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 
 # Khởi tạo SocketIO với CORS và async mode
 socketio = SocketIO(
@@ -574,6 +582,7 @@ simulation_thread.daemon = True
 
 if __name__ == "__main__":
     try:
+        # Thêm thông báo khởi động
         add_message('Hệ thống đã khởi động', 'info')
         add_message('Vui lòng kết nối API để bắt đầu', 'warning')
         
@@ -581,13 +590,7 @@ if __name__ == "__main__":
         simulation_thread.start()
         logger.info("Started data simulation thread")
 
-        socketio.run(
-            app,
-            host="0.0.0.0",
-            port=5000,
-            debug=True,
-            use_reloader=False,  # Tắt reloader để không gây vấn đề với thread
-            log_output=True
-        )
+        # Khởi động ứng dụng Flask
+        app.run(host="0.0.0.0", port=5000, debug=True)
     except Exception as e:
         logger.error(f"Error starting server: {str(e)}", exc_info=True)
