@@ -1,5 +1,5 @@
 """
-Ứng dụng Flask điều khiển BinanceTrader Bot đơn giản
+Ứng dụng Flask điều khiển BinanceTrader Bot
 """
 import os
 import json
@@ -19,10 +19,6 @@ logger = logging.getLogger('main')
 app = Flask(__name__)
 
 # Cấu hình session secret key
-if 'SESSION_SECRET' not in os.environ:
-    logger.warning("SESSION_SECRET not found in environment, generating a random one")
-    os.environ['SESSION_SECRET'] = os.urandom(24).hex()
-
 app.secret_key = os.environ.get("SESSION_SECRET")
 
 # Khởi tạo SocketIO với CORS và async mode
@@ -110,11 +106,12 @@ def check_risk_limits():
             return False
 
         # Lấy cấu hình rủi ro từ profile đã chọn
-        risk_profile = risk_manager.get_current_config().get('risk_profile', 'medium')
+        risk_config = risk_manager.get_current_config()
+        risk_profile = risk_config.get('risk_profile', 'medium')
         risk_settings = config_high_risk.get_risk_profile(risk_profile)
 
-        max_account_risk = risk_settings['max_account_risk']
         current_equity = account_data['equity']
+        max_account_risk = risk_settings['max_account_risk']
         max_loss = account_data['initial_balance'] * (max_account_risk / 100)
         current_loss = account_data['initial_balance'] - current_equity
 
@@ -176,15 +173,15 @@ def init_api_connection():
 
             # Lấy cấu hình rủi ro hiện tại
             risk_config = risk_manager.get_current_config()
-            effective_settings = risk_manager.get_effective_risk_settings()
+            risk_profile = risk_config.get('risk_profile', 'medium')
+            risk_settings = config_high_risk.get_risk_profile(risk_profile)
 
             add_message("Kết nối API thành công", "success")
             add_message(f"Chế độ: {connection_status['api_mode'].upper()}", "info")
             add_message(f"Loại giao dịch: {connection_status['trading_type'].upper()}", "info")
-            add_message(f"Hồ sơ rủi ro: {risk_config.get('risk_profile', 'medium').upper()}", "info")
-            add_message(f"Rủi ro tối đa: {effective_settings.get('max_account_risk', 25.0)}% tài khoản", "info")
-            add_message(f"Rủi ro mỗi giao dịch: {effective_settings.get('risk_per_trade', 2.5)}%", "info")
-            add_message(f"Đòn bẩy tối ưu: x{effective_settings.get('optimal_leverage', 12)}", "info")
+            add_message(f"Mức độ rủi ro: {risk_profile.upper()}", "info")
+            add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
+            add_message(f"Đòn bẩy tối ưu: {risk_settings['optimal_leverage']}x", "info")
 
             return True
 
@@ -246,14 +243,19 @@ def update_account_data(account_info):
 def index():
     """Trang điều khiển bot"""
     try:
+        # Lấy cấu hình rủi ro hiện tại
+        risk_config = risk_manager.get_current_config()
+        risk_profile = risk_config.get('risk_profile', 'medium')
+        risk_settings = config_high_risk.get_risk_profile(risk_profile)
+
         status = {
             'running': bot_status['running'],
             'mode': connection_status['api_mode'],
             'is_connected': connection_status['is_connected'],
             'is_authenticated': connection_status['is_authenticated'],
             'trading_type': connection_status['trading_type'],
-            'risk_profile': connection_status.get('risk_profile', 'medium'), #Added get method to handle missing risk_profile
-            'max_account_risk': risk_manager.get_current_config().get('max_account_risk', 25.0), # Use risk manager for max_account_risk
+            'risk_profile': risk_profile,
+            'max_account_risk': risk_settings['max_account_risk'],
             'current_risk': bot_status['current_risk'],
             'telegram_enabled': connection_status['telegram_enabled']
         }
@@ -412,22 +414,12 @@ def update_config():
             connection_status['trading_type'] = config['trading_type']
 
         if 'risk_profile' in config:
-            # Sử dụng RiskConfigManager để validate và set risk profile
+            # Validate risk profile
             if not risk_manager.set_risk_profile(config['risk_profile']):
                 return jsonify({
                     'success': False,
                     'message': 'Hồ sơ rủi ro không hợp lệ'
                 }), 400
-            connection_status['risk_profile'] = config['risk_profile']
-
-        if 'max_account_risk' in config:
-            max_risk = float(config['max_account_risk'])
-            if not (0 < max_risk <= 100):
-                return jsonify({
-                    'success': False,
-                    'message': 'Giới hạn rủi ro phải từ 0-100%'
-                }), 400
-            #connection_status['max_account_risk'] = max_risk  # Removed - managed by risk_manager
 
         # Save config to file
         try:
@@ -435,8 +427,7 @@ def update_config():
                 json.dump({
                     'api_mode': connection_status['api_mode'],
                     'trading_type': connection_status['trading_type'],
-                    'risk_profile': connection_status['risk_profile'],
-                    #'max_account_risk': connection_status['max_account_risk'] #Removed - managed by risk_manager
+                    'risk_profile': risk_manager.get_current_config().get('risk_profile', 'medium')
                 }, f)
         except Exception as e:
             logger.error(f"Error saving config file: {str(e)}", exc_info=True)
@@ -452,13 +443,17 @@ def update_config():
             else:
                 add_message("Không thể kết nối với cấu hình mới", "error")
 
+        # Get current risk settings
+        risk_config = risk_manager.get_current_config()
+        risk_settings = config_high_risk.get_risk_profile(risk_config.get('risk_profile', 'medium'))
+
         return jsonify({
             'success': True,
             'config': {
                 'api_mode': connection_status['api_mode'],
                 'trading_type': connection_status['trading_type'],
-                'risk_profile': connection_status['risk_profile'],
-                'max_account_risk': risk_manager.get_current_config().get('max_account_risk', 25.0), # Use risk manager for max_account_risk
+                'risk_profile': risk_config.get('risk_profile', 'medium'),
+                'max_account_risk': risk_settings['max_account_risk'],
                 'is_connected': connection_status['is_connected']
             }
         })
