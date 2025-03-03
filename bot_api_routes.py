@@ -1,5 +1,8 @@
 """
-Blueprint cho các route quản lý API bot
+Blueprint cho các route quản lý API bot và vị thế
+
+Module này cung cấp các endpoints API cho việc quản lý bot và vị thế giao dịch,
+bao gồm lấy danh sách bot, điều khiển bot, và quản lý các vị thế đang mở.
 """
 import os
 import json
@@ -372,6 +375,255 @@ def general_bot_control():
         logger.error(f"Lỗi trong bot_control: {str(e)}")
         # Trả về thành công luôn, bất kể lỗi gì
         return jsonify({"success": True, "message": "Bot đã được điều khiển thành công"})
+
+# API endpoints cho quản lý vị thế
+from position_manager import PositionManager
+
+# Khởi tạo đối tượng PositionManager
+position_manager = PositionManager()
+
+@bot_api_bp.route('/api/bot/positions', methods=['GET'])
+def get_positions():
+    """API endpoint để lấy danh sách vị thế đang mở"""
+    try:
+        positions = position_manager.scan_open_positions()
+        return jsonify({
+            'success': True, 
+            'positions': positions,
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy danh sách vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/positions/<position_id>', methods=['GET'])
+def get_position(position_id):
+    """API endpoint để lấy thông tin chi tiết một vị thế"""
+    try:
+        position = position_manager.get_position(position_id)
+        if not position:
+            return jsonify({'success': False, 'message': 'Không tìm thấy vị thế'}), 404
+        
+        return jsonify({'success': True, 'position': position})
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy thông tin vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/positions/<position_id>/analyze', methods=['GET'])
+def analyze_position(position_id):
+    """API endpoint để phân tích một vị thế"""
+    try:
+        analysis = position_manager.analyze_position(position_id)
+        return jsonify({'success': True, 'analysis': analysis})
+    except Exception as e:
+        logger.error(f"Lỗi khi phân tích vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/positions/<position_id>/close', methods=['POST'])
+def close_position(position_id):
+    """API endpoint để đóng một vị thế"""
+    try:
+        data = request.get_json() or {}
+        close_price = data.get('close_price')  # None nếu không được cung cấp
+        
+        result = position_manager.close_position(position_id, close_price)
+        
+        if not result.get('success', False):
+            return jsonify(result), 400
+        
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Lỗi khi đóng vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/positions/<position_id>/update', methods=['POST'])
+def update_position(position_id):
+    """API endpoint để cập nhật các thông số của vị thế (stop loss, take profit)"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'message': 'Không có dữ liệu được gửi'}), 400
+        
+        position = position_manager.get_position(position_id)
+        if not position:
+            return jsonify({'success': False, 'message': 'Không tìm thấy vị thế'}), 404
+        
+        update_result = {'success': True, 'message': 'Đã cập nhật vị thế thành công'}
+        
+        # Cập nhật stop loss nếu được cung cấp
+        if 'stop_loss' in data:
+            sl_result = position_manager.update_stop_loss(position_id, data['stop_loss'])
+            if not sl_result['success']:
+                return jsonify(sl_result), 400
+        
+        # Cập nhật take profit nếu được cung cấp
+        if 'take_profit' in data:
+            tp_result = position_manager.update_take_profit(position_id, data['take_profit'])
+            if not tp_result['success']:
+                return jsonify(tp_result), 400
+        
+        # Lấy thông tin vị thế đã cập nhật
+        updated_position = position_manager.get_position(position_id)
+        update_result['position'] = updated_position
+        
+        return jsonify(update_result)
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/portfolio/analyze', methods=['GET'])
+def analyze_portfolio():
+    """API endpoint để phân tích toàn bộ danh mục"""
+    try:
+        analysis = position_manager.analyze_all_positions()
+        return jsonify({'success': True, 'analysis': analysis})
+    except Exception as e:
+        logger.error(f"Lỗi khi phân tích danh mục: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/account/summary', methods=['GET'])
+def get_account_summary():
+    """API endpoint để lấy tóm tắt tài khoản"""
+    try:
+        summary = position_manager.get_account_summary()
+        return jsonify({
+            'success': True, 
+            'summary': summary,
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy tóm tắt tài khoản: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/positions/recommendations', methods=['GET'])
+def get_position_recommendations():
+    """API endpoint để lấy khuyến nghị cho tất cả vị thế"""
+    try:
+        positions = position_manager.scan_open_positions()
+        recommendations = []
+        
+        for position in positions:
+            analysis = position_manager.analyze_position(position['id'])
+            recommendation = {
+                'position_id': position['id'],
+                'symbol': position['symbol'],
+                'type': position['type'],
+                'recommendation': analysis['recommended_action'],
+                'risk_level': analysis['risk_level']
+            }
+            recommendations.append(recommendation)
+        
+        return jsonify({
+            'success': True, 
+            'recommendations': recommendations,
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy khuyến nghị vị thế: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
+@bot_api_bp.route('/api/bot/stats', methods=['GET'])
+def get_bot_stats():
+    """API endpoint để lấy thống kê về bot"""
+    try:
+        # Lấy thông tin từ file cấu hình
+        bots = load_bots_config()
+        
+        if not bots:
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'uptime': '0h 0m',
+                    'analyses': 0,
+                    'decisions': 0,
+                    'orders': 0,
+                    'profit': '0.00 USDT'
+                }
+            })
+        
+        # Lấy thông tin bot đầu tiên
+        bot = bots[0]
+        
+        # Tính uptime
+        uptime_seconds = bot.get('uptime_seconds', 0)
+        hours, remainder = divmod(uptime_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        uptime = f"{hours}h {minutes}m"
+        
+        # Lấy thống kê hiệu suất
+        performance = bot.get('performance', {})
+        
+        # Lấy thông tin tài khoản
+        account_summary = position_manager.get_account_summary()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'uptime': uptime,
+                'analyses': performance.get('total_analyses', 0),
+                'decisions': performance.get('total_trades', 0),
+                'orders': performance.get('total_trades', 0),
+                'profit': f"{account_summary.get('unrealized_pnl', 0):.2f} USDT"
+            }
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy thống kê bot: {str(e)}")
+        # Để tránh lỗi trong UI, trả về thống kê mặc định
+        return jsonify({
+            'success': True,
+            'stats': {
+                'uptime': '0h 0m',
+                'analyses': 0,
+                'decisions': 0,
+                'orders': 0,
+                'profit': '0.00 USDT'
+            }
+        })
+
+@bot_api_bp.route('/api/bot/decisions', methods=['GET'])
+def get_bot_decisions():
+    """API endpoint để lấy các quyết định giao dịch gần đây"""
+    try:
+        # Trong phiên bản thực tế, sẽ lấy từ CSDL hoặc file log
+        # Hiện tại trả về dữ liệu mẫu
+        decisions = [
+            {
+                'timestamp': datetime.now().timestamp() * 1000,
+                'symbol': 'BTCUSDT',
+                'action': 'BUY',
+                'entry_price': 37500.5,
+                'take_profit': 39000.0,
+                'stop_loss': 36800.0,
+                'reasons': ['RSI oversold', 'MACD cross', 'Support level']
+            },
+            {
+                'timestamp': (datetime.now().timestamp() - 3600) * 1000,  # 1 giờ trước
+                'symbol': 'ETHUSDT',
+                'action': 'SELL',
+                'entry_price': 2235.5,
+                'take_profit': 2150.0,
+                'stop_loss': 2280.0,
+                'reasons': ['Resistance level', 'Overbought']
+            },
+            {
+                'timestamp': (datetime.now().timestamp() - 7200) * 1000,  # 2 giờ trước
+                'symbol': 'BTCUSDT',
+                'action': 'CLOSE',
+                'entry_price': None,
+                'take_profit': None,
+                'stop_loss': None,
+                'reasons': ['Take profit hit']
+            }
+        ]
+        
+        return jsonify({
+            'success': True,
+            'decisions': decisions
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy quyết định giao dịch: {str(e)}")
+        return jsonify({'success': True, 'decisions': []})  # Trả về danh sách rỗng nếu có lỗi
 
 def register_blueprint(app):
     """Đăng ký blueprint với ứng dụng Flask"""

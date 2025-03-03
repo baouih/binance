@@ -106,6 +106,42 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Lệnh đang mở</h5>
+                    <button class="btn btn-sm btn-outline-light" id="btn-refresh-positions">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Cặp</th>
+                                    <th>Lệnh</th>
+                                    <th>Giá vào</th>
+                                    <th>Giá hiện tại</th>
+                                    <th>SL/TP</th>
+                                    <th>P&L</th>
+                                    <th>Khuyến nghị</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="positions-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Quyết định giao dịch gần đây</h5>
                     <button class="btn btn-sm btn-outline-light" id="btn-refresh-decisions">
                         <i class="bi bi-arrow-clockwise"></i> Làm mới
@@ -255,6 +291,7 @@
         const btnRestartBot = document.getElementById('btn-restart-bot');
         const btnTestTelegram = document.getElementById('btn-test-telegram');
         const btnRefreshDecisions = document.getElementById('btn-refresh-decisions');
+        const btnRefreshPositions = document.getElementById('btn-refresh-positions');
         const btnClearLogs = document.getElementById('btn-clear-logs');
         const statAnalyses = document.getElementById('stat-analyses');
         const statDecisions = document.getElementById('stat-decisions');
@@ -262,6 +299,146 @@
         const statProfit = document.getElementById('stat-profit');
         const toast = new bootstrap.Toast(document.getElementById('botMonitorToast'));
         const toastBody = document.querySelector('.toast-body');
+        
+        // Lấy lệnh đang mở
+        function getOpenPositions() {
+            fetch('/api/bot/positions')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.positions) {
+                        const positionsTableBody = document.getElementById('positions-table-body');
+                        positionsTableBody.innerHTML = '';
+                        
+                        if (data.positions.length === 0) {
+                            positionsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Không có lệnh đang mở</td></tr>';
+                            return;
+                        }
+                        
+                        data.positions.forEach(position => {
+                            const pnlClass = position.pnl >= 0 ? 'text-success' : 'text-danger';
+                            const recommendation = getPositionRecommendation(position);
+                            
+                            let row = `<tr>
+                                <td>${position.symbol}</td>
+                                <td>
+                                    <span class="badge ${position.type === 'LONG' ? 'bg-success' : 'bg-danger'}">
+                                        ${position.type}
+                                    </span>
+                                </td>
+                                <td>${position.entry_price.toLocaleString('vi-VN')}</td>
+                                <td>${position.current_price.toLocaleString('vi-VN')}</td>
+                                <td>
+                                    <small>SL: ${position.stop_loss ? position.stop_loss.toLocaleString('vi-VN') : 'N/A'}</small><br>
+                                    <small>TP: ${position.take_profit ? position.take_profit.toLocaleString('vi-VN') : 'N/A'}</small>
+                                </td>
+                                <td class="${pnlClass}">
+                                    ${position.pnl.toLocaleString('vi-VN')} USDT<br>
+                                    <small>(${position.pnl_percent.toFixed(2)}%)</small>
+                                </td>
+                                <td>
+                                    <span class="badge ${recommendation.badgeClass}">
+                                        ${recommendation.action}
+                                    </span><br>
+                                    <small>${recommendation.reason}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-warning btn-sm" onclick="modifyPosition('${position.id}', 'adjust_sl_tp')">
+                                            <i class="bi bi-gear-fill"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="closePosition('${position.id}')">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                            
+                            positionsTableBody.innerHTML += row;
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching positions:', error);
+                    const positionsTableBody = document.getElementById('positions-table-body');
+                    positionsTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Lỗi: ${error.message}</td></tr>`;
+                });
+        }
+        
+        // Khuyến nghị cho vị thế
+        function getPositionRecommendation(position) {
+            // Giả lập logic khuyến nghị (sẽ được thay thế bằng API thực tế)
+            let recommendation = {
+                action: '',
+                reason: '',
+                badgeClass: ''
+            };
+            
+            // Vị thế đang lời nhiều
+            if (position.pnl_percent > 15) {
+                recommendation.action = 'CHỐT LỜI';
+                recommendation.reason = 'Đã đạt 15% lợi nhuận';
+                recommendation.badgeClass = 'bg-success';
+            }
+            // Vị thế đang lời vừa phải
+            else if (position.pnl_percent > 5) {
+                recommendation.action = 'TRAILING STOP';
+                recommendation.reason = 'Kéo stop loss để bảo vệ lợi nhuận';
+                recommendation.badgeClass = 'bg-info';
+            }
+            // Vị thế đang lỗ nhẹ
+            else if (position.pnl_percent < -5 && position.pnl_percent > -10) {
+                recommendation.action = 'THEO DÕI';
+                recommendation.reason = 'Đang lỗ nhẹ, chờ xu hướng phục hồi';
+                recommendation.badgeClass = 'bg-warning';
+            }
+            // Vị thế đang lỗ nặng
+            else if (position.pnl_percent < -10) {
+                recommendation.action = 'CẮT LỖ';
+                recommendation.reason = 'Đang lỗ >10%, nguy cơ lỗ nặng';
+                recommendation.badgeClass = 'bg-danger';
+            }
+            // Mặc định
+            else {
+                recommendation.action = 'GIỮ';
+                recommendation.reason = 'Vị thế trong khoảng an toàn';
+                recommendation.badgeClass = 'bg-secondary';
+            }
+            
+            return recommendation;
+        }
+        
+        // Đóng vị thế
+        function closePosition(positionId) {
+            if (!confirm('Bạn có chắc chắn muốn đóng vị thế này?')) {
+                return;
+            }
+            
+            fetch(`/api/bot/positions/${positionId}/close`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message);
+                        getOpenPositions(); // Làm mới danh sách vị thế
+                    } else {
+                        showToast(data.message, true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error closing position:', error);
+                    showToast(`Lỗi: ${error.message}`, true);
+                });
+        }
+        
+        // Điều chỉnh SL/TP
+        function modifyPosition(positionId, action) {
+            // Tạo modal trong tương lai
+            alert('Tính năng đang được phát triển');
+        }
         
         // Lấy quyết định giao dịch gần đây
         function getRecentDecisions() {
@@ -408,6 +585,7 @@
         // Sự kiện Socket.IO
         socket.on('connect', function() {
             console.log('Connected to server');
+            getOpenPositions();
             getRecentDecisions();
             getBotStats();
         });
@@ -477,6 +655,11 @@
         
         btnRefreshDecisions.addEventListener('click', function() {
             getRecentDecisions();
+        });
+        
+        btnRefreshPositions.addEventListener('click', function() {
+            getOpenPositions();
+            showToast('Đã làm mới danh sách lệnh đang mở');
         });
         
         btnClearLogs.addEventListener('click', function() {
