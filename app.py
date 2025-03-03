@@ -23,7 +23,7 @@ app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 def get_bot_status_from_config():
     """Đọc trạng thái bot từ cấu hình tài khoản"""
     status = {
-        'running': False,
+        'status': 'stopped',
         'uptime': '0d 0h 0m',
         'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'version': '1.0.0',
