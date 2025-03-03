@@ -175,13 +175,26 @@ def backtest():
 @app.route('/trades')
 def trades():
     """Trang lịch sử giao dịch"""
-    return render_template('trades.html')
+    try:
+        # Get account data for trade history
+        account_info = get_account().json
+        return render_template('trades.html', account_data=account_info)
+    except Exception as e:
+        app.logger.error(f"Error loading trades page: {str(e)}")
+        # Return with empty data
+        return render_template('trades.html', account_data={})
 
 @app.route('/market')
 def market():
     """Trang phân tích thị trường"""
-    market_data = get_market_data()
-    return render_template('market.html', market_data=market_data)
+    try:
+        market_data = get_market_data()
+        app.logger.info(f"Market data loaded successfully: BTC price = ${market_data['btc_price']}")
+        return render_template('market.html', market_data=market_data)
+    except Exception as e:
+        app.logger.error(f"Error loading market page: {str(e)}")
+        # Fallback to default data if API fails
+        return render_template('market.html', market_data=EMPTY_MARKET_DATA.copy())
 
 @app.route('/position')
 def position():
