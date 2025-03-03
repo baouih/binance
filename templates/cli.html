@@ -130,13 +130,13 @@
             
             <div class="d-flex align-items-center">
                 <div class="me-3">
-                    <span class="status-badge {{ 'status-running' if bot_status.running else 'status-stopped' }}"></span>
-                    <span>{{ 'Đang chạy' if bot_status.running else 'Đang dừng' }}</span>
+                    <span class="status-badge {{ 'status-running' if bot_status.status == 'running' else 'status-stopped' }}"></span>
+                    <span>{{ 'Đang chạy' if bot_status.status == 'running' else 'Đang dừng' }}</span>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
+                    <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.status == 'running' else 'btn-outline-success' }}" 
                             id="toggleBotBtn">
-                        {{ 'Dừng' if bot_status.running else 'Khởi động' }}
+                        {{ 'Dừng' if bot_status.status == 'running' else 'Khởi động' }}
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
                         <i class="bi bi-arrow-repeat"></i> Khởi động lại
@@ -343,12 +343,12 @@
                 fetch('/api/bot/status')
                     .then(response => response.json())
                     .then(data => {
-                        const status = data.running ? `<span class="cli-success">RUNNING</span>` : `<span class="cli-error">STOPPED</span>`;
+                        const status = data.status === 'running' ? `<span class="cli-success">RUNNING</span>` : `<span class="cli-error">STOPPED</span>`;
                         addOutput(`<span class="cli-info">Bot status: ${status}</span>`);
                         addOutput(`<span class="cli-info">Last update: ${data.last_update}</span>`);
                         addOutput(`<span class="cli-info">Uptime: ${data.uptime}</span>`);
                         addOutput(`<span class="cli-info">Version: ${data.version}</span>`);
-                        addOutput(`<span class="cli-info">Active strategies: ${data.active_strategies.join(', ')}</span>`);
+                        addOutput(`<span class="cli-info">Active strategies: ${data.active_strategies ? data.active_strategies.join(', ') : 'None'}</span>`);
                     })
                     .catch(error => {
                         addOutput(`<span class="cli-error">Error fetching status: ${error}</span>`);
