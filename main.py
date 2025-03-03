@@ -225,9 +225,15 @@ def get_market():
 @app.route('/api/bot/status')
 def get_bot_status():
     """Lấy trạng thái hiện tại của bot"""
-    # Cập nhật chế độ API từ session
-    if 'api_mode' in session:
-        bot_status['mode'] = session['api_mode']
+    global bot_status
+    
+    # Cập nhật chế độ API từ cấu hình
+    try:
+        with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+            config = json.load(f)
+        bot_status['mode'] = config.get('api_mode', 'demo')
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc cấu hình api_mode: {str(e)}")
     
     # Kiểm tra xem có bot nào đang chạy không
     try:
