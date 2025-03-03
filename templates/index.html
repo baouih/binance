@@ -235,20 +235,21 @@
                     <div class="mb-3">
                         <label class="form-label">Mức độ rủi ro</label>
                         <select class="form-select" id="riskLevel">
-                            <option value="very_low">Rất thấp (5-10% tài khoản)</option>
                             <option value="low">Thấp (10-15% tài khoản)</option>
                             <option value="medium" selected>Trung bình (20-30% tài khoản)</option>
                             <option value="high">Cao (30-50% tài khoản)</option>
-                            <option value="very_high">Rất cao (50-70% tài khoản)</option>
                         </select>
+                        <small class="text-muted">
+                            Bot sẽ tự điều chỉnh chiến lược giao dịch dựa trên mức độ rủi ro được chọn
+                        </small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Giới hạn rủi ro tài khoản</label>
+                        <label class="form-label">Giới hạn rủi ro tối đa</label>
                         <div class="d-flex align-items-center">
                             <input type="range" class="form-range me-2" 
                                    id="maxAccountRisk" 
-                                   min="5" max="70" step="5" 
+                                   min="10" max="50" step="5" 
                                    value="25">
                             <span id="maxAccountRiskValue">25%</span>
                         </div>
@@ -555,9 +556,6 @@
         riskLevel.addEventListener('change', function() {
             let defaultRisk;
             switch(this.value) {
-                case 'very_low':
-                    defaultRisk = 10;
-                    break;
                 case 'low':
                     defaultRisk = 15;
                     break;
@@ -566,9 +564,6 @@
                     break;
                 case 'high':
                     defaultRisk = 40;
-                    break;
-                case 'very_high':
-                    defaultRisk = 60;
                     break;
             }
             maxAccountRisk.value = defaultRisk;
