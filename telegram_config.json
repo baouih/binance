@@ -1,0 +1,19 @@
+{
+    "enabled": true,
+    "bot_token": "YOUR_BOT_TOKEN",
+    "chat_id": "YOUR_CHAT_ID",
+    "notification_types": {
+        "system": true,
+        "signals": true,
+        "trades": true,
+        "positions": true,
+        "errors": true,
+        "daily_reports": true
+    },
+    "priority_level": "high",
+    "silent_hours": {
+        "enabled": false,
+        "start": "23:00",
+        "end": "07:00"
+    }
+}
