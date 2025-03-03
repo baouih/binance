@@ -1,6 +1,16 @@
 """
 Ứng dụng Flask điều khiển BinanceTrader Bot
 """
+# Kích hoạt eventlet monkey patching TRƯỚC khi import bất kỳ module nào khác
+try:
+    import eventlet
+    eventlet.monkey_patch()
+    print("Eventlet monkey patching applied successfully")
+except ImportError as e:
+    print(f"Error importing eventlet: {e}")
+    raise
+
+# Sau đó mới import các module khác
 import os
 import json
 import logging
@@ -12,8 +22,6 @@ from datetime import datetime
 try:
     from flask import Flask, render_template, request, jsonify, make_response
     from flask_socketio import SocketIO
-    import eventlet
-    eventlet.monkey_patch()
     print("Successfully imported Flask and dependencies")
 except ImportError as e:
     print(f"Error importing Flask dependencies: {e}")
@@ -490,6 +498,43 @@ def handle_disconnect():
     except Exception as e:
         logger.error(f"Error handling socket disconnect: {str(e)}", exc_info=True)
 
+@socketio.on('request_bot_status')
+def handle_request_bot_status():
+    """Xử lý khi client yêu cầu trạng thái bot"""
+    try:
+        logger.info('Client requested bot status')
+        socketio.emit('bot_status_update', bot_status)
+    except Exception as e:
+        logger.error(f"Error handling request_bot_status: {str(e)}", exc_info=True)
+
+@socketio.on('request_account_data')
+def handle_request_account_data():
+    """Xử lý khi client yêu cầu dữ liệu tài khoản"""
+    try:
+        logger.info('Client requested account data')
+        socketio.emit('account_data', account_data)
+    except Exception as e:
+        logger.error(f"Error handling request_account_data: {str(e)}", exc_info=True)
+        
+@socketio.on('request_market_data')
+def handle_request_market_data():
+    """Xử lý khi client yêu cầu dữ liệu thị trường"""
+    try:
+        logger.info('Client requested market data')
+        socketio.emit('market_data', market_data)
+    except Exception as e:
+        logger.error(f"Error handling request_market_data: {str(e)}", exc_info=True)
+        
+@socketio.on('request_messages')
+def handle_request_messages():
+    """Xử lý khi client yêu cầu danh sách thông báo"""
+    try:
+        logger.info('Client requested messages')
+        for msg in messages[-50:]:
+            socketio.emit('new_message', msg)
+    except Exception as e:
+        logger.error(f"Error handling request_messages: {str(e)}", exc_info=True)
+
 # Thêm hàm giả lập cập nhật dữ liệu
 def simulate_data_updates():
     """Giả lập cập nhật dữ liệu tài khoản và thị trường"""
@@ -590,7 +635,9 @@ if __name__ == "__main__":
         simulation_thread.start()
         logger.info("Started data simulation thread")
 
-        # Khởi động ứng dụng Flask
-        app.run(host="0.0.0.0", port=5000, debug=True)
+        # Khởi động ứng dụng Flask với SocketIO (không dùng app.run)
+        logger.info("Starting SocketIO server on port 5000")
+        socketio.run(app, host="0.0.0.0", port=5000, debug=True, 
+                   use_reloader=False, log_output=True)
     except Exception as e:
         logger.error(f"Error starting server: {str(e)}", exc_info=True)
