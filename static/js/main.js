@@ -1,6 +1,90 @@
 // Main JavaScript file for the BinanceTrader Bot
 
+// Biến toàn cục để theo dõi trạng thái kết nối API
+window.apiConnectionStatus = {
+    isConnected: false,
+    lastConnected: null,
+    reconnectAttempts: 0,
+    maxReconnectAttempts: 3
+};
+
+// Chức năng tải ban đầu của API
+window.initializeAPIConnection = function() {
+    if (window.apiConnectionStatus.isConnected) {
+        console.log('API connection already established, skipping initialization');
+        return Promise.resolve(true);
+    }
+    
+    console.log('Initializing API connection...');
+    
+    return fetch('/api/bot/status')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API connection established:', data);
+            window.apiConnectionStatus.isConnected = true;
+            window.apiConnectionStatus.lastConnected = new Date();
+            window.apiConnectionStatus.reconnectAttempts = 0;
+            return true;
+        })
+        .catch(error => {
+            console.error('API connection error:', error);
+            window.apiConnectionStatus.isConnected = false;
+            return false;
+        });
+};
+
+// Kiểm tra định kỳ trạng thái API
+window.checkAPIStatus = function() {
+    // Nếu đã kết nối trong 30 giây qua, hãy bỏ qua kiểm tra
+    if (window.apiConnectionStatus.isConnected && 
+        window.apiConnectionStatus.lastConnected && 
+        (new Date() - window.apiConnectionStatus.lastConnected) < 30000) {
+        return Promise.resolve(true);
+    }
+    
+    console.log('Checking API status...');
+    
+    return fetch('/api/bot/status')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API status check successful:', data);
+            window.apiConnectionStatus.isConnected = true;
+            window.apiConnectionStatus.lastConnected = new Date();
+            window.apiConnectionStatus.reconnectAttempts = 0;
+            return true;
+        })
+        .catch(error => {
+            console.error('API status check failed:', error);
+            window.apiConnectionStatus.isConnected = false;
+            
+            // Thử kết nối lại nếu chưa đạt số lần thử tối đa
+            if (window.apiConnectionStatus.reconnectAttempts < window.apiConnectionStatus.maxReconnectAttempts) {
+                window.apiConnectionStatus.reconnectAttempts++;
+                console.log(`Attempting to reconnect (${window.apiConnectionStatus.reconnectAttempts}/${window.apiConnectionStatus.maxReconnectAttempts})...`);
+                return window.initializeAPIConnection();
+            }
+            
+            return false;
+        });
+};
+
+// Khởi tạo kết nối khi trang được tải
 document.addEventListener('DOMContentLoaded', function() {
+    // Khởi tạo kết nối API
+    window.initializeAPIConnection();
+    
+    // Thiết lập kiểm tra định kỳ
+    setInterval(window.checkAPIStatus, 60000); // Kiểm tra mỗi 60 giây
     // Helper function to show toast messages
     function showToast(type, message) {
         const toastId = type === 'success' ? 'success-toast' : 'error-toast';

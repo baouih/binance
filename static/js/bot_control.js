@@ -64,8 +64,16 @@ function controlBot(action, botId = 'default') {
     // Hiển thị loading indicator
     document.getElementById('loading-overlay').classList.remove('d-none');
     
-    // Gửi request tới API
-    fetch(`/api/bot/control/${botId}`, {
+    // Đảm bảo kết nối API trước khi gửi request
+    window.checkAPIStatus().then(isConnected => {
+        if (!isConnected) {
+            document.getElementById('loading-overlay').classList.add('d-none');
+            showToast('error', 'Không thể kết nối với API. Vui lòng làm mới trang.');
+            return;
+        }
+        
+        // Gửi request tới API
+        fetch(`/api/bot/control/${botId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -111,6 +119,7 @@ function controlBot(action, botId = 'default') {
         document.getElementById('loading-overlay').classList.add('d-none');
         console.error('Error:', error);
         showToast('error', `Lỗi kết nối: ${error.message}`);
+    });
     });
 }
 

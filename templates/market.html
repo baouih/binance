@@ -422,8 +422,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo kết nối API nếu chưa được khởi tạo
+        if (window.initializeAPIConnection) {
+            window.initializeAPIConnection();
+        }
         // Market chart
         const marketChartCtx = document.getElementById('marketChart').getContext('2d');
         const marketChart = new Chart(marketChartCtx, {
@@ -503,31 +508,102 @@
 
         // Refresh market data button
         document.getElementById('refresh-market').addEventListener('click', function() {
-            // Simulate refreshing data
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+            // Hiển thị trạng thái đang làm mới
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang làm mới...';
             
-            setTimeout(() => {
-                // Update price displays with random fluctuations
-                const btcPrice = parseFloat(document.getElementById('btc-price').textContent.replace('$', '').replace(',', ''));
-                const ethPrice = parseFloat(document.getElementById('eth-price').textContent.replace('$', '').replace(',', ''));
-                const solPrice = parseFloat(document.getElementById('sol-price').textContent.replace('$', '').replace(',', ''));
-                const bnbPrice = parseFloat(document.getElementById('bnb-price').textContent.replace('$', '').replace(',', ''));
-                
-                document.getElementById('btc-price').textContent = '$' + (btcPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
-                document.getElementById('eth-price').textContent = '$' + (ethPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
-                document.getElementById('sol-price').textContent = '$' + (solPrice * (1 + (Math.random() * 0.03 - 0.015))).toFixed(2);
-                document.getElementById('bnb-price').textContent = '$' + (bnbPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
-                
-                // Update chart with new data point
-                const lastValue = marketChart.data.datasets[0].data[marketChart.data.datasets[0].data.length - 1];
-                const newValue = lastValue * (1 + (Math.random() * 0.04 - 0.02));
-                
-                marketChart.data.datasets[0].data.push(newValue);
-                marketChart.data.datasets[0].data.shift();
-                marketChart.update();
-                
-                this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
-            }, 1000);
+            // Kiểm tra trạng thái kết nối API
+            if (window.checkAPIStatus) {
+                window.checkAPIStatus().then(isConnected => {
+                    if (!isConnected) {
+                        this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
+                        const toast = new bootstrap.Toast(document.getElementById('error-toast'));
+                        document.getElementById('toast-error-message').textContent = 'Không thể kết nối với API. Vui lòng làm mới trang.';
+                        toast.show();
+                        return;
+                    }
+                    
+                    // Lấy dữ liệu thị trường thực từ API
+                    fetch('/api/market/data')
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Market data updated:', data);
+                            
+                            // Cập nhật giá hiển thị
+                            if (data.btc_price) document.getElementById('btc-price').textContent = '$' + data.btc_price.toFixed(2);
+                            if (data.eth_price) document.getElementById('eth-price').textContent = '$' + data.eth_price.toFixed(2);
+                            if (data.sol_price) document.getElementById('sol-price').textContent = '$' + data.sol_price.toFixed(2);
+                            if (data.bnb_price) document.getElementById('bnb-price').textContent = '$' + data.bnb_price.toFixed(2);
+                            
+                            // Cập nhật biểu đồ với điểm dữ liệu mới
+                            if (data.btc_price) {
+                                const newValue = data.btc_price;
+                                marketChart.data.datasets[0].data.push(newValue);
+                                marketChart.data.datasets[0].data.shift();
+                                marketChart.update();
+                            }
+                            
+                            this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
+                            
+                            // Hiển thị thông báo thành công
+                            const toast = new bootstrap.Toast(document.getElementById('success-toast'));
+                            document.getElementById('toast-message').textContent = 'Đã cập nhật dữ liệu thị trường thành công';
+                            toast.show();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching market data:', error);
+                            this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
+                            
+                            // Hiển thị thông báo lỗi
+                            const toast = new bootstrap.Toast(document.getElementById('error-toast'));
+                            document.getElementById('toast-error-message').textContent = 'Lỗi khi lấy dữ liệu thị trường: ' + error.message;
+                            toast.show();
+                            
+                            // Sử dụng dữ liệu mô phỏng như là backup
+                            // Update price displays with random fluctuations
+                            const btcPrice = parseFloat(document.getElementById('btc-price').textContent.replace('$', '').replace(',', ''));
+                            const ethPrice = parseFloat(document.getElementById('eth-price').textContent.replace('$', '').replace(',', ''));
+                            const solPrice = parseFloat(document.getElementById('sol-price').textContent.replace('$', '').replace(',', ''));
+                            const bnbPrice = parseFloat(document.getElementById('bnb-price').textContent.replace('$', '').replace(',', ''));
+                            
+                            document.getElementById('btc-price').textContent = '$' + (btcPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                            document.getElementById('eth-price').textContent = '$' + (ethPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                            document.getElementById('sol-price').textContent = '$' + (solPrice * (1 + (Math.random() * 0.03 - 0.015))).toFixed(2);
+                            document.getElementById('bnb-price').textContent = '$' + (bnbPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                            
+                            // Update chart with new data point
+                            const lastValue = marketChart.data.datasets[0].data[marketChart.data.datasets[0].data.length - 1];
+                            const newValue = lastValue * (1 + (Math.random() * 0.04 - 0.02));
+                            
+                            marketChart.data.datasets[0].data.push(newValue);
+                            marketChart.data.datasets[0].data.shift();
+                            marketChart.update();
+                        });
+                });
+            } else {
+                // Nếu không có API, sử dụng dữ liệu mô phỏng
+                setTimeout(() => {
+                    // Update price displays with random fluctuations
+                    const btcPrice = parseFloat(document.getElementById('btc-price').textContent.replace('$', '').replace(',', ''));
+                    const ethPrice = parseFloat(document.getElementById('eth-price').textContent.replace('$', '').replace(',', ''));
+                    const solPrice = parseFloat(document.getElementById('sol-price').textContent.replace('$', '').replace(',', ''));
+                    const bnbPrice = parseFloat(document.getElementById('bnb-price').textContent.replace('$', '').replace(',', ''));
+                    
+                    document.getElementById('btc-price').textContent = '$' + (btcPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                    document.getElementById('eth-price').textContent = '$' + (ethPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                    document.getElementById('sol-price').textContent = '$' + (solPrice * (1 + (Math.random() * 0.03 - 0.015))).toFixed(2);
+                    document.getElementById('bnb-price').textContent = '$' + (bnbPrice * (1 + (Math.random() * 0.02 - 0.01))).toFixed(2);
+                    
+                    // Update chart with new data point
+                    const lastValue = marketChart.data.datasets[0].data[marketChart.data.datasets[0].data.length - 1];
+                    const newValue = lastValue * (1 + (Math.random() * 0.04 - 0.02));
+                    
+                    marketChart.data.datasets[0].data.push(newValue);
+                    marketChart.data.datasets[0].data.shift();
+                    marketChart.update();
+                    
+                    this.innerHTML = '<i class="fas fa-sync me-1"></i> Làm mới';
+                }, 1000);
+            }
         });
 
         // Handle auto-refresh toggle
