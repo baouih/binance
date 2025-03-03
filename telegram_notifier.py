@@ -9,6 +9,7 @@ import logging
 import requests
 import json
 from datetime import datetime
+from typing import Dict, List, Optional, Union, Any
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -197,6 +198,117 @@ class TelegramNotifier:
         category = 'trade_profit' if is_profit else 'trade_loss'
         return self.send_message(message, category)
     
+    def send_system_status(self, 
+                           account_balance: float,
+                           positions: List[Dict] = None, 
+                           unrealized_pnl: float = 0.0,
+                           market_data: Dict = None,
+                           mode: str = None) -> bool:
+        """
+        Gửi thông báo trạng thái hệ thống khi bot khởi động hoặc khởi động lại
+        
+        Args:
+            account_balance (float): Số dư tài khoản
+            positions (List[Dict], optional): Danh sách vị thế đang mở
+            unrealized_pnl (float): Lãi/lỗ chưa thực hiện
+            market_data (Dict, optional): Dữ liệu thị trường
+            mode (str, optional): Chế độ giao dịch ('live', 'testnet', 'demo')
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu thất bại
+        """
+        # Xác định chế độ giao dịch nếu không được cung cấp
+        if mode is None:
+            try:
+                with open('account_config.json', 'r') as f:
+                    config = json.load(f)
+                    mode = config.get('api_mode', 'demo')
+            except:
+                mode = 'demo'  # Mặc định nếu không thể đọc config
+        
+        # Hiển thị chế độ giao dịch với màu sắc tương ứng
+        mode_emoji = '🟢' if mode == 'live' else '🟡' if mode == 'testnet' else '⚪'
+        mode_display = mode.upper()
+        
+        # Tạo thông báo
+        report_message = f"<b>🔄 BOT ĐÃ KHỞI ĐỘNG</b> {mode_emoji} <b>{mode_display}</b>\n\n"
+        report_message += f"<b>⏱️ Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        
+        # Thông tin tài khoản
+        report_message += f"<b>💰 Số dư:</b> {account_balance:,.2f} USDT\n"
+        
+        # Thông tin lãi/lỗ hiện tại
+        if unrealized_pnl > 0:
+            report_message += f"<b>📈 Lãi chưa thực hiện:</b> +{unrealized_pnl:,.2f} USDT\n"
+        elif unrealized_pnl < 0:
+            report_message += f"<b>📉 Lỗ chưa thực hiện:</b> {unrealized_pnl:,.2f} USDT\n"
+        
+        # Thông tin vị thế đang mở
+        if positions and len(positions) > 0:
+            report_message += f"\n<b>🔴 VỊ THẾ ĐANG MỞ ({len(positions)}):</b>\n"
+            for pos in positions:
+                symbol = pos.get('symbol', '')
+                size = pos.get('size', 0)
+                entry = pos.get('entry_price', 0)
+                curr = pos.get('current_price', 0)
+                pnl = pos.get('pnl', 0)
+                pnl_pct = pos.get('pnl_percent', 0)
+                
+                # PNL hiển thị
+                pnl_text = f"+{pnl:,.2f}" if pnl > 0 else f"{pnl:,.2f}"
+                pnl_pct_text = f"+{pnl_pct:.2f}%" if pnl_pct > 0 else f"{pnl_pct:.2f}%"
+                
+                report_message += f"  • {symbol}: {size} @ {entry:,.2f}, PNL: {pnl_text} ({pnl_pct_text})\n"
+        else:
+            report_message += "\n<b>🟢 Không có vị thế đang mở</b>\n"
+        
+        # Thông tin thị trường
+        if market_data:
+            report_message += f"\n<b>📊 THỊ TRƯỜNG HIỆN TẠI:</b>\n"
+            
+            if 'btc_price' in market_data and market_data['btc_price'] > 0:
+                report_message += f"  • BTC: ${market_data['btc_price']:,.2f}"
+                
+                if 'btc_change_24h' in market_data:
+                    change = market_data['btc_change_24h']
+                    change_text = f"+{change:.2f}%" if change > 0 else f"{change:.2f}%"
+                    report_message += f" ({change_text})\n"
+                else:
+                    report_message += "\n"
+            
+            if 'eth_price' in market_data and market_data['eth_price'] > 0:
+                report_message += f"  • ETH: ${market_data['eth_price']:,.2f}"
+                
+                if 'eth_change_24h' in market_data:
+                    change = market_data['eth_change_24h']
+                    change_text = f"+{change:.2f}%" if change > 0 else f"{change:.2f}%"
+                    report_message += f" ({change_text})\n"
+                else:
+                    report_message += "\n"
+        
+        # Đề xuất hành động
+        report_message += f"\n<b>📋 KẾ HOẠCH HÀNH ĐỘNG:</b>\n"
+        
+        if positions and len(positions) > 0:
+            report_message += "  • Kiểm soát quản lý rủi ro các vị thế đang mở\n"
+            
+            # Đề xuất dựa trên tình trạng lãi/lỗ vị thế
+            for pos in positions:
+                symbol = pos.get('symbol', '')
+                pnl_pct = pos.get('pnl_percent', 0)
+                
+                if pnl_pct > 5:
+                    report_message += f"  • Xem xét chốt lời cho {symbol} (đã đạt {pnl_pct:.2f}%)\n"
+                elif pnl_pct < -3:
+                    report_message += f"  • Xem xét quản lý rủi ro cho {symbol} (lỗ {pnl_pct:.2f}%)\n"
+        
+        # Đề xuất chung
+        report_message += "  • Theo dõi tín hiệu giao dịch mới\n"
+        report_message += "  • Cập nhật cài đặt tham số nếu cần\n"
+        
+        # Gửi thông báo
+        return self.send_message(report_message, 'system')
+        
     def send_market_alert(self, symbol: str, alert_type: str, 
                         price: float = None, message: str = None) -> bool:
         """

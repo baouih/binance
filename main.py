@@ -1100,6 +1100,77 @@ def start_background_tasks():
             bot_status['mode'] = api_mode.lower()
         else:
             logger.info("Auto-start bot is disabled in testing environment")
+            bot_status['mode'] = api_mode.lower()  # Set mode anyway
+        
+        # Lấy thông tin tài khoản và gửi thông báo khởi động
+        try:
+            # Lấy dữ liệu thị trường
+            market_data = get_market_data()
+            
+            # Lấy dữ liệu tài khoản
+            with app.app_context():
+                account_data = get_account().json
+                
+            # Xác định thông tin tài khoản
+            account_balance = float(account_data.get('totalWalletBalance', 0))
+            positions = account_data.get('positions', [])
+            
+            # Tính tổng lãi/lỗ chưa thực hiện
+            unrealized_pnl = 0.0
+            active_positions = []
+            
+            # Lọc các vị thế đang mở (có positionAmt khác 0)
+            for position in positions:
+                if float(position.get('positionAmt', 0)) != 0:
+                    position_size = abs(float(position.get('positionAmt', 0)))
+                    entry_price = float(position.get('entryPrice', 0))
+                    mark_price = float(position.get('markPrice', 0)) 
+                    
+                    # Xác định hướng vị thế
+                    position_side = 'LONG' if float(position.get('positionAmt', 0)) > 0 else 'SHORT'
+                    
+                    # Tính PNL
+                    pnl = 0
+                    if position_side == 'LONG':
+                        pnl = (mark_price - entry_price) * position_size
+                    else:
+                        pnl = (entry_price - mark_price) * position_size
+                    
+                    # Tính % PNL
+                    pnl_percent = 0
+                    if entry_price > 0:
+                        if position_side == 'LONG':
+                            pnl_percent = (mark_price - entry_price) / entry_price * 100
+                        else:
+                            pnl_percent = (entry_price - mark_price) / entry_price * 100
+                    
+                    # Cập nhật Unrealized PNL
+                    unrealized_pnl += pnl
+                    
+                    # Tạo dữ liệu vị thế đơn giản
+                    active_positions.append({
+                        'symbol': position.get('symbol', 'UNKNOWN'),
+                        'type': position_side,
+                        'size': position_size,
+                        'entry_price': entry_price,
+                        'current_price': mark_price,
+                        'pnl': pnl,
+                        'pnl_percent': pnl_percent
+                    })
+            
+            # Gửi thông báo trạng thái hệ thống qua Telegram
+            telegram_notifier.send_system_status(
+                account_balance=account_balance,
+                positions=active_positions,
+                unrealized_pnl=unrealized_pnl,
+                market_data=market_data,
+                mode=api_mode
+            )
+            
+            logger.info(f"Đã gửi thông báo khởi động hệ thống với dữ liệu tài khoản: số dư={account_balance}, PNL chưa thực hiện={unrealized_pnl}")
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}")
+            
     except Exception as e:
         logger.error(f"Error during auto-start check: {str(e)}")
     
