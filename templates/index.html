@@ -357,10 +357,10 @@
                 <!-- Bot controls -->
                 <div class="btn-group">
                     <button class="btn btn-sm {{ 'btn-outline-danger stop-bot-btn' if bot_status.running else 'btn-outline-success start-bot-btn' }}" 
-                            id="toggleBotBtn" data-bot-id="default" onclick="toggleBotStatus(); return false;">
+                            id="toggleBotBtn" data-bot-id="default" onclick="toggleBotStatus()">
                         {{ 'Dừng' if bot_status.running else 'Khởi động' }}
                     </button>
-                    <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
+                    <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn" onclick="restartBot()">
                         <i class="bi bi-arrow-repeat"></i> Khởi động lại
                     </button>
                 </div>
@@ -370,7 +370,7 @@
         <!-- Float button to toggle on/off - larger size and improved position -->
         <div class="d-block d-md-none" style="position: fixed; bottom: 85px; right: 20px; z-index: 1050;">
             <button class="btn {{ 'btn-danger stop-bot-btn' if bot_status.running else 'btn-success start-bot-btn' }} rounded-circle shadow" style="width: 60px; height: 60px;"
-                    id="mobileBotToggle" data-bot-id="default" onclick="toggleBotStatus(); return false;">
+                    id="mobileBotToggle" data-bot-id="default" onclick="toggleBotStatus()">
                 <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} fs-3"></i>
             </button>
             <div class="text-center mt-1" style="font-size: 12px; color: white; text-shadow: 0 0 3px rgba(0,0,0,0.7);">
@@ -1031,7 +1031,7 @@ Nhập 'help' để xem danh sách lệnh.
             
             // Initialize the bot controls with proper event listeners
             function setupBotControls() {
-                console.log("Setting up bot controls...");
+                console.log("Setting up bot controls with direct toggleBotStatus function...");
                 
                 // Initialize mobile control button
                 if (mobileBotToggle) {
@@ -1040,11 +1040,11 @@ Nhập 'help' để xem danh sách lệnh.
                     const newMobileToggle = mobileBotToggle.cloneNode(true);
                     mobileBotToggle.parentNode.replaceChild(newMobileToggle, mobileBotToggle);
                     
-                    // Add click event
+                    // Add click event with direct call to toggleBotStatus
                     newMobileToggle.addEventListener('click', function(e) {
                         e.preventDefault();
-                        console.log("Mobile bot toggle clicked");
-                        checkAPIAndToggleBot();
+                        console.log("Mobile bot toggle clicked - calling toggleBotStatus directly");
+                        toggleBotStatus();
                     });
                 } else {
                     console.warn("Mobile bot toggle button not found");
@@ -1182,11 +1182,17 @@ Nhập 'help' để xem danh sách lệnh.
                 // Show loading spinner
                 document.body.classList.add('processing');
                 
+                // Thêm timestamp để tránh cache
+                const restartTimestamp = new Date().getTime();
+                
                 // Send restart command to API
-                fetch('/api/bot/control', {
+                fetch(`/api/bot/control?_t=${restartTimestamp}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     body: JSON.stringify({ action: 'restart' })
                 })
@@ -1275,28 +1281,31 @@ Nhập 'help' để xem danh sách lệnh.
                 });
             });
             
-            // Bỏ qua xử lý sự kiện click vì đã thiết lập trực tiếp trên nút bấm
-            // Comment ra để tránh lỗi
-            /*
-            mobileBotToggle.addEventListener('click', function() {
-                toggleBotStatusDirectly();
-                return false;
-            });
-            */
-            
             // Hàm chuyển đổi trạng thái bot
             function toggleBotStatus() {
-                const action = document.getElementById('toggleBotBtn').textContent.trim() === 'Khởi động' ? 'start' : 'stop';
+                // Lấy action dựa trên trạng thái hiện tại
+                const isRunning = document.querySelector('.status-badge').classList.contains('status-running');
+                const action = isRunning ? 'stop' : 'start'; 
                 
-                console.log("Đang thực hiện hành động: " + action);
+                console.log("Đang thực hiện hành động BOT:", action);
+                console.log("Bot status hiện tại:", isRunning ? "running" : "stopped");
                 
                 // Hiển thị loading trước khi gửi request
                 document.body.classList.add('processing');
                 
-                fetch('/api/bot/control', {
+                // Ghi log chi tiết trước khi gửi request
+                console.log(`Gửi request đến /api/bot/control với payload: ${JSON.stringify({ action: action })}`);
+                
+                // Thêm timestamp để tránh cache
+                const timestamp = new Date().getTime();
+                
+                fetch(`/api/bot/control?_t=${timestamp}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     body: JSON.stringify({ action: action })
                 })
@@ -1448,17 +1457,12 @@ Nhập 'help' để xem danh sách lệnh.
             });
             
             // Handle restart bot button
-            restartBotBtn.addEventListener('click', function() {
-                // Hiển thị loading trước khi gửi request
-                document.body.classList.add('processing');
-                
-                fetch('/api/bot/control', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ action: 'restart' })
-                })
+            restartBotBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log("Restart button clicked directly");
+                restartBot();
+                return false;
+            });
                 .then(response => response.json())
                 .then(data => {
                     document.body.classList.remove('processing');

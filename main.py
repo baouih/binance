@@ -350,10 +350,11 @@ def test_telegram():
             'message': f'Lỗi: {str(e)}'
         })
 
-@app.route('/api/bot/control', methods=['POST'])
-def control_bot_general():
-    """API endpoint để điều khiển bot (start/stop/restart) không cần chỉ định ID"""
-    # Cập nhật file bot_status.json và trạng thái toàn cục
+# Route này được xử lý bởi blueprint bot_api_routes.py
+# @app.route('/api/bot/control', methods=['POST'])
+# def control_bot_general():
+#    """API endpoint để điều khiển bot (start/stop/restart) không cần chỉ định ID"""
+#    # Cập nhật file bot_status.json và trạng thái toàn cục
     try:
         # Kiểm tra dữ liệu từ request
         data = request.json
