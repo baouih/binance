@@ -269,8 +269,191 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Khởi tạo kết nối Socket.IO
+    const socket = io();
+    
+    // Xử lý sự kiện cập nhật trạng thái bot
+    socket.on('bot_status_update', function(data) {
+        // Cập nhật trạng thái hiển thị
+        updateBotStatusDisplay(data);
+        
+        // Cập nhật thông tin thống kê nếu có
+        if(data.stats) {
+            updateStatsDisplay(data.stats);
+        }
+        
+        // Hiển thị thông báo
+        showToast('success', 'Trạng thái bot đã được cập nhật');
+    });
+    
+    // Xử lý sự kiện thay đổi trạng thái (start/stop)
+    socket.on('bot_status_change', function(data) {
+        // Cập nhật trạng thái hiển thị
+        if(data.status === 'running') {
+            botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
+            botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
+            startBotBtn.disabled = true;
+            stopBotBtn.disabled = false;
+        } else {
+            botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
+            botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
+            startBotBtn.disabled = false;
+            stopBotBtn.disabled = true;
+        }
+        
+        // Hiển thị thông báo
+        showToast('success', data.message);
+    });
+    
+    // Xử lý sự kiện log mới
+    socket.on('bot_log', function(logData) {
+        // Thêm log mới vào đầu danh sách
+        addNewLog(logData);
+    });
+    
+    // Xử lý sự kiện quyết định giao dịch mới
+    socket.on('trading_decision', function(decision) {
+        // Thêm quyết định mới vào đầu danh sách
+        addNewDecision(decision);
+    });
+    
+    // Hàm cập nhật hiển thị trạng thái bot
+    function updateBotStatusDisplay(data) {
+        if(data.status === 'running') {
+            botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
+            botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
+            startBotBtn.disabled = true;
+            stopBotBtn.disabled = false;
+        } else {
+            botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
+            botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
+            startBotBtn.disabled = false;
+            stopBotBtn.disabled = true;
+        }
+        
+        // Cập nhật thời gian
+        updateLastUpdateTime();
+    }
+    
+    // Hàm cập nhật hiển thị thống kê
+    function updateStatsDisplay(stats) {
+        uptimeCounter.textContent = stats.uptime;
+        analysisCounter.textContent = stats.analyses;
+        decisionsCounter.textContent = stats.decisions;
+        ordersCounter.textContent = stats.orders;
+    }
+    
+    // Hàm thêm log mới
+    function addNewLog(logData) {
+        const logTime = new Date(logData.timestamp);
+        const formattedTime = logTime.toLocaleTimeString();
+        
+        const logItem = document.createElement('div');
+        logItem.className = `log-item ${logData.category}`;
+        logItem.innerHTML = `
+            <div class="d-flex justify-content-between">
+                <small class="timestamp">${formattedTime}</small>
+                <small class="badge ${getCategoryBadgeClass(logData.category)}">${getCategoryLabel(logData.category)}</small>
+            </div>
+            <div class="mt-1">${logData.message}</div>
+        `;
+        
+        // Nếu container đã có nội dung không phải là thông báo loading
+        if (!logContainer.querySelector('.text-center.py-5')) {
+            // Thêm phần tử mới vào đầu danh sách
+            logContainer.insertBefore(logItem, logContainer.firstChild);
+            
+            // Nếu có quá nhiều log, xóa bớt
+            const logItems = logContainer.querySelectorAll('.log-item');
+            if (logItems.length > 50) {
+                logContainer.removeChild(logItems[logItems.length - 1]);
+            }
+        } else {
+            // Nếu đang hiển thị loading, xóa nó và thêm log mới
+            logContainer.innerHTML = '';
+            logContainer.appendChild(logItem);
+        }
+    }
+    
+    // Hàm thêm quyết định mới
+    function addNewDecision(decision) {
+        const decisionTime = new Date(decision.timestamp);
+        const formattedTime = decisionTime.toLocaleDateString() + ' ' + decisionTime.toLocaleTimeString();
+        
+        const decisionItem = document.createElement('div');
+        decisionItem.className = `decision-item ${decision.action.toLowerCase()}`;
+        
+        let decisionContent = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="mb-0">${decision.symbol}: ${getActionLabel(decision.action)}</h5>
+                <span class="timestamp">${formattedTime}</span>
+            </div>
+        `;
+        
+        // Thêm chi tiết giá nếu có
+        if (decision.action !== 'HOLD') {
+            decisionContent += `
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="text-muted small">Giá vào lệnh</div>
+                            <div class="fw-bold">${formatPrice(decision.entry_price)}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="text-muted small">Take Profit</div>
+                            <div class="fw-bold text-success">${formatPrice(decision.take_profit)}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="text-muted small">Stop Loss</div>
+                            <div class="fw-bold text-danger">${formatPrice(decision.stop_loss)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Thêm lý do quyết định
+        decisionContent += `<div class="mb-2 fw-bold">Lý do:</div>`;
+        decision.reasons.forEach(reason => {
+            decisionContent += `<div class="reason-item"><i class="fas fa-check-circle me-1 text-success"></i> ${reason}</div>`;
+        });
+        
+        decisionItem.innerHTML = decisionContent;
+        
+        // Nếu container đã có nội dung không phải là thông báo loading
+        if (!decisionsContainer.querySelector('.text-center.py-5')) {
+            // Thêm phần tử mới vào đầu danh sách
+            decisionsContainer.insertBefore(decisionItem, decisionsContainer.firstChild);
+            
+            // Nếu có quá nhiều quyết định, xóa bớt
+            const decisionItems = decisionsContainer.querySelectorAll('.decision-item');
+            if (decisionItems.length > 5) {
+                decisionsContainer.removeChild(decisionItems[decisionItems.length - 1]);
+            }
+        } else {
+            // Nếu đang hiển thị loading, xóa nó và thêm quyết định mới
+            decisionsContainer.innerHTML = '';
+            decisionsContainer.appendChild(decisionItem);
+        }
+    }
+    
+    // Hàm hiển thị thông báo
+    function showToast(type, message) {
+        if (type === 'success') {
+            document.getElementById('toast-message').textContent = message;
+            new bootstrap.Toast(document.getElementById('success-toast')).show();
+        } else {
+            document.getElementById('toast-error-message').textContent = message;
+            new bootstrap.Toast(document.getElementById('error-toast')).show();
+        }
+    }
     // Khởi tạo các biến
     const botSelector = document.getElementById('botSelector');
     const refreshButton = document.getElementById('refreshButton');

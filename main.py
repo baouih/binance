@@ -481,6 +481,85 @@ def execute_cli_command():
     result = f"Đã thực thi lệnh: {command}"
     return jsonify({'result': result})
 
+@app.route('/api/bot/control/<bot_id>', methods=['POST'])
+def control_bot(bot_id):
+    """API endpoint để điều khiển bot (start/stop/restart/delete)"""
+    global bot_status
+    
+    # Kiểm tra dữ liệu từ request
+    data = request.json
+    action = data.get('action', '')
+    
+    if action not in ['start', 'stop', 'restart', 'delete']:
+        return jsonify({
+            'success': False,
+            'message': f'Hành động không hợp lệ: {action}'
+        })
+    
+    # Xử lý các hành động
+    if action == 'start':
+        bot_status['status'] = 'running'
+        bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Thông báo qua Socket.IO
+        socketio.emit('bot_status_change', {
+            'status': 'running',
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động'
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động',
+            'status': 'running'
+        })
+        
+    elif action == 'stop':
+        bot_status['status'] = 'stopped'
+        bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Thông báo qua Socket.IO
+        socketio.emit('bot_status_change', {
+            'status': 'stopped',
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được dừng'
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được dừng',
+            'status': 'stopped'
+        })
+        
+    elif action == 'restart':
+        bot_status['status'] = 'running'
+        bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Thông báo qua Socket.IO
+        socketio.emit('bot_status_change', {
+            'status': 'running',
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động lại'
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động lại',
+            'status': 'running'
+        })
+        
+    elif action == 'delete':
+        # Chỉ áp dụng với bot cụ thể, không với 'all'
+        if bot_id == 'all':
+            return jsonify({
+                'success': False,
+                'message': 'Không thể xóa tất cả các bot cùng lúc'
+            })
+            
+        # Xử lý xóa bot (giả lập)
+        return jsonify({
+            'success': True,
+            'message': f'Bot {bot_id} đã được xóa',
+            'status': 'deleted'
+        })
+
 def get_market_data():
     """Lấy dữ liệu thị trường"""
     # Cập nhật chế độ API từ cấu hình
