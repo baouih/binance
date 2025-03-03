@@ -925,5 +925,5 @@ if __name__ == '__main__':
     
     # Khởi động ứng dụng
     # Sử dụng gunicorn cho môi trường production
-    # socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True)
