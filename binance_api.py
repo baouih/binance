@@ -169,7 +169,11 @@ class BinanceAPI:
         Returns:
             Dict: Thông tin sàn giao dịch
         """
-        return self._request('GET', 'exchangeInfo')
+        # Đảm bảo sử dụng phiên bản API đúng cho từng loại tài khoản và môi trường
+        if self.account_type == 'futures':
+            return self._request('GET', 'exchangeInfo', version='v1')
+        else:
+            return self._request('GET', 'exchangeInfo')
         
     def get_symbol_info(self, symbol: str) -> Dict:
         """
@@ -181,7 +185,8 @@ class BinanceAPI:
         Returns:
             Dict: Thông tin symbol
         """
-        exchange_info = self._request('GET', 'exchangeInfo')
+        # Sử dụng phương thức get_exchange_info để đảm bảo đúng phiên bản API
+        exchange_info = self.get_exchange_info()
         for symbol_info in exchange_info.get('symbols', []):
             if symbol_info['symbol'] == symbol:
                 return symbol_info
@@ -339,7 +344,11 @@ class BinanceAPI:
         if symbol:
             params['symbol'] = symbol
             
-        return self._request('GET', 'ticker/price', params)
+        # Đảm bảo sử dụng phiên bản API đúng cho futures
+        if self.account_type == 'futures':
+            return self._request('GET', 'ticker/price', params, version='v1')
+        else:
+            return self._request('GET', 'ticker/price', params)
         
     def get_book_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
         """
