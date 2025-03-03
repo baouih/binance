@@ -1,172 +1,145 @@
-"""
-Order Manager - Module quản lý lệnh chờ và xác nhận tín hiệu
-
-Module này cung cấp các tính năng:
-1. Xác nhận tín hiệu qua nhiều khung thời gian trước khi vào lệnh
-2. Quản lý lệnh chờ và hủy lệnh khi điều kiện thị trường thay đổi
-3. Tìm điểm vào lệnh tối ưu dựa trên phân tích kỹ thuật
-"""
-
 import os
 import json
+import uuid
 import time
 import logging
 import threading
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime, timedelta
 
+# Thiết lập logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('order_manager.log')
+    ]
+)
 logger = logging.getLogger('order_manager')
 
 class OrderManager:
-    """Quản lý xác nhận tín hiệu và lệnh chờ"""
+    """
+    Quản lý tín hiệu giao dịch và lệnh chờ
     
-    def __init__(self, 
-                 signal_confirmation_threshold: int = 2,  # Số lần xác nhận tín hiệu cần thiết
-                 signal_valid_period: int = 300,  # Thời gian hiệu lực của tín hiệu (giây)
-                 pending_order_timeout: int = 1800,  # Thời gian timeout cho lệnh chờ (giây)
-                 storage_path: str = 'data/signals'):
+    Đảm bảo các tín hiệu giao dịch được xác nhận đủ trước khi vào lệnh,
+    đồng thời quản lý các lệnh chờ và hủy lệnh khi điều kiện thị trường thay đổi.
+    """
+    
+    def __init__(self, signal_confirmation_threshold: int = 2, 
+               signal_valid_period: int = 300, 
+               pending_order_timeout: int = 1800,
+               storage_path: str = '.'):
         """
         Khởi tạo Order Manager
         
         Args:
-            signal_confirmation_threshold: Số lần phải xác nhận tín hiệu trước khi vào lệnh
-            signal_valid_period: Thời gian (giây) mà tín hiệu còn hiệu lực
-            pending_order_timeout: Thời gian (giây) trước khi hủy lệnh chờ
-            storage_path: Đường dẫn lưu trữ dữ liệu tín hiệu
+            signal_confirmation_threshold: Số lần xác nhận cần thiết để tín hiệu được chấp nhận
+            signal_valid_period: Thời gian hiệu lực của tín hiệu (giây)
+            pending_order_timeout: Thời gian chờ tối đa cho lệnh chờ (giây)
+            storage_path: Đường dẫn lưu trữ dữ liệu
         """
         self.signal_confirmation_threshold = signal_confirmation_threshold
         self.signal_valid_period = signal_valid_period
         self.pending_order_timeout = pending_order_timeout
         self.storage_path = storage_path
         
-        # Đảm bảo thư mục lưu trữ tồn tại
+        # Dữ liệu tín hiệu và lệnh
+        self.pending_signals = {}  # Tín hiệu đang chờ xác nhận
+        self.confirmed_signals = {}  # Tín hiệu đã được xác nhận đủ
+        self.pending_orders = {}  # Lệnh đang chờ khớp
+        
+        # Tạo thư mục lưu trữ nếu chưa tồn tại
         os.makedirs(storage_path, exist_ok=True)
         
-        # Khởi tạo các dict lưu trữ tín hiệu và lệnh chờ
-        self.pending_signals = {}  # Dict lưu tín hiệu chờ xác nhận
-        self.pending_orders = {}   # Dict lưu lệnh đang chờ thực thi
-        self.confirmed_signals = {}  # Dict lưu tín hiệu đã xác nhận
-        
-        # Tải dữ liệu từ file nếu có
+        # Tải dữ liệu từ file (nếu có)
         self._load_data()
         
-        # Bắt đầu thread kiểm tra định kỳ
+        # Khởi động thread kiểm tra định kỳ
         self._start_background_checker()
+        
+        logger.info("Đã khởi tạo Order Manager")
     
-    def register_signal(self, 
-                       symbol: str,
-                       action: str,  # 'BUY' hoặc 'SELL'
-                       price: float,
-                       indicators: Dict,
-                       source: str = 'primary') -> Dict:
+    def register_signal(self, symbol: str, action: str, price: float, indicators: Dict,
+                      source: str = 'primary') -> Dict:
         """
-        Đăng ký tín hiệu mới để chờ xác nhận
+        Đăng ký một tín hiệu giao dịch mới hoặc xác nhận tín hiệu hiện có
         
         Args:
-            symbol: Cặp giao dịch (ví dụ: 'BTCUSDT')
+            symbol: Cặp giao dịch
             action: Hành động (BUY/SELL)
-            price: Giá tại thời điểm tạo tín hiệu
-            indicators: Dict các chỉ báo kỹ thuật hỗ trợ tín hiệu
-            source: Nguồn tín hiệu (primary/secondary/confirmation)
+            price: Giá tham chiếu
+            indicators: Các chỉ báo kỹ thuật liên quan
+            source: Nguồn tín hiệu (primary/secondary/...)
             
         Returns:
-            Dict: Thông tin tín hiệu đã đăng ký
+            Dict: Thông tin tín hiệu (bao gồm ID và trạng thái)
         """
         timestamp = datetime.now()
-        signal_id = f"{symbol}_{action}_{int(timestamp.timestamp())}"
         
-        # Kiểm tra tín hiệu đối nghịch gần đây
-        opposite_action = 'SELL' if action == 'BUY' else 'BUY'
-        opposite_key = f"{symbol}_{opposite_action}"
+        # Tạo key duy nhất cho tín hiệu dựa trên symbol và action
+        signal_key = f"{symbol}_{action}"
         
-        # Nếu có tín hiệu đối nghịch trong pending_signals, xem xét loại bỏ
-        opposite_signals = [s for s in self.pending_signals.values() 
-                           if s['symbol'] == symbol and s['action'] == opposite_action]
+        # Kiểm tra xem đã có tín hiệu tương tự chờ xác nhận chưa
+        matching_signal = None
+        for signal_id, signal in self.pending_signals.items():
+            if signal['symbol'] == symbol and signal['action'] == action:
+                # Kiểm tra thời gian còn hiệu lực
+                if datetime.fromisoformat(signal['expiry']) > timestamp:
+                    matching_signal = signal
+                    matching_signal_id = signal_id
+                    break
         
-        if opposite_signals:
-            logger.info(f"Phát hiện {len(opposite_signals)} tín hiệu {opposite_action} đối nghịch với {action} mới")
-            # Chỉ giữ lại tín hiệu đối nghịch nếu chúng rất mạnh (xác nhận > 1)
-            for opp_signal in opposite_signals:
-                if opp_signal['confirmations'] <= 1:
-                    logger.info(f"Hủy tín hiệu đối nghịch yếu: {opp_signal['id']}")
-                    self.pending_signals.pop(opp_signal['id'], None)
-        
-        # Tạo tín hiệu mới
-        signal = {
-            'id': signal_id,
-            'symbol': symbol,
-            'action': action,
-            'price': price,
-            'timestamp': timestamp.isoformat(),
-            'expiry': (timestamp + timedelta(seconds=self.signal_valid_period)).isoformat(),
-            'indicators': indicators,
-            'confirmations': 1,
-            'sources': [source],
-            'status': 'pending'  # pending, confirmed, expired, executed
-        }
-        
-        # Kiểm tra xem đã có tín hiệu cùng loại chưa
-        existing_signals = [s for s in self.pending_signals.values() 
-                           if s['symbol'] == symbol and s['action'] == action]
-        
-        if existing_signals:
-            # Nếu có, tăng số lần xác nhận cho tín hiệu gần nhất
-            latest_signal = max(existing_signals, key=lambda s: datetime.fromisoformat(s['timestamp']))
-            latest_signal['confirmations'] += 1
-            latest_signal['sources'].append(source)
+        if matching_signal:
+            # Cập nhật tín hiệu hiện có
+            matching_signal['confirmations'] += 1
+            matching_signal['last_price'] = price
+            matching_signal['last_updated'] = timestamp.isoformat()
+            matching_signal['sources'].append(source)
             
-            # Cập nhật thời gian hết hạn
-            latest_signal['expiry'] = (timestamp + timedelta(seconds=self.signal_valid_period)).isoformat()
+            # Nếu đủ số lần xác nhận, chuyển sang danh sách tín hiệu đã xác nhận
+            if matching_signal['confirmations'] >= self.signal_confirmation_threshold:
+                matching_signal['status'] = 'confirmed'
+                
+                # Tính toán điểm vào lệnh tối ưu
+                optimal_entry = self._calculate_optimal_entry(matching_signal)
+                matching_signal['optimal_entry'] = optimal_entry
+                
+                # Chuyển từ pending sang confirmed
+                self.confirmed_signals[matching_signal_id] = matching_signal
+                self.pending_signals.pop(matching_signal_id)
+                
+                logger.info(f"Tín hiệu {matching_signal_id} đã được xác nhận đủ, "
+                          f"điểm vào tối ưu: {optimal_entry['price']}")
+            else:
+                logger.info(f"Tín hiệu {matching_signal_id} cập nhật: "
+                          f"{matching_signal['confirmations']}/{self.signal_confirmation_threshold} xác nhận")
             
-            logger.info(f"Tăng xác nhận tín hiệu {latest_signal['id']} lên {latest_signal['confirmations']}")
-            
-            # Nếu đạt ngưỡng xác nhận, chuyển sang trạng thái confirmed
-            if latest_signal['confirmations'] >= self.signal_confirmation_threshold:
-                self._confirm_signal(latest_signal['id'])
-            
-            return latest_signal
+            signal = matching_signal
+            signal['id'] = matching_signal_id
         else:
-            # Nếu không, thêm tín hiệu mới
+            # Tạo tín hiệu mới
+            signal_id = str(uuid.uuid4())
+            expiry = timestamp + timedelta(seconds=self.signal_valid_period)
+            
+            signal = {
+                'id': signal_id,
+                'symbol': symbol,
+                'action': action,
+                'price': price,
+                'initial_price': price,
+                'last_price': price,
+                'timestamp': timestamp.isoformat(),
+                'expiry': expiry.isoformat(),
+                'indicators': indicators,
+                'confirmations': 1,
+                'sources': [source],
+                'status': 'pending',  # pending, confirmed, executed, expired
+                'last_updated': timestamp.isoformat()
+            }
+            
             self.pending_signals[signal_id] = signal
-            logger.info(f"Đăng ký tín hiệu mới: {signal_id}, cần thêm {self.signal_confirmation_threshold-1} xác nhận")
-            
-            # Lưu dữ liệu
-            self._save_data()
-            
-            return signal
-    
-    def _confirm_signal(self, signal_id: str) -> Optional[Dict]:
-        """
-        Xác nhận tín hiệu và chuyển sang trạng thái sẵn sàng vào lệnh
-        
-        Args:
-            signal_id: ID của tín hiệu cần xác nhận
-            
-        Returns:
-            Dict: Tín hiệu đã xác nhận hoặc None nếu không tìm thấy
-        """
-        if signal_id not in self.pending_signals:
-            logger.warning(f"Không tìm thấy tín hiệu {signal_id} để xác nhận")
-            return None
-        
-        signal = self.pending_signals.pop(signal_id)
-        signal['status'] = 'confirmed'
-        signal['confirmed_at'] = datetime.now().isoformat()
-        
-        # Tính toán điểm vào lệnh tối ưu dựa trên phân tích kỹ thuật
-        optimized_entry = self._calculate_optimal_entry(signal)
-        signal['optimized_entry'] = optimized_entry
-        
-        # Xác định mức stop loss và take profit phù hợp
-        if signal['action'] == 'BUY':
-            signal['stop_loss'] = optimized_entry['price'] * 0.985  # -1.5%
-            signal['take_profit'] = optimized_entry['price'] * 1.03  # +3%
-        else:  # SELL
-            signal['stop_loss'] = optimized_entry['price'] * 1.015  # +1.5%
-            signal['take_profit'] = optimized_entry['price'] * 0.97  # -3%
-        
-        self.confirmed_signals[signal_id] = signal
-        logger.info(f"Đã xác nhận tín hiệu {signal_id} với điểm vào tối ưu: {optimized_entry['price']}")
+            logger.info(f"Đã đăng ký tín hiệu mới: {signal_id} ({symbol} {action})")
         
         # Lưu dữ liệu
         self._save_data()
@@ -183,23 +156,73 @@ class OrderManager:
         Returns:
             Dict: Thông tin điểm vào tối ưu
         """
-        # TODO: Triển khai logic phân tích kỹ thuật thực sự
-        # Trong phiên bản đơn giản, chỉ sử dụng giá hiện tại với nhỏ chênh lệch
         current_price = signal['price']
         action = signal['action']
+        indicators = signal.get('indicators', {})
         
-        # Chênh lệch nhỏ để tạo lệnh giới hạn thay vì lệnh thị trường
+        # Phân tích trend để xác định vùng giá tốt hơn
+        trend = indicators.get('trend', 'neutral')
+        rsi = indicators.get('rsi', 50.0)
+        
+        # Xác định vùng giá dựa trên trend và RSI
+        # 1. Tìm vùng giá tối ưu dựa trên tín hiệu và chỉ báo
+        price_adjustment = 0.0
+        
+        # Điều chỉnh giá dựa trên RSI
         if action == 'BUY':
-            # Đặt giá mua thấp hơn 0.1% so với giá hiện tại
-            optimal_price = current_price * 0.999
+            # Mua: Nếu RSI thấp, giảm điều chỉnh (mua gần giá hiện tại hơn)
+            # Nếu RSI cao, tăng điều chỉnh (đặt mức mua thấp hơn)
+            if rsi < 30:  # Rất quá bán
+                price_adjustment = 0.001  # Giảm mức điều chỉnh, mua gần với giá hiện tại
+            elif rsi < 40:  # Quá bán nhẹ
+                price_adjustment = 0.003  # Điều chỉnh vừa phải
+            else:  # RSI trung tính hoặc cao
+                price_adjustment = 0.005  # Điều chỉnh lớn, chờ giá giảm sâu hơn
+                
         else:  # SELL
-            # Đặt giá bán cao hơn 0.1% so với giá hiện tại
-            optimal_price = current_price * 1.001
+            # Bán: Nếu RSI cao, giảm điều chỉnh (bán gần giá hiện tại hơn)
+            # Nếu RSI thấp, tăng điều chỉnh (đặt mức bán cao hơn)
+            if rsi > 70:  # Rất quá mua
+                price_adjustment = 0.001  # Giảm mức điều chỉnh, bán gần với giá hiện tại 
+            elif rsi > 60:  # Quá mua nhẹ
+                price_adjustment = 0.003  # Điều chỉnh vừa phải
+            else:  # RSI trung tính hoặc thấp
+                price_adjustment = 0.005  # Điều chỉnh lớn, chờ giá tăng cao hơn
+        
+        # Điều chỉnh thêm dựa trên trend
+        if trend == 'uptrend' and action == 'BUY':
+            # Trong uptrend, mua với điều chỉnh ít hơn (mua sớm hơn)
+            price_adjustment = max(0.001, price_adjustment * 0.7)
+        elif trend == 'downtrend' and action == 'SELL':
+            # Trong downtrend, bán với điều chỉnh ít hơn (bán sớm hơn)
+            price_adjustment = max(0.001, price_adjustment * 0.7)
+        elif trend == 'volatile':
+            # Trong thị trường biến động, tăng mức điều chỉnh để tìm điểm vào tốt hơn
+            price_adjustment = min(0.01, price_adjustment * 1.5)
+        
+        # Tính toán giá tối ưu dựa trên điều chỉnh
+        if action == 'BUY':
+            optimal_price = current_price * (1 - price_adjustment)
+            reason = f'Mua tại mức giảm {price_adjustment*100:.2f}% từ giá hiện tại, '
+            reason += f'dựa trên RSI={rsi:.1f} và xu hướng {trend}'
+        else:  # SELL
+            optimal_price = current_price * (1 + price_adjustment)
+            reason = f'Bán tại mức tăng {price_adjustment*100:.2f}% từ giá hiện tại, '
+            reason += f'dựa trên RSI={rsi:.1f} và xu hướng {trend}'
+        
+        # 2. Chia lệnh thành các phần (triển khai trong phiên bản sau)
+        entry_parts = [
+            {'percent': 40, 'price': optimal_price, 'description': 'Phần đầu vào điểm tối ưu'},
+            {'percent': 30, 'price': current_price, 'description': 'Phần tiếp theo vào giá thị trường nếu xác nhận mạnh'},
+            {'percent': 30, 'price': None, 'description': 'Phần dự phòng để theo dõi diễn biến'}
+        ]
         
         return {
             'price': optimal_price,
             'valid_until': (datetime.now() + timedelta(seconds=self.pending_order_timeout)).isoformat(),
-            'reason': 'Điểm vào tạo cơ hội lệnh giới hạn tốt hơn so với lệnh thị trường'
+            'reason': reason,
+            'entry_parts': entry_parts,
+            'adjustment_percent': price_adjustment * 100
         }
     
     def register_pending_order(self, 
@@ -320,29 +343,68 @@ class OrderManager:
             if symbol_base.lower() in indicators:
                 current_indicators = indicators[symbol_base.lower()]
                 
+                # Kiểm tra biến động thị trường mạnh 
+                # (chủ yếu là không vào lệnh trong thị trường biến động lớn)
+                if 'trend' in current_indicators and current_indicators['trend'] == 'volatile':
+                    order['cancel_reason'] = f"Thị trường đang biến động mạnh, không thích hợp cho lệnh này"
+                    orders_to_cancel.append(order)
+                    continue
+                
                 # Nếu tín hiệu đối nghịch xuất hiện
                 opposite_action = 'SELL' if order['action'] == 'BUY' else 'BUY'
-                if current_indicators['type'] == opposite_action:
+                if current_indicators.get('type') == opposite_action:
                     order['cancel_reason'] = f'Tín hiệu đối nghịch ({opposite_action}) xuất hiện'
                     orders_to_cancel.append(order)
                     continue
                 
                 # Nếu RSI thay đổi đáng kể
                 if 'rsi' in current_indicators:
+                    # Hủy lệnh khi RSI chạm ngưỡng ngược lại với tín hiệu ban đầu
                     if (order['action'] == 'BUY' and current_indicators['rsi'] > 70) or \
                        (order['action'] == 'SELL' and current_indicators['rsi'] < 30):
                         order['cancel_reason'] = f"RSI thay đổi đáng kể: {current_indicators['rsi']}"
+                        orders_to_cancel.append(order)
+                        continue
+                
+                # Nếu MACD thay đổi chiều của tín hiệu
+                if 'macd' in current_indicators and 'macd_signal' in current_indicators:
+                    # Với lệnh BUY, nếu MACD cắt xuống đường tín hiệu
+                    if order['action'] == 'BUY' and current_indicators['macd'] < current_indicators['macd_signal']:
+                        order['cancel_reason'] = "MACD cắt xuống đường tín hiệu, xu hướng tăng suy yếu"
+                        orders_to_cancel.append(order)
+                        continue
+                    # Với lệnh SELL, nếu MACD cắt lên đường tín hiệu
+                    elif order['action'] == 'SELL' and current_indicators['macd'] > current_indicators['macd_signal']:
+                        order['cancel_reason'] = "MACD cắt lên đường tín hiệu, xu hướng giảm suy yếu"
                         orders_to_cancel.append(order)
                         continue
             
             # Kiểm tra biến động giá lớn
             if symbol_base.lower() + '_price' in market_data:
                 current_price = market_data[symbol_base.lower() + '_price']
-                price_change_pct = abs(current_price - order['price']) / order['price'] * 100
+                if current_price > 0 and order['price'] > 0:  # Tránh lỗi chia cho 0
+                    price_change_pct = abs(current_price - order['price']) / order['price'] * 100
+                    
+                    # Nếu giá chuyển động theo hướng bất lợi cho lệnh
+                    if (order['action'] == 'BUY' and current_price > order['price'] * 1.02) or \
+                       (order['action'] == 'SELL' and current_price < order['price'] * 0.98):
+                        order['cancel_reason'] = f"Giá đã di chuyển {price_change_pct:.2f}% theo hướng bất lợi"
+                        orders_to_cancel.append(order)
+                        continue
+                    
+                    # Nếu giá thay đổi quá 2% so với giá đặt lệnh (theo bất kỳ hướng nào)
+                    if price_change_pct > 2.0:
+                        order['cancel_reason'] = f"Giá thay đổi {price_change_pct:.2f}% so với giá đặt lệnh"
+                        orders_to_cancel.append(order)
+            
+            # Kiểm tra biến động khối lượng bất thường
+            if symbol_base.lower() + '_volume' in market_data:
+                current_volume = market_data[symbol_base.lower() + '_volume']
+                avg_volume = market_data.get(symbol_base.lower() + '_avg_volume', current_volume)
                 
-                # Nếu giá thay đổi quá 2% so với giá đặt lệnh
-                if price_change_pct > 2.0:
-                    order['cancel_reason'] = f"Giá thay đổi {price_change_pct:.2f}% so với giá đặt lệnh"
+                # Nếu khối lượng tăng đột biến (gấp 3 lần trung bình), thị trường có thể đang bất ổn
+                if current_volume > avg_volume * 3:
+                    order['cancel_reason'] = f"Khối lượng giao dịch tăng đột biến, thị trường bất ổn"
                     orders_to_cancel.append(order)
             
         return orders_to_cancel
@@ -458,3 +520,64 @@ class OrderManager:
                       f"{len(self.pending_orders)} lệnh chờ")
         except Exception as e:
             logger.error(f"Lỗi khi tải dữ liệu: {str(e)}")
+            
+            
+if __name__ == "__main__":
+    # Test cơ bản OrderManager
+    order_manager = OrderManager()
+    
+    # Đăng ký một tín hiệu
+    signal = order_manager.register_signal(
+        symbol="BTCUSDT",
+        action="BUY",
+        price=84000.0,
+        indicators={
+            "rsi": 32.5,
+            "macd": 150.0,
+            "trend": "uptrend"
+        }
+    )
+    
+    print(f"Đã đăng ký tín hiệu: {signal['id']}")
+    
+    # Đăng ký tín hiệu lần thứ 2 (xác nhận)
+    signal = order_manager.register_signal(
+        symbol="BTCUSDT",
+        action="BUY",
+        price=84100.0,
+        indicators={
+            "rsi": 33.5,
+            "macd": 155.0,
+            "trend": "uptrend"
+        }
+    )
+    
+    print(f"Tín hiệu sau khi xác nhận: {signal}")
+    
+    # Kiểm tra các tín hiệu sẵn sàng thực thi
+    executable_signals = order_manager.get_executable_signals()
+    print(f"Tín hiệu sẵn sàng thực thi: {len(executable_signals)}")
+    
+    if executable_signals:
+        # Đăng ký lệnh chờ
+        order = order_manager.register_pending_order(
+            symbol="BTCUSDT",
+            action="BUY",
+            price=84050.0,
+            quantity=0.01,
+            stop_loss=83000.0,
+            take_profit=86000.0,
+            order_id="test_order_1",
+            signal_id=executable_signals[0]['id']
+        )
+        
+        print(f"Đã đăng ký lệnh chờ: {order['id']}")
+        
+        # Cập nhật trạng thái lệnh
+        updated_order = order_manager.update_order_status(
+            order_id="test_order_1",
+            status="filled",
+            fill_price=84055.0
+        )
+        
+        print(f"Lệnh sau khi cập nhật: {updated_order}")
