@@ -8,6 +8,8 @@ import random
 import time
 import threading
 import requests
+import hmac
+import hashlib
 from datetime import datetime
 
 from flask import Flask, render_template, request, jsonify, make_response
@@ -199,31 +201,26 @@ def init_api_connection():
             # Lấy vị thế thực từ Binance API
             account_data['positions'] = []
             
-            try:
-                # Đối với tài khoản Futures, chúng ta cần gọi API khác để lấy vị thế
-                # URL API cho Binance Futures testnet
-                futures_positions_url = "https://testnet.binancefuture.com/fapi/v2/positionRisk"
-                
-                # Trong trường hợp thực tế, sẽ sử dụng API key để xác thực
-                # Nhưng hiện tại chúng ta dùng dữ liệu công khai để đơn giản
-                logger.debug(f"Attempting to fetch positions from Binance API...")
-                
+            # Thêm hàm tạo vị thế mẫu nếu không thể lấy vị thế thực
+            def _generate_sample_positions():
                 # Lấy giá hiện tại cho các cặp giao dịch phổ biến
                 prices = {}
                 for symbol in ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']:
-                    symbol_response = requests.get(f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}")
-                    if symbol_response.status_code == 200:
-                        prices[symbol] = float(symbol_response.json()["price"])
+                    try:
+                        symbol_response = requests.get(f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}")
+                        if symbol_response.status_code == 200:
+                            prices[symbol] = float(symbol_response.json()["price"])
+                    except Exception as e:
+                        logger.error(f"Error getting price for {symbol}: {str(e)}")
                 
-                # Tạo 2 vị thế thực tế dựa trên giá thị trường hiện tại
+                # Tạo vị thế BTC long nếu có giá BTC
                 if 'BTCUSDT' in prices:
-                    # Tạo vị thế BTC long
                     btc_position = {
                         'id': 1001,
                         'symbol': 'BTCUSDT',
                         'side': 'BUY',
-                        'amount': 0.01,  # Số lượng thực tế
-                        'entry_price': prices['BTCUSDT'] * 0.995,  # Giả định giá vào thấp hơn 0.5%
+                        'amount': 0.01,  # Số lượng
+                        'entry_price': prices['BTCUSDT'] * 0.995,  # Giá vào thấp hơn 0.5%
                         'current_price': prices['BTCUSDT'],
                         'leverage': trading_config['leverage'],
                         'margin_type': 'isolated',
@@ -236,16 +233,16 @@ def init_api_connection():
                     btc_position['pnl'] = round(pnl, 2)
                     btc_position['pnl_percent'] = round(pnl_percent, 2)
                     account_data['positions'].append(btc_position)
-                    logger.debug(f"Added real BTC position with {btc_position['amount']} BTC")
+                    logger.debug(f"Added sample BTC position with {btc_position['amount']} BTC")
                 
+                # Tạo vị thế ETH short nếu có giá ETH
                 if 'ETHUSDT' in prices:
-                    # Tạo vị thế ETH short
                     eth_position = {
                         'id': 1002,
                         'symbol': 'ETHUSDT',
                         'side': 'SELL',
                         'amount': 0.1,
-                        'entry_price': prices['ETHUSDT'] * 1.005,  # Giả định giá vào cao hơn 0.5%
+                        'entry_price': prices['ETHUSDT'] * 1.005,  # Giá vào cao hơn 0.5%
                         'current_price': prices['ETHUSDT'],
                         'leverage': trading_config['leverage'],
                         'margin_type': 'isolated',
@@ -258,15 +255,132 @@ def init_api_connection():
                     eth_position['pnl'] = round(pnl, 2)
                     eth_position['pnl_percent'] = round(pnl_percent, 2)
                     account_data['positions'].append(eth_position)
-                    logger.debug(f"Added real ETH position with {eth_position['amount']} ETH")
+                    logger.debug(f"Added sample ETH position with {eth_position['amount']} ETH")
                 
-                # Cập nhật số lượng vị thế vào log và thông báo
-                logger.info(f"Loaded {len(account_data['positions'])} real positions from Binance API")
-                add_message(f"Đã tải {len(account_data['positions'])} vị thế", "success")
+                # Thông báo số lượng vị thế mẫu đã tạo
+                logger.info(f"Created {len(account_data['positions'])} sample positions")
+                add_message(f"Đã tạo {len(account_data['positions'])} vị thế mẫu (không tìm thấy vị thế thực tế)", "warning")
+            
+            try:
+                # Sử dụng API key để gọi API thực tế
+                api_key = os.environ.get('BINANCE_API_KEY')
+                api_secret = os.environ.get('BINANCE_API_SECRET')
+                
+                if api_key and api_secret:
+                    # URL API phụ thuộc vào loại tài khoản
+                    url = "https://testnet.binancefuture.com/fapi/v2/positionRisk"
+                    if connection_status['trading_type'] == 'futures':
+                        url = "https://testnet.binancefuture.com/fapi/v2/positionRisk"
+                        logger.debug(f"Using Futures API for position data: {url}")
+                    else:
+                        url = "https://testnet.binance.vision/api/v3/openOrders"
+                        logger.debug(f"Using Spot API for position data: {url}")
+                    
+                    # Tạo các thông số bổ sung cho API call
+                    timestamp = int(time.time() * 1000)
+                    params = {'timestamp': timestamp}
+                    
+                    # Trong trường hợp thực tế, chúng ta sử dụng API key để xác thực
+                    logger.debug(f"Attempting to fetch real positions from Binance API...")
+                    
+                    try:
+                        # Tạo signature cho API call
+                        query_string = '&'.join([f"{key}={params[key]}" for key in params])
+                        signature = hmac.new(
+                            api_secret.encode('utf-8'),
+                            query_string.encode('utf-8'),
+                            hashlib.sha256
+                        ).hexdigest()
+                        params['signature'] = signature
+                        
+                        # Gửi request đến Binance API
+                        headers = {'X-MBX-APIKEY': api_key}
+                        response = requests.get(url, headers=headers, params=params)
+                        
+                        if response.status_code == 200:
+                            # Xử lý dữ liệu vị thế từ API
+                            positions_data = response.json()
+                            logger.debug(f"Received position data: {json.dumps(positions_data)[:200]}...")
+                            
+                            # Đếm số vị thế thực sự (loại bỏ các vị thế có số lượng = 0)
+                            active_positions = []
+                            position_id = 1000
+                            
+                            # Lấy giá hiện tại cho các symbol
+                            prices = {}
+                            
+                            if isinstance(positions_data, list):
+                                for pos in positions_data:
+                                    # Kiểm tra xem có phải là vị thế thực sự không
+                                    if 'positionAmt' in pos and float(pos.get('positionAmt', 0)) != 0:
+                                        symbol = pos.get('symbol', 'UNKNOWN')
+                                        
+                                        # Lấy giá hiện tại
+                                        if symbol not in prices:
+                                            price_response = requests.get(f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}")
+                                            if price_response.status_code == 200:
+                                                prices[symbol] = float(price_response.json()["price"])
+                                        
+                                        # Tạo vị thế
+                                        position_id += 1
+                                        side = 'BUY' if float(pos.get('positionAmt', 0)) > 0 else 'SELL'
+                                        amount = abs(float(pos.get('positionAmt', 0)))
+                                        entry_price = float(pos.get('entryPrice', 0))
+                                        current_price = prices.get(symbol, entry_price)
+                                        leverage = int(pos.get('leverage', trading_config['leverage']))
+                                        
+                                        position = {
+                                            'id': position_id,
+                                            'symbol': symbol,
+                                            'side': side,
+                                            'amount': amount,
+                                            'entry_price': entry_price,
+                                            'current_price': current_price,
+                                            'leverage': leverage,
+                                            'margin_type': pos.get('marginType', 'isolated'),
+                                            'pnl': float(pos.get('unRealizedProfit', 0)),
+                                            'pnl_percent': 0,  # Sẽ tính sau
+                                            'timestamp': datetime.now().isoformat()
+                                        }
+                                        
+                                        # Tính PnL % dựa trên giá entry và giá hiện tại
+                                        if entry_price > 0:
+                                            if side == 'BUY':
+                                                pnl_percent = ((current_price / entry_price) - 1) * 100 * leverage
+                                            else:  # SELL
+                                                pnl_percent = ((entry_price / current_price) - 1) * 100 * leverage
+                                            position['pnl_percent'] = round(pnl_percent, 2)
+                                        
+                                        active_positions.append(position)
+                                        logger.debug(f"Added real position: {symbol} {side} {amount}")
+                            
+                            # Cập nhật danh sách vị thế
+                            account_data['positions'] = active_positions
+                            
+                            if len(active_positions) > 0:
+                                logger.info(f"Loaded {len(active_positions)} real positions from Binance API")
+                                add_message(f"Đã tải {len(active_positions)} vị thế thực tế", "success")
+                            else:
+                                logger.info("No active positions found, creating sample positions")
+                                _generate_sample_positions()
+                        else:
+                            logger.error(f"Error fetching positions: HTTP {response.status_code} - {response.text}")
+                            add_message(f"Lỗi tải vị thế: HTTP {response.status_code}", "error")
+                            _generate_sample_positions()
+                            
+                    except Exception as e:
+                        logger.error(f"Error in API authentication: {str(e)}", exc_info=True)
+                        add_message(f"Lỗi xác thực API: {str(e)}", "error")
+                        _generate_sample_positions()
+                else:
+                    # Nếu không có API key, tạo các vị thế mẫu để demo
+                    logger.info("No API keys provided, using sample positions")
+                    _generate_sample_positions()
             
             except Exception as e:
                 logger.error(f"Error fetching positions: {str(e)}", exc_info=True)
                 add_message(f"Lỗi tải vị thế: {str(e)}", "error")
+                _generate_sample_positions()
             
             logger.debug(f"Updated account balance based on BTC price: {account_balance}")
             
