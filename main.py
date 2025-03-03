@@ -1112,7 +1112,16 @@ def start_background_tasks():
                 account_data = get_account().json
                 
             # Xác định thông tin tài khoản
-            account_balance = float(account_data.get('totalWalletBalance', 0))
+            try:
+                account_balance = float(account_data.get('totalWalletBalance', 0))
+                # Nếu số dư từ API là 0 hoặc không hợp lệ, gán số dư mặc định là 10,000 USDT cho môi trường testnet/demo
+                if account_balance <= 0 and api_mode in ['testnet', 'demo']:
+                    logger.warning("Số dư từ API không hợp lệ, sử dụng số dư mặc định cho môi trường testnet/demo")
+                    account_balance = 10000.0
+            except (ValueError, TypeError) as e:
+                logger.error(f"Lỗi khi xử lý số dư tài khoản: {str(e)}")
+                account_balance = 10000.0 if api_mode in ['testnet', 'demo'] else 0.0
+                
             positions = account_data.get('positions', [])
             
             # Tính tổng lãi/lỗ chưa thực hiện
