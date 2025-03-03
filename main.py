@@ -831,23 +831,28 @@ def get_market_data():
 
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
-    # Biến market_data là phạm vi toàn cục
-    global market_data
-    
-    # Khởi tạo market_data nếu chưa tồn tại
-    if not globals().get('market_data'):
-        market_data = EMPTY_MARKET_DATA.copy()
-    
-    # Lấy dữ liệu thị trường mới
-    new_market_data = get_market_data()
-    
-    # Cập nhật market_data với dữ liệu mới
-    market_data.update(new_market_data)
-    
-    # Phát sự kiện cập nhật dữ liệu
-    socketio.emit('market_update', market_data)
-    
-    logger.info(f"Đã cập nhật dữ liệu thị trường. BTC=${market_data.get('btc_price', 0):.2f}")
+    try:
+        # Khởi tạo biến market_data với phạm vi toàn cục
+        global market_data
+        
+        # Khởi tạo market_data nếu chưa tồn tại
+        if 'market_data' not in globals():
+            market_data = EMPTY_MARKET_DATA.copy()
+        
+        # Lấy dữ liệu thị trường mới
+        new_market_data = get_market_data()
+        
+        # Cập nhật market_data với dữ liệu mới
+        market_data.update(new_market_data)
+        
+        # Phát sự kiện cập nhật dữ liệu
+        socketio.emit('market_update', market_data)
+        
+        logger.info(f"Đã cập nhật dữ liệu thị trường. BTC=${market_data.get('btc_price', 0):.2f}")
+        return True
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật dữ liệu thị trường: {str(e)}")
+        return False
     
     # Thêm log hoạt động phân tích thị trường
     log_data = {
