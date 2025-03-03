@@ -83,7 +83,7 @@ class TelegramNotifier:
     
     def send_trade_entry(self, symbol: str, side: str, entry_price: float, 
                        quantity: float, stop_loss: float = None, 
-                       take_profit: float = None, reason: str = None) -> bool:
+                       take_profit: float = None, reason: str = None, mode: str = None) -> bool:
         """
         Gửi thông báo vào lệnh
         
@@ -95,6 +95,7 @@ class TelegramNotifier:
             stop_loss (float, optional): Giá stop loss
             take_profit (float, optional): Giá take profit
             reason (str, optional): Lý do vào lệnh
+            mode (str, optional): Chế độ giao dịch ('live', 'testnet', 'demo')
             
         Returns:
             bool: True nếu gửi thành công, False nếu thất bại
@@ -103,7 +104,21 @@ class TelegramNotifier:
         direction_arrow = '🔼' if side == 'BUY' else '🔽'
         side_text = 'MUA' if side == 'BUY' else 'BÁN'
         
-        message = f"<b>{direction_arrow} VÀO LỆNH {side_text}</b>\n\n"
+        # Xác định chế độ giao dịch nếu không được cung cấp
+        if mode is None:
+            # Đọc từ account_config.json nếu tồn tại
+            try:
+                with open('account_config.json', 'r') as f:
+                    config = json.load(f)
+                    mode = config.get('api_mode', 'demo')
+            except:
+                mode = 'demo'  # Mặc định nếu không thể đọc config
+        
+        # Hiển thị chế độ giao dịch với màu sắc tương ứng
+        mode_emoji = '🟢' if mode == 'live' else '🟡' if mode == 'testnet' else '⚪'
+        mode_display = mode.upper()
+        
+        message = f"<b>{direction_arrow} VÀO LỆNH {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
         message += f"<b>Cặp:</b> {symbol}\n"
         message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
         message += f"<b>Số lượng:</b> {quantity}\n"
@@ -121,7 +136,7 @@ class TelegramNotifier:
     
     def send_trade_exit(self, symbol: str, side: str, exit_price: float, 
                       entry_price: float, quantity: float, profit_loss: float,
-                      profit_loss_percent: float, exit_reason: str = None) -> bool:
+                      profit_loss_percent: float, exit_reason: str = None, mode: str = None) -> bool:
         """
         Gửi thông báo thoát lệnh
         
@@ -134,6 +149,7 @@ class TelegramNotifier:
             profit_loss (float): Lãi/lỗ (USDT)
             profit_loss_percent (float): Lãi/lỗ (%)
             exit_reason (str, optional): Lý do thoát lệnh
+            mode (str, optional): Chế độ giao dịch ('live', 'testnet', 'demo')
             
         Returns:
             bool: True nếu gửi thành công, False nếu thất bại
@@ -146,7 +162,21 @@ class TelegramNotifier:
         side_text = 'MUA' if side == 'BUY' else 'BÁN'
         exit_text = 'BÁN' if side == 'BUY' else 'MUA'
         
-        message = f"<b>{pl_emoji} THOÁT LỆNH {side_text}</b>\n\n"
+        # Xác định chế độ giao dịch nếu không được cung cấp
+        if mode is None:
+            # Đọc từ account_config.json nếu tồn tại
+            try:
+                with open('account_config.json', 'r') as f:
+                    config = json.load(f)
+                    mode = config.get('api_mode', 'demo')
+            except:
+                mode = 'demo'  # Mặc định nếu không thể đọc config
+        
+        # Hiển thị chế độ giao dịch với màu sắc tương ứng
+        mode_emoji = '🟢' if mode == 'live' else '🟡' if mode == 'testnet' else '⚪'
+        mode_display = mode.upper()
+        
+        message = f"<b>{pl_emoji} THOÁT LỆNH {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
         message += f"<b>Cặp:</b> {symbol}\n"
         message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
         message += f"<b>Giá thoát:</b> {exit_price:,.2f} USDT\n"
