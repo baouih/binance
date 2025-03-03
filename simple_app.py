@@ -727,6 +727,9 @@ def init_api_connection():
 def index():
     """Trang điều khiển bot"""
     try:
+        # Cập nhật dữ liệu hiệu suất trước khi hiển thị trang
+        update_performance_data()
+        
         # Tạo object status cho client
         status = {
             'running': bot_status['running'],
