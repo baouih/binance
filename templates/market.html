@@ -523,21 +523,40 @@
                     }
                     
                     // Lấy dữ liệu thị trường thực từ API
-                    fetch('/api/market/data')
+                    fetch('/api/market/data', {
+                        headers: {
+                            'Cache-Control': 'no-cache',
+                            'Pragma': 'no-cache'
+                        }
+                    })
                         .then(response => response.json())
                         .then(data => {
                             console.log('Market data updated:', data);
                             
-                            // Cập nhật giá hiển thị
-                            if (data.btc_price) document.getElementById('btc-price').textContent = '$' + data.btc_price.toFixed(2);
-                            if (data.eth_price) document.getElementById('eth-price').textContent = '$' + data.eth_price.toFixed(2);
-                            if (data.sol_price) document.getElementById('sol-price').textContent = '$' + data.sol_price.toFixed(2);
-                            if (data.bnb_price) document.getElementById('bnb-price').textContent = '$' + data.bnb_price.toFixed(2);
+                            // Cập nhật giá hiển thị từ data.data (định dạng API)
+                            if (data && data.success && data.data) {
+                                if (data.data.btc_price) document.getElementById('btc-price').textContent = '$' + data.data.btc_price.toFixed(2);
+                                if (data.data.eth_price) document.getElementById('eth-price').textContent = '$' + data.data.eth_price.toFixed(2);
+                                if (data.data.sol_price) document.getElementById('sol-price').textContent = '$' + data.data.sol_price.toFixed(2);
+                                if (data.data.bnb_price) document.getElementById('bnb-price').textContent = '$' + data.data.bnb_price.toFixed(2);
+                            } else {
+                                // Fallback nếu định dạng không đúng
+                                if (data.btc_price) document.getElementById('btc-price').textContent = '$' + data.btc_price.toFixed(2);
+                                if (data.eth_price) document.getElementById('eth-price').textContent = '$' + data.eth_price.toFixed(2);
+                                if (data.sol_price) document.getElementById('sol-price').textContent = '$' + data.sol_price.toFixed(2);
+                                if (data.bnb_price) document.getElementById('bnb-price').textContent = '$' + data.bnb_price.toFixed(2);
+                            }
                             
                             // Cập nhật biểu đồ với điểm dữ liệu mới
-                            if (data.btc_price) {
-                                const newValue = data.btc_price;
-                                marketChart.data.datasets[0].data.push(newValue);
+                            let btcPrice = 0;
+                            if (data && data.success && data.data && data.data.btc_price) {
+                                btcPrice = data.data.btc_price;
+                            } else if (data && data.btc_price) {
+                                btcPrice = data.btc_price;
+                            }
+                            
+                            if (btcPrice > 0) {
+                                marketChart.data.datasets[0].data.push(btcPrice);
                                 marketChart.data.datasets[0].data.shift();
                                 marketChart.update();
                             }

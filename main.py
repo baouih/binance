@@ -472,6 +472,24 @@ def get_market():
     market_data = get_market_data()
     return jsonify(market_data)
 
+@app.route('/api/market/data')
+def get_market_data_api():
+    """API endpoint để lấy dữ liệu thị trường theo định dạng API"""
+    try:
+        market_data = get_market_data()
+        return jsonify({
+            'success': True,
+            'data': market_data,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+    except Exception as e:
+        app.logger.error(f"Error getting market data from API: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Không thể lấy dữ liệu thị trường. Vui lòng thử lại sau.'
+        }), 500
+
 @app.route('/api/execute_cli', methods=['POST'])
 def execute_cli_command():
     """Thực thi lệnh từ CLI web"""
