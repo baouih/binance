@@ -84,7 +84,8 @@ class TelegramNotifier:
     
     def send_trade_entry(self, symbol: str, side: str, entry_price: float, 
                        quantity: float, stop_loss: float = None, 
-                       take_profit: float = None, reason: str = None, mode: str = None) -> bool:
+                       take_profit: float = None, reason: str = None, mode: str = None,
+                       order_id: str = None, order_placed: bool = False) -> bool:
         """
         Gửi thông báo vào lệnh
         
@@ -97,6 +98,8 @@ class TelegramNotifier:
             take_profit (float, optional): Giá take profit
             reason (str, optional): Lý do vào lệnh
             mode (str, optional): Chế độ giao dịch ('live', 'testnet', 'demo')
+            order_id (str, optional): ID lệnh nếu đã đặt thành công
+            order_placed (bool): Lệnh đã được đặt thành công hay chưa
             
         Returns:
             bool: True nếu gửi thành công, False nếu thất bại

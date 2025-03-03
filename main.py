@@ -957,30 +957,107 @@ def update_market_data():
                 api_mode = config.get('api_mode', 'demo')
             except:
                 api_mode = 'demo'
+            
+            # Xác định số lượng giao dịch dựa trên loại coin
+            quantity = 0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0)
+            symbol = f"{coin}USDT"
+            
+            # Chỉ tạo lệnh thực sự nếu không phải chế độ demo và có API keys
+            order_result = None
+            order_placed = False
+            order_error = None
+            
+            if api_mode in ['testnet', 'live']:
+                try:
+                    # Tạo lệnh giao dịch thực tế thông qua Binance API
+                    with app.app_context():
+                        binance_client = BinanceAPI()
+                        
+                        # Kiểm tra đủ điều kiện tạo lệnh
+                        if not binance_client.api_key or not binance_client.api_secret:
+                            logger.warning(f"Không thể tạo lệnh {action} {symbol}: Thiếu API keys")
+                            order_error = "Thiếu API keys"
+                        elif not price or price <= 0:
+                            logger.warning(f"Không thể tạo lệnh {action} {symbol}: Giá không hợp lệ")
+                            order_error = "Giá không hợp lệ"
+                        else:
+                            # Thử tạo lệnh thực tế
+                            try:
+                                # Tạo client order ID duy nhất
+                                client_order_id = f"bot_{int(time.time()*1000)}_{random.randint(1000, 9999)}"
+                                
+                                # Tham số gửi lệnh
+                                order_params = {
+                                    'timeInForce': 'GTC',
+                                    'quantity': quantity,
+                                    'price': price,
+                                    'newClientOrderId': client_order_id
+                                }
+                                
+                                # Thực thi lệnh
+                                order_result = binance_client.create_order(
+                                    symbol=symbol,
+                                    side=action,
+                                    type='LIMIT',
+                                    **order_params
+                                )
+                                
+                                if order_result and 'orderId' in order_result:
+                                    order_placed = True
+                                    logger.info(f"Đã tạo lệnh {action} {symbol} thành công: ID={order_result['orderId']}")
+                                else:
+                                    logger.warning(f"Tạo lệnh {action} {symbol} không thành công: {order_result}")
+                                    order_error = "API trả về kết quả không hợp lệ"
+                            except Exception as e:
+                                logger.error(f"Lỗi khi tạo lệnh {action} {symbol}: {str(e)}")
+                                order_error = f"Lỗi API: {str(e)}"
+                except Exception as e:
+                    logger.error(f"Lỗi khởi tạo Binance API: {str(e)}")
+                    order_error = f"Lỗi kết nối: {str(e)}"
+            else:
+                # Chế độ demo không thực sự tạo lệnh
+                logger.info(f"Chế độ {api_mode.upper()}: Mô phỏng lệnh {action} {symbol}")
+                order_error = f"Chế độ {api_mode.upper()} chỉ mô phỏng lệnh"
+            
+            # Lịch sử giao dịch lưu vào log
+            trade_log = {
+                'timestamp': datetime.now().isoformat(),
+                'symbol': symbol,
+                'action': action,
+                'price': price,
+                'quantity': quantity,
+                'mode': api_mode,
+                'success': order_placed,
+                'error': order_error,
+                'order_id': order_result.get('orderId') if order_result else None
+            }
+            
+            # Lưu vào file log để kiểm tra sau này
+            try:
+                with open('trade_history.json', 'a+') as f:
+                    f.write(json.dumps(trade_log) + '\n')
+            except Exception as e:
+                logger.error(f"Không thể lưu lịch sử giao dịch: {str(e)}")
                 
-            # Gửi thông báo qua Telegram với chế độ API
-            if action == 'BUY':
-                telegram_notifier.send_trade_entry(
-                    symbol=f"{coin}USDT",
-                    side=action,
-                    entry_price=price,
-                    quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
-                    stop_loss=stop_loss,
-                    take_profit=take_profit,
-                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}",
-                    mode=api_mode
-                )
-            elif action == 'SELL':
-                telegram_notifier.send_trade_entry(
-                    symbol=f"{coin}USDT",
-                    side=action,
-                    entry_price=price,
-                    quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
-                    stop_loss=stop_loss,
-                    take_profit=take_profit,
-                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}",
-                    mode=api_mode
-                )
+            # Gửi thông báo qua Telegram
+            reason_text = f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
+            
+            # Thêm thông tin về kết quả tạo lệnh
+            if order_placed:
+                reason_text += f"\n✅ Đã đặt lệnh thành công: ID={order_result['orderId']}"
+            elif order_error:
+                reason_text += f"\n❌ Chưa đặt lệnh: {order_error}"
+            
+            telegram_notifier.send_trade_entry(
+                symbol=symbol,
+                side=action,
+                entry_price=price,
+                quantity=quantity,
+                stop_loss=stop_loss,
+                take_profit=take_profit,
+                reason=reason_text,
+                mode=api_mode
+            )
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
