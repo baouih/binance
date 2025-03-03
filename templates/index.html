@@ -11,7 +11,7 @@
         body {
             background-color: #0d1117;
             color: #c9d1d9;
-            padding-bottom: env(safe-area-inset-bottom); /* For mobile notch */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .status-badge {
@@ -22,13 +22,8 @@
             margin-right: 6px;
         }
 
-        .status-running {
-            background-color: #3fb950;
-        }
-
-        .status-stopped {
-            background-color: #f85149;
-        }
+        .status-running { background-color: #3fb950; }
+        .status-stopped { background-color: #f85149; }
 
         .mode-badge {
             display: inline-block;
@@ -45,7 +40,7 @@
         .mode-live { background-color: #dc3545; }
 
         .messages-container {
-            height: calc(100vh - 200px);
+            height: calc(100vh - 180px);
             overflow-y: auto;
             background: #161b22;
             border: 1px solid #30363d;
@@ -119,10 +114,38 @@
             animation: spin 1s linear infinite;
         }
 
+        /* Account info */
+        .info-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Config form */
+        .config-form {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
         /* Adjustments for mobile */
         @media (max-width: 768px) {
             .btn {
-                min-height: 44px; /* Larger touch target */
+                min-height: 44px;
                 font-size: 1rem;
             }
 
@@ -144,6 +167,7 @@
     </div>
 
     <div class="container py-4">
+        <!-- Header -->
         <header class="d-flex justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center">
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
@@ -166,24 +190,137 @@
             </div>
         </header>
 
-        <main>
-            <div class="messages-container p-3">
-                <div id="messages">
-                    {% for message in messages %}
-                    <div class="message message-{{ message.level }}">
-                        <span class="message-time">{{ message.timestamp }}</span>
-                        <div class="message-content">{{ message.content }}</div>
+        <!-- Account Info -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-label">Số dư tài khoản</div>
+                    <div class="info-value">
+                        $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
-        </main>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-label">Tiền có thể sử dụng</div>
+                    <div class="info-value">
+                        $<span id="availableBalance">{{ '{:.2f}'.format(account_data.available|default(0)) }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-label">Vị thế mở</div>
+                    <div class="info-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Data -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div class="info-label">BTC/USDT</div>
+                    <div class="info-value" id="btcPrice">${{ '{:.2f}'.format(market_data.btc_price|default(0)) }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div class="info-label">ETH/USDT</div>
+                    <div class="info-value" id="ethPrice">${{ '{:.2f}'.format(market_data.eth_price|default(0)) }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div class="info-label">SOL/USDT</div>
+                    <div class="info-value" id="solPrice">${{ '{:.2f}'.format(market_data.sol_price|default(0)) }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div class="info-label">BNB/USDT</div>
+                    <div class="info-value" id="bnbPrice">${{ '{:.2f}'.format(market_data.bnb_price|default(0)) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="row mb-4" id="configSection" style="display: none;">
+            <div class="col-12">
+                <div class="config-form">
+                    <h5 class="mb-3">Cấu hình Bot</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label">API Keys</label>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" id="apiKey" placeholder="API Key">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="apiSecret" placeholder="API Secret">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Telegram Bot (Tùy chọn)</label>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" id="telegramToken" placeholder="Bot Token">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="telegramChatId" placeholder="Chat ID">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Chế độ API</label>
+                        <select class="form-select" id="apiMode">
+                            <option value="testnet">Testnet</option>
+                            <option value="live">Live</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Loại giao dịch</label>
+                        <select class="form-select" id="tradingType">
+                            <option value="futures">Futures</option>
+                            <option value="spot">Spot</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mức độ rủi ro</label>
+                        <select class="form-select" id="riskLevel">
+                            <option value="very_low">Rất thấp (1x)</option>
+                            <option value="low">Thấp (2x)</option>
+                            <option value="medium" selected>Trung bình (5x)</option>
+                            <option value="high">Cao (10x)</option>
+                            <option value="very_high">Rất cao (20x)</option>
+                        </select>
+                    </div>
+
+                    <div class="text-end">
+                        <button class="btn btn-primary" onclick="saveConfig()">Lưu cấu hình</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message log -->
+        <div class="messages-container p-3">
+            <div id="messages">
+                {% for message in messages %}
+                <div class="message message-{{ message.level }}">
+                    <span class="message-time">{{ message.timestamp }}</span>
+                    <div class="message-content">{{ message.content }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        // Khởi tạo WebSocket với cấu hình reconnection
+        // Khởi tạo WebSocket
         const socket = io({
             reconnection: true,
             reconnectionAttempts: 5,
@@ -196,6 +333,7 @@
         const controlButton = document.getElementById('controlButton');
         const connectionStatus = document.getElementById('connectionStatus');
         const messagesContainer = document.getElementById('messages');
+        const configSection = document.getElementById('configSection');
 
         // Track connection state
         let isConnected = false;
@@ -274,6 +412,19 @@
 
         socket.on('bot_status_update', (status) => {
             updateBotStatus(status);
+        });
+
+        socket.on('account_update', (data) => {
+            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
+            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
+            document.getElementById('openPositions').textContent = data.positions.length;
+        });
+
+        socket.on('market_data', (data) => {
+            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
+            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
+            document.getElementById('solPrice').textContent = `$${data.sol_price.toFixed(2)}`;
+            document.getElementById('bnbPrice').textContent = `$${data.bnb_price.toFixed(2)}`;
         });
 
         // Thêm tin nhắn mới
@@ -368,12 +519,59 @@
             }
         }
 
+        // Lưu cấu hình
+        async function saveConfig() {
+            const config = {
+                api_mode: document.getElementById('apiMode').value,
+                trading_type: document.getElementById('tradingType').value,
+                risk_level: document.getElementById('riskLevel').value
+            };
+
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addMessage({
+                        content: 'Đã lưu cấu hình thành công',
+                        level: 'success',
+                        timestamp: new Date().toLocaleString()
+                    });
+                    configSection.style.display = 'none';
+                } else {
+                    addMessage({
+                        content: `Lỗi: ${data.message}`,
+                        level: 'error',
+                        timestamp: new Date().toLocaleString()
+                    });
+                }
+            } catch (error) {
+                addMessage({
+                    content: `Lỗi kết nối: ${error.message}`,
+                    level: 'error',
+                    timestamp: new Date().toLocaleString()
+                });
+            }
+        }
+
         // Event listener cho nút điều khiển
         controlButton.addEventListener('click', function() {
             if (this.disabled) return;
             const action = this.dataset.action || (this.textContent.includes('Dừng') ? 'stop' : 'start');
             controlBot(action);
         });
+
+        // Show config section on first load if not connected
+        if (!isConnected) {
+            configSection.style.display = 'block';
+        }
 
         // Auto-scroll to bottom on load
         window.onload = () => {
