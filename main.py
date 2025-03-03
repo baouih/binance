@@ -99,6 +99,16 @@ def add_message(content, level='info'):
     except Exception as e:
         logger.error(f"Error adding message: {str(e)}", exc_info=True)
 
+def emit_status_update():
+    """Gửi cập nhật trạng thái cho client"""
+    try:
+        socketio.emit('connection_status', connection_status)
+        socketio.emit('bot_status_update', bot_status)
+        socketio.emit('account_data', account_data)
+        socketio.emit('market_data', market_data)
+    except Exception as e:
+        logger.error(f"Error emitting status update: {str(e)}", exc_info=True)
+
 def check_risk_limits():
     """Kiểm tra giới hạn rủi ro"""
     try:
@@ -124,6 +134,10 @@ def check_risk_limits():
             if bot_status['running']:
                 add_message(f"Đã đạt giới hạn rủi ro {max_account_risk}% tài khoản!", "error")
                 add_message("Bot sẽ tự động dừng để bảo vệ tài khoản", "warning")
+                # Cập nhật trạng thái bot
+                bot_status['running'] = False
+                bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                emit_status_update()
                 return True
 
         return False
@@ -144,6 +158,7 @@ def init_api_connection():
             connection_status['is_connected'] = False
             connection_status['is_authenticated'] = False
             add_message("Vui lòng cấu hình API key Binance", "error")
+            emit_status_update()
             return False
 
         # Kiểm tra Telegram token  
@@ -183,8 +198,9 @@ def init_api_connection():
             add_message(f"Loại giao dịch: {connection_status['trading_type'].upper()}", "info")
             add_message(f"Mức độ rủi ro: {risk_profile.upper()}", "info")
             add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
-            add_message(f"Đòn bẩy tối ưu: {risk_settings['optimal_leverage']}x", "info")
 
+            # Emit status update
+            emit_status_update()
             return True
 
     except Exception as e:
@@ -193,6 +209,7 @@ def init_api_connection():
         connection_status['is_authenticated'] = False
         add_message(f"Lỗi kết nối: {str(e)}", "error")
         logger.error(f"API connection error: {str(e)}", exc_info=True)
+        emit_status_update()
         return False
 
 def update_account_data(account_info):
@@ -230,13 +247,10 @@ def update_account_data(account_info):
             account_data['current_drawdown'] = ((account_data['initial_balance'] - account_data['equity']) / account_data['initial_balance']) * 100
 
         account_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        socketio.emit('account_update', account_data)
+        emit_status_update()
 
         # Kiểm tra giới hạn rủi ro
-        if check_risk_limits() and bot_status['running']:
-            # Tự động dừng bot nếu đạt giới hạn
-            bot_status['running'] = False
-            socketio.emit('bot_status_update', bot_status)
+        check_risk_limits()
 
     except Exception as e:
         logger.error(f"Error updating account data: {str(e)}", exc_info=True)
@@ -258,7 +272,6 @@ def index():
             'is_authenticated': connection_status['is_authenticated'],
             'trading_type': connection_status['trading_type'],
             'risk_profile': risk_profile,
-            'max_account_risk': risk_settings['max_account_risk'],
             'current_risk': bot_status['current_risk'],
             'telegram_enabled': connection_status['telegram_enabled']
         }
@@ -284,35 +297,6 @@ def index():
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
-
-@app.route('/api/connect', methods=['POST'])
-def connect_api():
-    """API endpoint để kết nối với Binance API"""
-    try:
-        if connection_status['is_connected']:
-            return jsonify({
-                'success': False,
-                'message': 'Đã kết nối sẵn với API'
-            })
-
-        # Khởi tạo kết nối API
-        if init_api_connection():
-            return jsonify({
-                'success': True,
-                'status': connection_status
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': connection_status['last_error']
-            })
-
-    except Exception as e:
-        logger.error(f"Error connecting to API: {str(e)}", exc_info=True)
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
 
 @app.route('/api/bot/control', methods=['POST']) 
 def control_bot():
@@ -355,7 +339,7 @@ def control_bot():
                     'message': 'Vui lòng cấu hình API keys trước khi khởi động bot'
                 }), 400
 
-            # Thử kết nối API
+            # Thử kết nối API trước khi start
             if not init_api_connection():
                 logger.error("Failed to connect API")
                 return jsonify({
@@ -375,7 +359,6 @@ def control_bot():
             add_message('Đang phân tích thị trường...', 'info')
             add_message(f"Mức độ rủi ro: {risk_profile.upper()}", "info")
             add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
-            add_message(f"Đòn bẩy tối ưu: {risk_settings['optimal_leverage']}x", "info")
             add_message('Đang chờ tín hiệu giao dịch...', 'info')
 
         else:
@@ -387,11 +370,8 @@ def control_bot():
             add_message('Đã hủy tất cả các lệnh đang chờ', 'warning')
             add_message('Hệ thống đã tạm dừng hoàn toàn', 'info')
 
-        # Emit bot status qua websocket
-        try:
-            socketio.emit('bot_status_update', bot_status)
-        except Exception as e:
-            logger.error(f"Error emitting bot status: {str(e)}")
+        # Emit status update
+        emit_status_update()
 
         return jsonify({
             'success': True,
@@ -409,6 +389,12 @@ def control_bot():
 def update_config():
     """Cập nhật cấu hình bot"""
     try:
+        if bot_status['running']:
+            return jsonify({
+                'success': False,
+                'message': 'Vui lòng dừng bot trước khi thay đổi cấu hình'
+            }), 400
+
         config = request.json
 
         # Save API keys to environment
@@ -417,22 +403,7 @@ def update_config():
             os.environ['BINANCE_API_SECRET'] = config['api_secret']
             add_message("Đã lưu API keys", "success")
 
-        # Save Telegram settings
-        if 'telegram_token' in config and 'telegram_chat_id' in config:
-            if config['telegram_token'] and config['telegram_chat_id']:
-                os.environ['TELEGRAM_BOT_TOKEN'] = config['telegram_token']
-                os.environ['TELEGRAM_CHAT_ID'] = config['telegram_chat_id']
-                add_message("Đã lưu cấu hình Telegram", "success")
-
         # Validate trading config
-        if 'api_mode' in config:
-            if config['api_mode'] not in ['testnet', 'live']:
-                return jsonify({
-                    'success': False,
-                    'message': 'Chế độ API không hợp lệ'
-                }), 400
-            connection_status['api_mode'] = config['api_mode']
-
         if 'trading_type' in config:
             if config['trading_type'] not in ['spot', 'futures']:
                 return jsonify({
@@ -453,7 +424,6 @@ def update_config():
         try:
             with open('bot_config.json', 'w') as f:
                 json.dump({
-                    'api_mode': connection_status['api_mode'],
                     'trading_type': connection_status['trading_type'],
                     'risk_profile': risk_manager.get_current_config().get('risk_profile', 'medium')
                 }, f)
@@ -478,10 +448,8 @@ def update_config():
         return jsonify({
             'success': True,
             'config': {
-                'api_mode': connection_status['api_mode'],
                 'trading_type': connection_status['trading_type'],
                 'risk_profile': risk_config.get('risk_profile', 'medium'),
-                'max_account_risk': risk_settings['max_account_risk'],
                 'is_connected': connection_status['is_connected']
             }
         })
@@ -499,11 +467,7 @@ def handle_connect():
     try:
         logger.info('Client connected')
         # Gửi trạng thái hiện tại cho client mới
-        socketio.emit('connection_status', connection_status)
-        # Gửi riêng trạng thái bot
-        socketio.emit('bot_status_update', bot_status)
-        socketio.emit('account_data', account_data)
-        socketio.emit('market_data', market_data)
+        emit_status_update()
 
         # Gửi tin nhắn hiện tại
         for msg in messages[-50:]:

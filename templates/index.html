@@ -217,6 +217,7 @@
             transform: scale(0.95);
         }
 
+
         /* Toast notification */
         .toast-container {
             position: fixed;
@@ -254,34 +255,94 @@
         .toast.bg-danger {
             background-color: #dc3545;
         }
+
+        /* Status handling improvements */
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .connection-status {
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .connection-status.connected {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border: 1px solid #198754;
+        }
+
+        .connection-status.disconnected {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        /* Button states */
+        .btn {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn.loading .spinner-border {
+            display: inline-block !important;
+        }
+
+        .btn.loading .button-text,
+        .btn.loading .bi {
+            display: none;
+        }
+
+        /* Toast improvements */
+        .toast {
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
     </style>
 </head>
 <body>
     <div class="container py-4">
-        <!-- Header with improved status display -->
+        <!-- Header -->
         <header class="d-flex justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center">
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-                <!-- Bot Status -->
-                <div class="bot-status {{ 'running' if status.running else 'stopped' }}">
-                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }} me-2"></i>
-                    {{ 'Đang chạy' if status.running else 'Đã dừng' }}
+            <div class="status-container">
+                <!-- Connection Status -->
+                <div class="connection-status {{ 'connected' if status.is_connected else 'disconnected' }}">
+                    <i class="bi {{ 'bi-wifi' if status.is_connected else 'bi-wifi-off' }}"></i>
+                    <span>{{ 'Đã kết nối API' if status.is_connected else 'Chưa kết nối API' }}</span>
                 </div>
 
-                <!-- Environment Badge -->
-                <div class="status-badge {{ status.mode }}">
-                    <i class="bi {{ 'bi-gear' if status.mode == 'testnet' else 'bi-lightning' }}"></i>
-                    {{ 'Testnet' if status.mode == 'testnet' else 'Live' }}
+                <!-- Bot Status -->
+                <div class="connection-status {{ 'connected' if status.running else 'disconnected' }}">
+                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }}"></i>
+                    <span>{{ 'Đang chạy' if status.running else 'Đã dừng' }}</span>
                 </div>
 
                 <!-- Control Button -->
                 <button id="controlButton" type="button"
-                        class="btn {{ 'btn-danger btn-lg' if status.running else 'btn-success btn-lg' }}"
-                        onclick="handleControlButtonClick(this)">
+                        class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
+                        {{ 'disabled' if not status.is_connected }}
+                        onclick="handleControlButton(this)">
                     <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
                     <span class="button-text">{{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}</span>
                     <div class="spinner-border spinner-border-sm d-none" role="status">
@@ -292,48 +353,38 @@
         </header>
 
         <div class="row">
-            <!-- Left Column: Configuration -->
+            <!-- Left Column -->
             <div class="col-md-4">
                 <div class="info-card">
                     <h5 class="mb-3">Cấu hình Bot</h5>
 
-                    <!-- API Connection Guide -->
-                    <div class="api-guide mb-4">
-                        <h6 class="mb-2"><i class="bi bi-key-fill me-2"></i>Hướng dẫn kết nối API</h6>
-                        <ol>
-                            <li>Đăng nhập vào tài khoản Binance</li>
-                            <li>Vào phần API Management</li>
-                            <li>Tạo API key mới với quyền giao dịch</li>
-                            <li>Copy API Key và Secret vào form bên dưới</li>
-                        </ol>
-                    </div>
-
-                    <!-- API Configuration -->
-                    <div class="mb-3">
-                        <label class="form-label">API Keys</label>
+                    <!-- API Config -->
+                    <div class="mb-4">
+                        <label class="form-label">Binance API</label>
                         <div class="input-group mb-2">
-                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <span class="input-group-text">
+                                <i class="bi bi-key"></i>
+                            </span>
                             <input type="text" class="form-control" id="apiKey" placeholder="API Key">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                            <span class="input-group-text">
+                                <i class="bi bi-key-fill"></i>
+                            </span>
                             <input type="password" class="form-control" id="apiSecret" placeholder="API Secret">
                         </div>
                     </div>
 
-                    <!-- Trading Configuration -->
-                    <div class="mb-3">
+                    <!-- Trade Config -->
+                    <div class="mb-4">
                         <label class="form-label">Loại giao dịch</label>
                         <select class="form-select" id="tradingType">
                             <option value="futures">Futures (Đòn bẩy)</option>
                             <option value="spot">Spot (Thông thường)</option>
                         </select>
-                        <div class="form-text">
-                            Futures cho phép sử dụng đòn bẩy, rủi ro cao hơn nhưng lợi nhuận tiềm năng lớn hơn
-                        </div>
                     </div>
 
-                    <!-- Risk Configuration -->
+                    <!-- Risk Config -->
                     <div class="mb-4">
                         <label class="form-label">Mức độ rủi ro</label>
                         <select class="form-select" id="riskLevel">
@@ -356,7 +407,7 @@
 
                     <!-- Save Button -->
                     <div class="text-end">
-                        <button id="saveConfigBtn" type="button" 
+                        <button id="saveConfigBtn" type="button"
                                 class="btn btn-primary btn-lg"
                                 onclick="handleSaveConfig(this)">
                             <i class="bi bi-save me-2"></i>
@@ -369,27 +420,17 @@
                 </div>
             </div>
 
-            <!-- Right Column: Monitoring -->
+            <!-- Right Column -->
             <div class="col-md-8">
                 <!-- Account Info -->
-                <div class="info-card highlight mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Thông tin tài khoản</h5>
-                        <div class="bot-status {{ 'running' if status.running else 'stopped' }} small">
-                            {{ 'Đang giao dịch' if status.running else 'Chưa giao dịch' }}
-                        </div>
-                    </div>
+                <div class="info-card mb-4">
+                    <h5 class="mb-3">Thông tin tài khoản</h5>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="info-label">Số dư tài khoản</div>
                             <div class="info-value">
                                 $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
                             </div>
-                            {% if status.mode == 'testnet' %}
-                            <div class="testnet-balance">
-                                <i class="bi bi-info-circle me-1"></i>Số dư thử nghiệm
-                            </div>
-                            {% endif %}
                         </div>
                         <div class="col-md-4">
                             <div class="info-label">Tiền có thể sử dụng</div>
@@ -404,7 +445,7 @@
                     </div>
                 </div>
 
-                <!-- Market Data with Mini Charts -->
+                <!-- Market Data -->
                 <div class="info-card mb-4">
                     <h5 class="mb-3">Thị trường</h5>
                     <div class="row">
@@ -425,11 +466,12 @@
                     </div>
                 </div>
 
-                <!-- System Messages -->
+                <!-- System Log -->
                 <div class="info-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Nhật ký hệ thống</h5>
-                        <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary">
+                        <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary"
+                                onclick="clearLogs()">
                             <i class="bi bi-trash me-1"></i>
                             Xóa nhật ký
                         </button>
@@ -452,174 +494,174 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // Elements
-        const controlButton = document.getElementById('controlButton');
-        const saveConfigBtn = document.getElementById('saveConfigBtn');
-        const clearLogsBtn = document.getElementById('clearLogsBtn');
-        const messagesContainer = document.getElementById('messages');
-        const maxAccountRisk = document.getElementById('maxAccountRisk');
-        const maxAccountRiskValue = document.getElementById('maxAccountRiskValue');
-        const riskLevel = document.getElementById('riskLevel');
-        const riskDetails = document.getElementById('riskDetails');
-        const btcChartCanvas = document.getElementById('btcChart').getContext('2d');
-        const ethChartCanvas = document.getElementById('ethChart').getContext('2d');
-
-        // Track states
-        let isConnected = false;
-        let botRunning = {{ 'true' if status.running else 'false' }};
-        let reconnectCount = 0;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-        const RECONNECT_DELAY = 2000;
-
         // Debug logging
         function debugLog(action, data) {
             console.log(`[DEBUG] ${action}:`, data);
         }
 
-        // Socket connection with improved error handling
+        // Elements
+        const elements = {
+            connectionStatus: document.querySelector('.connection-status'),
+            botStatus: document.querySelector('.bot-status'),
+            controlButton: document.getElementById('controlButton'),
+            saveConfigBtn: document.getElementById('saveConfigBtn'),
+            clearLogsBtn: document.getElementById('clearLogsBtn'),
+            messagesContainer: document.getElementById('messages'),
+            riskLevel: document.getElementById('riskLevel'),
+            riskDetails: document.getElementById('riskDetails'),
+            btcChart: document.getElementById('btcChart').getContext('2d'),
+            ethChart: document.getElementById('ethChart').getContext('2d')
+        };
+
+        // State
+        let state = {
+            isConnected: {{ 'true' if status.is_connected else 'false' }},
+            botRunning: {{ 'true' if status.running else 'false' }},
+            reconnectAttempts: 0,
+            maxReconnectAttempts: 5
+        };
+
+        // Socket setup with improved error handling
         const socket = io({
             reconnection: true,
-            reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
-            reconnectionDelay: RECONNECT_DELAY,
+            reconnectionAttempts: state.maxReconnectAttempts,
+            reconnectionDelay: 2000,
             reconnectionDelayMax: 5000,
             timeout: 10000
         });
 
+        // Socket event handlers
         socket.on('connect', () => {
-            debugLog('Socket connected', {reconnectCount});
-            isConnected = true;
-            reconnectCount = 0;
+            debugLog('Socket connected', { reconnectAttempts: state.reconnectAttempts });
+            state.isConnected = true;
+            state.reconnectAttempts = 0;
             updateConnectionStatus(true);
-            updateButtonStates(true);
-            addMessage({
-                content: 'Đã kết nối tới máy chủ',
-                level: 'success',
-                timestamp: new Date().toLocaleString()
-            });
         });
 
         socket.on('disconnect', (reason) => {
-            debugLog('Socket disconnected', {reason, reconnectCount});
-            isConnected = false;
+            debugLog('Socket disconnected', { reason, reconnectAttempts: state.reconnectAttempts });
+            state.isConnected = false;
 
-            // Only update UI if max reconnects reached
-            if (reconnectCount >= MAX_RECONNECT_ATTEMPTS) {
+            if (state.reconnectAttempts >= state.maxReconnectAttempts) {
                 updateConnectionStatus(false);
-                updateButtonStates(false);
                 showToast('Mất kết nối tới máy chủ', 'error');
             }
         });
 
-        socket.on('reconnect_attempt', (attemptNumber) => {
-            debugLog('Reconnect attempt', {attemptNumber});
-            reconnectCount = attemptNumber;
+        socket.on('reconnect_attempt', (attempt) => {
+            debugLog('Reconnect attempt', { attempt });
+            state.reconnectAttempts = attempt;
         });
 
         socket.on('reconnect_failed', () => {
             debugLog('Reconnect failed');
             showToast('Không thể kết nối lại với máy chủ', 'error');
             updateConnectionStatus(false);
-            updateButtonStates(false);
         });
 
-        // Socket events for data updates
-        socket.on('bot_status_update', (data) => {
-            debugLog('Received bot status update', data);
-            // Chỉ cập nhật nếu trạng thái thực sự thay đổi
-            if (data.running !== botRunning) {
-                botRunning = data.running;
-                updateBotStatus(data);
+        // Socket data updates
+        socket.on('connection_status', (status) => {
+            debugLog('Received connection status', status);
+            state.isConnected = status.is_connected;
+            updateConnectionStatus(status.is_connected);
+        });
+
+        socket.on('bot_status_update', (status) => {
+            debugLog('Received bot status', status);
+            if (status.running !== state.botRunning) {
+                state.botRunning = status.running;
+                updateBotStatus(status);
             }
         });
 
-        // Update connection status badge (chỉ hiển thị trạng thái kết nối)
+        socket.on('account_data', (data) => {
+            debugLog('Received account data', data);
+            updateAccountData(data);
+        });
+
+        socket.on('market_data', (data) => {
+            debugLog('Received market data', data);
+            updateMarketData(data);
+        });
+
+        // UI update functions
         function updateConnectionStatus(connected) {
-            const statusBadge = document.querySelector('.status-badge');
-            if (!statusBadge) return;
+            const statusEl = document.querySelector('.connection-status');
+            if (!statusEl) return;
 
-            if (connected !== isConnected) {
-                debugLog('Updating connection status', {connected});
+            statusEl.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+            statusEl.innerHTML = `
+                <i class="bi ${connected ? 'bi-wifi' : 'bi-wifi-off'}"></i>
+                <span>${connected ? 'Đã kết nối API' : 'Chưa kết nối API'}</span>
+            `;
 
-                if (connected) {
-                    statusBadge.classList.remove('disconnected');
-                    statusBadge.classList.add('connected');
-                    statusBadge.innerHTML = '<i class="bi bi-wifi"></i> Đã kết nối';
-                } else {
-                    statusBadge.classList.remove('connected');
-                    statusBadge.classList.add('disconnected');
-                    statusBadge.innerHTML = '<i class="bi bi-wifi-off"></i> Mất kết nối';
-                }
-
-                isConnected = connected;
-            }
+            // Update control button state
+            elements.controlButton.disabled = !connected;
         }
 
-        // Update bot status UI (chỉ hiển thị trạng thái bot)
         function updateBotStatus(status) {
-            debugLog('Updating bot status', status);
-            const botStatusDiv = document.querySelector('.bot-status');
-            if (!botStatusDiv) return;
+            const statusEl = document.querySelector('.bot-status');
+            if (!statusEl) return;
 
-            const currentState = botStatusDiv.classList.contains('running');
-            // Chỉ cập nhật nếu trạng thái thay đổi
-            if (currentState !== status.running) {
-                if (status.running) {
-                    botStatusDiv.classList.remove('stopped');
-                    botStatusDiv.classList.add('running');
-                    botStatusDiv.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
+            // Only update if status changed
+            const currentState = statusEl.classList.contains('connected');
+            if (currentState === status.running) return;
 
-                    controlButton.classList.remove('btn-success');
-                    controlButton.classList.add('btn-danger');
-                    controlButton.querySelector('.button-text').textContent = 'Dừng Bot';
-                    controlButton.querySelector('.bi').classList.remove('bi-play-fill');
-                    controlButton.querySelector('.bi').classList.add('bi-stop-fill');
-                } else {
-                    botStatusDiv.classList.remove('running');
-                    botStatusDiv.classList.add('stopped');
-                    botStatusDiv.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
+            statusEl.className = `connection-status ${status.running ? 'connected' : 'disconnected'}`;
+            statusEl.innerHTML = `
+                <i class="bi ${status.running ? 'bi-play-circle-fill' : 'bi-stop-circle-fill'}"></i>
+                <span>${status.running ? 'Đang chạy' : 'Đã dừng'}</span>
+            `;
 
-                    controlButton.classList.remove('btn-danger');
-                    controlButton.classList.add('btn-success');
-                    controlButton.querySelector('.button-text').textContent = 'Khởi động Bot';
-                    controlButton.querySelector('.bi').classList.remove('bi-stop-fill');
-                    controlButton.querySelector('.bi').classList.add('bi-play-fill');
-                }
+            // Update control button
+            const button = elements.controlButton;
+            if (status.running) {
+                button.classList.remove('btn-success');
+                button.classList.add('btn-danger');
+                button.querySelector('.button-text').textContent = 'Dừng Bot';
+                button.querySelector('.bi').className = 'bi bi-stop-fill me-2';
+            } else {
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-success');
+                button.querySelector('.button-text').textContent = 'Khởi động Bot';
+                button.querySelector('.bi').className = 'bi bi-play-fill me-2';
             }
         }
 
-        // Update button states
-        function updateButtonStates(enabled) {
-            debugLog('Updating button states', {enabled, botRunning});
-            const buttons = [
-                document.getElementById('controlButton'),
-                document.getElementById('saveConfigBtn')
-            ];
+        function setButtonLoading(button, isLoading) {
+            debugLog('setButtonLoading', { button: button.id, isLoading });
 
-            buttons.forEach(button => {
-                if (!button) return;
-                button.disabled = !enabled;
-                button.title = enabled ? '' : 'Chưa kết nối tới máy chủ';
+            const spinner = button.querySelector('.spinner-border');
+            const text = button.querySelector('.button-text');
+            const icon = button.querySelector('.bi');
 
-                if (!enabled) {
-                    button.classList.remove('btn-success', 'btn-danger');
-                    button.classList.add('btn-secondary');
-                }
-            });
+            button.disabled = isLoading;
+            if (isLoading) {
+                spinner.classList.remove('d-none');
+                text.classList.add('d-none');
+                icon.classList.add('d-none');
+                button.classList.add('loading');
+            } else {
+                spinner.classList.add('d-none');
+                text.classList.remove('d-none');
+                icon.classList.remove('d-none');
+                button.classList.remove('loading');
+            }
         }
 
-        // Handle control button click with better error handling
-        async function handleControlButtonClick(button) {
-            if (button.disabled || !isConnected) {
-                showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
-                return;
-            }
-
-            const action = button.querySelector('.button-text').textContent.includes('Dừng') ? 'stop' : 'start';
-            debugLog('Control button clicked', {action, botRunning});
-
-            setButtonLoading(button, true);
-
+        // Action handlers
+        async function handleControlButton(button) {
             try {
+                if (button.disabled || !state.isConnected) {
+                    showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
+                    return;
+                }
+
+                const action = state.botRunning ? 'stop' : 'start';
+                debugLog('Control button clicked', { action });
+
+                setButtonLoading(button, true);
+
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -630,12 +672,10 @@
                 debugLog('Bot control response', data);
 
                 if (data.success) {
-                    botRunning = data.status.running;
                     showToast(
                         action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại',
                         'success'
                     );
-                    updateBotStatus(data.status);
                 } else {
                     showToast(`Lỗi: ${data.message}`, 'error');
                 }
@@ -647,37 +687,10 @@
             }
         }
 
-
-
-        function setButtonLoading(button, isLoading) {
-            debugLog('setButtonLoading', {button: button.id, isLoading});
-            const spinner = button.querySelector('.spinner-border');
-            const text = button.querySelector('.button-text');
-            const icon = button.querySelector('.bi');
-
-            button.disabled = isLoading;
-            if (isLoading) {
-                spinner.classList.remove('d-none');
-                text.classList.add('d-none');
-                icon.classList.add('d-none');
-                button.classList.add('active');
-            } else {
-                spinner.classList.add('d-none');
-                text.classList.remove('d-none');
-                icon.classList.remove('d-none');
-                button.classList.remove('active');
-            }
-        }
-
-
         async function handleSaveConfig(button) {
             try {
                 debugLog('handleSaveConfig', 'start');
-                if (button.disabled) {
-                    return;
-                }
 
-                // Validate required fields
                 const apiKey = document.getElementById('apiKey').value;
                 const apiSecret = document.getElementById('apiSecret').value;
 
@@ -692,7 +705,7 @@
                     api_key: apiKey,
                     api_secret: apiSecret,
                     trading_type: document.getElementById('tradingType').value,
-                    risk_profile: riskLevel.value
+                    risk_profile: elements.riskLevel.value
                 };
 
                 debugLog('Sending config', config);
@@ -708,23 +721,57 @@
 
                 if (data.success) {
                     showToast('Đã lưu cấu hình thành công', 'success');
-                    // Update connection status and button states after successful save
-                    isConnected = data.config.is_connected;
-                    updateButtonStates(isConnected);
-                    updateConnectionStatus(isConnected);
+                    state.isConnected = data.config.is_connected;
+                    updateConnectionStatus(state.isConnected);
                 } else {
                     showToast(`Lỗi: ${data.message}`, 'error');
                 }
             } catch (error) {
-                console.error('Save config error:', error);
+                debugLog('Save config error', error);
                 showToast(`Lỗi kết nối: ${error.message}`, 'error');
             } finally {
                 setTimeout(() => setButtonLoading(button, false), 500);
             }
         }
 
+        function clearLogs() {
+            elements.messagesContainer.innerHTML = '';
+            addMessage({
+                content: 'Đã xóa nhật ký hệ thống',
+                level: 'info',
+                timestamp: new Date().toLocaleString()
+            });
+        }
 
-        // Add message to log
+        // Helper functions
+        function showToast(message, type = 'success') {
+            debugLog('showToast', { message, type });
+
+            const toastContainer = document.querySelector('.toast-container') || (() => {
+                const container = document.createElement('div');
+                container.className = 'toast-container position-fixed top-0 end-0 p-3';
+                document.body.appendChild(container);
+                return container;
+            })();
+
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }
+
         function addMessage(message) {
             const messageHTML = `
                 <div class="message message-${message.level}">
@@ -732,141 +779,105 @@
                     <div class="message-content">${message.content}</div>
                 </div>
             `;
-            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            elements.messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
         }
 
-        // Clear logs
-        clearLogsBtn.addEventListener('click', () => {
-            messagesContainer.innerHTML = '';
-            addMessage({
-                content: 'Đã xóa nhật ký hệ thống',
-                level: 'info',
-                timestamp: new Date().toLocaleString()
-            });
-        });
+        function updateAccountData(data) {
+            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
+            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
+            document.getElementById('openPositions').textContent = data.positions?.length || 0;
+        }
+
+        function updateMarketData(data) {
+            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
+            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
+            updateCharts(data);
+        }
 
         // Risk level changes
-        maxAccountRisk.addEventListener('input', () => {
-            maxAccountRiskValue.textContent = `${maxAccountRisk.value}%`;
-        });
+        elements.riskLevel.addEventListener('change', function() {
+            const levels = {
+                low: { leverage: 2, riskPerTrade: 1, maxTrades: 10, dailyTarget: 1 },
+                medium: { leverage: 5, riskPerTrade: 2.5, maxTrades: 4, dailyTarget: 2 },
+                high: { leverage: 10, riskPerTrade: 5, maxTrades: 2, dailyTarget: 3 }
+            };
 
-        riskLevel.addEventListener('change', function() {
-            let leverage;
-            let riskPerTrade;
-            let maxTrades;
-            let dailyTarget;
-
-            switch(this.value) {
-                case 'low':
-                    leverage = 2;
-                    riskPerTrade = 1;
-                    maxTrades = 10;
-                    dailyTarget = 1;
-                    break;
-                case 'medium':
-                    leverage = 5;
-                    riskPerTrade = 2.5;
-                    maxTrades = 4;
-                    dailyTarget = 2;
-                    break;
-                case 'high':
-                    leverage = 10;
-                    riskPerTrade = 5;
-                    maxTrades = 2;
-                    dailyTarget = 3;
-                    break;
-            }
-            riskDetails.innerHTML = `
-                <p class="mb-1"><strong>Đòn bẩy:</strong> ${leverage}x</p>
-                <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> ${riskPerTrade}% tài khoản</p>
-                <p class="mb-1"><strong>Số lệnh tối đa:</strong> ${maxTrades} lệnh</p>
-                <p class="mb-0"><strong>Target lợi nhuận:</strong> ${dailyTarget}% mỗi ngày</p>
+            const level = levels[this.value];
+            elements.riskDetails.innerHTML = `
+                <p class="mb-1"><strong>Đòn bẩy:</strong> ${level.leverage}x</p>
+                <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> ${level.riskPerTrade}% tài khoản</p>
+                <p class="mb-1"><strong>Số lệnh tối đa:</strong> ${level.maxTrades} lệnh</p>
+                <p class="mb-0"><strong>Target lợi nhuận:</strong> ${level.dailyTarget}% mỗi ngày</p>
             `;
         });
 
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            // Create toast container if not exists
-            const toastContainer = document.querySelector('.toast-container') || (() => {
-                const container = document.createElement('div');
-                container.className = 'toast-container';
-                document.body.appendChild(container);
-                return container;
-            })();
+        // Chart initialization and updates
+        let btcChart, ethChart;
 
-            const toast = document.createElement('div');
-            toast.className = `toast ${type === 'error' ? 'bg-danger' : 'bg-success'} text-white`;
-            toast.textContent = message;
-
-            toastContainer.appendChild(toast);
-
-            // Trigger reflow
-            toast.offsetHeight;
-
-            // Show toast
-            toast.classList.add('show');
-
-            // Remove after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-
-        // Socket events for data updates
-        socket.on('account_update', (data) => {
-            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
-            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
-            document.getElementById('openPositions').textContent = data.positions.length;
-        });
-
-        socket.on('market_data', (data) => {
-            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
-            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
-            // Add more price updates as needed
-            updateCharts(data);
-        });
-
-        // Chart.js initialization and update function
-        let btcChart, ethChart; // Declare chart variables
         function updateCharts(data) {
-            // BTC chart data
+            const timeLabels = ['1h trước', '30p trước', '15p trước', 'Hiện tại'];
+
+            // BTC chart
             const btcData = {
-                labels: ['1h ago', '30m ago', '15m ago', 'Now'],
+                labels: timeLabels,
                 datasets: [{
                     label: 'BTC/USDT',
-                    data: [data.btc_price - 10, data.btc_price - 5, data.btc_price - 2, data.btc_price],
-                    fill: false,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
+                    data: [
+                        data.btc_price - 100,
+                        data.btc_price - 50,
+                        data.btc_price - 25,
+                        data.btc_price
+                    ],
+                    borderColor: '#0d6efd',
+                    tension: 0.4
                 }]
             };
 
-            // ETH chart data
+            // ETH chart
             const ethData = {
-                labels: ['1h ago', '30m ago', '15m ago', 'Now'],
+                labels: timeLabels,
                 datasets: [{
                     label: 'ETH/USDT',
-                    data: [data.eth_price - 8, data.eth_price - 4, data.eth_price - 1, data.eth_price],
-                    fill: false,
-                    borderColor: 'rgb(255, 99, 132)',
-                    tension: 0.1
+                    data: [
+                        data.eth_price - 50,
+                        data.eth_price - 25,
+                        data.eth_price - 10,
+                        data.eth_price
+                    ],
+                    borderColor: '#198754',
+                    tension: 0.4
                 }]
             };
 
-            // Create or update charts
-            if (!btcChart) {
-                btcChart = new Chart(btcChartCanvas, {
-                    type: 'line',
-                    data: btcData,                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: false
-                            }
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
+                }
+            };
+
+            if (!btcChart) {
+                btcChart = new Chart(elements.btcChart, {
+                    type: 'line',
+                    data: btcData,
+                    options: chartOptions
                 });
             } else {
                 btcChart.data = btcData;
@@ -874,16 +885,10 @@
             }
 
             if (!ethChart) {
-                ethChart = new Chart(ethChartCanvas, {
+                ethChart = new Chart(elements.ethChart, {
                     type: 'line',
                     data: ethData,
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: false
-                            }
-                        }
-                    }
+                    options: chartOptions
                 });
             } else {
                 ethChart.data = ethData;
@@ -891,11 +896,11 @@
             }
         }
 
-
-        // Auto-scroll to bottom on load
-        window.onload = () => {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        };
+        //        // Initialize on load
+        window.addEventListener('load', () => {
+            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+            elements.riskLevel.dispatchEvent(new Event('change'));
+        });
     </script>
 </body>
 </html>
