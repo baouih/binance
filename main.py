@@ -40,58 +40,99 @@ bot_status = {
 # Khởi tạo Telegram Notifier
 telegram_notifier = TelegramNotifier()
 
-# Dữ liệu mẫu cho thị trường khi không kết nối API thực
-SAMPLE_MARKET_DATA = {
-    # Dữ liệu thị trường cho Dashboard
-    'btc_price': 47823.45,
-    'btc_change_24h': 2.34,
-    'eth_price': 3245.78,
-    'eth_change_24h': 1.67,
-    'sol_price': 145.23,
-    'sol_change_24h': -0.89,
+# Placeholder cho dữ liệu thị trường khi chưa cập nhật từ API
+EMPTY_MARKET_DATA = {
+    # Dữ liệu thị trường trống, sẽ được cập nhật từ API thực
+    'btc_price': 0,
+    'btc_change_24h': 0,
+    'eth_price': 0,
+    'eth_change_24h': 0,
+    'sol_price': 0,
+    'sol_change_24h': 0,
     
-    # Dữ liệu tâm lý thị trường 
+    # Các dữ liệu khác sẽ được điền từ API thực
     'sentiment': {
-        'value': 65,
-        'state': 'warning',  # success (tham lam), warning (trung lập), danger (sợ hãi)
-        'text': 'Tham lam'
+        'value': 50,
+        'state': 'warning',
+        'text': 'Trung tính'
     },
     
-    # Chế độ thị trường hiện tại
-    'market_regime': {
-        'BTC': 'trending',
-        'ETH': 'ranging',
-        'SOL': 'volatile',
-        'BNB': 'trending'
-    },
-    
-    # Danh sách các cặp giao dịch với thông tin chi tiết
-    'pairs': [
-        {
-            'symbol': 'BTCUSDT',
-            'price': 47823.45,
-            'change': 2.34,
-            'high': 48125.00,
-            'low': 47512.67,
-            'volume': 1523.45
+    # Placeholder cho chỉ báo kỹ thuật (phù hợp với template)
+    'indicators': {
+        'rsi': 50,
+        'macd': 0,
+        'bb_width': 2.0,
+        'trend': 'neutral',
+        'trend_strength': 0.5,
+        'BTC': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
         },
-        {
-            'symbol': 'ETHUSDT',
-            'price': 3245.78,
-            'change': 1.67,
-            'high': 3289.12,
-            'low': 3198.45,
-            'volume': 12567.89
+        'ETH': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
         },
-        {
-            'symbol': 'SOLUSDT',
-            'price': 145.23,
-            'change': -0.89,
-            'high': 148.56,
-            'low': 142.78,
-            'volume': 7823.45
+        'SOL': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
         }
-    ]
+    },
+    
+    # Placeholder cho chế độ thị trường
+    'market_regime': {
+        'BTC': 'neutral',
+        'ETH': 'neutral',
+        'SOL': 'neutral',
+        'BNB': 'neutral'
+    },
+    
+    # Placeholder cho dự báo thị trường
+    'forecast': {
+        'text': 'Dự báo tăng nhẹ theo xu hướng hiện tại với mức kháng cự tiếp theo ở $85,500'
+    },
+    
+    # Placeholder cho khuyến nghị
+    'recommendation': {
+        'action': 'hold',
+        'text': 'Thị trường đang trong giai đoạn tích lũy, nên theo dõi và chờ đợi tín hiệu mạnh hơn.'
+    },
+    
+    # Placeholder cho tín hiệu
+    'signals': {
+        'BTC': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        },
+        'ETH': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        },
+        'SOL': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        }
+    },
+    
+    # Placeholder cho danh sách các cặp giao dịch
+    'pairs': []
 }
 
 # Đăng ký các blueprints
@@ -254,115 +295,144 @@ def get_bot_status():
 
 @app.route('/api/account')
 def get_account():
-    """Lấy dữ liệu tài khoản"""
+    """Lấy dữ liệu tài khoản thực từ Binance API"""
     # Cập nhật chế độ API từ cấu hình
     try:
         with open(ACCOUNT_CONFIG_PATH, 'r') as f:
             config = json.load(f)
-        api_mode = config.get('api_mode', 'demo')
+        api_mode = config.get('api_mode', 'testnet')
     except:
-        api_mode = 'demo'
+        api_mode = 'testnet'
     
-    # Trả về thông tin tài khoản dựa trên chế độ API
-    if api_mode == 'demo':
-        account_data = {
-            'balance': 10000.00,
-            'equity': 10000.00,
-            'available': 10000.00,
-            'margin': 0.00,
-            'pnl': 0.00,
-            'currency': 'USDT',
-            'mode': 'demo',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
-            'leverage': 3,
-            'positions': [
-                # Tạo dữ liệu mẫu cho chế độ demo
-            ]
-        }
-    elif api_mode == 'testnet':
-        account_data = {
-            'balance': 1000.00,
-            'equity': 1000.00,
-            'available': 1000.00,
-            'margin': 0.00,
-            'pnl': 0.00,
-            'currency': 'USDT',
-            'mode': 'testnet',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
-            'leverage': 5,
-            'positions': [
-                {
-                    'id': 'pos1',
-                    'symbol': 'BTCUSDT',
-                    'type': 'LONG',
-                    'entry_price': 47250.50,
-                    'current_price': 47823.45,
-                    'size': 0.01,
-                    'pnl': 57.29,
-                    'pnl_percent': 1.21,
-                    'liquidation_price': 42525.45
-                }
-            ]
-        }
-    else:  # live
-        # TODO: Kết nối Binance API thực để lấy dữ liệu
-        account_data = {
-            'balance': 500.00,
-            'equity': 500.00,
-            'available': 500.00,
-            'margin': 0.00,
-            'pnl': 0.00,
-            'currency': 'USDT',
-            'mode': 'live',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
-            'leverage': 3,
-            'positions': [
-                {
-                    'id': 'pos1',
-                    'symbol': 'BTCUSDT',
-                    'type': 'LONG',
-                    'entry_price': 47250.50,
-                    'current_price': 47823.45,
-                    'size': 0.01,
-                    'pnl': 57.29,
-                    'pnl_percent': 1.21,
-                    'liquidation_price': 42525.45
-                },
-                {
-                    'id': 'pos2',
-                    'symbol': 'ETHUSDT',
-                    'type': 'SHORT',
-                    'entry_price': 3300.25,
-                    'current_price': 3245.78,
-                    'size': 0.05,
-                    'pnl': 27.23,
-                    'pnl_percent': 0.83,
-                    'liquidation_price': 3465.30
-                }
-            ]
-        }
+    # Khởi tạo Binance API client
+    from binance_api import BinanceAPI
+    api_key = os.environ.get("BINANCE_API_KEY", "")
+    api_secret = os.environ.get("BINANCE_API_SECRET", "")
+    use_testnet = api_mode != 'live'
+    binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
+    
+    # Mặc định cho dữ liệu tài khoản
+    account_data = {
+        'balance': 0.00,
+        'equity': 0.00,
+        'available': 0.00,
+        'margin': 0.00,
+        'pnl': 0.00,
+        'currency': 'USDT',
+        'mode': api_mode,  # Quan trọng: để chữ thường cho đồng bộ với chế độ
+        'leverage': 5,
+        'positions': []
+    }
+    
+    try:
+        # Lấy dữ liệu tài khoản thực từ API
+        if api_mode in ['testnet', 'live']:
+            # Lấy dữ liệu tài khoản Futures từ API
+            futures_account = binance_client.get_futures_account()
+            
+            if futures_account:
+                # Tìm USDT trong danh sách assets
+                for asset in futures_account.get('assets', []):
+                    if asset.get('asset') == 'USDT':
+                        account_data['balance'] = float(asset.get('walletBalance', 0))
+                        account_data['equity'] = float(asset.get('marginBalance', 0))
+                        account_data['available'] = float(asset.get('availableBalance', 0))
+                        account_data['pnl'] = float(asset.get('unrealizedProfit', 0))
+                        logger.info(f"Đã lấy số dư thực tế từ API Binance {api_mode.capitalize()}: {account_data['balance']} USDT")
+                        break
+                
+                # Lấy thông tin vị thế
+                positions = binance_client.get_futures_position_risk()
+                active_positions = []
+                
+                for pos in positions:
+                    # Chỉ lấy các vị thế đang mở (có số lượng khác 0)
+                    position_amt = float(pos.get('positionAmt', 0))
+                    if position_amt != 0:
+                        symbol = pos.get('symbol', '')
+                        entry_price = float(pos.get('entryPrice', 0))
+                        mark_price = float(pos.get('markPrice', 0))
+                        unrealized_pnl = float(pos.get('unRealizedProfit', 0))
+                        leverage = int(pos.get('leverage', 1))
+                        
+                        # Tính PnL phần trăm
+                        pnl_percent = 0
+                        if entry_price > 0:
+                            if position_amt > 0:  # Long position
+                                pnl_percent = ((mark_price / entry_price) - 1) * 100 * leverage
+                            else:  # Short position
+                                pnl_percent = ((entry_price / mark_price) - 1) * 100 * leverage
+                        
+                        active_positions.append({
+                            'id': f"pos_{symbol}_{int(time.time())}",
+                            'symbol': symbol,
+                            'type': 'LONG' if position_amt > 0 else 'SHORT',
+                            'entry_price': entry_price,
+                            'current_price': mark_price,
+                            'size': abs(position_amt),
+                            'pnl': unrealized_pnl,
+                            'pnl_percent': pnl_percent,
+                            'liquidation_price': float(pos.get('liquidationPrice', 0)),
+                            'leverage': leverage
+                        })
+                
+                # Cập nhật danh sách vị thế vào dữ liệu tài khoản
+                account_data['positions'] = active_positions
+                
+                # Gửi thông báo khởi động với dữ liệu tài khoản
+                telegram_notifier.send_message(
+                    message=f"<b>Hệ thống đã kết nối API Binance {api_mode.capitalize()}</b>\n\n"
+                            f"Số dư: {account_data['balance']} USDT\n"
+                            f"PnL chưa thực hiện: {account_data['pnl']} USDT",
+                    category="system"
+                )
+                logger.info(f"Đã gửi thông báo khởi động hệ thống với dữ liệu tài khoản: số dư={account_data['balance']}, PNL chưa thực hiện={account_data['pnl']}")
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy dữ liệu tài khoản từ Binance API: {str(e)}")
+        # Nếu có lỗi, vẫn giữ giá trị mặc định
     
     return jsonify(account_data)
 
 @app.route('/api/signals')
 def get_signals():
-    """Lấy tín hiệu giao dịch gần đây"""
-    # Dữ liệu mẫu
-    signals = [
-        {
-            'time': (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
+    """Lấy tín hiệu giao dịch gần đây từ phân tích thị trường thực"""
+    # Khởi tạo danh sách tín hiệu trống
+    signals = []
+    
+    # Lấy dữ liệu thị trường với chỉ báo
+    market_data = get_market_data()
+    
+    # Nếu market_data có chứa signals
+    if 'signals' in market_data and isinstance(market_data['signals'], dict):
+        # Chuyển đổi từ định dạng {'BTC': {...}, 'ETH': {...}} sang danh sách
+        for symbol, signal_info in market_data['signals'].items():
+            if isinstance(signal_info, dict):
+                # Kiểm tra nếu có đầy đủ thông tin cần thiết
+                symbol_name = f"{symbol}USDT"
+                signal_type = signal_info.get('type', 'HOLD')
+                price = signal_info.get('price', 0)
+                time = signal_info.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                
+                signals.append({
+                    'time': time,
+                    'symbol': symbol_name,
+                    'type': signal_type,
+                    'strategy': signal_info.get('strategy', 'API Analysis'),
+                    'price': str(price) if price else '0',
+                    'strength': signal_info.get('strength', 'medium')
+                })
+    
+    # Nếu không có tín hiệu từ phân tích thực tế, trả về thông báo
+    if not signals:
+        signals.append({
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'symbol': 'BTCUSDT',
-            'type': 'BUY',
-            'strategy': 'RSI + Bollinger',
-            'price': '47823.45',
-            'strength': 'strong'
-        },
-        {
-            'time': (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
-            'symbol': 'ETHUSDT',
-            'type': 'SELL',
-            'strategy': 'MACD',
-            'price': '3245.78',
-            'strength': 'medium'
-        }
-    ]
+            'type': 'HOLD',
+            'strategy': 'Auto Analysis',
+            'price': str(market_data.get('btc_price', 0)),
+            'strength': 'neutral',
+            'message': 'Chưa có tín hiệu giao dịch mạnh'
+        })
     
     return jsonify(signals)
 
@@ -663,34 +733,8 @@ def get_market_data():
     # Tạo đối tượng Binance API
     binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
     
-    # Tạo market_data từ dữ liệu thực
-    market_data = {
-        'indicators': {
-            'rsi': 45.6,
-            'macd': 0.25,
-            'bb_width': 2.5,
-            'trend': 'up',
-            'trend_strength': 0.65
-        },
-        'sentiment': {
-            'value': 55,
-            'state': 'warning',
-            'description': 'Trung tính'
-        },
-        'forecast': {
-            'text': 'Dự báo tăng nhẹ theo xu hướng hiện tại với mức kháng cự tiếp theo ở $85,500'
-        },
-        'recommendation': {
-            'action': 'hold',
-            'text': 'Thị trường đang trong giai đoạn tích lũy, nên theo dõi và chờ đợi tín hiệu mạnh hơn.'
-        },
-        'market_regime': {
-            'BTCUSDT': 'trending',
-            'ETHUSDT': 'ranging',
-            'BNBUSDT': 'consolidating',
-            'SOLUSDT': 'volatile'
-        }
-    }
+    # Khởi tạo market_data từ template trống, sẽ điền từ dữ liệu API thực
+    market_data = EMPTY_MARKET_DATA.copy()
     
     try:
         # Lấy giá BTC hiện tại
@@ -803,8 +847,8 @@ def get_market_data():
         logger.info(f"Đã lấy dữ liệu thị trường thực từ Binance API: BTC=${market_data['btc_price']}")
     except Exception as e:
         logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
-        # Sử dụng dữ liệu mẫu nếu không lấy được dữ liệu thực
-        market_data = SAMPLE_MARKET_DATA.copy()
+        # Sử dụng dữ liệu trống nếu không lấy được dữ liệu thực
+        market_data = EMPTY_MARKET_DATA.copy()
     
     # Cập nhật danh sách cặp giao dịch
     for pair in market_data['pairs']:
