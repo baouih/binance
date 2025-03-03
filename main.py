@@ -1056,7 +1056,9 @@ def update_market_data():
                 stop_loss=stop_loss,
                 take_profit=take_profit,
                 reason=reason_text,
-                mode=api_mode
+                mode=api_mode,
+                order_id=order_result.get('orderId') if order_result else None,
+                order_placed=order_placed
             )
 
 def update_account_data():

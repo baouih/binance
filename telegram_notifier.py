@@ -122,7 +122,11 @@ class TelegramNotifier:
         mode_emoji = '🟢' if mode == 'live' else '🟡' if mode == 'testnet' else '⚪'
         mode_display = mode.upper()
         
-        message = f"<b>{direction_arrow} VÀO LỆNH {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
+        # Tạo tiêu đề với trạng thái lệnh
+        order_status_emoji = '✅' if order_placed else '📝'
+        order_status_text = "ĐÃ ĐẶT LỆNH" if order_placed else "TÍN HIỆU"
+        
+        message = f"<b>{direction_arrow} {order_status_emoji} {order_status_text} {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
         message += f"<b>Cặp:</b> {symbol}\n"
         message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
         message += f"<b>Số lượng:</b> {quantity}\n"
@@ -132,6 +136,10 @@ class TelegramNotifier:
         
         if take_profit:
             message += f"<b>Take Profit:</b> {take_profit:,.2f} USDT\n"
+            
+        # Thêm thông tin ID lệnh nếu có
+        if order_placed and order_id:
+            message += f"<b>Mã lệnh:</b> {order_id}\n"
         
         if reason:
             message += f"\n<b>Lý do:</b> {reason}"
