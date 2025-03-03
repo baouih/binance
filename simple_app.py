@@ -7,6 +7,7 @@ import logging
 import random
 import time
 import threading
+import requests
 from datetime import datetime
 
 from flask import Flask, render_template, request, jsonify, make_response
@@ -46,44 +47,21 @@ trading_config = {
 
 # Market data
 market_data = {
-    'btc_price': 49850.25,
-    'eth_price': 2680.15,
-    'sol_price': 98.75,
-    'bnb_price': 370.50,
-    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    'btc_price': 0,
+    'eth_price': 0,
+    'sol_price': 0,
+    'bnb_price': 0,
+    'last_updated': None
 }
 
 # Account data
 account_data = {
-    'balance': 10000.0,
-    'equity': 10000.0,
-    'available': 9500.0,
-    'positions': [
-        {
-            'id': 1001,
-            'symbol': 'BTCUSDT',
-            'side': 'BUY',
-            'amount': 0.22,
-            'entry_price': 49500.25,
-            'current_price': 49850.25,
-            'pnl': 77.0,
-            'pnl_percent': 0.71,
-            'timestamp': datetime.now().isoformat()
-        },
-        {
-            'id': 1002,
-            'symbol': 'ETHUSDT',
-            'side': 'SELL',
-            'amount': 1.5,
-            'entry_price': 2720.50,
-            'current_price': 2680.15,
-            'pnl': 60.53,
-            'pnl_percent': 1.48,
-            'timestamp': datetime.now().isoformat()
-        }
-    ],
-    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'initial_balance': 10000.0,
+    'balance': 0,
+    'equity': 0,
+    'available': 0,
+    'positions': [],
+    'last_updated': None,
+    'initial_balance': 0,
     'current_drawdown': 0
 }
 
@@ -133,6 +111,39 @@ def check_risk_limits():
 
     except Exception as e:
         logger.error(f"Error checking risk limits: {str(e)}", exc_info=True)
+        return False
+
+def update_market_prices():
+    """Lấy giá thị trường thực từ Binance API"""
+    try:
+        # Danh sách các cặp cần lấy giá
+        symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+        base_url = 'https://api.binance.com/api/v3/ticker/price'
+        
+        for symbol in symbols:
+            try:
+                # Gửi request đến Binance API
+                response = requests.get(f"{base_url}?symbol={symbol}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    symbol_key = symbol.lower().replace('usdt', '_price')
+                    
+                    # Cập nhật dữ liệu market_data
+                    market_data[symbol_key] = float(data['price'])
+                    market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    logger.error(f"Error getting price for {symbol}: {response.status_code}")
+                    # Không reset giá về 0 nếu không lấy được, giữ giá cũ
+            
+            except Exception as e:
+                logger.error(f"Error getting price for {symbol}: {str(e)}")
+                
+        logger.debug(f"Updated market prices: {market_data}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error updating market prices: {str(e)}")
         return False
 
 def init_api_connection():
@@ -451,12 +462,8 @@ def simulate_data_updates():
     try:
         logger.info("Starting data simulation")
         
-        # Tăng số liệu ban đầu
-        market_data['btc_price'] = 49850.25
-        market_data['eth_price'] = 2680.15
-        market_data['sol_price'] = 98.75
-        market_data['bnb_price'] = 370.50
-        market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # Cập nhật dữ liệu thị trường từ Binance API
+        update_market_prices()
         
         while True:
             # Cập nhật tài khoản theo trạng thái
@@ -521,12 +528,8 @@ def simulate_data_updates():
                     msg_content = f"Đóng vị thế: {closed_position['side']} {closed_position['amount']} {closed_position['symbol']} với P/L: ${pnl} ({pnl_percent}%)"
                     add_message(msg_content, 'success' if pnl > 0 else 'warning')
             
-            # Cập nhật giá thị trường
-            market_data['btc_price'] = market_data.get('btc_price', 49850.25) * (1 + random.uniform(-0.003, 0.003))
-            market_data['eth_price'] = market_data.get('eth_price', 2680.15) * (1 + random.uniform(-0.004, 0.004))
-            market_data['sol_price'] = market_data.get('sol_price', 98.75) * (1 + random.uniform(-0.006, 0.006))
-            market_data['bnb_price'] = market_data.get('bnb_price', 370.50) * (1 + random.uniform(-0.002, 0.002))
-            market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Cập nhật giá thị trường thực từ Binance API
+            update_market_prices()
             
             # Tính drawdown
             if account_data['initial_balance'] > 0:
