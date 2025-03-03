@@ -69,6 +69,29 @@
             color: #8b949e;
         }
 
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        .connection-status.connected {
+            background-color: #198754;
+            color: white;
+        }
+
+        .connection-status.disconnected {
+            background-color: #dc3545;
+            color: white;
+            display: block;
+        }
+
         /* Loading spinner */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -115,6 +138,11 @@
     </style>
 </head>
 <body>
+    <!-- Connection status indicator -->
+    <div id="connectionStatus" class="connection-status">
+        <i class="bi bi-wifi-off"></i> Mất kết nối
+    </div>
+
     <div class="container py-4">
         <header class="d-flex justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center">
@@ -155,14 +183,31 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        // Khởi tạo WebSocket
-        const socket = io();
+        // Khởi tạo WebSocket với cấu hình reconnection
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 10000
+        });
 
-        // Phần tử nút điều khiển
+        // Elements
         const controlButton = document.getElementById('controlButton');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const messagesContainer = document.getElementById('messages');
+
+        // Track connection state
+        let isConnected = false;
+        let reconnectAttempts = 0;
 
         socket.on('connect', () => {
             console.log('Connected to server');
+            isConnected = true;
+            reconnectAttempts = 0;
+            connectionStatus.classList.remove('disconnected');
+            connectionStatus.style.display = 'none';
+
             addMessage({
                 content: 'Đã kết nối tới máy chủ',
                 level: 'success',
@@ -172,8 +217,52 @@
 
         socket.on('disconnect', () => {
             console.log('Disconnected from server');
+            isConnected = false;
+            connectionStatus.classList.add('disconnected');
+            connectionStatus.style.display = 'block';
+
             addMessage({
                 content: 'Mất kết nối tới máy chủ',
+                level: 'error',
+                timestamp: new Date().toLocaleString()
+            });
+
+            // Disable control button when disconnected
+            controlButton.disabled = true;
+        });
+
+        socket.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`Reconnection attempt ${attemptNumber}`);
+            reconnectAttempts = attemptNumber;
+
+            addMessage({
+                content: `Đang thử kết nối lại (lần ${attemptNumber})...`,
+                level: 'warning',
+                timestamp: new Date().toLocaleString()
+            });
+        });
+
+        socket.on('reconnect', () => {
+            console.log('Reconnected to server');
+            isConnected = true;
+            reconnectAttempts = 0;
+            connectionStatus.classList.remove('disconnected');
+            connectionStatus.style.display = 'none';
+
+            // Re-enable control button
+            controlButton.disabled = false;
+
+            addMessage({
+                content: 'Đã kết nối lại thành công',
+                level: 'success',
+                timestamp: new Date().toLocaleString()
+            });
+        });
+
+        socket.on('reconnect_error', (error) => {
+            console.error('Reconnection error:', error);
+            addMessage({
+                content: 'Không thể kết nối lại tới máy chủ',
                 level: 'error',
                 timestamp: new Date().toLocaleString()
             });
@@ -189,15 +278,14 @@
 
         // Thêm tin nhắn mới
         function addMessage(message) {
-            const messagesDiv = document.getElementById('messages');
             const messageHTML = `
                 <div class="message message-${message.level}">
                     <span class="message-time">${message.timestamp}</span>
                     <div class="message-content">${message.content}</div>
                 </div>
             `;
-            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
         // Cập nhật trạng thái bot
@@ -230,6 +318,15 @@
 
         // Điều khiển bot
         async function controlBot(action) {
+            if (!isConnected) {
+                addMessage({
+                    content: 'Không thể điều khiển bot khi mất kết nối',
+                    level: 'error',
+                    timestamp: new Date().toLocaleString()
+                });
+                return;
+            }
+
             // Add loading state
             controlButton.classList.add('btn-loading');
             controlButton.disabled = true;
@@ -273,14 +370,14 @@
 
         // Event listener cho nút điều khiển
         controlButton.addEventListener('click', function() {
+            if (this.disabled) return;
             const action = this.dataset.action || (this.textContent.includes('Dừng') ? 'stop' : 'start');
             controlBot(action);
         });
 
         // Auto-scroll to bottom on load
         window.onload = () => {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         };
     </script>
 </body>

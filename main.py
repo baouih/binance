@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
+import eventlet
 
 # Thiết lập logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -23,7 +24,17 @@ if 'SESSION_SECRET' not in os.environ:
 app.secret_key = os.environ.get("SESSION_SECRET")
 
 # Khởi tạo SocketIO với CORS và async mode
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode='eventlet',  # Use eventlet for better performance
+    ping_timeout=10,  # Shorter ping timeout
+    ping_interval=5,  # More frequent pings
+    reconnection=True,  # Enable auto-reconnection
+    reconnection_attempts=5,  # Max 5 reconnection attempts
+    reconnection_delay=1000,  # Start with 1 second delay
+    reconnection_delay_max=5000  # Max 5 seconds between attempts
+)
 
 # Đường dẫn đến file cấu hình
 ACCOUNT_CONFIG_PATH = 'account_config.json'
@@ -51,8 +62,11 @@ def add_message(content, level='info'):
         while len(messages) > 100:
             messages.pop(0)
         # Gửi thông báo qua websocket
-        socketio.emit('new_message', message)
-        logger.debug(f"Added and emitted new message: {content}")
+        try:
+            socketio.emit('new_message', message)
+            logger.debug(f"Added and emitted new message: {content}")
+        except Exception as e:
+            logger.error(f"Error emitting message via socket: {str(e)}", exc_info=True)
     except Exception as e:
         logger.error(f"Error adding message: {str(e)}", exc_info=True)
 
@@ -112,7 +126,10 @@ def control_bot():
         bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # Emit bot status update through WebSocket
-        socketio.emit('bot_status_update', bot_status)
+        try:
+            socketio.emit('bot_status_update', bot_status)
+        except Exception as e:
+            logger.error(f"Error emitting bot status update: {str(e)}", exc_info=True)
 
         return jsonify({
             'success': True,
@@ -149,11 +166,29 @@ def handle_connect():
     except Exception as e:
         logger.error(f"Error handling socket connection: {str(e)}", exc_info=True)
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Xử lý khi client ngắt kết nối websocket"""
+    try:
+        logger.info('Client disconnected')
+    except Exception as e:
+        logger.error(f"Error handling socket disconnect: {str(e)}", exc_info=True)
+
 if __name__ == "__main__":
+    # Monkey patch để eventlet hoạt động tốt hơn
+    eventlet.monkey_patch()
+
     # Thêm thông báo khởi động
     try:
         add_message('Hệ thống đã khởi động', 'info')
-        # Chạy ứng dụng
-        socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+        # Chạy ứng dụng với eventlet WSGI server
+        socketio.run(
+            app,
+            host="0.0.0.0",
+            port=5000,
+            debug=True,
+            use_reloader=True,  # Enable auto-reload
+            log_output=True  # Enable logging
+        )
     except Exception as e:
         logger.error(f"Error starting server: {str(e)}", exc_info=True)
