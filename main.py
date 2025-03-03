@@ -20,8 +20,8 @@ logger = logging.getLogger('main')
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "binance_trader_bot_secret")
 
-# Khởi tạo SocketIO
-socketio = SocketIO(app)
+# Khởi tạo SocketIO với CORS và async mode
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Đường dẫn đến các file cấu hình
 ACCOUNT_CONFIG_PATH = 'account_config.json'
@@ -808,4 +808,6 @@ if __name__ == '__main__':
     start_background_tasks()
     
     # Khởi động ứng dụng
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # Sử dụng gunicorn cho môi trường production
+    # socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
