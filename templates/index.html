@@ -355,8 +355,8 @@
                 
                 <!-- Bot controls -->
                 <div class="btn-group">
-                    <button class="btn btn-sm {{ 'btn-outline-danger' if bot_status.running else 'btn-outline-success' }}" 
-                            id="toggleBotBtn">
+                    <button class="btn btn-sm {{ 'btn-outline-danger stop-bot-btn' if bot_status.running else 'btn-outline-success start-bot-btn' }}" 
+                            id="toggleBotBtn" data-bot-id="default">
                         {{ 'Dừng' if bot_status.running else 'Khởi động' }}
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" id="restartBotBtn">
@@ -368,8 +368,8 @@
         
         <!-- Float button to toggle on/off - larger size and improved position -->
         <div class="d-block d-md-none" style="position: fixed; bottom: 85px; right: 20px; z-index: 1050;">
-            <button class="btn {{ 'btn-danger' if bot_status.running else 'btn-success' }} rounded-circle shadow" style="width: 60px; height: 60px;"
-                    id="mobileBotToggle">
+            <button class="btn {{ 'btn-danger stop-bot-btn' if bot_status.running else 'btn-success start-bot-btn' }} rounded-circle shadow" style="width: 60px; height: 60px;"
+                    id="mobileBotToggle" data-bot-id="default">
                 <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} fs-3"></i>
             </button>
             <div class="text-center mt-1" style="font-size: 12px; color: white; text-shadow: 0 0 3px rgba(0,0,0,0.7);">
