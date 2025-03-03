@@ -40,38 +40,58 @@ socketio = SocketIO(
 RISK_LEVELS = {
     'very_low': {
         'name': 'Rất thấp',
+        'description': 'An toàn tối đa, lợi nhuận thấp',
         'leverage': 1,
-        'position_size': 0.01,
-        'stop_loss': 0.01,
-        'take_profit': 0.02
+        'position_size': 0.01,  # 1% tài khoản/lệnh
+        'stop_loss': 0.01,      # 1% stop loss
+        'take_profit': 0.02,    # 2% take profit
+        'max_positions': 3,      # Tối đa 3 lệnh cùng lúc
+        'risk_reward': 2.0,     # Tỷ lệ risk/reward
+        'daily_target': 0.005   # Target lợi nhuận ngày 0.5%
     },
     'low': {
         'name': 'Thấp', 
+        'description': 'Rủi ro thấp, lợi nhuận ổn định',
         'leverage': 2,
-        'position_size': 0.03,
-        'stop_loss': 0.02,
-        'take_profit': 0.04
+        'position_size': 0.03,  # 3% tài khoản/lệnh
+        'stop_loss': 0.02,      # 2% stop loss
+        'take_profit': 0.04,    # 4% take profit
+        'max_positions': 4,      # Tối đa 4 lệnh cùng lúc
+        'risk_reward': 2.0,     # Tỷ lệ risk/reward
+        'daily_target': 0.01    # Target lợi nhuận ngày 1%
     },
     'medium': {
         'name': 'Trung bình',
+        'description': 'Cân bằng giữa rủi ro và lợi nhuận',
         'leverage': 5,
-        'position_size': 0.05,
-        'stop_loss': 0.03,
-        'take_profit': 0.06
+        'position_size': 0.05,  # 5% tài khoản/lệnh
+        'stop_loss': 0.03,      # 3% stop loss 
+        'take_profit': 0.06,    # 6% take profit
+        'max_positions': 5,      # Tối đa 5 lệnh cùng lúc
+        'risk_reward': 2.0,     # Tỷ lệ risk/reward
+        'daily_target': 0.02    # Target lợi nhuận ngày 2%
     },
     'high': {
         'name': 'Cao',
+        'description': 'Rủi ro cao, tiềm năng lợi nhuận lớn',
         'leverage': 10,
-        'position_size': 0.1,
-        'stop_loss': 0.05,
-        'take_profit': 0.1
+        'position_size': 0.10,  # 10% tài khoản/lệnh
+        'stop_loss': 0.05,      # 5% stop loss
+        'take_profit': 0.10,    # 10% take profit
+        'max_positions': 3,      # Tối đa 3 lệnh cùng lúc
+        'risk_reward': 2.0,     # Tỷ lệ risk/reward
+        'daily_target': 0.05    # Target lợi nhuận ngày 5%
     },
     'very_high': {
         'name': 'Rất cao',
+        'description': 'Rủi ro rất cao, lợi nhuận tiềm năng rất lớn',
         'leverage': 20,
-        'position_size': 0.2,
-        'stop_loss': 0.1,
-        'take_profit': 0.2
+        'position_size': 0.20,  # 20% tài khoản/lệnh
+        'stop_loss': 0.10,      # 10% stop loss
+        'take_profit': 0.20,    # 20% take profit
+        'max_positions': 2,      # Tối đa 2 lệnh cùng lúc
+        'risk_reward': 2.0,     # Tỷ lệ risk/reward
+        'daily_target': 0.10    # Target lợi nhuận ngày 10%
     }
 }
 
@@ -173,10 +193,16 @@ def init_api_connection():
             # Cập nhật account data
             update_account_data(account)
 
+            risk_level = RISK_LEVELS[connection_status['risk_level']]
             add_message("Kết nối API thành công", "success")
             add_message(f"Chế độ: {connection_status['api_mode'].upper()}", "info")
             add_message(f"Loại giao dịch: {connection_status['trading_type'].upper()}", "info")
-            add_message(f"Mức độ rủi ro: {RISK_LEVELS[connection_status['risk_level']]['name']}", "info")
+            add_message(f"Mức độ rủi ro: {risk_level['name']}", "info")
+            add_message(f"Đòn bẩy: {risk_level['leverage']}x", "info")
+            add_message(f"Vốn mỗi lệnh: {risk_level['position_size']*100}% tài khoản", "info")
+            add_message(f"Stop loss: {risk_level['stop_loss']*100}%", "info")
+            add_message(f"Take profit: {risk_level['take_profit']*100}%", "info")
+            add_message(f"Số lệnh tối đa: {risk_level['max_positions']}", "info")
 
             return True
 
