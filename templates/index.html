@@ -904,16 +904,30 @@
 
         // Action handlers
         async function handleControlButton() {
+            // Debug
+            console.log('handleControlButton được gọi!');
+            
             const button = document.getElementById('controlButton');
+            console.log('Button text:', button.textContent);
+            
             const botStatus = document.querySelector('.bot-status');
+            if (!botStatus) console.log('Không tìm thấy element botStatus');
 
-            if (button.disabled) return;
+            if (button.disabled) {
+                console.log('Button đang disabled, không thực hiện thao tác');
+                return;
+            }
 
             button.disabled = true;
+            console.log('Button đã disabled trong quá trình xử lý');
 
             try {
                 const action = button.textContent.includes('Dừng') ? 'stop' : 'start';
+                console.log('Hành động:', action);
 
+                console.log('Gửi request đến /api/bot/control với action =', action);
+                showToast('Đang ' + (action === 'start' ? 'khởi động' : 'dừng') + ' bot...', 'info');
+                
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
