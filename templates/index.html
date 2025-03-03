@@ -11,6 +11,7 @@
         body {
             background-color: #0d1117;
             color: #c9d1d9;
+            padding-bottom: env(safe-area-inset-bottom); /* For mobile notch */
         }
 
         .status-badge {
@@ -67,6 +68,50 @@
             font-size: 0.8em;
             color: #8b949e;
         }
+
+        /* Loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-loading:after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+            border: 2px solid transparent;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Adjustments for mobile */
+        @media (max-width: 768px) {
+            .btn {
+                min-height: 44px; /* Larger touch target */
+                font-size: 1rem;
+            }
+
+            .mode-badge {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .messages-container {
+                height: calc(100vh - 180px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -86,8 +131,8 @@
                 <span class="status-badge {{ 'status-running' if status.running else 'status-stopped' }}"></span>
                 <span class="me-3">{{ 'Đang chạy' if status.running else 'Đang dừng' }}</span>
 
-                <button class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-sm me-2" 
-                        onclick="controlBot('{{ 'stop' if status.running else 'start' }}')">
+                <button id="controlButton" 
+                        class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-sm me-2">
                     {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
                 </button>
             </div>
@@ -112,6 +157,9 @@
     <script>
         // Khởi tạo WebSocket
         const socket = io();
+
+        // Phần tử nút điều khiển
+        const controlButton = document.getElementById('controlButton');
 
         socket.on('connect', () => {
             console.log('Connected to server');
@@ -156,7 +204,6 @@
         function updateBotStatus(status) {
             const statusBadge = document.querySelector('.status-badge');
             const statusText = statusBadge.nextElementSibling;
-            const controlButton = document.querySelector('button');
 
             if (status.running) {
                 statusBadge.classList.remove('status-stopped');
@@ -165,7 +212,7 @@
                 controlButton.classList.remove('btn-success');
                 controlButton.classList.add('btn-danger');
                 controlButton.textContent = 'Dừng Bot';
-                controlButton.onclick = () => controlBot('stop');
+                controlButton.dataset.action = 'stop';
             } else {
                 statusBadge.classList.remove('status-running');
                 statusBadge.classList.add('status-stopped');
@@ -173,12 +220,20 @@
                 controlButton.classList.remove('btn-danger');
                 controlButton.classList.add('btn-success');
                 controlButton.textContent = 'Khởi động Bot';
-                controlButton.onclick = () => controlBot('start');
+                controlButton.dataset.action = 'start';
             }
+
+            // Remove loading state
+            controlButton.classList.remove('btn-loading');
+            controlButton.disabled = false;
         }
 
         // Điều khiển bot
         async function controlBot(action) {
+            // Add loading state
+            controlButton.classList.add('btn-loading');
+            controlButton.disabled = true;
+
             try {
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
@@ -199,6 +254,9 @@
                         level: 'error',
                         timestamp: new Date().toLocaleString()
                     });
+                    // Remove loading state on error
+                    controlButton.classList.remove('btn-loading');
+                    controlButton.disabled = false;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -207,8 +265,17 @@
                     level: 'error',
                     timestamp: new Date().toLocaleString()
                 });
+                // Remove loading state on error
+                controlButton.classList.remove('btn-loading');
+                controlButton.disabled = false;
             }
         }
+
+        // Event listener cho nút điều khiển
+        controlButton.addEventListener('click', function() {
+            const action = this.dataset.action || (this.textContent.includes('Dừng') ? 'stop' : 'start');
+            controlBot(action);
+        });
 
         // Auto-scroll to bottom on load
         window.onload = () => {
