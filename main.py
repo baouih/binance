@@ -884,7 +884,7 @@ if __name__ == '__main__':
     # Khởi động tác vụ nền
     start_background_tasks()
     
-    logger.info("Background tasks not auto-started. Use API to start them manually.")
+    logger.info("Background tasks started.")
     
-    # Khởi động ứng dụng với Socket.IO
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    # Trong Replit, chúng ta không sử dụng phương thức socketio.run() mà để Gunicorn khởi động ứng dụng
+    app.run(host='0.0.0.0', port=5000, debug=True)
