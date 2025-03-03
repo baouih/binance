@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Control Panel</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        .status-running {
+            color: #4caf50;
+        }
+        .status-stopped {
+            color: #f44336;
+        }
+        .status-restarting {
+            color: #ff9800;
+        }
+        .btn-control {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .price-up {
+            color: #4caf50;
+        }
+        .price-down {
+            color: #f44336;
+        }
+        .position-long {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .position-short {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .table {
+            color: #e0e0e0;
+        }
+        .table-dark {
+            background-color: #1e1e1e;
+        }
+        .form-control, .form-select {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #444;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Menu</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="#dashboard" class="list-group-item list-group-item-action active" data-bs-toggle="list">Dashboard</a>
+                            <a href="#settings" class="list-group-item list-group-item-action" data-bs-toggle="list">Settings</a>
+                            <a href="#positions" class="list-group-item list-group-item-action" data-bs-toggle="list">Positions</a>
+                            <a href="#trades" class="list-group-item list-group-item-action" data-bs-toggle="list">Trade History</a>
+                            <a href="#market" class="list-group-item list-group-item-action" data-bs-toggle="list">Market</a>
+                            <a href="#terminal" class="list-group-item list-group-item-action" data-bs-toggle="list">Terminal</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Bot Status</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if bot_status.running %}
+                        <h4 class="status-running">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            RUNNING
+                        </h4>
+                        {% else %}
+                        <h4 class="status-stopped">STOPPED</h4>
+                        {% endif %}
+                        <p class="small text-muted">Mode: {{ bot_status.mode|upper }}</p>
+                        <p class="small text-muted">Updated: {{ bot_status.last_update }}</p>
+                        
+                        <div class="btn-group d-flex" role="group">
+                            <button id="startBtn" class="btn btn-sm btn-success" {% if bot_status.running %}disabled{% endif %}>
+                                <i class="bi bi-play-fill"></i> Start
+                            </button>
+                            <button id="stopBtn" class="btn btn-sm btn-danger" {% if not bot_status.running %}disabled{% endif %}>
+                                <i class="bi bi-stop-fill"></i> Stop
+                            </button>
+                            <button id="restartBtn" class="btn btn-sm btn-warning">
+                                <i class="bi bi-arrow-clockwise"></i> Restart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Account</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">Balance:</div>
+                            <div class="col-6 text-end">${{ account_data.balance|default('0.00') }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">Equity:</div>
+                            <div class="col-6 text-end">${{ account_data.equity|default('0.00') }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">PnL:</div>
+                            <div class="col-6 text-end {% if account_data.pnl > 0 %}price-up{% elif account_data.pnl < 0 %}price-down{% endif %}">
+                                ${{ account_data.pnl|default('0.00') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-10">
+                <div class="tab-content">
+                    <!-- Dashboard Tab -->
+                    <div class="tab-pane active" id="dashboard">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Market Overview</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h3>BTC/USDT 
+                                                    <span class="{% if market_data.btc_change > 0 %}price-up{% elif market_data.btc_change < 0 %}price-down{% endif %}">
+                                                        ${{ market_data.btc_price|default('0.00') }}
+                                                        ({{ market_data.btc_change|default('0.00') }}%)
+                                                    </span>
+                                                </h3>
+                                                <p>Volume 24h: ${{ market_data.btc_volume|default('0.00')|int }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h3>ETH/USDT 
+                                                    <span class="{% if market_data.eth_change > 0 %}price-up{% elif market_data.eth_change < 0 %}price-down{% endif %}">
+                                                        ${{ market_data.eth_price|default('0.00') }}
+                                                        ({{ market_data.eth_change|default('0.00') }}%)
+                                                    </span>
+                                                </h3>
+                                                <p>Volume 24h: ${{ market_data.eth_volume|default('0.00')|int }}</p>
+                                            </div>
+                                        </div>
+                                        <p>Market mood: <strong>{{ market_data.market_mood|default('Neutral')|upper }}</strong></p>
+                                        <div class="placeholder-chart" style="height: 300px; background-color: #333; display: flex; justify-content: center; align-items: center;">
+                                            <p>Price chart will be displayed here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Open Positions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-dark">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Symbol</th>
+                                                        <th>Type</th>
+                                                        <th>Size</th>
+                                                        <th>Entry</th>
+                                                        <th>Current</th>
+                                                        <th>PnL</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if account_data.positions and account_data.positions|length > 0 %}
+                                                        {% for position in account_data.positions %}
+                                                        <tr>
+                                                            <td>{{ position.symbol }}</td>
+                                                            <td class="{% if position.side == 'LONG' %}position-long{% else %}position-short{% endif %}">
+                                                                {{ position.side }}
+                                                            </td>
+                                                            <td>{{ position.size }}</td>
+                                                            <td>${{ position.entry_price }}</td>
+                                                            <td>${{ position.mark_price }}</td>
+                                                            <td class="{% if position.pnl > 0 %}price-up{% elif position.pnl < 0 %}price-down{% endif %}">
+                                                                ${{ position.pnl }}
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-danger close-position" data-position-id="{{ position.id }}">
+                                                                    Close
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td colspan="7" class="text-center">No open positions</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Bot Statistics</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col-6">Win Rate:</div>
+                                            <div class="col-6 text-end">65%</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">Total Trades:</div>
+                                            <div class="col-6 text-end">25</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">Profit Factor:</div>
+                                            <div class="col-6 text-end">1.75</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">Total Profit:</div>
+                                            <div class="col-6 text-end price-up">$128.45</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">Max Drawdown:</div>
+                                            <div class="col-6 text-end price-down">-15.2%</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6">Avg Trade:</div>
+                                            <div class="col-6 text-end price-up">$5.14</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Recent Trades</h5>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="list-group list-group-flush">
+                                            {% if trade_history and trade_history|length > 0 %}
+                                                {% for trade in trade_history %}
+                                                <div class="list-group-item">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1">{{ trade.symbol }} {{ trade.type }}</h6>
+                                                        <small class="{% if trade.pnl > 0 %}price-up{% elif trade.pnl < 0 %}price-down{% endif %}">
+                                                            ${{ trade.pnl }}
+                                                        </small>
+                                                    </div>
+                                                    <p class="mb-1">
+                                                        Entry: ${{ trade.entry }} | Exit: ${{ trade.exit }}
+                                                    </p>
+                                                    <small class="text-muted">{{ trade.time }}</small>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="list-group-item">No trade history available</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>System Log</h5>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="systemLog" style="height: 200px; overflow-y: auto; background: #0a0a0a; color: #00ff00; font-family: monospace; padding: 10px;">
+                                            <div>System started at {{ bot_status.start_time|default('N/A') }}</div>
+                                            <div>API mode: {{ bot_status.mode|upper }}</div>
+                                            <div>Status: {{ bot_status.status|upper }}</div>
+                                            <div>Last update: {{ bot_status.last_update }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Tab -->
+                    <div class="tab-pane" id="settings">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Account Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="settingsForm">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="apiMode" class="form-label">API Mode</label>
+                                            <select class="form-select" id="apiMode" name="api_mode">
+                                                <option value="demo" {% if account_config.api_mode == 'demo' %}selected{% endif %}>Demo</option>
+                                                <option value="testnet" {% if account_config.api_mode == 'testnet' %}selected{% endif %}>Testnet</option>
+                                                <option value="live" {% if account_config.api_mode == 'live' %}selected{% endif %}>Live</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="accountType" class="form-label">Account Type</label>
+                                            <select class="form-select" id="accountType" name="account_type">
+                                                <option value="spot" {% if account_config.account_type == 'spot' %}selected{% endif %}>Spot</option>
+                                                <option value="futures" {% if account_config.account_type == 'futures' %}selected{% endif %}>Futures</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="apiKey" class="form-label">API Key</label>
+                                            <input type="text" class="form-control" id="apiKey" name="api_key" value="{{ account_config.api_key }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="apiSecret" class="form-label">API Secret</label>
+                                            <input type="password" class="form-control" id="apiSecret" name="api_secret" value="{{ account_config.api_secret }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <button type="button" id="testConnection" class="btn btn-info">Test Connection</button>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="riskProfile" class="form-label">Risk Profile</label>
+                                            <select class="form-select" id="riskProfile" name="risk_profile">
+                                                <option value="low" {% if account_config.risk_profile == 'low' %}selected{% endif %}>Low Risk</option>
+                                                <option value="medium" {% if account_config.risk_profile == 'medium' %}selected{% endif %}>Medium Risk</option>
+                                                <option value="high" {% if account_config.risk_profile == 'high' %}selected{% endif %}>High Risk</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="leverage" class="form-label">Leverage (Futures)</label>
+                                            <input type="number" class="form-control" id="leverage" name="leverage" value="{{ account_config.leverage }}" min="1" max="125">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="symbols" class="form-label">Trading Pairs</label>
+                                        <select class="form-select" id="symbols" name="symbols" multiple>
+                                            <option value="BTCUSDT" {% if 'BTCUSDT' in account_config.symbols %}selected{% endif %}>BTC/USDT</option>
+                                            <option value="ETHUSDT" {% if 'ETHUSDT' in account_config.symbols %}selected{% endif %}>ETH/USDT</option>
+                                            <option value="BNBUSDT" {% if 'BNBUSDT' in account_config.symbols %}selected{% endif %}>BNB/USDT</option>
+                                            <option value="SOLUSDT" {% if 'SOLUSDT' in account_config.symbols %}selected{% endif %}>SOL/USDT</option>
+                                            <option value="ADAUSDT" {% if 'ADAUSDT' in account_config.symbols %}selected{% endif %}>ADA/USDT</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="timeframes" class="form-label">Timeframes</label>
+                                        <select class="form-select" id="timeframes" name="timeframes" multiple>
+                                            <option value="1m" {% if '1m' in account_config.timeframes %}selected{% endif %}>1 minute</option>
+                                            <option value="5m" {% if '5m' in account_config.timeframes %}selected{% endif %}>5 minutes</option>
+                                            <option value="15m" {% if '15m' in account_config.timeframes %}selected{% endif %}>15 minutes</option>
+                                            <option value="1h" {% if '1h' in account_config.timeframes %}selected{% endif %}>1 hour</option>
+                                            <option value="4h" {% if '4h' in account_config.timeframes %}selected{% endif %}>4 hours</option>
+                                            <option value="1d" {% if '1d' in account_config.timeframes %}selected{% endif %}>1 day</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <button type="button" id="saveSettings" class="btn btn-primary">Save Settings</button>
+                                        <button type="button" id="resetSettings" class="btn btn-secondary">Reset to Default</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Other tabs -->
+                    <div class="tab-pane" id="positions">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>All Positions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-dark">
+                                        <thead>
+                                            <tr>
+                                                <th>Symbol</th>
+                                                <th>Type</th>
+                                                <th>Size</th>
+                                                <th>Entry</th>
+                                                <th>Current</th>
+                                                <th>PnL</th>
+                                                <th>Margin</th>
+                                                <th>Leverage</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if account_data.positions and account_data.positions|length > 0 %}
+                                                {% for position in account_data.positions %}
+                                                <tr>
+                                                    <td>{{ position.symbol }}</td>
+                                                    <td class="{% if position.side == 'LONG' %}position-long{% else %}position-short{% endif %}">
+                                                        {{ position.side }}
+                                                    </td>
+                                                    <td>{{ position.size }}</td>
+                                                    <td>${{ position.entry_price }}</td>
+                                                    <td>${{ position.mark_price }}</td>
+                                                    <td class="{% if position.pnl > 0 %}price-up{% elif position.pnl < 0 %}price-down{% endif %}">
+                                                        ${{ position.pnl }}
+                                                    </td>
+                                                    <td>${{ position.margin }}</td>
+                                                    <td>{{ position.leverage }}x</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-danger close-position" data-position-id="{{ position.id }}">
+                                                            Close
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="9" class="text-center">No open positions</td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="trades">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Trade History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-dark">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Time</th>
+                                                <th>Symbol</th>
+                                                <th>Type</th>
+                                                <th>Size</th>
+                                                <th>Entry</th>
+                                                <th>Exit</th>
+                                                <th>PnL</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if trade_history and trade_history|length > 0 %}
+                                                {% for trade in trade_history %}
+                                                <tr>
+                                                    <td>{{ trade.id }}</td>
+                                                    <td>{{ trade.time }}</td>
+                                                    <td>{{ trade.symbol }}</td>
+                                                    <td class="{% if trade.type == 'LONG' %}position-long{% else %}position-short{% endif %}">
+                                                        {{ trade.type }}
+                                                    </td>
+                                                    <td>{{ trade.size }}</td>
+                                                    <td>${{ trade.entry }}</td>
+                                                    <td>${{ trade.exit }}</td>
+                                                    <td class="{% if trade.pnl > 0 %}price-up{% elif trade.pnl < 0 %}price-down{% endif %}">
+                                                        ${{ trade.pnl }}
+                                                    </td>
+                                                    <td>{{ trade.status }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="9" class="text-center">No trade history</td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="market">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Market Analysis</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="placeholder-chart" style="height: 500px; background-color: #333; display: flex; justify-content: center; align-items: center;">
+                                    <p>Detailed market analysis chart will be displayed here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="terminal">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Command Terminal</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="terminal-output" style="height: 400px; background-color: #0a0a0a; color: #00ff00; font-family: monospace; padding: 10px; overflow-y: auto; margin-bottom: 10px;">
+                                    <div>> Bot control terminal ready.</div>
+                                    <div>> Type 'help' for available commands.</div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="terminal-input" class="form-control" placeholder="Enter command...">
+                                    <button class="btn btn-primary" id="terminal-send">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bootstrap tab functionality
+            const triggerTabList = document.querySelectorAll('a[data-bs-toggle="list"]');
+            triggerTabList.forEach(triggerEl => {
+                const tabTrigger = new bootstrap.Tab(triggerEl);
+                triggerEl.addEventListener('click', event => {
+                    event.preventDefault();
+                    tabTrigger.show();
+                });
+            });
+            
+            // Bot control buttons
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            // Terminal elements
+            const terminalOutput = document.getElementById('terminal-output');
+            const terminalInput = document.getElementById('terminal-input');
+            const terminalSend = document.getElementById('terminal-send');
+            
+            // System log element
+            const systemLog = document.getElementById('systemLog');
+            
+            // Settings form elements
+            const testConnectionBtn = document.getElementById('testConnection');
+            const saveSettingsBtn = document.getElementById('saveSettings');
+            const resetSettingsBtn = document.getElementById('resetSettings');
+            
+            // Close position buttons
+            const closePositionBtns = document.querySelectorAll('.close-position');
+            
+            // Function to add message to terminal
+            function addTerminalMessage(message) {
+                const line = document.createElement('div');
+                line.textContent = '> ' + message;
+                terminalOutput.appendChild(line);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+            
+            // Function to add message to system log
+            function addSystemLogMessage(message) {
+                const line = document.createElement('div');
+                line.textContent = message;
+                systemLog.appendChild(line);
+                systemLog.scrollTop = systemLog.scrollHeight;
+            }
+            
+            // Send API request
+            async function sendRequest(url, method, data) {
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: data ? JSON.stringify(data) : null
+                    });
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error:', error);
+                    return { success: false, message: 'Network error: ' + error.message };
+                }
+            }
+            
+            // Start bot
+            startBtn.addEventListener('click', async function() {
+                addSystemLogMessage('Starting bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'start' });
+                addSystemLogMessage(result.message);
+                if (result.success) {
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+            
+            // Stop bot
+            stopBtn.addEventListener('click', async function() {
+                addSystemLogMessage('Stopping bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'stop' });
+                addSystemLogMessage(result.message);
+                if (result.success) {
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+            
+            // Restart bot
+            restartBtn.addEventListener('click', async function() {
+                addSystemLogMessage('Restarting bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'restart' });
+                addSystemLogMessage(result.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            });
+            
+            // Test API connection
+            testConnectionBtn.addEventListener('click', async function() {
+                const apiKey = document.getElementById('apiKey').value;
+                const apiSecret = document.getElementById('apiSecret').value;
+                const apiMode = document.getElementById('apiMode').value;
+                
+                addSystemLogMessage('Testing API connection...');
+                const result = await sendRequest('/api/test_connection', 'POST', {
+                    api_key: apiKey,
+                    api_secret: apiSecret,
+                    api_mode: apiMode
+                });
+                
+                alert(result.message);
+                addSystemLogMessage('API connection test: ' + result.message);
+            });
+            
+            // Save settings
+            saveSettingsBtn.addEventListener('click', async function() {
+                const form = document.getElementById('settingsForm');
+                const formData = new FormData(form);
+                const data = {};
+                
+                formData.forEach((value, key) => {
+                    // Handle multiple select values
+                    if (key === 'symbols' || key === 'timeframes') {
+                        if (!data[key]) {
+                            data[key] = [];
+                        }
+                        data[key].push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                });
+                
+                addSystemLogMessage('Saving settings...');
+                const result = await sendRequest('/api/account/settings', 'POST', data);
+                
+                alert(result.message);
+                addSystemLogMessage('Settings save: ' + result.message);
+                
+                if (result.success) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            });
+            
+            // Reset settings
+            resetSettingsBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset all settings to default?')) {
+                    window.location.reload();
+                }
+            });
+            
+            // Close position
+            closePositionBtns.forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const positionId = this.dataset.positionId;
+                    if (confirm(`Are you sure you want to close position ${positionId}?`)) {
+                        addSystemLogMessage(`Closing position ${positionId}...`);
+                        const result = await sendRequest('/api/positions/close', 'POST', { position_id: positionId });
+                        addSystemLogMessage(result.message);
+                        
+                        if (result.success) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    }
+                });
+            });
+            
+            // Terminal command handling
+            terminalSend.addEventListener('click', async function() {
+                const command = terminalInput.value.trim();
+                if (!command) return;
+                
+                addTerminalMessage(command);
+                terminalInput.value = '';
+                
+                if (command === 'help') {
+                    addTerminalMessage('Available commands:');
+                    addTerminalMessage('status - Show bot status');
+                    addTerminalMessage('start - Start the bot');
+                    addTerminalMessage('stop - Stop the bot');
+                    addTerminalMessage('restart - Restart the bot');
+                    addTerminalMessage('positions - Show open positions');
+                    addTerminalMessage('market - Show market data');
+                    addTerminalMessage('clear - Clear terminal');
+                } else if (command === 'status') {
+                    const result = await sendRequest('/api/bot/status', 'GET');
+                    addTerminalMessage(`Bot is ${result.running ? 'RUNNING' : 'STOPPED'}`);
+                    addTerminalMessage(`Mode: ${result.mode}`);
+                    addTerminalMessage(`Last update: ${result.last_update}`);
+                } else if (command === 'start') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'start' });
+                    addTerminalMessage(result.message);
+                } else if (command === 'stop') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'stop' });
+                    addTerminalMessage(result.message);
+                } else if (command === 'restart') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'restart' });
+                    addTerminalMessage(result.message);
+                } else if (command === 'positions') {
+                    const result = await sendRequest('/api/positions', 'GET');
+                    if (result.positions && result.positions.length > 0) {
+                        addTerminalMessage(`Found ${result.positions.length} open position(s):`);
+                        result.positions.forEach(pos => {
+                            addTerminalMessage(`${pos.symbol} ${pos.side} ${pos.size} @ $${pos.entry_price} | PnL: $${pos.pnl}`);
+                        });
+                    } else {
+                        addTerminalMessage('No open positions');
+                    }
+                } else if (command === 'market') {
+                    const result = await sendRequest('/api/market', 'GET');
+                    addTerminalMessage(`BTC: $${result.btc_price} (${result.btc_change}%)`);
+                    addTerminalMessage(`ETH: $${result.eth_price} (${result.eth_change}%)`);
+                    addTerminalMessage(`Market mood: ${result.market_mood}`);
+                } else if (command === 'clear') {
+                    terminalOutput.innerHTML = '';
+                    addTerminalMessage('Terminal cleared');
+                } else {
+                    addTerminalMessage(`Unknown command: ${command}`);
+                    addTerminalMessage("Type 'help' for available commands");
+                }
+            });
+            
+            // Allow terminal input to be submitted with Enter key
+            terminalInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    terminalSend.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

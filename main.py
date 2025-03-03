@@ -139,12 +139,16 @@ EMPTY_MARKET_DATA = {
 # Đăng ký các blueprints
 from config_route import register_blueprint as register_config_bp
 from bot_api_routes import register_blueprint as register_bot_api_bp
+from routes.bot_control import register_routes as register_bot_control_routes
 
 register_config_bp(app)
 logger.info("Đã đăng ký blueprint cho cấu hình")
 
 register_bot_api_bp(app)
 logger.info("Đã đăng ký blueprint cho API Bot")
+
+register_bot_control_routes(app)
+logger.info("Đã đăng ký routes cho Control Panel")
 
 @app.context_processor
 def inject_global_vars():

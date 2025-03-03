@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Control Panel</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        .status-running {
+            color: #4caf50;
+        }
+        .status-stopped {
+            color: #f44336;
+        }
+        .status-restarting {
+            color: #ff9800;
+        }
+        .btn-control {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .price-up {
+            color: #4caf50;
+        }
+        .price-down {
+            color: #f44336;
+        }
+        .position-long {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .position-short {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .table {
+            color: #e0e0e0;
+        }
+        .table-dark {
+            background-color: #1e1e1e;
+        }
+        .form-control, .form-select {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #444;
+            color: #fff;
+        }
+        .nav-tabs .nav-link {
+            color: #bbb;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #333;
+            color: #fff;
+            border-color: #444 #444 #333;
+        }
+        .terminal {
+            background-color: #0a0a0a;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+        .terminal-line {
+            margin: 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Bảng điều khiển bot</h1>
+        <div class="row">
+            <!-- Thông tin trạng thái và điều khiển -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Trạng thái bot</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if bot_status.running %}
+                        <h3 class="status-running">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            ĐANG CHẠY
+                        </h3>
+                        {% else %}
+                        <h3 class="status-stopped">DỪNG</h3>
+                        {% endif %}
+                        <p>Chế độ: <strong>{{ bot_status.mode|upper }}</strong></p>
+                        <p>Cập nhật: {{ bot_status.last_update }}</p>
+                        <hr>
+                        <button id="startBtn" class="btn btn-success btn-control" {% if bot_status.running %}disabled{% endif %}>
+                            <i class="bi bi-play-fill"></i> Khởi động
+                        </button>
+                        <button id="stopBtn" class="btn btn-danger btn-control" {% if not bot_status.running %}disabled{% endif %}>
+                            <i class="bi bi-stop-fill"></i> Dừng
+                        </button>
+                        <button id="restartBtn" class="btn btn-warning btn-control">
+                            <i class="bi bi-arrow-clockwise"></i> Khởi động lại
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Tài khoản</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Số dư: <strong>${{ account_data.balance|default('0.00') }}</strong></p>
+                        <p>Equity: <strong>${{ account_data.equity|default('0.00') }}</strong></p>
+                        <p>PnL: 
+                            <strong class="{% if account_data.pnl > 0 %}price-up{% elif account_data.pnl < 0 %}price-down{% endif %}">
+                                ${{ account_data.pnl|default('0.00') }}
+                            </strong>
+                        </p>
+                        <p>API Mode: <strong>{{ account_config.api_mode|upper }}</strong></p>
+                        <p>Loại tài khoản: <strong>{{ account_config.account_type|upper }}</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin thị trường và vị thế -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Thông tin thị trường</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3>BTC/USDT <span class="{% if market_data.btc_change > 0 %}price-up{% elif market_data.btc_change < 0 %}price-down{% endif %}">
+                                    ${{ market_data.btc_price|default('0.00') }}
+                                    ({{ market_data.btc_change|default('0.00') }}%)
+                                </span></h3>
+                                <p>Khối lượng 24h: ${{ market_data.btc_volume|default('0.00') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>ETH/USDT <span class="{% if market_data.eth_change > 0 %}price-up{% elif market_data.eth_change < 0 %}price-down{% endif %}">
+                                    ${{ market_data.eth_price|default('0.00') }}
+                                    ({{ market_data.eth_change|default('0.00') }}%)
+                                </span></h3>
+                                <p>Khối lượng 24h: ${{ market_data.eth_volume|default('0.00') }}</p>
+                            </div>
+                        </div>
+                        <p>Trạng thái thị trường: <strong>{{ market_data.market_mood|default('Neutral')|upper }}</strong></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Vị thế đang mở</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Loại</th>
+                                        <th>Size</th>
+                                        <th>Entry</th>
+                                        <th>Mark</th>
+                                        <th>PnL</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if account_data.positions and account_data.positions|length > 0 %}
+                                        {% for position in account_data.positions %}
+                                        <tr>
+                                            <td>{{ position.symbol }}</td>
+                                            <td class="{% if position.side == 'LONG' %}position-long{% else %}position-short{% endif %}">
+                                                {{ position.side }}
+                                            </td>
+                                            <td>{{ position.size }}</td>
+                                            <td>${{ position.entry_price }}</td>
+                                            <td>${{ position.mark_price }}</td>
+                                            <td class="{% if position.pnl > 0 %}price-up{% elif position.pnl < 0 %}price-down{% endif %}">
+                                                ${{ position.pnl }}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-danger close-position" data-position-id="{{ position.id }}">
+                                                    Đóng
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có vị thế nào đang mở</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Giao dịch gần đây</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Symbol</th>
+                                        <th>Loại</th>
+                                        <th>Size</th>
+                                        <th>Entry</th>
+                                        <th>Exit</th>
+                                        <th>PnL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if trade_history and trade_history|length > 0 %}
+                                        {% for trade in trade_history %}
+                                        <tr>
+                                            <td>{{ trade.time }}</td>
+                                            <td>{{ trade.symbol }}</td>
+                                            <td class="{% if trade.type == 'LONG' %}position-long{% else %}position-short{% endif %}">
+                                                {{ trade.type }}
+                                            </td>
+                                            <td>{{ trade.size }}</td>
+                                            <td>${{ trade.entry }}</td>
+                                            <td>${{ trade.exit }}</td>
+                                            <td class="{% if trade.pnl > 0 %}price-up{% elif trade.pnl < 0 %}price-down{% endif %}">
+                                                ${{ trade.pnl }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có dữ liệu giao dịch</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Terminal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="terminal" id="botTerminal">
+                            <p class="terminal-line">> Bot control panel ready.</p>
+                            <p class="terminal-line">> Type 'help' for available commands.</p>
+                        </div>
+                        <div class="input-group mt-3">
+                            <input type="text" class="form-control" id="terminalInput" placeholder="Enter command...">
+                            <button class="btn btn-primary" id="sendCommandBtn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bot control buttons
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const terminal = document.getElementById('botTerminal');
+            const terminalInput = document.getElementById('terminalInput');
+            const sendCommandBtn = document.getElementById('sendCommandBtn');
+
+            // Close position buttons
+            const closePositionBtns = document.querySelectorAll('.close-position');
+
+            // Function to add message to terminal
+            function addTerminalMessage(message) {
+                const line = document.createElement('p');
+                line.className = 'terminal-line';
+                line.textContent = '> ' + message;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+
+            // Send API request
+            async function sendRequest(url, method, data) {
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: data ? JSON.stringify(data) : null
+                    });
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error:', error);
+                    return { success: false, message: 'Network error: ' + error.message };
+                }
+            }
+
+            // Start bot
+            startBtn.addEventListener('click', async function() {
+                addTerminalMessage('Starting bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'start' });
+                addTerminalMessage(result.message);
+                if (result.success) {
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+
+            // Stop bot
+            stopBtn.addEventListener('click', async function() {
+                addTerminalMessage('Stopping bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'stop' });
+                addTerminalMessage(result.message);
+                if (result.success) {
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+
+            // Restart bot
+            restartBtn.addEventListener('click', async function() {
+                addTerminalMessage('Restarting bot...');
+                const result = await sendRequest('/api/bot/control', 'POST', { action: 'restart' });
+                addTerminalMessage(result.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            });
+
+            // Close position
+            closePositionBtns.forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const positionId = this.dataset.positionId;
+                    addTerminalMessage(`Closing position ${positionId}...`);
+                    const result = await sendRequest('/api/positions/close', 'POST', { position_id: positionId });
+                    addTerminalMessage(result.message);
+                    if (result.success) {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                });
+            });
+
+            // Terminal command handling
+            sendCommandBtn.addEventListener('click', async function() {
+                const command = terminalInput.value.trim();
+                if (!command) return;
+
+                addTerminalMessage(command);
+                terminalInput.value = '';
+
+                if (command === 'help') {
+                    addTerminalMessage('Available commands:');
+                    addTerminalMessage('status - Show bot status');
+                    addTerminalMessage('start - Start the bot');
+                    addTerminalMessage('stop - Stop the bot');
+                    addTerminalMessage('restart - Restart the bot');
+                    addTerminalMessage('positions - Show open positions');
+                    addTerminalMessage('market - Show market data');
+                    addTerminalMessage('clear - Clear terminal');
+                } else if (command === 'status') {
+                    const result = await sendRequest('/api/bot/status', 'GET');
+                    addTerminalMessage(`Bot is ${result.running ? 'RUNNING' : 'STOPPED'}`);
+                    addTerminalMessage(`Mode: ${result.mode}`);
+                    addTerminalMessage(`Last update: ${result.last_update}`);
+                } else if (command === 'start') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'start' });
+                    addTerminalMessage(result.message);
+                    if (result.success) {
+                        startBtn.disabled = true;
+                        stopBtn.disabled = false;
+                    }
+                } else if (command === 'stop') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'stop' });
+                    addTerminalMessage(result.message);
+                    if (result.success) {
+                        startBtn.disabled = false;
+                        stopBtn.disabled = true;
+                    }
+                } else if (command === 'restart') {
+                    const result = await sendRequest('/api/bot/control', 'POST', { action: 'restart' });
+                    addTerminalMessage(result.message);
+                } else if (command === 'positions') {
+                    const result = await sendRequest('/api/positions', 'GET');
+                    if (result.positions && result.positions.length > 0) {
+                        addTerminalMessage(`Found ${result.positions.length} open position(s):`);
+                        result.positions.forEach(pos => {
+                            addTerminalMessage(`${pos.symbol} ${pos.side} ${pos.size} @ $${pos.entry_price} | PnL: $${pos.pnl}`);
+                        });
+                    } else {
+                        addTerminalMessage('No open positions');
+                    }
+                } else if (command === 'market') {
+                    const result = await sendRequest('/api/market', 'GET');
+                    addTerminalMessage(`BTC: $${result.btc_price} (${result.btc_change}%)`);
+                    addTerminalMessage(`ETH: $${result.eth_price} (${result.eth_change}%)`);
+                    addTerminalMessage(`Market mood: ${result.market_mood}`);
+                } else if (command === 'clear') {
+                    terminal.innerHTML = '';
+                    addTerminalMessage('Terminal cleared');
+                } else {
+                    addTerminalMessage(`Unknown command: ${command}`);
+                    addTerminalMessage("Type 'help' for available commands");
+                }
+            });
+
+            // Allow terminal input to be submitted with Enter key
+            terminalInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendCommandBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
