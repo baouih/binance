@@ -7,9 +7,6 @@ import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_socketio import SocketIO
-import eventlet
-from risk_config_manager import RiskConfigManager
-import config_high_risk
 
 # Thiết lập logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -17,8 +14,6 @@ logger = logging.getLogger('main')
 
 # Khởi tạo ứng dụng Flask
 app = Flask(__name__)
-
-# Cấu hình session secret key
 app.secret_key = os.environ.get("SESSION_SECRET")
 
 # Khởi tạo SocketIO với CORS và async mode
@@ -34,27 +29,29 @@ socketio = SocketIO(
     reconnection_delay_max=5000
 )
 
-# Khởi tạo risk manager
-risk_manager = RiskConfigManager()
-
 # Trạng thái kết nối và cấu hình
 connection_status = {
     'is_connected': False,
     'is_authenticated': False,
     'last_error': None,
     'initialized': False,
-    'api_mode': 'testnet',
-    'trading_type': 'futures',
-    'telegram_enabled': False
+    'trading_type': 'futures'
 }
 
-# Trạng thái bot riêng biệt với kết nối
+# Trạng thái bot
 bot_status = {
     'running': False,
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'mode': 'testnet',
     'current_risk': 0.0,
     'risk_limit_reached': False
+}
+
+# Cấu hình giao dịch
+trading_config = {
+    'leverage': 10,  # Đòn bẩy mặc định x10
+    'risk_per_trade': 2.5,  # % rủi ro mỗi lệnh
+    'max_positions': 4,  # Số lệnh tối đa
+    'risk_profile': 'medium'  # Cấu hình rủi ro
 }
 
 # Market data
@@ -73,8 +70,8 @@ account_data = {
     'available': 0,
     'positions': [],
     'last_updated': None,
-    'initial_balance': 0,  # Số dư ban đầu để tính % rủi ro
-    'current_drawdown': 0  # % giảm từ số dư cao nhất
+    'initial_balance': 0,
+    'current_drawdown': 0
 }
 
 # Danh sách thông báo
@@ -115,26 +112,20 @@ def check_risk_limits():
         if not account_data['initial_balance']:
             return False
 
-        # Lấy cấu hình rủi ro từ profile đã chọn
-        risk_config = risk_manager.get_current_config()
-        risk_profile = risk_config.get('risk_profile', 'medium')
-        risk_settings = config_high_risk.get_risk_profile(risk_profile)
-
-        max_account_risk = risk_settings['max_account_risk']
         current_equity = account_data['equity']
-        max_loss = account_data['initial_balance'] * (max_account_risk / 100)
         current_loss = account_data['initial_balance'] - current_equity
 
         # Tính % rủi ro hiện tại
         bot_status['current_risk'] = (current_loss / account_data['initial_balance']) * 100
 
-        # Kiểm tra nếu đạt giới hạn rủi ro
-        if current_loss >= max_loss:
+        # Kiểm tra giới hạn rủi ro
+        max_risk = trading_config['risk_per_trade'] * trading_config['max_positions']
+
+        if bot_status['current_risk'] >= max_risk:
             bot_status['risk_limit_reached'] = True
             if bot_status['running']:
-                add_message(f"Đã đạt giới hạn rủi ro {max_account_risk}% tài khoản!", "error")
+                add_message(f"Đã đạt giới hạn rủi ro {max_risk}% tài khoản!", "error")
                 add_message("Bot sẽ tự động dừng để bảo vệ tài khoản", "warning")
-                # Cập nhật trạng thái bot
                 bot_status['running'] = False
                 bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 emit_status_update()
@@ -161,20 +152,12 @@ def init_api_connection():
             emit_status_update()
             return False
 
-        # Kiểm tra Telegram token  
-        telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-        telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-        if telegram_token and telegram_chat_id:
-            connection_status['telegram_enabled'] = True
-            add_message("Đã kết nối Telegram Bot", "success")
-
-        # Khởi tạo kết nối Binance API
+        # Khởi tạo kết nối Binance API  
         from binance_api import BinanceAPI
         client = BinanceAPI(
             api_key=api_key,
             api_secret=api_secret,
-            testnet=(connection_status['api_mode'] != 'live')
+            testnet=True  # Luôn dùng testnet để an toàn
         )
 
         # Test kết nối
@@ -188,16 +171,11 @@ def init_api_connection():
             # Cập nhật account data
             update_account_data(account)
 
-            # Lấy cấu hình rủi ro hiện tại
-            risk_config = risk_manager.get_current_config()
-            risk_profile = risk_config.get('risk_profile', 'medium')
-            risk_settings = config_high_risk.get_risk_profile(risk_profile)
-
             add_message("Kết nối API thành công", "success")
-            add_message(f"Chế độ: {connection_status['api_mode'].upper()}", "info")
             add_message(f"Loại giao dịch: {connection_status['trading_type'].upper()}", "info")
-            add_message(f"Mức độ rủi ro: {risk_profile.upper()}", "info")
-            add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
+            add_message(f"Đòn bẩy: x{trading_config['leverage']}", "info")
+            add_message(f"Rủi ro mỗi lệnh: {trading_config['risk_per_trade']}%", "info")
+            add_message(f"Số lệnh tối đa: {trading_config['max_positions']}", "info")
 
             # Emit status update
             emit_status_update()
@@ -259,28 +237,22 @@ def update_account_data(account_info):
 def index():
     """Trang điều khiển bot"""
     try:
-        # Lấy cấu hình rủi ro hiện tại
-        risk_config = risk_manager.get_current_config()
-        risk_profile = risk_config.get('risk_profile', 'medium')
-        risk_settings = config_high_risk.get_risk_profile(risk_profile)
-
         # Tạo object status cho client
         status = {
             'running': bot_status['running'],
-            'mode': connection_status['api_mode'],
+            'mode': 'testnet',
             'is_connected': connection_status['is_connected'],
             'is_authenticated': connection_status['is_authenticated'],
             'trading_type': connection_status['trading_type'],
-            'risk_profile': risk_profile,
-            'current_risk': bot_status['current_risk'],
-            'telegram_enabled': connection_status['telegram_enabled']
+            'current_risk': bot_status['current_risk']
         }
 
         response = make_response(render_template('index.html',
                                              status=status,
                                              messages=messages[-50:],
                                              account_data=account_data,
-                                             market_data=market_data))
+                                             market_data=market_data,
+                                             trading_config=trading_config))
 
         # Cache control
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
@@ -339,7 +311,7 @@ def control_bot():
                     'message': 'Vui lòng cấu hình API keys trước khi khởi động bot'
                 }), 400
 
-            # Thử kết nối API trước khi start
+            # Thử kết nối API
             if not init_api_connection():
                 logger.error("Failed to connect API")
                 return jsonify({
@@ -352,13 +324,11 @@ def control_bot():
             bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             # Thông báo
-            risk_profile = risk_manager.get_current_config().get('risk_profile', 'medium')
-            risk_settings = config_high_risk.get_risk_profile(risk_profile)
-
             add_message('Bot đã được khởi động', 'success')
             add_message('Đang phân tích thị trường...', 'info')
-            add_message(f"Mức độ rủi ro: {risk_profile.upper()}", "info")
-            add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
+            add_message(f"Đòn bẩy: x{trading_config['leverage']}", "info")
+            add_message(f"Rủi ro mỗi lệnh: {trading_config['risk_per_trade']}%", "info")
+            add_message(f"Số lệnh tối đa: {trading_config['max_positions']}", "info")
             add_message('Đang chờ tín hiệu giao dịch...', 'info')
 
         else:
@@ -412,20 +382,42 @@ def update_config():
                 }), 400
             connection_status['trading_type'] = config['trading_type']
 
-        if 'risk_profile' in config:
-            # Validate và set risk profile
-            if not risk_manager.set_risk_profile(config['risk_profile']):
+        # Update trading config
+        if 'leverage' in config:
+            leverage = int(config['leverage'])
+            if leverage < 1 or leverage > 100:
                 return jsonify({
                     'success': False,
-                    'message': 'Hồ sơ rủi ro không hợp lệ'
+                    'message': 'Đòn bẩy phải từ x1 đến x100'
                 }), 400
+            trading_config['leverage'] = leverage
+
+        if 'risk_per_trade' in config:
+            risk = float(config['risk_per_trade'])
+            if risk < 0.1 or risk > 10:
+                return jsonify({
+                    'success': False,
+                    'message': 'Rủi ro mỗi lệnh phải từ 0.1% đến 10%'
+                }), 400
+            trading_config['risk_per_trade'] = risk
+
+        if 'max_positions' in config:
+            positions = int(config['max_positions'])
+            if positions < 1 or positions > 10:
+                return jsonify({
+                    'success': False,
+                    'message': 'Số lệnh tối đa phải từ 1 đến 10'
+                }), 400
+            trading_config['max_positions'] = positions
 
         # Save config to file
         try:
             with open('bot_config.json', 'w') as f:
                 json.dump({
                     'trading_type': connection_status['trading_type'],
-                    'risk_profile': risk_manager.get_current_config().get('risk_profile', 'medium')
+                    'leverage': trading_config['leverage'],
+                    'risk_per_trade': trading_config['risk_per_trade'],
+                    'max_positions': trading_config['max_positions']
                 }, f)
         except Exception as e:
             logger.error(f"Error saving config file: {str(e)}", exc_info=True)
@@ -441,15 +433,13 @@ def update_config():
             else:
                 add_message("Không thể kết nối với cấu hình mới", "error")
 
-        # Get current risk settings
-        risk_config = risk_manager.get_current_config()
-        risk_settings = config_high_risk.get_risk_profile(risk_config.get('risk_profile', 'medium'))
-
         return jsonify({
             'success': True,
             'config': {
                 'trading_type': connection_status['trading_type'],
-                'risk_profile': risk_config.get('risk_profile', 'medium'),
+                'leverage': trading_config['leverage'],
+                'risk_per_trade': trading_config['risk_per_trade'],
+                'max_positions': trading_config['max_positions'],
                 'is_connected': connection_status['is_connected']
             }
         })
