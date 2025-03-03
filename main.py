@@ -823,7 +823,17 @@ def get_market_data():
 
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
-    market_data = get_market_data()
+    global market_data
+    
+    # Lấy dữ liệu thị trường mới
+    new_market_data = get_market_data()
+    
+    # Đảm bảo market_data có cấu trúc đúng
+    if not market_data:
+        market_data = {}
+    
+    # Cập nhật market_data với dữ liệu mới
+    market_data.update(new_market_data)
     
     # Bổ sung thêm thông tin chỉ báo kỹ thuật chi tiết cho mỗi coin
     if not 'indicators' in market_data:

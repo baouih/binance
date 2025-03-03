@@ -99,6 +99,10 @@ body {
 
 /* Responsiveness for small screens */
 @media (max-width: 768px) {
+    body {
+        padding-bottom: 70px !important; /* Make room for mobile navigation bar */
+    }
+    
     .chart-container {
         height: 250px;
     }
@@ -176,4 +180,24 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #6c757d;
+}
+
+/* Mobile Trading Menu Styles */
+.mobile-trading-menu {
+    padding: 5px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1030;
+}
+
+.mobile-trading-menu .mobile-nav-item {
+    transition: all 0.2s ease;
+}
+
+.mobile-trading-menu .mobile-nav-item.active {
+    color: #58a6ff !important;
+    font-weight: 500;
+}
+
+.mobile-trading-menu .mobile-nav-item:active {
+    transform: scale(0.95);
 }
