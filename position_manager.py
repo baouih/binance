@@ -611,7 +611,7 @@ class PositionManager:
         if profitable_positions and losing_positions:
             recommendations.append("💡 Có thể chốt lời các vị thế đang lãi để bù đắp các vị thế đang lỗ.")
         
-        if len(self.positions) > self.config['risk_management']['max_positions']:
+        if 'risk_management' in self.config and 'max_positions' in self.config['risk_management'] and len(self.positions) > self.config['risk_management']['max_positions']:
             recommendations.append(f"⚠️ Số lượng vị thế vượt quá giới hạn đã đặt ({self.config['risk_management']['max_positions']}).")
         
         if not recommendations:
