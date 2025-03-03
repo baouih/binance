@@ -315,8 +315,8 @@ def connect_api():
 def control_bot():
     """API điều khiển bot (start/stop)"""
     try:
-        # Kiểm tra đã kết nối API chưa
         if not connection_status['is_connected']:
+            logger.error("Chưa kết nối API")
             return jsonify({
                 'success': False,
                 'message': 'Vui lòng kết nối API trước'
@@ -326,6 +326,7 @@ def control_bot():
         logger.info(f"Received bot control action: {action}")
 
         if action not in ['start', 'stop']:
+            logger.error(f"Invalid action: {action}")
             return jsonify({
                 'success': False,
                 'message': f'Hành động không hợp lệ: {action}'
@@ -333,13 +334,32 @@ def control_bot():
 
         # Kiểm tra giới hạn rủi ro trước khi start
         if action == 'start' and bot_status['risk_limit_reached']:
+            logger.error("Risk limit reached, cannot start bot")
             return jsonify({
                 'success': False,
                 'message': 'Không thể khởi động bot: Đã đạt giới hạn rủi ro'
             }), 400
 
-        # Khi khởi động bot
+        # Kiểm tra API key trước khi start
         if action == 'start':
+            api_key = os.environ.get('BINANCE_API_KEY')
+            api_secret = os.environ.get('BINANCE_API_SECRET')
+
+            if not api_key or not api_secret:
+                logger.error("Missing API keys")
+                return jsonify({
+                    'success': False,
+                    'message': 'Vui lòng cấu hình API keys trước khi khởi động bot'
+                }), 400
+
+            # Thử kết nối API 
+            if not init_api_connection():
+                logger.error("Failed to connect to API") 
+                return jsonify({
+                    'success': False,
+                    'message': 'Không thể kết nối API, vui lòng kiểm tra lại cấu hình'
+                }), 400
+
             bot_status['running'] = True
             risk_profile = risk_manager.get_current_config().get('risk_profile', 'medium')
             risk_settings = config_high_risk.get_risk_profile(risk_profile)
@@ -362,7 +382,7 @@ def control_bot():
         try:
             socketio.emit('bot_status_update', bot_status)
         except Exception as e:
-            logger.error(f"Error emitting bot status update: {str(e)}", exc_info=True)
+            logger.error(f"Error emitting bot status update: {str(e)}")
 
         return jsonify({
             'success': True,
@@ -373,7 +393,7 @@ def control_bot():
         logger.error(f"Error controlling bot: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
-            'message': str(e)
+            'message': f'Lỗi hệ thống: {str(e)}'
         }), 500
 
 @app.route('/api/config', methods=['POST'])

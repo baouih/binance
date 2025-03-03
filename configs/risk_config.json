@@ -1,1 +1,7 @@
-{ "initial_balance": 100.0, "risk_profile": "medium", "strategy": "trend" }
+{
+    "initial_balance": 100.0,
+    "risk_profile": "high",
+    "strategy": "trend",
+    "custom_settings": null,
+    "last_updated": "2025-03-03 14:51:48"
+}
