@@ -319,29 +319,20 @@
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
             </div>
 
-            <div class="status-container">
-                <!-- Connection Status -->
-                <div class="connection-status {{ 'connected' if status.is_connected else 'disconnected' }}">
-                    <i class="bi {{ 'bi-wifi' if status.is_connected else 'bi-wifi-off' }}"></i>
-                    <span>{{ 'Đã kết nối API' if status.is_connected else 'Chưa kết nối API' }}</span>
-                </div>
-
+            <div class="d-flex align-items-center gap-3">
                 <!-- Bot Status -->
-                <div class="connection-status {{ 'connected' if status.running else 'disconnected' }}">
-                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }}"></i>
-                    <span>{{ 'Đang chạy' if status.running else 'Đã dừng' }}</span>
+                <div class="bot-status {{ 'running' if status.running else 'stopped' }}">
+                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }} me-2"></i>
+                    {{ 'Đang chạy' if status.running else 'Đã dừng' }}
                 </div>
 
                 <!-- Control Button -->
                 <button id="controlButton" type="button"
                         class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
                         {{ 'disabled' if not status.is_connected }}
-                        onclick="handleControlButton(this)">
+                        onclick="handleControlButton()">
                     <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
-                    <span class="button-text">{{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}</span>
-                    <div class="spinner-border spinner-border-sm d-none" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+                    {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
                 </button>
             </div>
         </header>
@@ -480,7 +471,7 @@
                             <span>Đòn bẩy</span>
                             <span id="leverageValue">x10</span>
                         </label>
-                        <input type="range" class="form-range" id="leverage" 
+                        <input type="range" class="form-range" id="leverage"
                                min="1" max="100" step="1" value="10">
                         <div class="form-text">
                             Kéo để điều chỉnh đòn bẩy từ x1 đến x100
@@ -546,7 +537,7 @@
         // Elements
         const elements = {
             connectionStatus: document.querySelector('.connection-status'),
-            botStatus: document.querySelector('.connection-status:nth-child(2)'),
+            botStatus: document.querySelector('.bot-status'), // Corrected selector
             controlButton: document.getElementById('controlButton'),
             saveConfigBtn: document.getElementById('saveConfigBtn'),
             leverage: document.getElementById('leverage'),
@@ -588,7 +579,7 @@
             timeout: 10000
         });
 
-        // Socket event handlers 
+        // Socket event handlers
         socket.on('connect', () => {
             debugLog('Socket connected', { reconnectAttempts: state.reconnectAttempts });
             state.isConnected = true;
@@ -626,10 +617,8 @@
 
         socket.on('bot_status_update', (status) => {
             debugLog('Received bot status', status);
-            if (status.running !== state.botRunning) {
-                state.botRunning = status.running;
-                updateBotStatus(status);
-            }
+            state.botRunning = status.running;
+            updateBotStatus(status);
         });
 
         socket.on('account_data', (data) => {
@@ -655,28 +644,6 @@
             elements.controlButton.disabled = !connected;
         }
 
-        function updateBotStatus(status) {
-            if (!elements.botStatus) return;
-
-            elements.botStatus.className = `connection-status ${status.running ? 'connected' : 'disconnected'}`;
-            elements.botStatus.innerHTML = `
-                <i class="bi ${status.running ? 'bi-play-circle-fill' : 'bi-stop-circle-fill'}"></i>
-                <span>${status.running ? 'Đang chạy' : 'Đã dừng'}</span>
-            `;
-
-            const button = elements.controlButton;
-            if (status.running) {
-                button.classList.remove('btn-success');
-                button.classList.add('btn-danger');
-                button.querySelector('.button-text').textContent = 'Dừng Bot';
-                button.querySelector('.bi').className = 'bi bi-stop-fill me-2';
-            } else {
-                button.classList.remove('btn-danger');
-                button.classList.add('btn-success');
-                button.querySelector('.button-text').textContent = 'Khởi động Bot';
-                button.querySelector('.bi').className = 'bi bi-play-fill me-2';
-            }
-        }
 
         function setButtonLoading(button, isLoading) {
             debugLog('setButtonLoading', { button: button.id, isLoading });
@@ -700,40 +667,52 @@
         }
 
         // Action handlers
-        async function handleControlButton(button) {
+        async function handleControlButton() {
+            const button = document.getElementById('controlButton');
+            const botStatus = document.querySelector('.bot-status');
+
+            if (button.disabled) return;
+
+            button.disabled = true;
+
             try {
-                if (button.disabled || !state.isConnected) {
-                    showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
-                    return;
-                }
-
-                const action = state.botRunning ? 'stop' : 'start';
-                debugLog('Control button clicked', { action });
-
-                setButtonLoading(button, true);
+                const action = button.textContent.includes('Dừng') ? 'stop' : 'start';
 
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action})
                 });
 
                 const data = await response.json();
-                debugLog('Bot control response', data);
 
                 if (data.success) {
-                    showToast(
-                        action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại',
-                        'success'
-                    );
+                    if (action === 'start') {
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-danger');
+                        button.innerHTML = '<i class="bi bi-stop-fill me-2"></i>Dừng Bot';
+
+                        botStatus.classList.remove('stopped');
+                        botStatus.classList.add('running');
+                        botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
+                    } else {
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-success');
+                        button.innerHTML = '<i class="bi bi-play-fill me-2"></i>Khởi động Bot';
+
+                        botStatus.classList.remove('running');
+                        botStatus.classList.add('stopped');
+                        botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
+                    }
+
+                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
                 } else {
                     showToast(`Lỗi: ${data.message}`, 'error');
                 }
             } catch (error) {
-                debugLog('Bot control error', error);
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
+                showToast('Lỗi kết nối tới máy chủ', 'error');
             } finally {
-                setTimeout(() => setButtonLoading(button, false), 500);
+                button.disabled = false;
             }
         }
 
@@ -869,7 +848,7 @@
             `;
         });
 
-        //        // Initialize on load
+        // Initialize on load
         window.addEventListener('load', () => {
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
             elements.riskLevel.dispatchEvent(new Event('change'));

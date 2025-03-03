@@ -38,12 +38,10 @@ connection_status = {
     'trading_type': 'futures'
 }
 
-# Trạng thái bot
+# Trạng thái bot và kết nối
 bot_status = {
     'running': False,
-    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    'current_risk': 0.0,
-    'risk_limit_reached': False
+    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 }
 
 # Cấu hình giao dịch
@@ -270,78 +268,49 @@ def index():
         response.headers['Expires'] = '-1'
         return response
 
-@app.route('/api/bot/control', methods=['POST']) 
+@app.route('/api/bot/control', methods=['POST'])
 def control_bot():
     """API điều khiển bot (start/stop)"""
     try:
-        # Validate yêu cầu đầu vào
         action = request.json.get('action')
-        logger.info(f"Received bot control action: {action}")
 
         if action not in ['start', 'stop']:
-            logger.error(f"Invalid action: {action}")
             return jsonify({
                 'success': False,
-                'message': f'Hành động không hợp lệ: {action}'
+                'message': 'Hành động không hợp lệ'
             }), 400
 
-        if not connection_status['is_connected']:
-            logger.error("Chưa kết nối API")
-            return jsonify({
-                'success': False,
-                'message': 'Vui lòng kết nối API trước'
-            }), 400
+        api_key = os.environ.get('BINANCE_API_KEY')
+        api_secret = os.environ.get('BINANCE_API_SECRET')
 
-        # Kiểm tra giới hạn rủi ro và API keys khi start
         if action == 'start':
-            if bot_status['risk_limit_reached']:
-                logger.error("Risk limit reached")
-                return jsonify({
-                    'success': False,
-                    'message': 'Không thể khởi động bot: Đã đạt giới hạn rủi ro'
-                }), 400
-
-            api_key = os.environ.get('BINANCE_API_KEY')
-            api_secret = os.environ.get('BINANCE_API_SECRET')
-
             if not api_key or not api_secret:
-                logger.error("Missing API keys")
                 return jsonify({
                     'success': False,
-                    'message': 'Vui lòng cấu hình API keys trước khi khởi động bot'
+                    'message': 'Vui lòng cấu hình API keys trước'
                 }), 400
 
             # Thử kết nối API
-            if not init_api_connection():
-                logger.error("Failed to connect API")
+            try:
+                from binance_api import BinanceAPI
+                client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=True)
+                client.get_account()
+            except Exception as e:
                 return jsonify({
                     'success': False,
-                    'message': 'Không thể kết nối API, vui lòng kiểm tra lại cấu hình'
+                    'message': f'Lỗi kết nối API: {str(e)}'
                 }), 400
 
-            # Khởi động bot
             bot_status['running'] = True
-            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-            # Thông báo
             add_message('Bot đã được khởi động', 'success')
-            add_message('Đang phân tích thị trường...', 'info')
-            add_message(f"Đòn bẩy: x{trading_config['leverage']}", "info")
-            add_message(f"Rủi ro mỗi lệnh: {trading_config['risk_per_trade']}%", "info")
-            add_message(f"Số lệnh tối đa: {trading_config['max_positions']}", "info")
-            add_message('Đang chờ tín hiệu giao dịch...', 'info')
 
         else:
-            # Dừng bot
             bot_status['running'] = False
-            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            add_message('Bot đã dừng lại', 'warning')
 
-            add_message('Bot đã được dừng lại', 'warning')
-            add_message('Đã hủy tất cả các lệnh đang chờ', 'warning')
-            add_message('Hệ thống đã tạm dừng hoàn toàn', 'info')
+        bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        # Emit status update
-        emit_status_update()
+        socketio.emit('bot_status', bot_status)
 
         return jsonify({
             'success': True,
