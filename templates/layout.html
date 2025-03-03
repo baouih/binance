@@ -71,9 +71,13 @@
                         </span>
                     </div>
                     <div class="bot-status-indicator me-3">
-                        {% if bot_status and bot_status.running %}
+                        {% if bot_status and bot_status.status == 'running' %}
                         <span class="badge rounded-pill text-bg-success">
                             <i class="fas fa-circle-notch fa-spin me-1"></i> Đang chạy
+                        </span>
+                        {% elif bot_status and bot_status.status == 'restarting' %}
+                        <span class="badge rounded-pill text-bg-warning">
+                            <i class="fas fa-sync fa-spin me-1"></i> Đang khởi động lại
                         </span>
                         {% else %}
                         <span class="badge rounded-pill text-bg-secondary">
@@ -86,7 +90,7 @@
                             <i class="fas fa-robot me-1"></i> Bot
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="botActions">
-                            {% if bot_status and bot_status.running %}
+                            {% if bot_status and bot_status.status == 'running' %}
                             <li><a class="dropdown-item stop-bot-btn" href="#" data-bot-id="default">
                                 <i class="fas fa-stop-circle text-danger me-1"></i> Dừng Bot
                             </a></li>
