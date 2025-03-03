@@ -4,6 +4,9 @@
 import os
 import json
 import logging
+import threading
+import random
+import time
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_socketio import SocketIO
@@ -479,17 +482,111 @@ def handle_disconnect():
     except Exception as e:
         logger.error(f"Error handling socket disconnect: {str(e)}", exc_info=True)
 
+# Thêm hàm giả lập cập nhật dữ liệu
+def simulate_data_updates():
+    """Giả lập cập nhật dữ liệu tài khoản và thị trường"""
+    try:
+        logger.info("Starting data simulation")
+        import threading
+        import random
+        
+        while True:
+            # Cập nhật tài khoản theo trạng thái
+            if bot_status['running'] and connection_status['is_connected']:
+                # Giả lập biến động số dư
+                change = random.uniform(-50, 100)
+                account_data['balance'] += change
+                account_data['available'] = account_data['balance'] * 0.95
+                account_data['equity'] = account_data['balance']
+                account_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # Thỉnh thoảng tạo vị thế mới
+                if random.random() < 0.1 and len(account_data['positions']) < trading_config['max_positions']:
+                    symbol = random.choice(['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'])
+                    side = random.choice(['BUY', 'SELL'])
+                    entry_price = market_data[symbol.lower().replace('usdt', '_price')] if symbol.lower().replace('usdt', '_price') in market_data else random.uniform(10000, 60000)
+                    amount = round(random.uniform(0.01, 0.5), 4)
+                    
+                    new_position = {
+                        'id': random.randint(1000, 9999),
+                        'symbol': symbol,
+                        'side': side,
+                        'amount': amount,
+                        'entry_price': round(entry_price, 2),
+                        'current_price': round(entry_price, 2),
+                        'profit_loss': 0,
+                        'timestamp': datetime.now().isoformat()
+                    }
+                    account_data['positions'].append(new_position)
+                    
+                    # Thông báo mở vị thế mới
+                    msg = {
+                        'content': f"Mở vị thế mới: {side} {amount} {symbol} @ ${round(entry_price, 2)}",
+                        'level': 'success',
+                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    }
+                    add_message(msg['content'], msg['level'])
+                
+                # Thỉnh thoảng đóng vị thế
+                if random.random() < 0.05 and account_data['positions']:
+                    position_index = random.randint(0, len(account_data['positions']) - 1)
+                    closed_position = account_data['positions'].pop(position_index)
+                    pnl = round(random.uniform(-100, 200), 2)
+                    
+                    # Thông báo đóng vị thế
+                    msg = {
+                        'content': f"Đóng vị thế: {closed_position['side']} {closed_position['amount']} {closed_position['symbol']} với P/L: ${pnl}",
+                        'level': 'success' if pnl > 0 else 'warning',
+                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    }
+                    add_message(msg['content'], msg['level'])
+            
+            # Cập nhật giá thị trường
+            market_data['btc_price'] = market_data.get('btc_price', 49850.25) * (1 + random.uniform(-0.003, 0.003))
+            market_data['eth_price'] = market_data.get('eth_price', 2680.15) * (1 + random.uniform(-0.004, 0.004))
+            market_data['sol_price'] = market_data.get('sol_price', 98.75) * (1 + random.uniform(-0.006, 0.006))
+            market_data['bnb_price'] = market_data.get('bnb_price', 370.50) * (1 + random.uniform(-0.002, 0.002))
+            market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Gửi cập nhật
+            socketio.emit('account_data', account_data)
+            socketio.emit('market_data', market_data)
+            socketio.emit('bot_status_update', bot_status)
+            
+            # Nghỉ ngơi giữa các cập nhật
+            time.sleep(5)
+    except Exception as e:
+        logger.error(f"Error in data simulation: {str(e)}", exc_info=True)
+
+# Tăng số liệu ban đầu
+market_data['btc_price'] = 49850.25
+market_data['eth_price'] = 2680.15
+market_data['sol_price'] = 98.75
+market_data['bnb_price'] = 370.50
+account_data['balance'] = 10000.0
+account_data['equity'] = 10000.0
+account_data['available'] = 9500.0
+account_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+# Khởi chạy thread giả lập dữ liệu
+simulation_thread = threading.Thread(target=simulate_data_updates)
+simulation_thread.daemon = True
+
 if __name__ == "__main__":
     try:
         add_message('Hệ thống đã khởi động', 'info')
         add_message('Vui lòng kết nối API để bắt đầu', 'warning')
+        
+        # Khởi chạy thread giả lập dữ liệu
+        simulation_thread.start()
+        logger.info("Started data simulation thread")
 
         socketio.run(
             app,
             host="0.0.0.0",
             port=5000,
             debug=True,
-            use_reloader=True,
+            use_reloader=False,  # Tắt reloader để không gây vấn đề với thread
             log_output=True
         )
     except Exception as e:
