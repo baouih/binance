@@ -120,30 +120,40 @@ def update_market_prices():
         symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
         base_url = 'https://api.binance.com/api/v3/ticker/price'
         
+        updated = False
+        
         for symbol in symbols:
             try:
                 # Gửi request đến Binance API
+                logger.debug(f"Fetching price for {symbol}...")
                 response = requests.get(f"{base_url}?symbol={symbol}")
                 
                 if response.status_code == 200:
                     data = response.json()
                     symbol_key = symbol.lower().replace('usdt', '_price')
+                    price = float(data['price'])
                     
                     # Cập nhật dữ liệu market_data
-                    market_data[symbol_key] = float(data['price'])
-                    market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    market_data[symbol_key] = price
+                    logger.debug(f"Updated price for {symbol}: {price}")
+                    updated = True
                 else:
-                    logger.error(f"Error getting price for {symbol}: {response.status_code}")
-                    # Không reset giá về 0 nếu không lấy được, giữ giá cũ
+                    logger.error(f"Error getting price for {symbol}: HTTP {response.status_code} - {response.text}")
             
             except Exception as e:
-                logger.error(f"Error getting price for {symbol}: {str(e)}")
-                
-        logger.debug(f"Updated market prices: {market_data}")
-        return True
+                logger.error(f"Exception getting price for {symbol}: {str(e)}")
+        
+        if updated:
+            market_data['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            add_message(f"Đã cập nhật giá thị trường", "info")
+            logger.debug(f"Updated market prices: {market_data}")
+        else:
+            logger.error("Failed to update any market prices")
+            
+        return updated
         
     except Exception as e:
-        logger.error(f"Error updating market prices: {str(e)}")
+        logger.error(f"Error updating market prices: {str(e)}", exc_info=True)
         return False
 
 def init_api_connection():
@@ -277,7 +287,13 @@ def control_bot():
                     'message': 'Vui lòng cấu hình API keys trước'
                 }), 400
 
-            # Giả lập kiểm tra kết nối API thành công
+            # Cập nhật dữ liệu thị trường trước khi khởi động
+            if update_market_prices():
+                add_message("Đã cập nhật giá thị trường thành công", "success")
+            else:
+                add_message("Không thể cập nhật giá thị trường", "warning")
+                
+            # Kích hoạt bot
             bot_status['running'] = True
             add_message('Bot đã được khởi động', 'success')
 
@@ -377,6 +393,39 @@ def update_config():
         if 'api_key' in config and 'api_secret' in config:
             if init_api_connection():
                 add_message("Đã kết nối lại với cấu hình mới", "success")
+                
+                # Cập nhật ngay giá thị trường
+                if update_market_prices():
+                    add_message("Đã cập nhật giá thị trường", "success")
+                    
+                    # Tạo vị thế mẫu khi có giá thị trường
+                    if market_data.get('btc_price', 0) > 0:
+                        # Thêm một vị thế BTC mẫu nếu chưa có vị thế nào
+                        if not account_data['positions']:
+                            new_position = {
+                                'id': 1001,
+                                'symbol': 'BTCUSDT',
+                                'side': 'BUY',
+                                'amount': 0.05,
+                                'entry_price': market_data['btc_price'] * 0.998,  # Giá vào thấp hơn 0.2%
+                                'current_price': market_data['btc_price'],
+                                'pnl': 0,
+                                'pnl_percent': 0,
+                                'timestamp': datetime.now().isoformat()
+                            }
+                            
+                            # Tính toán PnL
+                            pnl = (new_position['current_price'] - new_position['entry_price']) * new_position['amount']
+                            pnl_percent = ((new_position['current_price'] / new_position['entry_price']) - 1) * 100
+                            
+                            new_position['pnl'] = round(pnl, 2)
+                            new_position['pnl_percent'] = round(pnl_percent, 2)
+                            
+                            account_data['positions'].append(new_position)
+                            add_message(f"Đã tạo vị thế mẫu: BUY 0.05 BTCUSDT", "info")
+                    
+                else:
+                    add_message("Không thể cập nhật giá thị trường", "warning")
             else:
                 add_message("Không thể kết nối với cấu hình mới", "error")
 
