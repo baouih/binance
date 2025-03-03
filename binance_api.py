@@ -32,22 +32,52 @@ class BinanceAPI:
             api_secret (str, optional): API Secret Binance
             testnet (bool): Sử dụng testnet hay mainnet
         """
-        # Lưu cấu hình
-        self.testnet = testnet
+        # Tải cấu hình từ account_config.json để đồng bộ chế độ
+        import json
+        import os.path
+        
+        try:
+            # Tìm đường dẫn account_config.json
+            account_config_path = 'account_config.json'
+            if not os.path.exists(account_config_path):
+                account_config_path = '../account_config.json'
+                
+            if os.path.exists(account_config_path):
+                with open(account_config_path, 'r') as f:
+                    config = json.load(f)
+                    config_mode = config.get('api_mode', '').lower()
+                    
+                    # api_mode trong config quyết định chế độ testnet
+                    if config_mode == 'testnet':
+                        self.testnet = True
+                    elif config_mode == 'live':
+                        self.testnet = False
+                    else:
+                        # Giữ giá trị từ tham số
+                        self.testnet = testnet
+                        
+                logger.info(f"Đã tải cấu hình tài khoản từ {account_config_path}, chế độ API: {config_mode}")
+            else:
+                logger.warning(f"Không tìm thấy file cấu hình tài khoản, sử dụng chế độ mặc định: {'testnet' if testnet else 'live'}")
+                self.testnet = testnet
+                
+        except Exception as e:
+            logger.warning(f"Lỗi khi tải cấu hình tài khoản, sử dụng cấu hình mặc định: {str(e)}")
+            self.testnet = testnet
         
         # Log trạng thái môi trường
-        if testnet:
+        if self.testnet:
             logger.info("Kết nối đến môi trường TESTNET Binance")
         else:
             logger.info("Kết nối đến môi trường THỰC TẾ Binance")
+            
         # Lấy API keys từ biến môi trường nếu không được cung cấp
         self.api_key = api_key or os.environ.get('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.environ.get('BINANCE_API_SECRET', '')
-        self.testnet = testnet
         
-        # Endpoint URLs
-        if testnet:
-            self.base_url = 'https://testnet.binance.vision/api'
+        # Endpoint URLs cho Futures API (quan trọng: sửa endpoint cho đúng)
+        if self.testnet:
+            self.base_url = 'https://testnet.binancefuture.com/fapi'
             self.stream_url = 'wss://testnet.binance.vision/ws'
         else:
             self.base_url = 'https://api.binance.com/api'

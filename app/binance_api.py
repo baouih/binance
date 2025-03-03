@@ -28,15 +28,38 @@ class BinanceAPI:
         self.api_key = api_key or os.getenv('BINANCE_API_KEY', '')
         self.api_secret = api_secret or os.getenv('BINANCE_API_SECRET', '')
         
-        # Kiểm tra cấu hình testnet từ biến môi trường nếu có
+        # Kiểm tra cấu hình testnet từ biến môi trường và config
         env_testnet = os.getenv('BINANCE_TESTNET')
-        if env_testnet is not None:
-            self.testnet = env_testnet.lower() == 'true'
-        else:
-            self.testnet = testnet
+        
+        # Tải account_config.json để đảm bảo đồng bộ với cấu hình chính
+        try:
+            with open('../account_config.json', 'r') as f:
+                config = json.loads(f.read())
+                config_mode = config.get('api_mode', '').lower()
+                
+                # api_mode trong config quyết định chế độ testnet
+                if config_mode == 'testnet':
+                    self.testnet = True
+                elif config_mode == 'live':
+                    self.testnet = False
+                else:
+                    # Sử dụng giá trị từ tham số hoặc biến môi trường
+                    if env_testnet is not None:
+                        self.testnet = env_testnet.lower() == 'true'
+                    else:
+                        self.testnet = testnet
+                
+            logger.info(f"Đã tải cấu hình tài khoản, chế độ API: {config_mode}")
+        except Exception as e:
+            logger.warning(f"Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: {str(e)}")
+            # Sử dụng giá trị từ tham số hoặc biến môi trường
+            if env_testnet is not None:
+                self.testnet = env_testnet.lower() == 'true'
+            else:
+                self.testnet = testnet
             
-        # QUAN TRỌNG: Tắt chế độ giả lập, luôn sử dụng API thực
-        self.simulation_mode = False
+        # Vô hiệu hóa chế độ giả lập khi ở chế độ testnet hoặc live
+        self.simulation_mode = False if self.testnet else simulation_mode
         
         # Kiểm tra keys
         if self.api_key and self.api_secret:
@@ -45,8 +68,9 @@ class BinanceAPI:
             logger.warning("Khóa API Binance chưa được cấu hình! Vui lòng cung cấp API key và secret.")
             # Vẫn chạy nhưng sẽ không thành công khi gọi API private
         
-        # Luôn dùng live API
-        logger.info("Đang khởi tạo BinanceAPI trong chế độ live")
+        # Log thông tin chế độ
+        mode_str = "testnet" if self.testnet else ("live" if not self.simulation_mode else "demo")
+        logger.info(f"Đang khởi tạo BinanceAPI trong chế độ {mode_str}")
         try:
             # Initialize with REST client directly
             self.base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
