@@ -506,7 +506,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="info-label">Số dư tài khoản</div>
-                            <div class="info-value">
+                            <div class="info-value large-value">
                                 $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
                             </div>
                             <div class="testnet-balance mt-1">
@@ -516,7 +516,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="info-label">Tiền có thể sử dụng</div>
-                            <div class="info-value">
+                            <div class="info-value large-value">
                                 $<span id="availableBalance">{{ '{:.2f}'.format(account_data.available|default(0)) }}</span>
                             </div>
                             <div class="form-text mt-1">
@@ -528,12 +528,40 @@
                         </div>
                         <div class="col-md-4">
                             <div class="info-label">Vị thế mở</div>
-                            <div class="info-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
+                            <div class="info-value large-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
                             <div class="form-text mt-1">
                                 <a href="#" id="viewPositionsLink">
                                     <i class="bi bi-list-ul me-1"></i>
                                     Xem chi tiết
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Config Summary -->
+                    <div class="current-config-summary mt-3 p-3 rounded">
+                        <h6 class="mb-2"><i class="bi bi-gear-fill me-2"></i>Cấu hình hiện tại</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="config-item">
+                                    <i class="bi bi-graph-up me-1"></i>
+                                    <span class="label">Đòn bẩy:</span>
+                                    <span class="value fw-bold" id="currentLeverage">x100</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="config-item">
+                                    <i class="bi bi-shield-exclamation me-1"></i>
+                                    <span class="label">Rủi ro mỗi lệnh:</span>
+                                    <span class="value fw-bold" id="currentRiskPerTrade">10%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="config-item">
+                                    <i class="bi bi-grid-3x3 me-1"></i>
+                                    <span class="label">Số lệnh tối đa:</span>
+                                    <span class="value fw-bold" id="currentMaxPositions">10</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1056,6 +1084,22 @@
                 };
 
                 debugLog('Sending config', config);
+                
+                // Lưu vào localStorage
+                try {
+                    // Lưu API key vào localStorage (bảo mật) trước khi gửi đến server
+                    localStorage.setItem('binance_api_key', apiKey);
+                    localStorage.setItem('binance_api_secret', apiSecret);
+                    localStorage.setItem('binance_leverage', leverage);
+                    localStorage.setItem('binance_risk_per_trade', riskPerTrade);
+                    localStorage.setItem('binance_max_positions', maxPositions);
+                    localStorage.setItem('binance_trading_type', document.getElementById('tradingType').value);
+                    localStorage.setItem('binance_risk_profile', elements.riskLevel.value);
+                    
+                    debugLog('Saved config to localStorage', true);
+                } catch (storageErr) {
+                    debugLog('Failed to save to localStorage', storageErr);
+                }
 
                 const response = await fetch('/api/config', {
                     method: 'POST',
@@ -1070,6 +1114,11 @@
                     showToast('Đã lưu cấu hình thành công', 'success');
                     state.isConnected = data.config.is_connected;
                     updateConnectionStatus(state.isConnected);
+                    
+                    // Cập nhật hiển thị cấu hình hiện tại
+                    document.getElementById('currentLeverage').textContent = 'x' + leverage;
+                    document.getElementById('currentRiskPerTrade').textContent = riskPerTrade + '%';
+                    document.getElementById('currentMaxPositions').textContent = maxPositions;
                 } else {
                     showToast(`Lỗi: ${data.message}`, 'error');
                 }
@@ -1232,6 +1281,37 @@
             // Yêu cầu quyền thông báo
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                 Notification.requestPermission();
+            }
+            
+            // Tải cấu hình từ localStorage nếu có
+            try {
+                const savedApiKey = localStorage.getItem('binance_api_key');
+                const savedApiSecret = localStorage.getItem('binance_api_secret');
+                const savedLeverage = localStorage.getItem('binance_leverage');
+                const savedRiskPerTrade = localStorage.getItem('binance_risk_per_trade');
+                const savedMaxPositions = localStorage.getItem('binance_max_positions');
+                const savedTradingType = localStorage.getItem('binance_trading_type');
+                const savedRiskProfile = localStorage.getItem('binance_risk_profile');
+                
+                if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
+                if (savedApiSecret) document.getElementById('apiSecret').value = savedApiSecret;
+                if (savedLeverage) elements.leverage.value = savedLeverage;
+                if (savedRiskPerTrade) elements.riskPerTrade.value = savedRiskPerTrade;
+                if (savedMaxPositions) elements.maxPositions.value = savedMaxPositions;
+                if (savedTradingType) document.getElementById('tradingType').value = savedTradingType;
+                if (savedRiskProfile) elements.riskLevel.value = savedRiskProfile;
+                
+                // Cập nhật hiển thị cấu hình nếu có
+                if (savedLeverage) document.getElementById('currentLeverage').textContent = 'x' + savedLeverage;
+                if (savedRiskPerTrade) document.getElementById('currentRiskPerTrade').textContent = savedRiskPerTrade + '%';
+                if (savedMaxPositions) document.getElementById('currentMaxPositions').textContent = savedMaxPositions;
+                
+                // Hiển thị thông báo nếu tải được cấu hình
+                if (savedApiKey && savedApiSecret) {
+                    showToast('Đã tải cấu hình từ trình duyệt của bạn', 'success');
+                }
+            } catch (e) {
+                console.log('Không thể tải cấu hình từ localStorage:', e);
             }
             
             // Khởi tạo giao diện
