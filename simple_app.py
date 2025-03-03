@@ -46,21 +46,44 @@ trading_config = {
 
 # Market data
 market_data = {
-    'btc_price': 0,
-    'eth_price': 0,
-    'sol_price': 0,
-    'bnb_price': 0,
-    'last_updated': None
+    'btc_price': 49850.25,
+    'eth_price': 2680.15,
+    'sol_price': 98.75,
+    'bnb_price': 370.50,
+    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 }
 
 # Account data
 account_data = {
-    'balance': 0,
-    'equity': 0,
-    'available': 0,
-    'positions': [],
-    'last_updated': None,
-    'initial_balance': 0,
+    'balance': 10000.0,
+    'equity': 10000.0,
+    'available': 9500.0,
+    'positions': [
+        {
+            'id': 1001,
+            'symbol': 'BTCUSDT',
+            'side': 'BUY',
+            'amount': 0.22,
+            'entry_price': 49500.25,
+            'current_price': 49850.25,
+            'pnl': 77.0,
+            'pnl_percent': 0.71,
+            'timestamp': datetime.now().isoformat()
+        },
+        {
+            'id': 1002,
+            'symbol': 'ETHUSDT',
+            'side': 'SELL',
+            'amount': 1.5,
+            'entry_price': 2720.50,
+            'current_price': 2680.15,
+            'pnl': 60.53,
+            'pnl_percent': 1.48,
+            'timestamp': datetime.now().isoformat()
+        }
+    ],
+    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'initial_balance': 10000.0,
     'current_drawdown': 0
 }
 

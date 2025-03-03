@@ -495,11 +495,16 @@
             // Thêm các thông báo mới (hiển thị theo thứ tự ngược lại - mới nhất lên đầu)
             messages.slice().reverse().forEach(message => {
                 const messageEl = document.createElement('div');
-                messageEl.className = `alert alert-${message.level} mb-2`;
+                messageEl.className = `alert alert-${message.level} mb-2 text-white`;
+                messageEl.style.backgroundColor = message.level === 'success' ? '#198754' : 
+                                                  message.level === 'warning' ? '#ffc107' : 
+                                                  message.level === 'danger' ? '#dc3545' : 
+                                                  message.level === 'info' ? '#0dcaf0' : '#212529';
+                messageEl.style.color = message.level === 'warning' ? '#000' : '#fff';
                 messageEl.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <span>${message.content}</span>
-                        <small class="text-muted">${message.timestamp}</small>
+                        <small style="color: ${message.level === 'warning' ? '#555' : '#e9e9e9'}">${message.timestamp}</small>
                     </div>
                 `;
                 messagesContainer.appendChild(messageEl);
@@ -512,7 +517,7 @@
             if (!positionsContainer) return;
             
             if (positions.length === 0) {
-                positionsContainer.innerHTML = '<div class="text-center text-muted">Không có vị thế nào đang mở</div>';
+                positionsContainer.innerHTML = '<div class="text-center text-light">Không có vị thế nào đang mở</div>';
                 return;
             }
             
@@ -604,9 +609,9 @@
                 <div class="toast-header ${type === 'danger' ? 'bg-danger text-white' : type === 'success' ? 'bg-success text-white' : ''}">
                     <strong class="me-auto">Thông báo</strong>
                     <small>${new Date().toLocaleTimeString()}</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" class="btn-close ${type === 'danger' || type === 'success' ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="toast-body">
+                <div class="toast-body bg-dark text-white">
                     ${message}
                 </div>
             `;
