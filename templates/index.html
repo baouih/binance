@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bot Giao Dịch Crypto - Control Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.min.css">
     <style>
         body {
             background-color: #0d1117;
@@ -14,33 +14,63 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .status-badge {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
+        /* Card styles */
+        .info-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
-        .status-running { background-color: #3fb950; }
-        .status-stopped { background-color: #f85149; }
+        .info-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
 
-        .mode-badge {
-            display: inline-block;
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
             padding: 4px 10px;
             border-radius: 15px;
             font-weight: bold;
             font-size: 0.8rem;
             margin-right: 10px;
+        }
+
+        .status-badge i {
+            margin-right: 5px;
+        }
+
+        .status-badge.connected {
+            background-color: #238636;
             color: white;
         }
 
-        .mode-demo { background-color: #6c757d; }
-        .mode-testnet { background-color: #fd7e14; }
-        .mode-live { background-color: #dc3545; }
+        .status-badge.disconnected {
+            background-color: #f85149;
+            color: white;
+        }
 
+        .status-badge.testnet {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .status-badge.live {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Messages container */
         .messages-container {
-            height: calc(100vh - 180px);
+            height: 300px;
             overflow-y: auto;
             background: #161b22;
             border: 1px solid #30363d;
@@ -64,35 +94,7 @@
             color: #8b949e;
         }
 
-        /* Connection status indicator */
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            z-index: 1000;
-            display: none;
-        }
-
-        .connection-status.connected {
-            background-color: #198754;
-            color: white;
-        }
-
-        .connection-status.disconnected {
-            background-color: #dc3545;
-            color: white;
-            display: block;
-        }
-
-        /* Loading spinner */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* Loading button state */
         .btn-loading {
             position: relative;
             pointer-events: none;
@@ -108,258 +110,306 @@
             left: 50%;
             margin-top: -8px;
             margin-left: -8px;
-            border: 2px solid transparent;
+            border: 2px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
-        /* Account info */
-        .info-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .info-label {
+        /* Tabs */
+        .nav-pills .nav-link {
+            color: #8b949e;
+            background: none;
+            border: 1px solid #30363d;
+            margin-right: 5px;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #238636;
+            border-color: #238636;
+            color: white;
+        }
+
+        /* Help text */
+        .help-text {
             color: #8b949e;
             font-size: 0.9rem;
+            margin-top: 5px;
         }
 
-        .info-value {
-            font-size: 1.2rem;
-            font-weight: bold;
+        .alert-testnet {
+            background-color: rgba(253, 126, 20, 0.1);
+            border-color: #fd7e14;
+            color: #fd7e14;
         }
 
-        /* Config form */
-        .config-form {
-            background: #161b22;
-            border: 1px solid #30363d;
+        /* New styles for improved UI */
+        .bot-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .bot-status.running {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border: 1px solid #198754;
+        }
+
+        .bot-status.stopped {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .mini-chart {
+            height: 100px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .api-guide {
+            background: rgba(13, 110, 253, 0.1);
+            border: 1px solid #0d6efd;
             border-radius: 6px;
             padding: 15px;
             margin-bottom: 15px;
         }
 
-        /* Adjustments for mobile */
-        @media (max-width: 768px) {
-            .btn {
-                min-height: 44px;
-                font-size: 1rem;
-            }
-
-            .mode-badge {
-                padding: 6px 12px;
-                font-size: 0.9rem;
-            }
-
-            .messages-container {
-                height: calc(100vh - 180px);
-            }
+        .api-guide ol {
+            margin-bottom: 0;
+            padding-left: 20px;
         }
 
-        /*Added Styles for Risk Level Display*/
-        .risk-level-display {
-            display: flex;
-            align-items: center;
+        .info-card.highlight {
+            border-color: #198754;
+            box-shadow: 0 0 0 1px #198754;
         }
 
-        .risk-level-label {
-            margin-right: 10px;
+        .testnet-balance {
+            font-size: 0.9rem;
+            color: #fd7e14;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- Connection status indicator -->
-    <div id="connectionStatus" class="connection-status">
-        <i class="bi bi-wifi-off"></i> Mất kết nối
-    </div>
-
     <div class="container py-4">
-        <!-- Header -->
+        <!-- Header with improved status display -->
         <header class="d-flex justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center">
                 <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
                 <span class="fs-4">Bot Giao Dịch Crypto</span>
-                <div class="ms-3">
-                    <span class="mode-badge mode-{{ status.mode }}">
-                        {{ 'Chế độ Demo' if status.mode == 'demo' else 'Chế độ Testnet' if status.mode == 'testnet' else 'Chế độ Live' }}
-                    </span>
-                </div>
             </div>
 
-            <div class="d-flex align-items-center">
-                <span class="status-badge {{ 'status-running' if status.running else 'status-stopped' }}"></span>
-                <span class="me-3">{{ 'Đang chạy' if status.running else 'Đang dừng' }}</span>
+            <div class="d-flex align-items-center gap-3">
+                <!-- Bot Status -->
+                <div class="bot-status {{ 'running' if status.running else 'stopped' }}">
+                    <i class="bi {{ 'bi-play-circle-fill' if status.running else 'bi-stop-circle-fill' }} me-2"></i>
+                    {{ 'Đang chạy' if status.running else 'Đã dừng' }}
+                </div>
 
+                <!-- Environment Badge -->
+                <div class="status-badge {{ status.mode }}">
+                    <i class="bi {{ 'bi-gear' if status.mode == 'testnet' else 'bi-lightning' }}"></i>
+                    {{ 'Testnet' if status.mode == 'testnet' else 'Live' }}
+                </div>
+
+                <!-- Control Button -->
                 <button id="controlButton" 
-                        class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-sm me-2">
+                        class="btn {{ 'btn-danger btn-lg' if status.running else 'btn-success btn-lg' }}">
+                    <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
                     {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
                 </button>
             </div>
         </header>
 
-        <!-- Configuration -->
-        <div class="row mb-4" id="configSection">
-            <div class="col-12">
-                <div class="config-form">
+        <div class="row">
+            <!-- Left Column: Configuration -->
+            <div class="col-md-4">
+                <div class="info-card">
                     <h5 class="mb-3">Cấu hình Bot</h5>
 
+                    <!-- API Connection Guide -->
+                    <div class="api-guide mb-4">
+                        <h6 class="mb-2"><i class="bi bi-key-fill me-2"></i>Hướng dẫn kết nối API</h6>
+                        <ol>
+                            <li>Đăng nhập vào tài khoản Binance</li>
+                            <li>Vào phần API Management</li>
+                            <li>Tạo API key mới với quyền giao dịch</li>
+                            <li>Copy API Key và Secret vào form bên dưới</li>
+                        </ol>
+                    </div>
+
+                    <!-- API Configuration -->
                     <div class="mb-3">
                         <label class="form-label">API Keys</label>
                         <div class="input-group mb-2">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
                             <input type="text" class="form-control" id="apiKey" placeholder="API Key">
                         </div>
                         <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                             <input type="password" class="form-control" id="apiSecret" placeholder="API Secret">
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Telegram Bot (Tùy chọn)</label>
-                        <div class="input-group mb-2">
-                            <input type="text" class="form-control" id="telegramToken" placeholder="Bot Token">
-                        </div>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="telegramChatId" placeholder="Chat ID">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Chế độ API</label>
-                        <select class="form-select" id="apiMode">
-                            <option value="testnet">Testnet</option>
-                            <option value="live">Live</option>
-                        </select>
-                    </div>
-
+                    <!-- Trading Configuration -->
                     <div class="mb-3">
                         <label class="form-label">Loại giao dịch</label>
                         <select class="form-select" id="tradingType">
-                            <option value="futures">Futures</option>
-                            <option value="spot">Spot</option>
+                            <option value="futures">Futures (Đòn bẩy)</option>
+                            <option value="spot">Spot (Thông thường)</option>
                         </select>
+                        <div class="form-text">
+                            Futures cho phép sử dụng đòn bẩy, rủi ro cao hơn nhưng lợi nhuận tiềm năng lớn hơn
+                        </div>
                     </div>
 
-                    <div class="mb-3">
+                    <!-- Risk Configuration -->
+                    <div class="mb-4">
                         <label class="form-label">Mức độ rủi ro</label>
-                        <div class="risk-level-display">
-                            <select class="form-select" id="riskLevel">
-                                <option value="low">Thấp (10-15% tài khoản)</option>
-                                <option value="medium" selected>Trung bình (20-30% tài khoản)</option>
-                                <option value="high">Cao (30-50% tài khoản)</option>
-                            </select>
-                            <span class="risk-level-label" id="riskLevelDisplay">Trung bình (20-30% tài khoản)</span>
+                        <select class="form-select" id="riskLevel">
+                            <option value="low">Thấp (2x)</option>
+                            <option value="medium" selected>Trung bình (5x)</option>
+                            <option value="high">Cao (10x)</option>
+                        </select>
+                        <div class="mt-3">
+                            <div class="alert alert-info">
+                                <h6 class="mb-2">Chi tiết mức rủi ro</h6>
+                                <div id="riskDetails">
+                                    <p class="mb-1"><strong>Đòn bẩy:</strong> 5x</p>
+                                    <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> 2.5% tài khoản</p>
+                                    <p class="mb-1"><strong>Số lệnh tối đa:</strong> 4 lệnh</p>
+                                    <p class="mb-0"><strong>Target lợi nhuận:</strong> 2% mỗi ngày</p>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted">
-                            Bot sẽ tự điều chỉnh chiến lược giao dịch dựa trên mức độ rủi ro được chọn
-                        </small>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Giới hạn rủi ro tối đa</label>
-                        <div class="d-flex align-items-center">
-                            <input type="range" class="form-range me-2" 
-                                   id="maxAccountRisk" 
-                                   min="10" max="50" step="5" 
-                                   value="25">
-                            <span id="maxAccountRiskValue">25%</span>
-                        </div>
-                        <small class="text-muted">
-                            Bot sẽ tự động dừng khi tổng thiệt hại đạt đến giới hạn này
-                        </small>
-                    </div>
-
+                    <!-- Save Button -->
                     <div class="text-end">
-                        <button id="saveConfigBtn" class="btn btn-primary">Lưu cấu hình</button>
+                        <button id="saveConfigBtn" class="btn btn-primary btn-lg">
+                            <i class="bi bi-save me-2"></i>
+                            Lưu cấu hình
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Account Info -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="info-card">
-                    <div class="info-label">Số dư tài khoản</div>
-                    <div class="info-value">
-                        $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
+            <!-- Right Column: Monitoring -->
+            <div class="col-md-8">
+                <!-- Account Info -->
+                <div class="info-card highlight mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Thông tin tài khoản</h5>
+                        <div class="bot-status {{ 'running' if status.running else 'stopped' }} small">
+                            {{ 'Đang giao dịch' if status.running else 'Chưa giao dịch' }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-label">Số dư tài khoản</div>
+                            <div class="info-value">
+                                $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
+                            </div>
+                            {% if status.mode == 'testnet' %}
+                            <div class="testnet-balance">
+                                <i class="bi bi-info-circle me-1"></i>Số dư thử nghiệm
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">Tiền có thể sử dụng</div>
+                            <div class="info-value">
+                                $<span id="availableBalance">{{ '{:.2f}'.format(account_data.available|default(0)) }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">Vị thế mở</div>
+                            <div class="info-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="info-card">
-                    <div class="info-label">Tiền có thể sử dụng</div>
-                    <div class="info-value">
-                        $<span id="availableBalance">{{ '{:.2f}'.format(account_data.available|default(0)) }}</span>
+
+                <!-- Market Data with Mini Charts -->
+                <div class="info-card mb-4">
+                    <h5 class="mb-3">Thị trường</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">BTC/USDT</div>
+                            <div class="info-value" id="btcPrice">
+                                ${{ '{:.2f}'.format(market_data.btc_price|default(0)) }}
+                            </div>
+                            <canvas id="btcChart" class="mini-chart"></canvas>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">ETH/USDT</div>
+                            <div class="info-value" id="ethPrice">
+                                ${{ '{:.2f}'.format(market_data.eth_price|default(0)) }}
+                            </div>
+                            <canvas id="ethChart" class="mini-chart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="info-card">
-                    <div class="info-label">Vị thế mở</div>
-                    <div class="info-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Market Data -->
-        <div class="row mb-4">
-            <div class="col-md-3">
+                <!-- System Messages -->
                 <div class="info-card">
-                    <div class="info-label">BTC/USDT</div>
-                    <div class="info-value" id="btcPrice">${{ '{:.2f}'.format(market_data.btc_price|default(0)) }}</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Nhật ký hệ thống</h5>
+                        <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-trash me-1"></i>
+                            Xóa nhật ký
+                        </button>
+                    </div>
+                    <div class="messages-container" id="messages">
+                        {% for message in messages %}
+                        <div class="message message-{{ message.level }}">
+                            <span class="message-time">{{ message.timestamp }}</span>
+                            <div class="message-content">{{ message.content }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-label">ETH/USDT</div>
-                    <div class="info-value" id="ethPrice">${{ '{:.2f}'.format(market_data.eth_price|default(0)) }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-label">SOL/USDT</div>
-                    <div class="info-value" id="solPrice">${{ '{:.2f}'.format(market_data.sol_price|default(0)) }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-label">BNB/USDT</div>
-                    <div class="info-value" id="bnbPrice">${{ '{:.2f}'.format(market_data.bnb_price|default(0)) }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Message log -->
-        <div class="messages-container p-3">
-            <div id="messages">
-                {% for message in messages %}
-                <div class="message message-{{ message.level }}">
-                    <span class="message-time">{{ message.timestamp }}</span>
-                    <div class="message-content">{{ message.content }}</div>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         // Elements
         const controlButton = document.getElementById('controlButton');
-        const connectionStatus = document.getElementById('connectionStatus');
-        const messagesContainer = document.getElementById('messages');
-        const configSection = document.getElementById('configSection');
         const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const messagesContainer = document.getElementById('messages');
         const maxAccountRisk = document.getElementById('maxAccountRisk');
         const maxAccountRiskValue = document.getElementById('maxAccountRiskValue');
         const riskLevel = document.getElementById('riskLevel');
-        const riskLevelDisplay = document.getElementById('riskLevelDisplay'); // Added for risk level display
+        const riskDetails = document.getElementById('riskDetails');
+        const btcChartCanvas = document.getElementById('btcChart');
+        const ethChartCanvas = document.getElementById('ethChart');
 
-        // Khởi tạo WebSocket
+
+        // Socket connection
         const socket = io({
             reconnection: true,
             reconnectionAttempts: 5,
@@ -370,14 +420,11 @@
 
         // Track connection state
         let isConnected = false;
-        let reconnectAttempts = 0;
 
         socket.on('connect', () => {
             console.log('Connected to server');
             isConnected = true;
-            reconnectAttempts = 0;
-            connectionStatus.classList.remove('disconnected');
-            connectionStatus.style.display = 'none';
+            updateConnectionStatus(true);
 
             addMessage({
                 content: 'Đã kết nối tới máy chủ',
@@ -389,8 +436,7 @@
         socket.on('disconnect', () => {
             console.log('Disconnected from server');
             isConnected = false;
-            connectionStatus.classList.add('disconnected');
-            connectionStatus.style.display = 'block';
+            updateConnectionStatus(false);
 
             addMessage({
                 content: 'Mất kết nối tới máy chủ',
@@ -398,28 +444,15 @@
                 timestamp: new Date().toLocaleString()
             });
 
-            // Disable buttons when disconnected
+            // Disable buttons
             controlButton.disabled = true;
             saveConfigBtn.disabled = true;
-        });
-
-        socket.on('reconnect_attempt', (attemptNumber) => {
-            console.log(`Reconnection attempt ${attemptNumber}`);
-            reconnectAttempts = attemptNumber;
-
-            addMessage({
-                content: `Đang thử kết nối lại (lần ${attemptNumber})...`,
-                level: 'warning',
-                timestamp: new Date().toLocaleString()
-            });
         });
 
         socket.on('reconnect', () => {
             console.log('Reconnected to server');
             isConnected = true;
-            reconnectAttempts = 0;
-            connectionStatus.classList.remove('disconnected');
-            connectionStatus.style.display = 'none';
+            updateConnectionStatus(true);
 
             // Re-enable buttons
             controlButton.disabled = false;
@@ -432,37 +465,21 @@
             });
         });
 
-        socket.on('reconnect_error', (error) => {
-            console.error('Reconnection error:', error);
-            addMessage({
-                content: 'Không thể kết nối lại tới máy chủ',
-                level: 'error',
-                timestamp: new Date().toLocaleString()
-            });
-        });
+        // Update connection status badge
+        function updateConnectionStatus(connected) {
+            const botStatus = document.querySelector('.bot-status');
+            if (connected) {
+                botStatus.classList.remove('stopped');
+                botStatus.classList.add('running');
+                botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i> Đang chạy';
+            } else {
+                botStatus.classList.remove('running');
+                botStatus.classList.add('stopped');
+                botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i> Đã dừng';
+            }
+        }
 
-        socket.on('new_message', (message) => {
-            addMessage(message);
-        });
-
-        socket.on('bot_status_update', (status) => {
-            updateBotStatus(status);
-        });
-
-        socket.on('account_update', (data) => {
-            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
-            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
-            document.getElementById('openPositions').textContent = data.positions.length;
-        });
-
-        socket.on('market_data', (data) => {
-            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
-            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
-            document.getElementById('solPrice').textContent = `$${data.sol_price.toFixed(2)}`;
-            document.getElementById('bnbPrice').textContent = `$${data.bnb_price.toFixed(2)}`;
-        });
-
-        // Thêm tin nhắn mới
+        // Add message to log
         function addMessage(message) {
             const messageHTML = `
                 <div class="message message-${message.level}">
@@ -474,35 +491,17 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Cập nhật trạng thái bot
-        function updateBotStatus(status) {
-            const statusBadge = document.querySelector('.status-badge');
-            const statusText = statusBadge.nextElementSibling;
+        // Clear logs
+        clearLogsBtn.addEventListener('click', () => {
+            messagesContainer.innerHTML = '';
+            addMessage({
+                content: 'Đã xóa nhật ký hệ thống',
+                level: 'info',
+                timestamp: new Date().toLocaleString()
+            });
+        });
 
-            if (status.running) {
-                statusBadge.classList.remove('status-stopped');
-                statusBadge.classList.add('status-running');
-                statusText.textContent = 'Đang chạy';
-                controlButton.classList.remove('btn-success');
-                controlButton.classList.add('btn-danger');
-                controlButton.textContent = 'Dừng Bot';
-                controlButton.dataset.action = 'stop';
-            } else {
-                statusBadge.classList.remove('status-running');
-                statusBadge.classList.add('status-stopped');
-                statusText.textContent = 'Đang dừng';
-                controlButton.classList.remove('btn-danger');
-                controlButton.classList.add('btn-success');
-                controlButton.textContent = 'Khởi động Bot';
-                controlButton.dataset.action = 'start';
-            }
-
-            // Remove loading state
-            controlButton.classList.remove('btn-loading');
-            controlButton.disabled = false;
-        }
-
-        // Điều khiển bot
+        // Control bot
         async function controlBot(action) {
             if (!isConnected) {
                 addMessage({
@@ -513,16 +512,13 @@
                 return;
             }
 
-            // Add loading state
             controlButton.classList.add('btn-loading');
             controlButton.disabled = true;
 
             try {
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action })
                 });
 
@@ -531,67 +527,92 @@
                 if (data.success) {
                     updateBotStatus(data.status);
                 } else {
-                    console.error('Error controlling bot:', data.message);
                     addMessage({
                         content: `Lỗi: ${data.message}`,
                         level: 'error',
                         timestamp: new Date().toLocaleString()
                     });
-                    // Remove loading state on error
-                    controlButton.classList.remove('btn-loading');
-                    controlButton.disabled = false;
                 }
             } catch (error) {
-                console.error('Error:', error);
                 addMessage({
                     content: `Lỗi kết nối: ${error.message}`,
                     level: 'error',
                     timestamp: new Date().toLocaleString()
                 });
-                // Remove loading state on error
-                controlButton.classList.remove('btn-loading');
-                controlButton.disabled = false;
+            }
+
+            controlButton.classList.remove('btn-loading');
+            controlButton.disabled = false;
+        }
+
+        // Update bot status
+        function updateBotStatus(status) {
+            const botStatusDiv = document.querySelector('.bot-status');
+            const controlIcon = controlButton.querySelector('.bi');
+
+            if (status.running) {
+                controlButton.classList.remove('btn-success');
+                controlButton.classList.add('btn-danger');
+                controlButton.textContent = 'Dừng Bot';
+                controlIcon.classList.remove('bi-play-fill');
+                controlIcon.classList.add('bi-stop-fill');
+                botStatusDiv.classList.remove('stopped');
+                botStatusDiv.classList.add('running');
+                botStatusDiv.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i> Đang chạy';
+
+            } else {
+                controlButton.classList.remove('btn-danger');
+                controlButton.classList.add('btn-success');
+                controlButton.textContent = 'Khởi động Bot';
+                controlIcon.classList.remove('bi-stop-fill');
+                controlIcon.classList.add('bi-play-fill');
+                botStatusDiv.classList.remove('running');
+                botStatusDiv.classList.add('stopped');
+                botStatusDiv.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i> Đã dừng';
             }
         }
 
-        // Event listener cho nút điều khiển
-        controlButton.addEventListener('click', function() {
-            if (this.disabled) return;
-            const action = this.dataset.action || (this.textContent.includes('Dừng') ? 'stop' : 'start');
-            controlBot(action);
+        // Risk level changes
+        maxAccountRisk.addEventListener('input', () => {
+            maxAccountRiskValue.textContent = `${maxAccountRisk.value}%`;
         });
 
-        // Cập nhật giá trị hiển thị khi thay đổi thanh trượt
-        maxAccountRisk.addEventListener('input', function() {
-            maxAccountRiskValue.textContent = `${this.value}%`;
-        });
-
-        // Cập nhật giá trị thanh trượt khi chọn mức độ rủi ro
         riskLevel.addEventListener('change', function() {
-            let defaultRisk;
-            let riskLevelText;
+            let leverage;
+            let riskPerTrade;
+            let maxTrades;
+            let dailyTarget;
+
             switch(this.value) {
                 case 'low':
-                    defaultRisk = 15;
-                    riskLevelText = "Thấp (10-15% tài khoản)";
+                    leverage = 2;
+                    riskPerTrade = 1;
+                    maxTrades = 10;
+                    dailyTarget = 1;
                     break;
                 case 'medium':
-                    defaultRisk = 25;
-                    riskLevelText = "Trung bình (20-30% tài khoản)";
+                    leverage = 5;
+                    riskPerTrade = 2.5;
+                    maxTrades = 4;
+                    dailyTarget = 2;
                     break;
                 case 'high':
-                    defaultRisk = 40;
-                    riskLevelText = "Cao (30-50% tài khoản)";
+                    leverage = 10;
+                    riskPerTrade = 5;
+                    maxTrades = 2;
+                    dailyTarget = 3;
                     break;
             }
-            maxAccountRisk.value = defaultRisk;
-            maxAccountRiskValue.textContent = `${defaultRisk}%`;
-            riskLevelDisplay.textContent = riskLevelText; // Update risk level display
+            riskDetails.innerHTML = `
+                <p class="mb-1"><strong>Đòn bẩy:</strong> ${leverage}x</p>
+                <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> ${riskPerTrade}% tài khoản</p>
+                <p class="mb-1"><strong>Số lệnh tối đa:</strong> ${maxTrades} lệnh</p>
+                <p class="mb-0"><strong>Target lợi nhuận:</strong> ${dailyTarget}% mỗi ngày</p>
+            `;
         });
 
-        // Lưu cấu hình
+        // Save configuration
         async function saveConfig() {
-            // Add loading state
             saveConfigBtn.classList.add('btn-loading');
             saveConfigBtn.disabled = true;
 
@@ -600,7 +621,6 @@
                 api_secret: document.getElementById('apiSecret').value,
                 telegram_token: document.getElementById('telegramToken').value,
                 telegram_chat_id: document.getElementById('telegramChatId').value,
-                api_mode: document.getElementById('apiMode').value,
                 trading_type: document.getElementById('tradingType').value,
                 risk_profile: riskLevel.value,
                 max_account_risk: parseFloat(maxAccountRisk.value)
@@ -609,31 +629,17 @@
             try {
                 const response = await fetch('/api/config', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(config)
                 });
 
                 const data = await response.json();
 
-                if (data.success) {
-                    addMessage({
-                        content: 'Đã lưu cấu hình thành công',
-                        level: 'success',
-                        timestamp: new Date().toLocaleString()
-                    });
-
-                    if (data.config.is_connected) {
-                        configSection.style.display = 'none';
-                    }
-                } else {
-                    addMessage({
-                        content: `Lỗi: ${data.message}`,
-                        level: 'error',
-                        timestamp: new Date().toLocaleString()
-                    });
-                }
+                addMessage({
+                    content: data.success ? 'Đã lưu cấu hình thành công' : `Lỗi: ${data.message}`,
+                    level: data.success ? 'success' : 'error',
+                    timestamp: new Date().toLocaleString()
+                });
             } catch (error) {
                 addMessage({
                     content: `Lỗi kết nối: ${error.message}`,
@@ -642,13 +648,96 @@
                 });
             }
 
-            // Remove loading state
             saveConfigBtn.classList.remove('btn-loading');
             saveConfigBtn.disabled = false;
         }
 
-        // Event listener cho nút lưu cấu hình  
+        // Event listeners
+        controlButton.addEventListener('click', function() {
+            if (this.disabled) return;
+            const action = this.textContent.includes('Dừng') ? 'stop' : 'start';
+            controlBot(action);
+        });
+
         saveConfigBtn.addEventListener('click', saveConfig);
+
+        // Socket events for data updates
+        socket.on('account_update', (data) => {
+            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
+            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
+            document.getElementById('openPositions').textContent = data.positions.length;
+        });
+
+        socket.on('market_data', (data) => {
+            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
+            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
+            // Add more price updates as needed
+            updateCharts(data);
+        });
+
+        // Chart.js initialization and update function
+        let btcChart, ethChart; // Declare chart variables
+        function updateCharts(data) {
+            // BTC chart data
+            const btcData = {
+                labels: ['1h ago', '30m ago', '15m ago', 'Now'],
+                datasets: [{
+                    label: 'BTC/USDT',
+                    data: [data.btc_price - 10, data.btc_price - 5, data.btc_price - 2, data.btc_price],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            };
+
+             // ETH chart data
+            const ethData = {
+                labels: ['1h ago', '30m ago', '15m ago', 'Now'],
+                datasets: [{
+                    label: 'ETH/USDT',
+                    data: [data.eth_price - 8, data.eth_price - 4, data.eth_price - 1, data.eth_price],
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            };
+
+            // Create or update charts
+            if (!btcChart) {
+                btcChart = new Chart(btcChartCanvas, {
+                    type: 'line',
+                    data: btcData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                btcChart.data = btcData;
+                btcChart.update();
+            }
+
+            if (!ethChart) {
+                ethChart = new Chart(ethChartCanvas, {
+                    type: 'line',
+                    data: ethData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            } else {
+                ethChart.data = ethData;
+                ethChart.update();
+            }
+        }
+
 
         // Auto-scroll to bottom on load
         window.onload = () => {
