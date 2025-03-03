@@ -357,11 +357,14 @@ def get_account():
                         
                         # Tính PnL phần trăm
                         pnl_percent = 0
-                        if entry_price > 0:
-                            if position_amt > 0:  # Long position
-                                pnl_percent = ((mark_price / entry_price) - 1) * 100 * leverage
-                            else:  # Short position
-                                pnl_percent = ((entry_price / mark_price) - 1) * 100 * leverage
+                        try:
+                            if entry_price > 0 and mark_price > 0:  # Đảm bảo không chia cho 0
+                                if position_amt > 0:  # Long position
+                                    pnl_percent = ((mark_price / entry_price) - 1) * 100 * leverage
+                                else:  # Short position
+                                    pnl_percent = ((entry_price / mark_price) - 1) * 100 * leverage
+                        except Exception as e:
+                            logger.warning(f"Lỗi khi tính PnL phần trăm: {e}, sử dụng giá trị mặc định 0")
                         
                         active_positions.append({
                             'id': f"pos_{symbol}_{int(time.time())}",
@@ -1260,18 +1263,10 @@ def start_background_tasks():
         auto_start = config.get('auto_start_enabled', False)
         api_mode = config.get('api_mode', 'demo')
         
-        # Tự động khởi động bot (chỉ khi không phải môi trường test)
-        if auto_start and api_mode != 'demo':
-            # TODO: Triển khai khởi động bot thực tế
-            logger.info("Auto-starting bot...")
-            global bot_status
-            bot_status['status'] = 'running'
-            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            # Đảm bảo mode nhất quán trong toàn bộ hệ thống
-            bot_status['mode'] = api_mode.lower()
-        else:
-            logger.info("Auto-start bot is disabled in testing environment")
-            bot_status['mode'] = api_mode.lower()  # Set mode anyway
+        # Cập nhật mode mà không tự động khởi động bot
+        global bot_status
+        bot_status['mode'] = api_mode.lower()
+        logger.info(f"Bot mode set to: {api_mode.lower()}, auto_start is {'enabled' if auto_start else 'disabled'}")
         
         # Lấy thông tin tài khoản và gửi thông báo khởi động
         try:
@@ -1378,7 +1373,11 @@ def start_background_tasks():
     thread.start()
     logger.info("Background tasks started")
 
-# Khởi động các tác vụ nền
-start_background_tasks()
+# Kiểm tra biến môi trường để quyết định có tự động khởi động các tác vụ nền hay không
+if os.environ.get("AUTO_START_BACKGROUND_TASKS", "false").lower() == "true":
+    start_background_tasks()
+    logger.info("Auto-started background tasks from environment variable")
+else:
+    logger.info("Background tasks not auto-started. Use API to start them manually.")
     
 # Không chạy ứng dụng ở đây - được quản lý bởi gunicorn

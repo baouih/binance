@@ -19,6 +19,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Nút Dừng Bot
+    const stopBotButtons = document.querySelectorAll('.stop-bot-btn');
+    
+    if (stopBotButtons && stopBotButtons.length > 0) {
+        stopBotButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Bot ID để dừng
+                const botId = this.getAttribute('data-bot-id') || 'default';
+                
+                // Hiển thị loading
+                window.showLoading();
+                
+                // Gửi lệnh dừng bot
+                stopBot(botId);
+            });
+        });
+    }
+    
     // Các chức năng khác
     function startBot(botId) {
         // Gửi request tới API
@@ -74,6 +92,62 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Hiển thị thông báo lỗi thông thường
                     showToast('error', 'Lỗi: ' + (data.message || 'Không thể khởi động bot'));
                 }
+            }
+        })
+        .catch(error => {
+            // Ẩn loading
+            window.hideLoading();
+            
+            // Hiển thị thông báo lỗi
+            showToast('error', 'Lỗi kết nối: ' + error.message);
+        });
+    }
+    
+    function stopBot(botId) {
+        // Gửi request tới API
+        fetch('/api/bot/control', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                action: 'stop',
+                bot_id: botId || 'default'
+            })
+        })
+        .then(response => {
+            console.log("Response status:", response.status);
+            try {
+                return response.json();
+            } catch (e) {
+                console.error("Error parsing JSON:", e);
+                return { success: false, error_type: 'parse_error', message: "Không thể phân tích phản hồi từ máy chủ" };
+            }
+        })
+        .then(data => {
+            console.log("Received data:", data);
+            // Ẩn loading
+            window.hideLoading();
+            
+            if (data.success) {
+                // Thành công thực sự
+                BOT_STATUS = { running: false };
+                
+                // Hiển thị thông báo thành công
+                showToast('success', 'Bot đã được dừng thành công');
+                
+                // Cập nhật giao diện trạng thái bot
+                updateBotStatus(botId, 'stopped');
+                
+                // Tự động làm mới trang sau 2 giây
+                setTimeout(function() {
+                    console.log("Reloading page...");
+                    window.location.reload();
+                }, 2000);
+            } else {
+                console.error('Bot không thể dừng:', data);
+                // Hiển thị thông báo lỗi thông thường
+                showToast('error', 'Lỗi: ' + (data.message || 'Không thể dừng bot'));
             }
         })
         .catch(error => {

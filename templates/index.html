@@ -658,14 +658,14 @@
                     <div class="col-md-4">
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Số dư tài khoản</h6>
-                            <h3>${{ '{:.2f}'.format(account_data.balance) }}</h3>
+                            <h3>${{ '{:.2f}'.format(account_data.balance|default(0)) }}</h3>
                             <small class="text-muted">Tài khoản {{ 'demo' if bot_status.mode == 'demo' else 'thật' if bot_status.mode == 'live' else 'testnet' }}</small>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Equity</h6>
-                            <h3>${{ '{:.2f}'.format(account_data.equity) }}</h3>
+                            <h3>${{ '{:.2f}'.format(account_data.equity|default(0)) }}</h3>
                             <small class="text-muted">Bao gồm vị thế đang mở</small>
                         </div>
                     </div>
@@ -673,9 +673,14 @@
                         <div class="dashboard-card p-3">
                             <h6 class="text-info">Lợi nhuận</h6>
                             <h3>
-                                ${{ '{:.2f}'.format(account_data.equity - account_data.balance) }} 
-                                <small class="{{ 'text-success' if account_data.equity >= account_data.balance else 'text-danger' }}">
-                                    {{ '+' if account_data.equity >= account_data.balance else '' }}{{ '{:.2f}'.format((account_data.equity - account_data.balance) / account_data.balance * 100) }}%
+                                ${{ '{:.2f}'.format((account_data.equity|default(0)) - (account_data.balance|default(0))) }} 
+                                <small class="{{ 'text-success' if (account_data.equity|default(0)) >= (account_data.balance|default(0)) else 'text-danger' }}">
+                                    {{ '+' if (account_data.equity|default(0)) >= (account_data.balance|default(0)) else '' }}
+                                    {% if account_data.balance|default(0) > 0 %}
+                                        {{ '{:.2f}'.format(((account_data.equity|default(0)) - (account_data.balance|default(0))) / (account_data.balance|default(1)) * 100) }}%
+                                    {% else %}
+                                        0.00%
+                                    {% endif %}
                                 </small>
                             </h3>
                             <small class="text-muted">Lợi nhuận vị thế hiện tại</small>
@@ -2061,35 +2066,35 @@ Active strategies: {{ bot_status.active_strategies|join(', ') }}`;
     </script>
     
     <!-- Mobile Trading Menu - Fixed bottom navigation for mobile devices -->
-    <div class="mobile-trading-menu d-md-none fixed-bottom bg-dark border-top border-secondary" style="display: none;">
+    <div class="mobile-trading-menu d-md-none fixed-bottom bg-dark border-top border-secondary">
         <div class="container-fluid px-0">
             <div class="row gx-0 text-center">
                 <div class="col">
-                    <a href="#dashboard" class="d-block py-2 text-decoration-none text-light mobile-nav-item active" data-bs-toggle="tab" data-bs-target="#dashboard">
+                    <a href="/" class="d-block py-2 text-decoration-none text-light mobile-nav-item active" id="dashboard-mobile-btn">
                         <i class="fas fa-chart-line d-block mb-1"></i>
                         <small>Dashboard</small>
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#market" class="d-block py-2 text-decoration-none text-light mobile-nav-item" data-bs-toggle="tab" data-bs-target="#market">
+                    <a href="/market" class="d-block py-2 text-decoration-none text-light mobile-nav-item" id="market-mobile-btn">
                         <i class="fas fa-globe d-block mb-1"></i>
                         <small>Thị trường</small>
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#trades" class="d-block py-2 text-decoration-none text-light mobile-nav-item" data-bs-toggle="tab" data-bs-target="#trades">
+                    <a href="/trades" class="d-block py-2 text-decoration-none text-light mobile-nav-item" id="trades-mobile-btn">
                         <i class="fas fa-exchange-alt d-block mb-1"></i>
                         <small>Giao dịch</small>
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#settings" class="d-block py-2 text-decoration-none text-light mobile-nav-item" data-bs-toggle="tab" data-bs-target="#settings">
+                    <a href="/settings" class="d-block py-2 text-decoration-none text-light mobile-nav-item" id="settings-mobile-btn">
                         <i class="fas fa-cog d-block mb-1"></i>
                         <small>Cài đặt</small>
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#cli" class="d-block py-2 text-decoration-none text-light mobile-nav-item" data-bs-toggle="tab" data-bs-target="#cli">
+                    <a href="/cli" class="d-block py-2 text-decoration-none text-light mobile-nav-item" id="cli-mobile-btn">
                         <i class="fas fa-terminal d-block mb-1"></i>
                         <small>CLI</small>
                     </a>
