@@ -388,8 +388,8 @@
                 <!-- Control Button -->
                 <button id="controlButton" type="button"
                         class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
-                        {{ 'disabled' if not status.is_connected }}
-                        onclick="handleControlButton()">
+                        data-action="{{ 'stop' if status.running else 'start' }}"
+                        {{ 'disabled' if not status.is_connected }}>
                     <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
                     {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
                 </button>
@@ -1185,6 +1185,38 @@
                 // Đây sẽ là nơi mở modal hiển thị chi tiết vị thế
                 showToast('Tính năng này đang được phát triển', 'info');
             });
+            
+            // Fix: Thêm event listener trực tiếp cho nút khởi động bot
+            const controlButton = document.getElementById('controlButton');
+            if (controlButton) {
+                console.log('Đã tìm thấy nút điều khiển bot, thêm event listener');
+                
+                // Xóa event click cũ (nếu có)
+                controlButton.onclick = null;
+                
+                // Thêm event listener mới
+                controlButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Đã nhấp vào nút điều khiển bot');
+                    handleControlButton();
+                });
+                
+                // Thêm xử lý cho touchend để đảm bảo hoạt động trên thiết bị di động
+                controlButton.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Đã chạm vào nút điều khiển bot (touchend)');
+                    handleControlButton();
+                });
+                
+                // Thêm xử lý cho touchstart để cải thiện trải nghiệm người dùng trên mobile
+                controlButton.addEventListener('touchstart', function(e) {
+                    console.log('Bắt đầu chạm vào nút điều khiển bot (touchstart)');
+                });
+            } else {
+                console.error('Không tìm thấy nút điều khiển bot với id "controlButton"');
+            }
         });
     </script>
 </body>
