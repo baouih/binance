@@ -147,6 +147,11 @@ def position():
     """Trang quản lý vị thế"""
     return render_template('position.html')
 
+@app.route('/positions')
+def positions():
+    """Trang quản lý tất cả vị thế"""
+    return render_template('positions.html')
+
 @app.route('/settings')
 def settings():
     """Trang cài đặt bot"""

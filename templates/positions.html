@@ -1,0 +1,1127 @@
+{% extends 'layout.html' %}
+
+{% block title %}Quản lý Vị thế | BinanceTrader Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i> Quản lý Tất cả Vị thế
+                    </h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="refreshPositionsBtn">
+                            <i class="fas fa-sync-alt"></i> Làm mới
+                        </button>
+                        <div class="btn-group ms-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-filter="all">Tất cả vị thế</a></li>
+                                <li><a class="dropdown-item" href="#" data-filter="profit">Đang lãi</a></li>
+                                <li><a class="dropdown-item" href="#" data-filter="loss">Đang lỗ</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" data-filter="long">Vị thế Long</a></li>
+                                <li><a class="dropdown-item" href="#" data-filter="short">Vị thế Short</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body position-relative" style="min-height: 400px;">
+                    <div id="positionsLoading" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p class="mt-2">Đang tải danh sách vị thế...</p>
+                    </div>
+                    
+                    <div id="positionsEmptyState" class="text-center py-5" style="display: none;">
+                        <img src="/static/img/empty-positions.svg" alt="Không có vị thế" style="max-width: 120px;" />
+                        <h5 class="mt-3">Chưa có vị thế nào</h5>
+                        <p class="text-muted">Bot chưa mở vị thế nào hoặc tất cả vị thế đã được đóng.</p>
+                    </div>
+                    
+                    <div id="positionsList">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="positionsTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Cặp</th>
+                                        <th scope="col">Loại</th>
+                                        <th scope="col">Giá vào</th>
+                                        <th scope="col">Giá hiện tại</th>
+                                        <th scope="col">Khối lượng</th>
+                                        <th scope="col">Lợi nhuận</th>
+                                        <th scope="col">Đánh giá</th>
+                                        <th scope="col">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i> Phân tích Danh mục
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="portfolioAnalysisLoading" class="text-center py-4" style="display: none;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                                <p class="mt-2">Đang phân tích danh mục...</p>
+                            </div>
+                            
+                            <div id="portfolioAnalysis">
+                                <div class="row align-items-center mb-4">
+                                    <div class="col-md-4 text-center">
+                                        <div class="d-inline-block position-relative">
+                                            <canvas id="portfolioPieChart" width="140" height="140"></canvas>
+                                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                                <h3 class="mb-0 fs-4" id="totalPositionsCount">0</h3>
+                                                <small class="text-muted">Vị thế</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row mb-2">
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-3">
+                                                        <i class="fas fa-coins fa-2x text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">Tổng P&L</h6>
+                                                        <h5 class="mb-0" id="totalPnl">0.00 USDT</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-3">
+                                                        <i class="fas fa-percentage fa-2x text-warning"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">P&L Trung bình</h6>
+                                                        <h5 class="mb-0" id="avgPnlPercent">0.00%</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-3">
+                                                        <i class="fas fa-shield-alt fa-2x text-danger"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">Mức độ rủi ro</h6>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge bg-danger me-2" id="riskLevel">-</span>
+                                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                                <div id="riskScoreBar" class="progress-bar bg-danger" style="width: 0%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-3">
+                                                        <i class="fas fa-balance-scale fa-2x text-info"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">Cảnh báo</h6>
+                                                        <div>
+                                                            <span class="badge bg-secondary me-1" id="concentrationRiskBadge">
+                                                                <i class="fas fa-exclamation-triangle"></i> Tập trung
+                                                            </span>
+                                                            <span class="badge bg-secondary me-1" id="correlationRiskBadge">
+                                                                <i class="fas fa-link"></i> Tương quan
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <h6 class="mb-2">Khuyến nghị:</h6>
+                                    <ul class="list-group list-group-flush" id="portfolioRecommendations">
+                                        <!-- Được thêm bằng JavaScript -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-history me-2"></i> Lịch sử Thay đổi
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush" id="positionActivityList">
+                                <!-- Sẽ được thêm bằng JavaScript -->
+                            </div>
+                            <div class="text-center p-3" id="positionActivityEmpty" style="display: none;">
+                                <p class="text-muted mb-0">Chưa có hoạt động nào gần đây</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi tiết vị thế -->
+<div class="modal fade" id="positionDetailModal" tabindex="-1" aria-labelledby="positionDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="positionDetailModalLabel">Chi tiết Vị thế</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="positionDetailBody">
+                <!-- Chi tiết vị thế sẽ được thêm bằng JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-danger" id="closePositionBtn">Đóng vị thế</button>
+                <button type="button" class="btn btn-primary" id="updatePositionBtn">Cập nhật SL/TP</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cập nhật SL/TP -->
+<div class="modal fade" id="updateSlTpModal" tabindex="-1" aria-labelledby="updateSlTpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateSlTpModalLabel">Cập nhật Stop Loss & Take Profit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateSlTpForm">
+                    <input type="hidden" id="updatePositionId" name="positionId">
+                    
+                    <div class="mb-3">
+                        <label for="stopLossPrice" class="form-label">Stop Loss (giá)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="stopLossPrice" name="stopLossPrice" step="0.01">
+                            <span class="input-group-text">USDT</span>
+                        </div>
+                        <small class="form-text text-muted" id="slPriceInfo"></small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="takeProfitPrice" class="form-label">Take Profit (giá)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="takeProfitPrice" name="takeProfitPrice" step="0.01">
+                            <span class="input-group-text">USDT</span>
+                        </div>
+                        <small class="form-text text-muted" id="tpPriceInfo"></small>
+                    </div>
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="trailingStopSwitch">
+                        <label class="form-check-label" for="trailingStopSwitch">Sử dụng Trailing Stop</label>
+                    </div>
+                    
+                    <div id="trailingStopOptions" style="display:none;">
+                        <div class="mb-3">
+                            <label for="trailingActivation" class="form-label">Kích hoạt Trailing Stop khi lợi nhuận đạt</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="trailingActivation" name="trailingActivation" value="1" min="0.1" step="0.1">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="trailingDistance" class="form-label">Khoảng cách Trailing Stop</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="trailingDistance" name="trailingDistance" value="0.5" min="0.1" step="0.1">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmUpdateSlTp">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đóng vị thế -->
+<div class="modal fade" id="closePositionModal" tabindex="-1" aria-labelledby="closePositionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="closePositionModalLabel">Xác nhận đóng vị thế</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn đóng vị thế này?</p>
+                <div class="alert alert-info" id="closePositionInfo">
+                    <!-- Thông tin vị thế -->
+                </div>
+                <div class="mb-3">
+                    <label for="closePositionPrice" class="form-label">Giá đóng vị thế</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="closePositionPrice" name="closePositionPrice" step="0.01">
+                        <span class="input-group-text">USDT</span>
+                    </div>
+                    <small class="form-text text-muted">Để trống để sử dụng giá thị trường hiện tại</small>
+                </div>
+                <div class="mb-3">
+                    <label for="closePositionReason" class="form-label">Lý do đóng vị thế</label>
+                    <select class="form-select" id="closePositionReason">
+                        <option value="take_profit">Chốt lời</option>
+                        <option value="stop_loss">Cắt lỗ</option>
+                        <option value="manual">Đóng thủ công</option>
+                        <option value="strategy_exit">Tín hiệu thoát chiến lược</option>
+                        <option value="risk_management">Quản lý rủi ro</option>
+                        <option value="other">Lý do khác</option>
+                    </select>
+                </div>
+                <input type="hidden" id="closePositionId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmClosePosition">Đóng vị thế</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Khởi tạo
+        loadPositions();
+        loadPortfolioAnalysis();
+        
+        // Làm mới dữ liệu mỗi 30 giây
+        setInterval(function() {
+            loadPositions(false);
+            loadPortfolioAnalysis(false);
+        }, 30000);
+        
+        // Sự kiện làm mới
+        $('#refreshPositionsBtn').click(function() {
+            loadPositions();
+            loadPortfolioAnalysis();
+        });
+        
+        // Sự kiện lọc
+        $('.dropdown-item[data-filter]').click(function(e) {
+            e.preventDefault();
+            const filter = $(this).data('filter');
+            filterPositions(filter);
+        });
+        
+        // Sự kiện toggle Trailing Stop
+        $('#trailingStopSwitch').change(function() {
+            if($(this).is(':checked')) {
+                $('#trailingStopOptions').slideDown();
+            } else {
+                $('#trailingStopOptions').slideUp();
+            }
+        });
+        
+        // Cập nhật SL/TP
+        $('#updatePositionBtn').click(function() {
+            const positionId = $(this).data('position-id');
+            const positionData = $(this).data('position');
+            
+            $('#updatePositionId').val(positionId);
+            $('#stopLossPrice').val(positionData.stop_loss || '');
+            $('#takeProfitPrice').val(positionData.take_profit || '');
+            
+            const positionType = positionData.type;
+            const entryPrice = positionData.entry_price;
+            const currentPrice = positionData.current_price;
+            
+            // Thông tin phụ về SL/TP
+            if (positionType === 'LONG') {
+                $('#slPriceInfo').html(`Nên đặt dưới giá hiện tại (${currentPrice} USDT)`);
+                $('#tpPriceInfo').html(`Nên đặt trên giá hiện tại (${currentPrice} USDT)`);
+            } else {
+                $('#slPriceInfo').html(`Nên đặt trên giá hiện tại (${currentPrice} USDT)`);
+                $('#tpPriceInfo').html(`Nên đặt dưới giá hiện tại (${currentPrice} USDT)`);
+            }
+            
+            $('#updateSlTpModal').modal('show');
+        });
+        
+        // Xác nhận cập nhật SL/TP
+        $('#confirmUpdateSlTp').click(function() {
+            const positionId = $('#updatePositionId').val();
+            const stopLoss = $('#stopLossPrice').val();
+            const takeProfit = $('#takeProfitPrice').val();
+            const useTrailingStop = $('#trailingStopSwitch').is(':checked');
+            const trailingActivation = $('#trailingActivation').val();
+            const trailingDistance = $('#trailingDistance').val();
+            
+            // Dữ liệu gửi đi
+            const data = {
+                stop_loss: stopLoss,
+                take_profit: takeProfit,
+                use_trailing_stop: useTrailingStop,
+                trailing_activation: trailingActivation,
+                trailing_distance: trailingDistance
+            };
+            
+            // Gửi yêu cầu cập nhật
+            $.ajax({
+                url: `/api/bot/position/${positionId}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    if (response.success) {
+                        $('#updateSlTpModal').modal('hide');
+                        showToast('Thành công', 'Đã cập nhật Stop Loss và Take Profit', 'success');
+                        loadPositions();
+                    } else {
+                        showToast('Lỗi', response.message || 'Không thể cập nhật', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi', 'Đã xảy ra lỗi khi kết nối với máy chủ', 'error');
+                }
+            });
+        });
+        
+        // Đóng vị thế
+        $('#closePositionBtn').click(function() {
+            const positionId = $(this).data('position-id');
+            const positionData = $(this).data('position');
+            
+            $('#closePositionId').val(positionId);
+            $('#closePositionPrice').val(positionData.current_price);
+            
+            // Hiển thị thông tin vị thế
+            const pnlClass = positionData.pnl >= 0 ? 'text-success' : 'text-danger';
+            $('#closePositionInfo').html(`
+                <strong>${positionData.symbol} ${positionData.type}</strong><br>
+                Giá vào: ${positionData.entry_price} USDT<br>
+                Giá hiện tại: ${positionData.current_price} USDT<br>
+                P&L: <span class="${pnlClass}">${positionData.pnl.toFixed(2)} USDT (${positionData.pnl_percent.toFixed(2)}%)</span>
+            `);
+            
+            $('#closePositionModal').modal('show');
+        });
+        
+        // Xác nhận đóng vị thế
+        $('#confirmClosePosition').click(function() {
+            const positionId = $('#closePositionId').val();
+            const closePrice = $('#closePositionPrice').val();
+            const reason = $('#closePositionReason').val();
+            
+            // Dữ liệu gửi đi
+            const data = {
+                close_price: closePrice,
+                reason: reason
+            };
+            
+            // Gửi yêu cầu đóng vị thế
+            $.ajax({
+                url: `/api/bot/position/${positionId}/close`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    if (response.success) {
+                        $('#closePositionModal').modal('hide');
+                        $('#positionDetailModal').modal('hide');
+                        showToast('Thành công', 'Đã đóng vị thế', 'success');
+                        loadPositions();
+                        loadPortfolioAnalysis();
+                    } else {
+                        showToast('Lỗi', response.message || 'Không thể đóng vị thế', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi', 'Đã xảy ra lỗi khi kết nối với máy chủ', 'error');
+                }
+            });
+        });
+    });
+    
+    function loadPositions(showLoading = true) {
+        if (showLoading) {
+            $('#positionsLoading').show();
+            $('#positionsList').hide();
+            $('#positionsEmptyState').hide();
+        }
+        
+        $.get('/api/account', function(data) {
+            const positions = data.positions || [];
+            
+            if (positions.length === 0) {
+                $('#positionsEmptyState').show();
+                $('#positionsList').hide();
+            } else {
+                $('#positionsList').show();
+                $('#positionsEmptyState').hide();
+                
+                // Cập nhật bảng vị thế
+                const tableBody = $('#positionsTable tbody');
+                tableBody.empty();
+                
+                positions.forEach(function(position) {
+                    const pnlClass = position.pnl >= 0 ? 'text-success' : 'text-danger';
+                    const typeClass = position.type === 'LONG' ? 'text-success' : 'text-danger';
+                    const typeText = position.type === 'LONG' ? 'LONG' : 'SHORT';
+                    const typeIcon = position.type === 'LONG' ? 'fa-arrow-up' : 'fa-arrow-down';
+                    
+                    const row = `
+                        <tr data-position-id="${position.id}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="symbol-icon me-2">
+                                        ${getCryptoIcon(position.symbol)}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">${position.symbol}</div>
+                                        <small class="text-muted">${formatLeverage(position.leverage)}x</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge ${position.type === 'LONG' ? 'bg-success' : 'bg-danger'}">
+                                    <i class="fas ${typeIcon} me-1"></i> ${typeText}
+                                </span>
+                            </td>
+                            <td>${position.entry_price} USDT</td>
+                            <td>${position.current_price} USDT</td>
+                            <td>${position.size}</td>
+                            <td class="${pnlClass}">
+                                ${position.pnl.toFixed(2)} USDT
+                                <div><small>${position.pnl_percent.toFixed(2)}%</small></div>
+                            </td>
+                            <td>
+                                ${getRiskBadge(position)}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-info me-1 view-position-btn" data-position-id="${position.id}">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary me-1 edit-position-btn" data-position-id="${position.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger close-position-btn" data-position-id="${position.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    tableBody.append(row);
+                });
+                
+                // Đăng ký sự kiện cho các nút
+                $('.view-position-btn').click(function() {
+                    const positionId = $(this).data('position-id');
+                    viewPositionDetails(positionId);
+                });
+                
+                $('.edit-position-btn').click(function() {
+                    const positionId = $(this).data('position-id');
+                    const position = positions.find(p => p.id === positionId);
+                    
+                    $('#updatePositionBtn').data('position-id', positionId);
+                    $('#updatePositionBtn').data('position', position);
+                    $('#updatePositionBtn').click();
+                });
+                
+                $('.close-position-btn').click(function() {
+                    const positionId = $(this).data('position-id');
+                    const position = positions.find(p => p.id === positionId);
+                    
+                    $('#closePositionBtn').data('position-id', positionId);
+                    $('#closePositionBtn').data('position', position);
+                    $('#closePositionBtn').click();
+                });
+            }
+            
+            $('#positionsLoading').hide();
+        }).fail(function() {
+            $('#positionsLoading').hide();
+            showToast('Lỗi', 'Không thể tải danh sách vị thế', 'error');
+        });
+    }
+    
+    function loadPortfolioAnalysis(showLoading = true) {
+        if (showLoading) {
+            $('#portfolioAnalysisLoading').show();
+            $('#portfolioAnalysis').hide();
+        }
+        
+        $.get('/api/bot/portfolio/analyze', function(response) {
+            if (response.success) {
+                const analysis = response.analysis;
+                const portfolio = analysis.portfolio;
+                
+                // Cập nhật tổng quan
+                $('#totalPositionsCount').text(portfolio.total_positions);
+                $('#totalPnl').text(`${portfolio.total_pnl.toFixed(2)} USDT`);
+                $('#avgPnlPercent').text(`${portfolio.average_pnl_percent.toFixed(2)}%`);
+                
+                // Cập nhật mức độ rủi ro
+                const riskLevel = portfolio.risk_level;
+                let riskBadgeClass = 'bg-success';
+                let riskPct = 25;
+                
+                if (riskLevel === 'medium') {
+                    riskBadgeClass = 'bg-warning';
+                    riskPct = 50;
+                } else if (riskLevel === 'high') {
+                    riskBadgeClass = 'bg-danger';
+                    riskPct = 75;
+                } else if (riskLevel === 'very_high') {
+                    riskBadgeClass = 'bg-danger';
+                    riskPct = 100;
+                }
+                
+                $('#riskLevel').removeClass('bg-success bg-warning bg-danger').addClass(riskBadgeClass);
+                $('#riskLevel').text(formatRiskLevel(riskLevel));
+                $('#riskScoreBar').removeClass('bg-success bg-warning bg-danger').addClass(riskBadgeClass);
+                $('#riskScoreBar').css('width', `${riskPct}%`);
+                
+                // Cập nhật cảnh báo
+                if (portfolio.concentration_risk) {
+                    $('#concentrationRiskBadge').removeClass('bg-secondary').addClass('bg-warning');
+                } else {
+                    $('#concentrationRiskBadge').removeClass('bg-warning').addClass('bg-secondary');
+                }
+                
+                if (portfolio.correlation_risk) {
+                    $('#correlationRiskBadge').removeClass('bg-secondary').addClass('bg-warning');
+                } else {
+                    $('#correlationRiskBadge').removeClass('bg-warning').addClass('bg-secondary');
+                }
+                
+                // Cập nhật khuyến nghị
+                const recommendationsList = $('#portfolioRecommendations');
+                recommendationsList.empty();
+                
+                portfolio.recommendations.forEach(function(rec) {
+                    recommendationsList.append(`
+                        <li class="list-group-item py-2">
+                            <i class="fas fa-check-circle me-2 text-primary"></i> ${rec}
+                        </li>
+                    `);
+                });
+                
+                // Vẽ biểu đồ phân bổ
+                const positions = analysis.positions || [];
+                const longPositions = positions.filter(p => p.type === 'LONG').length;
+                const shortPositions = positions.filter(p => p.type === 'SHORT').length;
+                
+                const profitPositions = positions.filter(p => p.pnl >= 0).length;
+                const lossPositions = positions.filter(p => p.pnl < 0).length;
+                
+                if (window.portfolioChart) {
+                    window.portfolioChart.destroy();
+                }
+                
+                const ctx = document.getElementById('portfolioPieChart').getContext('2d');
+                window.portfolioChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Long', 'Short'],
+                        datasets: [{
+                            data: [longPositions, shortPositions],
+                            backgroundColor: ['rgba(40, 167, 69, 0.7)', 'rgba(220, 53, 69, 0.7)'],
+                            borderColor: ['rgba(40, 167, 69, 1)', 'rgba(220, 53, 69, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                $('#portfolioAnalysisLoading').hide();
+                $('#portfolioAnalysis').show();
+            } else {
+                $('#portfolioAnalysisLoading').hide();
+                showToast('Lỗi', response.message || 'Không thể phân tích danh mục', 'error');
+            }
+        }).fail(function() {
+            $('#portfolioAnalysisLoading').hide();
+            showToast('Lỗi', 'Không thể tải phân tích danh mục', 'error');
+        });
+    }
+    
+    function viewPositionDetails(positionId) {
+        $.get(`/api/bot/position/${positionId}/analyze`, function(response) {
+            if (response.success) {
+                const position = response.position;
+                const analysis = response.analysis;
+                
+                // Cập nhật title
+                $('#positionDetailModalLabel').text(`Chi tiết Vị thế: ${position.symbol} ${position.type}`);
+                
+                // Chuẩn bị dữ liệu
+                const pnlClass = position.pnl >= 0 ? 'text-success' : 'text-danger';
+                const pnlIcon = position.pnl >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                const typeClass = position.type === 'LONG' ? 'text-success' : 'text-danger';
+                const typeIcon = position.type === 'LONG' ? 'fa-arrow-up' : 'fa-arrow-down';
+                
+                // Xây dựng HTML chi tiết
+                let html = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Thông tin cơ bản</h5>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>Cặp giao dịch:</td>
+                                            <td><strong>${position.symbol}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Loại:</td>
+                                            <td>
+                                                <span class="${typeClass}"><i class="fas ${typeIcon}"></i> ${position.type}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Đòn bẩy:</td>
+                                            <td><strong>${formatLeverage(position.leverage)}x</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Giá vào lệnh:</td>
+                                            <td><strong>${position.entry_price} USDT</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Giá hiện tại:</td>
+                                            <td><strong>${position.current_price} USDT</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Khối lượng:</td>
+                                            <td><strong>${position.size}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>P&L:</td>
+                                            <td class="${pnlClass}"><strong>${position.pnl.toFixed(2)} USDT (${position.pnl_percent.toFixed(2)}%)</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Stop Loss:</td>
+                                            <td><strong>${position.stop_loss || 'Chưa đặt'}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Take Profit:</td>
+                                            <td><strong>${position.take_profit || 'Chưa đặt'}</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Phân tích & Khuyến nghị</h5>
+                                    <div class="mb-3">
+                                        <strong>Khuyến nghị:</strong>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <span class="badge ${getBadgeColorForAction(analysis.recommended_action.action)} me-2" style="font-size: 1rem; padding: 0.5rem;">
+                                                ${formatActionText(analysis.recommended_action.action)}
+                                            </span>
+                                            <span>${analysis.recommended_action.reason}</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Mức độ rủi ro:</strong>
+                                        <span class="badge ${getRiskBadgeColor(analysis.risk_level)} ms-2">${formatRiskLevel(analysis.risk_level)}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Điều kiện thị trường:</strong>
+                                        <table class="table table-sm mt-2">
+                                            <tr>
+                                                <td>Xu hướng:</td>
+                                                <td><span class="${getTrendClass(analysis.market_condition.trend)}">${formatTrend(analysis.market_condition.trend)}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Biến động:</td>
+                                                <td>${formatVolatility(analysis.market_condition.volatility)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Momentum:</td>
+                                                <td><span class="${getMomentumClass(analysis.market_condition.momentum)}">${formatMomentum(analysis.market_condition.momentum)}</span></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="card-title mb-0">Đề xuất Stop Loss</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Loại</th>
+                                                    <th>Giá</th>
+                                                    <th>Rủi ro</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                `;
+                
+                // Thêm đề xuất Stop Loss
+                if (analysis.stop_loss_recommendations && analysis.stop_loss_recommendations.length > 0) {
+                    analysis.stop_loss_recommendations.slice(0, 3).forEach(function(sl) {
+                        html += `
+                            <tr>
+                                <td><small>${sl.type}</small></td>
+                                <td>${sl.price.toFixed(2)} USDT</td>
+                                <td><span class="badge bg-danger">${sl.risk_percent.toFixed(2)}%</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary set-sl-btn" data-price="${sl.price.toFixed(2)}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html += `<tr><td colspan="4" class="text-center">Không có đề xuất</td></tr>`;
+                }
+                
+                html += `
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <small class="text-muted">${analysis.stop_loss_recommendations && analysis.stop_loss_recommendations.length > 0 ? analysis.stop_loss_recommendations[0].description : ''}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="card-title mb-0">Đề xuất Take Profit</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Loại</th>
+                                                    <th>Giá</th>
+                                                    <th>Lợi nhuận</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                `;
+                
+                // Thêm đề xuất Take Profit
+                if (analysis.take_profit_recommendations && analysis.take_profit_recommendations.length > 0) {
+                    analysis.take_profit_recommendations.slice(0, 3).forEach(function(tp) {
+                        html += `
+                            <tr>
+                                <td><small>${tp.type}</small></td>
+                                <td>${tp.price.toFixed(2)} USDT</td>
+                                <td><span class="badge bg-success">${tp.profit_percent.toFixed(2)}%</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success set-tp-btn" data-price="${tp.price.toFixed(2)}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html += `<tr><td colspan="4" class="text-center">Không có đề xuất</td></tr>`;
+                }
+                
+                html += `
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <small class="text-muted">${analysis.take_profit_recommendations && analysis.take_profit_recommendations.length > 0 ? analysis.take_profit_recommendations[0].description : ''}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Cập nhật nội dung modal
+                $('#positionDetailBody').html(html);
+                
+                // Cập nhật data cho các nút chính
+                $('#closePositionBtn').data('position-id', positionId);
+                $('#closePositionBtn').data('position', position);
+                
+                $('#updatePositionBtn').data('position-id', positionId);
+                $('#updatePositionBtn').data('position', position);
+                
+                // Đăng ký sự kiện cho các nút trong modal
+                $('.set-sl-btn').click(function() {
+                    const price = $(this).data('price');
+                    $('#updatePositionBtn').click();
+                    setTimeout(function() {
+                        $('#stopLossPrice').val(price);
+                    }, 500);
+                });
+                
+                $('.set-tp-btn').click(function() {
+                    const price = $(this).data('price');
+                    $('#updatePositionBtn').click();
+                    setTimeout(function() {
+                        $('#takeProfitPrice').val(price);
+                    }, 500);
+                });
+                
+                // Hiển thị modal
+                $('#positionDetailModal').modal('show');
+            } else {
+                showToast('Lỗi', response.message || 'Không thể tải chi tiết vị thế', 'error');
+            }
+        }).fail(function() {
+            showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+        });
+    }
+    
+    function filterPositions(filter) {
+        const rows = $('#positionsTable tbody tr');
+        rows.show();
+        
+        if (filter === 'profit') {
+            rows.each(function() {
+                const pnl = $(this).find('td:nth-child(6)').text();
+                if (pnl.includes('-')) {
+                    $(this).hide();
+                }
+            });
+        } else if (filter === 'loss') {
+            rows.each(function() {
+                const pnl = $(this).find('td:nth-child(6)').text();
+                if (!pnl.includes('-')) {
+                    $(this).hide();
+                }
+            });
+        } else if (filter === 'long') {
+            rows.each(function() {
+                const type = $(this).find('td:nth-child(2) .badge').text().trim();
+                if (type !== 'LONG') {
+                    $(this).hide();
+                }
+            });
+        } else if (filter === 'short') {
+            rows.each(function() {
+                const type = $(this).find('td:nth-child(2) .badge').text().trim();
+                if (type !== 'SHORT') {
+                    $(this).hide();
+                }
+            });
+        }
+    }
+    
+    // Các hàm trợ giúp
+    function getCryptoIcon(symbol) {
+        const coin = symbol.replace('USDT', '');
+        return `<i class="crypto-icon">${coin}</i>`;
+    }
+    
+    function formatLeverage(leverage) {
+        return leverage || 1;
+    }
+    
+    function getRiskBadge(position) {
+        // Đánh giá rủi ro đơn giản dựa trên P&L và đòn bẩy
+        let riskLevel = 'low';
+        if (position.pnl_percent < -5) {
+            riskLevel = 'high';
+        } else if (position.pnl_percent < -2) {
+            riskLevel = 'medium';
+        }
+        
+        const badges = {
+            'low': '<span class="badge bg-success">Thấp</span>',
+            'medium': '<span class="badge bg-warning">Trung bình</span>',
+            'high': '<span class="badge bg-danger">Cao</span>'
+        };
+        
+        return badges[riskLevel];
+    }
+    
+    function formatRiskLevel(level) {
+        const labels = {
+            'low': 'Thấp',
+            'medium': 'Trung bình',
+            'high': 'Cao',
+            'very_high': 'Rất cao'
+        };
+        return labels[level] || level;
+    }
+    
+    function getRiskBadgeColor(level) {
+        const colors = {
+            'low': 'bg-success',
+            'medium': 'bg-warning',
+            'high': 'bg-danger',
+            'very_high': 'bg-danger'
+        };
+        return colors[level] || 'bg-secondary';
+    }
+    
+    function formatActionText(action) {
+        const actions = {
+            'CLOSE': 'ĐÓNG',
+            'PARTIAL_CLOSE': 'ĐÓNG MỘT PHẦN',
+            'MOVE_SL': 'ĐIỀU CHỈNH SL',
+            'HOLD': 'GIỮ',
+            'WATCH': 'THEO DÕI',
+            'CONSIDER_CLOSE': 'CÂN NHẮC ĐÓNG'
+        };
+        return actions[action] || action;
+    }
+    
+    function getBadgeColorForAction(action) {
+        const colors = {
+            'CLOSE': 'bg-danger',
+            'PARTIAL_CLOSE': 'bg-warning',
+            'MOVE_SL': 'bg-info',
+            'HOLD': 'bg-success',
+            'WATCH': 'bg-secondary',
+            'CONSIDER_CLOSE': 'bg-warning'
+        };
+        return colors[action] || 'bg-secondary';
+    }
+    
+    function formatTrend(trend) {
+        const trends = {
+            'uptrend': 'Tăng',
+            'downtrend': 'Giảm',
+            'ranging': 'Dao động',
+            'neutral': 'Trung lập'
+        };
+        return trends[trend] || trend;
+    }
+    
+    function getTrendClass(trend) {
+        const classes = {
+            'uptrend': 'text-success',
+            'downtrend': 'text-danger',
+            'ranging': 'text-warning',
+            'neutral': 'text-muted'
+        };
+        return classes[trend] || '';
+    }
+    
+    function formatVolatility(volatility) {
+        const labels = {
+            'low': 'Thấp',
+            'medium': 'Trung bình',
+            'high': 'Cao',
+            'very_high': 'Rất cao'
+        };
+        return labels[volatility] || volatility;
+    }
+    
+    function formatMomentum(momentum) {
+        const labels = {
+            'positive': 'Tích cực',
+            'negative': 'Tiêu cực',
+            'neutral': 'Trung lập'
+        };
+        return labels[momentum] || momentum;
+    }
+    
+    function getMomentumClass(momentum) {
+        const classes = {
+            'positive': 'text-success',
+            'negative': 'text-danger',
+            'neutral': 'text-muted'
+        };
+        return classes[momentum] || '';
+    }
+    
+    function showToast(title, message, type) {
+        const toast = `
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                <div class="toast-header ${type === 'error' ? 'bg-danger text-white' : type === 'success' ? 'bg-success text-white' : ''}">
+                    <strong class="me-auto">${title}</strong>
+                    <small class="text-white">Vừa xong</small>
+                    <button type="button" class="btn-close ${type === 'error' || type === 'success' ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        const toastContainer = $('#toastContainer');
+        if (toastContainer.length === 0) {
+            $('body').append('<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"></div>');
+        }
+        
+        $('#toastContainer').append(toast);
+        const toastEl = $('#toastContainer .toast').last();
+        const bsToast = new bootstrap.Toast(toastEl);
+        bsToast.show();
+        
+        // Tự động xóa toast sau khi đóng
+        toastEl.on('hidden.bs.toast', function() {
+            $(this).remove();
+        });
+    }
+</script>
+{% endblock %}
