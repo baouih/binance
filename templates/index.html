@@ -457,7 +457,20 @@
             console.log(`[DEBUG] ${action}:`, data);
         }
 
-        // Add these functions at the beginning of the script section
+        // Add these functions to handle button states
+        function updateButtonStates(isConnected) {
+            const controlButton = document.getElementById('controlButton');
+            const saveConfigBtn = document.getElementById('saveConfigBtn');
+
+            controlButton.disabled = !isConnected;
+            controlButton.title = isConnected ? '' : 'Chưa kết nối tới máy chủ';
+
+            if (!isConnected) {
+                controlButton.classList.remove('btn-success', 'btn-danger');
+                controlButton.classList.add('btn-secondary');
+            }
+        }
+
         function setButtonLoading(button, isLoading) {
             debugLog('setButtonLoading', {button: button.id, isLoading});
             const spinner = button.querySelector('.spinner-border');
@@ -478,11 +491,12 @@
             }
         }
 
+
         async function handleControlButtonClick(button) {
             try {
                 debugLog('handleControlButtonClick', 'start');
-                if (button.disabled) {
-                    debugLog('handleControlButtonClick', 'button disabled');
+                if (button.disabled || !isConnected) {
+                    showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
                     return;
                 }
 
@@ -518,7 +532,6 @@
             try {
                 debugLog('handleSaveConfig', 'start');
                 if (button.disabled) {
-                    debugLog('handleSaveConfig', 'button disabled');
                     return;
                 }
 
@@ -553,6 +566,10 @@
 
                 if (data.success) {
                     showToast('Đã lưu cấu hình thành công', 'success');
+                    // Update connection status and button states after successful save
+                    isConnected = data.config.is_connected;
+                    updateButtonStates(isConnected);
+                    updateConnectionStatus(isConnected);
                 } else {
                     showToast(`Lỗi: ${data.message}`, 'error');
                 }
@@ -594,6 +611,7 @@
             console.log('Connected to server');
             isConnected = true;
             updateConnectionStatus(true);
+            updateButtonStates(true);
 
             addMessage({
                 content: 'Đã kết nối tới máy chủ',
@@ -606,16 +624,13 @@
             console.log('Disconnected from server');
             isConnected = false;
             updateConnectionStatus(false);
+            updateButtonStates(false);
 
             addMessage({
                 content: 'Mất kết nối tới máy chủ',
                 level: 'error',
                 timestamp: new Date().toLocaleString()
             });
-
-            // Disable buttons
-            controlButton.disabled = true;
-            saveConfigBtn.disabled = true;
         });
 
         socket.on('reconnect', () => {
@@ -736,7 +751,6 @@
                 <p class="mb-0"><strong>Target lợi nhuận:</strong> ${dailyTarget}% mỗi ngày</p>
             `;
         });
-
 
         // Toast notification function
         function showToast(message, type = 'success') {
