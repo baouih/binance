@@ -891,13 +891,32 @@ def update_market_data():
     # Thỉnh thoảng tạo quyết định giao dịch mới
     # Chỉ demo, trong thực tế sẽ dựa trên logic phân tích thực của bot
     if random.random() < 0.2:  # 20% khả năng
-        coin = random.choice(['BTC', 'ETH', 'SOL', 'BNB'])
+        # Chỉ chọn các coin có dữ liệu giá thực
+        available_coins = []
+        if market_data.get('btc_price', 0) > 0:
+            available_coins.append('BTC')
+        if market_data.get('eth_price', 0) > 0:
+            available_coins.append('ETH')
+        if market_data.get('sol_price', 0) > 0:
+            available_coins.append('SOL')
+        
+        # Nếu không có coin nào có giá thực, thêm BNB với giá mặc định
+        if not available_coins:
+            available_coins = ['BNB']
+        
+        coin = random.choice(available_coins)
         action = market_data['signals'][coin]['type']
         
         # Tạo một quyết định giao dịch và báo cáo
         if action in ['BUY', 'SELL']:
+            # Lấy giá thực từ market_data
             price = market_data.get(f'{coin.lower()}_price', 0)
-            if coin.lower() == 'bnb':
+            
+            # Hiển thị giá đang sử dụng trong log
+            logger.info(f"Tạo tín hiệu giao dịch {action} cho {coin} với giá: {price}")
+            
+            # Sử dụng giá mặc định cho BNB nếu không có hoặc giá = 0
+            if coin.lower() == 'bnb' or price <= 0:
                 price = 388.75
                 
             # Tính toán stop loss và take profit
