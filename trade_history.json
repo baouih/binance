@@ -1,1 +1,2 @@
 {"timestamp": "2025-03-03T03:14:08.773588", "symbol": "BTCUSDT", "action": "BUY", "price": 84153.3, "quantity": 0.01, "mode": "testnet", "success": false, "error": "L\u1ed7i k\u1ebft n\u1ed1i: name 'BinanceAPI' is not defined", "order_id": null}
+{"timestamp": "2025-03-03T03:19:25.466174", "symbol": "ETHUSDT", "action": "SELL", "price": 2157.7, "quantity": 0.2, "mode": "testnet", "success": true, "error": null, "order_id": 1503381753}

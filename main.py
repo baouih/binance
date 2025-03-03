@@ -971,6 +971,8 @@ def update_market_data():
                 try:
                     # Tạo lệnh giao dịch thực tế thông qua Binance API
                     with app.app_context():
+                        # Sử dụng binance_api để tránh lỗi "BinanceAPI is not defined"
+                        from binance_api import BinanceAPI
                         binance_client = BinanceAPI()
                         
                         # Kiểm tra đủ điều kiện tạo lệnh
@@ -1209,11 +1211,29 @@ def start_background_tasks():
                 
             # Xác định thông tin tài khoản
             try:
-                account_balance = float(account_data.get('totalWalletBalance', 0))
-                # Nếu số dư từ API là 0 hoặc không hợp lệ, gán số dư mặc định là 10,000 USDT cho môi trường testnet/demo
-                if account_balance <= 0 and api_mode in ['testnet', 'demo']:
-                    logger.warning("Số dư từ API không hợp lệ, sử dụng số dư mặc định cho môi trường testnet/demo")
+                # Xử lý dữ liệu tài khoản
+                if api_mode == 'testnet':
+                    # Nếu là môi trường testnet, truy cập trực tiếp vào API để lấy số dư Futures
+                    try:
+                        from binance_api import BinanceAPI
+                        api_client = BinanceAPI()
+                        futures_account = api_client.get_futures_account()
+                        if futures_account and 'totalWalletBalance' in futures_account:
+                            account_balance = float(futures_account['totalWalletBalance'])
+                            logger.info(f"Đã lấy số dư thực tế từ API Binance Testnet: {account_balance} USDT")
+                        else:
+                            account_balance = 10000.0
+                            logger.warning("Không thể lấy số dư từ API Binance Testnet, sử dụng giá trị mặc định")
+                    except Exception as api_error:
+                        logger.error(f"Lỗi khi truy cập API Binance Testnet: {str(api_error)}")
+                        account_balance = 10000.0
+                elif api_mode == 'demo':
+                    # Chế độ demo luôn sử dụng 10,000 USDT
                     account_balance = 10000.0
+                    logger.info("Chế độ Demo: Sử dụng số dư mặc định 10,000 USDT")
+                else:
+                    # Chế độ live - lấy số dư thực từ dữ liệu tài khoản
+                    account_balance = float(account_data.get('totalWalletBalance', 0))
             except (ValueError, TypeError) as e:
                 logger.error(f"Lỗi khi xử lý số dư tài khoản: {str(e)}")
                 account_balance = 10000.0 if api_mode in ['testnet', 'demo'] else 0.0
