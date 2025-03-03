@@ -1,0 +1,300 @@
+"""
+Ứng dụng Flask chính cho BinanceTrader Bot
+"""
+import os
+import logging
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask_socketio import SocketIO
+import threading
+import time
+import schedule
+import json
+import glob
+
+# Thêm module Telegram Notifier
+from telegram_notifier import TelegramNotifier
+
+# Thiết lập logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('main')
+
+# Khởi tạo ứng dụng Flask
+app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "binance_trader_bot_secret")
+
+# Khởi tạo SocketIO với CORS và async mode
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+# Đường dẫn đến các file cấu hình
+ACCOUNT_CONFIG_PATH = 'account_config.json'
+BOTS_CONFIG_PATH = 'bots_config.json'
+
+# Biến toàn cục cho trạng thái bot
+bot_status = {
+    'status': 'stopped',
+    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'mode': 'demo',
+}
+
+# Khởi tạo Telegram Notifier
+telegram_notifier = TelegramNotifier()
+
+# Placeholder cho dữ liệu thị trường khi chưa cập nhật từ API
+EMPTY_MARKET_DATA = {
+    # Dữ liệu thị trường trống, sẽ được cập nhật từ API thực
+    'btc_price': 0,
+    'btc_change_24h': 0,
+    'eth_price': 0,
+    'eth_change_24h': 0,
+    'sol_price': 0,
+    'sol_change_24h': 0,
+    
+    # Các dữ liệu khác sẽ được điền từ API thực
+    'sentiment': {
+        'value': 50,
+        'state': 'warning',
+        'text': 'Trung tính'
+    },
+    
+    # Placeholder cho chỉ báo kỹ thuật (phù hợp với template)
+    'indicators': {
+        'rsi': 50,
+        'macd': 0,
+        'bb_width': 2.0,
+        'trend': 'neutral',
+        'trend_strength': 0.5,
+        'BTC': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
+        },
+        'ETH': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
+        },
+        'SOL': {
+            'rsi': 50,
+            'macd': 0,
+            'ma_short': 0,
+            'ma_long': 0,
+            'trend': 'neutral'
+        }
+    },
+    
+    # Placeholder cho chế độ thị trường
+    'market_regime': {
+        'BTC': 'neutral',
+        'ETH': 'neutral',
+        'SOL': 'neutral',
+        'BNB': 'neutral'
+    },
+    
+    # Placeholder cho dự báo thị trường
+    'forecast': {
+        'text': 'Dự báo tăng nhẹ theo xu hướng hiện tại với mức kháng cự tiếp theo ở $85,500'
+    },
+    
+    # Placeholder cho khuyến nghị
+    'recommendation': {
+        'action': 'hold',
+        'text': 'Thị trường đang trong giai đoạn tích lũy, nên theo dõi và chờ đợi tín hiệu mạnh hơn.'
+    },
+    
+    # Placeholder cho tín hiệu
+    'signals': {
+        'BTC': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        },
+        'ETH': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        },
+        'SOL': {
+            'type': 'HOLD',
+            'strength': 'neutral',
+            'time': '',
+            'price': 0,
+            'strategy': 'Waiting for data'
+        }
+    },
+    
+    # Placeholder cho danh sách các cặp giao dịch
+    'pairs': []
+}
+
+# Đăng ký các blueprints
+from config_route import register_blueprint as register_config_bp
+from bot_api_routes import register_blueprint as register_bot_api_bp
+
+register_config_bp(app)
+logger.info("Đã đăng ký blueprint cho cấu hình")
+
+register_bot_api_bp(app)
+logger.info("Đã đăng ký blueprint cho API Bot")
+
+@app.context_processor
+def inject_global_vars():
+    """Thêm các biến toàn cục vào tất cả các templates"""
+    return {
+        'bot_status': bot_status,
+        'current_year': datetime.now().year
+    }
+
+@app.route('/')
+def index():
+    """Trang chủ Dashboard"""
+    try:
+        # Lấy dữ liệu tài khoản và thị trường để hiển thị trên dashboard
+        account_data = get_account().json
+        market_data = get_market_data()
+        app.logger.info(f"Dashboard loaded successfully: BTC price = ${market_data['btc_price']}")
+        
+        return render_template('index.html', account_data=account_data, market_data=market_data)
+    except Exception as e:
+        app.logger.error(f"Error loading dashboard: {str(e)}")
+        # Fallback to default empty data
+        return render_template('index.html', 
+                              account_data={'balance': 0, 'equity': 0, 'available': 0, 'pnl': 0, 'mode': 'demo'},
+                              market_data=EMPTY_MARKET_DATA.copy())
+
+@app.route('/strategies')
+def strategies():
+    """Trang quản lý chiến lược"""
+    return render_template('strategies.html')
+
+@app.route('/backtest')
+def backtest():
+    """Trang backtest"""
+    return render_template('backtest.html')
+
+@app.route('/trades')
+def trades():
+    """Trang lịch sử giao dịch"""
+    try:
+        # Get account data for trade history
+        account_info = get_account().json
+        return render_template('trades.html', account_data=account_info)
+    except Exception as e:
+        app.logger.error(f"Error loading trades page: {str(e)}")
+        # Return with empty data
+        return render_template('trades.html', account_data={})
+
+@app.route('/market')
+def market():
+    """Trang phân tích thị trường"""
+    try:
+        market_data = get_market_data()
+        app.logger.info(f"Market data loaded successfully: BTC price = ${market_data['btc_price']}")
+        return render_template('market.html', market_data=market_data)
+    except Exception as e:
+        app.logger.error(f"Error loading market page: {str(e)}")
+        # Fallback to default data if API fails
+        return render_template('market.html', market_data=EMPTY_MARKET_DATA.copy())
+
+@app.route('/position')
+def position():
+    """Trang quản lý vị thế"""
+    try:
+        # Get account data for positions
+        account_info = get_account().json
+        return render_template('position.html', account_data=account_info)
+    except Exception as e:
+        app.logger.error(f"Error loading position page: {str(e)}")
+        # Return with empty data
+        return render_template('position.html', account_data={})
+
+@app.route('/positions')
+def positions():
+    """Trang quản lý tất cả vị thế"""
+    return render_template('positions.html')
+
+@app.route('/settings')
+def settings():
+    """Trang cài đặt bot"""
+    try:
+        # Get account data for settings page
+        account_info = get_account().json
+        return render_template('settings.html', account_data=account_info)
+    except Exception as e:
+        app.logger.error(f"Error loading settings page: {str(e)}")
+        # Return with empty data
+        return render_template('settings.html', account_data={})
+
+@app.route('/bots')
+def bots():
+    """Trang quản lý bot"""
+    return render_template('bots.html')
+
+@app.route('/account')
+def account():
+    """Trang cài đặt tài khoản và API"""
+    return render_template('account.html')
+
+@app.route('/trading_report')
+def trading_report():
+    """Trang báo cáo giao dịch"""
+    return render_template('trading_report.html')
+
+@app.route('/cli')
+def cli():
+    """Trang giao diện dòng lệnh"""
+    return render_template('cli.html')
+
+@app.route('/bot-monitor')
+def bot_monitor():
+    """Trang giám sát hoạt động bot"""
+    return render_template('bot_monitor.html')
+
+@app.route('/change_language', methods=['POST'])
+def change_language():
+    """Thay đổi ngôn ngữ"""
+    language = request.form.get('language', 'vi')
+    session['language'] = language
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/api/test_telegram', methods=['GET'])
+def test_telegram():
+    """Kiểm tra kết nối Telegram"""
+    try:
+        # Gửi tin nhắn test đến Telegram
+        result = telegram_notifier.send_message(
+            message=f"<b>Kiểm tra kết nối</b>\n\nĐây là tin nhắn kiểm tra kết nối từ BinanceTrader Bot. Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            category="system"
+        )
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Kết nối Telegram thành công!'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Không thể gửi tin nhắn đến Telegram. Vui lòng kiểm tra cấu hình.'
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi: {str(e)}'
+        })
+
+@app.route('/api/market')
+def get_market():
+    """Lấy dữ liệu thị trường"""
+    market_data = get_market_data()
+    return jsonify(market_data)
+
