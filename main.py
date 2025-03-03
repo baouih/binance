@@ -25,7 +25,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "binance_trader_bot_secret")
 
 # Khởi tạo SocketIO với CORS và async mode
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', ping_timeout=60, ping_interval=25)
 
 # Đường dẫn đến các file cấu hình
 ACCOUNT_CONFIG_PATH = 'account_config.json'

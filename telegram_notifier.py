@@ -30,6 +30,25 @@ class TelegramNotifier:
         self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM")
         self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "1834332146")
         self.api_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+    
+    def set_token(self, token: str):
+        """
+        Cập nhật token
+        
+        Args:
+            token (str): Token mới
+        """
+        self.token = token
+        self.api_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+    
+    def set_chat_id(self, chat_id: str):
+        """
+        Cập nhật chat_id
+        
+        Args:
+            chat_id (str): Chat ID mới
+        """
+        self.chat_id = chat_id
         
         # Màu cho các loại thông báo
         self.colors = {
