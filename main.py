@@ -805,8 +805,9 @@ def update_market_data():
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
-    account_data = get_account().json
-    socketio.emit('account_update', account_data)
+    with app.app_context():
+        account_data = get_account().json
+        socketio.emit('account_update', account_data)
     
     # Cập nhật vị thế
     if account_data.get('positions'):
