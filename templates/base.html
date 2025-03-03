@@ -61,6 +61,38 @@
         </div>
     </footer>
     
+    <!-- Mobile Navigation Bar (Only visible on small screens) -->
+    <div class="mobile-trading-menu fixed-bottom d-md-none">
+        <div class="container-fluid">
+            <div class="row text-center">
+                <div class="col">
+                    <a href="/" class="mobile-nav-item text-decoration-none text-light" id="mobile-home">
+                        <i class="fas fa-home"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/market" class="mobile-nav-item text-decoration-none text-light" id="mobile-market">
+                        <i class="fas fa-globe-asia"></i>
+                        <span>Thị trường</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/position" class="mobile-nav-item text-decoration-none text-light" id="mobile-position">
+                        <i class="fas fa-wallet"></i>
+                        <span>Vị thế</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/settings" class="mobile-nav-item text-decoration-none text-light" id="mobile-settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài đặt</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast messages -->
     <div class="toast-container">
         <!-- Success toast -->
@@ -116,9 +148,23 @@
                 '/cli': 'nav-cli'
             };
             
+            // Highlight desktop nav
             const navId = navItems[path];
             if (navId) {
                 document.getElementById(navId)?.classList.add('active');
+            }
+            
+            // Highlight mobile nav
+            const mobileNavItems = {
+                '/': 'mobile-home',
+                '/market': 'mobile-market',
+                '/position': 'mobile-position',
+                '/settings': 'mobile-settings'
+            };
+            
+            const mobileNavId = mobileNavItems[path];
+            if (mobileNavId) {
+                document.getElementById(mobileNavId)?.classList.add('active');
             }
         });
     </script>

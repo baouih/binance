@@ -6,16 +6,36 @@
 <div class="container">
     <h2 class="mb-4">Cài đặt</h2>
     
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card bg-dark border-secondary h-100">
+    <!-- Tab navigation for mobile -->
+    <ul class="nav nav-tabs d-md-none mb-4" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="api-tab" data-bs-toggle="tab" data-bs-target="#api-settings" type="button" role="tab" aria-controls="api-settings" aria-selected="true">
+                <i class="fas fa-key me-1"></i> API
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="notification-tab" data-bs-toggle="tab" data-bs-target="#notification-settings" type="button" role="tab" aria-controls="notification-settings" aria-selected="false">
+                <i class="fas fa-bell me-1"></i> Thông báo
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-settings" type="button" role="tab" aria-controls="security-settings" aria-selected="false">
+                <i class="fas fa-shield-alt me-1"></i> Bảo mật
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab content for mobile -->
+    <div class="tab-content d-md-none mb-4" id="settingsTabContent">
+        <div class="tab-pane fade show active" id="api-settings" role="tabpanel" aria-labelledby="api-tab">
+            <div class="card bg-dark border-secondary">
                 <div class="card-header bg-dark border-secondary">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-key me-2"></i> Cài đặt API
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form id="api-settings-form">
+                    <form id="api-settings-form-mobile">
                         <div class="mb-3">
                             <label class="form-label">Chế độ API</label>
                             <div class="form-check mb-2">
