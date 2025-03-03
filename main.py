@@ -50,14 +50,14 @@ EMPTY_MARKET_DATA = {
     'eth_change_24h': 0,
     'sol_price': 0,
     'sol_change_24h': 0,
-    
+
     # Các dữ liệu khác sẽ được điền từ API thực
     'sentiment': {
         'value': 50,
         'state': 'warning',
         'text': 'Trung tính'
     },
-    
+
     # Placeholder cho chỉ báo kỹ thuật (phù hợp với template)
     'indicators': {
         'rsi': 50,
@@ -87,7 +87,7 @@ EMPTY_MARKET_DATA = {
             'trend': 'neutral'
         }
     },
-    
+
     # Placeholder cho chế độ thị trường
     'market_regime': {
         'BTC': 'neutral',
@@ -95,18 +95,18 @@ EMPTY_MARKET_DATA = {
         'SOL': 'neutral',
         'BNB': 'neutral'
     },
-    
+
     # Placeholder cho dự báo thị trường
     'forecast': {
         'text': 'Dự báo tăng nhẹ theo xu hướng hiện tại với mức kháng cự tiếp theo ở $85,500'
     },
-    
+
     # Placeholder cho khuyến nghị
     'recommendation': {
         'action': 'hold',
         'text': 'Thị trường đang trong giai đoạn tích lũy, nên theo dõi và chờ đợi tín hiệu mạnh hơn.'
     },
-    
+
     # Placeholder cho tín hiệu
     'signals': {
         'BTC': {
@@ -131,7 +131,7 @@ EMPTY_MARKET_DATA = {
             'strategy': 'Waiting for data'
         }
     },
-    
+
     # Placeholder cho danh sách các cặp giao dịch
     'pairs': []
 }
@@ -166,12 +166,12 @@ def index():
         account_data = get_account().json
         market_data = get_market_data()
         app.logger.info(f"Dashboard loaded successfully: BTC price = ${market_data['btc_price']}")
-        
+
         return render_template('index.html', account_data=account_data, market_data=market_data)
     except Exception as e:
         app.logger.error(f"Error loading dashboard: {str(e)}")
         # Fallback to default empty data
-        return render_template('index.html', 
+        return render_template('index.html',
                               account_data={'balance': 0, 'equity': 0, 'available': 0, 'pnl': 0, 'mode': 'demo'},
                               market_data=EMPTY_MARKET_DATA.copy())
 
@@ -191,7 +191,7 @@ def trades():
     try:
         # Get account data for trade history
         account_info = get_account().json
-        
+
         # Thêm dữ liệu cho template
         trade_data = {
             'total_profit': 128.45,
@@ -223,16 +223,16 @@ def trades():
                 }
             ]
         }
-        
+
         return render_template('trades.html', account_data=account_info, **trade_data)
     except Exception as e:
         app.logger.error(f"Error loading trades page: {str(e)}")
         # Return with empty data but with required template variables
-        return render_template('trades.html', 
-                              account_data={}, 
-                              total_profit=0, 
-                              win_rate=0, 
-                              total_trades=0, 
+        return render_template('trades.html',
+                              account_data={},
+                              total_profit=0,
+                              win_rate=0,
+                              total_trades=0,
                               profit_factor=0,
                               trades=[])
 
@@ -245,12 +245,16 @@ def market():
         return render_template('market.html', market_data=market_data)
     except Exception as e:
         app.logger.error(f"Error loading market page: {str(e)}")
-        # Đảm bảo rằng EMPTY_MARKET_DATA có sẵn để sử dụng
+        # Đảm bảo rằng default_data có đầy đủ các trường cần thiết
         default_data = {
             'btc_price': 0.0,
             'eth_price': 0.0,
-            'btc_change': 0.0,
-            'eth_change': 0.0,
+            'btc_change_24h': 0.0,
+            'eth_change_24h': 0.0,
+            'sol_price': 0.0,
+            'sol_change_24h': 0.0,
+            'bnb_price': 0.0,
+            'bnb_change_24h': 0.0,
             'market_mood': 'neutral',
             'btc_volume': 0.0,
             'eth_volume': 0.0,
@@ -260,9 +264,29 @@ def market():
             'dominance': {
                 'BTC': 45.0,
                 'ETH': 18.0,
-                'Others': 37.0
+                'SOL': 5.0,
+                'BNB': 4.0,
+                'Others': 28.0
             },
-            'recent_trades': []
+            'recent_trades': [],
+            'market_regime': {
+                'BTC': 'neutral',
+                'ETH': 'neutral',
+                'SOL': 'neutral',
+                'BNB': 'neutral'
+            },
+            'sentiment': {
+                'value': 50,
+                'state': 'warning',
+                'text': 'Trung tính',
+                'description': 'Thị trường đang trong trạng thái cân bằng'
+            },
+            'signals': {
+                'BTC': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+                'ETH': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+                'SOL': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+                'BNB': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'}
+            }
         }
         return render_template('market.html', market_data=default_data)
 
@@ -336,7 +360,7 @@ def test_telegram():
             message=f"<b>Kiểm tra kết nối</b>\n\nĐây là tin nhắn kiểm tra kết nối từ BinanceTrader Bot. Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             category="system"
         )
-        
+
         if result:
             return jsonify({
                 'success': True,
@@ -359,167 +383,167 @@ def test_telegram():
 # def control_bot_general():
 #    """API endpoint để điều khiển bot (start/stop/restart) không cần chỉ định ID"""
 #    # Cập nhật file bot_status.json và trạng thái toàn cục
-    try:
-        # Kiểm tra dữ liệu từ request
-        data = request.json
-        logger.info(f"Nhận request điều khiển bot: {data}")
-        
-        if not data:
-            return jsonify({
-                'success': False,
-                'message': 'Không tìm thấy dữ liệu JSON trong request'
-            }), 400
-            
-        action = data.get('action', '')
-        logger.info(f"Thực hiện hành động điều khiển bot: {action}")
-        
-        if not action or action not in ['start', 'stop', 'restart']:
-            return jsonify({
-                'success': False,
-                'message': f'Hành động không hợp lệ: {action}'
-            }), 400
-        
-        # Đọc trạng thái hiện tại
-        bot_status = {}
-        try:
-            with open('bot_status.json', 'r', encoding='utf-8') as f:
-                bot_status = json.load(f)
-        except Exception as e:
-            logger.warning(f"Không thể đọc bot_status.json: {e}")
-            bot_status = {"running": False}
-            
-        # Xử lý các hành động
-        if action == 'start':
-            logger.info("Starting bot")
-            bot_status['running'] = True
-            bot_status['status'] = 'running'
-            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
-            # Ghi thời gian bắt đầu nếu chưa có
-            if 'start_time' not in bot_status:
-                bot_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                with open('bot_start_time.txt', 'w') as f:
-                    f.write(bot_status['start_time'])
-            
-            # Gửi thông báo qua Telegram
-            try:
-                telegram_notifier.send_message(
-                    message=f"<b>Bot đã được khởi động</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
-                )
-            except Exception as e:
-                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
-            
-            # Lưu trạng thái vào file
-            try:
-                with open('bot_status.json', 'w', encoding='utf-8') as f:
-                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
-            except Exception as e:
-                logger.error(f"Không thể lưu bot_status.json: {e}")
-            
-            return jsonify({
-                'success': True,
-                'message': 'Bot đã được khởi động thành công',
-                'status': 'running'
-            })
-            
-        elif action == 'stop':
-            logger.info("Stopping bot")
-            bot_status['running'] = False
-            bot_status['status'] = 'stopped'
-            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
-            # Gửi thông báo qua Telegram
-            try:
-                telegram_notifier.send_message(
-                    message=f"<b>Bot đã được dừng lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
-                )
-            except Exception as e:
-                app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
-            
-            return jsonify({
-                'success': True,
-                'message': 'Bot đã được dừng lại thành công',
-                'status': 'stopped'
-            })
-            
-        elif action == 'restart':
-            logger.info("Restarting bot")
-            bot_status['running'] = False # Đầu tiên dừng bot
-            bot_status['status'] = 'restarting'
-            
-            # Giả lập restart: Thay đổi trạng thái từ restarting -> running sau 2 giây
-            def set_running():
-                bot_status['status'] = 'running'
-                bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                logger.info("Bot is now running after restart")
-                
-            timer = threading.Timer(2.0, set_running)
-            timer.daemon = True
-            timer.start()
-            
-            # Gửi thông báo qua Telegram
-            try:
-                telegram_notifier.send_message(
-                    message=f"<b>Bot đang được khởi động lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
-                )
-            except Exception as e:
-                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
-                
-            # Sau 2 giây, bot sẽ khởi động lại
-            def start_bot_after_delay():
-                time.sleep(2)
-                # Cập nhật lại trạng thái của bot
-                try:
-                    with open('bot_status.json', 'r', encoding='utf-8') as f:
-                        current_status = json.load(f)
-                    
-                    current_status['running'] = True 
-                    current_status['status'] = 'running'
-                    current_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    
-                    with open('bot_status.json', 'w', encoding='utf-8') as f:
-                        json.dump(current_status, f, indent=4, ensure_ascii=False)
-                    
-                    logger.info("Bot đã khởi động lại thành công")
-                except Exception as e:
-                    logger.error(f"Không thể cập nhật trạng thái bot sau khi khởi động lại: {e}")
-            
-            # Lưu trạng thái restarting vào file
-            try:
-                with open('bot_status.json', 'w', encoding='utf-8') as f:
-                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
-            except Exception as e:
-                logger.error(f"Không thể lưu bot_status.json khi khởi động lại: {e}")
-            
-            # Chạy thread khởi động lại bot
-            restart_thread = threading.Thread(target=start_bot_after_delay)
-            restart_thread.daemon = True
-            restart_thread.start()
-                
-            return jsonify({
-                'success': True,
-                'message': 'Bot đang được khởi động lại',
-                'status': 'restarting'
-            })
-            
-        # Không xử lý lệnh delete trong phiên bản này
-        else:
-            # Lệnh không được hỗ trợ
-            return jsonify({
-                'success': False,
-                'message': 'Lệnh không được hỗ trợ'
-            }), 400
-    
-    except Exception as e:
-        app.logger.error(f"Lỗi khi điều khiển bot: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'Đã xảy ra lỗi: {str(e)}',
-            'error': str(e)
-        }), 500
+#    try:
+#        # Kiểm tra dữ liệu từ request
+#        data = request.json
+#        logger.info(f"Nhận request điều khiển bot: {data}")
+
+#        if not data:
+#            return jsonify({
+#                'success': False,
+#                'message': 'Không tìm thấy dữ liệu JSON trong request'
+#            }), 400
+
+#        action = data.get('action', '')
+#        logger.info(f"Thực hiện hành động điều khiển bot: {action}")
+
+#        if not action or action not in ['start', 'stop', 'restart']:
+#            return jsonify({
+#                'success': False,
+#                'message': f'Hành động không hợp lệ: {action}'
+#            }), 400
+
+#        # Đọc trạng thái hiện tại
+#        bot_status = {}
+#        try:
+#            with open('bot_status.json', 'r', encoding='utf-8') as f:
+#                bot_status = json.load(f)
+#        except Exception as e:
+#            logger.warning(f"Không thể đọc bot_status.json: {e}")
+#            bot_status = {"running": False}
+
+#        # Xử lý các hành động
+#        if action == 'start':
+#            logger.info("Starting bot")
+#            bot_status['running'] = True
+#            bot_status['status'] = 'running'
+#            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+#            # Ghi thời gian bắt đầu nếu chưa có
+#            if 'start_time' not in bot_status:
+#                bot_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#                with open('bot_start_time.txt', 'w') as f:
+#                    f.write(bot_status['start_time'])
+
+#            # Gửi thông báo qua Telegram
+#            try:
+#                telegram_notifier.send_message(
+#                    message=f"<b>Bot đã được khởi động</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+#                    category="system"
+#                )
+#            except Exception as e:
+#                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+
+#            # Lưu trạng thái vào file
+#            try:
+#                with open('bot_status.json', 'w', encoding='utf-8') as f:
+#                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
+#            except Exception as e:
+#                logger.error(f"Không thể lưu bot_status.json: {e}")
+
+#            return jsonify({
+#                'success': True,
+#                'message': 'Bot đã được khởi động thành công',
+#                'status': 'running'
+#            })
+
+#        elif action == 'stop':
+#            logger.info("Stopping bot")
+#            bot_status['running'] = False
+#            bot_status['status'] = 'stopped'
+#            bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+#            # Gửi thông báo qua Telegram
+#            try:
+#                telegram_notifier.send_message(
+#                    message=f"<b>Bot đã được dừng lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+#                    category="system"
+#                )
+#            except Exception as e:
+#                app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+
+#            return jsonify({
+#                'success': True,
+#                'message': 'Bot đã được dừng lại thành công',
+#                'status': 'stopped'
+#            })
+
+#        elif action == 'restart':
+#            logger.info("Restarting bot")
+#            bot_status['running'] = False # Đầu tiên dừng bot
+#            bot_status['status'] = 'restarting'
+
+#            # Giả lập restart: Thay đổi trạng thái từ restarting -> running sau 2 giây
+#            def set_running():
+#                bot_status['status'] = 'running'
+#                bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#                logger.info("Bot is now running after restart")
+
+#            timer = threading.Timer(2.0, set_running)
+#            timer.daemon = True
+#            timer.start()
+
+#            # Gửi thông báo qua Telegram
+#            try:
+#                telegram_notifier.send_message(
+#                    message=f"<b>Bot đang được khởi động lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+#                    category="system"
+#                )
+#            except Exception as e:
+#                logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
+
+#            # Sau 2 giây, bot sẽ khởi động lại
+#            def start_bot_after_delay():
+#                time.sleep(2)
+#                # Cập nhật lại trạng thái của bot
+#                try:
+#                    with open('bot_status.json', 'r', encoding='utf-8') as f:
+#                        current_status = json.load(f)
+
+#                    current_status['running'] = True
+#                    current_status['status'] = 'running'
+#                    current_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+#                    with open('bot_status.json', 'w', encoding='utf-8') as f:
+#                        json.dump(current_status, f, indent=4, ensure_ascii=False)
+
+#                    logger.info("Bot đã khởi động lại thành công")
+#                except Exception as e:
+#                    logger.error(f"Không thể cập nhật trạng thái bot sau khi khởi động lại: {e}")
+
+#            # Lưu trạng thái restarting vào file
+#            try:
+#                with open('bot_status.json', 'w', encoding='utf-8') as f:
+#                    json.dump(bot_status, f, indent=4, ensure_ascii=False)
+#            except Exception as e:
+#                logger.error(f"Không thể lưu bot_status.json khi khởi động lại: {e}")
+
+#            # Chạy thread khởi động lại bot
+#            restart_thread = threading.Thread(target=start_bot_after_delay)
+#            restart_thread.daemon = True
+#            restart_thread.start()
+
+#            return jsonify({
+#                'success': True,
+#                'message': 'Bot đang được khởi động lại',
+#                'status': 'restarting'
+#            })
+
+#        # Không xử lý lệnh delete trong phiên bản này
+#        else:
+#            # Lệnh không được hỗ trợ
+#            return jsonify({
+#                'success': False,
+#                'message': 'Lệnh không được hỗ trợ'
+#            }), 400
+
+#    except Exception as e:
+#        app.logger.error(f"Lỗi khi điều khiển bot: {str(e)}")
+#        return jsonify({
+#            'success': False,
+#            'message': f'Đã xảy ra lỗi: {str(e)}',
+#            'error': str(e)
+#        }), 500
 
 @app.route('/api/market')
 def get_market():
@@ -549,9 +573,9 @@ def get_market_data_api():
 def execute_cli_command():
     """Thực thi lệnh từ CLI web"""
     command = request.json.get('command', '')
-    
+
     # TODO: Xử lý lệnh CLI
-    
+
     result = f"Đã thực thi lệnh: {command}"
     return jsonify({'result': result})
 
@@ -559,7 +583,7 @@ def execute_cli_command():
 def get_bot_status():
     """Lấy trạng thái hiện tại của bot"""
     global bot_status
-    
+
     # Cập nhật chế độ API từ cấu hình
     try:
         with open(ACCOUNT_CONFIG_PATH, 'r') as f:
@@ -570,7 +594,7 @@ def get_bot_status():
         logger.debug(f"Đã cập nhật chế độ API: {bot_status['mode']}")
     except Exception as e:
         logger.error(f"Lỗi khi đọc cấu hình api_mode: {str(e)}")
-    
+
     # Kiểm tra xem có bot nào đang chạy không
     try:
         from bot_api_routes import load_bots_config
@@ -582,7 +606,7 @@ def get_bot_status():
             bot_status['last_updated'] = first_bot.get('last_update', bot_status['last_updated'])
     except Exception as e:
         logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
-    
+
     return jsonify(bot_status)
 
 @app.route('/api/account')
@@ -595,14 +619,14 @@ def get_account():
         api_mode = config.get('api_mode', 'testnet')
     except:
         api_mode = 'testnet'
-    
+
     # Khởi tạo Binance API client
     from binance_api import BinanceAPI
     api_key = os.environ.get("BINANCE_API_KEY", "")
     api_secret = os.environ.get("BINANCE_API_SECRET", "")
     use_testnet = api_mode != 'live'
     binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
-    
+
     # Mặc định cho dữ liệu tài khoản
     account_data = {
         'balance': 0.00,
@@ -615,13 +639,13 @@ def get_account():
         'leverage': 5,
         'positions': []
     }
-    
+
     try:
         # Lấy dữ liệu tài khoản thực từ API
         if api_mode in ['testnet', 'live']:
             # Lấy dữ liệu tài khoản Futures từ API
             futures_account = binance_client.get_futures_account()
-            
+
             if futures_account:
                 # Tìm USDT trong danh sách assets
                 for asset in futures_account.get('assets', []):
@@ -632,11 +656,11 @@ def get_account():
                         account_data['pnl'] = float(asset.get('unrealizedProfit', 0))
                         logger.info(f"Đã lấy số dư thực tế từ API Binance {api_mode.capitalize()}: {account_data['balance']} USDT")
                         break
-                
+
                 # Lấy thông tin vị thế
                 positions = binance_client.get_futures_position_risk()
                 active_positions = []
-                
+
                 for pos in positions:
                     # Chỉ lấy các vị thế đang mở (có số lượng khác 0)
                     position_amt = float(pos.get('positionAmt', 0))
@@ -646,7 +670,7 @@ def get_account():
                         mark_price = float(pos.get('markPrice', 0))
                         unrealized_pnl = float(pos.get('unRealizedProfit', 0))
                         leverage = int(pos.get('leverage', 1))
-                        
+
                         # Tính PnL phần trăm
                         pnl_percent = 0
                         try:
@@ -657,7 +681,7 @@ def get_account():
                                     pnl_percent = ((entry_price / mark_price) - 1) * 100 * leverage
                         except Exception as e:
                             logger.warning(f"Lỗi khi tính PnL phần trăm: {e}, sử dụng giá trị mặc định 0")
-                        
+
                         active_positions.append({
                             'id': f"pos_{symbol}_{int(time.time())}",
                             'symbol': symbol,
@@ -670,10 +694,10 @@ def get_account():
                             'liquidation_price': float(pos.get('liquidationPrice', 0)),
                             'leverage': leverage
                         })
-                
+
                 # Cập nhật danh sách vị thế vào dữ liệu tài khoản
                 account_data['positions'] = active_positions
-                
+
                 # Gửi thông báo khởi động với dữ liệu tài khoản
                 telegram_notifier.send_message(
                     message=f"<b>Hệ thống đã kết nối API Binance {api_mode.capitalize()}</b>\n\n"
@@ -685,7 +709,7 @@ def get_account():
     except Exception as e:
         logger.error(f"Lỗi khi lấy dữ liệu tài khoản từ Binance API: {str(e)}")
         # Nếu có lỗi, vẫn giữ giá trị mặc định
-    
+
     return jsonify(account_data)
 
 @app.route('/api/signals')
@@ -693,10 +717,10 @@ def get_signals():
     """Lấy tín hiệu giao dịch gần đây từ phân tích thị trường thực"""
     # Khởi tạo danh sách tín hiệu trống
     signals = []
-    
+
     # Lấy dữ liệu thị trường với chỉ báo
     market_data = get_market_data()
-    
+
     # Nếu market_data có chứa signals
     if 'signals' in market_data and isinstance(market_data['signals'], dict):
         # Chuyển đổi từ định dạng {'BTC': {...}, 'ETH': {...}} sang danh sách
@@ -707,7 +731,7 @@ def get_signals():
                 signal_type = signal_info.get('type', 'HOLD')
                 price = signal_info.get('price', 0)
                 time = signal_info.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                
+
                 signals.append({
                     'time': time,
                     'symbol': symbol_name,
@@ -716,7 +740,7 @@ def get_signals():
                     'price': str(price) if price else '0',
                     'strength': signal_info.get('strength', 'medium')
                 })
-    
+
     # Nếu không có tín hiệu từ phân tích thực tế, trả về thông báo
     if not signals:
         signals.append({
@@ -728,160 +752,166 @@ def get_signals():
             'strength': 'neutral',
             'message': 'Chưa có tín hiệu giao dịch mạnh'
         })
-    
+
     return jsonify(signals)
 
 def get_market_data():
     """Lấy dữ liệu thị trường thực từ Binance API"""
+    # Khởi tạo template dữ liệu thị trường với đầy đủ các trường
+    market_data = {
+        'btc_price': 0.0,
+        'eth_price': 0.0,
+        'sol_price': 0.0,
+        'bnb_price': 0.0,
+        'btc_change_24h': 0.0,
+        'eth_change_24h': 0.0,
+        'sol_change_24h': 0.0,
+        'bnb_change_24h': 0.0,
+        'indicators': {
+            'rsi': 50,
+            'macd': 0,
+            'bb_width': 2.0,
+            'trend': 'neutral',
+            'trend_strength': 0.5,
+            'BTC': {
+                'rsi': 50,
+                'macd': 0,
+                'ma_short': 0,
+                'ma_long': 0,
+                'trend': 'neutral'
+            },
+            'ETH': {
+                'rsi': 50,
+                'macd': 0,
+                'ma_short': 0,
+                'ma_long': 0,
+                'trend': 'neutral'
+            },
+            'SOL': {
+                'rsi': 50,
+                'macd': 0,
+                'ma_short': 0,
+                'ma_long': 0,
+                'trend': 'neutral'
+            }
+        },
+        'market_regime': {
+            'BTC': 'neutral',
+            'ETH': 'neutral',
+            'SOL': 'neutral',
+            'BNB': 'neutral'
+        },
+        'sentiment': {
+            'value': 50,
+            'state': 'warning',
+            'text': 'Trung tính',
+            'description': 'Thị trường đang trong trạng thái cân bằng'
+        },
+        'signals': {
+            'BTC': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+            'ETH': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+            'SOL': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'},
+            'BNB': {'type': 'HOLD', 'strength': 'neutral', 'time': '', 'price': 0, 'strategy': 'Waiting for data'}
+        },
+        'forecast': {
+            'text': 'Dự báo tăng nhẹ theo xu hướng hiện tại với mức kháng cự tiếp theo ở $85,500',
+            'confidence': 0.65,
+            'target_price': 85500,
+            'timeframe': '24h'
+        },
+        'recommendation': {
+            'action': 'hold',
+            'text': 'Thị trường đang trong giai đoạn tích lũy, nên theo dõi và chờ đợi tín hiệu mạnh hơn.',
+            'strength': 'medium',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+    }
+
     # Lấy cấu hình tài khoản
     try:
         with open(ACCOUNT_CONFIG_PATH, 'r') as f:
             config = json.load(f)
         api_mode = config.get('api_mode', 'demo')
-    except:
+    except Exception as e:
+        app.logger.error(f"Lỗi khi đọc cấu hình tài khoản: {str(e)}")
         api_mode = 'demo'
-    
+
     # Khởi tạo kết nối Binance API
-    from binance_api import BinanceAPI
-    # Tải khóa API từ biến môi trường
-    api_key = os.environ.get("BINANCE_API_KEY", "")
-    api_secret = os.environ.get("BINANCE_API_SECRET", "")
-    
-    # Xác định chế độ sử dụng testnet hay mainnet
-    use_testnet = api_mode != 'live'
-    
-    # Tạo đối tượng Binance API
-    binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
-    
-    # Khởi tạo market_data từ template trống, sẽ điền từ dữ liệu API thực
-    market_data = EMPTY_MARKET_DATA.copy()
-    
+    try:
+        from binance_api import BinanceAPI
+        api_key = os.environ.get("BINANCE_API_KEY", "")
+        api_secret = os.environ.get("BINANCE_API_SECRET", "")
+        use_testnet = api_mode != 'live'
+        binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
+    except Exception as e:
+        app.logger.error(f"Lỗi khi khởi tạo Binance API client: {str(e)}")
+        return market_data
+
+    # Lấy dữ liệu thị trường
     try:
         # Lấy giá BTC hiện tại
         btc_ticker = binance_client.get_symbol_ticker('BTCUSDT')
-        if 'price' in btc_ticker:
+        if btc_ticker and 'price' in btc_ticker:
             market_data['btc_price'] = float(btc_ticker['price'])
-        else:
-            market_data['btc_price'] = 0
-            
+            app.logger.debug(f"Đã lấy giá BTC: ${market_data['btc_price']}")
+
         # Lấy giá ETH hiện tại
         eth_ticker = binance_client.get_symbol_ticker('ETHUSDT')
-        if 'price' in eth_ticker:
+        if eth_ticker and 'price' in eth_ticker:
             market_data['eth_price'] = float(eth_ticker['price'])
-        else:
-            market_data['eth_price'] = 0
-            
+            app.logger.debug(f"Đã lấy giá ETH: ${market_data['eth_price']}")
+
         # Lấy giá SOL hiện tại
         sol_ticker = binance_client.get_symbol_ticker('SOLUSDT')
-        if 'price' in sol_ticker:
+        if sol_ticker and 'price' in sol_ticker:
             market_data['sol_price'] = float(sol_ticker['price'])
-        else:
-            market_data['sol_price'] = 0
-            
+            app.logger.debug(f"Đã lấy giá SOL: ${market_data['sol_price']}")
+
+        # Lấy giá BNB hiện tại
+        bnb_ticker = binance_client.get_symbol_ticker('BNBUSDT')
+        if bnb_ticker and 'price' in bnb_ticker:
+            market_data['bnb_price'] = float(bnb_ticker['price'])
+            app.logger.debug(f"Đã lấy giá BNB: ${market_data['bnb_price']}")
+
         # Lấy dữ liệu ticker 24h cho BTC
         btc_24h = binance_client.get_24h_ticker('BTCUSDT')
-        if isinstance(btc_24h, dict) and 'priceChangePercent' in btc_24h:
+        if btc_24h and isinstance(btc_24h, dict) and 'priceChangePercent' in btc_24h:
             market_data['btc_change_24h'] = float(btc_24h['priceChangePercent'])
-        else:
-            market_data['btc_change_24h'] = 0
-            
+            app.logger.debug(f"Đã lấy thay đổi giá BTC 24h: {market_data['btc_change_24h']}%")
+
         # Lấy dữ liệu ticker 24h cho ETH
         eth_24h = binance_client.get_24h_ticker('ETHUSDT')
-        if isinstance(eth_24h, dict) and 'priceChangePercent' in eth_24h:
+        if eth_24h and isinstance(eth_24h, dict) and 'priceChangePercent' in eth_24h:
             market_data['eth_change_24h'] = float(eth_24h['priceChangePercent'])
-        else:
-            market_data['eth_change_24h'] = 0
-            
+            app.logger.debug(f"Đã lấy thay đổi giá ETH 24h: {market_data['eth_change_24h']}%")
+
         # Lấy dữ liệu ticker 24h cho SOL
         sol_24h = binance_client.get_24h_ticker('SOLUSDT')
-        if isinstance(sol_24h, dict) and 'priceChangePercent' in sol_24h:
+        if sol_24h and isinstance(sol_24h, dict) and 'priceChangePercent' in sol_24h:
             market_data['sol_change_24h'] = float(sol_24h['priceChangePercent'])
-        else:
-            market_data['sol_change_24h'] = 0
-            
-        # Tạo danh sách các cặp giao dịch từ dữ liệu thực
-        market_data['pairs'] = [
-            {
-                'symbol': 'BTCUSDT',
-                'price': market_data['btc_price'],
-                'change': market_data['btc_change_24h'],
-                'volume': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 0
-            },
-            {
-                'symbol': 'ETHUSDT',
-                'price': market_data['eth_price'],
-                'change': market_data['eth_change_24h'],
-                'volume': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 0
-            },
-            {
-                'symbol': 'SOLUSDT',
-                'price': market_data['sol_price'],
-                'change': market_data['sol_change_24h'],
-                'volume': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 0
-            }
-        ]
-        
-        # Thêm chế độ thị trường và dữ liệu khác
-        market_data['market_regime'] = {
-            'BTC': 'neutral',
-            'ETH': 'neutral',
-            'SOL': 'neutral',
-            'BNB': 'neutral'
-        }
-        
-        # Thêm sentiment cho chỉ số sợ hãi/tham lam
-        # Trong thực tế, điều này nên được tính toán dựa trên dữ liệu phân tích
-        market_data['sentiment'] = {
-            'value': 65,  # 0-100
-            'state': 'warning',  # danger, warning, success tương ứng với sợ hãi, trung lập, tham lam
-            'text': 'Tham lam nhẹ'
-        }
-        
-        # Thêm các thông tin khối lượng và xu hướng giao dịch
-        market_data['volume_24h'] = {
-            'BTC': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 12345.67,
-            'ETH': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 45678.90,
-            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 987654.32
-        }
-        
-        # Cập nhật thông tin thị trường hiện tại
-        market_data['market_summary'] = {
-            'total_volume_24h': 15234567.89,
-            'gainers_count': 12,
-            'losers_count': 8,
-            'stable_count': 5
-        }
-        
-        # Thêm thông tin các mức hỗ trợ/kháng cự
-        market_data['btc_levels'] = {
-            'support': [
-                {'price': market_data['btc_price'] * 0.97, 'strength': 'strong'},
-                {'price': market_data['btc_price'] * 0.95, 'strength': 'medium'}
-            ],
-            'resistance': [
-                {'price': market_data['btc_price'] * 1.03, 'strength': 'medium'},
-                {'price': market_data['btc_price'] * 1.05, 'strength': 'strong'}
-            ]
-        }
-            
-        logger.info(f"Đã lấy dữ liệu thị trường thực từ Binance API: BTC=${market_data['btc_price']}")
+            app.logger.debug(f"Đã lấy thay đổi giá SOL 24h: {market_data['sol_change_24h']}%")
+
+        # Lấy dữ liệu ticker 24h cho BNB
+        bnb_24h = binance_client.get_24h_ticker('BNBUSDT')
+        if bnb_24h and isinstance(bnb_24h, dict) and 'priceChangePercent' in bnb_24h:
+            market_data['bnb_change_24h'] = float(bnb_24h['priceChangePercent'])
+            app.logger.debug(f"Đã lấy thay đổi giá BNB 24h: {market_data['bnb_change_24h']}%")
+
+        # Cập nhật dự báo dựa trên dữ liệu thực
+        if market_data['btc_price'] > 0:  # Chỉ cập nhật nếu có dữ liệu giá hợp lệ
+            if market_data['btc_change_24h'] > 0:
+                market_data['forecast']['text'] = f"Dự báo tiếp tục tăng với mức kháng cự tiếp theo ở ${market_data['btc_price'] * 1.05:.0f}"
+                market_data['forecast']['target_price'] = market_data['btc_price'] * 1.05
+            else:
+                market_data['forecast']['text'] = f"Dự báo có thể điều chỉnh với mức hỗ trợ gần nhất ở ${market_data['btc_price'] * 0.95:.0f}"
+                market_data['forecast']['target_price'] = market_data['btc_price'] * 0.95
+
+        app.logger.info(f"Đã lấy dữ liệu thị trường thực từ Binance API: BTC=${market_data['btc_price']}")
+
     except Exception as e:
-        logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
-        # Sử dụng dữ liệu trống nếu không lấy được dữ liệu thực
-        market_data = EMPTY_MARKET_DATA.copy()
-    
-    # Cập nhật danh sách cặp giao dịch
-    for pair in market_data['pairs']:
-        if pair['symbol'] == 'BTCUSDT':
-            pair['price'] = market_data['btc_price']
-            pair['change'] = market_data['btc_change_24h']
-        elif pair['symbol'] == 'ETHUSDT':
-            pair['price'] = market_data['eth_price']
-            pair['change'] = market_data['eth_change_24h']
-        elif pair['symbol'] == 'SOLUSDT':
-            pair['price'] = market_data['sol_price']
-            pair['change'] = market_data['sol_change_24h']
-    
+        app.logger.error(f"Lỗi khi lấy dữ liệu thị trường: {str(e)}")
+        app.logger.error(f"Stack trace: ", exc_info=True)
+
     return market_data
 
 def update_market_data():
@@ -889,26 +919,26 @@ def update_market_data():
     try:
         # Khởi tạo biến market_data với phạm vi toàn cục
         global market_data
-        
+
         # Khởi tạo market_data nếu chưa tồn tại
         if 'market_data' not in globals():
             market_data = EMPTY_MARKET_DATA.copy()
-        
+
         # Lấy dữ liệu thị trường mới
         new_market_data = get_market_data()
-        
+
         # Cập nhật market_data với dữ liệu mới
         market_data.update(new_market_data)
-        
+
         # Phát sự kiện cập nhật dữ liệu
         socketio.emit('market_update', market_data)
-        
+
         logger.info(f"Đã cập nhật dữ liệu thị trường. BTC=${market_data.get('btc_price', 0):.2f}")
         return True
     except Exception as e:
         logger.error(f"Lỗi khi cập nhật dữ liệu thị trường: {str(e)}")
         return False
-    
+
     # Thêm log hoạt động phân tích thị trường
     log_data = {
         'timestamp': datetime.now().isoformat(),
@@ -921,10 +951,10 @@ def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
     # Lấy dữ liệu tài khoản mới (account_data là response từ API)
     account_data = get_account().json
-    
+
     # Phát sự kiện cập nhật dữ liệu
     socketio.emit('account_update', account_data)
-    
+
     logger.debug(f"Đã cập nhật dữ liệu tài khoản. Balance={account_data.get('balance', 0):.2f} USDT")
 
 # Schedule cho các tác vụ định kỳ
@@ -935,13 +965,13 @@ def start_background_tasks():
             schedule.run_pending()
             # Thời gian ngủ ngắn để không tốn nhiều CPU
             time.sleep(1)
-    
+
     # Đặt lịch cập nhật dữ liệu thị trường mỗi 5 giây
     schedule.every(5).seconds.do(update_market_data)
-    
+
     # Đặt lịch cập nhật dữ liệu tài khoản mỗi 30 giây
     schedule.every(30).seconds.do(update_account_data)
-    
+
     # Tạo và khởi động thread cho tác vụ định kỳ
     thread = threading.Thread(target=run_schedule)
     thread.daemon = True  # Kết thúc khi chương trình chính kết thúc
@@ -957,7 +987,7 @@ def close_position():
             'success': False,
             'message': 'Không tìm thấy position_id trong request'
         }), 400
-    
+
     # TODO: Thực hiện đóng vị thế trên Binance API (testnet)
     try:
         # Giả lập đóng vị thế thành công
@@ -976,10 +1006,10 @@ def close_position():
 def get_bot_logs():
     """Lấy nhật ký hoạt động của bot"""
     bot_id = request.args.get('bot_id')
-    
+
     # Giới hạn số lượng log
     limit = int(request.args.get('limit', 50))
-    
+
     # Dữ liệu mẫu cho logs
     current_time = datetime.now()
     logs = [
@@ -1009,7 +1039,7 @@ def get_bot_logs():
             'message': 'Phân tích thị trường ETH: Xu hướng giảm, MACD chuyển sang tiêu cực'
         }
     ]
-    
+
     return jsonify({
         'success': True,
         'logs': logs[:limit]
@@ -1019,8 +1049,8 @@ def get_bot_logs():
 if __name__ == '__main__':
     # Khởi động tác vụ nền
     start_background_tasks()
-    
+
     logger.info("Background tasks started.")
-    
+
     # Sử dụng phương thức truyền thống để khởi động Flask
     app.run(host='0.0.0.0', port=5000)
