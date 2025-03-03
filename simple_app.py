@@ -84,6 +84,20 @@ telegram_config = {
     'min_interval': 5  # Khoảng thời gian tối thiểu giữa các tin nhắn (giây)
 }
 
+# Danh sách các đồng tiền uy tín, thanh khoản cao
+top_crypto_list = [
+    {'symbol': 'BTCUSDT', 'name': 'Bitcoin', 'enabled': True, 'liquidity_rank': 1},
+    {'symbol': 'ETHUSDT', 'name': 'Ethereum', 'enabled': True, 'liquidity_rank': 2},
+    {'symbol': 'BNBUSDT', 'name': 'Binance Coin', 'enabled': True, 'liquidity_rank': 3},
+    {'symbol': 'SOLUSDT', 'name': 'Solana', 'enabled': True, 'liquidity_rank': 4},
+    {'symbol': 'XRPUSDT', 'name': 'Ripple', 'enabled': True, 'liquidity_rank': 5},
+    {'symbol': 'ADAUSDT', 'name': 'Cardano', 'enabled': False, 'liquidity_rank': 6},
+    {'symbol': 'DOGEUSDT', 'name': 'Dogecoin', 'enabled': False, 'liquidity_rank': 7},
+    {'symbol': 'MATICUSDT', 'name': 'Polygon', 'enabled': False, 'liquidity_rank': 8},
+    {'symbol': 'DOTUSDT', 'name': 'Polkadot', 'enabled': False, 'liquidity_rank': 9},
+    {'symbol': 'AVAXUSDT', 'name': 'Avalanche', 'enabled': False, 'liquidity_rank': 10}
+]
+
 # Thông tin phân tích tiền điện tử
 crypto_analysis = {
     'entry_points': {},   # Điểm vào lệnh cho từng đồng tiền
@@ -91,7 +105,6 @@ crypto_analysis = {
     'trends': {},         # Xu hướng hiện tại (uptrend, downtrend, sideway)
     'liquidity': {},      # Thanh khoản (volume giao dịch 24h)
     'stability': {},      # Độ ổn định (biến động giá trung bình)
-    'tradable': {},       # Các đồng đủ điều kiện để giao dịch
     'last_analyzed': None # Thời gian phân tích gần nhất
 }
 
@@ -302,30 +315,16 @@ def analyze_liquidity(force_analyze=False):
 def update_market_prices():
     """Lấy giá thị trường thực từ Binance API"""
     try:
-        # Danh sách các cặp cần lấy giá và phân tích
-        # Khi thêm cặp mới vào đây, cần update cả market_data để lưu trữ giá
-        trading_symbols = [
-            'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 
-            'DOGEUSDT', 'XRPUSDT', 'DOTUSDT', 'MATICUSDT', 'AVAXUSDT',
-            'LINKUSDT', 'LTCUSDT', 'UNIUSDT', 'NEARUSDT', 'APTUSDT',
-            'OPUSDT', 'ARBUSDT', 'SUIUSDT', 'FILUSDT', 'ATOMUSDT'
-            # 'PIUSDT'  # Sẽ thêm Pi Network khi được niêm yết trên Binance
-        ]
+        # Lọc các đồng tiền đã được bật (enabled)
+        enabled_symbols = [crypto['symbol'] for crypto in top_crypto_list if crypto['enabled']]
         
-        # Lọc chỉ những đồng được phân tích là có thanh khoản tốt, nếu đã phân tích
-        if crypto_analysis['tradable'] and not connection_status['trading_type'] == 'spot':
-            tradable_symbols = [symbol for symbol, is_tradable in crypto_analysis['tradable'].items() if is_tradable]
-            if tradable_symbols:
-                # Nếu có các đồng được đánh dấu là có thanh khoản tốt, chỉ tập trung vào chúng
-                symbols = tradable_symbols
-                logger.debug(f"Using {len(symbols)} tradable symbols for price update")
-            else:
-                # Nếu không có đồng nào đủ thanh khoản, vẫn theo dõi tất cả
-                symbols = trading_symbols
-                logger.debug("No tradable symbols found, using all trading symbols for price update")
-        else:
-            # Nếu chưa phân tích hoặc tài khoản spot, sử dụng tất cả
-            symbols = trading_symbols
+        if not enabled_symbols:
+            # Nếu không có đồng nào được bật, mặc định dùng 3 đồng hàng đầu
+            enabled_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
+            logger.warning("No crypto enabled, using default top 3")
+        
+        logger.debug(f"Using {len(enabled_symbols)} enabled symbols for price update: {', '.join(enabled_symbols)}")
+        symbols = enabled_symbols
         
         base_url = 'https://api.binance.com/api/v3/ticker/price'
         
@@ -633,7 +632,8 @@ def index():
             'is_connected': connection_status['is_connected'],
             'is_authenticated': connection_status['is_authenticated'],
             'trading_type': connection_status['trading_type'],
-            'current_risk': bot_status['current_risk']
+            'current_risk': bot_status['current_risk'],
+            'crypto_list': top_crypto_list  # Thêm danh sách đồng tiền cho giao diện
         }
 
         response = make_response(render_template('index-ajax.html',
@@ -988,15 +988,18 @@ def simulate_data_updates():
                 
                 # Tạo vị thế mới nếu chưa đạt max và có giá thị trường
                 if len(account_data['positions']) < trading_config['max_positions'] and random.random() < 0.1:
-                    # Ưu tiên dùng giá thị trường thực
+                    # Chỉ sử dụng các đồng đã được kích hoạt (enabled)
+                    enabled_symbols = [crypto['symbol'] for crypto in top_crypto_list if crypto['enabled']]
+                    
+                    # Lọc các đồng đã kích hoạt có giá thị trường
                     symbols_with_price = []
-                    for sym in ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']:
+                    for sym in enabled_symbols:
                         key = sym.lower().replace('usdt', '_price')
                         if key in market_data and market_data[key] > 0:
                             symbols_with_price.append(sym)
                     
-                    # Nếu có symbols với giá thì dùng, không thì dùng list mặc định
-                    symbol_list = symbols_with_price if symbols_with_price else ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT']
+                    # Nếu không có symbol nào được kích hoạt và có giá, dùng top 3 mặc định
+                    symbol_list = symbols_with_price if symbols_with_price else ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
                     
                     symbol = random.choice(symbol_list)
                     side = random.choice(['BUY', 'SELL'])
