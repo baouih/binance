@@ -48,12 +48,12 @@ connection_status = {
     'telegram_enabled': False
 }
 
-# Trạng thái bot
+# Trạng thái bot riêng biệt với kết nối
 bot_status = {
     'running': False,
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'mode': 'testnet',
-    'current_risk': 0.0,  # % rủi ro hiện tại của tài khoản
+    'current_risk': 0.0,
     'risk_limit_reached': False
 }
 
@@ -141,6 +141,8 @@ def init_api_connection():
 
         if not api_key or not api_secret:
             connection_status['last_error'] = "Thiếu API key"
+            connection_status['is_connected'] = False
+            connection_status['is_authenticated'] = False
             add_message("Vui lòng cấu hình API key Binance", "error")
             return False
 
@@ -248,6 +250,7 @@ def index():
         risk_profile = risk_config.get('risk_profile', 'medium')
         risk_settings = config_high_risk.get_risk_profile(risk_profile)
 
+        # Tạo object status cho client
         status = {
             'running': bot_status['running'],
             'mode': connection_status['api_mode'],
@@ -260,12 +263,13 @@ def index():
             'telegram_enabled': connection_status['telegram_enabled']
         }
 
-        # Thêm cache control headers
         response = make_response(render_template('index.html',
-                                              status=status,
-                                              messages=messages[-50:],
-                                              account_data=account_data,
-                                              market_data=market_data))
+                                             status=status,
+                                             messages=messages[-50:],
+                                             account_data=account_data,
+                                             market_data=market_data))
+
+        # Cache control
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
@@ -273,11 +277,10 @@ def index():
 
     except Exception as e:
         logger.error(f"Error loading dashboard: {str(e)}", exc_info=True)
-        # Fallback to default state with cache control
         response = make_response(render_template('index.html',
-                                              status={'running': False, 'mode': 'testnet'},
-                                              messages=[]))
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+                                             status={'running': False, 'mode': 'testnet'},
+                                             messages=[]))
+        response.headers['Cache-Control'] = 'no-store'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
@@ -311,17 +314,11 @@ def connect_api():
             'message': str(e)
         }), 500
 
-@app.route('/api/bot/control', methods=['POST'])
+@app.route('/api/bot/control', methods=['POST']) 
 def control_bot():
     """API điều khiển bot (start/stop)"""
     try:
-        if not connection_status['is_connected']:
-            logger.error("Chưa kết nối API")
-            return jsonify({
-                'success': False,
-                'message': 'Vui lòng kết nối API trước'
-            }), 400
-
+        # Validate yêu cầu đầu vào
         action = request.json.get('action')
         logger.info(f"Received bot control action: {action}")
 
@@ -332,16 +329,22 @@ def control_bot():
                 'message': f'Hành động không hợp lệ: {action}'
             }), 400
 
-        # Kiểm tra giới hạn rủi ro trước khi start
-        if action == 'start' and bot_status['risk_limit_reached']:
-            logger.error("Risk limit reached, cannot start bot")
+        if not connection_status['is_connected']:
+            logger.error("Chưa kết nối API")
             return jsonify({
                 'success': False,
-                'message': 'Không thể khởi động bot: Đã đạt giới hạn rủi ro'
+                'message': 'Vui lòng kết nối API trước'
             }), 400
 
-        # Kiểm tra API key trước khi start
+        # Kiểm tra giới hạn rủi ro và API keys khi start
         if action == 'start':
+            if bot_status['risk_limit_reached']:
+                logger.error("Risk limit reached")
+                return jsonify({
+                    'success': False,
+                    'message': 'Không thể khởi động bot: Đã đạt giới hạn rủi ro'
+                }), 400
+
             api_key = os.environ.get('BINANCE_API_KEY')
             api_secret = os.environ.get('BINANCE_API_SECRET')
 
@@ -352,15 +355,19 @@ def control_bot():
                     'message': 'Vui lòng cấu hình API keys trước khi khởi động bot'
                 }), 400
 
-            # Thử kết nối API 
+            # Thử kết nối API
             if not init_api_connection():
-                logger.error("Failed to connect to API") 
+                logger.error("Failed to connect API")
                 return jsonify({
                     'success': False,
                     'message': 'Không thể kết nối API, vui lòng kiểm tra lại cấu hình'
                 }), 400
 
+            # Khởi động bot
             bot_status['running'] = True
+            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Thông báo
             risk_profile = risk_manager.get_current_config().get('risk_profile', 'medium')
             risk_settings = config_high_risk.get_risk_profile(risk_profile)
 
@@ -370,19 +377,21 @@ def control_bot():
             add_message(f"Rủi ro tối đa: {risk_settings['max_account_risk']}% tài khoản", "info")
             add_message(f"Đòn bẩy tối ưu: {risk_settings['optimal_leverage']}x", "info")
             add_message('Đang chờ tín hiệu giao dịch...', 'info')
+
         else:
+            # Dừng bot
             bot_status['running'] = False
+            bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
             add_message('Bot đã được dừng lại', 'warning')
             add_message('Đã hủy tất cả các lệnh đang chờ', 'warning')
             add_message('Hệ thống đã tạm dừng hoàn toàn', 'info')
 
-        bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        # Emit bot status update through WebSocket
+        # Emit bot status qua websocket
         try:
             socketio.emit('bot_status_update', bot_status)
         except Exception as e:
-            logger.error(f"Error emitting bot status update: {str(e)}")
+            logger.error(f"Error emitting bot status: {str(e)}")
 
         return jsonify({
             'success': True,
@@ -491,7 +500,8 @@ def handle_connect():
         logger.info('Client connected')
         # Gửi trạng thái hiện tại cho client mới
         socketio.emit('connection_status', connection_status)
-        socketio.emit('bot_status', bot_status)
+        # Gửi riêng trạng thái bot
+        socketio.emit('bot_status_update', bot_status)
         socketio.emit('account_data', account_data)
         socketio.emit('market_data', market_data)
 
@@ -507,19 +517,15 @@ def handle_disconnect():
     """Xử lý khi client ngắt kết nối websocket"""
     try:
         logger.info('Client disconnected')
+        # Không thay đổi trạng thái bot khi disconnect
     except Exception as e:
         logger.error(f"Error handling socket disconnect: {str(e)}", exc_info=True)
 
 if __name__ == "__main__":
-    # Monkey patch để eventlet hoạt động tốt hơn
-    eventlet.monkey_patch()
-
-    # Thêm thông báo khởi động
     try:
         add_message('Hệ thống đã khởi động', 'info')
         add_message('Vui lòng kết nối API để bắt đầu', 'warning')
 
-        # Chạy ứng dụng với eventlet WSGI server
         socketio.run(
             app,
             host="0.0.0.0",

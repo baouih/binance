@@ -452,24 +452,202 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Elements
+        const controlButton = document.getElementById('controlButton');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const messagesContainer = document.getElementById('messages');
+        const maxAccountRisk = document.getElementById('maxAccountRisk');
+        const maxAccountRiskValue = document.getElementById('maxAccountRiskValue');
+        const riskLevel = document.getElementById('riskLevel');
+        const riskDetails = document.getElementById('riskDetails');
+        const btcChartCanvas = document.getElementById('btcChart').getContext('2d');
+        const ethChartCanvas = document.getElementById('ethChart').getContext('2d');
+
+        // Track states
+        let isConnected = false;
+        let botRunning = {{ 'true' if status.running else 'false' }};
+        let reconnectCount = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
+        const RECONNECT_DELAY = 2000;
+
         // Debug logging
         function debugLog(action, data) {
             console.log(`[DEBUG] ${action}:`, data);
         }
 
-        // Add these functions to handle button states
-        function updateButtonStates(isConnected) {
-            const controlButton = document.getElementById('controlButton');
-            const saveConfigBtn = document.getElementById('saveConfigBtn');
+        // Socket connection with improved error handling
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
+            reconnectionDelay: RECONNECT_DELAY,
+            reconnectionDelayMax: 5000,
+            timeout: 10000
+        });
 
-            controlButton.disabled = !isConnected;
-            controlButton.title = isConnected ? '' : 'Chưa kết nối tới máy chủ';
+        socket.on('connect', () => {
+            debugLog('Socket connected', {reconnectCount});
+            isConnected = true;
+            reconnectCount = 0;
+            updateConnectionStatus(true);
+            updateButtonStates(true);
+            addMessage({
+                content: 'Đã kết nối tới máy chủ',
+                level: 'success',
+                timestamp: new Date().toLocaleString()
+            });
+        });
 
-            if (!isConnected) {
-                controlButton.classList.remove('btn-success', 'btn-danger');
-                controlButton.classList.add('btn-secondary');
+        socket.on('disconnect', (reason) => {
+            debugLog('Socket disconnected', {reason, reconnectCount});
+            isConnected = false;
+
+            // Only update UI if max reconnects reached
+            if (reconnectCount >= MAX_RECONNECT_ATTEMPTS) {
+                updateConnectionStatus(false);
+                updateButtonStates(false);
+                showToast('Mất kết nối tới máy chủ', 'error');
+            }
+        });
+
+        socket.on('reconnect_attempt', (attemptNumber) => {
+            debugLog('Reconnect attempt', {attemptNumber});
+            reconnectCount = attemptNumber;
+        });
+
+        socket.on('reconnect_failed', () => {
+            debugLog('Reconnect failed');
+            showToast('Không thể kết nối lại với máy chủ', 'error');
+            updateConnectionStatus(false);
+            updateButtonStates(false);
+        });
+
+        // Socket events for data updates
+        socket.on('bot_status_update', (data) => {
+            debugLog('Received bot status update', data);
+            // Chỉ cập nhật nếu trạng thái thực sự thay đổi
+            if (data.running !== botRunning) {
+                botRunning = data.running;
+                updateBotStatus(data);
+            }
+        });
+
+        // Update connection status badge (chỉ hiển thị trạng thái kết nối)
+        function updateConnectionStatus(connected) {
+            const statusBadge = document.querySelector('.status-badge');
+            if (!statusBadge) return;
+
+            if (connected !== isConnected) {
+                debugLog('Updating connection status', {connected});
+
+                if (connected) {
+                    statusBadge.classList.remove('disconnected');
+                    statusBadge.classList.add('connected');
+                    statusBadge.innerHTML = '<i class="bi bi-wifi"></i> Đã kết nối';
+                } else {
+                    statusBadge.classList.remove('connected');
+                    statusBadge.classList.add('disconnected');
+                    statusBadge.innerHTML = '<i class="bi bi-wifi-off"></i> Mất kết nối';
+                }
+
+                isConnected = connected;
             }
         }
+
+        // Update bot status UI (chỉ hiển thị trạng thái bot)
+        function updateBotStatus(status) {
+            debugLog('Updating bot status', status);
+            const botStatusDiv = document.querySelector('.bot-status');
+            if (!botStatusDiv) return;
+
+            const currentState = botStatusDiv.classList.contains('running');
+            // Chỉ cập nhật nếu trạng thái thay đổi
+            if (currentState !== status.running) {
+                if (status.running) {
+                    botStatusDiv.classList.remove('stopped');
+                    botStatusDiv.classList.add('running');
+                    botStatusDiv.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
+
+                    controlButton.classList.remove('btn-success');
+                    controlButton.classList.add('btn-danger');
+                    controlButton.querySelector('.button-text').textContent = 'Dừng Bot';
+                    controlButton.querySelector('.bi').classList.remove('bi-play-fill');
+                    controlButton.querySelector('.bi').classList.add('bi-stop-fill');
+                } else {
+                    botStatusDiv.classList.remove('running');
+                    botStatusDiv.classList.add('stopped');
+                    botStatusDiv.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
+
+                    controlButton.classList.remove('btn-danger');
+                    controlButton.classList.add('btn-success');
+                    controlButton.querySelector('.button-text').textContent = 'Khởi động Bot';
+                    controlButton.querySelector('.bi').classList.remove('bi-stop-fill');
+                    controlButton.querySelector('.bi').classList.add('bi-play-fill');
+                }
+            }
+        }
+
+        // Update button states
+        function updateButtonStates(enabled) {
+            debugLog('Updating button states', {enabled, botRunning});
+            const buttons = [
+                document.getElementById('controlButton'),
+                document.getElementById('saveConfigBtn')
+            ];
+
+            buttons.forEach(button => {
+                if (!button) return;
+                button.disabled = !enabled;
+                button.title = enabled ? '' : 'Chưa kết nối tới máy chủ';
+
+                if (!enabled) {
+                    button.classList.remove('btn-success', 'btn-danger');
+                    button.classList.add('btn-secondary');
+                }
+            });
+        }
+
+        // Handle control button click with better error handling
+        async function handleControlButtonClick(button) {
+            if (button.disabled || !isConnected) {
+                showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
+                return;
+            }
+
+            const action = button.querySelector('.button-text').textContent.includes('Dừng') ? 'stop' : 'start';
+            debugLog('Control button clicked', {action, botRunning});
+
+            setButtonLoading(button, true);
+
+            try {
+                const response = await fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+
+                const data = await response.json();
+                debugLog('Bot control response', data);
+
+                if (data.success) {
+                    botRunning = data.status.running;
+                    showToast(
+                        action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại',
+                        'success'
+                    );
+                    updateBotStatus(data.status);
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                debugLog('Bot control error', error);
+                showToast(`Lỗi kết nối: ${error.message}`, 'error');
+            } finally {
+                setTimeout(() => setButtonLoading(button, false), 500);
+            }
+        }
+
+
 
         function setButtonLoading(button, isLoading) {
             debugLog('setButtonLoading', {button: button.id, isLoading});
@@ -491,42 +669,6 @@
             }
         }
 
-
-        async function handleControlButtonClick(button) {
-            try {
-                debugLog('handleControlButtonClick', 'start');
-                if (button.disabled || !isConnected) {
-                    showToast('Vui lòng kết nối API trước khi điều khiển bot', 'error');
-                    return;
-                }
-
-                const action = button.querySelector('.button-text').textContent.includes('Dừng') ? 'stop' : 'start';
-                debugLog('handleControlButtonClick action', action);
-
-                setButtonLoading(button, true);
-
-                const response = await fetch('/api/bot/control', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action })
-                });
-
-                const data = await response.json();
-                debugLog('Bot control response', data);
-
-                if (data.success) {
-                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
-                    updateBotStatus(data.status);
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('Bot control error:', error);
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            } finally {
-                setTimeout(() => setButtonLoading(button, false), 500);
-            }
-        }
 
         async function handleSaveConfig(button) {
             try {
@@ -582,87 +724,6 @@
         }
 
 
-        // Elements
-        const controlButton = document.getElementById('controlButton');
-        const saveConfigBtn = document.getElementById('saveConfigBtn');
-        const clearLogsBtn = document.getElementById('clearLogsBtn');
-        const messagesContainer = document.getElementById('messages');
-        const maxAccountRisk = document.getElementById('maxAccountRisk');
-        const maxAccountRiskValue = document.getElementById('maxAccountRiskValue');
-        const riskLevel = document.getElementById('riskLevel');
-        const riskDetails = document.getElementById('riskDetails');
-        const btcChartCanvas = document.getElementById('btcChart');
-        const ethChartCanvas = document.getElementById('ethChart');
-
-
-        // Socket connection
-        const socket = io({
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            timeout: 10000
-        });
-
-        // Track connection state
-        let isConnected = false;
-
-        socket.on('connect', () => {
-            console.log('Connected to server');
-            isConnected = true;
-            updateConnectionStatus(true);
-            updateButtonStates(true);
-
-            addMessage({
-                content: 'Đã kết nối tới máy chủ',
-                level: 'success',
-                timestamp: new Date().toLocaleString()
-            });
-        });
-
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            isConnected = false;
-            updateConnectionStatus(false);
-            updateButtonStates(false);
-
-            addMessage({
-                content: 'Mất kết nối tới máy chủ',
-                level: 'error',
-                timestamp: new Date().toLocaleString()
-            });
-        });
-
-        socket.on('reconnect', () => {
-            console.log('Reconnected to server');
-            isConnected = true;
-            updateConnectionStatus(true);
-
-            // Re-enable buttons
-            controlButton.disabled = false;
-            saveConfigBtn.disabled = false;
-
-            addMessage({
-                content: 'Đã kết nối lại thành công',
-                level: 'success',
-                timestamp: new Date().toLocaleString()
-            });
-        });
-
-        // Update connection status badge
-        function updateConnectionStatus(connected) {
-            const botStatus = document.querySelector('.bot-status');
-            if (connected) {
-                botStatus.classList.remove('stopped');
-                botStatus.classList.add('running');
-                botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i> Đang chạy';
-            } else {
-                botStatus.classList.remove('running');
-                botStatus.classList.add('stopped');
-                botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i> Đã dừng';
-            }
-        }
-
         // Add message to log
         function addMessage(message) {
             const messageHTML = `
@@ -684,34 +745,6 @@
                 timestamp: new Date().toLocaleString()
             });
         });
-
-
-        // Update bot status
-        function updateBotStatus(status) {
-            const botStatusDiv = document.querySelector('.bot-status');
-            const controlIcon = controlButton.querySelector('.bi');
-
-            if (status.running) {
-                controlButton.classList.remove('btn-success');
-                controlButton.classList.add('btn-danger');
-                controlButton.querySelector('.button-text').textContent = 'Dừng Bot';
-                controlIcon.classList.remove('bi-play-fill');
-                controlIcon.classList.add('bi-stop-fill');
-                botStatusDiv.classList.remove('stopped');
-                botStatusDiv.classList.add('running');
-                botStatusDiv.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i> Đang chạy';
-
-            } else {
-                controlButton.classList.remove('btn-danger');
-                controlButton.classList.add('btn-success');
-                controlButton.querySelector('.button-text').textContent = 'Khởi động Bot';
-                controlIcon.classList.remove('bi-stop-fill');
-                controlIcon.classList.add('bi-play-fill');
-                botStatusDiv.classList.remove('running');
-                botStatusDiv.classList.add('stopped');
-                botStatusDiv.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i> Đã dừng';
-            }
-        }
 
         // Risk level changes
         maxAccountRisk.addEventListener('input', () => {
@@ -827,8 +860,7 @@
             if (!btcChart) {
                 btcChart = new Chart(btcChartCanvas, {
                     type: 'line',
-                    data: btcData,
-                    options: {
+                    data: btcData,                    options: {
                         scales: {
                             y: {
                                 beginAtZero: false
