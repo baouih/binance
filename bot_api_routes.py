@@ -476,6 +476,27 @@ def update_position(position_id):
 def analyze_portfolio():
     """API endpoint để phân tích toàn bộ danh mục"""
     try:
+        # Đảm bảo chúng ta có vị thế trước khi phân tích
+        positions = position_manager.scan_open_positions()
+        if not positions:
+            return jsonify({
+                'success': True,
+                'analysis': {
+                    'portfolio': {
+                        'total_positions': 0,
+                        'total_pnl': 0,
+                        'average_pnl_percent': 0,
+                        'risk_level': 'low',
+                        'risk_score': 0,
+                        'correlation_risk': False,
+                        'concentration_risk': False,
+                        'recommendations': ["Chưa có vị thế nào được mở. Hãy đợi tín hiệu giao dịch tốt."]
+                    },
+                    'positions': [],
+                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+            })
+        
         analysis = position_manager.analyze_all_positions()
         return jsonify({'success': True, 'analysis': analysis})
     except Exception as e:
