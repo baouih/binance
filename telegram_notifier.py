@@ -126,7 +126,10 @@ class TelegramNotifier:
         order_status_emoji = '✅' if order_placed else '📝'
         order_status_text = "ĐÃ ĐẶT LỆNH" if order_placed else "TÍN HIỆU"
         
-        message = f"<b>{direction_arrow} {order_status_emoji} {order_status_text} {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
+        # Thêm cảnh báo để phân biệt rõ tín hiệu và lệnh đã đặt
+        warning = "" if order_placed else "<i>⚠️ Đây chỉ là tín hiệu, không phải xác nhận lệnh đã đặt</i>\n\n"
+        
+        message = f"<b>{direction_arrow} {order_status_emoji} {order_status_text} {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n{warning}"
         message += f"<b>Cặp:</b> {symbol}\n"
         message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
         message += f"<b>Số lượng:</b> {quantity}\n"

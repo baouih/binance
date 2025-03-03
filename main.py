@@ -1003,8 +1003,23 @@ def update_market_data():
                                 )
                                 
                                 if order_result and 'orderId' in order_result:
-                                    order_placed = True
-                                    logger.info(f"Đã tạo lệnh {action} {symbol} thành công: ID={order_result['orderId']}")
+                                    # Xác minh lệnh đã thực sự được tạo bằng cách kiểm tra lại với API
+                                    try:
+                                        # Đợi một chút để đảm bảo lệnh đã được ghi nhận trong hệ thống
+                                        time.sleep(1)
+                                        # Kiểm tra lệnh đã tạo
+                                        order_check = binance_client.get_order(symbol=symbol, order_id=order_result['orderId'])
+                                        if order_check and 'orderId' in order_check:
+                                            order_placed = True
+                                            logger.info(f"Đã xác minh lệnh {action} {symbol} thành công: ID={order_result['orderId']}")
+                                        else:
+                                            logger.warning(f"Không thể xác minh lệnh {action} {symbol}: {order_check}")
+                                            order_error = "Không thể xác minh lệnh đã tạo"
+                                    except Exception as verify_err:
+                                        logger.error(f"Lỗi khi xác minh lệnh {action} {symbol}: {str(verify_err)}")
+                                        # Nếu không xác minh được, vẫn đánh dấu là thành công nhưng ghi log cảnh báo
+                                        order_placed = True
+                                        logger.warning(f"Không thể xác minh lệnh nhưng giả định đã tạo thành công, ID={order_result['orderId']}")
                                 else:
                                     logger.warning(f"Tạo lệnh {action} {symbol} không thành công: {order_result}")
                                     order_error = "API trả về kết quả không hợp lệ"
@@ -1043,10 +1058,12 @@ def update_market_data():
             reason_text = f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
             
             # Thêm thông tin về kết quả tạo lệnh
-            if order_placed:
+            if order_placed and order_result and 'orderId' in order_result:
                 reason_text += f"\n✅ Đã đặt lệnh thành công: ID={order_result['orderId']}"
             elif order_error:
                 reason_text += f"\n❌ Chưa đặt lệnh: {order_error}"
+            else:
+                reason_text += f"\n⚠️ Trạng thái lệnh không xác định"
             
             telegram_notifier.send_trade_entry(
                 symbol=symbol,
