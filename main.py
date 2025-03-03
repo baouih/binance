@@ -231,7 +231,10 @@ def get_bot_status():
     try:
         with open(ACCOUNT_CONFIG_PATH, 'r') as f:
             config = json.load(f)
-        bot_status['mode'] = config.get('api_mode', 'demo')
+        api_mode = config.get('api_mode', 'demo')
+        # Đảm bảo mode nhất quán trong toàn bộ hệ thống
+        bot_status['mode'] = api_mode.lower()
+        logger.debug(f"Đã cập nhật chế độ API: {bot_status['mode']}")
     except Exception as e:
         logger.error(f"Lỗi khi đọc cấu hình api_mode: {str(e)}")
     
@@ -944,7 +947,8 @@ def start_background_tasks():
             global bot_status
             bot_status['status'] = 'running'
             bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            bot_status['mode'] = api_mode
+            # Đảm bảo mode nhất quán trong toàn bộ hệ thống
+            bot_status['mode'] = api_mode.lower()
         else:
             logger.info("Auto-start bot is disabled in testing environment")
     except Exception as e:

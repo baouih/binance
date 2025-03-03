@@ -488,6 +488,58 @@ class TelegramNotifier:
             logger.error(f"Lỗi khi gửi thông báo lỗi qua Telegram: {e}")
             return False
             
+    def send_bot_status(self, status: str, mode: str, uptime: str = None, 
+                   stats: Dict = None) -> bool:
+        """
+        Gửi thông báo trạng thái bot qua Telegram.
+        
+        Args:
+            status (str): Trạng thái của bot ('running', 'stopped')
+            mode (str): Chế độ API ('demo', 'testnet', 'live')
+            uptime (str, optional): Thời gian hoạt động của bot
+            stats (Dict, optional): Các thống kê bổ sung
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled:
+            return False
+        
+        try:
+            # Tạo icon và trạng thái hiển thị
+            status_icon = "🟢" if status == "running" else "🔴"
+            status_text = "ĐANG CHẠY" if status == "running" else "ĐÃ DỪNG"
+            
+            # Chuẩn hóa và hiển thị chế độ
+            mode_text = mode.lower()
+            if mode_text == "testnet":
+                mode_display = "Testnet"
+            elif mode_text == "live":
+                mode_display = "Live"
+            else:
+                mode_display = "Demo"
+            
+            # Tạo tin nhắn
+            message = f"<b>{status_icon} BOT {status_text}</b>\n\n"
+            message += f"Chế độ: {mode_display}\n"
+            
+            if uptime:
+                message += f"Thời gian hoạt động: {uptime}\n"
+            
+            # Thêm phần thống kê
+            if stats and isinstance(stats, dict):
+                message += "\nThống kê:\n"
+                for key, value in stats.items():
+                    message += f"- {key}: {value}\n"
+            
+            message += f"\n<i>Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>"
+            
+            return self.send_message(message)
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo trạng thái bot qua Telegram: {e}")
+            return False
+            
     def send_startup_notification(self) -> bool:
         """
         Gửi thông báo khởi động hệ thống qua Telegram.
