@@ -129,7 +129,7 @@ class BinanceAPI:
         return signature
         
     def _request(self, method: str, endpoint: str, params: Dict = None, 
-              signed: bool = False, version: str = 'v3') -> Dict:
+              signed: bool = False, version: str = None) -> Dict:
         """
         Gửi request đến Binance API
         
@@ -138,11 +138,18 @@ class BinanceAPI:
             endpoint (str): Endpoint của API
             params (Dict, optional): Tham số cho request
             signed (bool): Cần ký request không
-            version (str): Phiên bản API
+            version (str, optional): Phiên bản API, sẽ tự động chọn phù hợp nếu None
             
         Returns:
             Dict: Phản hồi từ API
         """
+        # Chọn phiên bản API phù hợp dựa trên loại tài khoản
+        if version is None:
+            if self.account_type == 'futures':
+                version = 'v1'  # Futures API sử dụng v1
+            else:
+                version = 'v3'  # Spot API sử dụng v3
+        
         url = f"{self.base_url}/{version}/{endpoint}"
         
         # Chuẩn bị tham số
@@ -547,7 +554,11 @@ class BinanceAPI:
         params = {
             'symbol': symbol
         }
-        return self._request('GET', 'ticker/price', params)
+        # Đảm bảo sử dụng phiên bản API đúng cho futures
+        if self.account_type == 'futures':
+            return self._request('GET', 'ticker/price', params, version='v1')
+        else:
+            return self._request('GET', 'ticker/price', params)
         
     # Các phương thức hữu ích khác
     def convert_klines_to_dataframe(self, klines: List[List]) -> 'pd.DataFrame':
