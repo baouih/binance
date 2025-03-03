@@ -1,488 +1,265 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
-{% block title %}Giám sát bot{% endblock %}
+{% block title %}Giám sát Bot{% endblock %}
 
-{% block additional_css %}
+{% block styles %}
 <style>
-    .activity-log {
-        height: 400px;
-        overflow-y: auto;
-        background-color: var(--bs-dark-bg-subtle);
-        border-radius: 5px;
-        padding: 10px;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 0.9rem;
-    }
-    
     .log-item {
-        padding: 6px 0;
-        border-bottom: 1px solid var(--bs-dark-border-subtle);
-    }
-    
-    .log-item:last-child {
-        border-bottom: none;
-    }
-    
-    .log-timestamp {
-        color: var(--bs-info);
-        margin-right: 8px;
-    }
-    
-    .log-category {
-        padding: 2px 6px;
-        border-radius: 3px;
-        margin-right: 8px;
-        font-size: 0.75rem;
-        font-weight: bold;
-    }
-    
-    .log-analysis {
-        background-color: var(--bs-info-bg-subtle);
-        color: var(--bs-info-text);
-    }
-    
-    .log-decision {
-        background-color: var(--bs-warning-bg-subtle);
-        color: var(--bs-warning-text);
-    }
-    
-    .log-action {
-        background-color: var(--bs-success-bg-subtle);
-        color: var(--bs-success-text);
-    }
-    
-    .log-error {
-        background-color: var(--bs-danger-bg-subtle);
-        color: var(--bs-danger-text);
-    }
-
-    .log-market {
-        background-color: var(--bs-primary-bg-subtle);
-        color: var(--bs-primary-text);
-    }
-    
-    .bot-stats-card {
+        border-left: 3px solid #ccc;
+        padding: 10px;
+        margin-bottom: 8px;
         transition: all 0.3s ease;
     }
-    
-    .bot-stats-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    .log-item:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+    .log-item.market {
+        border-left-color: #0dcaf0; /* info */
+    }
+    .log-item.analysis {
+        border-left-color: #6c757d; /* secondary */
+    }
+    .log-item.decision {
+        border-left-color: #ffc107; /* warning */
+    }
+    .log-item.action {
+        border-left-color: #198754; /* success */
+    }
+    .log-item.error {
+        border-left-color: #dc3545; /* danger */
+    }
+
+    .data-card {
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    .data-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
     
-    .trade-decision-card {
-        border-left: 4px solid transparent;
+    .decision-item {
+        border: 1px solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.2s;
     }
-    
-    .trade-decision-buy {
-        border-left-color: var(--bs-success);
+    .decision-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
-    
-    .trade-decision-sell {
-        border-left-color: var(--bs-danger);
+    .decision-item.buy {
+        border-left: 4px solid #198754;
     }
-    
-    .trade-decision-hold {
-        border-left-color: var(--bs-warning);
+    .decision-item.sell {
+        border-left: 4px solid #dc3545;
     }
-    
-    .market-indicator {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-    
-    .trend-up {
-        background-color: var(--bs-success);
-    }
-    
-    .trend-down {
-        background-color: var(--bs-danger);
-    }
-    
-    .trend-sideways {
-        background-color: var(--bs-warning);
-    }
-    
-    .bot-control-btn {
-        width: 100%;
-        margin-bottom: 8px;
+    .decision-item.hold {
+        border-left: 4px solid #ffc107;
     }
     
     .reason-item {
-        margin-bottom: 5px;
-        padding-left: 15px;
-        position: relative;
+        padding: 5px 10px;
+        margin: 2px 0;
+        background-color: rgba(0,0,0,.03);
+        border-radius: 4px;
+        font-size: 14px;
     }
     
-    .reason-item:before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: var(--bs-info);
+    .stats-counter {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .counter-label {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    #logContainer {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    #decisionsContainer {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .timestamp {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .bot-controls {
+        position: sticky;
+        top: 0;
+        background: var(--bs-body-bg);
+        z-index: 1000;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+    
+    .last-update {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2"><i class="fas fa-robot me-2"></i>Giám sát hoạt động bot</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-monitor">
-                    <i class="fas fa-sync me-1"></i> Làm mới
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="download-log">
-                    <i class="fas fa-download me-1"></i> Tải logs
-                </button>
-            </div>
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="botDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-microchip me-1"></i>
-                    <span id="selected-bot-name">Tất cả các bot</span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="botDropdown" id="bot-selector">
-                    <li><a class="dropdown-item active" href="#" data-bot-id="all">Tất cả các bot</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <!-- Danh sách bot sẽ được thêm vào đây bằng JavaScript -->
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bot Status & Controls -->
+<div class="container-fluid my-4">
     <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="alert" id="bot-status-alert" role="alert">
-                <div class="d-flex align-items-center">
-                    <div id="bot-status-icon" class="me-3">
-                        <i class="fas fa-circle-notch fa-spin fa-2x"></i>
-                    </div>
-                    <div>
-                        <h4 class="alert-heading" id="bot-status-heading">Bot đang hoạt động</h4>
-                        <p class="mb-0" id="bot-status-text">Bot đang phân tích thị trường và tìm kiếm cơ hội giao dịch.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Điều khiển bot</h5>
-                </div>
+        <div class="col-12">
+            <h2 class="mb-3"><i class="fas fa-desktop me-2"></i> Giám sát Bot</h2>
+            
+            <div class="bot-controls card mb-4">
                 <div class="card-body">
-                    <button id="start-bot-btn" class="btn btn-success bot-control-btn">
-                        <i class="fas fa-play me-1"></i> Khởi động bot
-                    </button>
-                    <button id="stop-bot-btn" class="btn btn-danger bot-control-btn">
-                        <i class="fas fa-stop me-1"></i> Dừng bot
-                    </button>
-                    <button id="restart-bot-btn" class="btn btn-warning bot-control-btn">
-                        <i class="fas fa-redo me-1"></i> Khởi động lại bot
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bot Stats & Market Overview -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm bot-stats-card">
-                <div class="card-body">
-                    <h5 class="card-title">Phân tích thị trường</h5>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>BTC:</span>
-                        <span><i class="market-indicator" id="btc-trend-indicator"></i> <span id="btc-trend-text">--</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>ETH:</span>
-                        <span><i class="market-indicator" id="eth-trend-indicator"></i> <span id="eth-trend-text">--</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>SOL:</span>
-                        <span><i class="market-indicator" id="sol-trend-indicator"></i> <span id="sol-trend-text">--</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>BNB:</span>
-                        <span><i class="market-indicator" id="bnb-trend-indicator"></i> <span id="bnb-trend-text">--</span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm bot-stats-card">
-                <div class="card-body">
-                    <h5 class="card-title">Tâm lý thị trường</h5>
-                    <div class="text-center">
-                        <div class="display-6 mb-2" id="sentiment-value">--</div>
-                        <div class="progress mb-3">
-                            <div class="progress-bar" id="sentiment-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div id="sentiment-description">--</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm bot-stats-card">
-                <div class="card-body">
-                    <h5 class="card-title">Tín hiệu hiện tại</h5>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>BTC:</span>
-                        <span id="btc-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>ETH:</span>
-                        <span id="eth-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>SOL:</span>
-                        <span id="sol-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>BNB:</span>
-                        <span id="bnb-signal" class="badge rounded-pill bg-secondary">Chờ phân tích</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm bot-stats-card">
-                <div class="card-body">
-                    <h5 class="card-title">Thống kê hoạt động</h5>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Thời gian chạy:</span>
-                        <span id="bot-uptime">--</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Phân tích hoàn thành:</span>
-                        <span id="analysis-count">--</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Quyết định giao dịch:</span>
-                        <span id="decision-count">--</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>Lệnh thực thi:</span>
-                        <span id="order-count">--</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Trading Decision & Activity Log -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">Quyết định giao dịch gần đây</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="recent-decisions">
-                        <!-- Decision cards will be inserted here -->
-                        <div class="trade-decision-card trade-decision-buy p-3 border-bottom">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0">BTCUSDT</h6>
-                                <div>
-                                    <span class="badge bg-success me-1">MUA</span>
-                                    <small class="text-muted">12:45:30</small>
-                                </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <select id="botSelector" class="form-select me-2">
+                                    <option value="all">Tất cả Bot</option>
+                                    <option value="bot1">Bot 1 - BTCUSDT</option>
+                                    <option value="bot2">Bot 2 - ETHUSDT</option>
+                                </select>
+                                <button id="refreshButton" class="btn btn-outline-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                             </div>
-                            <p class="mb-2">Điểm vào lệnh: 83,250 USDT</p>
-                            <p class="mb-2">Take profit: 85,500 USDT (+2.7%)</p>
-                            <p class="mb-2">Stop loss: 82,150 USDT (-1.32%)</p>
-                            <p class="mb-0"><strong>Lý do:</strong></p>
-                            <div class="reason-item">RSI vượt ngưỡng 30 từ dưới lên</div>
-                            <div class="reason-item">Giá đang nằm trên MA50</div>
-                            <div class="reason-item">Khối lượng giao dịch tăng</div>
                         </div>
-                        
-                        <div class="trade-decision-card trade-decision-sell p-3 border-bottom">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0">ETHUSDT</h6>
-                                <div>
-                                    <span class="badge bg-danger me-1">BÁN</span>
-                                    <small class="text-muted">11:30:15</small>
-                                </div>
+                        <div class="col-md-4 text-center">
+                            <div id="botStatusBadge" class="badge rounded-pill text-bg-success fs-6 px-3 py-2">
+                                <i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động
                             </div>
-                            <p class="mb-2">Điểm vào lệnh: 4,120 USDT</p>
-                            <p class="mb-2">Take profit: 3,950 USDT (+4.1%)</p>
-                            <p class="mb-2">Stop loss: 4,220 USDT (-2.4%)</p>
-                            <p class="mb-0"><strong>Lý do:</strong></p>
-                            <div class="reason-item">MACD đường chính cắt xuống đường tín hiệu</div>
-                            <div class="reason-item">Giá chạm kháng cự mạnh</div>
-                            <div class="reason-item">Đồng thời phân kỳ âm</div>
                         </div>
-                        
-                        <div class="trade-decision-card trade-decision-hold p-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0">SOLUSDT</h6>
-                                <div>
-                                    <span class="badge bg-warning me-1">GIỮ</span>
-                                    <small class="text-muted">10:15:42</small>
-                                </div>
-                            </div>
-                            <p class="mb-0"><strong>Lý do:</strong></p>
-                            <div class="reason-item">Thị trường đang biến động cao</div>
-                            <div class="reason-item">Chưa có tín hiệu vào lệnh rõ ràng</div>
-                            <div class="reason-item">Chờ giá ổn định trước khi ra quyết định</div>
+                        <div class="col-md-4 text-end">
+                            <button id="startBotBtn" class="btn btn-success me-2">
+                                <i class="fas fa-play me-1"></i> Bắt đầu
+                            </button>
+                            <button id="stopBotBtn" class="btn btn-danger">
+                                <i class="fas fa-stop me-1"></i> Dừng
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12 text-end">
+                            <span class="last-update">Cập nhật lần cuối: <span id="lastUpdateTime">Vừa xong</span></span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Nhật ký hoạt động</h5>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary active log-filter" data-filter="all">Tất cả</button>
-                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="analysis">Phân tích</button>
-                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="decision">Quyết định</button>
-                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="action">Hành động</button>
-                        <button type="button" class="btn btn-outline-secondary log-filter" data-filter="market">Thị trường</button>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card data-card">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="card-title mb-0">Thời gian hoạt động</h5>
+                                <i class="fas fa-clock text-primary"></i>
+                            </div>
+                            <div class="stats-counter" id="uptimeCounter">14h 35m</div>
+                            <div class="counter-label">Liên tục</div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="activity-log" id="activity-log">
-                        <!-- Logs will be inserted here dynamically -->
+                <div class="col-md-3">
+                    <div class="card data-card">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="card-title mb-0">Phân tích thị trường</h5>
+                                <i class="fas fa-chart-line text-info"></i>
+                            </div>
+                            <div class="stats-counter" id="analysisCounter">342</div>
+                            <div class="counter-label">Lần phân tích</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card data-card">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="card-title mb-0">Quyết định</h5>
+                                <i class="fas fa-brain text-warning"></i>
+                            </div>
+                            <div class="stats-counter" id="decisionsCounter">28</div>
+                            <div class="counter-label">Lần ra quyết định</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card data-card">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="card-title mb-0">Lệnh giao dịch</h5>
+                                <i class="fas fa-exchange-alt text-success"></i>
+                            </div>
+                            <div class="stats-counter" id="ordersCounter">12</div>
+                            <div class="counter-label">Lệnh đã thực thi</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Current Market Conditions & Active Positions -->
-    <div class="row mb-4">
+    
+    <div class="row">
         <div class="col-md-6">
-            <div class="card shadow-sm">
+            <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Điều kiện thị trường hiện tại</h5>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-market">
-                        <i class="fas fa-sync me-1"></i> Làm mới
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Quyết định giao dịch gần đây
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary" id="refreshDecisions">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
-                <div class="card-body" id="market-conditions">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>BTC/USDT</h6>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Giá:</span>
-                                <span id="btc-price">--</span>
+                <div class="card-body">
+                    <div id="decisionsContainer">
+                        <!-- Quyết định sẽ được thêm vào đây bằng JavaScript -->
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>RSI (14):</span>
-                                <span id="btc-rsi">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>MACD:</span>
-                                <span id="btc-macd">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Xu hướng:</span>
-                                <span id="btc-trend">--</span>
-                            </div>
-                            
-                            <h6>ETH/USDT</h6>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Giá:</span>
-                                <span id="eth-price">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>RSI (14):</span>
-                                <span id="eth-rsi">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>MACD:</span>
-                                <span id="eth-macd">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Xu hướng:</span>
-                                <span id="eth-trend">--</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>SOL/USDT</h6>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Giá:</span>
-                                <span id="sol-price">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>RSI (14):</span>
-                                <span id="sol-rsi">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>MACD:</span>
-                                <span id="sol-macd">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Xu hướng:</span>
-                                <span id="sol-trend">--</span>
-                            </div>
-                            
-                            <h6>BNB/USDT</h6>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Giá:</span>
-                                <span id="bnb-price">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>RSI (14):</span>
-                                <span id="bnb-rsi">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>MACD:</span>
-                                <span id="bnb-macd">--</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Xu hướng:</span>
-                                <span id="bnb-trend">--</span>
-                            </div>
+                            <p class="mt-2">Đang tải quyết định giao dịch...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-md-6">
-            <div class="card shadow-sm">
+            <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Vị thế đang mở</h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="auto-refresh-monitor-positions" checked>
-                        <label class="form-check-label" for="auto-refresh-monitor-positions">Tự động làm mới</label>
-                    </div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-alt me-2 text-info"></i>
+                        Nhật ký hoạt động
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary" id="refreshLogs">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Cặp</th>
-                                    <th>Loại</th>
-                                    <th>Giá vào</th>
-                                    <th>Giá hiện tại</th>
-                                    <th>P&L</th>
-                                    <th>Take Profit</th>
-                                    <th>Stop Loss</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monitor-positions-table">
-                                <!-- Positions will be inserted here -->
-                                <tr id="no-monitor-positions-row">
-                                    <td colspan="7" class="text-center py-4">
-                                        <div class="empty-state">
-                                            <i class="fas fa-exchange-alt mb-3" style="font-size: 2rem;"></i>
-                                            <h5>Không có vị thế đang mở</h5>
-                                            <p class="text-muted">Khi bot mở vị thế mới, chúng sẽ hiển thị ở đây.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div id="logContainer">
+                        <!-- Log entries sẽ được thêm vào đây bằng JavaScript -->
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Đang tải nhật ký hoạt động...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -492,6 +269,369 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='js/bot_monitor.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Khởi tạo các biến
+    const botSelector = document.getElementById('botSelector');
+    const refreshButton = document.getElementById('refreshButton');
+    const startBotBtn = document.getElementById('startBotBtn');
+    const stopBotBtn = document.getElementById('stopBotBtn');
+    const botStatusBadge = document.getElementById('botStatusBadge');
+    const lastUpdateTime = document.getElementById('lastUpdateTime');
+    
+    const refreshLogs = document.getElementById('refreshLogs');
+    const refreshDecisions = document.getElementById('refreshDecisions');
+    
+    const logContainer = document.getElementById('logContainer');
+    const decisionsContainer = document.getElementById('decisionsContainer');
+    
+    const uptimeCounter = document.getElementById('uptimeCounter');
+    const analysisCounter = document.getElementById('analysisCounter');
+    const decisionsCounter = document.getElementById('decisionsCounter');
+    const ordersCounter = document.getElementById('ordersCounter');
+    
+    // Chức năng tải nhật ký
+    function loadLogs() {
+        const selectedBot = botSelector.value;
+        
+        // Hiển thị animation loading
+        logContainer.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Đang tải nhật ký hoạt động...</p>
+            </div>
+        `;
+        
+        // Gọi API để lấy logs
+        fetch(`/api/bot/logs?bot_id=${selectedBot}&limit=50`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.logs && data.logs.length > 0) {
+                    // Xóa loading và render logs
+                    logContainer.innerHTML = '';
+                    
+                    // Hiển thị logs mới nhất đầu tiên
+                    data.logs.forEach(log => {
+                        const logTime = new Date(log.timestamp);
+                        const formattedTime = logTime.toLocaleTimeString();
+                        
+                        const logItem = document.createElement('div');
+                        logItem.className = `log-item ${log.category}`;
+                        logItem.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <small class="timestamp">${formattedTime}</small>
+                                <small class="badge ${getCategoryBadgeClass(log.category)}">${getCategoryLabel(log.category)}</small>
+                            </div>
+                            <div class="mt-1">${log.message}</div>
+                        `;
+                        
+                        logContainer.appendChild(logItem);
+                    });
+                } else {
+                    logContainer.innerHTML = '<div class="text-center py-3">Không có nhật ký hoạt động nào.</div>';
+                }
+                
+                // Cập nhật thời gian
+                updateLastUpdateTime();
+            })
+            .catch(error => {
+                console.error('Error loading logs:', error);
+                logContainer.innerHTML = '<div class="text-center py-3 text-danger">Đã xảy ra lỗi khi tải nhật ký.</div>';
+            });
+    }
+    
+    // Chức năng tải quyết định
+    function loadDecisions() {
+        const selectedBot = botSelector.value;
+        
+        // Hiển thị animation loading
+        decisionsContainer.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Đang tải quyết định giao dịch...</p>
+            </div>
+        `;
+        
+        // Gọi API để lấy decisions
+        fetch(`/api/bot/decisions?bot_id=${selectedBot}&limit=5`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.decisions && data.decisions.length > 0) {
+                    // Xóa loading và render decisions
+                    decisionsContainer.innerHTML = '';
+                    
+                    // Hiển thị decisions mới nhất đầu tiên
+                    data.decisions.forEach(decision => {
+                        const decisionTime = new Date(decision.timestamp);
+                        const formattedTime = decisionTime.toLocaleDateString() + ' ' + decisionTime.toLocaleTimeString();
+                        
+                        const decisionItem = document.createElement('div');
+                        decisionItem.className = `decision-item ${decision.action.toLowerCase()}`;
+                        
+                        let decisionContent = `
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="mb-0">${decision.symbol}: ${getActionLabel(decision.action)}</h5>
+                                <span class="timestamp">${formattedTime}</span>
+                            </div>
+                        `;
+                        
+                        // Thêm chi tiết giá nếu có
+                        if (decision.action !== 'HOLD') {
+                            decisionContent += `
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="text-muted small">Giá vào lệnh</div>
+                                            <div class="fw-bold">${formatPrice(decision.entry_price)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="text-muted small">Take Profit</div>
+                                            <div class="fw-bold text-success">${formatPrice(decision.take_profit)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="text-muted small">Stop Loss</div>
+                                            <div class="fw-bold text-danger">${formatPrice(decision.stop_loss)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        // Thêm lý do quyết định
+                        decisionContent += `<div class="mb-2 fw-bold">Lý do:</div>`;
+                        decision.reasons.forEach(reason => {
+                            decisionContent += `<div class="reason-item"><i class="fas fa-check-circle me-1 text-success"></i> ${reason}</div>`;
+                        });
+                        
+                        decisionItem.innerHTML = decisionContent;
+                        decisionsContainer.appendChild(decisionItem);
+                    });
+                } else {
+                    decisionsContainer.innerHTML = '<div class="text-center py-3">Không có quyết định giao dịch nào.</div>';
+                }
+                
+                // Cập nhật thời gian
+                updateLastUpdateTime();
+            })
+            .catch(error => {
+                console.error('Error loading decisions:', error);
+                decisionsContainer.innerHTML = '<div class="text-center py-3 text-danger">Đã xảy ra lỗi khi tải quyết định giao dịch.</div>';
+            });
+    }
+    
+    // Chức năng tải thống kê
+    function loadStats() {
+        const selectedBot = botSelector.value;
+        
+        fetch(`/api/bot/stats?bot_id=${selectedBot}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.stats) {
+                    // Cập nhật biến đếm
+                    uptimeCounter.textContent = data.stats.uptime;
+                    analysisCounter.textContent = data.stats.analyses;
+                    decisionsCounter.textContent = data.stats.decisions;
+                    ordersCounter.textContent = data.stats.orders;
+                }
+                
+                // Cập nhật thời gian
+                updateLastUpdateTime();
+            })
+            .catch(error => {
+                console.error('Error loading stats:', error);
+            });
+    }
+    
+    // Chức năng tải trạng thái bot
+    function loadBotStatus() {
+        fetch('/api/bot/status')
+            .then(response => response.json())
+            .then(data => {
+                // Cập nhật trạng thái
+                if (data.status === 'running') {
+                    botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
+                    botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
+                    
+                    // Cập nhật trạng thái nút
+                    startBotBtn.disabled = true;
+                    stopBotBtn.disabled = false;
+                } else {
+                    botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
+                    botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
+                    
+                    // Cập nhật trạng thái nút
+                    startBotBtn.disabled = false;
+                    stopBotBtn.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading bot status:', error);
+            });
+    }
+    
+    // Hàm cập nhật thời gian
+    function updateLastUpdateTime() {
+        lastUpdateTime.textContent = new Date().toLocaleTimeString();
+    }
+    
+    // Chuyển đổi danh mục thành badge class
+    function getCategoryBadgeClass(category) {
+        switch (category) {
+            case 'market': return 'bg-info text-white';
+            case 'analysis': return 'bg-secondary text-white';
+            case 'decision': return 'bg-warning text-dark';
+            case 'action': return 'bg-success text-white';
+            case 'error': return 'bg-danger text-white';
+            default: return 'bg-light text-dark';
+        }
+    }
+    
+    // Chuyển đổi danh mục thành nhãn
+    function getCategoryLabel(category) {
+        switch (category) {
+            case 'market': return 'Thị trường';
+            case 'analysis': return 'Phân tích';
+            case 'decision': return 'Quyết định';
+            case 'action': return 'Hành động';
+            case 'error': return 'Lỗi';
+            default: return category;
+        }
+    }
+    
+    // Chuyển đổi hành động thành nhãn
+    function getActionLabel(action) {
+        switch (action) {
+            case 'BUY': return '<span class="badge bg-success">MUA</span>';
+            case 'SELL': return '<span class="badge bg-danger">BÁN</span>';
+            case 'HOLD': return '<span class="badge bg-warning text-dark">GIỮ</span>';
+            default: return action;
+        }
+    }
+    
+    // Định dạng giá
+    function formatPrice(price) {
+        if (!price) return 'N/A';
+        return parseFloat(price).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + ' USDT';
+    }
+    
+    // Khởi tạo trang
+    function initializePage() {
+        loadBotStatus();
+        loadLogs();
+        loadDecisions();
+        loadStats();
+    }
+    
+    // Thiết lập sự kiện
+    botSelector.addEventListener('change', function() {
+        // Khi bot được chọn thay đổi, tải lại tất cả dữ liệu
+        initializePage();
+    });
+    
+    refreshButton.addEventListener('click', function() {
+        // Làm mới tất cả dữ liệu
+        initializePage();
+    });
+    
+    refreshLogs.addEventListener('click', function() {
+        // Chỉ làm mới nhật ký
+        loadLogs();
+    });
+    
+    refreshDecisions.addEventListener('click', function() {
+        // Chỉ làm mới quyết định
+        loadDecisions();
+    });
+    
+    startBotBtn.addEventListener('click', function() {
+        const selectedBot = botSelector.value;
+        
+        // Gửi yêu cầu khởi động bot
+        fetch('/api/bot/control/' + selectedBot, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'start'
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hiển thị thông báo thành công
+                document.getElementById('toast-message').textContent = 'Bot đã được khởi động thành công!';
+                new bootstrap.Toast(document.getElementById('success-toast')).show();
+                
+                // Cập nhật trạng thái
+                loadBotStatus();
+            } else {
+                // Hiển thị thông báo lỗi
+                document.getElementById('toast-error-message').textContent = data.message || 'Không thể khởi động bot!';
+                new bootstrap.Toast(document.getElementById('error-toast')).show();
+            }
+        })
+        .catch(error => {
+            console.error('Error starting bot:', error);
+            document.getElementById('toast-error-message').textContent = 'Đã xảy ra lỗi khi khởi động bot!';
+            new bootstrap.Toast(document.getElementById('error-toast')).show();
+        });
+    });
+    
+    stopBotBtn.addEventListener('click', function() {
+        const selectedBot = botSelector.value;
+        
+        // Gửi yêu cầu dừng bot
+        fetch('/api/bot/control/' + selectedBot, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'stop'
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hiển thị thông báo thành công
+                document.getElementById('toast-message').textContent = 'Bot đã được dừng thành công!';
+                new bootstrap.Toast(document.getElementById('success-toast')).show();
+                
+                // Cập nhật trạng thái
+                loadBotStatus();
+            } else {
+                // Hiển thị thông báo lỗi
+                document.getElementById('toast-error-message').textContent = data.message || 'Không thể dừng bot!';
+                new bootstrap.Toast(document.getElementById('error-toast')).show();
+            }
+        })
+        .catch(error => {
+            console.error('Error stopping bot:', error);
+            document.getElementById('toast-error-message').textContent = 'Đã xảy ra lỗi khi dừng bot!';
+            new bootstrap.Toast(document.getElementById('error-toast')).show();
+        });
+    });
+    
+    // Thiết lập intervalpokki
+    setInterval(function() {
+        // Cập nhật trạng thái bot mỗi 30 giây
+        loadBotStatus();
+    }, 30000);
+    
+    // Khởi tạo trang
+    initializePage();
+});
+</script>
 {% endblock %}
