@@ -914,9 +914,9 @@ def update_market_data():
     }
     socketio.emit('bot_log', log_data)
     
-    # Thỉnh thoảng tạo quyết định giao dịch mới
+    # Tạm thời tắt tính năng tạo quyết định giao dịch tự động để tránh lệnh đúp
     # Chỉ demo, trong thực tế sẽ dựa trên logic phân tích thực của bot
-    if random.random() < 0.2:  # 20% khả năng
+    if False:  # Đã tắt (trước đây là 20% khả năng)
         # Chỉ chọn các coin có dữ liệu giá thực
         available_coins = []
         if market_data.get('btc_price', 0) > 0:
