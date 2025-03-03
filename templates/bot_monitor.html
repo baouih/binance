@@ -2,263 +2,156 @@
 
 {% block title %}Giám sát Bot{% endblock %}
 
-{% block styles %}
-<style>
-    .log-item {
-        border-left: 3px solid #ccc;
-        padding: 10px;
-        margin-bottom: 8px;
-        transition: all 0.3s ease;
-    }
-    .log-item:hover {
-        background-color: rgba(0,0,0,0.05);
-    }
-    .log-item.market {
-        border-left-color: #0dcaf0; /* info */
-    }
-    .log-item.analysis {
-        border-left-color: #6c757d; /* secondary */
-    }
-    .log-item.decision {
-        border-left-color: #ffc107; /* warning */
-    }
-    .log-item.action {
-        border-left-color: #198754; /* success */
-    }
-    .log-item.error {
-        border-left-color: #dc3545; /* danger */
-    }
-
-    .data-card {
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    .data-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    
-    .decision-item {
-        border: 1px solid rgba(0,0,0,.125);
-        border-radius: .25rem;
-        padding: 15px;
-        margin-bottom: 15px;
-        transition: all 0.2s;
-    }
-    .decision-item:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
-    .decision-item.buy {
-        border-left: 4px solid #198754;
-    }
-    .decision-item.sell {
-        border-left: 4px solid #dc3545;
-    }
-    .decision-item.hold {
-        border-left: 4px solid #ffc107;
-    }
-    
-    .reason-item {
-        padding: 5px 10px;
-        margin: 2px 0;
-        background-color: rgba(0,0,0,.03);
-        border-radius: 4px;
-        font-size: 14px;
-    }
-    
-    .stats-counter {
-        font-size: 24px;
-        font-weight: bold;
-    }
-    
-    .counter-label {
-        font-size: 14px;
-        color: #6c757d;
-    }
-    
-    #logContainer {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    #decisionsContainer {
-        max-height: 500px;
-        overflow-y: auto;
-    }
-    
-    .timestamp {
-        font-size: 12px;
-        color: #6c757d;
-    }
-    
-    .bot-controls {
-        position: sticky;
-        top: 0;
-        background: var(--bs-body-bg);
-        z-index: 1000;
-        padding: 15px 0;
-        border-bottom: 1px solid rgba(0,0,0,.1);
-    }
-    
-    .last-update {
-        font-size: 12px;
-        color: #6c757d;
-    }
-    
-    /* Animations */
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    
-    .pulse-animation {
-        animation: pulse 2s infinite;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid my-4">
+<div class="container-fluid py-4">
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="mb-3"><i class="fas fa-desktop me-2"></i> Giám sát Bot</h2>
-            
-            <div class="bot-controls card mb-4">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <div class="d-flex align-items-center">
-                                <select id="botSelector" class="form-select me-2">
-                                    <option value="all">Tất cả Bot</option>
-                                    <option value="bot1">Bot 1 - BTCUSDT</option>
-                                    <option value="bot2">Bot 2 - ETHUSDT</option>
-                                </select>
-                                <button id="refreshButton" class="btn btn-outline-primary">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <div id="botStatusBadge" class="badge rounded-pill text-bg-success fs-6 px-3 py-2">
-                                <i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <button id="startBotBtn" class="btn btn-success me-2">
-                                <i class="fas fa-play me-1"></i> Bắt đầu
-                            </button>
-                            <button id="stopBotBtn" class="btn btn-danger">
-                                <i class="fas fa-stop me-1"></i> Dừng
-                            </button>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Trạng thái Bot</h5>
+                        <div>
+                            <span class="badge rounded-pill {{ 'bg-success' if bot_status.status == 'running' else 'bg-danger' }}" id="status-badge">
+                                {{ 'Đang chạy' if bot_status.status == 'running' else 'Đã dừng' }}
+                            </span>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-12 text-end">
-                            <span class="last-update">Cập nhật lần cuối: <span id="lastUpdateTime">Vừa xong</span></span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Chế độ API:</label>
+                                <div class="fw-bold" id="api-mode">{{ bot_status.mode|capitalize }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Cập nhật gần nhất:</label>
+                                <div class="fw-bold" id="last-updated">{{ bot_status.last_updated }}</div>
+                            </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Thời gian hoạt động:</label>
+                                <div class="fw-bold" id="uptime">--</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phiên bản:</label>
+                                <div class="fw-bold" id="version">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <button class="btn btn-success" id="btn-start-bot" {{ 'disabled' if bot_status.status == 'running' else '' }}>
+                            <i class="bi bi-play-fill"></i> Khởi động Bot
+                        </button>
+                        <button class="btn btn-danger" id="btn-stop-bot" {{ 'disabled' if bot_status.status == 'stopped' else '' }}>
+                            <i class="bi bi-stop-fill"></i> Dừng Bot
+                        </button>
+                        <button class="btn btn-warning" id="btn-restart-bot">
+                            <i class="bi bi-arrow-repeat"></i> Khởi động lại
+                        </button>
+                        <button class="btn btn-info" id="btn-test-telegram">
+                            <i class="bi bi-telegram"></i> Kiểm tra Telegram
+                        </button>
                     </div>
                 </div>
             </div>
-            
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card data-card">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="card-title mb-0">Thời gian hoạt động</h5>
-                                <i class="fas fa-clock text-primary"></i>
-                            </div>
-                            <div class="stats-counter" id="uptimeCounter">14h 35m</div>
-                            <div class="counter-label">Liên tục</div>
-                        </div>
-                    </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Thống kê hoạt động</h5>
                 </div>
-                <div class="col-md-3">
-                    <div class="card data-card">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="card-title mb-0">Phân tích thị trường</h5>
-                                <i class="fas fa-chart-line text-info"></i>
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card border-0 mt-3">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0 fw-bold" id="stat-analyses">--</h3>
+                                    <div class="text-muted small">Phân tích thị trường</div>
+                                </div>
                             </div>
-                            <div class="stats-counter" id="analysisCounter">342</div>
-                            <div class="counter-label">Lần phân tích</div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card data-card">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="card-title mb-0">Quyết định</h5>
-                                <i class="fas fa-brain text-warning"></i>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card border-0 mt-3">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0 fw-bold" id="stat-decisions">--</h3>
+                                    <div class="text-muted small">Quyết định giao dịch</div>
+                                </div>
                             </div>
-                            <div class="stats-counter" id="decisionsCounter">28</div>
-                            <div class="counter-label">Lần ra quyết định</div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card data-card">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="card-title mb-0">Lệnh giao dịch</h5>
-                                <i class="fas fa-exchange-alt text-success"></i>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card border-0 mt-3">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0 fw-bold" id="stat-orders">--</h3>
+                                    <div class="text-muted small">Lệnh đã đặt</div>
+                                </div>
                             </div>
-                            <div class="stats-counter" id="ordersCounter">12</div>
-                            <div class="counter-label">Lệnh đã thực thi</div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card border-0 mt-3">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0 fw-bold" id="stat-profit">--</h3>
+                                    <div class="text-muted small">Lợi nhuận</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-lightbulb me-2 text-warning"></i>
-                        Quyết định giao dịch gần đây
-                    </h5>
-                    <button class="btn btn-sm btn-outline-secondary" id="refreshDecisions">
-                        <i class="fas fa-sync-alt"></i>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Quyết định giao dịch gần đây</h5>
+                    <button class="btn btn-sm btn-outline-light" id="btn-refresh-decisions">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới
                     </button>
                 </div>
                 <div class="card-body">
-                    <div id="decisionsContainer">
-                        <!-- Quyết định sẽ được thêm vào đây bằng JavaScript -->
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Đang tải quyết định giao dịch...</p>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Cặp</th>
+                                    <th>Hành động</th>
+                                    <th>Giá</th>
+                                    <th>Take Profit</th>
+                                    <th>Stop Loss</th>
+                                    <th>Lý do</th>
+                                </tr>
+                            </thead>
+                            <tbody id="decisions-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-list-alt me-2 text-info"></i>
-                        Nhật ký hoạt động
-                    </h5>
-                    <button class="btn btn-sm btn-outline-secondary" id="refreshLogs">
-                        <i class="fas fa-sync-alt"></i>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Nhật ký hoạt động</h5>
+                    <button class="btn btn-sm btn-outline-light" id="btn-clear-logs">
+                        <i class="bi bi-trash"></i> Xóa nhật ký
                     </button>
                 </div>
-                <div class="card-body">
-                    <div id="logContainer">
-                        <!-- Log entries sẽ được thêm vào đây bằng JavaScript -->
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                <div class="card-body p-0">
+                    <div class="log-container">
+                        <div id="log-content" class="p-3">
+                            <div class="log-message text-center text-muted">
+                                <span>Đang kết nối tới bot...</span>
                             </div>
-                            <p class="mt-2">Đang tải nhật ký hoạt động...</p>
                         </div>
                     </div>
                 </div>
@@ -266,555 +159,329 @@
         </div>
     </div>
 </div>
+
+<!-- Toast cho thông báo -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="botMonitorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Đã cập nhật dữ liệu!
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .log-container {
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #1a1a1a;
+        border-radius: 0 0 0.25rem 0.25rem;
+    }
+    
+    .log-message {
+        padding: 6px 0;
+        border-bottom: 1px solid #2c2c2c;
+        font-family: monospace;
+        font-size: 0.9rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    
+    .log-message .timestamp {
+        color: #999;
+        margin-right: 10px;
+    }
+    
+    .log-category {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    
+    .log-category-market {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .log-category-analysis {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .log-category-decision {
+        background-color: #0dcaf0;
+        color: black;
+    }
+    
+    .log-category-action {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .log-category-error {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .log-category-info {
+        background-color: #6f42c1;
+        color: white;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Khởi tạo kết nối Socket.IO
-    const socket = io();
-    
-    // Xử lý sự kiện cập nhật trạng thái bot
-    socket.on('bot_status_update', function(data) {
-        // Cập nhật trạng thái hiển thị
-        updateBotStatusDisplay(data);
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = io();
+        const statusBadge = document.getElementById('status-badge');
+        const apiMode = document.getElementById('api-mode');
+        const lastUpdated = document.getElementById('last-updated');
+        const uptime = document.getElementById('uptime');
+        const version = document.getElementById('version');
+        const decisionsTableBody = document.getElementById('decisions-table-body');
+        const logContent = document.getElementById('log-content');
+        const btnStartBot = document.getElementById('btn-start-bot');
+        const btnStopBot = document.getElementById('btn-stop-bot');
+        const btnRestartBot = document.getElementById('btn-restart-bot');
+        const btnTestTelegram = document.getElementById('btn-test-telegram');
+        const btnRefreshDecisions = document.getElementById('btn-refresh-decisions');
+        const btnClearLogs = document.getElementById('btn-clear-logs');
+        const statAnalyses = document.getElementById('stat-analyses');
+        const statDecisions = document.getElementById('stat-decisions');
+        const statOrders = document.getElementById('stat-orders');
+        const statProfit = document.getElementById('stat-profit');
+        const toast = new bootstrap.Toast(document.getElementById('botMonitorToast'));
+        const toastBody = document.querySelector('.toast-body');
         
-        // Cập nhật thông tin thống kê nếu có
-        if(data.stats) {
-            updateStatsDisplay(data.stats);
-        }
-        
-        // Hiển thị thông báo
-        showToast('success', 'Trạng thái bot đã được cập nhật');
-    });
-    
-    // Xử lý sự kiện thay đổi trạng thái (start/stop)
-    socket.on('bot_status_change', function(data) {
-        // Cập nhật trạng thái hiển thị
-        if(data.status === 'running') {
-            botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
-            botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
-            startBotBtn.disabled = true;
-            stopBotBtn.disabled = false;
-        } else {
-            botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
-            botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
-            startBotBtn.disabled = false;
-            stopBotBtn.disabled = true;
-        }
-        
-        // Hiển thị thông báo
-        showToast('success', data.message);
-    });
-    
-    // Xử lý sự kiện log mới
-    socket.on('bot_log', function(logData) {
-        // Thêm log mới vào đầu danh sách
-        addNewLog(logData);
-    });
-    
-    // Xử lý sự kiện quyết định giao dịch mới
-    socket.on('trading_decision', function(decision) {
-        // Thêm quyết định mới vào đầu danh sách
-        addNewDecision(decision);
-    });
-    
-    // Hàm cập nhật hiển thị trạng thái bot
-    function updateBotStatusDisplay(data) {
-        if(data.status === 'running') {
-            botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
-            botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
-            startBotBtn.disabled = true;
-            stopBotBtn.disabled = false;
-        } else {
-            botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
-            botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
-            startBotBtn.disabled = false;
-            stopBotBtn.disabled = true;
-        }
-        
-        // Cập nhật thời gian
-        updateLastUpdateTime();
-    }
-    
-    // Hàm cập nhật hiển thị thống kê
-    function updateStatsDisplay(stats) {
-        uptimeCounter.textContent = stats.uptime;
-        analysisCounter.textContent = stats.analyses;
-        decisionsCounter.textContent = stats.decisions;
-        ordersCounter.textContent = stats.orders;
-    }
-    
-    // Hàm thêm log mới
-    function addNewLog(logData) {
-        const logTime = new Date(logData.timestamp);
-        const formattedTime = logTime.toLocaleTimeString();
-        
-        const logItem = document.createElement('div');
-        logItem.className = `log-item ${logData.category}`;
-        logItem.innerHTML = `
-            <div class="d-flex justify-content-between">
-                <small class="timestamp">${formattedTime}</small>
-                <small class="badge ${getCategoryBadgeClass(logData.category)}">${getCategoryLabel(logData.category)}</small>
-            </div>
-            <div class="mt-1">${logData.message}</div>
-        `;
-        
-        // Nếu container đã có nội dung không phải là thông báo loading
-        if (!logContainer.querySelector('.text-center.py-5')) {
-            // Thêm phần tử mới vào đầu danh sách
-            logContainer.insertBefore(logItem, logContainer.firstChild);
-            
-            // Nếu có quá nhiều log, xóa bớt
-            const logItems = logContainer.querySelectorAll('.log-item');
-            if (logItems.length > 50) {
-                logContainer.removeChild(logItems[logItems.length - 1]);
-            }
-        } else {
-            // Nếu đang hiển thị loading, xóa nó và thêm log mới
-            logContainer.innerHTML = '';
-            logContainer.appendChild(logItem);
-        }
-    }
-    
-    // Hàm thêm quyết định mới
-    function addNewDecision(decision) {
-        const decisionTime = new Date(decision.timestamp);
-        const formattedTime = decisionTime.toLocaleDateString() + ' ' + decisionTime.toLocaleTimeString();
-        
-        const decisionItem = document.createElement('div');
-        decisionItem.className = `decision-item ${decision.action.toLowerCase()}`;
-        
-        let decisionContent = `
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <h5 class="mb-0">${decision.symbol}: ${getActionLabel(decision.action)}</h5>
-                <span class="timestamp">${formattedTime}</span>
-            </div>
-        `;
-        
-        // Thêm chi tiết giá nếu có
-        if (decision.action !== 'HOLD') {
-            decisionContent += `
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <div class="text-muted small">Giá vào lệnh</div>
-                            <div class="fw-bold">${formatPrice(decision.entry_price)}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <div class="text-muted small">Take Profit</div>
-                            <div class="fw-bold text-success">${formatPrice(decision.take_profit)}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <div class="text-muted small">Stop Loss</div>
-                            <div class="fw-bold text-danger">${formatPrice(decision.stop_loss)}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Thêm lý do quyết định
-        decisionContent += `<div class="mb-2 fw-bold">Lý do:</div>`;
-        decision.reasons.forEach(reason => {
-            decisionContent += `<div class="reason-item"><i class="fas fa-check-circle me-1 text-success"></i> ${reason}</div>`;
-        });
-        
-        decisionItem.innerHTML = decisionContent;
-        
-        // Nếu container đã có nội dung không phải là thông báo loading
-        if (!decisionsContainer.querySelector('.text-center.py-5')) {
-            // Thêm phần tử mới vào đầu danh sách
-            decisionsContainer.insertBefore(decisionItem, decisionsContainer.firstChild);
-            
-            // Nếu có quá nhiều quyết định, xóa bớt
-            const decisionItems = decisionsContainer.querySelectorAll('.decision-item');
-            if (decisionItems.length > 5) {
-                decisionsContainer.removeChild(decisionItems[decisionItems.length - 1]);
-            }
-        } else {
-            // Nếu đang hiển thị loading, xóa nó và thêm quyết định mới
-            decisionsContainer.innerHTML = '';
-            decisionsContainer.appendChild(decisionItem);
-        }
-    }
-    
-    // Hàm hiển thị thông báo
-    function showToast(type, message) {
-        if (type === 'success') {
-            document.getElementById('toast-message').textContent = message;
-            new bootstrap.Toast(document.getElementById('success-toast')).show();
-        } else {
-            document.getElementById('toast-error-message').textContent = message;
-            new bootstrap.Toast(document.getElementById('error-toast')).show();
-        }
-    }
-    // Khởi tạo các biến
-    const botSelector = document.getElementById('botSelector');
-    const refreshButton = document.getElementById('refreshButton');
-    const startBotBtn = document.getElementById('startBotBtn');
-    const stopBotBtn = document.getElementById('stopBotBtn');
-    const botStatusBadge = document.getElementById('botStatusBadge');
-    const lastUpdateTime = document.getElementById('lastUpdateTime');
-    
-    const refreshLogs = document.getElementById('refreshLogs');
-    const refreshDecisions = document.getElementById('refreshDecisions');
-    
-    const logContainer = document.getElementById('logContainer');
-    const decisionsContainer = document.getElementById('decisionsContainer');
-    
-    const uptimeCounter = document.getElementById('uptimeCounter');
-    const analysisCounter = document.getElementById('analysisCounter');
-    const decisionsCounter = document.getElementById('decisionsCounter');
-    const ordersCounter = document.getElementById('ordersCounter');
-    
-    // Chức năng tải nhật ký
-    function loadLogs() {
-        const selectedBot = botSelector.value;
-        
-        // Hiển thị animation loading
-        logContainer.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2">Đang tải nhật ký hoạt động...</p>
-            </div>
-        `;
-        
-        // Gọi API để lấy logs
-        fetch(`/api/bot/logs?bot_id=${selectedBot}&limit=50`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.logs && data.logs.length > 0) {
-                    // Xóa loading và render logs
-                    logContainer.innerHTML = '';
-                    
-                    // Hiển thị logs mới nhất đầu tiên
-                    data.logs.forEach(log => {
-                        const logTime = new Date(log.timestamp);
-                        const formattedTime = logTime.toLocaleTimeString();
+        // Lấy quyết định giao dịch gần đây
+        function getRecentDecisions() {
+            fetch('/api/bot/decisions')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.decisions) {
+                        decisionsTableBody.innerHTML = '';
                         
-                        const logItem = document.createElement('div');
-                        logItem.className = `log-item ${log.category}`;
-                        logItem.innerHTML = `
-                            <div class="d-flex justify-content-between">
-                                <small class="timestamp">${formattedTime}</small>
-                                <small class="badge ${getCategoryBadgeClass(log.category)}">${getCategoryLabel(log.category)}</small>
-                            </div>
-                            <div class="mt-1">${log.message}</div>
-                        `;
-                        
-                        logContainer.appendChild(logItem);
-                    });
-                } else {
-                    logContainer.innerHTML = '<div class="text-center py-3">Không có nhật ký hoạt động nào.</div>';
-                }
-                
-                // Cập nhật thời gian
-                updateLastUpdateTime();
-            })
-            .catch(error => {
-                console.error('Error loading logs:', error);
-                logContainer.innerHTML = '<div class="text-center py-3 text-danger">Đã xảy ra lỗi khi tải nhật ký.</div>';
-            });
-    }
-    
-    // Chức năng tải quyết định
-    function loadDecisions() {
-        const selectedBot = botSelector.value;
-        
-        // Hiển thị animation loading
-        decisionsContainer.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2">Đang tải quyết định giao dịch...</p>
-            </div>
-        `;
-        
-        // Gọi API để lấy decisions
-        fetch(`/api/bot/decisions?bot_id=${selectedBot}&limit=5`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.decisions && data.decisions.length > 0) {
-                    // Xóa loading và render decisions
-                    decisionsContainer.innerHTML = '';
-                    
-                    // Hiển thị decisions mới nhất đầu tiên
-                    data.decisions.forEach(decision => {
-                        const decisionTime = new Date(decision.timestamp);
-                        const formattedTime = decisionTime.toLocaleDateString() + ' ' + decisionTime.toLocaleTimeString();
-                        
-                        const decisionItem = document.createElement('div');
-                        decisionItem.className = `decision-item ${decision.action.toLowerCase()}`;
-                        
-                        let decisionContent = `
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="mb-0">${decision.symbol}: ${getActionLabel(decision.action)}</h5>
-                                <span class="timestamp">${formattedTime}</span>
-                            </div>
-                        `;
-                        
-                        // Thêm chi tiết giá nếu có
-                        if (decision.action !== 'HOLD') {
-                            decisionContent += `
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-muted small">Giá vào lệnh</div>
-                                            <div class="fw-bold">${formatPrice(decision.entry_price)}</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-muted small">Take Profit</div>
-                                            <div class="fw-bold text-success">${formatPrice(decision.take_profit)}</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-muted small">Stop Loss</div>
-                                            <div class="fw-bold text-danger">${formatPrice(decision.stop_loss)}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        
-                        // Thêm lý do quyết định
-                        decisionContent += `<div class="mb-2 fw-bold">Lý do:</div>`;
-                        decision.reasons.forEach(reason => {
-                            decisionContent += `<div class="reason-item"><i class="fas fa-check-circle me-1 text-success"></i> ${reason}</div>`;
+                        data.decisions.forEach(decision => {
+                            const date = new Date(decision.timestamp);
+                            const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                            
+                            let row = `<tr>
+                                <td>${formattedDate}</td>
+                                <td>${decision.symbol}</td>
+                                <td>
+                                    <span class="badge ${decision.action === 'BUY' ? 'bg-success' : (decision.action === 'SELL' ? 'bg-danger' : 'bg-warning')}">
+                                        ${decision.action}
+                                    </span>
+                                </td>
+                                <td>${decision.entry_price ? decision.entry_price.toLocaleString('vi-VN') : '-'}</td>
+                                <td>${decision.take_profit ? decision.take_profit.toLocaleString('vi-VN') : '-'}</td>
+                                <td>${decision.stop_loss ? decision.stop_loss.toLocaleString('vi-VN') : '-'}</td>
+                                <td>`;
+                            
+                            if (decision.reasons && decision.reasons.length > 0) {
+                                row += `<ul class="mb-0 ps-3">`;
+                                decision.reasons.forEach(reason => {
+                                    row += `<li>${reason}</li>`;
+                                });
+                                row += `</ul>`;
+                            } else {
+                                row += `-`;
+                            }
+                            
+                            row += `</td></tr>`;
+                            
+                            decisionsTableBody.innerHTML += row;
                         });
-                        
-                        decisionItem.innerHTML = decisionContent;
-                        decisionsContainer.appendChild(decisionItem);
-                    });
-                } else {
-                    decisionsContainer.innerHTML = '<div class="text-center py-3">Không có quyết định giao dịch nào.</div>';
-                }
-                
-                // Cập nhật thời gian
-                updateLastUpdateTime();
-            })
-            .catch(error => {
-                console.error('Error loading decisions:', error);
-                decisionsContainer.innerHTML = '<div class="text-center py-3 text-danger">Đã xảy ra lỗi khi tải quyết định giao dịch.</div>';
-            });
-    }
-    
-    // Chức năng tải thống kê
-    function loadStats() {
-        const selectedBot = botSelector.value;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching decisions:', error);
+                    decisionsTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Lỗi: ${error.message}</td></tr>`;
+                });
+        }
         
-        fetch(`/api/bot/stats?bot_id=${selectedBot}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.stats) {
-                    // Cập nhật biến đếm
-                    uptimeCounter.textContent = data.stats.uptime;
-                    analysisCounter.textContent = data.stats.analyses;
-                    decisionsCounter.textContent = data.stats.decisions;
-                    ordersCounter.textContent = data.stats.orders;
-                }
-                
-                // Cập nhật thời gian
-                updateLastUpdateTime();
-            })
-            .catch(error => {
-                console.error('Error loading stats:', error);
-            });
-    }
-    
-    // Chức năng tải trạng thái bot
-    function loadBotStatus() {
-        fetch('/api/bot/status')
-            .then(response => response.json())
-            .then(data => {
-                // Cập nhật trạng thái
-                if (data.status === 'running') {
-                    botStatusBadge.className = 'badge rounded-pill text-bg-success fs-6 px-3 py-2';
-                    botStatusBadge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> Bot đang hoạt động';
-                    
-                    // Cập nhật trạng thái nút
-                    startBotBtn.disabled = true;
-                    stopBotBtn.disabled = false;
-                } else {
-                    botStatusBadge.className = 'badge rounded-pill text-bg-secondary fs-6 px-3 py-2';
-                    botStatusBadge.innerHTML = '<i class="fas fa-stop-circle me-1"></i> Bot đã dừng';
-                    
-                    // Cập nhật trạng thái nút
-                    startBotBtn.disabled = false;
-                    stopBotBtn.disabled = true;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading bot status:', error);
-            });
-    }
-    
-    // Hàm cập nhật thời gian
-    function updateLastUpdateTime() {
-        lastUpdateTime.textContent = new Date().toLocaleTimeString();
-    }
-    
-    // Chuyển đổi danh mục thành badge class
-    function getCategoryBadgeClass(category) {
-        switch (category) {
-            case 'market': return 'bg-info text-white';
-            case 'analysis': return 'bg-secondary text-white';
-            case 'decision': return 'bg-warning text-dark';
-            case 'action': return 'bg-success text-white';
-            case 'error': return 'bg-danger text-white';
-            default: return 'bg-light text-dark';
+        // Lấy thống kê bot
+        function getBotStats() {
+            fetch('/api/bot/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.stats) {
+                        statAnalyses.textContent = data.stats.analyses || '--';
+                        statDecisions.textContent = data.stats.decisions || '--';
+                        statOrders.textContent = data.stats.orders || '--';
+                        statProfit.textContent = data.stats.profit || '--';
+                    }
+                })
+                .catch(error => console.error('Error fetching bot stats:', error));
         }
-    }
-    
-    // Chuyển đổi danh mục thành nhãn
-    function getCategoryLabel(category) {
-        switch (category) {
-            case 'market': return 'Thị trường';
-            case 'analysis': return 'Phân tích';
-            case 'decision': return 'Quyết định';
-            case 'action': return 'Hành động';
-            case 'error': return 'Lỗi';
-            default: return category;
-        }
-    }
-    
-    // Chuyển đổi hành động thành nhãn
-    function getActionLabel(action) {
-        switch (action) {
-            case 'BUY': return '<span class="badge bg-success">MUA</span>';
-            case 'SELL': return '<span class="badge bg-danger">BÁN</span>';
-            case 'HOLD': return '<span class="badge bg-warning text-dark">GIỮ</span>';
-            default: return action;
-        }
-    }
-    
-    // Định dạng giá
-    function formatPrice(price) {
-        if (!price) return 'N/A';
-        return parseFloat(price).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }) + ' USDT';
-    }
-    
-    // Khởi tạo trang
-    function initializePage() {
-        loadBotStatus();
-        loadLogs();
-        loadDecisions();
-        loadStats();
-    }
-    
-    // Thiết lập sự kiện
-    botSelector.addEventListener('change', function() {
-        // Khi bot được chọn thay đổi, tải lại tất cả dữ liệu
-        initializePage();
-    });
-    
-    refreshButton.addEventListener('click', function() {
-        // Làm mới tất cả dữ liệu
-        initializePage();
-    });
-    
-    refreshLogs.addEventListener('click', function() {
-        // Chỉ làm mới nhật ký
-        loadLogs();
-    });
-    
-    refreshDecisions.addEventListener('click', function() {
-        // Chỉ làm mới quyết định
-        loadDecisions();
-    });
-    
-    startBotBtn.addEventListener('click', function() {
-        const selectedBot = botSelector.value;
         
-        // Gửi yêu cầu khởi động bot
-        fetch('/api/bot/control/' + selectedBot, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'start'
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Hiển thị thông báo thành công
-                document.getElementById('toast-message').textContent = 'Bot đã được khởi động thành công!';
-                new bootstrap.Toast(document.getElementById('success-toast')).show();
-                
-                // Cập nhật trạng thái
-                loadBotStatus();
+        // Hiển thị thông báo
+        function showToast(message, isError = false) {
+            toastBody.textContent = message;
+            
+            if (isError) {
+                toastBody.classList.add('bg-danger', 'text-white');
             } else {
-                // Hiển thị thông báo lỗi
-                document.getElementById('toast-error-message').textContent = data.message || 'Không thể khởi động bot!';
-                new bootstrap.Toast(document.getElementById('error-toast')).show();
+                toastBody.classList.remove('bg-danger', 'text-white');
             }
-        })
-        .catch(error => {
-            console.error('Error starting bot:', error);
-            document.getElementById('toast-error-message').textContent = 'Đã xảy ra lỗi khi khởi động bot!';
-            new bootstrap.Toast(document.getElementById('error-toast')).show();
+            
+            toast.show();
+        }
+        
+        // Thêm log vào container
+        function addLogMessage(log) {
+            const date = new Date(log.timestamp);
+            const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+            
+            const logMessageElement = document.createElement('div');
+            logMessageElement.className = 'log-message';
+            
+            logMessageElement.innerHTML = `
+                <span class="timestamp">[${formattedDate}]</span>
+                <span class="log-category log-category-${log.category}">${log.category}</span>
+                <span class="message">${log.message}</span>
+            `;
+            
+            logContent.appendChild(logMessageElement);
+            
+            // Cuộn xuống log mới nhất
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        // Điều khiển bot
+        function controlBot(action) {
+            fetch(`/api/bot/control/all`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: action }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message);
+                    } else {
+                        showToast(data.message, true);
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error ${action} bot:`, error);
+                    showToast(`Lỗi: ${error.message}`, true);
+                });
+        }
+        
+        // Kiểm tra kết nối Telegram
+        function testTelegramConnection() {
+            btnTestTelegram.disabled = true;
+            btnTestTelegram.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang kiểm tra...';
+            
+            fetch('/api/test_telegram')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Kết nối Telegram thành công! Kiểm tra tin nhắn đã nhận.');
+                    } else {
+                        showToast(data.message, true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error testing Telegram:', error);
+                    showToast(`Lỗi: ${error.message}`, true);
+                })
+                .finally(() => {
+                    btnTestTelegram.disabled = false;
+                    btnTestTelegram.innerHTML = '<i class="bi bi-telegram"></i> Kiểm tra Telegram';
+                });
+        }
+        
+        // Sự kiện Socket.IO
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            getRecentDecisions();
+            getBotStats();
+        });
+        
+        socket.on('bot_status_update', function(data) {
+            if (data.status === 'running') {
+                statusBadge.className = 'badge rounded-pill bg-success';
+                statusBadge.textContent = 'Đang chạy';
+                btnStartBot.disabled = true;
+                btnStopBot.disabled = false;
+            } else {
+                statusBadge.className = 'badge rounded-pill bg-danger';
+                statusBadge.textContent = 'Đã dừng';
+                btnStartBot.disabled = false;
+                btnStopBot.disabled = true;
+            }
+            
+            if (data.mode) {
+                apiMode.textContent = data.mode.charAt(0).toUpperCase() + data.mode.slice(1);
+            }
+            
+            if (data.last_updated) {
+                lastUpdated.textContent = data.last_updated;
+            }
+            
+            if (data.stats) {
+                uptime.textContent = data.stats.uptime || '--';
+                
+                if (data.stats.analyses) statAnalyses.textContent = data.stats.analyses;
+                if (data.stats.decisions) statDecisions.textContent = data.stats.decisions;
+                if (data.stats.orders) statOrders.textContent = data.stats.orders;
+            }
+            
+            if (data.version) {
+                version.textContent = data.version;
+            }
+        });
+        
+        socket.on('bot_status_change', function(data) {
+            showToast(data.message);
+        });
+        
+        socket.on('bot_log', function(log) {
+            addLogMessage(log);
+        });
+        
+        socket.on('trading_decision', function(decision) {
+            getRecentDecisions();
+        });
+        
+        // Sự kiện nút
+        btnStartBot.addEventListener('click', function() {
+            controlBot('start');
+        });
+        
+        btnStopBot.addEventListener('click', function() {
+            controlBot('stop');
+        });
+        
+        btnRestartBot.addEventListener('click', function() {
+            controlBot('restart');
+        });
+        
+        btnTestTelegram.addEventListener('click', function() {
+            testTelegramConnection();
+        });
+        
+        btnRefreshDecisions.addEventListener('click', function() {
+            getRecentDecisions();
+        });
+        
+        btnClearLogs.addEventListener('click', function() {
+            logContent.innerHTML = '<div class="log-message text-center text-muted"><span>Nhật ký đã được xóa</span></div>';
         });
     });
-    
-    stopBotBtn.addEventListener('click', function() {
-        const selectedBot = botSelector.value;
-        
-        // Gửi yêu cầu dừng bot
-        fetch('/api/bot/control/' + selectedBot, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'stop'
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Hiển thị thông báo thành công
-                document.getElementById('toast-message').textContent = 'Bot đã được dừng thành công!';
-                new bootstrap.Toast(document.getElementById('success-toast')).show();
-                
-                // Cập nhật trạng thái
-                loadBotStatus();
-            } else {
-                // Hiển thị thông báo lỗi
-                document.getElementById('toast-error-message').textContent = data.message || 'Không thể dừng bot!';
-                new bootstrap.Toast(document.getElementById('error-toast')).show();
-            }
-        })
-        .catch(error => {
-            console.error('Error stopping bot:', error);
-            document.getElementById('toast-error-message').textContent = 'Đã xảy ra lỗi khi dừng bot!';
-            new bootstrap.Toast(document.getElementById('error-toast')).show();
-        });
-    });
-    
-    // Thiết lập intervalpokki
-    setInterval(function() {
-        // Cập nhật trạng thái bot mỗi 30 giây
-        loadBotStatus();
-    }, 30000);
-    
-    // Khởi tạo trang
-    initializePage();
-});
 </script>
 {% endblock %}

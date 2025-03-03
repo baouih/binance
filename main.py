@@ -12,6 +12,9 @@ import schedule
 import json
 import random
 
+# Thêm module Telegram Notifier
+from telegram_notifier import TelegramNotifier
+
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('main')
@@ -33,6 +36,9 @@ bot_status = {
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'mode': 'demo',
 }
+
+# Khởi tạo Telegram Notifier
+telegram_notifier = TelegramNotifier()
 
 # Dữ liệu mẫu cho thị trường khi không kết nối API thực
 SAMPLE_MARKET_DATA = {
@@ -177,6 +183,33 @@ def change_language():
     language = request.form.get('language', 'vi')
     session['language'] = language
     return redirect(request.referrer or url_for('index'))
+
+@app.route('/api/test_telegram', methods=['GET'])
+def test_telegram():
+    """Kiểm tra kết nối Telegram"""
+    try:
+        # Gửi tin nhắn test đến Telegram
+        result = telegram_notifier.send_message(
+            message=f"<b>Kiểm tra kết nối</b>\n\nĐây là tin nhắn kiểm tra kết nối từ BinanceTrader Bot. Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            category="system"
+        )
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Kết nối Telegram thành công!'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Không thể gửi tin nhắn đến Telegram. Vui lòng kiểm tra cấu hình.'
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi: {str(e)}'
+        })
 
 @app.route('/api/market')
 def get_market():
@@ -507,6 +540,16 @@ def control_bot(bot_id):
             'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động'
         })
         
+        # Gửi thông báo qua Telegram
+        telegram_notifier.send_bot_status(
+            status='running',
+            mode=bot_status['mode'],
+            uptime='0h 0m',
+            stats={
+                'Trạng thái': 'Đã khởi động'
+            }
+        )
+        
         return jsonify({
             'success': True,
             'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động',
@@ -523,6 +566,17 @@ def control_bot(bot_id):
             'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được dừng'
         })
         
+        # Gửi thông báo qua Telegram
+        telegram_notifier.send_bot_status(
+            status='stopped',
+            mode=bot_status['mode'],
+            uptime='--',
+            stats={
+                'Trạng thái': 'Đã dừng',
+                'Thời gian': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+        )
+        
         return jsonify({
             'success': True,
             'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được dừng',
@@ -538,6 +592,17 @@ def control_bot(bot_id):
             'status': 'running',
             'message': f'Bot {"tất cả" if bot_id == "all" else bot_id} đã được khởi động lại'
         })
+        
+        # Gửi thông báo qua Telegram
+        telegram_notifier.send_bot_status(
+            status='running',
+            mode=bot_status['mode'],
+            uptime='0h 0m',
+            stats={
+                'Trạng thái': 'Đã khởi động lại',
+                'Thời gian': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+        )
         
         return jsonify({
             'success': True,
@@ -715,6 +780,28 @@ def update_market_data():
                 'message': f'Quyết định: {action} {coin}USDT tại {price:.2f} USDT, SL: {stop_loss:.2f} USDT, TP: {take_profit:.2f} USDT'
             }
             socketio.emit('bot_log', log_data)
+            
+            # Gửi thông báo qua Telegram
+            if action == 'BUY':
+                telegram_notifier.send_trade_entry(
+                    symbol=f"{coin}USDT",
+                    side=action,
+                    entry_price=price,
+                    quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
+                    stop_loss=stop_loss,
+                    take_profit=take_profit,
+                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
+                )
+            elif action == 'SELL':
+                telegram_notifier.send_trade_entry(
+                    symbol=f"{coin}USDT",
+                    side=action,
+                    entry_price=price,
+                    quantity=0.01 if coin == 'BTC' else (0.2 if coin == 'ETH' else 1.0),
+                    stop_loss=stop_loss,
+                    take_profit=take_profit,
+                    reason=f"RSI = {market_data['indicators'][coin]['rsi']}, MACD = {market_data['indicators'][coin]['macd']}, Xu hướng: {market_data['indicators'][coin]['trend']}"
+                )
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
@@ -734,6 +821,35 @@ def update_account_data():
                 'message': f'Cập nhật vị thế: {position["symbol"]} {position["type"]}, Giá hiện tại: {position["current_price"]}, P&L: {position["pnl"]:.2f} USDT'
             }
             socketio.emit('bot_log', log_data)
+            
+            # Thỉnh thoảng gửi thông báo lãi/lỗ qua Telegram (mô phỏng thoát lệnh)
+            if random.random() < 0.05:  # 5% khả năng sẽ mô phỏng thoát lệnh
+                is_profit = position['pnl'] > 0
+                side = 'BUY' if position['type'] == 'LONG' else 'SELL'
+                exit_price = position['current_price']
+                entry_price = position['entry_price']
+                
+                # Gửi thông báo thoát lệnh qua Telegram
+                telegram_notifier.send_trade_exit(
+                    symbol=position['symbol'],
+                    side=side,
+                    exit_price=exit_price,
+                    entry_price=entry_price,
+                    quantity=position['size'],
+                    profit_loss=position['pnl'],
+                    profit_loss_percent=position['pnl_percent'],
+                    exit_reason="Đạt mức take profit" if is_profit else "Kích hoạt stop loss"
+                )
+                
+                # Gửi cảnh báo thị trường nếu có biến động lớn
+                if random.random() < 0.2:  # 20% khả năng gửi thêm cảnh báo
+                    symbol = position['symbol'].replace('USDT', '')
+                    telegram_notifier.send_market_alert(
+                        symbol=position['symbol'],
+                        alert_type=f"Biến động lớn cho {symbol}",
+                        price=exit_price,
+                        message=f"Giá {symbol} đã biến động {position['pnl_percent']:.2f}% trong thời gian ngắn"
+                    )
 
 def check_bot_status():
     """Kiểm tra trạng thái bot"""
