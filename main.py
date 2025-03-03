@@ -341,7 +341,11 @@ def control_bot():
 
         bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        socketio.emit('bot_status', bot_status)
+        # Gửi cập nhật trạng thái bot đến client
+        socketio.emit('bot_status_update', bot_status)
+        
+        # Ghi log để debug
+        logger.debug(f"Emitted bot status update: {bot_status}")
 
         return jsonify({
             'success': True,
