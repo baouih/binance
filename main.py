@@ -269,7 +269,7 @@ def get_account():
             'margin': 0.00,
             'pnl': 0.00,
             'currency': 'USDT',
-            'mode': 'Demo',
+            'mode': 'demo',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
             'leverage': 3,
             'positions': [
                 # Tạo dữ liệu mẫu cho chế độ demo
@@ -283,7 +283,7 @@ def get_account():
             'margin': 0.00,
             'pnl': 0.00,
             'currency': 'USDT',
-            'mode': 'Testnet',
+            'mode': 'testnet',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
             'leverage': 5,
             'positions': [
                 {
@@ -308,7 +308,7 @@ def get_account():
             'margin': 0.00,
             'pnl': 0.00,
             'currency': 'USDT',
-            'mode': 'Live',
+            'mode': 'live',  # Quan trọng: để chữ thường cho đồng bộ với chế độ
             'leverage': 3,
             'positions': [
                 {
