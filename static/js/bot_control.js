@@ -1,279 +1,197 @@
-// JavaScript for bot control
+/**
+ * Bot Control Module
+ * Module Javascript để điều khiển bot giao dịch thông qua REST API
+ */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Nút Chạy Bot
+    console.log('Bot Control Module initialized');
+    
+    // Tìm tất cả các nút khởi động bot
     const startBotButtons = document.querySelectorAll('.start-bot-btn');
-    
-    if (startBotButtons && startBotButtons.length > 0) {
-        startBotButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Bot ID để khởi động
-                const botId = this.getAttribute('data-bot-id') || 'default';
-                
-                // Hiển thị loading
-                window.showLoading();
-                
-                // Gửi lệnh khởi động bot
-                startBot(botId);
-            });
-        });
-    }
-    
-    // Nút Dừng Bot
+    // Tìm tất cả các nút dừng bot
     const stopBotButtons = document.querySelectorAll('.stop-bot-btn');
+    // Tìm nút khởi động lại bot
+    const restartBotButtons = document.querySelectorAll('#restartBotBtn');
     
-    if (stopBotButtons && stopBotButtons.length > 0) {
-        stopBotButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Bot ID để dừng
-                const botId = this.getAttribute('data-bot-id') || 'default';
-                
-                // Hiển thị loading
-                window.showLoading();
-                
-                // Gửi lệnh dừng bot
-                stopBot(botId);
-            });
+    // Thêm sự kiện cho các nút khởi động bot
+    startBotButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const botId = this.getAttribute('data-bot-id') || 'default';
+            controlBot('start', botId);
+        });
+    });
+    
+    // Thêm sự kiện cho các nút dừng bot
+    stopBotButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const botId = this.getAttribute('data-bot-id') || 'default';
+            controlBot('stop', botId);
+        });
+    });
+    
+    // Thêm sự kiện cho các nút khởi động lại bot
+    restartBotButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const botId = this.getAttribute('data-bot-id') || 'default';
+            controlBot('restart', botId);
+        });
+    });
+    
+    // Thêm sự kiện cho nút trên mobile
+    const mobileBotToggle = document.getElementById('mobileBotToggle');
+    if (mobileBotToggle) {
+        mobileBotToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Kiểm tra nút đang là start hay stop dựa vào lớp CSS
+            const action = this.classList.contains('btn-success') ? 'start' : 'stop';
+            const botId = this.getAttribute('data-bot-id') || 'default';
+            controlBot(action, botId);
         });
     }
-    
-    // Các chức năng khác
-    function startBot(botId) {
-        // Gửi request tới API
-        fetch('/api/bot/control', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                action: 'start',
-                strategy_mode: 'auto'
-            })
-        })
-        .then(response => {
-            console.log("Response status:", response.status);
-            try {
-                return response.json();
-            } catch (e) {
-                console.error("Error parsing JSON:", e);
-                return { success: false, error_type: 'parse_error', message: "Không thể phân tích phản hồi từ máy chủ" };
-            }
-        })
-        .then(data => {
-            console.log("Received data:", data);
-            // Ẩn loading
-            window.hideLoading();
-            
-            if (data.success) {
-                // Thành công thực sự
-                BOT_STATUS = { running: true };
-                
-                // Hiển thị thông báo thành công
-                showToast('success', 'Bot đã được khởi động thành công');
-                
-                // Cập nhật giao diện trạng thái bot
-                updateBotStatus(botId, 'running');
-                
-                // Tự động làm mới trang sau 2 giây
-                setTimeout(function() {
-                    console.log("Reloading page...");
-                    window.location.reload();
-                }, 2000);
-            } else {
-                console.error('Bot không thể khởi động:', data);
-                
-                // Kiểm tra nguyên nhân lỗi
-                if (data.error_type === 'missing_api_config') {
-                    // Hiển thị thông báo cấu hình API
-                    showRedirectToast('error', 'Cần cấu hình API', 
-                        'Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.', 
-                        '/settings');
-                } else {
-                    // Hiển thị thông báo lỗi thông thường
-                    showToast('error', 'Lỗi: ' + (data.message || 'Không thể khởi động bot'));
-                }
-            }
-        })
-        .catch(error => {
-            // Ẩn loading
-            window.hideLoading();
-            
-            // Hiển thị thông báo lỗi
-            showToast('error', 'Lỗi kết nối: ' + error.message);
-        });
-    }
-    
-    function stopBot(botId) {
-        // Gửi request tới API
-        fetch('/api/bot/control', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                action: 'stop',
-                bot_id: botId || 'default'
-            })
-        })
-        .then(response => {
-            console.log("Response status:", response.status);
-            try {
-                return response.json();
-            } catch (e) {
-                console.error("Error parsing JSON:", e);
-                return { success: false, error_type: 'parse_error', message: "Không thể phân tích phản hồi từ máy chủ" };
-            }
-        })
-        .then(data => {
-            console.log("Received data:", data);
-            // Ẩn loading
-            window.hideLoading();
-            
-            if (data.success) {
-                // Thành công thực sự
-                BOT_STATUS = { running: false };
-                
-                // Hiển thị thông báo thành công
-                showToast('success', 'Bot đã được dừng thành công');
-                
-                // Cập nhật giao diện trạng thái bot
-                updateBotStatus(botId, 'stopped');
-                
-                // Tự động làm mới trang sau 2 giây
-                setTimeout(function() {
-                    console.log("Reloading page...");
-                    window.location.reload();
-                }, 2000);
-            } else {
-                console.error('Bot không thể dừng:', data);
-                // Hiển thị thông báo lỗi thông thường
-                showToast('error', 'Lỗi: ' + (data.message || 'Không thể dừng bot'));
-            }
-        })
-        .catch(error => {
-            // Ẩn loading
-            window.hideLoading();
-            
-            // Hiển thị thông báo lỗi
-            showToast('error', 'Lỗi kết nối: ' + error.message);
-        });
-    }
-    
-    function updateBotStatus(botId, status) {
-        // Cập nhật giao diện trạng thái bot
-        const statusBadge = document.querySelector(`.bot-status-badge[data-bot-id="${botId}"]`);
-        const statusText = document.querySelector(`.bot-status-text[data-bot-id="${botId}"]`);
-        
-        if (statusBadge) {
-            // Xóa tất cả các class trạng thái
-            statusBadge.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-secondary');
-            
-            // Thêm class mới dựa trên trạng thái
-            if (status === 'running') {
-                statusBadge.classList.add('bg-success');
-                statusBadge.textContent = 'Đang chạy';
-            } else if (status === 'stopped') {
-                statusBadge.classList.add('bg-danger');
-                statusBadge.textContent = 'Đã dừng';
-            } else if (status === 'restarting') {
-                statusBadge.classList.add('bg-warning');
-                statusBadge.textContent = 'Đang khởi động lại';
-            } else {
-                statusBadge.classList.add('bg-secondary');
-                statusBadge.textContent = 'Không xác định';
-            }
-        }
-        
-        if (statusText) {
-            if (status === 'running') {
-                statusText.textContent = 'Đang chạy';
-            } else if (status === 'stopped') {
-                statusText.textContent = 'Đã dừng';
-            } else if (status === 'restarting') {
-                statusText.textContent = 'Đang khởi động lại';
-            } else {
-                statusText.textContent = 'Không xác định';
-            }
-        }
-        
-        // Cập nhật nút Start/Stop nếu có
-        const startButton = document.querySelector(`.start-bot-btn[data-bot-id="${botId}"]`);
-        const stopButton = document.querySelector(`.stop-bot-btn[data-bot-id="${botId}"]`);
-        
-        if (startButton && stopButton) {
-            if (status === 'running') {
-                startButton.classList.add('d-none');
-                stopButton.classList.remove('d-none');
-            } else {
-                startButton.classList.remove('d-none');
-                stopButton.classList.add('d-none');
-            }
-        }
-    }
-    
-    // Toast thông báo đặc biệt có nút chuyển hướng
-    function showRedirectToast(type, title, message, redirectUrl) {
-        // Tạo toast container nếu chưa có
-        let toastContainer = document.getElementById('redirect-toast-container');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'redirect-toast-container';
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            document.body.appendChild(toastContainer);
-        }
-        
-        // Tạo toast mới
-        const toastId = 'redirect-toast-' + new Date().getTime();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.id = toastId;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
-        
-        // Tạo nội dung toast
-        toast.innerHTML = `
-            <div class="toast-header ${type === 'error' ? 'bg-danger text-white' : 'bg-success text-white'}">
-                <strong class="me-auto">${title}</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                <p>${message}</p>
-                <div class="mt-2 pt-2 border-top d-flex justify-content-end">
-                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="toast">Đóng</button>
-                    <a href="${redirectUrl}" class="btn btn-primary">Thiết lập ngay</a>
-                </div>
-            </div>
-        `;
-        
-        // Thêm toast vào container
-        toastContainer.appendChild(toast);
-        
-        // Hiển thị toast
-        const bsToast = new bootstrap.Toast(toast, {
-            autohide: false
-        });
-        bsToast.show();
-        
-        // Return toast object for further management
-        return { id: toastId, bsToast };
-    }
-    
-    // Thêm vào window để các script khác có thể sử dụng
-    window.showRedirectToast = showRedirectToast;
 });
 
-// Toast thông báo thông thường
+/**
+ * Điều khiển bot thông qua API
+ * @param {string} action - Hành động: 'start', 'stop', 'restart'
+ * @param {string} botId - ID của bot cần điều khiển
+ */
+function controlBot(action, botId = 'default') {
+    console.log(`Đang thực hiện: ${action} cho bot ${botId}`);
+    
+    // Hiển thị loading indicator
+    document.getElementById('loading-overlay').classList.remove('d-none');
+    
+    // Gửi request tới API
+    fetch('/api/bot/control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: action,
+            bot_id: botId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Ẩn loading indicator
+        document.getElementById('loading-overlay').classList.add('d-none');
+        
+        if (data.success) {
+            console.log('Success:', data);
+            showToast('success', data.message || `Bot ${botId} đã ${action === 'start' ? 'khởi động' : action === 'stop' ? 'dừng' : 'khởi động lại'} thành công`);
+            
+            // Tải lại trang sau 1 giây để cập nhật trạng thái
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            console.error('Error:', data);
+            
+            // Xử lý các lỗi khác nhau
+            if (data.error_type === 'missing_api_config') {
+                // Đối với lỗi thiếu cấu hình API
+                handleMissingApiConfig();
+            } else {
+                // Hiển thị lỗi thông thường
+                showToast('error', data.message || 'Không thể điều khiển bot');
+            }
+        }
+    })
+    .catch(error => {
+        // Ẩn loading indicator
+        document.getElementById('loading-overlay').classList.add('d-none');
+        console.error('Error:', error);
+        showToast('error', `Lỗi kết nối: ${error.message}`);
+    });
+}
+
+/**
+ * Hiển thị thông báo toast
+ * @param {string} type - Loại thông báo: 'success', 'error'
+ * @param {string} message - Nội dung thông báo
+ */
 function showToast(type, message) {
+    // Xác định toast element
     const toastId = type === 'success' ? 'success-toast' : 'error-toast';
-    const messageId = type === 'success' ? 'toast-message' : 'toast-error-message';
-    
     const toastElement = document.getElementById(toastId);
-    const messageElement = document.getElementById(messageId);
     
-    if (toastElement && messageElement) {
-        messageElement.textContent = message;
-        const toast = new bootstrap.Toast(toastElement);
-        toast.show();
+    if (!toastElement) {
+        console.error(`Toast element with id ${toastId} not found`);
+        return;
     }
+    
+    // Cập nhật nội dung
+    const messageElement = toastElement.querySelector('.toast-body');
+    if (messageElement) {
+        messageElement.textContent = message;
+    }
+    
+    // Hiển thị toast
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+}
+
+/**
+ * Xử lý trường hợp thiếu cấu hình API
+ */
+function handleMissingApiConfig() {
+    // Kiểm tra xem người dùng đang ở thiết bị di động không
+    const isMobileDevice = window.innerWidth < 768;
+    
+    if (isMobileDevice) {
+        // Trên mobile, chuyển hướng trực tiếp đến trang settings
+        window.location.href = '/settings';
+        return;
+    }
+    
+    // Trên desktop, hiển thị modal thông báo
+    const modalId = 'apiConfigMissingModal';
+    
+    // Kiểm tra và xóa modal cũ nếu tồn tại
+    let oldModal = document.getElementById(modalId);
+    if (oldModal) {
+        oldModal.remove();
+    }
+    
+    // Tạo modal mới
+    const modalHTML = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Cần cấu hình API</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Bạn cần cấu hình API Key Binance trước khi có thể chạy bot trong chế độ này.</p>
+                        <ol class="mt-3">
+                            <li>Truy cập trang cài đặt API</li>
+                            <li>Nhập API Key và API Secret</li> 
+                            <li>Lưu cài đặt và thử lại</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <a href="/settings" class="btn btn-primary">Đi đến cài đặt API</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Thêm modal vào body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Hiển thị modal
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
 }

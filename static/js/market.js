@@ -1,72 +1,146 @@
-// JavaScript cho trang thị trường
+/**
+ * Market.js - Script for market data and chart functionality
+ * 
+ * This script handles fetching real-time market data from Binance API 
+ * and rendering charts and updates for the market page.
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Market.js loaded');
+
+    // Market chart element
+    const marketChartElement = document.getElementById('marketChart');
     
-    // Cài đặt biểu đồ thị trường
-    setupMarketChart();
+    // Chart type buttons
+    const chartTypeButtons = document.querySelectorAll('.chart-type');
     
-    // Cài đặt cập nhật tự động
-    setupAutoRefresh();
+    // Refresh market data button
+    const refreshMarketButton = document.getElementById('refresh-market');
     
-    // Xử lý nút làm mới
-    document.getElementById('refresh-market').addEventListener('click', function() {
-        refreshMarketData();
-    });
+    // Auto refresh toggle
+    const autoRefreshToggle = document.getElementById('auto-refresh');
     
-    // Xử lý thay đổi khung thời gian
-    document.querySelectorAll('.timeframe-option').forEach(function(option) {
+    // Current chart configuration
+    let chartConfig = {
+        timeframe: '24h', // Default timeframe 
+        symbol: 'BTCUSDT', // Default symbol
+        type: 'line',      // Default chart type
+    };
+    
+    // Chart instance
+    let marketChart = null;
+    
+    // Auto refresh interval
+    let autoRefreshInterval = null;
+    
+    // Timeframe options
+    const timeframeOptions = document.querySelectorAll('.timeframe-option');
+    timeframeOptions.forEach(option => {
         option.addEventListener('click', function() {
-            const timeframe = this.getAttribute('data-value');
+            const value = this.getAttribute('data-value');
             document.getElementById('timeframe-text').textContent = this.textContent;
-            updateChartTimeframe(timeframe);
+            chartConfig.timeframe = value;
+            loadMarketData();
         });
     });
-});
-
-// Tạo biểu đồ thị trường
-function setupMarketChart() {
-    const ctx = document.getElementById('marketChart').getContext('2d');
     
-    // Dữ liệu mẫu cho biểu đồ
-    const labels = [];
-    const prices = [];
-    
-    // Tạo dữ liệu mẫu cho 30 ngày
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        labels.push(date.toLocaleDateString('vi-VN'));
-        
-        // Giá mẫu với một vài biến động
-        const basePrice = 80000 + Math.random() * 5000;
-        prices.push(basePrice + (Math.sin(i/2) * 2000));
+    // Initialize chart
+    if (marketChartElement) {
+        initializeChart();
     }
     
-    window.marketChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
+    // Add event listeners to chart type buttons
+    chartTypeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const chartType = this.getAttribute('data-type');
+            
+            // Remove active class from all buttons
+            chartTypeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update chart type
+            chartConfig.type = chartType;
+            
+            // Reinitialize chart
+            if (marketChart) {
+                marketChart.destroy();
+            }
+            initializeChart();
+        });
+    });
+    
+    // Add event listener to refresh button
+    if (refreshMarketButton) {
+        refreshMarketButton.addEventListener('click', function() {
+            loadMarketData();
+        });
+    }
+    
+    // Handle auto refresh toggle
+    if (autoRefreshToggle) {
+        autoRefreshToggle.addEventListener('change', function() {
+            if (this.checked) {
+                enableAutoRefresh();
+            } else {
+                disableAutoRefresh();
+            }
+        });
+        
+        // Initialize auto refresh based on initial state
+        if (autoRefreshToggle.checked) {
+            enableAutoRefresh();
+        }
+    }
+    
+    /**
+     * Initialize market chart
+     */
+    function initializeChart() {
+        if (!marketChartElement) return;
+        
+        const ctx = marketChartElement.getContext('2d');
+        
+        // Default data while real data loads
+        const defaultData = {
+            labels: Array(24).fill(0).map((_, i) => i),
             datasets: [{
-                label: 'BTC/USDT',
-                data: prices,
-                borderColor: '#1f77b4',
-                backgroundColor: 'rgba(31, 119, 180, 0.1)',
+                label: `${chartConfig.symbol} Price`,
+                data: Array(24).fill(null),
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
-                tension: 0.2,
-                fill: true
+                fill: false,
+                tension: 0.4
             }]
-        },
-        options: {
+        };
+        
+        const options = {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
                 },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
                 tooltip: {
-                    mode: 'index',
-                    intersect: false,
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
@@ -74,172 +148,167 @@ function setupMarketChart() {
                                 label += ': ';
                             }
                             if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('en-US', { 
-                                    style: 'currency', 
-                                    currency: 'USD' 
-                                }).format(context.parsed.y);
+                                label += '$' + context.parsed.y.toLocaleString();
                             }
                             return label;
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        maxTicksLimit: 10
-                    },
-                    grid: {
-                        display: false
-                    }
                 },
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(200, 200, 200, 0.15)'
-                    }
+                legend: {
+                    display: true,
+                    position: 'top'
                 }
             }
-        }
-    });
-}
-
-// Cập nhật khung thời gian biểu đồ
-function updateChartTimeframe(timeframe) {
-    console.log(`Updating chart timeframe to: ${timeframe}`);
-    
-    // Trong ứng dụng thực tế, sẽ gọi API để lấy dữ liệu cho khung thời gian mới
-    // API endpoint có thể là: `/api/market/chart?symbol=BTCUSDT&timeframe=${timeframe}`
-    
-    // Mô phỏng cập nhật dữ liệu
-    const today = new Date();
-    const labels = [];
-    const prices = [];
-    
-    let days = 30;
-    switch(timeframe) {
-        case '1h':
-            days = 1;
-            break;
-        case '4h':
-            days = 2;
-            break;
-        case '24h':
-            days = 7;
-            break;
-        case '7d':
-            days = 30;
-            break;
-        case '30d':
-            days = 90;
-            break;
-    }
-    
-    // Tạo dữ liệu mới
-    for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
+        };
         
-        if (timeframe === '1h' || timeframe === '4h') {
-            date.setHours(today.getHours() - i);
-            labels.push(date.toLocaleTimeString('vi-VN'));
-        } else {
-            labels.push(date.toLocaleDateString('vi-VN'));
-        }
-        
-        // Giá mẫu với một vài biến động
-        const basePrice = 80000 + Math.random() * 5000;
-        prices.push(basePrice + (Math.sin(i/2) * 2000));
-    }
-    
-    // Cập nhật dữ liệu biểu đồ
-    window.marketChart.data.labels = labels;
-    window.marketChart.data.datasets[0].data = prices;
-    window.marketChart.update();
-}
-
-// Cài đặt cập nhật tự động
-function setupAutoRefresh() {
-    const autoRefreshCheckbox = document.getElementById('auto-refresh');
-    let refreshInterval;
-    
-    if (autoRefreshCheckbox) {
-        autoRefreshCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                refreshInterval = setInterval(refreshMarketData, 30000); // Cập nhật mỗi 30 giây
-                console.log('Auto refresh enabled');
-            } else {
-                clearInterval(refreshInterval);
-                console.log('Auto refresh disabled');
-            }
+        marketChart = new Chart(ctx, {
+            type: chartConfig.type === 'candle' ? 'bar' : 'line',
+            data: defaultData,
+            options: options
         });
         
-        // Khởi tạo auto refresh nếu checkbox được chọn
-        if (autoRefreshCheckbox.checked) {
-            refreshInterval = setInterval(refreshMarketData, 30000);
-            console.log('Auto refresh initialized');
-        }
-    }
-}
-
-// Làm mới dữ liệu thị trường
-function refreshMarketData() {
-    console.log('Refreshing market data...');
-    
-    // Gọi API để lấy dữ liệu thị trường mới nhất
-    fetch('/api/market')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Market data refreshed:', data);
-            updateMarketUI(data);
-        })
-        .catch(error => {
-            console.error('Error refreshing market data:', error);
-        });
-}
-
-// Cập nhật UI thị trường với dữ liệu mới
-function updateMarketUI(data) {
-    // Cập nhật giá BTC
-    if (data.btc_price) {
-        document.getElementById('btc-price').textContent = `$${parseFloat(data.btc_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        // Load real data
+        loadChartData();
     }
     
-    // Cập nhật giá ETH
-    if (data.eth_price) {
-        document.getElementById('eth-price').textContent = `$${parseFloat(data.eth_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }
-    
-    // Cập nhật giá SOL
-    if (data.sol_price) {
-        document.getElementById('sol-price').textContent = `$${parseFloat(data.sol_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }
-    
-    // Cập nhật giá BNB
-    if (data.bnb_price) {
-        document.getElementById('bnb-price').textContent = `$${parseFloat(data.bnb_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }
-    
-    // Cập nhật thông tin Market Regime (nếu có)
-    if (data.market_regime) {
-        const regimeElements = document.querySelectorAll('.indicator-dot');
-        regimeElements.forEach(element => {
-            element.classList.remove('active');
-        });
+    /**
+     * Load market overview data
+     */
+    function loadMarketData() {
+        // Show loading indicator
+        document.body.classList.add('loading');
         
-        // Tìm và kích hoạt chế độ thị trường hiện tại
-        const currentRegimeClass = data.market_regime.toLowerCase();
-        const currentRegimeElement = document.querySelector(`.indicator-dot.${currentRegimeClass}`);
-        if (currentRegimeElement) {
-            currentRegimeElement.classList.add('active');
+        // Fetch real-time data from API
+        fetch(`/api/market/data?timeframe=${chartConfig.timeframe}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update BTC price and change
+                const btcPrice = document.getElementById('btc-price');
+                if (btcPrice && data.btc_price) {
+                    btcPrice.textContent = `$${data.btc_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                }
+                
+                // Update ETH price and change
+                const ethPrice = document.getElementById('eth-price');
+                if (ethPrice && data.eth_price) {
+                    ethPrice.textContent = `$${data.eth_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                }
+                
+                // Update SOL price and change
+                const solPrice = document.getElementById('sol-price');
+                if (solPrice && data.sol_price) {
+                    solPrice.textContent = `$${data.sol_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                }
+                
+                // Update BNB price and change
+                const bnbPrice = document.getElementById('bnb-price');
+                if (bnbPrice && data.bnb_price) {
+                    bnbPrice.textContent = `$${data.bnb_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                }
+                
+                // Hide loading indicator
+                document.body.classList.remove('loading');
+                
+                // Also update chart data
+                loadChartData();
+            })
+            .catch(error => {
+                console.error('Error fetching market data:', error);
+                document.body.classList.remove('loading');
+                
+                // Show error toast
+                showToast('error', 'Lỗi khi tải dữ liệu thị trường');
+            });
+    }
+    
+    /**
+     * Load chart data from API
+     */
+    function loadChartData() {
+        if (!marketChart) return;
+        
+        // Fetch chart data from API
+        fetch(`/api/market/chart?symbol=${chartConfig.symbol}&timeframe=${chartConfig.timeframe}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.labels && data.prices) {
+                    updateChart(data.labels, data.prices);
+                } else {
+                    console.error('Invalid chart data format:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching chart data:', error);
+            });
+    }
+    
+    /**
+     * Update chart with new data
+     * @param {Array} labels - Array of time labels
+     * @param {Array} prices - Array of price values
+     */
+    function updateChart(labels, prices) {
+        if (!marketChart) return;
+        
+        const chartData = {
+            labels: labels,
+            datasets: [{
+                label: `${chartConfig.symbol} Price`,
+                data: prices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2,
+                fill: chartConfig.type === 'line',
+                tension: 0.4
+            }]
+        };
+        
+        marketChart.data = chartData;
+        marketChart.update();
+    }
+    
+    /**
+     * Enable auto refresh of market data
+     */
+    function enableAutoRefresh() {
+        // Clear existing interval if any
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+        
+        // Set new interval (refresh every 30 seconds)
+        autoRefreshInterval = setInterval(loadMarketData, 30000);
+    }
+    
+    /**
+     * Disable auto refresh of market data
+     */
+    function disableAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
         }
     }
     
-    // Hiển thị thông báo cập nhật
-    const timestamp = new Date().toLocaleTimeString('vi-VN');
-    console.log(`Market data updated at ${timestamp}`);
-}
+    /**
+     * Show toast message
+     * @param {string} type - 'success' or 'error'
+     * @param {string} message - Message to display
+     */
+    function showToast(type, message) {
+        const toastId = type === 'success' ? 'success-toast' : 'error-toast';
+        const messageId = type === 'success' ? 'toast-message' : 'toast-error-message';
+        
+        const toastElement = document.getElementById(toastId);
+        const messageElement = document.getElementById(messageId);
+        
+        if (toastElement && messageElement) {
+            messageElement.textContent = message;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    }
+    
+    // Initial load of market data
+    loadMarketData();
+});
