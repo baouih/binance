@@ -10,7 +10,7 @@ import threading
 import requests
 import hmac
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Flask, render_template, request, jsonify, make_response
 
@@ -1014,10 +1014,25 @@ def update_config():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     """API lấy trạng thái hệ thống"""
+    # Cập nhật dữ liệu hiệu suất trước khi trả về
+    update_performance_data()
+    
     status_data = {
         'bot_status': bot_status.copy(),  # Sử dụng copy() để không thay đổi giá trị gốc
         'connection_status': connection_status,
-        'account_data': account_data,
+        'account_data': {
+            'balance': account_data['balance'],
+            'equity': account_data['equity'],
+            'available': account_data['available'],
+            'positions': account_data['positions'],
+            'last_updated': account_data['last_updated'],
+            'initial_balance': account_data['initial_balance'],
+            'current_drawdown': account_data['current_drawdown'],
+            'performance': account_data['performance'],
+            'win_rate': account_data['win_rate'],
+            'wins': account_data['wins'],
+            'losses': account_data['losses']
+        },
         'market_data': market_data,
         'messages': messages[-10:]  # Chỉ trả về 10 tin nhắn gần nhất
     }
@@ -1287,12 +1302,49 @@ def simulate_data_updates():
                 if random.random() < 0.05 and account_data['positions']:
                     position_index = random.randint(0, len(account_data['positions']) - 1)
                     closed_position = account_data['positions'].pop(position_index)
-                    pnl = round(random.uniform(-100, 200), 2)
-                    pnl_percent = round(random.uniform(-5, 10), 2)
+                    
+                    # Tính lợi nhuận thực tế dựa trên giá hiện tại
+                    if closed_position['side'] == 'BUY':
+                        pnl = (closed_position['current_price'] - closed_position['entry_price']) * closed_position['amount']
+                        pnl_percent = ((closed_position['current_price'] / closed_position['entry_price']) - 1) * 100
+                    else:  # SELL
+                        pnl = (closed_position['entry_price'] - closed_position['current_price']) * closed_position['amount']
+                        pnl_percent = ((closed_position['entry_price'] / closed_position['current_price']) - 1) * 100
+                    
+                    pnl = round(pnl, 2)
+                    pnl_percent = round(pnl_percent, 2)
+                    
+                    # Cập nhật số dư tài khoản
+                    account_data['balance'] += pnl
+                    account_data['equity'] += pnl
+                    
+                    # Cập nhật thống kê thắng/thua
+                    if pnl > 0:
+                        account_data['wins'] += 1
+                    else:
+                        account_data['losses'] += 1
+                        
+                    # Lưu vào lịch sử
+                    closed_position['exit_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    closed_position['pnl'] = pnl
+                    closed_position['pnl_percent'] = pnl_percent
+                    account_data['position_history'].append(closed_position)
+                    
+                    # Thêm vào lịch sử lợi nhuận
+                    account_data['profit_history'].append({
+                        'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'pnl': pnl,
+                        'pnl_percent': pnl_percent,
+                        'symbol': closed_position['symbol'],
+                        'balance': account_data['balance']
+                    })
+                    
+                    # Cập nhật dữ liệu hiệu suất
+                    update_performance_data()
                     
                     # Thông báo đóng vị thế
                     msg_content = f"Đóng vị thế: {closed_position['side']} {closed_position['amount']} {closed_position['symbol']} với P/L: ${pnl} ({pnl_percent}%)"
-                    add_message(msg_content, 'success' if pnl > 0 else 'warning')
+                    add_message(msg_content, 'success' if pnl > 0 else 'warning', send_to_telegram=pnl > 100)
             
             # Cập nhật giá thị trường thực từ Binance API
             update_market_prices()
