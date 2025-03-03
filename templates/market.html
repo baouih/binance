@@ -2,6 +2,16 @@
 
 {% block title %}Thị trường{% endblock %}
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/market.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/market.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -38,14 +48,17 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <h5 class="card-title text-primary">BTC/USDT</h5>
-                        <span class="badge bg-success">
-                            <i class="fas fa-arrow-up"></i> 2.5%
+                        <span class="badge {% if market_data.btc_change_24h > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas {% if market_data.btc_change_24h > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %}"></i> 
+                            {{ "%.2f"|format(market_data.btc_change_24h|abs) }}%
                         </span>
                     </div>
-                    <h2 class="mb-0" id="btc-price">$73,250.00</h2>
+                    <h2 class="mb-0" id="btc-price">${{ "%.2f"|format(market_data.btc_price) }}</h2>
                     <div class="d-flex justify-content-between mt-2">
-                        <small class="text-muted">Vol: $1.2B</small>
-                        <small class="text-success">24h: +2.5%</small>
+                        <small class="text-muted">Vol: ${{ market_data.btc_volume|default('N/A') }}</small>
+                        <small class="{% if market_data.btc_change_24h > 0 %}text-success{% else %}text-danger{% endif %}">
+                            24h: {{ '+' if market_data.btc_change_24h > 0 else '' }}{{ "%.2f"|format(market_data.btc_change_24h) }}%
+                        </small>
                     </div>
                 </div>
             </div>
@@ -55,14 +68,17 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <h5 class="card-title text-primary">ETH/USDT</h5>
-                        <span class="badge bg-success">
-                            <i class="fas fa-arrow-up"></i> 3.1%
+                        <span class="badge {% if market_data.eth_change_24h > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas {% if market_data.eth_change_24h > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %}"></i> 
+                            {{ "%.2f"|format(market_data.eth_change_24h|abs) }}%
                         </span>
                     </div>
-                    <h2 class="mb-0" id="eth-price">$3,150.00</h2>
+                    <h2 class="mb-0" id="eth-price">${{ "%.2f"|format(market_data.eth_price) }}</h2>
                     <div class="d-flex justify-content-between mt-2">
-                        <small class="text-muted">Vol: $450M</small>
-                        <small class="text-success">24h: +3.1%</small>
+                        <small class="text-muted">Vol: ${{ market_data.eth_volume|default('N/A') }}</small>
+                        <small class="{% if market_data.eth_change_24h > 0 %}text-success{% else %}text-danger{% endif %}">
+                            24h: {{ '+' if market_data.eth_change_24h > 0 else '' }}{{ "%.2f"|format(market_data.eth_change_24h) }}%
+                        </small>
                     </div>
                 </div>
             </div>
@@ -72,14 +88,17 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <h5 class="card-title text-primary">SOL/USDT</h5>
-                        <span class="badge bg-success">
-                            <i class="fas fa-arrow-up"></i> 5.2%
+                        <span class="badge {% if market_data.sol_change_24h > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas {% if market_data.sol_change_24h > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %}"></i> 
+                            {{ "%.2f"|format(market_data.sol_change_24h|abs) }}%
                         </span>
                     </div>
-                    <h2 class="mb-0" id="sol-price">$137.50</h2>
+                    <h2 class="mb-0" id="sol-price">${{ "%.2f"|format(market_data.sol_price) }}</h2>
                     <div class="d-flex justify-content-between mt-2">
-                        <small class="text-muted">Vol: $280M</small>
-                        <small class="text-success">24h: +5.2%</small>
+                        <small class="text-muted">Vol: ${{ market_data.sol_volume|default('N/A') }}</small>
+                        <small class="{% if market_data.sol_change_24h > 0 %}text-success{% else %}text-danger{% endif %}">
+                            24h: {{ '+' if market_data.sol_change_24h > 0 else '' }}{{ "%.2f"|format(market_data.sol_change_24h) }}%
+                        </small>
                     </div>
                 </div>
             </div>
@@ -89,14 +108,17 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <h5 class="card-title text-primary">BNB/USDT</h5>
-                        <span class="badge bg-danger">
-                            <i class="fas fa-arrow-down"></i> 1.5%
+                        <span class="badge {% if market_data.bnb_change_24h > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas {% if market_data.bnb_change_24h > 0 %}fa-arrow-up{% else %}fa-arrow-down{% endif %}"></i> 
+                            {{ "%.2f"|format(market_data.bnb_change_24h|abs) if market_data.bnb_change_24h else "0.00" }}%
                         </span>
                     </div>
-                    <h2 class="mb-0" id="bnb-price">$410.00</h2>
+                    <h2 class="mb-0" id="bnb-price">${{ "%.2f"|format(market_data.bnb_price) if market_data.bnb_price else "N/A" }}</h2>
                     <div class="d-flex justify-content-between mt-2">
-                        <small class="text-muted">Vol: $150M</small>
-                        <small class="text-danger">24h: -1.5%</small>
+                        <small class="text-muted">Vol: ${{ market_data.bnb_volume|default('N/A') }}</small>
+                        <small class="{% if market_data.bnb_change_24h > 0 %}text-success{% else %}text-danger{% endif %}">
+                            24h: {{ '+' if market_data.bnb_change_24h and market_data.bnb_change_24h > 0 else '' }}{{ "%.2f"|format(market_data.bnb_change_24h) if market_data.bnb_change_24h else "0.00" }}%
+                        </small>
                     </div>
                 </div>
             </div>

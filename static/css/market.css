@@ -1,0 +1,127 @@
+/* CSS cho trang thị trường */
+
+/* Card thị trường */
+.card {
+    border-radius: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Symbol Icons */
+.symbol-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* Market Regime Indicators */
+.regime-indicator {
+    text-align: center;
+}
+
+.indicator-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.indicator-dot i {
+    font-size: 1.2rem;
+}
+
+.indicator-dot.trending {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #198754;
+}
+
+.indicator-dot.trending.active {
+    background-color: rgba(25, 135, 84, 0.4);
+    box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
+}
+
+.indicator-dot.ranging {
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #0d6efd;
+}
+
+.indicator-dot.ranging.active {
+    background-color: rgba(13, 110, 253, 0.4);
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+}
+
+.indicator-dot.volatile {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.indicator-dot.volatile.active {
+    background-color: rgba(220, 53, 69, 0.4);
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+.indicator-dot.quiet {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+}
+
+.indicator-dot.quiet.active {
+    background-color: rgba(108, 117, 125, 0.4);
+    box-shadow: 0 0 10px rgba(108, 117, 125, 0.5);
+}
+
+/* Market Chart Card */
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Market Table */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .indicator-dot {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .symbol-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+}
