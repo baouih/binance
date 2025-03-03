@@ -825,12 +825,12 @@ def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
     global market_data
     
+    # Khởi tạo market_data nếu chưa tồn tại
+    if 'market_data' not in globals():
+        market_data = {}
+    
     # Lấy dữ liệu thị trường mới
     new_market_data = get_market_data()
-    
-    # Đảm bảo market_data có cấu trúc đúng
-    if not market_data:
-        market_data = {}
     
     # Cập nhật market_data với dữ liệu mới
     market_data.update(new_market_data)
