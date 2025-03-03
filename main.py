@@ -3,13 +3,14 @@
 """
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_socketio import SocketIO
 import threading
 import time
 import schedule
 import json
+import random
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -165,6 +166,11 @@ def cli():
     """Trang giao diện dòng lệnh"""
     return render_template('cli.html')
 
+@app.route('/bot-monitor')
+def bot_monitor():
+    """Trang giám sát hoạt động bot"""
+    return render_template('bot_monitor.html')
+
 @app.route('/change_language', methods=['POST'])
 def change_language():
     """Thay đổi ngôn ngữ"""
@@ -311,6 +317,160 @@ def get_signals():
     
     return jsonify(signals)
 
+@app.route('/api/bot/logs', methods=['GET'])
+def get_bot_logs():
+    """Lấy nhật ký hoạt động của bot"""
+    bot_id = request.args.get('bot_id')
+    
+    # Giới hạn số lượng log
+    limit = int(request.args.get('limit', 50))
+    
+    # Dữ liệu mẫu cho logs
+    current_time = datetime.now()
+    logs = [
+        {
+            'timestamp': (current_time - timedelta(minutes=1)).isoformat(),
+            'category': 'market',
+            'message': 'Phân tích thị trường BTC: Xu hướng tăng, RSI = 65.2, Bollinger Bands đang mở rộng'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=2)).isoformat(),
+            'category': 'analysis',
+            'message': 'Đã hoàn thành phân tích kỹ thuật cho BTCUSDT trên khung thời gian 1h'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=3)).isoformat(),
+            'category': 'decision',
+            'message': 'Quyết định: MUA BTCUSDT tại 83,250 USDT, SL: 82,150 USDT, TP: 85,500 USDT'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=4)).isoformat(),
+            'category': 'action',
+            'message': 'Đã đặt lệnh: MUA 0.05 BTCUSDT với giá 83,250 USDT'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=5)).isoformat(),
+            'category': 'market',
+            'message': 'Phân tích thị trường ETH: Xu hướng giảm, MACD chuyển sang tiêu cực'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=6)).isoformat(),
+            'category': 'decision',
+            'message': 'Quyết định: BÁN ETHUSDT tại 4,120 USDT, SL: 4,220 USDT, TP: 3,950 USDT'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=7)).isoformat(),
+            'category': 'action',
+            'message': 'Đã đặt lệnh: BÁN 0.2 ETHUSDT với giá 4,120 USDT'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=8)).isoformat(),
+            'category': 'market',
+            'message': 'Phân tích thị trường SOL: Biến động cao, khó xác định xu hướng'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=9)).isoformat(),
+            'category': 'decision',
+            'message': 'Quyết định: GIỮ SOLUSDT, chờ thị trường ổn định'
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=10)).isoformat(),
+            'category': 'analysis',
+            'message': 'Phân tích mẫu hình giá: BTC đang hình thành mẫu hình cờ tăng'
+        }
+    ]
+    
+    # Nếu có bot_id, lọc log chỉ của bot đó
+    if bot_id and bot_id != 'all':
+        # TODO: Trong thực tế, sẽ lọc log theo bot_id
+        # Hiện tại chỉ giả lập cho demo
+        pass
+    
+    return jsonify({
+        'success': True,
+        'logs': logs[:limit]
+    })
+
+@app.route('/api/bot/logs/<bot_id>', methods=['GET'])
+def get_bot_logs_by_id(bot_id):
+    """Lấy nhật ký hoạt động của một bot cụ thể"""
+    return get_bot_logs()
+
+@app.route('/api/bot/decisions', methods=['GET'])
+def get_bot_decisions():
+    """Lấy quyết định giao dịch gần đây của bot"""
+    bot_id = request.args.get('bot_id')
+    limit = int(request.args.get('limit', 5))
+    
+    # Dữ liệu mẫu
+    current_time = datetime.now()
+    decisions = [
+        {
+            'timestamp': (current_time - timedelta(minutes=3)).isoformat(),
+            'symbol': 'BTCUSDT',
+            'action': 'BUY',
+            'entry_price': 83250.00,
+            'take_profit': 85500.00,
+            'stop_loss': 82150.00,
+            'reasons': [
+                'RSI vượt ngưỡng 30 từ dưới lên',
+                'Giá đang nằm trên MA50',
+                'Khối lượng giao dịch tăng'
+            ]
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=6)).isoformat(),
+            'symbol': 'ETHUSDT',
+            'action': 'SELL',
+            'entry_price': 4120.00,
+            'take_profit': 3950.00,
+            'stop_loss': 4220.00,
+            'reasons': [
+                'MACD đường chính cắt xuống đường tín hiệu',
+                'Giá chạm kháng cự mạnh',
+                'Đồng thời phân kỳ âm'
+            ]
+        },
+        {
+            'timestamp': (current_time - timedelta(minutes=9)).isoformat(),
+            'symbol': 'SOLUSDT',
+            'action': 'HOLD',
+            'reasons': [
+                'Thị trường đang biến động cao',
+                'Chưa có tín hiệu vào lệnh rõ ràng',
+                'Chờ giá ổn định trước khi ra quyết định'
+            ]
+        }
+    ]
+    
+    # Nếu có bot_id, lọc quyết định chỉ của bot đó
+    if bot_id and bot_id != 'all':
+        # TODO: Trong thực tế, sẽ lọc theo bot_id
+        pass
+    
+    return jsonify({
+        'success': True,
+        'decisions': decisions[:limit]
+    })
+
+@app.route('/api/bot/stats', methods=['GET'])
+def get_bot_stats():
+    """Lấy thống kê hoạt động của bot"""
+    bot_id = request.args.get('bot_id')
+    
+    # Dữ liệu mẫu
+    stats = {
+        'uptime': '14h 35m',
+        'analyses': 342,
+        'decisions': 28,
+        'orders': 12
+    }
+    
+    return jsonify({
+        'success': True,
+        'stats': stats
+    })
+
 @app.route('/api/execute_cli', methods=['POST'])
 def execute_cli_command():
     """Thực thi lệnh từ CLI web"""
@@ -344,12 +504,157 @@ def get_market_data():
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
     market_data = get_market_data()
+    
+    # Bổ sung thêm thông tin chỉ báo kỹ thuật chi tiết cho mỗi coin
+    if not 'indicators' in market_data:
+        market_data['indicators'] = {
+            'BTC': {
+                'rsi': 62.5,
+                'macd': 0.0025,
+                'ma_short': 47750.32,
+                'ma_long': 46982.78,
+                'bb_upper': 48950.12,
+                'bb_lower': 46250.67,
+                'bb_middle': 47650.45,
+                'trend': market_data.get('market_regime', {}).get('BTC', 'neutral')
+            },
+            'ETH': {
+                'rsi': 48.2,
+                'macd': -0.0012,
+                'ma_short': 3230.45,
+                'ma_long': 3185.26,
+                'bb_upper': 3350.68,
+                'bb_lower': 3125.35,
+                'bb_middle': 3238.12,
+                'trend': market_data.get('market_regime', {}).get('ETH', 'neutral')
+            },
+            'SOL': {
+                'rsi': 35.8,
+                'macd': -0.0045,
+                'ma_short': 142.35,
+                'ma_long': 147.82,
+                'bb_upper': 152.45,
+                'bb_lower': 138.76,
+                'bb_middle': 145.65,
+                'trend': market_data.get('market_regime', {}).get('SOL', 'neutral')
+            },
+            'BNB': {
+                'rsi': 58.3,
+                'macd': 0.0018,
+                'ma_short': 390.25,
+                'ma_long': 385.45,
+                'bb_upper': 402.35,
+                'bb_lower': 378.65,
+                'bb_middle': 390.50,
+                'trend': market_data.get('market_regime', {}).get('BNB', 'neutral')
+            }
+        }
+    
+    # Bổ sung thêm tín hiệu giao dịch chi tiết cho mỗi coin
+    if not 'signals' in market_data:
+        market_data['signals'] = {
+            'BTC': {
+                'type': 'BUY',
+                'strength': 'strong',
+                'price': market_data.get('btc_price', 0),
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'RSI + Bollinger Bands'
+            },
+            'ETH': {
+                'type': 'SELL',
+                'strength': 'medium',
+                'price': market_data.get('eth_price', 0),
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'MACD + EMA Cross'
+            },
+            'SOL': {
+                'type': 'HOLD',
+                'strength': 'weak',
+                'price': market_data.get('sol_price', 0),
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'Trend Analysis'
+            },
+            'BNB': {
+                'type': 'BUY',
+                'strength': 'medium',
+                'price': 388.75,
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'Bollinger Breakout'
+            }
+        }
+    
+    # Phát sự kiện cập nhật dữ liệu
     socketio.emit('market_update', market_data)
+    
+    # Thêm log hoạt động phân tích thị trường
+    log_data = {
+        'timestamp': datetime.now().isoformat(),
+        'category': 'market',
+        'message': f'Phân tích thị trường BTC: {market_data["market_regime"]["BTC"]}, RSI = {market_data["indicators"]["BTC"]["rsi"]}'
+    }
+    socketio.emit('bot_log', log_data)
+    
+    # Thỉnh thoảng tạo quyết định giao dịch mới
+    # Chỉ demo, trong thực tế sẽ dựa trên logic phân tích thực của bot
+    if random.random() < 0.2:  # 20% khả năng
+        coin = random.choice(['BTC', 'ETH', 'SOL', 'BNB'])
+        action = market_data['signals'][coin]['type']
+        
+        # Tạo một quyết định giao dịch và báo cáo
+        if action in ['BUY', 'SELL']:
+            price = market_data.get(f'{coin.lower()}_price', 0)
+            if coin.lower() == 'bnb':
+                price = 388.75
+                
+            # Tính toán stop loss và take profit
+            if action == 'BUY':
+                stop_loss = price * 0.985  # -1.5%
+                take_profit = price * 1.03  # +3%
+            else:  # SELL
+                stop_loss = price * 1.015  # +1.5%
+                take_profit = price * 0.97  # -3%
+                
+            decision = {
+                'timestamp': datetime.now().isoformat(),
+                'symbol': f'{coin}USDT',
+                'action': action,
+                'entry_price': price,
+                'take_profit': take_profit,
+                'stop_loss': stop_loss,
+                'reasons': [
+                    f'RSI = {market_data["indicators"][coin]["rsi"]}',
+                    f'MACD = {market_data["indicators"][coin]["macd"]}',
+                    f'Xu hướng: {market_data["indicators"][coin]["trend"]}'
+                ]
+            }
+            socketio.emit('trading_decision', decision)
+            
+            # Thêm log quyết định
+            log_data = {
+                'timestamp': datetime.now().isoformat(),
+                'category': 'decision',
+                'message': f'Quyết định: {action} {coin}USDT tại {price:.2f} USDT, SL: {stop_loss:.2f} USDT, TP: {take_profit:.2f} USDT'
+            }
+            socketio.emit('bot_log', log_data)
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
     account_data = get_account().json
     socketio.emit('account_update', account_data)
+    
+    # Cập nhật vị thế
+    if account_data.get('positions'):
+        socketio.emit('positions_update', account_data['positions'])
+        
+        # Thỉnh thoảng (chỉ demo) tạo log thực thi giao dịch
+        if random.random() < 0.1:  # 10% khả năng
+            position = random.choice(account_data['positions'])
+            log_data = {
+                'timestamp': datetime.now().isoformat(),
+                'category': 'action',
+                'message': f'Cập nhật vị thế: {position["symbol"]} {position["type"]}, Giá hiện tại: {position["current_price"]}, P&L: {position["pnl"]:.2f} USDT'
+            }
+            socketio.emit('bot_log', log_data)
 
 def check_bot_status():
     """Kiểm tra trạng thái bot"""
@@ -362,6 +667,23 @@ def check_bot_status():
         bot_status['status'] = 'stopped'
         bot_status['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         socketio.emit('bot_status_update', bot_status)
+        
+    # Thêm thống kê hoạt động của bot (trong thực tế sẽ lấy từ dữ liệu thật)
+    stats = {
+        'uptime': '14h 35m',
+        'analyses': 342,
+        'decisions': 28,
+        'orders': 12
+    }
+    
+    # Cập nhật bot status với thêm thông tin stats
+    bot_status_update = bot_status.copy()
+    bot_status_update['stats'] = stats
+    
+    # Bổ sung thêm thông tin phiên bản
+    bot_status_update['version'] = '3.2.1'
+    
+    socketio.emit('bot_status_update', bot_status_update)
 
 def background_tasks():
     """Thực thi các tác vụ nền theo lịch"""
