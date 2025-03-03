@@ -740,7 +740,7 @@ def index():
             'current_risk': bot_status['current_risk'],
             'crypto_list': top_crypto_list  # Thêm danh sách đồng tiền cho giao diện
         }
-
+        
         response = make_response(render_template('index-ajax.html',
                                              status=status,
                                              messages=messages[-50:],
@@ -792,6 +792,29 @@ def index():
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
+
+@app.route('/settings')
+def settings():
+    """Trang cài đặt hệ thống"""
+    try:
+        # Tạo object status cho client
+        status = {
+            'running': bot_status['running'],
+            'mode': 'testnet',
+            'is_connected': connection_status['is_connected'],
+            'is_authenticated': connection_status['is_authenticated'],
+            'trading_type': connection_status['trading_type'],
+            'crypto_list': top_crypto_list
+        }
+        
+        # Render template với dữ liệu cần thiết
+        return render_template('settings.html', 
+                              status=status,
+                              bot_status=bot_status,
+                              telegram_config=telegram_config)
+    except Exception as e:
+        logger.error(f"Lỗi tải trang cài đặt: {str(e)}", exc_info=True)
+        return render_template('error.html', error=str(e))
 
 @app.route('/api/bot/control', methods=['POST'])
 def control_bot():
