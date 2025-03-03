@@ -271,7 +271,9 @@ def get_account():
             'currency': 'USDT',
             'mode': 'Demo',
             'leverage': 3,
-            'positions': []  # Không có vị thế nào trong chế độ demo
+            'positions': [
+                # Tạo dữ liệu mẫu cho chế độ demo
+            ]
         }
     elif api_mode == 'testnet':
         account_data = {
@@ -646,15 +648,38 @@ def get_market_data():
     except:
         api_mode = 'demo'
     
-    if api_mode == 'demo':
-        # Trả về dữ liệu mẫu
-        return SAMPLE_MARKET_DATA
-    elif api_mode == 'testnet':
-        # TODO: Kết nối Binance Testnet API
-        return SAMPLE_MARKET_DATA
-    else:  # live
-        # TODO: Kết nối Binance API thực
-        return SAMPLE_MARKET_DATA
+    # Tạo bản sao của dữ liệu mẫu để không sửa đổi trực tiếp
+    market_data = SAMPLE_MARKET_DATA.copy()
+    
+    # Tạo biến động nhẹ về giá cho dữ liệu thị trường để mô phỏng chuyển động thực tế
+    price_change_btc = random.uniform(-100, 100)
+    price_change_eth = random.uniform(-10, 10)
+    price_change_sol = random.uniform(-5, 5)
+    
+    # Cập nhật giá
+    market_data['btc_price'] += price_change_btc
+    market_data['eth_price'] += price_change_eth
+    market_data['sol_price'] += price_change_sol
+    
+    # Cập nhật thay đổi 24h (mô phỏng)
+    market_data['btc_change_24h'] = random.uniform(-3.0, 3.0)
+    market_data['eth_change_24h'] = random.uniform(-4.0, 4.0)
+    market_data['sol_change_24h'] = random.uniform(-5.0, 5.0)
+    
+    # Cập nhật danh sách cặp giao dịch
+    for pair in market_data['pairs']:
+        if pair['symbol'] == 'BTCUSDT':
+            pair['price'] = market_data['btc_price']
+            pair['change'] = market_data['btc_change_24h']
+        elif pair['symbol'] == 'ETHUSDT':
+            pair['price'] = market_data['eth_price']
+            pair['change'] = market_data['eth_change_24h']
+        elif pair['symbol'] == 'SOLUSDT':
+            pair['price'] = market_data['sol_price']
+            pair['change'] = market_data['sol_change_24h']
+    
+    # Trả về dữ liệu thị trường đã được cập nhật
+    return market_data
 
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""

@@ -106,6 +106,28 @@ body {
     .hide-on-mobile {
         display: none;
     }
+    
+    /* Ensure navbar collapses properly on mobile */
+    .navbar-collapse {
+        max-height: calc(100vh - 56px);
+        overflow-y: auto;
+    }
+    
+    /* Improve spacing on mobile */
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Make tables responsive */
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    /* Adjust card padding for mobile */
+    .card-body {
+        padding: 0.75rem;
+    }
 }
 
 /* Animation for loading states */
