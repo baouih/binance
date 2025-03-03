@@ -920,6 +920,59 @@ def get_status():
         'messages': messages[-10:]  # Chỉ trả về 10 tin nhắn gần nhất
     })
 
+@app.route('/api/crypto/toggle', methods=['POST'])
+def toggle_crypto():
+    """API bật/tắt đồng tiền trong danh sách giao dịch"""
+    try:
+        # Lấy thông tin từ request
+        symbol = request.json.get('symbol')
+        enabled = request.json.get('enabled', False)
+        
+        if not symbol:
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu thông tin đồng tiền'
+            }), 400
+        
+        # Tìm đồng tiền trong danh sách
+        found = False
+        for crypto in top_crypto_list:
+            if crypto['symbol'] == symbol:
+                crypto['enabled'] = enabled
+                found = True
+                break
+                
+        if not found:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy đồng tiền {symbol}'
+            }), 404
+            
+        # Thông báo
+        status = "bật" if enabled else "tắt"
+        symbol_name = symbol.replace('USDT', '')
+        add_message(f"Đã {status} giao dịch đồng {symbol_name}", "info")
+            
+        # Lưu cấu hình (có thể mở rộng sau)
+        try:
+            with open('crypto_config.json', 'w') as f:
+                json.dump(top_crypto_list, f)
+        except Exception as e:
+            logger.warning(f"Không thể lưu cấu hình đồng tiền: {str(e)}")
+
+        return jsonify({
+            'success': True,
+            'message': f'Đã {status} giao dịch đồng {symbol_name}',
+            'crypto_list': top_crypto_list
+        })
+        
+    except Exception as e:
+        logger.error(f"Lỗi khi bật/tắt đồng tiền: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi: {str(e)}'
+        }), 500
+
 @app.route('/api/positions/close', methods=['POST'])
 def close_position():
     """API đóng vị thế"""
@@ -1109,8 +1162,34 @@ def simulate_data_updates():
 simulation_thread = threading.Thread(target=simulate_data_updates)
 simulation_thread.daemon = True
 
+# Hàm tải cấu hình đồng tiền từ file
+def load_crypto_config():
+    """Tải cấu hình đồng tiền từ file"""
+    global top_crypto_list
+    try:
+        if os.path.exists('crypto_config.json'):
+            with open('crypto_config.json', 'r') as f:
+                saved_config = json.load(f)
+                
+                # Cập nhật trạng thái enabled cho các đồng tiền đã có
+                for saved_crypto in saved_config:
+                    for crypto in top_crypto_list:
+                        if crypto['symbol'] == saved_crypto['symbol']:
+                            crypto['enabled'] = saved_crypto['enabled']
+                            break
+                
+                logger.info(f"Đã tải cấu hình cho {len(saved_config)} đồng tiền từ file")
+                add_message("Đã tải cấu hình đồng tiền", "info")
+        else:
+            logger.info("Không tìm thấy file cấu hình đồng tiền, sử dụng mặc định")
+    except Exception as e:
+        logger.error(f"Lỗi tải cấu hình đồng tiền: {str(e)}", exc_info=True)
+
 if __name__ == "__main__":
     try:
+        # Tải cấu hình đồng tiền
+        load_crypto_config()
+        
         # Thêm thông báo khởi động
         add_message('Hệ thống đã khởi động', 'info')
         add_message('Vui lòng kết nối API để bắt đầu', 'warning')
