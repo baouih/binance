@@ -386,15 +386,16 @@
                 </div>
 
                 <!-- Control Button -->
-                <div class="control-button-wrapper">
-                    <button id="controlButton" type="button"
-                            class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
-                            data-action="{{ 'stop' if status.running else 'start' }}"
-                            {{ 'disabled' if not status.is_connected }}>
-                        <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
-                        {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
-                    </button>
-                </div>
+                <button id="controlButton" type="button"
+                        class="btn {{ 'btn-danger' if status.running else 'btn-success' }} btn-lg"
+                        onclick="handleControlButton(this)"
+                        {{ 'disabled' if not status.is_connected }}>
+                    <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
+                    <span class="button-text">{{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}</span>
+                    <div class="spinner-border spinner-border-sm d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
             </div>
         </header>
 
@@ -905,36 +906,95 @@
         }
 
         // Action handlers
-        async function handleControlButton() {
-            // Debug
-            console.log('handleControlButton được gọi!');
+        async function handleControlButton(button) {
+            debugLog('handleControlButton', 'start');
             
-            const button = document.getElementById('controlButton');
-            console.log('Button text:', button.textContent);
-            
-            const botStatus = document.querySelector('.bot-status');
-            if (!botStatus) console.log('Không tìm thấy element botStatus');
-
-            if (button.disabled) {
-                console.log('Button đang disabled, không thực hiện thao tác');
-                return;
-            }
-
-            button.disabled = true;
-            console.log('Button đã disabled trong quá trình xử lý');
-
             try {
-                const action = button.textContent.includes('Dừng') ? 'stop' : 'start';
-                console.log('Hành động:', action);
-
-                console.log('Gửi request đến /api/bot/control với action =', action);
+                if (!button) {
+                    button = document.getElementById('controlButton');
+                }
+                
+                if (button.disabled) {
+                    debugLog('Button disabled', true);
+                    return;
+                }
+                
+                // Hiển thị loading spinner
+                setButtonLoading(button, true);
+                
+                // Tìm text trong button
+                const buttonText = button.querySelector('.button-text').textContent;
+                const action = buttonText.includes('Dừng') ? 'stop' : 'start';
+                debugLog('Action', action);
+                
                 showToast('Đang ' + (action === 'start' ? 'khởi động' : 'dừng') + ' bot...', 'info');
                 
+                // Sử dụng XHR thay vì fetch để kiểm tra vấn đề
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/bot/control', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        const data = JSON.parse(xhr.responseText);
+                        debugLog('API response', data);
+                        
+                        if (data.success) {
+                            const botStatus = document.querySelector('.bot-status');
+                            
+                            if (action === 'start') {
+                                button.querySelector('.button-text').textContent = 'Dừng Bot';
+                                button.querySelector('i').className = 'bi bi-stop-fill me-2';
+                                button.classList.remove('btn-success');
+                                button.classList.add('btn-danger');
+                                
+                                if (botStatus) {
+                                    botStatus.classList.remove('stopped');
+                                    botStatus.classList.add('running');
+                                    botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
+                                }
+                            } else {
+                                button.querySelector('.button-text').textContent = 'Khởi động Bot';
+                                button.querySelector('i').className = 'bi bi-play-fill me-2';
+                                button.classList.remove('btn-danger');
+                                button.classList.add('btn-success');
+                                
+                                if (botStatus) {
+                                    botStatus.classList.remove('running');
+                                    botStatus.classList.add('stopped');
+                                    botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
+                                }
+                            }
+                            
+                            showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
+                        } else {
+                            showToast(`Lỗi: ${data.message || 'Không thể thực hiện hành động'}`, 'error');
+                        }
+                    } else {
+                        showToast(`Lỗi server: ${xhr.status}`, 'error');
+                    }
+                    
+                    // Dừng loading state
+                    setTimeout(() => setButtonLoading(button, false), 500);
+                };
+                
+                xhr.onerror = function(e) {
+                    debugLog('XHR error', e);
+                    showToast('Lỗi kết nối tới server', 'error');
+                    setTimeout(() => setButtonLoading(button, false), 500);
+                };
+                
+                // Gửi request
+                xhr.send(JSON.stringify({action}));
+                return;
+                
+                // Phần fetch cũ
+                /*
                 const response = await fetch('/api/bot/control', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({action})
                 });
+                */
 
                 const data = await response.json();
 
