@@ -279,10 +279,14 @@
                 </div>
 
                 <!-- Control Button -->
-                <button id="controlButton"
-                        class="btn {{ 'btn-danger btn-lg' if status.running else 'btn-success btn-lg' }}">
+                <button id="controlButton" type="button"
+                        class="btn {{ 'btn-danger btn-lg' if status.running else 'btn-success btn-lg' }}"
+                        onclick="handleControlButtonClick(this)">
                     <i class="bi {{ 'bi-stop-fill' if status.running else 'bi-play-fill' }} me-2"></i>
-                    {{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}
+                    <span class="button-text">{{ 'Dừng Bot' if status.running else 'Khởi động Bot' }}</span>
+                    <div class="spinner-border spinner-border-sm d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </button>
             </div>
         </header>
@@ -352,9 +356,14 @@
 
                     <!-- Save Button -->
                     <div class="text-end">
-                        <button id="saveConfigBtn" class="btn btn-primary btn-lg">
+                        <button id="saveConfigBtn" type="button" 
+                                class="btn btn-primary btn-lg"
+                                onclick="handleSaveConfig(this)">
                             <i class="bi bi-save me-2"></i>
-                            Lưu cấu hình
+                            <span class="button-text">Lưu cấu hình</span>
+                            <div class="spinner-border spinner-border-sm d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -443,6 +452,119 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Debug logging
+        function debugLog(action, data) {
+            console.log(`[DEBUG] ${action}:`, data);
+        }
+
+        // Add these functions at the beginning of the script section
+        function setButtonLoading(button, isLoading) {
+            debugLog('setButtonLoading', {button: button.id, isLoading});
+            const spinner = button.querySelector('.spinner-border');
+            const text = button.querySelector('.button-text');
+            const icon = button.querySelector('.bi');
+
+            button.disabled = isLoading;
+            if (isLoading) {
+                spinner.classList.remove('d-none');
+                text.classList.add('d-none');
+                icon.classList.add('d-none');
+                button.classList.add('active');
+            } else {
+                spinner.classList.add('d-none');
+                text.classList.remove('d-none');
+                icon.classList.remove('d-none');
+                button.classList.remove('active');
+            }
+        }
+
+        async function handleControlButtonClick(button) {
+            try {
+                debugLog('handleControlButtonClick', 'start');
+                if (button.disabled) {
+                    debugLog('handleControlButtonClick', 'button disabled');
+                    return;
+                }
+
+                const action = button.querySelector('.button-text').textContent.includes('Dừng') ? 'stop' : 'start';
+                debugLog('handleControlButtonClick action', action);
+
+                setButtonLoading(button, true);
+
+                const response = await fetch('/api/bot/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+
+                const data = await response.json();
+                debugLog('Bot control response', data);
+
+                if (data.success) {
+                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
+                    updateBotStatus(data.status);
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Bot control error:', error);
+                showToast(`Lỗi kết nối: ${error.message}`, 'error');
+            } finally {
+                setTimeout(() => setButtonLoading(button, false), 500);
+            }
+        }
+
+        async function handleSaveConfig(button) {
+            try {
+                debugLog('handleSaveConfig', 'start');
+                if (button.disabled) {
+                    debugLog('handleSaveConfig', 'button disabled');
+                    return;
+                }
+
+                // Validate required fields
+                const apiKey = document.getElementById('apiKey').value;
+                const apiSecret = document.getElementById('apiSecret').value;
+
+                if (!apiKey || !apiSecret) {
+                    showToast('Vui lòng nhập API Key và Secret', 'error');
+                    return;
+                }
+
+                setButtonLoading(button, true);
+
+                const config = {
+                    api_key: apiKey,
+                    api_secret: apiSecret,
+                    trading_type: document.getElementById('tradingType').value,
+                    risk_profile: riskLevel.value
+                };
+
+                debugLog('Sending config', config);
+
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+                debugLog('Save config response', data);
+
+                if (data.success) {
+                    showToast('Đã lưu cấu hình thành công', 'success');
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Save config error:', error);
+                showToast(`Lỗi kết nối: ${error.message}`, 'error');
+            } finally {
+                setTimeout(() => setButtonLoading(button, false), 500);
+            }
+        }
+
+
         // Elements
         const controlButton = document.getElementById('controlButton');
         const saveConfigBtn = document.getElementById('saveConfigBtn');
@@ -548,45 +670,6 @@
             });
         });
 
-        // Control bot
-        async function controlBot(action) {
-            if (!isConnected) {
-                showToast('Không thể điều khiển bot khi mất kết nối', 'error');
-                return;
-            }
-
-            // Add loading state
-            controlButton.classList.add('btn-loading', 'active');
-            controlButton.disabled = true;
-
-            try {
-                const response = await fetch('/api/bot/control', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast(
-                        action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại',
-                        'success'
-                    );
-                    updateBotStatus(data.status);
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            } finally {
-                // Remove loading state
-                setTimeout(() => {
-                    controlButton.classList.remove('btn-loading', 'active');
-                    controlButton.disabled = false;
-                }, 500);
-            }
-        }
 
         // Update bot status
         function updateBotStatus(status) {
@@ -596,7 +679,7 @@
             if (status.running) {
                 controlButton.classList.remove('btn-success');
                 controlButton.classList.add('btn-danger');
-                controlButton.textContent = 'Dừng Bot';
+                controlButton.querySelector('.button-text').textContent = 'Dừng Bot';
                 controlIcon.classList.remove('bi-play-fill');
                 controlIcon.classList.add('bi-stop-fill');
                 botStatusDiv.classList.remove('stopped');
@@ -606,7 +689,7 @@
             } else {
                 controlButton.classList.remove('btn-danger');
                 controlButton.classList.add('btn-success');
-                controlButton.textContent = 'Khởi động Bot';
+                controlButton.querySelector('.button-text').textContent = 'Khởi động Bot';
                 controlIcon.classList.remove('bi-stop-fill');
                 controlIcon.classList.add('bi-play-fill');
                 botStatusDiv.classList.remove('running');
@@ -654,122 +737,6 @@
             `;
         });
 
-        // Save configuration
-        async function saveConfig() {
-            // Add loading state and disable button
-            saveConfigBtn.classList.add('btn-loading', 'active');
-            saveConfigBtn.disabled = true;
-
-            try {
-                const config = {
-                    api_key: document.getElementById('apiKey').value,
-                    api_secret: document.getElementById('apiSecret').value,
-                    trading_type: document.getElementById('tradingType').value,
-                    risk_profile: riskLevel.value,
-                    max_account_risk: parseFloat(maxAccountRisk?.value || 25)
-                };
-
-                const response = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showToast('Đã lưu cấu hình thành công', 'success');
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            } finally {
-                // Remove loading state
-                setTimeout(() => {
-                    saveConfigBtn.classList.remove('btn-loading', 'active');
-                    saveConfigBtn.disabled = false;
-                }, 500);
-            }
-        }
-
-        // Event listeners
-        controlButton.addEventListener('click', function() {
-            if (this.disabled) return;
-
-            // Add loading state
-            this.classList.add('btn-loading', 'active');
-            this.disabled = true;
-
-            const action = this.textContent.includes('Dừng') ? 'stop' : 'start';
-
-            // Call API
-            fetch('/api/bot/control', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
-                    updateBotStatus(data.status);
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            })
-            .catch(error => {
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            })
-            .finally(() => {
-                // Remove loading state after delay
-                setTimeout(() => {
-                    this.classList.remove('btn-loading', 'active');
-                    this.disabled = false;
-                }, 500);
-            });
-        });
-
-        saveConfigBtn.addEventListener('click', function() {
-            if (this.disabled) return;
-
-            // Add loading state
-            this.classList.add('btn-loading', 'active');
-            this.disabled = true;
-
-            const config = {
-                api_key: document.getElementById('apiKey').value,
-                api_secret: document.getElementById('apiSecret').value, 
-                trading_type: document.getElementById('tradingType').value,
-                risk_profile: riskLevel.value,
-                max_account_risk: parseFloat(maxAccountRisk.value)
-            };
-
-            // Call API
-            fetch('/api/config', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(config)
-            })
-            .then(response => response.json())  
-            .then(data => {
-                if (data.success) {
-                    showToast('Đã lưu cấu hình thành công', 'success');
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            })
-            .catch(error => {
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            })
-            .finally(() => {
-                // Remove loading state after delay  
-                setTimeout(() => {
-                    this.classList.remove('btn-loading', 'active');
-                    this.disabled = false;
-                }, 500);
-            });
-        });
 
         // Toast notification function
         function showToast(message, type = 'success') {
