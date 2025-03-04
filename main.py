@@ -691,7 +691,25 @@ def background_tasks():
     generate_initial_fake_data()
     
     # Thêm thông báo khởi động
-    add_system_message("Bot đã khởi động thành công!")
+    startup_message = "Bot đã khởi động thành công!"
+    add_system_message(startup_message)
+    
+    # Gửi thông báo khởi động qua Telegram nếu được bật
+    if telegram_config.get('enabled') and telegram_config.get('notify_bot_status', True):
+        try:
+            # Tạo thông báo chi tiết khi khởi động
+            bot_startup_message = (
+                f"🤖 *BOT GIAO DỊCH ĐÃ KHỞI ĐỘNG*\n\n"
+                f"⏰ Thời gian: `{format_vietnam_time()}`\n"
+                f"💰 Số dư: `{bot_status['balance']:.2f} USDT`\n"
+                f"🔄 Chế độ giao dịch: `{bot_status.get('trading_mode', 'Demo')}`\n"
+                f"👁️ Trạng thái: `Đang hoạt động, chờ tín hiệu`\n\n"
+                f"_Bot sẽ tự động thông báo khi có tín hiệu giao dịch mới_"
+            )
+            telegram_notifier.send_message(bot_startup_message)
+            logger.info("Đã gửi thông báo khởi động qua Telegram")
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo khởi động qua Telegram: {str(e)}")
     
     # Cập nhật số dư ban đầu
     update_initial_balances()
@@ -908,7 +926,26 @@ def start_bot():
     bot_status['running'] = True
     bot_status['status'] = 'running'
     bot_status['last_update'] = format_vietnam_time()
-    add_system_message("Bot đã được khởi động!")
+    
+    # Thêm thông báo hệ thống
+    start_message = "Bot đã được khởi động!"
+    add_system_message(start_message)
+    
+    # Gửi thông báo qua Telegram nếu được bật
+    if telegram_config.get('enabled') and telegram_config.get('notify_bot_status', True):
+        try:
+            bot_start_message = (
+                f"🟢 *BOT ĐÃ BẮT ĐẦU HOẠT ĐỘNG*\n\n"
+                f"⏰ Thời gian: `{format_vietnam_time()}`\n"
+                f"💰 Số dư: `{bot_status['balance']:.2f} USDT`\n"
+                f"👁️ Trạng thái: `Đang hoạt động, chờ tín hiệu`\n\n"
+                f"_Bot sẽ tự động thông báo khi có tín hiệu giao dịch mới_"
+            )
+            telegram_notifier.send_message(bot_start_message)
+            logger.info("Đã gửi thông báo khởi động qua Telegram")
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo khởi động qua Telegram: {str(e)}")
+    
     return jsonify({'success': True, 'status': bot_status['status']})
 
 @app.route('/stop-bot', methods=['POST'])
@@ -916,7 +953,26 @@ def stop_bot():
     bot_status['running'] = False
     bot_status['status'] = 'stopped'
     bot_status['last_update'] = format_vietnam_time()
-    add_system_message("Bot đã được dừng!")
+    
+    # Thêm thông báo hệ thống
+    stop_message = "Bot đã được dừng!"
+    add_system_message(stop_message)
+    
+    # Gửi thông báo qua Telegram nếu được bật
+    if telegram_config.get('enabled') and telegram_config.get('notify_bot_status', True):
+        try:
+            bot_stop_message = (
+                f"🔴 *BOT ĐÃ DỪNG HOẠT ĐỘNG*\n\n"
+                f"⏰ Thời gian: `{format_vietnam_time()}`\n"
+                f"💰 Số dư hiện tại: `{bot_status['balance']:.2f} USDT`\n"
+                f"👁️ Trạng thái: `Đã dừng, không tìm kiếm tín hiệu mới`\n\n"
+                f"_Các vị thế hiện tại vẫn được giữ nguyên_"
+            )
+            telegram_notifier.send_message(bot_stop_message)
+            logger.info("Đã gửi thông báo dừng bot qua Telegram")
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo dừng bot qua Telegram: {str(e)}")
+    
     return jsonify({'success': True, 'status': bot_status['status']})
 
 @app.route('/api/signals')
