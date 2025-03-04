@@ -60,8 +60,8 @@
                 </div>
                 
                 <div id="openPositions">
-                    {% if account_data.positions and account_data.positions|length > 0 %}
-                        {% for position in account_data.positions %}
+                    {% if positions and positions|length > 0 %}
+                        {% for position in positions %}
                         <div class="position-card mb-3 {% if position.pnl > 0 %}profit{% elif position.pnl < 0 %}loss{% endif %}">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
@@ -166,7 +166,7 @@
                 <div class="row mb-3">
                     <div class="col-7">
                         <div class="info-label">Số dư khả dụng</div>
-                        <div class="info-value">${{ account_data.balance|default(bot_status.balance, true)|round(2) }}</div>
+                        <div class="info-value">${{ bot_status.balance|round(2) }}</div>
                         {% if bot_status.mode == 'testnet' %}
                         <div class="testnet-balance">
                             <i class="bi bi-info-circle me-1"></i> Số dư testnet (không phải tiền thật)
@@ -175,7 +175,7 @@
                     </div>
                     <div class="col-5">
                         <div class="info-label">Số vị thế</div>
-                        <div class="info-value">{{ account_data.positions|default([])|length }}</div>
+                        <div class="info-value">{{ positions|default([])|length }}</div>
                     </div>
                 </div>
                 
