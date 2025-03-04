@@ -235,19 +235,19 @@ function createPositionCardHTML(position) {
             <div class="row mb-3">
                 <div class="col-md-3 col-6">
                     <div class="info-label">Giá vào</div>
-                    <div>$${position.entry_price.toFixed(2)}</div>
+                    <div>$${position.entry_price ? position.entry_price.toFixed(2) : '0.00'}</div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="info-label">Khối lượng</div>
-                    <div>${position.quantity}</div>
+                    <div>${position.quantity || '0.00'}</div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="info-label">Stop Loss</div>
-                    <div>$${position.stop_loss.toFixed(2)}</div>
+                    <div>$${position.stop_loss ? position.stop_loss.toFixed(2) : '0.00'}</div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="info-label">Take Profit</div>
-                    <div>$${position.take_profit.toFixed(2)}</div>
+                    <div>$${position.take_profit ? position.take_profit.toFixed(2) : '0.00'}</div>
                 </div>
             </div>
             
@@ -255,7 +255,7 @@ function createPositionCardHTML(position) {
                 <div class="info-label">P/L</div>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="info-value ${isProfitable ? 'text-success' : position.pnl < 0 ? 'text-danger' : ''}">
-                        ${position.pnl.toFixed(2)} USD (${position.pnl_percent.toFixed(2)}%)
+                        ${position.pnl ? position.pnl.toFixed(2) : '0.00'} USD (${position.pnl_percent ? position.pnl_percent.toFixed(2) : '0.00'}%)
                     </div>
                     <div>
                         <span class="badge ${isProfitable ? 'bg-success' : position.pnl < 0 ? 'bg-danger' : 'bg-secondary'}">
@@ -522,13 +522,13 @@ function analyzePosition(positionId) {
             // Tạm thời hiển thị kết quả dưới dạng alert
             let analysisHTML = `
                 <div class="mb-3">
-                    <h5>Phân tích vị thế ${data.symbol}</h5>
-                    <p>Loại: ${data.type} - Giá vào: $${data.entry_price}</p>
-                    <p>P/L hiện tại: ${data.pnl.toFixed(2)} USD (${data.pnl_percent.toFixed(2)}%)</p>
+                    <h5>Phân tích vị thế ${data.symbol || 'Không xác định'}</h5>
+                    <p>Loại: ${data.type || 'N/A'} - Giá vào: $${data.entry_price ? data.entry_price.toFixed(2) : '0.00'}</p>
+                    <p>P/L hiện tại: ${data.pnl ? data.pnl.toFixed(2) : '0.00'} USD (${data.pnl_percent ? data.pnl_percent.toFixed(2) : '0.00'}%)</p>
                 </div>
                 <div class="mb-3">
                     <h6>Đề xuất</h6>
-                    <p>${data.recommendation}</p>
+                    <p>${data.recommendation || 'Không có đề xuất'}</p>
                 </div>
             `;
             
