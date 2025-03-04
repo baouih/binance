@@ -558,15 +558,25 @@ def save_config():
     
     # Lưu cấu hình Telegram
     try:
-        tg_config = {
-            'enabled': telegram_config['enabled'],
-            'bot_token': telegram_config['bot_token'],
-            'chat_id': telegram_config['chat_id'],
-            'min_interval': telegram_config['min_interval']
-        }
+        # Tạo một bản sao của cấu hình Telegram hiện tại
+        tg_config = telegram_config.copy()
+        
+        # Loại bỏ các trường không cần lưu vào file
+        if 'last_notification' in tg_config:
+            del tg_config['last_notification']
+        
+        # Đảm bảo lưu tất cả các cài đặt thông báo
+        keys_to_save = [
+            'enabled', 'bot_token', 'chat_id', 'min_interval',
+            'notify_new_trades', 'notify_position_opened', 'notify_position_closed',
+            'notify_bot_status', 'notify_error_status', 'notify_daily_summary'
+        ]
+        
+        # Lọc và chỉ lưu các trường cần thiết
+        final_config = {k: tg_config.get(k) for k in keys_to_save if k in tg_config}
         
         with open(TELEGRAM_CONFIG_PATH, 'w') as f:
-            json.dump(tg_config, f, indent=2)
+            json.dump(final_config, f, indent=2)
             
         logger.info(f"Đã lưu cấu hình Telegram vào {TELEGRAM_CONFIG_PATH}")
     except Exception as e:
@@ -1072,6 +1082,21 @@ def telegram_config_api():
         
         if 'min_interval' in data:
             telegram_config['min_interval'] = data['min_interval']
+            
+        # Cập nhật các cài đặt thông báo chi tiết
+        notification_settings = [
+            'notify_new_trades',
+            'notify_position_opened',
+            'notify_position_closed',
+            'notify_bot_status',
+            'notify_error_status',
+            'notify_daily_summary'
+        ]
+        
+        # Lưu các cài đặt thông báo
+        for setting in notification_settings:
+            if setting in data:
+                telegram_config[setting] = data[setting]
         
         # Lưu cấu hình
         save_config()
