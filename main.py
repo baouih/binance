@@ -890,7 +890,23 @@ def save_config():
 import random
 
 def generate_initial_fake_data():
-    global positions, trades
+    global positions, trades, market_prices
+    
+    # Tạo giá giả lập cho tất cả các cặp tiền nếu chưa có
+    fake_prices = {
+        'BTCUSDT': 83000.0,
+        'ETHUSDT': 2050.0,
+        'BNBUSDT': 650.0,
+        'ADAUSDT': 0.55,
+        'DOGEUSDT': 0.15,
+        'XRPUSDT': 0.58,
+        'DOTUSDT': 8.25
+    }
+    
+    # Cập nhật market_prices với giá giả lập
+    for symbol in available_symbols:
+        if symbol not in market_prices:
+            market_prices[symbol] = fake_prices.get(symbol, 1.0)
     
     # Tạo một số vị thế mẫu
     for i in range(3):
@@ -1054,6 +1070,187 @@ def background_tasks():
             logger.error(f"Lỗi trong tác vụ nền: {e}")
         
         time.sleep(10)  # Cập nhật mỗi 10 giây
+
+# Đóng vị thế theo giá
+def close_position_by_price(position_id, current_price, reason="Manual Close"):
+    """Đóng vị thế với giá hiện tại và lý do được cung cấp"""
+    global positions, bot_status
+    
+    for i, position in enumerate(positions):
+        if position['id'] == position_id:
+            # Ghi lại thông tin vị thế
+            trade = {
+                'id': position['id'],
+                'symbol': position['symbol'],
+                'side': position['side'],
+                'entry_price': position['entry_price'],
+                'exit_price': current_price,
+                'quantity': position['quantity'],
+                'leverage': position['leverage'],
+                'entry_time': position['timestamp'],
+                'exit_time': format_vietnam_time(),
+                'duration': position['age'],
+                'strategy': position.get('strategy', 'Unknown'),
+                'reason': reason
+            }
+            
+            # Tính P/L
+            if position['side'] == 'BUY':
+                pnl = (current_price - position['entry_price']) * position['quantity'] * position['leverage']
+                pnl_percent = ((current_price - position['entry_price']) / position['entry_price']) * 100 * position['leverage']
+            else:  # SELL
+                pnl = (position['entry_price'] - current_price) * position['quantity'] * position['leverage']
+                pnl_percent = ((position['entry_price'] - current_price) / position['entry_price']) * 100 * position['leverage']
+            
+            trade['pnl'] = pnl
+            trade['pnl_percent'] = pnl_percent
+            trade['status'] = 'profit' if pnl > 0 else 'loss'
+            
+            # Thêm vào lịch sử giao dịch
+            trades.append(trade)
+            
+            # Xoá vị thế
+            positions.pop(i)
+            
+            # Cập nhật số dư
+            bot_status['balance'] += pnl
+            
+            # Thêm thông báo
+            result_text = "lãi" if pnl > 0 else "lỗ"
+            add_system_message(f"Đã đóng vị thế {trade['side']} cho {trade['symbol']} với {result_text} {pnl:.2f} ({pnl_percent:.2f}%) - Lý do: {reason}")
+            
+            # Gửi thông báo qua Telegram nếu được bật
+            if telegram_config.get('enabled') and telegram_config.get('notify_position_closed', True):
+                now = datetime.now()
+                last_notification = telegram_config.get('last_notification')
+                
+                # Kiểm tra khoảng thời gian tối thiểu giữa các thông báo
+                if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config.get('min_interval', 5):
+                    try:
+                        # Tạo thông báo chi tiết với emoji thích hợp
+                        position_type = "MUA" if trade['side'] == 'BUY' else "BÁN"  # Cần giữ lại vì 'side' đã được chuyển từ position['type']
+                        
+                        emoji = "🟢" if pnl > 0 else "🔴"
+                        profit_emoji = "💰" if pnl > 0 else "📉"
+                        
+                        message = (
+                            f"{emoji} *VỊ THẾ ĐÃ ĐÓNG - {position_type} {trade['symbol']}*\n\n"
+                            f"💲 Giá vào: `{trade['entry_price']:.2f}`\n"
+                            f"💲 Giá ra: `{trade['exit_price']:.2f}`\n"
+                            f"📊 Khối lượng: `{trade['quantity']:.4f}`\n"
+                            f"⚡ Đòn bẩy: `{trade['leverage']}x`\n"
+                            f"{profit_emoji} P/L: `{pnl:.2f} USDT ({pnl_percent:.2f}%)`\n"
+                            f"⏱️ Thời gian giữ: `{timedelta(seconds=trade['duration'])}`\n"
+                            f"📝 Lý do đóng: `{reason}`\n\n"
+                            f"💵 Số dư mới: `{bot_status['balance']:.2f} USDT`"
+                        )
+                        
+                        telegram_notifier.send_message(message)
+                        
+                        # Cập nhật thời gian thông báo cuối cùng
+                        telegram_config['last_notification'] = now
+                    except Exception as e:
+                        logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
+            
+            return True
+    
+    return False
+
+# Cập nhật giá thị trường theo thời gian thực hoặc giả lập
+def update_market_prices():
+    global market_prices, fake_prices
+    
+    # Định nghĩa fake_prices nếu chưa có
+    if 'fake_prices' not in globals():
+        fake_prices = {
+            'BTCUSDT': 83000.0,
+            'ETHUSDT': 2050.0,
+            'BNBUSDT': 650.0,
+            'ADAUSDT': 0.55,
+            'DOGEUSDT': 0.15,
+            'XRPUSDT': 0.58,
+            'DOTUSDT': 8.25
+        }
+    
+    try:
+        # Thử lấy giá từ API Binance thực
+        api = BinanceAPI()
+        
+        for symbol in available_symbols:
+            try:
+                ticker = api.get_symbol_ticker(symbol)
+                if ticker and 'price' in ticker:
+                    market_prices[symbol] = float(ticker['price'])
+                    logger.debug(f"Đã cập nhật giá {symbol}: {market_prices[symbol]}")
+            except Exception as e:
+                logger.warning(f"Không thể cập nhật giá {symbol} từ API: {str(e)}")
+                
+                # Nếu không lấy được giá thực, sinh giá giả lập
+                if symbol not in market_prices:
+                    market_prices[symbol] = fake_prices.get(symbol, 1.0)
+                else:
+                    # Biến động giá ngẫu nhiên ±0.5%
+                    market_prices[symbol] *= (1 + random.uniform(-0.005, 0.005))
+        
+        # Cập nhật biến động giá thị trường
+        btc_volatility = abs(random.uniform(-3, 3))
+        market_data_api = {
+            'btc_price': market_prices.get('BTCUSDT', 0),
+            'eth_price': market_prices.get('ETHUSDT', 0),
+            'market_volatility': btc_volatility,
+            'market_trend': 'bullish' if random.random() > 0.4 else ('bearish' if random.random() > 0.5 else 'sideways'),
+            'timestamp': format_vietnam_time()
+        }
+        
+        # Cập nhật giá cho tất cả các vị thế
+        for pos in positions:
+            symbol = pos['symbol']
+            if symbol in market_prices:
+                pos['current_price'] = market_prices[symbol]
+                
+                # Tính toán lợi nhuận/lỗ chưa thực hiện
+                entry_price = pos['entry_price']
+                quantity = pos['quantity']
+                if pos['side'] == 'BUY':
+                    pnl = (pos['current_price'] - entry_price) * quantity * pos['leverage']
+                    pnl_percent = ((pos['current_price'] - entry_price) / entry_price) * 100 * pos['leverage']
+                else:  # SELL
+                    pnl = (entry_price - pos['current_price']) * quantity * pos['leverage']
+                    pnl_percent = ((entry_price - pos['current_price']) / entry_price) * 100 * pos['leverage']
+                
+                pos['unrealized_pnl'] = pnl
+                pos['unrealized_pnl_percent'] = pnl_percent
+                
+                # Kiểm tra điều kiện đóng vị thế
+                if (pos['side'] == 'BUY' and pos['current_price'] <= pos['stop_loss']) or \
+                   (pos['side'] == 'SELL' and pos['current_price'] >= pos['stop_loss']):
+                    # Lấy index của vị thế cần đóng
+                    close_position_by_price(pos['id'], pos['current_price'], 'Stop Loss đã kích hoạt')
+                
+                elif (pos['side'] == 'BUY' and pos['current_price'] >= pos['take_profit']) or \
+                     (pos['side'] == 'SELL' and pos['current_price'] <= pos['take_profit']):
+                    # Lấy index của vị thế cần đóng
+                    close_position_by_price(pos['id'], pos['current_price'], 'Take Profit đã kích hoạt')
+                    
+        return market_data_api
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật giá thị trường: {str(e)}")
+        
+        # Nếu có lỗi, sinh giá giả lập
+        for symbol in available_symbols:
+            if symbol in market_prices:
+                # Biến động giá ngẫu nhiên ±0.5%
+                market_prices[symbol] *= (1 + random.uniform(-0.005, 0.005))
+            else:
+                market_prices[symbol] = fake_prices.get(symbol, 1.0)
+        
+        return {
+            'btc_price': market_prices.get('BTCUSDT', 0),
+            'eth_price': market_prices.get('ETHUSDT', 0),
+            'market_volatility': abs(random.uniform(-3, 3)),
+            'market_trend': 'sideways',
+            'timestamp': format_vietnam_time()
+        }
 
 # Cập nhật số dư ban đầu
 def update_initial_balances():
@@ -1900,4 +2097,13 @@ if __name__ == "__main__":
     background_thread.start()
     
     # Khởi chạy ứng dụng
+    # Nếu chạy trực tiếp bằng Python
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False, log_output=True)
+
+# Cần định nghĩa như thế này để gunicorn có thể tìm thấy app
+# Khi khởi động bằng gunicorn, tác vụ nền vẫn cần được bắt đầu
+if not os.environ.get('RUNNING_BACKGROUND_TASKS'):
+    os.environ['RUNNING_BACKGROUND_TASKS'] = 'True'
+    background_thread = threading.Thread(target=background_tasks)
+    background_thread.daemon = True
+    background_thread.start()

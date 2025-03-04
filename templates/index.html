@@ -378,8 +378,8 @@
                 {% if account_data.positions and account_data.positions|length > 0 %}
                     {% for position in account_data.positions %}
                     <div class="position-summary mb-3 p-3 rounded 
-                        {% if position.pnl > 0 %}bg-success bg-opacity-10 border-success{% 
-                        elif position.pnl < 0 %}bg-danger bg-opacity-10 border-danger{% 
+                        {% if position.unrealized_pnl > 0 %}bg-success bg-opacity-10 border-success{% 
+                        elif position.unrealized_pnl < 0 %}bg-danger bg-opacity-10 border-danger{% 
                         else %}bg-secondary bg-opacity-10 border-secondary{% endif %} border-opacity-25 border-start border-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
@@ -392,8 +392,8 @@
                                 </span>
                             </div>
                             <div class="text-end">
-                                <div class="{{ 'text-success' if position.pnl > 0 else 'text-danger' if position.pnl < 0 else '' }}">
-                                    ${{ position.pnl|round(2) }} ({{ position.pnl_percent|round(2) }}%)
+                                <div class="{{ 'text-success' if position.unrealized_pnl > 0 else 'text-danger' if position.unrealized_pnl < 0 else '' }}">
+                                    ${{ position.unrealized_pnl|round(2) }} ({{ position.unrealized_pnl_percent|round(2) }}%)
                                 </div>
                             </div>
                         </div>
