@@ -1118,6 +1118,10 @@ def position():
 
 @app.route('/settings')
 def settings():
+    # Đảm bảo có múi giờ Việt Nam +7 là mặc định
+    if 'timezone' not in bot_status:
+        bot_status['timezone'] = 'UTC+7'
+        
     return render_template('settings.html', 
                            bot_status=bot_status, 
                            telegram_config=telegram_config,
