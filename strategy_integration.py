@@ -65,7 +65,7 @@ class StrategyIntegration:
         if self.telegram_enabled:
             bot_token = self.account_config.get('telegram_bot_token', '')
             chat_id = self.account_config.get('telegram_chat_id', '')
-            self.telegram = TelegramNotifier(bot_token=bot_token, chat_id=chat_id)
+            self.telegram = TelegramNotifier(token=bot_token, chat_id=chat_id)
         else:
             self.telegram = None
         

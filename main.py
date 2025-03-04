@@ -1030,11 +1030,31 @@ def generate_initial_fake_data():
 
 # Background task để cập nhật dữ liệu
 def background_tasks():
+    """Hàm chạy các tác vụ nền"""
+    global market_data, system_messages, signals, bot_status
+    
     # Tải cấu hình
     load_config()
     
     # Tạo dữ liệu mẫu
     generate_initial_fake_data()
+    
+    # Cấu hình logger cho hàm background_tasks
+    bg_logger = logging.getLogger('background_tasks')
+    bg_logger.setLevel(logging.INFO)
+    
+    bg_logger.info("Bắt đầu tác vụ nền")
+    
+    # Khởi tạo StrategyIntegration
+    bg_logger.info("Khởi tạo hệ thống chiến thuật giao dịch")
+    strategy_integration = StrategyIntegration(
+        account_config_path=ACCOUNT_CONFIG_PATH,
+        bot_config_path=BOT_CONFIG_PATH,
+        algorithm_config_path='configs/algorithm_config.json'
+    )
+    
+    # Biến đếm chu kỳ
+    cycle_count = 0
     
     # Cập nhật số dư thực từ API
     try:
@@ -1077,11 +1097,63 @@ def background_tasks():
     while True:
         try:
             update_market_prices()
-            generate_fake_signal()
             
             # Cập nhật tuổi của các vị thế
             for pos in positions:
                 pos['age'] += 10  # Tăng 10 giây
+            
+            # Chạy chiến thuật giao dịch thật nếu bot đang hoạt động
+            if bot_status['running'] and cycle_count % 6 == 0:  # Mỗi 1 phút (6*10 giây)
+                try:
+                    bg_logger.info("Chạy chu kỳ chiến thuật giao dịch")
+                    strategy_result = strategy_integration.run_strategy_cycle()
+                    
+                    if strategy_result['success']:
+                        # Xử lý vị thế đã đóng
+                        for closed_pos in strategy_result.get('closed_positions', []):
+                            bg_logger.info(f"Vị thế đã đóng: {closed_pos['symbol']} {closed_pos['side']} - " +
+                                         f"P/L: {closed_pos['pnl_pct']:.2f}% ({closed_pos['pnl_abs']:.2f} USD)")
+                            
+                            # Cập nhật dữ liệu giao dịch
+                            trade = {
+                                'id': str(uuid.uuid4())[:8],
+                                'symbol': closed_pos['symbol'],
+                                'side': closed_pos['side'],
+                                'entry_price': closed_pos['entry_price'],
+                                'exit_price': closed_pos['exit_price'],
+                                'quantity': closed_pos['quantity'],
+                                'entry_time': closed_pos['entry_time'],
+                                'exit_time': closed_pos['exit_time'],
+                                'profit_loss': closed_pos['pnl_abs'],
+                                'profit_loss_percent': closed_pos['pnl_pct'],
+                                'status': 'CLOSED',
+                                'exit_reason': closed_pos['close_reason']
+                            }
+                            trades.append(trade)
+                        
+                        # Cập nhật tín hiệu
+                        for pos in strategy_integration.active_positions.values():
+                            signals.append({
+                                'id': str(uuid.uuid4())[:8],
+                                'timestamp': format_vietnam_time(),
+                                'symbol': pos['symbol'],
+                                'signal_type': pos['side'],
+                                'signal_strength': 0.8,
+                                'confidence': 85,
+                                'strategy': 'Composite Strategy',
+                                'timeframe': '1h',
+                                'price': pos['entry_price'],
+                                'executed': True,
+                                'details': f"Mở vị thế {pos['side']} từ chiến thuật tổng hợp"
+                            })
+                    else:
+                        bg_logger.warning(f"Lỗi khi chạy chu kỳ chiến thuật: {strategy_result.get('message', 'Unknown error')}")
+                except Exception as e:
+                    bg_logger.error(f"Lỗi khi chạy chiến thuật giao dịch: {str(e)}")
+            
+            # Tạo tín hiệu giả nếu bot đang chạy và không có dữ liệu từ chiến thuật thật
+            elif bot_status['running'] and len(signals) < 5:
+                generate_fake_signal()
             
             # Gửi dữ liệu cập nhật qua SocketIO
             socketio.emit('market_update', {
@@ -1105,6 +1177,9 @@ def background_tasks():
             
             # Gửi hiệu suất
             socketio.emit('performance_update', performance_data)
+            
+            # Tăng biến đếm chu kỳ
+            cycle_count += 1
             
         except Exception as e:
             logger.error(f"Lỗi trong tác vụ nền: {e}")
