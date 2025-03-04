@@ -488,7 +488,7 @@ def open_position(signal):
     position = {
         'id': position_id,
         'symbol': signal['symbol'],
-        'side': signal['type'],
+        'type': signal['type'],  # Đổi 'side' thành 'type' để thống nhất với các hàm khác
         'entry_price': entry_price,
         'current_price': entry_price,
         'quantity': quantity,
@@ -569,7 +569,7 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
         exit_price = market_prices.get(symbol, position['entry_price'])
     
     # Tính P/L
-    if position['side'] == 'BUY':
+    if position['type'] == 'BUY':  # Thay 'side' thành 'type'
         pnl = (exit_price - position['entry_price']) * position['quantity']
         pnl_percent = ((exit_price - position['entry_price']) / position['entry_price']) * 100
     else:  # SELL
@@ -580,7 +580,7 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
     trade = {
         'id': position['id'],
         'symbol': position['symbol'],
-        'side': position['side'],
+        'side': position['type'],  # Sử dụng 'type' thay vì 'side'
         'entry_price': position['entry_price'],
         'exit_price': exit_price,
         'quantity': position['quantity'],
@@ -617,7 +617,7 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
         if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config.get('min_interval', 5):
             try:
                 # Tạo thông báo chi tiết với emoji thích hợp
-                position_type = "MUA" if trade['side'] == 'BUY' else "BÁN"
+                position_type = "MUA" if trade['side'] == 'BUY' else "BÁN"  # Cần giữ lại vì 'side' đã được chuyển từ position['type']
                 
                 # Emoji dựa trên lợi nhuận
                 if pnl > 0:
