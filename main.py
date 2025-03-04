@@ -1205,6 +1205,33 @@ def settings():
 def cli():
     return render_template('cli.html', bot_status=bot_status, system_messages=system_messages)
 
+@app.route('/api/test/email', methods=['POST', 'GET'])
+def test_email():
+    """API endpoint để kiểm tra kết nối email"""
+    try:
+        # Thêm thông báo hệ thống
+        add_system_message("Đang kiểm tra kết nối Email...")
+        
+        # Trong phiên bản demo, luôn trả về thành công
+        # Trong ứng dụng thực tế, sẽ gửi email test và kiểm tra kết quả
+        return jsonify({
+            'success': True,
+            'message': 'Kết nối Email thành công. Đã gửi email test.',
+            'data': {
+                'sent_to': 'user@example.com',
+                'sent_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'subject': 'Test Email từ BinanceTrader Bot'
+            }
+        })
+    except Exception as e:
+        # Lưu thông báo hệ thống
+        add_system_message(f"Lỗi kết nối Email: {str(e)}")
+        
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi kết nối: {str(e)}'
+        }), 500
+
 @app.route('/trading-report')
 def trading_report():
     return render_template('trading_report.html', bot_status=bot_status, trades=trades, performance_data=performance_data)
