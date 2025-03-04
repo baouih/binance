@@ -694,9 +694,37 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Thêm container cho alerts ở đầu trang -->
+<div id="alertContainer" class="alert-container position-fixed top-4 start-50 translate-middle-x" style="z-index: 1050; width: 90%; max-width: 500px;"></div>
+
+<!-- Thêm container cho toasts -->
+<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;"></div>
+
+<!-- Sử dụng module script -->
+<script type="module">
+    // Import từ ui-helpers.js và settings-handlers.js
+    import { showAlert, showLoading, hideLoading, showToast } from '/static/js/ui-helpers.js';
+    import { initSettingsPage } from '/static/js/settings-handlers.js';
+    
+    // Cung cấp các hàm chính cho window object để có thể gọi từ HTML events
+    window.showAlert = showAlert;
+    window.showLoading = showLoading;
+    window.hideLoading = hideLoading;
+    window.showToast = showToast;
+    
+    // Khởi tạo trang settings
+    document.addEventListener('DOMContentLoaded', function() {
+        initSettingsPage();
+    });
+</script>
 <script>
-    // Hàm hiển thị thông báo
-    function showAlert(type, message) {
+    // Fallback script cho trường hợp module không hoạt động
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kiểm tra nếu initSettingsPage đã được thực thi qua module
+        if (typeof window._settingsPageInitialized === 'undefined') {
+            console.log('Fallback script initialized!');
+            // Đặt cờ để tránh khởi tạo lại
+            window._settingsPageInitialized = true;
         // Tạo element alert
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
