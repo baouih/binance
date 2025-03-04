@@ -7,6 +7,10 @@
     margin-bottom: 1rem;
     border: 1px solid transparent;
     animation: fadeIn 0.3s ease-in-out;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    position: relative;
+    z-index: 1050; /* Đảm bảo hiển thị trên các phần tử khác */
 }
 
 .alert-success {

@@ -26,6 +26,7 @@ function showAlert(type, message, timeout = 5000, targetSelector = null) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
+    alertDiv.style.pointerEvents = 'auto'; // Đảm bảo có thể click vào alert
     
     // Thêm biểu tượng phù hợp
     let icon = 'info-circle';
@@ -33,10 +34,16 @@ function showAlert(type, message, timeout = 5000, targetSelector = null) {
     if (type === 'danger') icon = 'exclamation-triangle';
     if (type === 'warning') icon = 'exclamation-circle';
     
+    // Nếu là thông báo lỗi API 404, định dạng lại nội dung
+    let displayMessage = message;
+    if (type === 'danger' && message.includes('404')) {
+        displayMessage = '<span class="error-text">Lỗi kết nối API:</span> ' + message;
+    }
+    
     // Thêm nội dung
     alertDiv.innerHTML = `
         <i class="bi bi-${icon} me-2"></i>
-        ${message}
+        ${displayMessage}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
@@ -51,12 +58,13 @@ function showAlert(type, message, timeout = 5000, targetSelector = null) {
             container = document.createElement('div');
             container.className = 'alert-container';
             container.style.position = 'fixed';
-            container.style.top = '20px';
+            container.style.top = '80px'; // Đặt cao hơn để tránh menu
             container.style.left = '50%';
             container.style.transform = 'translateX(-50%)';
-            container.style.zIndex = '1050';
+            container.style.zIndex = '1060'; // Tăng z-index
             container.style.width = '80%';
             container.style.maxWidth = '500px';
+            container.style.pointerEvents = 'none'; // Cho phép click xuyên qua phần trong suốt
             document.body.insertBefore(container, document.body.firstChild);
         }
     }
