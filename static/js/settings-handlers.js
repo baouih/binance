@@ -282,7 +282,7 @@ function setupApiSettingsHandlers() {
                         apiStatusElem.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Kết nối thành công</span>';
                     }
                     
-                    // Cập nhật trạng thái kết nối API trên toàn bộ giao diện
+                    // Cập nhật trạng thái API
                     const apiStatusBadges = document.querySelectorAll('.status-badge');
                     apiStatusBadges.forEach(badge => {
                         if (badge.classList.contains('connected') || badge.classList.contains('disconnected')) {
@@ -301,13 +301,8 @@ function setupApiSettingsHandlers() {
                         }
                     });
                     
-                    // Thay đổi nút từ "Lưu cấu hình API" thành "Đã kết nối"
-                    const saveApiBtn = document.getElementById('saveApiSettings');
-                    if (saveApiBtn) {
-                        saveApiBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Đã kết nối';
-                        saveApiBtn.classList.remove('btn-primary');
-                        saveApiBtn.classList.add('btn-success');
-                    }
+                    // Thông báo người dùng cần lưu cấu hình thay vì tự động cập nhật
+                    showAlert('info', 'Kết nối API thành công! Hãy nhấn nút "Lưu cấu hình API" để lưu lại thông tin.');
                 })
                 .catch((error, errorMessage) => {
                     hideLoading();
