@@ -896,7 +896,7 @@ def generate_initial_fake_data():
     for i in range(3):
         symbol = random.choice(fake_symbols)
         side = random.choice(['BUY', 'SELL'])
-        entry_price = fake_prices[symbol]
+        entry_price = market_prices[symbol]
         quantity = random.uniform(0.01, 0.5)
         leverage = random.choice([1, 2, 3, 5, 10])
         
@@ -934,7 +934,7 @@ def generate_initial_fake_data():
     for i in range(20):
         symbol = random.choice(fake_symbols)
         side = random.choice(['BUY', 'SELL'])
-        entry_price = fake_prices[symbol] * (1 + random.uniform(-0.1, 0.1))
+        entry_price = market_prices[symbol] * (1 + random.uniform(-0.1, 0.1))
         exit_price = entry_price * (1 + random.uniform(-0.05, 0.05))
         quantity = random.uniform(0.01, 0.5)
         
@@ -1029,7 +1029,7 @@ def background_tasks():
             
             # Gửi dữ liệu cập nhật qua SocketIO
             socketio.emit('market_update', {
-                'prices': fake_prices,
+                'prices': market_prices,
                 'timestamp': format_vietnam_time()
             })
             
@@ -1134,10 +1134,10 @@ def index():
     
     # Sử dụng dữ liệu từ API nếu có
     market_data = {
-        'btc_price': api_market_data.get('btc_price', fake_prices.get('BTCUSDT', 36500.0)),
-        'eth_price': api_market_data.get('eth_price', fake_prices.get('ETHUSDT', 2400.0)),
-        'sol_price': api_market_data.get('sol_price', fake_prices.get('SOLUSDT', 117.0)),
-        'bnb_price': api_market_data.get('bnb_price', fake_prices.get('BNBUSDT', 370.0)),
+        'btc_price': api_market_data.get('btc_price', market_prices.get('BTCUSDT', 36500.0)),
+        'eth_price': api_market_data.get('eth_price', market_prices.get('ETHUSDT', 2400.0)),
+        'sol_price': api_market_data.get('sol_price', market_prices.get('SOLUSDT', 117.0)),
+        'bnb_price': api_market_data.get('bnb_price', market_prices.get('BNBUSDT', 370.0)),
         'btc_change_24h': api_market_data.get('btc_change_24h', random.uniform(-2, 3)),
         'eth_change_24h': api_market_data.get('eth_change_24h', random.uniform(-3, 4)),
         'market_mode': 'Uptrend' if api_market_data.get('market_trend') == 'bullish' else ('Downtrend' if api_market_data.get('market_trend') == 'bearish' else 'Sideways'),
@@ -1184,7 +1184,7 @@ def index():
     # Dữ liệu theo dõi
     watchlist = {
         'BTCUSDT': {
-            'price': fake_prices.get('BTCUSDT', 36500),
+            'price': market_prices.get('BTCUSDT', 36500),
             'change_24h': random.uniform(-5, 5),
             'alerts': [
                 {'price': 35000, 'condition': 'below', 'active': True},
@@ -1192,7 +1192,7 @@ def index():
             ]
         },
         'ETHUSDT': {
-            'price': fake_prices.get('ETHUSDT', 2400),
+            'price': market_prices.get('ETHUSDT', 2400),
             'change_24h': random.uniform(-5, 5),
             'alerts': [
                 {'price': 2200, 'condition': 'below', 'active': True},
@@ -1200,7 +1200,7 @@ def index():
             ]
         },
         'SOLUSDT': {
-            'price': fake_prices.get('SOLUSDT', 115),
+            'price': market_prices.get('SOLUSDT', 115),
             'change_24h': random.uniform(-5, 5),
             'alerts': [
                 {'price': 100, 'condition': 'below', 'active': True}
@@ -1222,7 +1222,7 @@ def index():
                           bot_status=bot_status, 
                           account_data=account_data,
                           market_data=market_data,
-                          fake_prices=fake_prices,
+                          fake_prices=market_prices,  # Thay fake_prices bằng market_prices
                           signals=signals,
                           strategy_stats=strategy_stats,
                           performance_stats=performance_stats,
@@ -1358,8 +1358,8 @@ def open_new_position():
             'id': str(uuid.uuid4())[:8],
             'symbol': data.get('symbol', 'BTCUSDT'),
             'type': data.get('side', 'BUY'),
-            'entry_price': data.get('entry_price', fake_prices.get(data.get('symbol', 'BTCUSDT'), 0)),
-            'current_price': fake_prices.get(data.get('symbol', 'BTCUSDT'), 0),
+            'entry_price': data.get('entry_price', market_prices.get(data.get('symbol', 'BTCUSDT'), 0)),
+            'current_price': market_prices.get(data.get('symbol', 'BTCUSDT'), 0),
             'quantity': data.get('quantity', 0.1),
             'stop_loss': data.get('stop_loss', 0),
             'take_profit': data.get('take_profit', 0),
@@ -1730,15 +1730,15 @@ def test_telegram():
 # Thêm các route điều hướng
 @app.route('/strategies')
 def strategies():
-    return render_template('strategies.html', bot_status=bot_status, fake_prices=fake_prices)
+    return render_template('strategies.html', bot_status=bot_status, fake_prices=market_prices)
 
 @app.route('/backtest')
 def backtest():
-    return render_template('backtest.html', bot_status=bot_status, fake_prices=fake_prices)
+    return render_template('backtest.html', bot_status=bot_status, fake_prices=market_prices)
 
 @app.route('/trades')
 def trades_page():
-    return render_template('trades.html', bot_status=bot_status, trades=trades, fake_prices=fake_prices)
+    return render_template('trades.html', bot_status=bot_status, trades=trades, fake_prices=market_prices)
 
 @app.route('/market')
 def market():
@@ -1746,10 +1746,10 @@ def market():
     api_market_data = get_market_data_from_api()
     
     # Lấy dữ liệu thị trường hiện tại
-    current_btc_price = fake_prices.get('BTCUSDT', 36500.0)
-    current_eth_price = fake_prices.get('ETHUSDT', 2400.0)
-    current_sol_price = fake_prices.get('SOLUSDT', 117.0)
-    current_bnb_price = fake_prices.get('BNBUSDT', 370.0)
+    current_btc_price = market_prices.get('BTCUSDT', 36500.0)
+    current_eth_price = market_prices.get('ETHUSDT', 2400.0)
+    current_sol_price = market_prices.get('SOLUSDT', 117.0)
+    current_bnb_price = market_prices.get('BNBUSDT', 370.0)
     
     # Tính toán các chỉ báo kỹ thuật dựa trên dữ liệu hiện tại
     btc_rsi = random.uniform(35, 75)
@@ -1805,11 +1805,11 @@ def market():
         'timestamp': format_vietnam_time()
     }
     
-    return render_template('market.html', bot_status=bot_status, fake_prices=fake_prices, market_data=market_data, fake_symbols=fake_symbols, api_data=api_market_data)
+    return render_template('market.html', bot_status=bot_status, fake_prices=market_prices, market_data=market_data, fake_symbols=fake_symbols, api_data=api_market_data)
 
 @app.route('/position')
 def position():
-    return render_template('position.html', bot_status=bot_status, positions=positions, fake_prices=fake_prices)
+    return render_template('position.html', bot_status=bot_status, positions=positions, fake_prices=market_prices)
 
 @app.route('/settings')
 def settings():
