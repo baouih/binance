@@ -504,21 +504,35 @@ def load_config():
         if os.path.exists(TELEGRAM_CONFIG_PATH):
             with open(TELEGRAM_CONFIG_PATH, 'r') as f:
                 tg_config = json.load(f)
-                # Cập nhật cấu hình Telegram
-                if 'enabled' in tg_config:
-                    telegram_config['enabled'] = tg_config['enabled']
-                if 'bot_token' in tg_config and tg_config['bot_token']:
-                    telegram_config['bot_token'] = tg_config['bot_token']
-                if 'chat_id' in tg_config and tg_config['chat_id']:
-                    telegram_config['chat_id'] = tg_config['chat_id']
-                if 'min_interval' in tg_config:
-                    telegram_config['min_interval'] = tg_config['min_interval']
+                
+                # Danh sách các thông số thông báo cần tải
+                notification_settings = [
+                    'enabled', 'bot_token', 'chat_id', 'min_interval',
+                    'notify_new_trades', 'notify_position_opened', 'notify_position_closed',
+                    'notify_bot_status', 'notify_error_status', 'notify_daily_summary'
+                ]
+                
+                # Cập nhật cấu hình Telegram từ file
+                for setting in notification_settings:
+                    if setting in tg_config:
+                        # Đối với bot_token và chat_id, chỉ cập nhật nếu không trống
+                        if setting in ['bot_token', 'chat_id']:
+                            if tg_config[setting] and tg_config[setting].strip():
+                                telegram_config[setting] = tg_config[setting]
+                        else:
+                            telegram_config[setting] = tg_config[setting]
                 
                 # Đảm bảo luôn có giá trị mặc định
                 if not telegram_config['bot_token']:
                     telegram_config['bot_token'] = DEFAULT_BOT_TOKEN
                 if not telegram_config['chat_id']:
                     telegram_config['chat_id'] = DEFAULT_CHAT_ID
+                
+                # Ghi log cài đặt đã tải
+                logger.info(f"Đã tải cấu hình Telegram: enabled={telegram_config['enabled']}, " + 
+                           f"notify_new_trades={telegram_config['notify_new_trades']}, " +
+                           f"notify_error_status={telegram_config['notify_error_status']}, " +
+                           f"notify_daily_summary={telegram_config['notify_daily_summary']}")
                 
                 # Cập nhật notifier
                 telegram_notifier.set_token(telegram_config['bot_token'])
