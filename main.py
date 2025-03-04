@@ -1000,56 +1000,75 @@ def telegram_config_api():
         return jsonify({'success': True, 'data': telegram_config})
     
     data = request.json
-    if 'enabled' in data:
-        telegram_config['enabled'] = data['enabled']
+    if not data:
+        return jsonify({'success': False, 'message': 'Không có dữ liệu được gửi lên'})
     
-    global telegram_notifier
-    
-    if 'bot_token' in data:
-        telegram_config['bot_token'] = data['bot_token']
-    
-    if 'chat_id' in data:
-        telegram_config['chat_id'] = data['chat_id']
-    
-    # Cập nhật Telegram notifier với thông tin mới
-    telegram_notifier = TelegramNotifier(
-        token=telegram_config['bot_token'],
-        chat_id=telegram_config['chat_id']
-    )
-    
-    if 'min_interval' in data:
-        telegram_config['min_interval'] = data['min_interval']
-    
-    # Lưu cấu hình
-    save_config()
-    logger.info("Đã lưu cấu hình Telegram")
-    
-    # Thử gửi tin nhắn kiểm tra
-    if telegram_config['enabled'] and telegram_config['bot_token'] and telegram_config['chat_id']:
-        result = telegram_notifier.send_message("✅ Kết nối Telegram thành công! Bot thông báo đã sẵn sàng.")
-        if not result:
-            add_system_message("Kết nối Telegram thất bại, vui lòng kiểm tra token và chat_id")
-            return jsonify({
-                'success': True,
-                'message': "Kết nối Telegram thất bại, vui lòng kiểm tra token và chat_id",
-                'config': {
-                    'enabled': telegram_config['enabled'],
-                    'has_token': bool(telegram_config['bot_token']),
-                    'has_chat_id': bool(telegram_config['chat_id']),
-                    'min_interval': telegram_config['min_interval']
-                }
-            })
-    
-    return jsonify({
-        'success': True,
-        'message': "Cấu hình Telegram đã được lưu",
-        'config': {
-            'enabled': telegram_config['enabled'],
-            'has_token': bool(telegram_config['bot_token']),
-            'has_chat_id': bool(telegram_config['chat_id']),
-            'min_interval': telegram_config['min_interval']
-        }
-    })
+    try:
+        # Lưu cấu hình cũ để phục hồi trong trường hợp lỗi
+        old_config = telegram_config.copy()
+        
+        # Cập nhật cấu hình
+        if 'enabled' in data:
+            telegram_config['enabled'] = data['enabled']
+        
+        if 'bot_token' in data:
+            telegram_config['bot_token'] = data['bot_token']
+        
+        if 'chat_id' in data:
+            telegram_config['chat_id'] = data['chat_id']
+        
+        if 'min_interval' in data:
+            telegram_config['min_interval'] = data['min_interval']
+        
+        # Lưu cấu hình
+        save_config()
+        logger.info("Đã lưu cấu hình Telegram")
+        
+        # Chỉ cố tạo notifier mới nếu cả token và chat_id đều có giá trị
+        test_success = False
+        if telegram_config['enabled'] and telegram_config['bot_token'] and telegram_config['chat_id']:
+            # Cập nhật Telegram notifier với thông tin mới
+            telegram_notifier = TelegramNotifier(
+                token=telegram_config['bot_token'],
+                chat_id=telegram_config['chat_id']
+            )
+            
+            # Gửi tin nhắn test nếu được yêu cầu
+            if data.get('send_test_message', False):
+                result = telegram_notifier.send_message("✅ Kết nối Telegram thành công! Bot thông báo đã sẵn sàng (UTC+7).")
+                test_success = bool(result)
+                if not result:
+                    # Nếu gửi không thành công, ghi log và thông báo
+                    add_system_message("Kết nối Telegram thất bại, vui lòng kiểm tra token và chat_id")
+                    return jsonify({
+                        'success': False, 
+                        'message': "Kết nối Telegram thất bại, vui lòng kiểm tra token và chat_id",
+                        'config': {
+                            'enabled': telegram_config['enabled'],
+                            'has_token': bool(telegram_config['bot_token']),
+                            'has_chat_id': bool(telegram_config['chat_id']),
+                            'min_interval': telegram_config['min_interval']
+                        }
+                    })
+        
+        return jsonify({
+            'success': True,
+            'test_success': test_success,
+            'message': "Cấu hình Telegram đã được lưu thành công",
+            'config': {
+                'enabled': telegram_config['enabled'],
+                'has_token': bool(telegram_config['bot_token']),
+                'has_chat_id': bool(telegram_config['chat_id']),
+                'min_interval': telegram_config['min_interval']
+            }
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật cấu hình Telegram: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': f'Có lỗi xảy ra: {str(e)}',
+            'data': telegram_config
+        })
 
 @app.route('/test-telegram', methods=['POST'])
 def test_telegram():
