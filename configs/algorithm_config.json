@@ -1,0 +1,130 @@
+{
+    "primary_algorithm": "combined_strategy",
+    "backup_algorithm": "ema_cross_strategy",
+    "algorithms": {
+        "rsi_strategy": {
+            "enabled": true,
+            "parameters": {
+                "rsi_period": 13,
+                "rsi_overbought": 73,
+                "rsi_oversold": 27,
+                "use_ema_confirmation": true,
+                "ema_period": 50
+            }
+        },
+        "macd_strategy": {
+            "enabled": true,
+            "parameters": {
+                "fast_period": 10,
+                "slow_period": 26,
+                "signal_period": 9,
+                "use_histogram": true,
+                "use_price_action": true
+            }
+        },
+        "bollinger_strategy": {
+            "enabled": true,
+            "parameters": {
+                "bb_period": 20,
+                "bb_std": 2.25,
+                "use_bb_squeeze": true,
+                "use_rsi_filter": true,
+                "rsi_period": 14
+            }
+        },
+        "ema_cross_strategy": {
+            "enabled": true,
+            "parameters": {
+                "fast_ema": 8,
+                "slow_ema": 21,
+                "use_volume_filter": true,
+                "volume_period": 20,
+                "use_adx_filter": true
+            }
+        },
+        "support_resistance_strategy": {
+            "enabled": false,
+            "parameters": {
+                "lookback_period": 100,
+                "zone_threshold": 0.5,
+                "use_fibonacci": true,
+                "confirmation_candles": 2,
+                "use_volume_confirmation": true
+            }
+        },
+        "breakout_strategy": {
+            "enabled": false,
+            "parameters": {
+                "lookback_period": 50,
+                "breakout_threshold": 1.2,
+                "use_volume_surge": true,
+                "volume_surge_threshold": 1.8,
+                "confirmation_candles": 1
+            }
+        },
+        "ml_strategy": {
+            "enabled": false,
+            "parameters": {
+                "model_type": "Ensemble",
+                "feature_count": 20,
+                "prediction_horizon": 12,
+                "confidence_threshold": 0.75,
+                "use_market_regime": true
+            }
+        },
+        "combined_strategy": {
+            "enabled": true,
+            "parameters": {
+                "strategies": ["rsi_strategy", "macd_strategy", "bollinger_strategy", "ema_cross_strategy"],
+                "dynamic_weights": true,
+                "use_market_regime": true,
+                "min_signal_agreement": 0.6,
+                "performance_lookback": 50
+            }
+        }
+    },
+    "market_regime": {
+        "detection_enabled": true,
+        "lookback_period": 20,
+        "volatility_threshold": 1.5,
+        "trend_threshold": 0.6,
+        "regimes": {
+            "trending_up": {
+                "strategies": ["ema_cross_strategy", "macd_strategy"],
+                "weights": [0.6, 0.4]
+            },
+            "trending_down": {
+                "strategies": ["ema_cross_strategy", "macd_strategy"],
+                "weights": [0.6, 0.4]
+            },
+            "ranging": {
+                "strategies": ["rsi_strategy", "bollinger_strategy"],
+                "weights": [0.6, 0.4]
+            },
+            "volatile": {
+                "strategies": ["bollinger_strategy", "ema_cross_strategy"],
+                "weights": [0.7, 0.3]
+            }
+        }
+    },
+    "risk_management": {
+        "dynamic_position_sizing": true,
+        "max_risk_per_trade": 1.0,
+        "max_total_risk": 5.0,
+        "stop_loss_atr_multiplier": 1.5,
+        "take_profit_atr_multiplier": 2.5,
+        "trailing_stop_activation": 1.0,
+        "trailing_stop_callback": 0.3,
+        "market_volatility_adjustment": true
+    },
+    "signal_filters": {
+        "use_confirmation": true,
+        "min_signal_strength": 0.5,
+        "filter_by_volume": true,
+        "filter_by_market_regime": true,
+        "filter_by_time_of_day": false,
+        "filter_by_news_events": false
+    },
+    "last_updated": "2025-03-04 23:38:00",
+    "creator": "system"
+}
