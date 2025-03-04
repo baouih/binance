@@ -2,5 +2,11 @@
   "enabled": true,
   "bot_token": "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM",
   "chat_id": "1834332146",
-  "min_interval": 5
+  "min_interval": 5,
+  "notify_new_trades": true,
+  "notify_position_opened": true,
+  "notify_position_closed": true,
+  "notify_bot_status": true,
+  "notify_error_status": true,
+  "notify_daily_summary": false
 }
