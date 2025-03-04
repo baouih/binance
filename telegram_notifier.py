@@ -168,14 +168,14 @@ class TelegramNotifier:
         
         message = f"<b>{direction_arrow} {order_status_emoji} {order_status_text} {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n{warning}"
         message += f"<b>Cặp:</b> {symbol}\n"
-        message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
+        message += f"<b>Giá vào:</b> {entry_price:.2f} USDT\n"
         message += f"<b>Số lượng:</b> {quantity}\n"
         
         if stop_loss:
-            message += f"<b>Stop Loss:</b> {stop_loss:,.2f} USDT\n"
+            message += f"<b>Stop Loss:</b> {stop_loss:.2f} USDT\n"
         
         if take_profit:
-            message += f"<b>Take Profit:</b> {take_profit:,.2f} USDT\n"
+            message += f"<b>Take Profit:</b> {take_profit:.2f} USDT\n"
             
         # Thêm thông tin ID lệnh nếu có
         if order_placed and order_id:
@@ -230,12 +230,12 @@ class TelegramNotifier:
         
         message = f"<b>{pl_emoji} THOÁT LỆNH {side_text}</b> {mode_emoji} <b>{mode_display}</b>\n\n"
         message += f"<b>Cặp:</b> {symbol}\n"
-        message += f"<b>Giá vào:</b> {entry_price:,.2f} USDT\n"
-        message += f"<b>Giá thoát:</b> {exit_price:,.2f} USDT\n"
+        message += f"<b>Giá vào:</b> {entry_price:.2f} USDT\n"
+        message += f"<b>Giá thoát:</b> {exit_price:.2f} USDT\n"
         message += f"<b>Số lượng:</b> {quantity}\n"
         
         # Highlight profit/loss
-        profit_loss_text = f"+{profit_loss:,.2f}" if is_profit else f"{profit_loss:,.2f}"
+        profit_loss_text = f"+{profit_loss:.2f}" if is_profit else f"{profit_loss:.2f}"
         profit_loss_percent_text = f"+{profit_loss_percent:.2f}%" if is_profit else f"{profit_loss_percent:.2f}%"
         
         if is_profit:
@@ -286,7 +286,7 @@ class TelegramNotifier:
         report_message += f"<b>⏱️ Thời gian:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
         
         # Thông tin tài khoản
-        report_message += f"<b>💰 Số dư:</b> {account_balance:,.2f} USDT\n"
+        report_message += f"<b>💰 Số dư:</b> {account_balance:.2f} USDT\n"
         
         # Thông tin lãi/lỗ hiện tại
         if unrealized_pnl > 0:
