@@ -501,20 +501,35 @@ def load_config():
                 # Cập nhật cấu hình Telegram
                 if 'enabled' in tg_config:
                     telegram_config['enabled'] = tg_config['enabled']
-                if 'bot_token' in tg_config:
+                if 'bot_token' in tg_config and tg_config['bot_token']:
                     telegram_config['bot_token'] = tg_config['bot_token']
-                if 'chat_id' in tg_config:
+                if 'chat_id' in tg_config and tg_config['chat_id']:
                     telegram_config['chat_id'] = tg_config['chat_id']
                 if 'min_interval' in tg_config:
                     telegram_config['min_interval'] = tg_config['min_interval']
+                
+                # Đảm bảo luôn có giá trị mặc định
+                if not telegram_config['bot_token']:
+                    telegram_config['bot_token'] = DEFAULT_BOT_TOKEN
+                if not telegram_config['chat_id']:
+                    telegram_config['chat_id'] = DEFAULT_CHAT_ID
                 
                 # Cập nhật notifier
                 telegram_notifier.set_token(telegram_config['bot_token'])
                 telegram_notifier.set_chat_id(telegram_config['chat_id'])
                 
                 logger.info(f"Đã tải cấu hình Telegram từ {TELEGRAM_CONFIG_PATH}")
+        else:
+            # Tạo file cấu hình mới với giá trị mặc định
+            save_config()
+            logger.info(f"Đã tạo file cấu hình Telegram mới: {TELEGRAM_CONFIG_PATH}")
     except Exception as e:
         logger.error(f"Lỗi khi tải cấu hình Telegram: {e}")
+        # Trong trường hợp lỗi, vẫn đảm bảo sử dụng giá trị mặc định
+        telegram_config['bot_token'] = DEFAULT_BOT_TOKEN
+        telegram_config['chat_id'] = DEFAULT_CHAT_ID
+        telegram_notifier.set_token(DEFAULT_BOT_TOKEN)
+        telegram_notifier.set_chat_id(DEFAULT_CHAT_ID)
 
 # Lưu cấu hình vào file
 def save_config():
@@ -1034,10 +1049,20 @@ def telegram_config_api():
             telegram_config['enabled'] = data['enabled']
         
         if 'bot_token' in data:
-            telegram_config['bot_token'] = data['bot_token']
+            # Chỉ cập nhật nếu có dữ liệu hợp lệ
+            if data['bot_token'] and data['bot_token'].strip():
+                telegram_config['bot_token'] = data['bot_token'].strip()
+            else:
+                # Nếu trống, sử dụng giá trị mặc định
+                telegram_config['bot_token'] = DEFAULT_BOT_TOKEN
         
         if 'chat_id' in data:
-            telegram_config['chat_id'] = data['chat_id']
+            # Chỉ cập nhật nếu có dữ liệu hợp lệ
+            if data['chat_id'] and data['chat_id'].strip():
+                telegram_config['chat_id'] = data['chat_id'].strip()
+            else:
+                # Nếu trống, sử dụng giá trị mặc định
+                telegram_config['chat_id'] = DEFAULT_CHAT_ID
         
         if 'min_interval' in data:
             telegram_config['min_interval'] = data['min_interval']
@@ -1101,10 +1126,14 @@ def test_telegram():
     if not data or 'bot_token' not in data or 'chat_id' not in data:
         return jsonify({'success': False, 'message': 'Thiếu thông tin Bot Token hoặc Chat ID'})
     
+    # Đảm bảo dữ liệu hợp lệ, sử dụng giá trị mặc định nếu cần
+    bot_token = data['bot_token'].strip() if data['bot_token'] and data['bot_token'].strip() else DEFAULT_BOT_TOKEN
+    chat_id = data['chat_id'].strip() if data['chat_id'] and data['chat_id'].strip() else DEFAULT_CHAT_ID
+    
     # Tạo một notifier tạm thời với thông tin từ người dùng
     temp_notifier = TelegramNotifier(
-        token=data['bot_token'],
-        chat_id=data['chat_id']
+        token=bot_token,
+        chat_id=chat_id
     )
     
     # Gửi tin nhắn test với định dạng đẹp
