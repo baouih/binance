@@ -209,7 +209,9 @@ function createPositionCardHTML(position) {
     const riskRewardRatio = risk > 0 ? (reward / risk).toFixed(2) : '0';
     
     return `
-        <div class="position-card mb-3 ${isProfitable ? 'profit' : position.pnl < 0 ? 'loss' : ''}">
+        <div class="position-card mb-3 ${isProfitable ? 'profit' : position.pnl < 0 ? 'loss' : ''}" 
+            data-position-id="${position.id}"
+            data-toggle="position-details">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <h5 class="mb-0">${position.symbol}</h5>
@@ -222,10 +224,10 @@ function createPositionCardHTML(position) {
                 </div>
                 <div class="text-end">
                     <div class="info-value">
-                        $${position.current_price.toFixed(2)}
+                        $${position.current_price ? position.current_price.toFixed(2) : '0.00'}
                     </div>
                     <div class="price-change ${position.pnl_percent > 0 ? 'positive' : position.pnl_percent < 0 ? 'negative' : ''}">
-                        ${position.pnl_percent.toFixed(2)}%
+                        ${position.pnl_percent ? position.pnl_percent.toFixed(2) : '0.00'}%
                     </div>
                 </div>
             </div>

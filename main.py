@@ -137,6 +137,34 @@ signals = []
 # Dữ liệu thị trường
 market_data = {}
 
+# Hàm lấy dữ liệu thị trường từ API hoặc giả lập
+def get_market_data_from_api():
+    """Lấy dữ liệu thị trường từ API (hoặc giả lập)"""
+    try:
+        # Trong thực tế, đây sẽ là cuộc gọi đến API Binance
+        # Hiện tại, chúng ta sẽ sử dụng dữ liệu giả lập
+        return {
+            'btc_price': fake_prices.get('BTCUSDT', 36500.0),
+            'btc_change_24h': random.uniform(-3.0, 3.0),
+            'eth_price': fake_prices.get('ETHUSDT', 2400.0),
+            'eth_change_24h': random.uniform(-4.0, 4.0),
+            'sol_price': fake_prices.get('SOLUSDT', 117.0),
+            'sol_change_24h': random.uniform(-5.0, 5.0),
+            'bnb_price': fake_prices.get('BNBUSDT', 370.0),
+            'bnb_change_24h': random.uniform(-2.0, 2.0),
+            'market_trend': random.choice(['bullish', 'bearish', 'neutral']),
+            'market_volatility': random.uniform(0.5, 3.0),
+            'timestamp': format_vietnam_time()
+        }
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy dữ liệu thị trường: {str(e)}")
+        return {
+            'btc_price': 36500.0,
+            'eth_price': 2400.0,
+            'market_trend': 'neutral',
+            'timestamp': format_vietnam_time()
+        }
+
 # Hàm cập nhật dữ liệu giả
 def update_fake_data():
     global fake_prices, market_data, performance_data, bot_status
@@ -1145,7 +1173,20 @@ def get_performance():
 
 @app.route('/api/market')
 def get_market():
-    return jsonify({'success': True, 'market': market_data})
+    # Lấy dữ liệu thị trường từ API hoặc giả lập
+    market_data_api = get_market_data_from_api()
+    
+    # Kết hợp với market_data hiện tại
+    market_response = {
+        'market': market_data,
+        'api_data': market_data_api,
+        'symbols': fake_symbols,
+        'selected_symbols': selected_trading_coins,
+        'timestamp': format_vietnam_time(),
+        'success': True
+    }
+    
+    return jsonify(market_response)
 
 @app.route('/api/close-position/<position_id>', methods=['POST'])
 def api_close_position(position_id):
