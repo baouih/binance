@@ -11,11 +11,11 @@ import { showAlert, showLoading, hideLoading, validateForm, fetchAPI } from './u
 const API_ENDPOINTS = {
     GENERAL_SETTINGS: '/api/account/settings',
     API_SETTINGS: '/api/account/settings',
-    TEST_API_CONNECTION: '/api/binance/test',
+    TEST_API_CONNECTION: '/api/test_connection', // Sửa lại cho đúng với route trong routes/bot_control.py
     TRADING_COINS: '/api/trading/coins',
     RISK_SETTINGS: '/api/security/settings',
     TELEGRAM_SETTINGS: '/api/notification/settings',
-    TEST_TELEGRAM: '/api/telegram/test', // <-- Đã sửa lại đúng endpoint
+    TEST_TELEGRAM: '/api/telegram/test',
     NOTIFICATION_SETTINGS: '/api/notification/settings',
     ADVANCED_SETTINGS: '/api/security/settings',
     LOG_ENTRIES: '/api/logs'
