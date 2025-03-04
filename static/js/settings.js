@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const apiConnectionStatus = document.getElementById('api-connection-status');
     
     // Notification settings elements
-    const enableTelegramNotifications = document.getElementById('enable-telegram-notifications');
+    const enableTelegramNotifications = document.getElementById('telegramEnabledSwitch');
     const telegramBotToken = document.getElementById('telegramBotToken');
     const telegramChatId = document.getElementById('telegramChatId');
     const testTelegramBtn = document.getElementById('testTelegramBtn');
@@ -42,6 +42,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load Telegram configuration on page load
     loadTelegramConfig(); // Gọi hàm này để tải cấu hình Telegram từ máy chủ
+    
+    // Quản lý sự kiện khi bật/tắt thông báo Telegram
+    if (enableTelegramNotifications) {
+        enableTelegramNotifications.addEventListener('change', function() {
+            // Hiển thị/ẩn phần cài đặt Telegram dựa trên trạng thái của công tắc
+            const telegramSettings = document.getElementById('telegramSettings');
+            if (telegramSettings) {
+                telegramSettings.style.display = this.checked ? 'block' : 'none';
+            }
+        });
+    }
     
     // API mode radio buttons
     const apiModeRadios = document.querySelectorAll('input[name="api-mode"]');
@@ -289,20 +300,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const enableTelegram = enableTelegramNotifications.checked;
         const botToken = telegramBotToken.value.trim();
         const chatId = telegramChatId.value.trim();
-        const notifyNewTrades = document.getElementById('notify-new-trades').checked;
-        const notifyClosedTrades = document.getElementById('notify-closed-trades').checked;
-        const notifyErrorStatus = document.getElementById('notify-error-status').checked;
-        const notifyDailySummary = document.getElementById('notify-daily-summary').checked;
+        
+        // Lấy giá trị từ các checkbox với ID thực tế trong HTML
+        const notifyTradingSignals = document.getElementById('notifyTradingSignals')?.checked || false;
+        const notifyPositionOpened = document.getElementById('notifyPositionOpened')?.checked || false;
+        const notifyPositionClosed = document.getElementById('notifyPositionClosed')?.checked || false;
+        const notifyBotStatus = document.getElementById('notifyBotStatus')?.checked || false;
+        const notifyErrors = document.getElementById('notifyErrors')?.checked || false;
+        const notifyDailyReport = document.getElementById('notifyDailyReport')?.checked || false;
         
         // Prepare data for API
         const data = {
             enabled: enableTelegram,
             bot_token: botToken,
             chat_id: chatId,
-            notify_new_trades: notifyNewTrades,
-            notify_closed_trades: notifyClosedTrades,
-            notify_error_status: notifyErrorStatus,
-            notify_daily_summary: notifyDailySummary
+            notify_new_trades: notifyTradingSignals,
+            notify_position_opened: notifyPositionOpened,
+            notify_position_closed: notifyPositionClosed,
+            notify_bot_status: notifyBotStatus,
+            notify_error_status: notifyErrors,
+            notify_daily_summary: notifyDailyReport
         };
         
         // Send data to server
