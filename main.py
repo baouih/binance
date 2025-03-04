@@ -586,11 +586,18 @@ def get_current_balance():
             # Lấy số dư từ tài khoản futures
             account_info = binance_api.get_futures_account()
             if isinstance(account_info, dict) and 'totalWalletBalance' in account_info:
-                logger.info(f"Đã lấy số dư từ API Binance Futures: {account_info['totalWalletBalance']} USDT")
-                real_balance = float(account_info['totalWalletBalance'])
+                wallet_balance = account_info['totalWalletBalance']
+                logger.info(f"Đã lấy số dư từ API Binance Futures: {wallet_balance} USDT")
                 
-                # Cập nhật bot_status
+                # Chuyển đổi chuỗi thành số float và đảm bảo không bị làm tròn
+                real_balance = float(wallet_balance)
+                
+                # Ghi log chi tiết để debug
+                logger.debug(f"Số dư gốc từ API: {wallet_balance}, chuyển đổi thành float: {real_balance}")
+                
+                # Cập nhật bot_status với giá trị chính xác
                 if real_balance > 0:
+                    # Lưu giá trị chính xác, không làm tròn
                     bot_status['balance'] = real_balance
                     bot_status['api_connected'] = True
                     bot_status['last_api_check'] = format_vietnam_time()
@@ -599,6 +606,8 @@ def get_current_balance():
                 for pos in positions:
                     real_balance += pos['unrealized_pnl']
                 
+                # Thêm log kiểm tra giá trị cuối cùng
+                logger.info(f"Số dư cuối cùng từ API (đã tính P/L): {real_balance} USDT")
                 return real_balance
         else:
             # Lấy số dư từ tài khoản spot cho USDT
@@ -1329,10 +1338,16 @@ def get_system_messages():
 
 @app.route('/api/balance')
 def get_balance():
+    # Lấy số dư hiện tại từ API, đảm bảo là giá trị chính xác
+    current_balance = get_current_balance()
+    
+    # Log để debug
+    logger.debug(f"API Balance Endpoint - current_balance: {current_balance}, bot_status['balance']: {bot_status['balance']}")
+    
     return jsonify({
         'success': True,
         'balance': bot_status['balance'],
-        'current_balance': get_current_balance(),
+        'current_balance': current_balance,
         'initial_balances': initial_balances
     })
 

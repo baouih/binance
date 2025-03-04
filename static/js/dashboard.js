@@ -658,9 +658,20 @@ function updateTrades(data) {
 function updateAccount(data) {
     // Update balance and other account info
     if (data.balance) {
+        // Kiểm tra xem số dư có phải là giá trị không làm tròn không
+        console.log('Raw balance from API:', data.balance);
+        
         document.querySelectorAll('[data-account="balance"]').forEach(elem => {
-            elem.textContent = `$${data.balance.toFixed(2)}`;
+            elem.textContent = `$${Number(data.balance).toFixed(2)}`;
         });
+        
+        // Cập nhật nhãn nếu là dữ liệu thực
+        const demoLabel = document.querySelector('.balance-label.bg-secondary');
+        if (demoLabel && data.balance > 10000) {
+            demoLabel.textContent = 'live';
+            demoLabel.classList.remove('bg-secondary');
+            demoLabel.classList.add('bg-success');
+        }
     }
     
     // Update equity curve if available

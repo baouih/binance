@@ -8,5 +8,5 @@
   "notify_position_closed": true,
   "notify_bot_status": true,
   "notify_error_status": true,
-  "notify_daily_summary": true
+  "notify_daily_summary": false
 }
