@@ -48,18 +48,21 @@ bot_status = {
 }
 
 # Cấu hình Telegram
+DEFAULT_BOT_TOKEN = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM"
+DEFAULT_CHAT_ID = "1834332146"
+
 telegram_config = {
     'enabled': False,
-    'bot_token': '',
-    'chat_id': '',
+    'bot_token': DEFAULT_BOT_TOKEN,
+    'chat_id': DEFAULT_CHAT_ID,
     'min_interval': 5,  # Khoảng thời gian tối thiểu giữa các thông báo (phút)
     'last_notification': None
 }
 
 # Khởi tạo Telegram Notifier
 telegram_notifier = TelegramNotifier(
-    token=telegram_config.get('bot_token', ''),
-    chat_id=telegram_config.get('chat_id', '')
+    token=telegram_config.get('bot_token', DEFAULT_BOT_TOKEN),
+    chat_id=telegram_config.get('chat_id', DEFAULT_CHAT_ID)
 )
 
 # Dữ liệu tạm để hiển thị
