@@ -331,16 +331,36 @@ function setupApiSettingsHandlers() {
                                     <div class="alert alert-info small mb-0">
                                         <i class="bi bi-info-circle me-1"></i> Gợi ý: Kiểm tra phiên bản API (v1/v2) hoặc cài đặt server API.
                                     </div>
-                                </div>
-                                <div style="height:80px"></div><!-- Tạo khoảng trống cố định không gây lấn xuống -->`;
+                                </div>`;
+                                
+                            // Hiển thị thông báo lỗi trong container riêng
+                            const errorContainer = document.getElementById('apiErrorContainer');
+                            if (errorContainer) {
+                                errorContainer.innerHTML = `
+                                    <div class="alert alert-danger">
+                                        <h6 class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi API 404</h6>
+                                        <p class="mb-0">API endpoint kiểm tra kết nối không tồn tại. Vui lòng kiểm tra phiên bản API hoặc liên hệ quản trị viên.</p>
+                                    </div>
+                                `; 
+                            }
                         } else {
                             // Hiển thị các lỗi khác
                             apiStatusElem.innerHTML = `
                                 <div class="api-status api-status-error p-3 mb-2">
                                     <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối API</h6>
                                     <p class="mb-0">${error.message}</p>
-                                </div>
-                                <div style="height:80px"></div><!-- Tạo khoảng trống cố định không gây lấn xuống -->`;
+                                </div>`;
+                                
+                            // Hiển thị thông báo lỗi trong container riêng
+                            const errorContainer = document.getElementById('apiErrorContainer');
+                            if (errorContainer) {
+                                errorContainer.innerHTML = `
+                                    <div class="alert alert-danger">
+                                        <h6 class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối API</h6>
+                                        <p class="mb-0">${error.message}</p>
+                                    </div>
+                                `; 
+                            }
                         }
                     }
                 });
