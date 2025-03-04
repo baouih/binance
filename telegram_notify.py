@@ -34,8 +34,8 @@ class TelegramNotifier:
             chat_id (str, optional): ID của chat nơi gửi tin nhắn
         """
         self.base_url = "https://api.telegram.org/bot"
-        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN")
-        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "")
+        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")
         
         # Fix token format - ensure it starts with number and not letter
         if self.token and not self.token.split(':')[0].isdigit():

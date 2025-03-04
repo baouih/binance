@@ -1102,13 +1102,37 @@ def test_telegram():
         chat_id=data['chat_id']
     )
     
-    # Gửi tin nhắn test
-    result = temp_notifier.send_message("🧪 Đây là tin nhắn kiểm tra từ BinanceTrader Bot")
+    # Gửi tin nhắn test với định dạng đẹp
+    test_message = f"""🧪 <b>KIỂM TRA KẾT NỐI TELEGRAM</b>
+
+✅ Bot giao dịch đã kết nối thành công với Telegram!
+
+<b>Bạn sẽ nhận được các thông báo sau:</b>
+• 💰 Thông tin số dư tài khoản
+• 📊 Vị thế đang mở/đóng
+• 🤖 Trạng thái bot (chạy/dừng)
+• 📈 Phân tích thị trường
+• ⚙️ Thay đổi cấu hình
+• 📑 Báo cáo lãi/lỗ định kỳ
+
+⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+
+    message = data.get('message', test_message)
+    result = temp_notifier.send_message(message)
     
     if result:
-        return jsonify({'success': True, 'message': 'Đã gửi tin nhắn kiểm tra thành công'})
+        # Cập nhật trạng thái nếu thành công
+        add_system_message("Đã gửi tin nhắn test đến Telegram thành công")
+        return jsonify({
+            'success': True, 
+            'message': 'Đã gửi tin nhắn kiểm tra thành công. Vui lòng kiểm tra Telegram của bạn.'
+        })
     else:
-        return jsonify({'success': False, 'message': 'Không thể gửi tin nhắn kiểm tra. Vui lòng kiểm tra Bot Token và Chat ID'})
+        add_system_message("Không thể gửi tin nhắn Telegram, kiểm tra token và chat ID")
+        return jsonify({
+            'success': False, 
+            'message': 'Không thể gửi tin nhắn kiểm tra. Vui lòng kiểm tra token và chat ID.'
+        })
 
 # Thêm các route điều hướng
 @app.route('/strategies')
