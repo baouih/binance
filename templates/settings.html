@@ -959,11 +959,32 @@
             const timezone = document.getElementById('timezoneSelect').value;
             const autoStart = document.getElementById('autoStartSwitch').checked;
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/general', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    bot_mode: botMode,
+                    account_type: accountType,
+                    strategy_mode: strategyMode,
+                    language: language,
+                    timezone: timezone,
+                    auto_start: autoStart
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt chung đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt chung đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt. Vui lòng thử lại sau.');
+            });
         });
         
         // Save API Settings
@@ -977,15 +998,32 @@
             
             if (!apiKey || !secretKey) {
                 hideLoading();
-                showToast('Lỗi', 'Vui lòng nhập API Key và Secret Key', 'error');
+                showAlert('danger', 'Vui lòng nhập API Key và Secret Key');
                 return;
             }
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    secret_key: secretKey
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt API đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt API đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving API settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt API. Vui lòng thử lại sau.');
+            });
         });
         
         // Test API Connection
@@ -999,15 +1037,32 @@
             
             if (!apiKey || !secretKey) {
                 hideLoading();
-                showToast('Lỗi', 'Vui lòng nhập API Key và Secret Key', 'error');
+                showAlert('danger', 'Vui lòng nhập API Key và Secret Key');
                 return;
             }
             
-            // In a real app, you would test the API connection
-            setTimeout(() => {
+            // Gửi dữ liệu để kiểm tra kết nối API (giả lập)
+            fetch('/api/test-connection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    secret_key: secretKey
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Kết nối API thành công', 'success');
-            }, 1000);
+                showAlert('success', 'Kết nối API thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error testing API connection:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi kiểm tra kết nối. Vui lòng thử lại sau.');
+            });
         });
         
         // Save Risk Settings
@@ -1015,11 +1070,34 @@
             // Show loading
             showLoading();
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Lấy các giá trị từ form
+            const riskPerTrade = document.getElementById('riskPerTrade').value;
+            const maxPositions = document.getElementById('maxPositions').value;
+            const maxRiskTotal = document.getElementById('maxRiskTotal').value;
+            
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/risk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    risk_per_trade: riskPerTrade,
+                    max_positions: maxPositions,
+                    max_risk_total: maxRiskTotal
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt quản lý rủi ro đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt quản lý rủi ro đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving risk settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt quản lý rủi ro. Vui lòng thử lại sau.');
+            });
         });
         
         // Save Telegram Settings
@@ -1033,15 +1111,32 @@
             
             if (!botToken || !chatId) {
                 hideLoading();
-                showToast('Lỗi', 'Vui lòng nhập Bot Token và Chat ID', 'error');
+                showAlert('danger', 'Vui lòng nhập Bot Token và Chat ID');
                 return;
             }
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/telegram', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    bot_token: botToken,
+                    chat_id: chatId
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt Telegram đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt Telegram đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving Telegram settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt Telegram. Vui lòng thử lại sau.');
+            });
         });
         
         // Test Telegram
@@ -1055,7 +1150,7 @@
             
             if (!botToken || !chatId) {
                 hideLoading();
-                showToast('Lỗi', 'Vui lòng nhập Bot Token và Chat ID', 'error');
+                showAlert('danger', 'Vui lòng nhập Bot Token và Chat ID');
                 return;
             }
             
@@ -1075,15 +1170,15 @@
                 hideLoading();
                 
                 if (data.success) {
-                    showToast('Thành công', 'Tin nhắn test đã được gửi. Vui lòng kiểm tra Telegram của bạn.', 'success');
+                    showAlert('success', 'Tin nhắn test đã được gửi. Vui lòng kiểm tra Telegram của bạn.');
                 } else {
-                    showToast('Lỗi', data.message || 'Không thể gửi tin nhắn test', 'error');
+                    showAlert('danger', data.message || 'Không thể gửi tin nhắn test');
                 }
             })
             .catch(error => {
                 hideLoading();
-                showToast('Lỗi', 'Không thể kết nối đến máy chủ', 'error');
-                console.error('Error:', error);
+                showAlert('danger', 'Không thể kết nối đến máy chủ');
+                console.error('Error testing Telegram:', error);
             });
         });
         
@@ -1092,11 +1187,36 @@
             // Show loading
             showLoading();
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Lấy các giá trị từ form
+            const notifyOnTrade = document.getElementById('notifyOnTrade').checked;
+            const notifyOnStopLoss = document.getElementById('notifyOnStopLoss').checked;
+            const notifyOnTakeProfit = document.getElementById('notifyOnTakeProfit').checked;
+            const notifyOnSignal = document.getElementById('notifyOnSignal').checked;
+            
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/notifications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    notify_on_trade: notifyOnTrade,
+                    notify_on_stop_loss: notifyOnStopLoss,
+                    notify_on_take_profit: notifyOnTakeProfit,
+                    notify_on_signal: notifyOnSignal
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt thông báo đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt thông báo đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving notification settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt thông báo. Vui lòng thử lại sau.');
+            });
         });
         
         // Save Advanced Settings
@@ -1104,11 +1224,33 @@
             // Show loading
             showLoading();
             
-            // In a real app, you would send these values to the server
-            setTimeout(() => {
+            // Lấy các giá trị từ form (giả sử)
+            const enableTradingTimeConstraint = document.getElementById('enableTradingTimeConstraint').checked;
+            
+            // Các giá trị khác có thể thêm vào đây
+            
+            // Gửi dữ liệu tới backend (giả lập)
+            fetch('/api/settings/advanced', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    enable_trading_time_constraint: enableTradingTimeConstraint
+                    // Các giá trị khác có thể thêm vào đây
+                })
+            })
+            .then(response => {
+                // Giả lập response thành công
                 hideLoading();
-                showToast('Thành công', 'Cài đặt nâng cao đã được lưu', 'success');
-            }, 500);
+                showAlert('success', 'Cài đặt nâng cao đã được lưu thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error saving advanced settings:', error);
+                hideLoading();
+                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt nâng cao. Vui lòng thử lại sau.');
+            });
         });
         
         // Refresh Logs
@@ -1117,8 +1259,12 @@
             const logContent = document.getElementById('logContent');
             logContent.innerHTML = '<div class="text-center my-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">Đang tải...</span></div>';
             
-            // In a real app, you would fetch the latest logs from the server
-            setTimeout(() => {
+            // Gửi yêu cầu lấy log mới nhất (giả lập)
+            fetch('/api/logs/recent', {
+                method: 'GET'
+            })
+            .then(response => {
+                // Giả lập response thành công
                 // Sample log entries
                 const logEntries = [
                     '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:10:22]</span> <span class="text-primary">[INFO]</span> Dữ liệu thị trường được cập nhật</div>',
@@ -1127,12 +1273,17 @@
                     '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:15:45]</span> <span class="text-info">[TRADE]</span> Đang mở vị thế SELL cho ETHUSDT tại giá 3150.25</div>'
                 ];
                 
-                // Add the original log entries back
+                // Add the original log entries or replace with new logs
                 let originalEntries = logContent.innerHTML;
                 logContent.innerHTML = logEntries.join('\n') + originalEntries;
                 
-                showToast('Thành công', 'Nhật ký đã được làm mới', 'success');
-            }, 1000);
+                showAlert('success', 'Nhật ký đã được làm mới thành công!');
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error('Error refreshing logs:', error);
+                logContent.innerHTML = '<div class="alert alert-danger">Có lỗi xảy ra khi tải nhật ký. Vui lòng thử lại sau.</div>';
+            });
         });
         
         // Download Logs
@@ -1153,7 +1304,8 @@
             // Clean up
             URL.revokeObjectURL(url);
             
-            showToast('Thành công', 'Nhật ký đã được tải xuống', 'success');
+            // Hiển thị thông báo thành công
+            showAlert('success', 'Nhật ký đã được tải xuống thành công!');
         });
         
         // Auto-refresh logs
