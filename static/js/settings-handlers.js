@@ -14,7 +14,7 @@ const API_ENDPOINTS = {
     TEST_API_CONNECTION: '/api/test_connection', // Sửa lại cho đúng với route trong routes/bot_control.py
     TRADING_COINS: '/api/trading/coins',
     RISK_SETTINGS: '/api/security/settings',
-    TELEGRAM_SETTINGS: '/api/notification/settings',
+    TELEGRAM_SETTINGS: '/api/telegram/config', // Đã sửa để trỏ đến endpoint đúng
     TEST_TELEGRAM: '/api/telegram/test',
     NOTIFICATION_SETTINGS: '/api/notification/settings',
     ADVANCED_SETTINGS: '/api/security/settings',
