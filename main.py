@@ -235,6 +235,7 @@ def generate_fake_signal():
         signal_strength = random.uniform(0.1, 0.9)
         confidence = random.uniform(60, 95)
         strategy = random.choice(['RSI', 'MACD Cross', 'EMA Cross', 'Bollinger Bands', 'Support/Resistance'])
+        timeframe = random.choice(['1m', '5m', '15m', '1h', '4h', '1d'])
         
         signal = {
             'id': str(uuid.uuid4())[:8],
@@ -245,6 +246,7 @@ def generate_fake_signal():
             'strength': signal_strength,
             'confidence': confidence,
             'strategy': strategy,
+            'timeframe': timeframe,
             'executed': False
         }
         
@@ -256,7 +258,36 @@ def generate_fake_signal():
         socketio.emit('new_signal', signal)
         
         # Thêm thông báo
-        add_system_message(f"Đã phát hiện tín hiệu {signal_type} cho {symbol} với độ tin cậy {confidence:.1f}%")
+        signal_message = f"Đã phát hiện tín hiệu {signal_type} cho {symbol} với độ tin cậy {confidence:.1f}%"
+        add_system_message(signal_message)
+        
+        # Gửi thông báo qua Telegram nếu được bật
+        if telegram_config.get('enabled') and telegram_config.get('notify_new_trades', True):
+            try:
+                # Tạo thông báo chi tiết
+                signal_arrow = "🔴 BÁN" if signal_type == "SELL" else "🟢 MUA"
+                
+                signal_alert = (
+                    f"{signal_arrow} *TÍN HIỆU GIAO DỊCH MỚI*\n\n"
+                    f"🪙 *Cặp giao dịch:* `{symbol}`\n"
+                    f"⏱️ *Khung thời gian:* `{timeframe}`\n"
+                    f"💰 *Giá hiện tại:* `{fake_prices[symbol]:.2f} USDT`\n"
+                    f"📊 *Chiến lược:* `{strategy}`\n"
+                    f"⭐ *Độ tin cậy:* `{confidence:.1f}%`\n"
+                    f"🔄 *Độ mạnh:* `{signal_strength:.2f}`\n"
+                    f"⏰ *Thời gian:* `{format_vietnam_time()}`\n\n"
+                )
+                
+                # Thêm thông tin về hành động (tự động hoặc thủ công)
+                if signal_strength > 0.5 and confidence > 75:
+                    signal_alert += f"🤖 _Bot sẽ tự động thực hiện lệnh này do tín hiệu mạnh_"
+                else:
+                    signal_alert += f"👤 _Tín hiệu yếu, không thực hiện tự động_"
+                
+                telegram_notifier.send_message(signal_alert)
+                logger.info(f"Đã gửi thông báo tín hiệu {symbol} {signal_type} qua Telegram")
+            except Exception as e:
+                logger.error(f"Lỗi khi gửi thông báo tín hiệu qua Telegram: {str(e)}")
         
         # Mở vị thế tự động nếu tín hiệu đủ mạnh
         if signal_strength > 0.5 and confidence > 75 and bot_status['running']:
@@ -325,24 +356,37 @@ def open_position(signal):
     # Thêm thông báo
     add_system_message(f"Đã mở vị thế {signal['type']} cho {signal['symbol']} tại giá {entry_price:.2f}")
     
-    # Gửi thông báo qua Telegram
-    if telegram_config['enabled']:
+    # Gửi thông báo qua Telegram nếu được bật
+    if telegram_config.get('enabled') and telegram_config.get('notify_position_opened', True):
         now = datetime.now()
         last_notification = telegram_config.get('last_notification')
         
         # Kiểm tra khoảng thời gian tối thiểu giữa các thông báo
-        if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config['min_interval']:
-            message = f"🔔 *Vị thế mới đã được mở*\n" \
-                     f"Symbol: `{signal['symbol']}`\n" \
-                     f"Loại: `{signal['type']}`\n" \
-                     f"Giá vào: `{entry_price:.2f}`\n" \
-                     f"Số lượng: `{quantity:.4f}`\n" \
-                     f"Stop Loss: `{stop_loss:.2f}`\n" \
-                     f"Take Profit: `{take_profit:.2f}`\n" \
-                     f"Thời gian: `{position['timestamp']}`"
-            
-            telegram_notifier.send_message(message)
-            telegram_config['last_notification'] = now
+        if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config.get('min_interval', 5):
+            try:
+                # Tạo thông báo chi tiết với emoji
+                position_type = "MUA" if signal['type'] == 'BUY' else "BÁN"
+                position_emoji = "🟢" if signal['type'] == 'BUY' else "🔴"
+                
+                position_message = (
+                    f"{position_emoji} *VỊ THẾ MỚI ĐÃ ĐƯỢC MỞ*\n\n"
+                    f"🪙 *Cặp giao dịch:* `{signal['symbol']}`\n"
+                    f"⚙️ *Loại lệnh:* `{position_type}`\n"
+                    f"💰 *Giá vào:* `{entry_price:.2f} USDT`\n"
+                    f"📊 *Số lượng:* `{quantity:.4f}`\n"
+                    f"🛑 *Stop Loss:* `{stop_loss:.2f} USDT`\n"
+                    f"🎯 *Take Profit:* `{take_profit:.2f} USDT`\n"
+                    f"📈 *Chiến lược:* `{signal['strategy']}`\n"
+                    f"⏰ *Thời gian:* `{position['timestamp']}`\n\n"
+                    f"_Vị thế sẽ được tự động quản lý theo chiến lược đã thiết lập_"
+                )
+                
+                # Gửi thông báo
+                telegram_notifier.send_message(position_message)
+                logger.info(f"Đã gửi thông báo mở vị thế {signal['symbol']} {signal['type']} qua Telegram")
+                telegram_config['last_notification'] = now
+            except Exception as e:
+                logger.error(f"Lỗi khi gửi thông báo mở vị thế qua Telegram: {str(e)}")
     
     return position_id
 
@@ -406,25 +450,51 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
     result_text = "lãi" if pnl > 0 else "lỗ"
     add_system_message(f"Đã đóng vị thế {trade['side']} cho {trade['symbol']} với {result_text} {pnl:.2f} ({pnl_percent:.2f}%) - Lý do: {reason}")
     
-    # Gửi thông báo qua Telegram
-    if telegram_config['enabled'] and (pnl_percent > 2 or pnl_percent < -2):  # Chỉ gửi khi P/L > 2% hoặc < -2%
+    # Gửi thông báo qua Telegram nếu được bật
+    if telegram_config.get('enabled') and telegram_config.get('notify_position_closed', True):
         now = datetime.now()
         last_notification = telegram_config.get('last_notification')
         
         # Kiểm tra khoảng thời gian tối thiểu giữa các thông báo
-        if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config['min_interval']:
-            emoji = "🟢" if pnl > 0 else "🔴"
-            message = f"{emoji} *Vị thế đã đóng*\n" \
-                     f"Symbol: `{trade['symbol']}`\n" \
-                     f"Loại: `{trade['side']}`\n" \
-                     f"Giá vào: `{trade['entry_price']:.2f}`\n" \
-                     f"Giá ra: `{trade['exit_price']:.2f}`\n" \
-                     f"P/L: `{pnl:.2f} ({pnl_percent:.2f}%)`\n" \
-                     f"Lý do: `{reason}`\n" \
-                     f"Thời gian: `{trade['exit_time']}`"
-            
-            telegram_notifier.send_message(message)
-            telegram_config['last_notification'] = now
+        if not last_notification or (now - last_notification).total_seconds() / 60 >= telegram_config.get('min_interval', 5):
+            try:
+                # Tạo thông báo chi tiết với emoji thích hợp
+                position_type = "MUA" if trade['side'] == 'BUY' else "BÁN"
+                
+                # Emoji dựa trên lợi nhuận
+                if pnl > 0:
+                    result_emoji = "✅"
+                    result_text = f"LỜI +{pnl:.2f} USDT ({pnl_percent:.2f}%)"
+                else:
+                    result_emoji = "❌"
+                    result_text = f"LỖ {pnl:.2f} USDT ({pnl_percent:.2f}%)"
+                
+                # Tạo thông báo chi tiết
+                position_message = (
+                    f"{result_emoji} *VỊ THẾ ĐÃ ĐÓNG*\n\n"
+                    f"🪙 *Cặp giao dịch:* `{trade['symbol']}`\n"
+                    f"⚙️ *Loại lệnh:* `{position_type}`\n"
+                    f"💵 *Kết quả:* `{result_text}`\n"
+                    f"📈 *Giá vào:* `{trade['entry_price']:.2f} USDT`\n"
+                    f"📉 *Giá ra:* `{trade['exit_price']:.2f} USDT`\n"
+                    f"📊 *Số lượng:* `{trade['quantity']:.4f}`\n"
+                    f"⏱️ *Thời gian giữ:* `{int(trade['duration'] / 3600)} giờ {int((trade['duration'] % 3600) / 60)} phút`\n"
+                    f"🔄 *Lý do đóng:* `{reason}`\n"
+                    f"⏰ *Thời gian đóng:* `{trade['exit_time']}`\n\n"
+                )
+                
+                # Thêm gợi ý nếu lỗ
+                if pnl < 0:
+                    position_message += "_💡 Lưu ý: Bạn nên xem xét điều chỉnh chiến lược hoặc cài đặt stop loss chặt chẽ hơn._"
+                else:
+                    position_message += "_💡 Tiếp tục theo dõi thị trường và chờ đợi cơ hội tiếp theo._"
+                
+                # Gửi thông báo
+                telegram_notifier.send_message(position_message)
+                logger.info(f"Đã gửi thông báo đóng vị thế {trade['symbol']} {trade['side']} qua Telegram")
+                telegram_config['last_notification'] = now
+            except Exception as e:
+                logger.error(f"Lỗi khi gửi thông báo đóng vị thế qua Telegram: {str(e)}")
     
     return True
 
