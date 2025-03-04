@@ -229,7 +229,7 @@ def generate_fake_signal():
         
         signal = {
             'id': str(uuid.uuid4())[:8],
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'timestamp': format_vietnam_time(),
             'symbol': symbol,
             'type': signal_type,
             'price': fake_prices[symbol],
@@ -430,9 +430,26 @@ def get_current_balance():
     return balance
 
 # Thêm thông báo hệ thống
+# Các hàm thời gian Việt Nam
+def get_vietnam_time():
+    """Trả về thời gian hiện tại theo múi giờ Việt Nam (+7)"""
+    from datetime import datetime, timedelta
+    return (datetime.utcnow() + timedelta(hours=7))
+
+def format_vietnam_time(dt=None, include_time=True):
+    """Format thời gian theo múi giờ Việt Nam (+7)"""
+    if dt is None:
+        dt = get_vietnam_time()
+    
+    if include_time:
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        return dt.strftime('%Y-%m-%d')
+
 def add_system_message(message):
     global system_messages
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # Sử dụng thời gian Việt Nam (UTC+7)
+    timestamp = format_vietnam_time()
     system_messages.append({
         'id': str(uuid.uuid4())[:8],
         'timestamp': timestamp,
