@@ -182,9 +182,9 @@
                 <div class="mb-3">
                     <div class="info-label">Unrealized P/L</div>
                     {% set total_pnl = 0 %}
-                    {% if account_data.positions %}
-                        {% for position in account_data.positions %}
-                            {% set total_pnl = total_pnl + position.pnl %}
+                    {% if positions %}
+                        {% for position in positions %}
+                            {% set total_pnl = total_pnl + position.unrealized_pnl %}
                         {% endfor %}
                     {% endif %}
                     <div class="info-value {% if total_pnl > 0 %}text-success{% elif total_pnl < 0 %}text-danger{% endif %}">
@@ -195,12 +195,12 @@
                 <div>
                     <div class="info-label">Margin sử dụng</div>
                     {% set used_margin = 0 %}
-                    {% if account_data.positions %}
-                        {% for position in account_data.positions %}
+                    {% if positions %}
+                        {% for position in positions %}
                             {% set used_margin = used_margin + (position.entry_price * position.quantity / position.leverage|default(1)) %}
                         {% endfor %}
                     {% endif %}
-                    <div class="info-value">${{ used_margin|round(2) }} ({{ (used_margin / account_data.balance|default(bot_status.balance) * 100)|round(2) }}%)</div>
+                    <div class="info-value">${{ used_margin|round(2) }} ({{ (used_margin / bot_status.balance * 100)|round(2) }}%)</div>
                 </div>
             </div>
             
@@ -215,14 +215,14 @@
                     </div>
                     <div class="col-6">
                         <div class="info-label">Đòn bẩy tối đa</div>
-                        <div class="info-value">x{{ account_data.max_leverage|default(10) }}</div>
+                        <div class="info-value">x10</div>
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <div class="info-label">Rủi ro danh mục</div>
                     <div class="progress" style="height: 20px;">
-                        {% set portfolio_risk = (account_data.positions|default([])|length * 2.5)|round(2) %}
+                        {% set portfolio_risk = (positions|default([])|length * 2.5)|round(2) %}
                         <div class="progress-bar {% if portfolio_risk <= 10 %}bg-success{% elif portfolio_risk <= 20 %}bg-warning{% else %}bg-danger{% endif %}" 
                              role="progressbar" 
                              style="width: {{ portfolio_risk }}%;" 
@@ -243,7 +243,7 @@
                     <div class="info-label">Đề xuất quản lý rủi ro</div>
                     <ul class="mb-0">
                         <li>Số lệnh tối đa: {{ (30 / 2.5)|round(0, 'floor') }}</li>
-                        <li>Size vị thế tối đa: ${{ (account_data.balance|default(bot_status.balance) * 0.1)|round(2) }}</li>
+                        <li>Size vị thế tối đa: ${{ (bot_status.balance * 0.1)|round(2) }}</li>
                         <li>Stop loss tối thiểu: 2% từ giá vào</li>
                     </ul>
                 </div>
@@ -258,9 +258,9 @@
                     <div class="progress" style="height: 20px;">
                         {% set long_positions = 0 %}
                         {% set short_positions = 0 %}
-                        {% if account_data.positions %}
-                            {% for position in account_data.positions %}
-                                {% if position.type == 'LONG' %}
+                        {% if positions %}
+                            {% for position in positions %}
+                                {% if position.side == 'BUY' %}
                                     {% set long_positions = long_positions + 1 %}
                                 {% else %}
                                     {% set short_positions = short_positions + 1 %}
@@ -270,9 +270,9 @@
                         
                         {% set long_percent = 0 %}
                         {% set short_percent = 0 %}
-                        {% if account_data.positions|default([])|length > 0 %}
-                            {% set long_percent = (long_positions / account_data.positions|length * 100)|round(0) %}
-                            {% set short_percent = (short_positions / account_data.positions|length * 100)|round(0) %}
+                        {% if positions|default([])|length > 0 %}
+                            {% set long_percent = (long_positions / positions|length * 100)|round(0) %}
+                            {% set short_percent = (short_positions / positions|length * 100)|round(0) %}
                         {% endif %}
                         
                         <div class="progress-bar bg-success" role="progressbar" style="width: {{ long_percent }}%;" aria-valuenow="{{ long_percent }}" aria-valuemin="0" aria-valuemax="100">
@@ -487,10 +487,10 @@
         let tokenDistribution = new Chart(tokenDistCtx, {
             type: 'pie',
             data: {
-                labels: [{% for position in account_data.positions|default([]) %}'{{ position.symbol }}',{% endfor %}],
+                labels: [{% for position in positions|default([]) %}'{{ position.symbol }}',{% endfor %}],
                 datasets: [{
                     label: 'Phân bố vị thế',
-                    data: [{% for position in account_data.positions|default([]) %}{{ position.entry_price * position.quantity }},{% endfor %}],
+                    data: [{% for position in positions|default([]) %}{{ position.entry_price * position.quantity }},{% endfor %}],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
@@ -584,7 +584,7 @@
             const leverage = parseInt(leverageInput.value) || 1;
             
             // Account balance from the page (demo data)
-            const balance = {{ account_data.balance|default(bot_status.balance, true) }};
+            const balance = {{ bot_status.balance }};
             
             // Calculate quantity, risk, R/R ratio, and margin
             let quantity = 0;
@@ -756,8 +756,8 @@
                 const positionId = this.dataset.positionId;
                 
                 // Find position data
-                {% if account_data.positions %}
-                    {% for position in account_data.positions %}
+                {% if positions %}
+                    {% for position in positions %}
                         if ('{{ position.id }}' === positionId) {
                             // Fill form with position data
                             document.getElementById('editPositionId').value = '{{ position.id }}';
