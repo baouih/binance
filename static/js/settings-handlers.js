@@ -295,9 +295,29 @@ function setupApiSettingsHandlers() {
                     }
                     
                     // Hiển thị thông báo lỗi chi tiết
-                    if (error.message && error.message.includes('HTTP error! Status: 404')) {
-                        showAlert('danger', 'API endpoint kiểm tra kết nối không tồn tại. Vui lòng liên hệ quản trị viên.');
-                        console.error('API endpoint not found:', API_ENDPOINTS.TEST_API_CONNECTION);
+                    if (error.message) {
+                        if (error.message.includes('HTTP error! Status: 404')) {
+                            // Hiển thị thông báo lỗi về API không tồn tại
+                            showAlert('danger', 'API endpoint kiểm tra kết nối không tồn tại. Vui lòng liên hệ quản trị viên.', 10000);
+                            console.error('API endpoint not found:', API_ENDPOINTS.TEST_API_CONNECTION);
+                            
+                            // Hiển thị gợi ý trên giao diện
+                            apiStatusElem.innerHTML = `
+                                <div class="api-status api-status-error p-3 mb-2">
+                                    <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi API 404</h6>
+                                    <p class="mb-2">API endpoint kiểm tra kết nối không tồn tại. Endpoint: <code>${API_ENDPOINTS.TEST_API_CONNECTION}</code></p>
+                                    <div class="alert alert-info small mb-0">
+                                        <i class="bi bi-info-circle me-1"></i> Gợi ý: Kiểm tra cấu hình endpoints hoặc cài đặt server API.
+                                    </div>
+                                </div>`;
+                        } else {
+                            // Hiển thị các lỗi khác
+                            apiStatusElem.innerHTML = `
+                                <div class="api-status api-status-error p-3 mb-2">
+                                    <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối API</h6>
+                                    <p class="mb-0">${error.message}</p>
+                                </div>`;
+                        }
                     }
                 });
         });

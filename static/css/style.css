@@ -276,9 +276,13 @@ canvas {
 
 /* API connection status */
 .api-status {
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 10;
 }
 
 .api-status-success {
@@ -294,4 +298,12 @@ canvas {
 .api-status-warning {
     background-color: rgba(255, 193, 7, 0.1);
     border: 1px solid #ffc107;
+}
+
+.api-status code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 90%;
+    color: inherit;
 }
