@@ -994,9 +994,35 @@ def market():
         'btc_price': fake_prices.get('BTCUSDT', 0),
         'eth_price': fake_prices.get('ETHUSDT', 0),
         'sol_price': fake_prices.get('SOLUSDT', 25.0),
-        'bnb_price': fake_prices.get('BNBUSDT', 0)
+        'bnb_price': fake_prices.get('BNBUSDT', 0),
+        'technical_indicators': {
+            'oscillators': {
+                'rsi': {'value': 62, 'signal': 'neutral'},
+                'macd': {'value': 125, 'signal': 'bullish'},
+                'stoch': {'value': 75, 'signal': 'neutral'}
+            }
+        },
+        'market_analysis': {
+            'btc_volatility': 2.3,
+            'fear_greed_index': 65,
+            'market_sentiment': 65,
+            'market_cycle': 'Uptrend',
+            'major_resistances': [74000, 76000, 78000],
+            'major_supports': [68500, 67000, 65200],
+            'analysis_summary': 'Thị trường đang trong xu hướng tăng với khối lượng ổn định. Các chỉ báo kỹ thuật cho thấy khả năng tiếp tục đà tăng nhưng có thể có điều chỉnh ngắn hạn tại các vùng kháng cự.'
+        },
+        'indicators': {
+            'bb_upper': fake_prices.get('BTCUSDT', 36500) * 1.02,
+            'bb_lower': fake_prices.get('BTCUSDT', 36500) * 0.98,
+            'ema50': fake_prices.get('BTCUSDT', 36500) * 0.99,
+            'ema200': fake_prices.get('BTCUSDT', 36500) * 0.97
+        },
+        'high_24h': fake_prices.get('BTCUSDT', 36500) * 1.02,
+        'low_24h': fake_prices.get('BTCUSDT', 36500) * 0.98,
+        'volume': 149000000,
+        'trades': 125600
     }
-    return render_template('market.html', bot_status=bot_status, fake_prices=fake_prices, market_data=market_data)
+    return render_template('market.html', bot_status=bot_status, fake_prices=fake_prices, market_data=market_data, fake_symbols=fake_symbols)
 
 @app.route('/position')
 def position():
