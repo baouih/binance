@@ -22,6 +22,9 @@ from binance_api import BinanceAPI
 # Thêm module Data Processor
 from data_processor import DataProcessor
 
+# Thêm chiến thuật giao dịch nâng cao
+from strategy_integration import StrategyIntegration
+
 # Thêm route sentiment
 from routes.sentiment_route import register_blueprint as register_sentiment_bp
 

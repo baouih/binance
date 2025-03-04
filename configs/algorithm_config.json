@@ -1,130 +1,152 @@
 {
-    "primary_algorithm": "combined_strategy",
+    "primary_algorithm": "composite_strategy",
     "backup_algorithm": "ema_cross_strategy",
-    "algorithms": {
-        "rsi_strategy": {
-            "enabled": true,
-            "parameters": {
-                "rsi_period": 13,
-                "rsi_overbought": 73,
-                "rsi_oversold": 27,
-                "use_ema_confirmation": true,
-                "ema_period": 50
-            }
+    "composite_indicator": {
+        "enabled": true,
+        "indicators": ["rsi", "macd", "bbands", "ema_cross", "adx", "volume_trend"],
+        "weights": {
+            "rsi": 0.25,
+            "macd": 0.25,
+            "bbands": 0.15,
+            "ema_cross": 0.20,
+            "adx": 0.10,
+            "volume_trend": 0.05
         },
-        "macd_strategy": {
-            "enabled": true,
-            "parameters": {
-                "fast_period": 10,
-                "slow_period": 26,
-                "signal_period": 9,
-                "use_histogram": true,
-                "use_price_action": true
-            }
-        },
-        "bollinger_strategy": {
-            "enabled": true,
-            "parameters": {
-                "bb_period": 20,
-                "bb_std": 2.25,
-                "use_bb_squeeze": true,
-                "use_rsi_filter": true,
-                "rsi_period": 14
-            }
-        },
-        "ema_cross_strategy": {
-            "enabled": true,
-            "parameters": {
-                "fast_ema": 8,
-                "slow_ema": 21,
-                "use_volume_filter": true,
-                "volume_period": 20,
-                "use_adx_filter": true
-            }
-        },
-        "support_resistance_strategy": {
-            "enabled": false,
-            "parameters": {
-                "lookback_period": 100,
-                "zone_threshold": 0.5,
-                "use_fibonacci": true,
-                "confirmation_candles": 2,
-                "use_volume_confirmation": true
-            }
-        },
-        "breakout_strategy": {
-            "enabled": false,
-            "parameters": {
-                "lookback_period": 50,
-                "breakout_threshold": 1.2,
-                "use_volume_surge": true,
-                "volume_surge_threshold": 1.8,
-                "confirmation_candles": 1
-            }
-        },
-        "ml_strategy": {
-            "enabled": false,
-            "parameters": {
-                "model_type": "Ensemble",
-                "feature_count": 20,
-                "prediction_horizon": 12,
-                "confidence_threshold": 0.75,
-                "use_market_regime": true
-            }
-        },
-        "combined_strategy": {
-            "enabled": true,
-            "parameters": {
-                "strategies": ["rsi_strategy", "macd_strategy", "bollinger_strategy", "ema_cross_strategy"],
-                "dynamic_weights": true,
-                "use_market_regime": true,
-                "min_signal_agreement": 0.6,
-                "performance_lookback": 50
-            }
-        }
+        "dynamic_weights": true,
+        "lookback_period": 20
     },
     "market_regime": {
-        "detection_enabled": true,
-        "lookback_period": 20,
-        "volatility_threshold": 1.5,
-        "trend_threshold": 0.6,
+        "enabled": true,
+        "default_regime": "neutral",
         "regimes": {
-            "trending_up": {
-                "strategies": ["ema_cross_strategy", "macd_strategy"],
-                "weights": [0.6, 0.4]
-            },
-            "trending_down": {
-                "strategies": ["ema_cross_strategy", "macd_strategy"],
-                "weights": [0.6, 0.4]
-            },
-            "ranging": {
-                "strategies": ["rsi_strategy", "bollinger_strategy"],
-                "weights": [0.6, 0.4]
+            "trending": {
+                "description": "Thị trường đang trong xu hướng mạnh, giá di chuyển theo một hướng rõ ràng, nên ưu tiên chiến thuật theo xu hướng.",
+                "strategies": ["macd_strategy", "ema_cross_strategy", "adx_strategy", "rsi_strategy"],
+                "weights": [0.35, 0.30, 0.25, 0.10]
             },
             "volatile": {
-                "strategies": ["bollinger_strategy", "ema_cross_strategy"],
-                "weights": [0.7, 0.3]
+                "description": "Thị trường đang biến động mạnh với những bước nhảy giá lớn, nên ưu tiên chiến thuật với stop loss rộng hơn.",
+                "strategies": ["adx_strategy", "bollinger_strategy", "volume_strategy", "macd_strategy"],
+                "weights": [0.30, 0.25, 0.25, 0.20]
+            },
+            "ranging": {
+                "description": "Thị trường đang trong vùng sideway, giá dao động trong phạm vi hẹp, nên ưu tiên chiến thuật range-bound.",
+                "strategies": ["bollinger_strategy", "rsi_strategy", "volume_strategy", "macd_strategy"],
+                "weights": [0.40, 0.30, 0.20, 0.10]
+            },
+            "quiet": {
+                "description": "Thị trường đang yên ắng với biến động thấp, nên cẩn thận với các tín hiệu yếu hoặc giả.",
+                "strategies": ["bollinger_strategy", "volume_strategy", "rsi_strategy", "macd_strategy"],
+                "weights": [0.35, 0.30, 0.20, 0.15]
+            },
+            "neutral": {
+                "description": "Không xác định được rõ ràng chế độ thị trường, sử dụng hỗn hợp các chiến thuật.",
+                "strategies": ["macd_strategy", "rsi_strategy", "bollinger_strategy", "ema_cross_strategy"],
+                "weights": [0.25, 0.25, 0.25, 0.25]
             }
         }
     },
     "risk_management": {
-        "dynamic_position_sizing": true,
-        "max_risk_per_trade": 1.0,
-        "max_total_risk": 5.0,
+        "default_risk_per_trade": 1.0,
+        "max_risk_per_day": 5.0,
+        "max_open_positions": 5,
+        "max_positions_per_symbol": 1,
+        "market_volatility_adjustment": true,
         "stop_loss_atr_multiplier": 1.5,
         "take_profit_atr_multiplier": 2.5,
+        "trailing_stop_enabled": true,
         "trailing_stop_activation": 1.0,
         "trailing_stop_callback": 0.3,
-        "market_volatility_adjustment": true
+        "min_profit_to_adjust_stop": 0.5
     },
     "signal_filters": {
-        "use_confirmation": true,
-        "min_signal_strength": 0.5,
-        "filter_by_volume": true,
+        "min_signal_strength": 0.3,
+        "multi_timeframe_confirmation": true,
         "filter_by_market_regime": true,
-        "filter_by_time_of_day": false,
-        "filter_by_news_events": false
+        "min_volume_percentile": 20,
+        "ignore_overbought_oversold": false
     },
-    "last_updated": "2025-03-04 23:38:00",
-    "creator": "system"
+    "algorithms": {
+        "rsi_strategy": {
+            "parameters": {
+                "rsi_period": 14,
+                "rsi_overbought": 70,
+                "rsi_oversold": 30,
+                "use_divergence": true
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.1, "parameters": {"rsi_period": 21}},
+                "volatile": {"weight": 0.2, "parameters": {"rsi_period": 14}},
+                "ranging": {"weight": 0.3, "parameters": {"rsi_period": 14}}
+            }
+        },
+        "macd_strategy": {
+            "parameters": {
+                "fast_period": 12,
+                "slow_period": 26,
+                "signal_period": 9,
+                "use_histogram": true
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.35, "parameters": {}},
+                "volatile": {"weight": 0.2, "parameters": {}},
+                "ranging": {"weight": 0.1, "parameters": {}}
+            }
+        },
+        "bollinger_strategy": {
+            "parameters": {
+                "bb_period": 20,
+                "bb_std": 2.0,
+                "use_bb_width": true,
+                "squeeze_threshold": 0.05
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.15, "parameters": {}},
+                "volatile": {"weight": 0.25, "parameters": {"bb_std": 2.5}},
+                "ranging": {"weight": 0.4, "parameters": {"bb_std": 1.8}}
+            }
+        },
+        "ema_cross_strategy": {
+            "parameters": {
+                "fast_ema": 10,
+                "slow_ema": 50,
+                "use_price_distance": true
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.3, "parameters": {}},
+                "volatile": {"weight": 0.15, "parameters": {}},
+                "ranging": {"weight": 0.1, "parameters": {}}
+            }
+        },
+        "adx_strategy": {
+            "parameters": {
+                "adx_period": 14,
+                "adx_threshold": 25,
+                "use_di_cross": true
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.25, "parameters": {}},
+                "volatile": {"weight": 0.3, "parameters": {"adx_threshold": 30}},
+                "ranging": {"weight": 0.05, "parameters": {}}
+            }
+        },
+        "volume_strategy": {
+            "parameters": {
+                "volume_period": 20,
+                "volume_threshold": 1.5,
+                "use_obv": true
+            },
+            "market_regimes": {
+                "trending": {"weight": 0.1, "parameters": {}},
+                "volatile": {"weight": 0.25, "parameters": {}},
+                "ranging": {"weight": 0.2, "parameters": {}}
+            }
+        }
+    },
+    "multi_timeframe": {
+        "enabled": true,
+        "timeframes": ["1h", "4h", "1d"],
+        "weights": [0.4, 0.3, 0.3]
+    },
+    "last_updated": "2025-03-04 23:44:00"
 }
