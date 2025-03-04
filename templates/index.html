@@ -384,8 +384,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <h6 class="mb-0">{{ position.symbol }}</h6>
-                                <span class="badge bg-{{ 'success' if position.type == 'LONG' else 'danger' }}">
-                                    {{ position.type }}
+                                <span class="badge bg-{{ 'success' if position.side == 'BUY' else 'danger' }}">
+                                    {{ 'LONG' if position.side == 'BUY' else 'SHORT' }}
                                 </span>
                                 <span class="badge bg-secondary">
                                     x{{ position.leverage|default(1) }}

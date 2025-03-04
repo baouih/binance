@@ -62,12 +62,12 @@
                 <div id="openPositions">
                     {% if positions and positions|length > 0 %}
                         {% for position in positions %}
-                        <div class="position-card mb-3 {% if position.pnl > 0 %}profit{% elif position.pnl < 0 %}loss{% endif %}">
+                        <div class="position-card mb-3 {% if position.unrealized_pnl > 0 %}profit{% elif position.unrealized_pnl < 0 %}loss{% endif %}">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <h5 class="mb-0">{{ position.symbol }}</h5>
-                                    <span class="badge bg-{{ 'success' if position.type == 'LONG' else 'danger' }}">
-                                        {{ position.type }}
+                                    <span class="badge bg-{{ 'success' if position.side == 'BUY' else 'danger' }}">
+                                        {{ 'LONG' if position.side == 'BUY' else 'SHORT' }}
                                     </span>
                                     <span class="badge bg-secondary ms-1">
                                         x{{ position.leverage|default(1) }}
@@ -77,8 +77,8 @@
                                     <div class="info-value">
                                         ${{ position.current_price|round(2) }}
                                     </div>
-                                    <div class="price-change {{ 'positive' if position.pnl_percent > 0 else 'negative' if position.pnl_percent < 0 else '' }}">
-                                        {{ position.pnl_percent|round(2) }}%
+                                    <div class="price-change {{ 'positive' if position.unrealized_pnl_percent > 0 else 'negative' if position.unrealized_pnl_percent < 0 else '' }}">
+                                        {{ position.unrealized_pnl_percent|round(2) }}%
                                     </div>
                                 </div>
                             </div>
@@ -105,12 +105,12 @@
                             <div class="mb-3">
                                 <div class="info-label">P/L</div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div class="info-value {% if position.pnl > 0 %}text-success{% elif position.pnl < 0 %}text-danger{% endif %}">
-                                        {{ position.pnl|round(2) }} USD ({{ position.pnl_percent|round(2) }}%)
+                                    <div class="info-value {% if position.unrealized_pnl > 0 %}text-success{% elif position.unrealized_pnl < 0 %}text-danger{% endif %}">
+                                        {{ position.unrealized_pnl|round(2) }} USD ({{ position.unrealized_pnl_percent|round(2) }}%)
                                     </div>
                                     <div>
-                                        <span class="badge {% if position.pnl > 0 %}bg-success{% elif position.pnl < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
-                                            {% if position.pnl > 0 %}Lợi nhuận{% elif position.pnl < 0 %}Lỗ{% else %}Hòa vốn{% endif %}
+                                        <span class="badge {% if position.unrealized_pnl > 0 %}bg-success{% elif position.unrealized_pnl < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {% if position.unrealized_pnl > 0 %}Lợi nhuận{% elif position.unrealized_pnl < 0 %}Lỗ{% else %}Hòa vốn{% endif %}
                                         </span>
                                     </div>
                                 </div>
@@ -119,8 +119,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="info-label">Risk/Reward</div>
-                                    {% set risk = position.entry_price - position.stop_loss if position.type == 'LONG' else position.stop_loss - position.entry_price %}
-                                    {% set reward = position.take_profit - position.entry_price if position.type == 'LONG' else position.entry_price - position.take_profit %}
+                                    {% set risk = position.entry_price - position.stop_loss if position.side == 'BUY' else position.stop_loss - position.entry_price %}
+                                    {% set reward = position.take_profit - position.entry_price if position.side == 'BUY' else position.entry_price - position.take_profit %}
                                     {% set risk_reward_ratio = (reward / risk)|round(2) if risk > 0 else 0 %}
                                     <div>{{ risk_reward_ratio }}:1</div>
                                 </div>
