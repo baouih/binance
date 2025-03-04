@@ -10,12 +10,12 @@ import { showAlert, showToast, showLoading, hideLoading, fetchAPI, formatCurrenc
 // Định nghĩa các API endpoint
 const API_ENDPOINTS = {
     POSITIONS: '/api/positions',
-    POSITION_DETAIL: '/api/positions/{id}',
-    CLOSE_POSITION: '/api/positions/{id}/close',
-    UPDATE_POSITION: '/api/positions/{id}/update',
-    ANALYZE_POSITION: '/api/positions/{id}/analyze',
-    OPEN_POSITION: '/api/positions/open',
-    ACCOUNT_SUMMARY: '/api/account/summary'
+    POSITION_DETAIL: '/api/position/{id}',
+    CLOSE_POSITION: '/api/close-position/{id}',
+    UPDATE_POSITION: '/api/position/{id}/update',
+    ANALYZE_POSITION: '/api/position/{id}/analyze',
+    OPEN_POSITION: '/api/open-position',
+    ACCOUNT_SUMMARY: '/api/balance'
 };
 
 // Các tham số và biến toàn cục
