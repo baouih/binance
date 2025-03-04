@@ -72,6 +72,9 @@ fake_prices = {
     'DOTUSDT': 17.8
 }
 
+# Danh sách các đồng coin đã được chọn để giao dịch (mặc định BTCUSDT để đảm bảo luôn có ít nhất một đồng)
+selected_trading_coins = ['BTCUSDT']  # Mặc định BTC để luôn có ít nhất một đồng coin để giao dịch
+
 # Lưu trữ thông báo hệ thống
 system_messages = []
 
@@ -211,7 +214,12 @@ def update_fake_data():
 def generate_fake_signal():
     global signals
     if bot_status['running'] and random.random() < 0.2:  # 20% cơ hội tạo tín hiệu
-        symbol = random.choice(fake_symbols)
+        # Sử dụng danh sách các đồng coin đã chọn, nếu không có thì dùng BTCUSDT
+        if len(selected_trading_coins) > 0:
+            symbol = random.choice(selected_trading_coins)
+        else:
+            symbol = 'BTCUSDT'  # Luôn đảm bảo có ít nhất một đồng coin mặc định
+            
         signal_type = random.choice(['BUY', 'SELL'])
         signal_strength = random.uniform(0.1, 0.9)
         confidence = random.uniform(60, 95)
@@ -904,6 +912,35 @@ def set_account_type():
         return jsonify({'success': True, 'account_type': bot_status['account_type']})
     return jsonify({'success': False, 'message': 'Missing account_type parameter'})
 
+@app.route('/api/trading/coins', methods=['GET'])
+def get_trading_coins():
+    return jsonify({
+        'success': True,
+        'selected_coins': selected_trading_coins,
+        'available_coins': fake_symbols
+    })
+
+@app.route('/api/trading/coins', methods=['POST'])
+def set_trading_coins():
+    global selected_trading_coins
+    data = request.json
+    if 'coins' in data and isinstance(data['coins'], list):
+        # Đảm bảo chỉ chọn các đồng coin có trong danh sách giả lập
+        selected_trading_coins = [coin for coin in data['coins'] if coin in fake_symbols]
+        
+        # Nếu không có đồng coin nào được chọn, mặc định chọn BTCUSDT
+        if len(selected_trading_coins) == 0:
+            selected_trading_coins = ['BTCUSDT']
+            add_system_message("Không có đồng coin nào được chọn, mặc định giao dịch BTCUSDT")
+        else:
+            add_system_message(f"Đã cập nhật danh sách đồng coin giao dịch: {', '.join(selected_trading_coins)}")
+            
+        return jsonify({
+            'success': True,
+            'selected_coins': selected_trading_coins
+        })
+    return jsonify({'success': False, 'message': 'Invalid coins parameter'})
+
 @app.route('/api/telegram/config', methods=['GET', 'POST'])
 def telegram_config_api():
     global telegram_config, telegram_notifier
@@ -1030,7 +1067,11 @@ def position():
 
 @app.route('/settings')
 def settings():
-    return render_template('settings.html', bot_status=bot_status, telegram_config=telegram_config)
+    return render_template('settings.html', 
+                           bot_status=bot_status, 
+                           telegram_config=telegram_config,
+                           selected_trading_coins=selected_trading_coins,
+                           available_coins=fake_symbols)
 
 @app.route('/cli')
 def cli():

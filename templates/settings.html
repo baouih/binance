@@ -47,6 +47,10 @@
                         <i class="bi bi-key me-2"></i>
                         Kết nối API
                     </a>
+                    <a class="list-group-item list-group-item-action" id="trading-coins-tab" data-bs-toggle="list" href="#trading-coins" role="tab" aria-controls="trading-coins">
+                        <i class="bi bi-currency-bitcoin me-2"></i>
+                        Đồng coin giao dịch
+                    </a>
                     <a class="list-group-item list-group-item-action" id="risk-tab" data-bs-toggle="list" href="#risk" role="tab" aria-controls="risk">
                         <i class="bi bi-shield-exclamation me-2"></i>
                         Quản lý rủi ro
@@ -426,6 +430,57 @@
                     </div>
                 </div>
                 
+                <!-- Trading Coins Settings -->
+                <div class="tab-pane fade" id="trading-coins" role="tabpanel" aria-labelledby="trading-coins-tab">
+                    <div class="info-card">
+                        <h5 class="mb-3">Cài đặt đồng coin giao dịch</h5>
+                        
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <strong>Thông tin:</strong> Chọn các đồng coin bạn muốn bot giao dịch. Nếu không chọn đồng coin nào, bot sẽ mặc định giao dịch BTCUSDT.
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Chọn đồng coin giao dịch</label>
+                            <div class="coin-selection-container border rounded p-3">
+                                <div class="row">
+                                    {% for coin in available_coins %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input trading-coin-checkbox" type="checkbox" 
+                                                   id="coin-{{ coin }}" value="{{ coin }}"
+                                                   {% if coin in selected_trading_coins %}checked{% endif %}>
+                                            <label class="form-check-label" for="coin-{{ coin }}">
+                                                {{ coin }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <button type="button" class="btn btn-sm btn-secondary" id="selectAllCoins">
+                                <i class="bi bi-check-all me-1"></i> Chọn tất cả
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" id="deselectAllCoins">
+                                <i class="bi bi-x-lg me-1"></i> Bỏ chọn tất cả
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" id="resetDefaultCoin">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại mặc định
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" id="saveTradingCoinsSettings">
+                                <i class="bi bi-save me-2"></i>
+                                Lưu cài đặt đồng coin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Advanced Settings -->
                 <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
                     <div class="info-card">
@@ -577,6 +632,75 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Trading Coins Selection Handlers
+        const selectAllCoinsBtn = document.getElementById('selectAllCoins');
+        const deselectAllCoinsBtn = document.getElementById('deselectAllCoins');
+        const resetDefaultCoinBtn = document.getElementById('resetDefaultCoin');
+        const saveTradingCoinsBtn = document.getElementById('saveTradingCoinsSettings');
+        const tradingCoinCheckboxes = document.querySelectorAll('.trading-coin-checkbox');
+        
+        // Select all coins
+        selectAllCoinsBtn.addEventListener('click', function() {
+            tradingCoinCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        });
+        
+        // Deselect all coins
+        deselectAllCoinsBtn.addEventListener('click', function() {
+            tradingCoinCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+        
+        // Reset to default (BTCUSDT only)
+        resetDefaultCoinBtn.addEventListener('click', function() {
+            tradingCoinCheckboxes.forEach(checkbox => {
+                checkbox.checked = checkbox.value === 'BTCUSDT';
+            });
+        });
+        
+        // Save trading coins settings
+        saveTradingCoinsBtn.addEventListener('click', function() {
+            const selectedCoins = [];
+            tradingCoinCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedCoins.push(checkbox.value);
+                }
+            });
+            
+            // Send to backend API
+            fetch('/api/trading/coins', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    coins: selectedCoins
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success alert
+                    showAlert('success', 'Danh sách đồng coin giao dịch đã được cập nhật thành công!');
+                    
+                    // Update UI to reflect selected coins
+                    if (data.selected_coins && data.selected_coins.length > 0) {
+                        tradingCoinCheckboxes.forEach(checkbox => {
+                            checkbox.checked = data.selected_coins.includes(checkbox.value);
+                        });
+                    }
+                } else {
+                    showAlert('danger', 'Có lỗi xảy ra khi cập nhật danh sách đồng coin giao dịch.');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving trading coins:', error);
+                showAlert('danger', 'Có lỗi xảy ra khi kết nối đến máy chủ.');
+            });
+        });
+        
         // Toggle Secret Key Visibility
         document.getElementById('toggleSecretKey').addEventListener('click', function() {
             const secretKeyInput = document.getElementById('secretKey');
