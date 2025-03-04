@@ -480,18 +480,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script type="module" src="/static/js/position-handlers.js"></script>
 <script>
+    // Initialize Chart.js for token distribution
     document.addEventListener('DOMContentLoaded', function() {
-        // Token distribution chart
-        let tokenDistCtx = document.getElementById('tokenDistributionChart').getContext('2d');
-        let tokenDistribution = new Chart(tokenDistCtx, {
-            type: 'pie',
-            data: {
-                labels: [{% for position in positions|default([]) %}'{{ position.symbol }}',{% endfor %}],
-                datasets: [{
-                    label: 'Phân bố vị thế',
-                    data: [{% for position in positions|default([]) %}{{ position.entry_price * position.quantity }},{% endfor %}],
-                    backgroundColor: [
+        // Token distribution chart will be managed by position-handlers.js
+        /* Chart initialization moved to position-handlers.js */
+        // This script block remains for any page-specific scripts that aren't part of the handlers
                         'rgba(255, 99, 132, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
                         'rgba(255, 206, 86, 0.7)',
