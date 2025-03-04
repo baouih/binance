@@ -138,65 +138,78 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(response => response.json())
-        .then(data => {
+        .then(result => {
             // Hide loading
             window.hideLoading();
             
+            // Kiểm tra cấu trúc phản hồi mới (data.success/data.data)
+            let configData;
+            if (result.success && result.data) {
+                // Cấu trúc mới: {success: true, data: {...}}
+                configData = result.data;
+                console.log('Dữ liệu cấu hình (định dạng mới):', configData);
+            } else {
+                // Cấu trúc cũ trực tiếp: {...}
+                configData = result;
+                console.log('Dữ liệu cấu hình (định dạng cũ):', configData);
+            }
+            
             // Kiểm tra dữ liệu có tồn tại không
-            if (data && data.enabled !== undefined) {
+            if (configData) {
                 // Kích hoạt công tắc nếu enabled = true
                 if (enableTelegramNotifications) {
                     // Set tình trạng của công tắc chính xác theo giá trị từ server
-                    enableTelegramNotifications.checked = Boolean(data.enabled);
-                    console.log('Đặt trạng thái công tắc Telegram:', Boolean(data.enabled));
+                    enableTelegramNotifications.checked = Boolean(configData.enabled);
+                    console.log('Đặt trạng thái công tắc Telegram:', Boolean(configData.enabled));
                 }
                 
                 // Đặt giá trị token, sử dụng giá trị từ server hoặc mặc định
                 if (telegramBotToken) {
-                    telegramBotToken.value = data.bot_token || "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+                    telegramBotToken.value = configData.bot_token || "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
                 }
                 
                 // Đặt giá trị chat ID, sử dụng giá trị từ server hoặc mặc định
                 if (telegramChatId) {
-                    telegramChatId.value = data.chat_id || "1834332146";
+                    telegramChatId.value = configData.chat_id || "1834332146";
                 }
                 
                 // Cập nhật các checkbox thông báo nếu có
                 if (document.getElementById('notify-new-trades')) {
                     document.getElementById('notify-new-trades').checked = 
-                        data.notify_new_trades === undefined ? true : Boolean(data.notify_new_trades);
+                        configData.notify_new_trades === undefined ? true : Boolean(configData.notify_new_trades);
                 }
                 
                 if (document.getElementById('notify-closed-trades')) {
                     document.getElementById('notify-closed-trades').checked = 
-                        data.notify_closed_trades === undefined ? true : Boolean(data.notify_closed_trades);
+                        configData.notify_closed_trades === undefined ? true : Boolean(configData.notify_closed_trades);
                 }
                 
                 if (document.getElementById('notify-error-status')) {
                     document.getElementById('notify-error-status').checked = 
-                        data.notify_error_status === undefined ? true : Boolean(data.notify_error_status);
+                        configData.notify_error_status === undefined ? true : Boolean(configData.notify_error_status);
                 }
                 
                 if (document.getElementById('notify-daily-summary')) {
                     document.getElementById('notify-daily-summary').checked = 
-                        data.notify_daily_summary === undefined ? false : Boolean(data.notify_daily_summary);
+                        configData.notify_daily_summary === undefined ? false : Boolean(configData.notify_daily_summary);
                 }
                 
                 // Cập nhật khoảng thời gian tối thiểu nếu có
-                if (data.min_interval) {
+                if (configData.min_interval) {
                     const minIntervalInput = document.getElementById('notify-min-interval');
                     if (minIntervalInput) {
-                        minIntervalInput.value = data.min_interval;
+                        minIntervalInput.value = configData.min_interval;
                     }
                 }
                 
-                console.log('Đã tải cấu hình Telegram thành công:', data);
+                console.log('Đã tải cấu hình Telegram thành công:', configData);
             } else {
-                console.error('Không tìm thấy dữ liệu cấu hình Telegram hoặc dữ liệu không hợp lệ:', data);
+                console.error('Không tìm thấy dữ liệu cấu hình Telegram hoặc dữ liệu không hợp lệ:', result);
                 
                 // Đặt giá trị mặc định khi không có dữ liệu
                 if (telegramBotToken) telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
                 if (telegramChatId) telegramChatId.value = "1834332146";
+                if (enableTelegramNotifications) enableTelegramNotifications.checked = false;
             }
         })
         .catch(error => {
