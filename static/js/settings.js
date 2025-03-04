@@ -40,43 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveSecurityButton.addEventListener('click', saveSecuritySettings);
     }
     
-    // Load Telegram configuration on page load
-    function loadTelegramConfig() {
-        // Tải cấu hình Telegram từ máy chủ
-        fetch('/api/telegram/config')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    console.log('Đã tải cấu hình Telegram:', data.data);
-                    
-                    // Cập nhật UI với dữ liệu từ máy chủ
-                    if (enableTelegramNotifications) {
-                        enableTelegramNotifications.checked = data.data.enabled;
-                        
-                        // Hiển thị/ẩn phần cài đặt dựa trên trạng thái
-                        const telegramSettings = document.getElementById('telegramSettings');
-                        if (telegramSettings) {
-                            telegramSettings.style.display = data.data.enabled ? 'block' : 'none';
-                        }
-                    }
-                    
-                    if (telegramBotToken && data.data.bot_token) {
-                        telegramBotToken.value = data.data.bot_token;
-                    }
-                    
-                    if (telegramChatId && data.data.chat_id) {
-                        telegramChatId.value = data.data.chat_id;
-                    }
-                    
-                    // Cập nhật trạng thái các checkbox thông báo
-                    updateNotificationCheckboxes(data.data);
-                }
-            })
-            .catch(error => {
-                console.error('Lỗi khi tải cấu hình Telegram:', error);
-            });
-    }
-    
+    // Hàm cập nhật trạng thái các checkbox thông báo
     function updateNotificationCheckboxes(config) {
         // Danh sách ánh xạ giữa setting và ID checkbox
         const checkboxMappings = {
@@ -97,9 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
-    // Gọi hàm để tải cấu hình Telegram từ máy chủ
-    loadTelegramConfig();
     
     // Quản lý sự kiện khi bật/tắt thông báo Telegram
     if (enableTelegramNotifications) {
@@ -230,6 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Set tình trạng của công tắc chính xác theo giá trị từ server
                     enableTelegramNotifications.checked = Boolean(configData.enabled);
                     console.log('Đặt trạng thái công tắc Telegram:', Boolean(configData.enabled));
+                    
+                    // Hiển thị/ẩn phần cài đặt Telegram dựa trên trạng thái
+                    const telegramSettings = document.getElementById('telegramSettings');
+                    if (telegramSettings) {
+                        telegramSettings.style.display = Boolean(configData.enabled) ? 'block' : 'none';
+                    }
                 }
                 
                 // Đặt giá trị token, sử dụng giá trị từ server hoặc mặc định
@@ -242,26 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     telegramChatId.value = configData.chat_id || "1834332146";
                 }
                 
-                // Cập nhật các checkbox thông báo nếu có
-                if (document.getElementById('notify-new-trades')) {
-                    document.getElementById('notify-new-trades').checked = 
-                        configData.notify_new_trades === undefined ? true : Boolean(configData.notify_new_trades);
-                }
-                
-                if (document.getElementById('notify-closed-trades')) {
-                    document.getElementById('notify-closed-trades').checked = 
-                        configData.notify_closed_trades === undefined ? true : Boolean(configData.notify_closed_trades);
-                }
-                
-                if (document.getElementById('notify-error-status')) {
-                    document.getElementById('notify-error-status').checked = 
-                        configData.notify_error_status === undefined ? true : Boolean(configData.notify_error_status);
-                }
-                
-                if (document.getElementById('notify-daily-summary')) {
-                    document.getElementById('notify-daily-summary').checked = 
-                        configData.notify_daily_summary === undefined ? false : Boolean(configData.notify_daily_summary);
-                }
+                // Cập nhật các checkbox thông báo chi tiết dùng IDs mới
+                updateNotificationCheckboxes(configData);
                 
                 // Cập nhật khoảng thời gian tối thiểu nếu có
                 if (configData.min_interval) {
