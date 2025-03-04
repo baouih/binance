@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Load Telegram configuration on page load
-    loadTelegramConfig();
+    loadTelegramConfig(); // Gọi hàm này để tải cấu hình Telegram từ máy chủ
     
     // API mode radio buttons
     const apiModeRadios = document.querySelectorAll('input[name="api-mode"]');
@@ -138,22 +138,49 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(response => response.json())
-        .then(response => {
+        .then(data => {
             // Hide loading
             window.hideLoading();
             
-            if (response.success && response.data) {
-                const data = response.data;
-                
-                // Cập nhật UI với dữ liệu từ server
-                enableTelegramNotifications.checked = data.enabled;
+            // Kiểm tra dữ liệu có tồn tại không
+            if (data) {
+                // Kích hoạt công tắc nếu enabled = true
+                if (enableTelegramNotifications) {
+                    enableTelegramNotifications.checked = data.enabled === true;
+                }
                 
                 // Đặt giá trị token, sử dụng giá trị từ server hoặc mặc định
-                telegramBotToken.value = data.bot_token || "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+                if (telegramBotToken) {
+                    telegramBotToken.value = data.bot_token || "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+                }
                 
                 // Đặt giá trị chat ID, sử dụng giá trị từ server hoặc mặc định
-                telegramChatId.value = data.chat_id || "1834332146";
+                if (telegramChatId) {
+                    telegramChatId.value = data.chat_id || "1834332146";
+                }
                 
+                // Cập nhật các checkbox thông báo nếu có
+                if (document.getElementById('notify-new-trades')) {
+                    document.getElementById('notify-new-trades').checked = 
+                        data.notify_new_trades === undefined ? true : data.notify_new_trades;
+                }
+                
+                if (document.getElementById('notify-closed-trades')) {
+                    document.getElementById('notify-closed-trades').checked = 
+                        data.notify_closed_trades === undefined ? true : data.notify_closed_trades;
+                }
+                
+                if (document.getElementById('notify-error-status')) {
+                    document.getElementById('notify-error-status').checked = 
+                        data.notify_error_status === undefined ? true : data.notify_error_status;
+                }
+                
+                if (document.getElementById('notify-daily-summary')) {
+                    document.getElementById('notify-daily-summary').checked = 
+                        data.notify_daily_summary === undefined ? false : data.notify_daily_summary;
+                }
+                
+                // Cập nhật khoảng thời gian tối thiểu nếu có
                 if (data.min_interval) {
                     const minIntervalInput = document.getElementById('notify-min-interval');
                     if (minIntervalInput) {
@@ -161,20 +188,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                console.log('Đã tải cấu hình Telegram');
+                console.log('Đã tải cấu hình Telegram thành công:', data);
             } else {
-                console.error('Lỗi tải cấu hình Telegram:', response.message);
+                console.error('Không tìm thấy dữ liệu cấu hình Telegram');
+                
+                // Đặt giá trị mặc định khi không có dữ liệu
+                if (telegramBotToken) telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+                if (telegramChatId) telegramChatId.value = "1834332146";
             }
         })
         .catch(error => {
             // Hide loading
             window.hideLoading();
             
-            console.error('Lỗi kết nối khi tải cấu hình Telegram:', error);
+            console.error('Lỗi khi tải cấu hình Telegram:', error);
             
             // Đặt giá trị mặc định khi không thể tải từ server
-            telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
-            telegramChatId.value = "1834332146";
+            if (telegramBotToken) telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+            if (telegramChatId) telegramChatId.value = "1834332146";
         });
     }
     

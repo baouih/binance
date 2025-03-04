@@ -170,6 +170,72 @@ def update_security_settings():
         logger.error(f"Lỗi khi cập nhật cài đặt bảo mật: {str(e)}")
         return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
 
+@config_bp.route('/api/telegram/config', methods=['GET'])
+def get_telegram_config():
+    """API endpoint để lấy cấu hình Telegram"""
+    try:
+        telegram_config_path = 'telegram_config.json'
+        
+        # Đọc cấu hình Telegram
+        if os.path.exists(telegram_config_path):
+            with open(telegram_config_path, 'r') as f:
+                config = json.load(f)
+        else:
+            # Cấu hình mặc định nếu file không tồn tại
+            config = {
+                'enabled': False,
+                'bot_token': '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM',
+                'chat_id': '1834332146',
+                'min_interval': 5,
+                'notify_new_trades': True,
+                'notify_closed_trades': True,
+                'notify_error_status': True,
+                'notify_daily_summary': False
+            }
+            
+            # Lưu cấu hình mặc định
+            with open(telegram_config_path, 'w') as f:
+                json.dump(config, f)
+        
+        return jsonify(config)
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy cấu hình Telegram: {str(e)}")
+        return jsonify({'error': f"Lỗi: {str(e)}"}), 500
+        
+@config_bp.route('/api/telegram/config', methods=['POST'])
+def update_telegram_config():
+    """API endpoint để cập nhật cấu hình Telegram"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'message': 'Không có dữ liệu được gửi'}), 400
+        
+        # Lưu cấu hình vào telegram_config.json
+        config_file = 'telegram_config.json'
+        
+        # Tạo hoặc cập nhật cấu hình
+        config = {
+            'enabled': data.get('enabled', False),
+            'bot_token': data.get('bot_token', '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM'),
+            'chat_id': data.get('chat_id', '1834332146'),
+            'min_interval': data.get('min_interval', 5),
+            'notify_new_trades': data.get('notify_new_trades', True),
+            'notify_closed_trades': data.get('notify_closed_trades', True), 
+            'notify_error_status': data.get('notify_error_status', True),
+            'notify_daily_summary': data.get('notify_daily_summary', False)
+        }
+        
+        with open(config_file, 'w') as f:
+            json.dump(config, f)
+        
+        logger.info(f"Đã cập nhật cấu hình Telegram thành công!")
+        
+        return jsonify({'success': True, 'message': 'Đã cập nhật cấu hình Telegram thành công'})
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật cấu hình Telegram: {str(e)}")
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
+
 @config_bp.route('/api/telegram/test', methods=['POST'])
 def test_telegram():
     """API endpoint để kiểm tra kết nối Telegram"""
