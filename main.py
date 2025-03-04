@@ -1197,17 +1197,16 @@ def close_position_by_price(position_id, current_price, reason="Manual Close"):
 def update_market_prices():
     global market_prices, fake_prices
     
-    # Định nghĩa fake_prices nếu chưa có
-    if 'fake_prices' not in globals():
-        fake_prices = {
-            'BTCUSDT': 83000.0,
-            'ETHUSDT': 2050.0,
-            'BNBUSDT': 650.0,
-            'ADAUSDT': 0.55,
-            'DOGEUSDT': 0.15,
-            'XRPUSDT': 0.58,
-            'DOTUSDT': 8.25
-        }
+    # Định nghĩa fake_prices
+    fake_prices = {
+        'BTCUSDT': 83000.0,
+        'ETHUSDT': 2050.0,
+        'BNBUSDT': 650.0,
+        'ADAUSDT': 0.55,
+        'DOGEUSDT': 0.15,
+        'XRPUSDT': 0.58,
+        'DOTUSDT': 8.25
+    }
     
     try:
         # Thử lấy giá từ API Binance thực
@@ -1274,12 +1273,23 @@ def update_market_prices():
         logger.error(f"Lỗi khi cập nhật giá thị trường: {str(e)}")
         
         # Nếu có lỗi, sinh giá giả lập
+        # Đảm bảo fake_prices đã được định nghĩa
+        fake_prices_fallback = {
+            'BTCUSDT': 83000.0,
+            'ETHUSDT': 2050.0,
+            'BNBUSDT': 650.0,
+            'ADAUSDT': 0.55,
+            'DOGEUSDT': 0.15,
+            'XRPUSDT': 0.58,
+            'DOTUSDT': 8.25
+        }
+        
         for symbol in available_symbols:
             if symbol in market_prices:
                 # Biến động giá ngẫu nhiên ±0.5%
                 market_prices[symbol] *= (1 + random.uniform(-0.005, 0.005))
             else:
-                market_prices[symbol] = fake_prices.get(symbol, 1.0)
+                market_prices[symbol] = fake_prices_fallback.get(symbol, 1.0)
         
         return {
             'btc_price': market_prices.get('BTCUSDT', 0),

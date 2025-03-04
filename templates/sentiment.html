@@ -8,7 +8,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     margin-bottom: 20px;
-    background: #fff;
+    background: var(--bs-dark-bg-subtle);
     transition: transform 0.3s ease;
   }
   
@@ -27,16 +27,25 @@
   
   .mood-body {
     padding: 20px;
+    color: var(--bs-body-color);
   }
   
   .mood-emoji {
-    font-size: 3rem;
+    font-size: 3.5rem;
     margin-right: 15px;
     transition: transform 0.5s ease;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
   }
   
   .mood-emoji:hover {
-    transform: scale(1.2);
+    transform: scale(1.2) rotate(15deg);
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1.2); }
   }
   
   .mood-description {
@@ -56,11 +65,19 @@
     border-radius: 20px;
     margin-left: 10px;
     font-size: 0.9rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
   }
   
   .trend-emoji {
     font-size: 1.2rem;
     margin-right: 5px;
+    animation: slide 0.5s infinite alternate;
+  }
+  
+  @keyframes slide {
+    from { transform: translateX(-2px); }
+    to { transform: translateX(2px); }
   }
   
   .components-list {
@@ -71,20 +88,21 @@
     display: flex;
     align-items: center;
     margin-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--bs-border-color);
     padding-bottom: 8px;
   }
   
   .component-icon {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     margin-right: 10px;
-    background-color: #f0f0f0;
+    background-color: var(--bs-tertiary-bg);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 14px;
+    color: var(--bs-primary);
   }
   
   .component-text {
@@ -92,16 +110,22 @@
   }
   
   .insight-card {
-    background-color: #f8f9fa;
-    border-left: 4px solid #6c757d;
-    padding: 10px 15px;
+    background-color: var(--bs-tertiary-bg);
+    border-left: 4px solid var(--bs-info);
+    padding: 12px 15px;
     margin-bottom: 10px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 8px 8px 0;
+    transition: all 0.3s ease;
+  }
+  
+  .insight-card:hover {
+    border-left-width: 8px;
+    transform: translateX(5px);
   }
   
   .insight-card i {
     margin-right: 10px;
-    color: #6c757d;
+    color: var(--bs-info);
   }
   
   .chart-container {
@@ -109,6 +133,29 @@
     margin: 20px 0;
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    padding: 10px;
+  }
+  
+  /* Responsive mobile tweaks */
+  @media (max-width: 768px) {
+    .mood-emoji {
+      font-size: 2.5rem;
+    }
+    
+    .mood-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .mood-header > div:last-child {
+      margin-top: 10px;
+    }
+    
+    .chart-container {
+      height: 200px;
+    }
   }
 </style>
 {% endblock %}
@@ -216,26 +263,40 @@
   fetch('/sentiment/api/sentiment/history')
     .then(response => response.json())
     .then(data => {
+      // Ensure data is not empty
+      if (!data || data.length === 0) {
+        console.warn('No sentiment history data available');
+        document.getElementById('sentiment-history-chart').innerHTML = '<div class="alert alert-warning">Không có dữ liệu lịch sử cảm xúc</div>';
+        return;
+      }
+      
       const timestamps = data.map(item => item.timestamp);
       const scores = data.map(item => item.score);
       const emojis = data.map(item => item.emoji);
       const levels = data.map(item => item.level);
       
       // Render sentiment history chart
-      const ctx = document.getElementById('sentiment-history-chart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: timestamps,
-          datasets: [{
-            label: 'Sentiment Score',
-            data: scores,
-            borderColor: '#2c3e50',
-            backgroundColor: 'rgba(44, 62, 80, 0.1)',
-            tension: 0.3,
-            fill: true
-          }]
-        },
+      const ctx = document.getElementById('sentiment-history-chart');
+      if (!ctx) {
+        console.error('Cannot find sentiment-history-chart element');
+        return;
+      }
+      
+      try {
+        const ctxContext = ctx.getContext('2d');
+        new Chart(ctxContext, {
+          type: 'line',
+          data: {
+            labels: timestamps,
+            datasets: [{
+              label: 'Điểm cảm xúc',
+              data: scores,
+              borderColor: '#3498db',
+              backgroundColor: 'rgba(52, 152, 219, 0.2)',
+              tension: 0.3,
+              fill: true
+            }]
+          },
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -304,19 +365,26 @@
   
   // Render component chart if we have data
   if (componentLabels.length > 0) {
-    const componentCtx = document.getElementById('sentiment-components-chart').getContext('2d');
-    new Chart(componentCtx, {
-      type: 'bar',
-      data: {
-        labels: componentLabels,
-        datasets: [{
-          label: 'Component Score',
-          data: componentData,
-          backgroundColor: componentColors,
-          borderColor: 'rgba(0, 0, 0, 0.1)',
-          borderWidth: 1
-        }]
-      },
+    const componentCtx = document.getElementById('sentiment-components-chart');
+    if (!componentCtx) {
+      console.error('Cannot find sentiment-components-chart element');
+      return;
+    }
+    
+    try {
+      const componentCtxContext = componentCtx.getContext('2d');
+      new Chart(componentCtxContext, {
+        type: 'bar',
+        data: {
+          labels: componentLabels,
+          datasets: [{
+            label: 'Thành phần cảm xúc',
+            data: componentData,
+            backgroundColor: componentColors,
+            borderColor: 'rgba(0, 0, 0, 0.1)',
+            borderWidth: 1
+          }]
+        },
       options: {
         responsive: true,
         maintainAspectRatio: false,
