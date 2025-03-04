@@ -9,16 +9,16 @@ import { showAlert, showLoading, hideLoading, validateForm, fetchAPI } from './u
 
 // Các API endpoint
 const API_ENDPOINTS = {
-    GENERAL_SETTINGS: '/api/settings/general',
-    API_SETTINGS: '/api/settings/api',
-    TEST_API_CONNECTION: '/api/test-connection',
-    TRADING_COINS: '/api/trading/coins',
-    RISK_SETTINGS: '/api/settings/risk',
-    TELEGRAM_SETTINGS: '/api/settings/telegram',
-    TEST_TELEGRAM: '/test-telegram',
-    NOTIFICATION_SETTINGS: '/api/settings/notifications',
-    ADVANCED_SETTINGS: '/api/settings/advanced',
-    LOG_ENTRIES: '/api/logs'
+    GENERAL_SETTINGS: '/api/v1/settings/general',
+    API_SETTINGS: '/api/v1/settings/api',
+    TEST_API_CONNECTION: '/api/v1/test-connection',
+    TRADING_COINS: '/api/v1/trading/coins',
+    RISK_SETTINGS: '/api/v1/settings/risk',
+    TELEGRAM_SETTINGS: '/api/v1/settings/telegram',
+    TEST_TELEGRAM: '/api/v1/test-telegram',
+    NOTIFICATION_SETTINGS: '/api/v1/settings/notifications',
+    ADVANCED_SETTINGS: '/api/v1/settings/advanced',
+    LOG_ENTRIES: '/api/v1/logs'
 };
 
 /**
@@ -307,10 +307,10 @@ function setupApiSettingsHandlers() {
                                     <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi API 404</h6>
                                     <p class="mb-2">API endpoint kiểm tra kết nối không tồn tại. Endpoint: <code>${API_ENDPOINTS.TEST_API_CONNECTION}</code></p>
                                     <div class="alert alert-info small mb-0">
-                                        <i class="bi bi-info-circle me-1"></i> Gợi ý: Kiểm tra cấu hình endpoints hoặc cài đặt server API.
+                                        <i class="bi bi-info-circle me-1"></i> Gợi ý: Kiểm tra phiên bản API (v1/v2) hoặc cài đặt server API.
                                     </div>
                                 </div>
-                                <div class="mb-5"></div><!-- Thêm khoảng trống dưới để tránh menu che khuất -->`;
+                                <div style="height:80px"></div><!-- Tạo khoảng trống cố định không gây lấn xuống -->`;
                         } else {
                             // Hiển thị các lỗi khác
                             apiStatusElem.innerHTML = `
@@ -318,7 +318,7 @@ function setupApiSettingsHandlers() {
                                     <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối API</h6>
                                     <p class="mb-0">${error.message}</p>
                                 </div>
-                                <div class="mb-5"></div><!-- Thêm khoảng trống dưới để tránh menu che khuất -->`;
+                                <div style="height:80px"></div><!-- Tạo khoảng trống cố định không gây lấn xuống -->`;
                         }
                     }
                 });
