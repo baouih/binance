@@ -8,6 +8,7 @@
 // Global variables
 let equityCurveChart, performanceRadarChart;
 const refreshInterval = 10000; // 10 seconds refresh interval
+let lastBalanceUpdate = 0; // Timestamp của lần cập nhật balance cuối cùng
 const API_ENDPOINTS = {
     ACCOUNT: '/api/account',
     MARKET: '/api/market',
@@ -20,7 +21,8 @@ const API_ENDPOINTS = {
     TEST_EMAIL: '/api/test/email',
     RUN_BACKTEST: '/api/backtest/run',
     GENERATE_REPORT: '/api/reports/generate',
-    SAVE_SETTINGS: '/api/settings/save'
+    SAVE_SETTINGS: '/api/settings/save',
+    BALANCE: '/api/balance'
 };
 
 // Document ready function
@@ -569,9 +571,46 @@ function generateReport(reportType) {
  */
 function fetchDashboardData() {
     // Initial data is now fetched by fetchAllData() in startDataPolling()
-    // This function is kept for backward compatibility
     console.log('Fetching initial dashboard data...');
+    
+    // Gọi API cập nhật số dư từ API
+    fetch(API_ENDPOINTS.BALANCE)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Balance data:', data);
+            if (data.success && data.current_balance) {
+                // Cập nhật số dư hiển thị
+                updateAccountBalance(data.current_balance, data.balance, data.initial_balances);
+                lastBalanceUpdate = Date.now();
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching balance data:', error);
+        });
+    
+    // Sau đó tải các dữ liệu khác
     fetchAllData();
+}
+
+/**
+ * Cập nhật số dư hiển thị từ API
+ */
+function updateAccountBalance(currentBalance, accountBalance, initialBalances) {
+    // Cập nhật hiển thị số dư
+    const balanceElem = document.getElementById('account-balance');
+    if (balanceElem) {
+        balanceElem.textContent = `$${currentBalance.toFixed(2)}`;
+        // Xóa nhãn "demo" nếu có
+        const demoLabel = document.querySelector('.balance-label.bg-secondary');
+        if (demoLabel) {
+            demoLabel.textContent = 'live';
+            demoLabel.classList.remove('bg-secondary');
+            demoLabel.classList.add('bg-success');
+        }
+    }
+    
+    // Cập nhật các thông tin liên quan đến số dư khác nếu cần
+    console.log('Balance updated from API:', currentBalance);
 }
 
 /**

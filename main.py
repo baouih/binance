@@ -891,6 +891,16 @@ def background_tasks():
     # Tạo dữ liệu mẫu
     generate_initial_fake_data()
     
+    # Cập nhật số dư thực từ API
+    try:
+        real_balance = get_current_balance()
+        if real_balance > 0:
+            bot_status['balance'] = real_balance
+            logger.info(f"Đã cập nhật số dư từ API: {real_balance} USDT")
+            add_system_message(f"Đã cập nhật số dư từ API: {real_balance:.2f} USDT")
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật số dư từ API: {str(e)}")
+    
     # Thêm thông báo khởi động
     startup_message = "Bot đã khởi động thành công!"
     add_system_message(startup_message)
