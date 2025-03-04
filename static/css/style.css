@@ -253,3 +253,41 @@ body {
 canvas {
     width: 100% !important;
 }
+
+/* Spinner Animation */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error text highlighting */
+.error-text {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* API connection status */
+.api-status {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.api-status-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+}
+
+.api-status-error {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+}
+
+.api-status-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+}

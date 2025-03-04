@@ -248,6 +248,17 @@ function setupApiSettingsHandlers() {
             // Hiển thị loading
             showLoading('Đang kiểm tra kết nối API...');
             
+            // Cập nhật trạng thái nút
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Đang kiểm tra...';
+            this.disabled = true;
+            
+            // Hiển thị trạng thái API
+            const apiStatusElem = document.getElementById('apiConnectionStatus');
+            if (apiStatusElem) {
+                apiStatusElem.innerHTML = '<span class="badge bg-warning">Đang kiểm tra...</span>';
+            }
+            
             // Gửi API request
             fetchAPI(API_ENDPOINTS.TEST_API_CONNECTION, {
                 method: 'POST',
@@ -258,11 +269,36 @@ function setupApiSettingsHandlers() {
             }, false)
                 .then(data => {
                     hideLoading();
+                    
+                    // Khôi phục nút
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
+                    // Hiển thị thông báo thành công
                     showAlert('success', 'Kết nối API thành công!');
+                    
+                    // Cập nhật trạng thái API
+                    if (apiStatusElem) {
+                        apiStatusElem.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Kết nối thành công</span>';
+                    }
                 })
-                .catch(() => {
+                .catch((error, errorMessage) => {
                     hideLoading();
-                    // Message already shown by fetchAPI
+                    
+                    // Khôi phục nút
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
+                    // Cập nhật trạng thái API
+                    if (apiStatusElem) {
+                        apiStatusElem.innerHTML = `<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Kết nối thất bại</span>`;
+                    }
+                    
+                    // Hiển thị thông báo lỗi chi tiết
+                    if (error.message && error.message.includes('HTTP error! Status: 404')) {
+                        showAlert('danger', 'API endpoint kiểm tra kết nối không tồn tại. Vui lòng liên hệ quản trị viên.');
+                        console.error('API endpoint not found:', API_ENDPOINTS.TEST_API_CONNECTION);
+                    }
                 });
         });
     }
