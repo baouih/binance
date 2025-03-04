@@ -27,8 +27,8 @@ class TelegramNotifier:
             token (str): Token của Telegram bot API
             chat_id (str): ID của chat/người dùng nhận thông báo
         """
-        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM")
-        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "1834332146")
+        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "1834332146")
+        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM")
         self.api_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
         
         # Màu cho các loại thông báo
