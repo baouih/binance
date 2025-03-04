@@ -772,14 +772,28 @@ def add_system_message(message):
 def load_config():
     global bot_status, telegram_config, telegram_notifier
     
+    # Tải cấu hình tài khoản
+    try:
+        if os.path.exists(ACCOUNT_CONFIG_PATH):
+            with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+                account_config = json.load(f)
+                # Cập nhật mode từ api_mode trong cấu hình tài khoản
+                if 'api_mode' in account_config:
+                    bot_status['mode'] = account_config['api_mode']
+                if 'account_type' in account_config:
+                    bot_status['account_type'] = account_config['account_type']
+                
+                logger.info(f"Đã tải cấu hình tài khoản từ {ACCOUNT_CONFIG_PATH}")
+    except Exception as e:
+        logger.error(f"Lỗi khi tải cấu hình tài khoản: {e}")
+    
     # Tải cấu hình bot
     try:
         if os.path.exists(BOT_CONFIG_PATH):
             with open(BOT_CONFIG_PATH, 'r') as f:
                 bot_config = json.load(f)
                 # Cập nhật các giá trị từ cấu hình
-                if 'mode' in bot_config:
-                    bot_status['mode'] = bot_config['mode']
+                # Không cập nhật mode ở đây để đảm bảo mode lấy từ account_config.json
                 if 'account_type' in bot_config:
                     bot_status['account_type'] = bot_config['account_type']
                 if 'balance' in bot_config:
@@ -857,6 +871,22 @@ def save_config():
             json.dump(bot_config, f, indent=2)
             
         logger.info(f"Đã lưu cấu hình bot vào {BOT_CONFIG_PATH}")
+        
+        # Đồng bộ api_mode trong account_config.json với mode trong bot_status
+        try:
+            if os.path.exists(ACCOUNT_CONFIG_PATH):
+                with open(ACCOUNT_CONFIG_PATH, 'r') as f:
+                    account_config = json.load(f)
+                
+                # Cập nhật api_mode từ bot_status['mode']
+                account_config['api_mode'] = bot_status['mode']
+                
+                with open(ACCOUNT_CONFIG_PATH, 'w') as f:
+                    json.dump(account_config, f, indent=2)
+                
+                logger.info(f"Đã đồng bộ api_mode trong {ACCOUNT_CONFIG_PATH} thành {bot_status['mode']}")
+        except Exception as e:
+            logger.error(f"Lỗi khi đồng bộ cấu hình api_mode: {e}")
     except Exception as e:
         logger.error(f"Lỗi khi lưu cấu hình bot: {e}")
     

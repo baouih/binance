@@ -1,5 +1,5 @@
 {
-  "mode": "demo",
+  "mode": "testnet",
   "account_type": "futures",
-  "balance": 10000.0
+  "balance": 13063.06
 }
