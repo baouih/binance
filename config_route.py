@@ -180,35 +180,81 @@ def test_telegram():
         
         bot_token = data['bot_token']
         chat_id = data['chat_id']
-        message = data.get('message', '🔔 Đây là tin nhắn kiểm tra từ BinanceTrader Bot')
+        message = data.get('message')  # Lấy tin nhắn tùy chỉnh nếu có
         
-        # Thực sự gửi tin nhắn tới Telegram
+        # Sử dụng module telegram_notify để gửi tin nhắn test
         try:
-            import requests
-            telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-            payload = {
-                'chat_id': chat_id,
-                'text': message,
-                'parse_mode': 'HTML'
-            }
-            response = requests.post(telegram_api_url, json=payload, timeout=10)
+            from telegram_notify import TelegramNotifier
             
-            if response.status_code == 200:
-                logger.info(f"Đã gửi tin nhắn test đến Telegram chat ID: {chat_id}")
-                return jsonify({'success': True, 'message': 'Đã gửi tin nhắn test thành công'})
+            # Khởi tạo notifier tạm thời với token và chat_id được cung cấp
+            temp_notifier = TelegramNotifier(token=bot_token, chat_id=chat_id)
+            
+            # Gửi tin nhắn test
+            if message:
+                # Nếu có tin nhắn tùy chỉnh, sử dụng tin nhắn đó
+                success = temp_notifier.send_message(message, parse_mode="HTML")
             else:
-                logger.error(f"Lỗi gửi tin nhắn Telegram: {response.text}")
+                # Sử dụng hàm gửi tin nhắn kiểm tra có sẵn với định dạng đẹp
+                success = temp_notifier.send_test_message()
+            
+            if success:
+                logger.info(f"Đã gửi tin nhắn test đến Telegram chat ID: {chat_id}")
+                
+                # Lưu token và chat_id tạm thời để sử dụng khi lưu cài đặt
+                return jsonify({
+                    'success': True, 
+                    'message': 'Đã gửi tin nhắn test thành công. Vui lòng kiểm tra Telegram của bạn.'
+                })
+            else:
+                logger.error(f"Không thể gửi tin nhắn Telegram")
                 return jsonify({
                     'success': False, 
-                    'message': f'Lỗi Telegram API: {response.status_code} - {response.text}'
+                    'message': 'Không thể gửi tin nhắn test. Vui lòng kiểm tra token và chat ID.'
                 }), 400
         
         except Exception as telegram_error:
-            logger.error(f"Lỗi kết nối Telegram: {str(telegram_error)}")
-            return jsonify({
-                'success': False, 
-                'message': f'Lỗi kết nối Telegram: {str(telegram_error)}'
-            }), 500
+            logger.error(f"Lỗi khi sử dụng telegram_notify: {str(telegram_error)}")
+            
+            # Fallback: Sử dụng cách gửi tin nhắn qua requests trực tiếp nếu module có vấn đề
+            try:
+                import requests
+                telegram_api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                default_message = """🧪 <b>KIỂM TRA KẾT NỐI TELEGRAM</b>
+
+✅ Bot giao dịch đã kết nối thành công với Telegram!
+
+<b>Bạn sẽ nhận được các thông báo sau:</b>
+• 💰 Thông tin số dư tài khoản
+• 📊 Vị thế đang mở/đóng
+• 🤖 Trạng thái bot (chạy/dừng)
+• 📈 Phân tích thị trường
+• ⚙️ Thay đổi cấu hình
+• 📑 Báo cáo lãi/lỗ định kỳ
+
+⏰ """ + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                payload = {
+                    'chat_id': chat_id,
+                    'text': message or default_message,
+                    'parse_mode': 'HTML'
+                }
+                response = requests.post(telegram_api_url, json=payload, timeout=10)
+                
+                if response.status_code == 200:
+                    logger.info(f"[Fallback] Đã gửi tin nhắn test đến Telegram chat ID: {chat_id}")
+                    return jsonify({'success': True, 'message': 'Đã gửi tin nhắn test thành công'})
+                else:
+                    logger.error(f"Lỗi gửi tin nhắn Telegram: {response.text}")
+                    return jsonify({
+                        'success': False, 
+                        'message': f'Lỗi Telegram API: {response.status_code} - {response.text}'
+                    }), 400
+            except Exception as req_error:
+                logger.error(f"Lỗi kết nối Telegram (fallback): {str(req_error)}")
+                return jsonify({
+                    'success': False, 
+                    'message': f'Lỗi kết nối Telegram: {str(req_error)}'
+                }), 500
         
     except Exception as e:
         logger.error(f"Lỗi khi kiểm tra Telegram: {str(e)}")

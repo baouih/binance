@@ -41,13 +41,37 @@ class TelegramNotifier:
         if not self.enabled:
             logger.warning("Telegram không được kích hoạt. Thiếu token hoặc chat_id.")
     
+    def send_test_message(self) -> bool:
+        """
+        Gửi tin nhắn kiểm tra kết nối Telegram.
+        
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        test_message = """🧪 <b>KIỂM TRA KẾT NỐI TELEGRAM</b>
+
+✅ Bot giao dịch đã kết nối thành công với Telegram!
+
+<b>Bạn sẽ nhận được các thông báo sau:</b>
+• 💰 Thông tin số dư tài khoản
+• 📊 Vị thế đang mở/đóng
+• 🤖 Trạng thái bot (chạy/dừng)
+• 📈 Phân tích thị trường
+• ⚙️ Thay đổi cấu hình
+• 📑 Báo cáo lãi/lỗ định kỳ
+
+⏰ {0}"""
+        
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return self.send_message(test_message.format(current_time), category="test")
+        
     def send_message(self, message: str, category: str = None, parse_mode: str = "HTML") -> bool:
         """
         Gửi tin nhắn văn bản qua Telegram.
         
         Args:
             message (str): Nội dung tin nhắn
-            category (str, optional): Phân loại tin nhắn ("system", "alert", "trade", etc.)
+            category (str, optional): Phân loại tin nhắn ("system", "alert", "trade", "test", etc.)
             parse_mode (str): Chế độ định dạng ("HTML" hoặc "Markdown")
             
         Returns:
@@ -58,7 +82,11 @@ class TelegramNotifier:
             return False
         
         # Format tin nhắn theo loại
-        if category == "system" and "BOT ĐÃ KHỞI ĐỘNG" not in message:
+        if category == "test":
+            # Nếu là tin nhắn test, sử dụng nguyên bản
+            formatted_message = message
+            
+        elif category == "system" and "BOT ĐÃ KHỞI ĐỘNG" not in message:
             # Nếu đây là thông báo kết nối từ hệ thống, thì không thay đổi định dạng
             if "Hệ thống đã kết nối API Binance" in message:
                 formatted_message = message

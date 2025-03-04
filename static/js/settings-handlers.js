@@ -566,7 +566,7 @@ function setupTelegramSettingsHandlers() {
                 return;
             }
             
-            // Hiển thị loading
+            // Hiển thị loading indicator
             showLoading('Đang gửi tin nhắn test...');
             
             // Gửi API request
@@ -574,20 +574,78 @@ function setupTelegramSettingsHandlers() {
                 method: 'POST',
                 body: JSON.stringify({
                     bot_token: botToken,
-                    chat_id: chatId
+                    chat_id: chatId,
+                    message: "🧪 KIỂM TRA KẾT NỐI TELEGRAM\n\n" +
+                            "✅ Bot giao dịch đã kết nối thành công với Telegram!\n\n" +
+                            "Bạn sẽ nhận được các thông báo sau:\n" +
+                            "• 💰 Thông tin số dư tài khoản\n" +
+                            "• 📊 Vị thế đang mở/đóng\n" +
+                            "• 🤖 Trạng thái bot (chạy/dừng)\n" +
+                            "• 📈 Phân tích thị trường\n" +
+                            "• ⚙️ Thay đổi cấu hình\n" +
+                            "• 📑 Báo cáo lãi/lỗ định kỳ\n\n" +
+                            "⏰ " + new Date().toLocaleString("vi-VN")
                 })
-            }, false)
+            }, true) // Đặt là true để sử dụng loading indicator trong fetchAPI
                 .then(data => {
-                    hideLoading();
                     if (data.success) {
-                        showAlert('success', 'Tin nhắn test đã được gửi. Vui lòng kiểm tra Telegram của bạn.');
+                        showAlert('success', 'Tin nhắn test đã được gửi. Vui lòng kiểm tra Telegram của bạn.', 8000);
+                        
+                        // Cập nhật UI để hiển thị trạng thái kết nối
+                        const telegramStatusElem = document.getElementById('telegramConnectionStatus');
+                        if (telegramStatusElem) {
+                            telegramStatusElem.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Kết nối thành công</span>';
+                        }
+                        
+                        // Hiển thị thông báo chi tiết
+                        const telegramMsgContainer = document.getElementById('telegramMessageContainer');
+                        if (telegramMsgContainer) {
+                            telegramMsgContainer.innerHTML = `
+                                <div class="alert alert-success">
+                                    <h6 class="mb-1"><i class="bi bi-check-circle-fill me-2"></i>Kết nối Telegram thành công!</h6>
+                                    <p class="mb-0">Tin nhắn test đã được gửi. Vui lòng kiểm tra ứng dụng Telegram của bạn.</p>
+                                </div>
+                            `;
+                            telegramMsgContainer.style.display = 'block';
+                        }
                     } else {
-                        showAlert('danger', data.message || 'Không thể gửi tin nhắn test');
+                        showAlert('danger', data.message || 'Không thể gửi tin nhắn test', 10000);
+                        
+                        // Hiển thị thông báo lỗi chi tiết
+                        const telegramMsgContainer = document.getElementById('telegramMessageContainer');
+                        if (telegramMsgContainer) {
+                            telegramMsgContainer.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <h6 class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối Telegram</h6>
+                                    <p class="mb-0">${data.message || 'Không thể gửi tin nhắn test. Vui lòng kiểm tra lại Bot Token và Chat ID.'}</p>
+                                </div>
+                            `;
+                            telegramMsgContainer.style.display = 'block';
+                        }
                     }
                 })
-                .catch(() => {
-                    hideLoading();
-                    // Message already shown by fetchAPI
+                .catch((error) => {
+                    // Hiển thị thông báo lỗi chi tiết
+                    showAlert('danger', 'Lỗi kết nối: ' + error.message, 10000);
+                    
+                    const telegramMsgContainer = document.getElementById('telegramMessageContainer');
+                    if (telegramMsgContainer) {
+                        telegramMsgContainer.innerHTML = `
+                            <div class="alert alert-danger">
+                                <h6 class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối Telegram</h6>
+                                <p class="mb-0">Không thể kết nối đến Telegram API. Chi tiết lỗi: ${error.message}</p>
+                                <div class="mt-2 small">
+                                    <strong>Gợi ý:</strong>
+                                    <ul class="mb-0">
+                                        <li>Kiểm tra Bot Token có đúng định dạng không</li>
+                                        <li>Đảm bảo Chat ID là chính xác</li>
+                                        <li>Kiểm tra kết nối internet</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        telegramMsgContainer.style.display = 'block';
+                    }
                 });
         });
     }
