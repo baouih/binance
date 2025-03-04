@@ -576,15 +576,68 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
     
     return True
 
-# Lấy số dư hiện tại (bao gồm cả unrealized P/L)
+# Lấy số dư hiện tại (bao gồm cả unrealized P/L) từ API hoặc cục bộ
 def get_current_balance():
-    balance = bot_status['balance']
-    
-    # Cộng thêm unrealized P/L từ các vị thế đang mở
-    for pos in positions:
-        balance += pos['unrealized_pnl']
-    
-    return balance
+    try:
+        # Thử lấy số dư từ API Binance
+        binance_api = BinanceAPI()
+        
+        if bot_status['account_type'] == 'futures':
+            # Lấy số dư từ tài khoản futures
+            account_info = binance_api.get_futures_account()
+            if isinstance(account_info, dict) and 'totalWalletBalance' in account_info:
+                logger.info(f"Đã lấy số dư từ API Binance Futures: {account_info['totalWalletBalance']} USDT")
+                real_balance = float(account_info['totalWalletBalance'])
+                
+                # Cập nhật bot_status
+                if real_balance > 0:
+                    bot_status['balance'] = real_balance
+                    bot_status['api_connected'] = True
+                    bot_status['last_api_check'] = format_vietnam_time()
+                    
+                # Cộng thêm unrealized P/L từ các vị thế đang mở
+                for pos in positions:
+                    real_balance += pos['unrealized_pnl']
+                
+                return real_balance
+        else:
+            # Lấy số dư từ tài khoản spot cho USDT
+            account_info = binance_api.get_account()
+            if isinstance(account_info, dict) and 'balances' in account_info:
+                for balance in account_info['balances']:
+                    if balance['asset'] == 'USDT':
+                        logger.info(f"Đã lấy số dư từ API Binance Spot: {balance['free']} USDT")
+                        real_balance = float(balance['free']) + float(balance['locked'])
+                        
+                        # Cập nhật bot_status
+                        if real_balance > 0:
+                            bot_status['balance'] = real_balance
+                            bot_status['api_connected'] = True
+                            bot_status['last_api_check'] = format_vietnam_time()
+                        
+                        return real_balance
+        
+        # Nếu không thể lấy từ API, sử dụng dữ liệu cục bộ
+        logger.warning("Không thể lấy số dư từ API, sử dụng dữ liệu cục bộ")
+        local_balance = bot_status['balance']
+        
+        # Cộng thêm unrealized P/L từ các vị thế đang mở
+        for pos in positions:
+            local_balance += pos['unrealized_pnl']
+        
+        return local_balance
+        
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy số dư tài khoản: {str(e)}")
+        
+        # Sử dụng dữ liệu cục bộ khi có lỗi
+        balance = bot_status['balance']
+        
+        # Cộng thêm unrealized P/L từ các vị thế đang mở
+        for pos in positions:
+            balance += pos['unrealized_pnl']
+        
+        return balance
 
 # Thêm thông báo hệ thống
 # Các hàm thời gian Việt Nam
