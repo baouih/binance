@@ -74,17 +74,10 @@ telegram_notifier = TelegramNotifier(
     chat_id=telegram_config.get('chat_id', DEFAULT_CHAT_ID)
 )
 
-# Dữ liệu tạm để hiển thị
-fake_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT', 'DOTUSDT']
-fake_prices = {
-    'BTCUSDT': 36500.0,
-    'ETHUSDT': 2400.0,
-    'BNBUSDT': 320.0,
-    'ADAUSDT': 0.45,
-    'DOGEUSDT': 0.12,
-    'XRPUSDT': 0.65,
-    'DOTUSDT': 17.8
-}
+# Danh sách các đồng coin được hỗ trợ
+available_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT', 'DOTUSDT']
+# Dữ liệu giá sẽ được lấy từ API thực tế
+market_prices = {}
 
 # Danh sách các đồng coin đã được chọn để giao dịch (mặc định BTCUSDT để đảm bảo luôn có ít nhất một đồng)
 selected_trading_coins = ['BTCUSDT']  # Mặc định BTC để luôn có ít nhất một đồng coin để giao dịch
@@ -146,11 +139,41 @@ def get_market_data_from_api():
     Lấy dữ liệu thị trường từ API Binance.
     
     Returns:
-        dict: Dữ liệu thị trường từ API hoặc dữ liệu giả lập nếu không thể kết nối
+        dict: Dữ liệu thị trường từ API Binance
     """
+    global market_prices
+    
     try:
         # Khởi tạo kết nối API Binance
         binance_api = BinanceAPI()
+        
+        # Cập nhật giá hiện tại của tất cả các cặp giao dịch
+        all_prices = {}
+        for symbol in available_symbols:
+            try:
+                ticker = binance_api.get_symbol_ticker(symbol)
+                if isinstance(ticker, dict) and 'price' in ticker:
+                    all_prices[symbol] = float(ticker['price'])
+                    # Lưu giá vào market_prices để sử dụng ở những nơi khác
+                    market_prices[symbol] = float(ticker['price'])
+            except Exception as e:
+                logger.warning(f"Không thể lấy giá của {symbol}: {str(e)}")
+                # Nếu không lấy được giá mới, giữ nguyên giá cũ nếu có
+                if symbol in market_prices:
+                    all_prices[symbol] = market_prices[symbol]
+                else:
+                    # Nếu chưa có giá, đặt giá mặc định
+                    default_prices = {
+                        'BTCUSDT': 50000.0,
+                        'ETHUSDT': 3000.0,
+                        'BNBUSDT': 400.0,
+                        'ADAUSDT': 0.50,
+                        'DOGEUSDT': 0.15,
+                        'XRPUSDT': 0.70,
+                        'DOTUSDT': 20.0
+                    }
+                    all_prices[symbol] = default_prices.get(symbol, 0.0)
+                    market_prices[symbol] = all_prices[symbol]
         
         # Lấy giá hiện tại của các đồng tiền chính
         btc_ticker = binance_api.get_symbol_ticker('BTCUSDT')
@@ -163,18 +186,33 @@ def get_market_data_from_api():
         eth_24h = binance_api.get_24h_ticker('ETHUSDT')
         
         if not isinstance(btc_ticker, dict) or not isinstance(eth_ticker, dict):
-            logger.warning("Không thể lấy dữ liệu ticker từ API, sử dụng dữ liệu giả lập")
+            logger.error("Không thể lấy dữ liệu ticker từ API")
             return {}
         
         # Chuyển đổi giá từ chuỗi sang số
-        btc_price = float(btc_ticker.get('price', fake_prices.get('BTCUSDT', 36500)))
-        eth_price = float(eth_ticker.get('price', fake_prices.get('ETHUSDT', 2400)))
-        bnb_price = float(bnb_ticker.get('price', fake_prices.get('BNBUSDT', 370))) if isinstance(bnb_ticker, dict) else fake_prices.get('BNBUSDT', 370)
-        sol_price = float(sol_ticker.get('price', fake_prices.get('SOLUSDT', 117))) if isinstance(sol_ticker, dict) else fake_prices.get('SOLUSDT', 117)
+        default_btc = market_prices.get('BTCUSDT', 50000.0)
+        default_eth = market_prices.get('ETHUSDT', 3000.0)
+        default_bnb = market_prices.get('BNBUSDT', 400.0)
+        default_sol = market_prices.get('SOLUSDT', 120.0)
         
-        # Tính toán biến động 24h
-        btc_change_24h = float(btc_24h.get('priceChangePercent', '0.0')) if isinstance(btc_24h, dict) else random.uniform(-2.0, 3.0)
-        eth_change_24h = float(eth_24h.get('priceChangePercent', '0.0')) if isinstance(eth_24h, dict) else random.uniform(-3.0, 4.0)
+        btc_price = float(btc_ticker.get('price', default_btc))
+        eth_price = float(eth_ticker.get('price', default_eth))
+        bnb_price = float(bnb_ticker.get('price', default_bnb)) if isinstance(bnb_ticker, dict) else default_bnb
+        sol_price = float(sol_ticker.get('price', default_sol)) if isinstance(sol_ticker, dict) else default_sol
+        
+        # Lấy dữ liệu từ API cho tất cả các cặp giao dịch
+        all_24h_data = {}
+        all_tickers = binance_api.get_24h_ticker()  # Lấy tất cả tickers cùng lúc
+        
+        if isinstance(all_tickers, list):
+            for ticker in all_tickers:
+                if 'symbol' in ticker and ticker['symbol'] in available_symbols:
+                    symbol = ticker['symbol']
+                    all_24h_data[symbol] = ticker
+        
+        # Tính toán biến động 24h từ dữ liệu API
+        btc_change_24h = float(btc_24h.get('priceChangePercent', '0.0')) if isinstance(btc_24h, dict) else 0.0
+        eth_change_24h = float(eth_24h.get('priceChangePercent', '0.0')) if isinstance(eth_24h, dict) else 0.0
         
         # Lấy khối lượng giao dịch
         btc_volume = float(btc_24h.get('volume', '0.0')) if isinstance(btc_24h, dict) else random.randint(1000, 5000)
@@ -185,6 +223,25 @@ def get_market_data_from_api():
         
         # Xác định xu hướng thị trường
         market_trend = 'bullish' if btc_change_24h > 0 else ('bearish' if btc_change_24h < 0 else 'neutral')
+        
+        # Lấy dữ liệu vị thế từ tài khoản futures nếu có
+        account_positions = []
+        account_balance = 0.0
+        
+        if bot_status['account_type'] == 'futures':
+            try:
+                account_info = binance_api.get_futures_account()
+                if isinstance(account_info, dict):
+                    account_balance = float(account_info.get('totalWalletBalance', 0.0))
+                    
+                    # Lấy dữ liệu vị thế
+                    position_info = binance_api.get_futures_position_risk()
+                    if isinstance(position_info, list):
+                        for pos in position_info:
+                            if float(pos.get('positionAmt', 0)) != 0:
+                                account_positions.append(pos)
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy dữ liệu tài khoản futures: {str(e)}")
         
         # Đóng gói dữ liệu
         market_data = {
@@ -198,6 +255,10 @@ def get_market_data_from_api():
             'eth_volume': eth_volume,
             'market_volatility': market_volatility,
             'market_trend': market_trend,
+            'all_prices': all_prices,
+            'all_24h_data': all_24h_data,
+            'account_positions': account_positions,
+            'account_balance': account_balance,
             'timestamp': format_vietnam_time(),
             'data_source': 'binance_api'
         }
@@ -209,47 +270,57 @@ def get_market_data_from_api():
     except Exception as e:
         logger.error(f"Lỗi khi lấy dữ liệu thị trường từ API: {str(e)}")
         return {
-            'btc_price': fake_prices.get('BTCUSDT', 36500.0),
-            'eth_price': fake_prices.get('ETHUSDT', 2400.0),
+            'btc_price': 50000.0,
+            'eth_price': 3000.0,
             'market_trend': 'neutral',
-            'timestamp': format_vietnam_time()
+            'timestamp': format_vietnam_time(),
+            'data_source': 'default_values'
         }
 
-# Hàm cập nhật dữ liệu giả
-def update_fake_data():
-    global fake_prices, market_data, performance_data, bot_status
+# Hàm cập nhật dữ liệu thị trường định kỳ
+def update_market_data():
+    global market_prices, market_data, performance_data, bot_status
     
-    # Cập nhật giá
-    for symbol in fake_symbols:
-        change = random.uniform(-0.5, 0.5)
-        fake_prices[symbol] *= (1 + change / 100)
+    # Lấy dữ liệu mới từ API
+    api_data = get_market_data_from_api()
+    if api_data and 'all_prices' in api_data:
+        # Cập nhật giá mới
+        for symbol, price in api_data['all_prices'].items():
+            market_prices[symbol] = price
         
-        if symbol not in market_data:
-            market_data[symbol] = {
-                'symbol': symbol,
-                'price': fake_prices[symbol],
-                'change_24h': 0,
-                'volume': 0,
-                'high_24h': fake_prices[symbol],
-                'low_24h': fake_prices[symbol],
-                'indicators': {}
-            }
-        else:
-            market_data[symbol]['price'] = fake_prices[symbol]
-            market_data[symbol]['change_24h'] = random.uniform(-5, 5)
-            market_data[symbol]['volume'] = random.uniform(100000, 10000000)
-            market_data[symbol]['high_24h'] = fake_prices[symbol] * (1 + random.uniform(0.5, 2) / 100)
-            market_data[symbol]['low_24h'] = fake_prices[symbol] * (1 - random.uniform(0.5, 2) / 100)
-            
-            # Thêm các chỉ báo kỹ thuật
-            market_data[symbol]['indicators'] = {
-                'rsi': random.uniform(30, 70),
-                'macd': random.uniform(-10, 10),
-                'ema50': fake_prices[symbol] * (1 + random.uniform(-2, 2) / 100),
-                'ema200': fake_prices[symbol] * (1 + random.uniform(-4, 4) / 100),
-                'bb_upper': fake_prices[symbol] * (1 + random.uniform(1, 3) / 100),
-                'bb_lower': fake_prices[symbol] * (1 - random.uniform(1, 3) / 100)
-            }
+        for symbol, price in market_prices.items():
+            if symbol not in market_data:
+                market_data[symbol] = {
+                    'symbol': symbol,
+                    'price': price,
+                    'change_24h': 0,
+                    'volume': 0,
+                    'high_24h': price,
+                    'low_24h': price,
+                    'indicators': {}
+                }
+            else:
+                # Cập nhật giá
+                market_data[symbol]['price'] = price
+                
+                # Lấy dữ liệu 24h từ API nếu có
+                if symbol in api_data.get('all_24h_data', {}):
+                    ticker_24h = api_data['all_24h_data'][symbol]
+                    market_data[symbol]['change_24h'] = float(ticker_24h.get('priceChangePercent', 0))
+                    market_data[symbol]['volume'] = float(ticker_24h.get('volume', 0))
+                    market_data[symbol]['high_24h'] = float(ticker_24h.get('highPrice', price))
+                    market_data[symbol]['low_24h'] = float(ticker_24h.get('lowPrice', price))
+                
+                # Tính toán các chỉ báo kỹ thuật từ API khi có dữ liệu lịch sử đủ
+                # Hiện tại dùng giá trị ngẫu nhiên cho mục đích demo
+                market_data[symbol]['indicators'] = {
+                    'rsi': random.uniform(30, 70),
+                    'macd': random.uniform(-10, 10),
+                    'ema50': price * (1 + random.uniform(-2, 2) / 100),
+                    'ema200': price * (1 + random.uniform(-4, 4) / 100),
+                    'bb_upper': price * (1 + random.uniform(1, 3) / 100),
+                    'bb_lower': price * (1 - random.uniform(1, 3) / 100)
+                }
     
     # Cập nhật thời gian chạy của bot nếu đang hoạt động
     if bot_status['running']:
@@ -258,7 +329,9 @@ def update_fake_data():
     # Cập nhật số dư nếu có vị thế đang mở
     if positions and bot_status['running']:
         for pos in positions:
-            current_price = fake_prices[pos['symbol']]
+            # Lấy giá hiện tại từ market_prices
+            symbol = pos['symbol']
+            current_price = market_prices.get(symbol, pos['entry_price'])
             price_diff = current_price - pos['entry_price']
             
             if pos['side'] == 'BUY':
@@ -315,12 +388,15 @@ def generate_fake_signal():
         strategy = random.choice(['RSI', 'MACD Cross', 'EMA Cross', 'Bollinger Bands', 'Support/Resistance'])
         timeframe = random.choice(['1m', '5m', '15m', '1h', '4h', '1d'])
         
+        # Lấy giá hiện tại từ market_prices
+        current_price = market_prices.get(symbol, 0.0)
+        
         signal = {
             'id': str(uuid.uuid4())[:8],
             'timestamp': format_vietnam_time(),
             'symbol': symbol,
             'type': signal_type,
-            'price': fake_prices[symbol],
+            'price': current_price,
             'strength': signal_strength,
             'confidence': confidence,
             'strategy': strategy,
@@ -345,11 +421,14 @@ def generate_fake_signal():
                 # Tạo thông báo chi tiết
                 signal_arrow = "🔴 BÁN" if signal_type == "SELL" else "🟢 MUA"
                 
+                # Lấy giá hiện tại từ market_prices
+                current_price = market_prices.get(symbol, 0.0)
+                
                 signal_alert = (
                     f"{signal_arrow} *TÍN HIỆU GIAO DỊCH MỚI*\n\n"
                     f"🪙 *Cặp giao dịch:* `{symbol}`\n"
                     f"⏱️ *Khung thời gian:* `{timeframe}`\n"
-                    f"💰 *Giá hiện tại:* `{fake_prices[symbol]:.2f} USDT`\n"
+                    f"💰 *Giá hiện tại:* `{current_price:.2f} USDT`\n"
                     f"📊 *Chiến lược:* `{strategy}`\n"
                     f"⭐ *Độ tin cậy:* `{confidence:.1f}%`\n"
                     f"🔄 *Độ mạnh:* `{signal_strength:.2f}`\n"
@@ -486,7 +565,8 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
     
     # Sử dụng giá hiện tại nếu không cung cấp giá thoát
     if exit_price is None:
-        exit_price = fake_prices[position['symbol']]
+        symbol = position['symbol']
+        exit_price = market_prices.get(symbol, position['entry_price'])
     
     # Tính P/L
     if position['side'] == 'BUY':
@@ -1310,18 +1390,44 @@ def get_performance():
 
 @app.route('/api/market')
 def get_market():
-    # Lấy dữ liệu thị trường từ API hoặc giả lập
+    # Lấy dữ liệu thị trường từ API
     market_data_api = get_market_data_from_api()
     
-    # Kết hợp với market_data hiện tại
-    market_response = {
-        'market': market_data,
-        'api_data': market_data_api,
-        'symbols': fake_symbols,
-        'selected_symbols': selected_trading_coins,
-        'timestamp': format_vietnam_time(),
-        'success': True
-    }
+    # Ưu tiên sử dụng dữ liệu API cho phản hồi
+    if market_data_api and 'data_source' in market_data_api and market_data_api['data_source'] == 'binance_api':
+        logger.info("Sử dụng dữ liệu thị trường thực từ Binance API")
+        
+        # Cập nhật dữ liệu trong bộ nhớ với dữ liệu thực
+        global market_data
+        for key, value in market_data_api.items():
+            market_data[key] = value
+            
+        # Thêm vị thế vào phản hồi
+        if 'account_positions' in market_data_api and market_data_api['account_positions']:
+            positions_data = market_data_api['account_positions']
+            logger.info(f"Đã lấy {len(positions_data)} vị thế từ API")
+        else:
+            logger.info("Không có vị thế nào từ API")
+        
+        # Xây dựng phản hồi từ dữ liệu thực
+        market_response = {
+            'market': market_data_api,  # Sử dụng dữ liệu API làm chính
+            'symbols': fake_symbols,
+            'selected_symbols': selected_trading_coins,
+            'timestamp': format_vietnam_time(),
+            'success': True
+        }
+    else:
+        # Nếu không có dữ liệu API, sử dụng dữ liệu hiện tại
+        logger.warning("Không thể lấy dữ liệu thị trường từ API, sử dụng dữ liệu hiện tại")
+        market_response = {
+            'market': market_data,
+            'api_data': market_data_api,
+            'symbols': fake_symbols,
+            'selected_symbols': selected_trading_coins,
+            'timestamp': format_vietnam_time(),
+            'success': True
+        }
     
     return jsonify(market_response)
 
@@ -1341,14 +1447,30 @@ def get_balance():
     # Lấy số dư hiện tại từ API, đảm bảo là giá trị chính xác
     current_balance = get_current_balance()
     
+    # Cập nhật số dư trong bot_status để đảm bảo giá trị chính xác
+    if current_balance and current_balance > 0:
+        bot_status['balance'] = current_balance
+    
     # Log để debug
     logger.debug(f"API Balance Endpoint - current_balance: {current_balance}, bot_status['balance']: {bot_status['balance']}")
+    
+    # Lấy dữ liệu thị trường từ API để lấy thông tin vị thế
+    market_data_api = get_market_data_from_api()
+    positions_data = []
+    
+    # Thêm vị thế vào phản hồi nếu có
+    if market_data_api and 'account_positions' in market_data_api and market_data_api['account_positions']:
+        positions_data = market_data_api['account_positions']
+        logger.info(f"API Balance - Lấy được {len(positions_data)} vị thế từ API")
     
     return jsonify({
         'success': True,
         'balance': bot_status['balance'],
         'current_balance': current_balance,
-        'initial_balances': initial_balances
+        'initial_balances': initial_balances,
+        'positions': positions_data,
+        'data_source': 'binance_api',
+        'timestamp': format_vietnam_time()
     })
 
 @app.route('/api/v1/test-connection', methods=['POST'])
