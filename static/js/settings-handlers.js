@@ -25,6 +25,22 @@ const API_ENDPOINTS = {
  * Khởi tạo trang cài đặt
  */
 function initSettingsPage() {
+    // Khôi phục API key và secret key từ localStorage
+    const apiKeyInput = document.getElementById('apiKey');
+    const secretKeyInput = document.getElementById('secretKey');
+    
+    if (apiKeyInput && localStorage.getItem('api_key')) {
+        apiKeyInput.value = localStorage.getItem('api_key');
+    } else if (apiKeyInput && localStorage.getItem('temp_api_key')) {
+        apiKeyInput.value = localStorage.getItem('temp_api_key');
+    }
+    
+    if (secretKeyInput && localStorage.getItem('secret_key')) {
+        secretKeyInput.value = localStorage.getItem('secret_key');
+    } else if (secretKeyInput && localStorage.getItem('temp_secret_key')) {
+        secretKeyInput.value = localStorage.getItem('temp_secret_key');
+    }
+    
     // Đăng ký tất cả các sự kiện
     setupTradingCoinsHandlers();
     setupGeneralSettingsHandlers();
@@ -328,6 +344,25 @@ function setupApiSettingsHandlers() {
                     // Lưu dữ liệu API vào localStorage để không mất khi refresh trang
                     localStorage.setItem('temp_api_key', apiKey);
                     localStorage.setItem('temp_secret_key', secretKey);
+                    
+                    // Thêm function để tự động điền vào form khi trang reload
+                    window.addEventListener('DOMContentLoaded', function() {
+                        // Khôi phục API key và secret key từ localStorage
+                        const apiKeyInput = document.getElementById('apiKey');
+                        const secretKeyInput = document.getElementById('secretKey');
+                        
+                        if (apiKeyInput && localStorage.getItem('api_key')) {
+                            apiKeyInput.value = localStorage.getItem('api_key');
+                        } else if (apiKeyInput && localStorage.getItem('temp_api_key')) {
+                            apiKeyInput.value = localStorage.getItem('temp_api_key');
+                        }
+                        
+                        if (secretKeyInput && localStorage.getItem('secret_key')) {
+                            secretKeyInput.value = localStorage.getItem('secret_key');
+                        } else if (secretKeyInput && localStorage.getItem('temp_secret_key')) {
+                            secretKeyInput.value = localStorage.getItem('temp_secret_key');
+                        }
+                    });
                 })
                 .catch((error, errorMessage) => {
                     hideLoading();
