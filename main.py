@@ -932,7 +932,7 @@ def test_connection():
         
         # Cập nhật trạng thái kết nối API
         bot_status['api_connected'] = True
-        bot_status['last_api_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        bot_status['last_api_check'] = format_vietnam_time()
         
         # Lưu thông báo hệ thống
         add_system_message("Kết nối API thành công")
@@ -1195,7 +1195,7 @@ def on_disconnect():
 def on_start_bot():
     bot_status['running'] = True
     bot_status['status'] = 'running'
-    bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    bot_status['last_update'] = format_vietnam_time()
     add_system_message("Bot đã được khởi động!")
     socketio.emit('bot_status_update', bot_status)
 
@@ -1203,7 +1203,7 @@ def on_start_bot():
 def on_stop_bot():
     bot_status['running'] = False
     bot_status['status'] = 'stopped'
-    bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    bot_status['last_update'] = format_vietnam_time()
     add_system_message("Bot đã được dừng!")
     socketio.emit('bot_status_update', bot_status)
 
