@@ -4,6 +4,70 @@
 
 {% block title %}Cài đặt - Bot Giao Dịch Crypto{% endblock %}
 
+{% block head %}
+<style>
+    /* Loading overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    /* Coin selection container */
+    .coin-selection-container {
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: var(--bs-body-bg);
+    }
+    
+    /* Checkbox styling */
+    .trading-coin-checkbox {
+        cursor: pointer;
+    }
+    
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    
+    .status-badge.connected {
+        background-color: #198754;
+        color: #fff;
+    }
+    
+    .status-badge.disconnected {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    
+    .status-badge.testnet {
+        background-color: #fd7e14;
+        color: #fff;
+    }
+    
+    .status-badge.live {
+        background-color: #dc3545;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row mb-4">
@@ -631,6 +695,123 @@
 
 {% block scripts %}
 <script>
+    // Hàm hiển thị thông báo
+    function showAlert(type, message) {
+        // Tạo element alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        
+        // Thêm biểu tượng phù hợp
+        let icon = 'info-circle';
+        if (type === 'success') icon = 'check-circle';
+        if (type === 'danger') icon = 'exclamation-triangle';
+        if (type === 'warning') icon = 'exclamation-circle';
+        
+        // Thêm nội dung
+        alertDiv.innerHTML = `
+            <i class="bi bi-${icon} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Thêm vào đầu trang
+        const content = document.querySelector('.tab-content');
+        if (content) {
+            content.parentNode.insertBefore(alertDiv, content);
+            
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 5000);
+        }
+    }
+    
+    // Hàm hiển thị loading
+    function showLoading() {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loadingOverlay';
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Đang tải...</span></div>';
+        document.body.appendChild(loadingOverlay);
+    }
+    
+    // Hàm ẩn loading
+    function hideLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+        }
+    }
+    
+    // Hàm hiển thị toast
+    function showToast(title, message, type = 'info') {
+        // Sử dụng Bootstrap để hiển thị toast
+        const toastContainer = document.getElementById('toastContainer');
+        
+        // Tạo toast container nếu chưa có
+        if (!toastContainer) {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1060';
+            document.body.appendChild(container);
+        }
+        
+        // Tạo toast
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = 'toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        // Thêm biểu tượng phù hợp
+        let icon = 'info-circle';
+        let bgClass = 'bg-info';
+        if (type === 'success') {
+            icon = 'check-circle-fill';
+            bgClass = 'bg-success';
+        }
+        if (type === 'error' || type === 'danger') {
+            icon = 'exclamation-triangle-fill';
+            bgClass = 'bg-danger';
+            type = 'danger';
+        }
+        if (type === 'warning') {
+            icon = 'exclamation-triangle-fill';
+            bgClass = 'bg-warning';
+        }
+        
+        // Thêm nội dung
+        toast.innerHTML = `
+            <div class="toast-header ${bgClass} text-white">
+                <i class="bi bi-${icon} me-2"></i>
+                <strong class="me-auto">${title}</strong>
+                <small>Vừa xong</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        // Thêm vào container
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Hiển thị toast
+        const toastElement = new bootstrap.Toast(document.getElementById(toastId));
+        toastElement.show();
+        
+        // Tự động xoá sau khi ẩn
+        const element = document.getElementById(toastId);
+        element.addEventListener('hidden.bs.toast', function() {
+            element.remove();
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // Trading Coins Selection Handlers
         const selectAllCoinsBtn = document.getElementById('selectAllCoins');
