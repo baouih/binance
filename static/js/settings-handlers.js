@@ -225,12 +225,12 @@ function setupApiSettingsHandlers() {
                 return;
             }
             
-            // Hiển thị loading
-            showLoading('Đang lưu cài đặt API...');
-            
             // Lưu dữ liệu vào localStorage để tránh mất khi refresh trang
             localStorage.setItem('api_key', apiKey);
             localStorage.setItem('secret_key', secretKey);
+            
+            // Hiển thị loading indicator
+            showLoading('Đang lưu cài đặt API...');
             
             // Gửi API request
             fetchAPI(API_ENDPOINTS.API_SETTINGS, {
@@ -239,9 +239,8 @@ function setupApiSettingsHandlers() {
                     api_key: apiKey,
                     secret_key: secretKey
                 })
-            }, false)
+            }, true) // Đặt là true để sử dụng loading indicator trong fetchAPI
                 .then(data => {
-                    hideLoading();
                     showAlert('success', 'Cài đặt API đã được lưu thành công!');
                     
                     // Xóa thông báo lỗi nếu có
@@ -250,8 +249,9 @@ function setupApiSettingsHandlers() {
                         apiErrorContainer.innerHTML = '';
                     }
                 })
-                .catch(() => {
-                    hideLoading();
+                .catch((error) => {
+                    // Hiển thị thông báo lỗi chi tiết hơn
+                    showAlert('danger', 'Không thể lưu cài đặt API: ' + error.message);
                     // Message already shown by fetchAPI
                 });
         });
