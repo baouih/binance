@@ -1,0 +1,341 @@
+{% extends "layout.html" %}
+{% block title %}Crypto Mood Meter{% endblock %}
+
+{% block styles %}
+<style>
+  .mood-meter-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: #fff;
+    transition: transform 0.3s ease;
+  }
+  
+  .mood-meter-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .mood-header {
+    color: white;
+    padding: 15px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mood-body {
+    padding: 20px;
+  }
+  
+  .mood-emoji {
+    font-size: 3rem;
+    margin-right: 15px;
+    transition: transform 0.5s ease;
+  }
+  
+  .mood-emoji:hover {
+    transform: scale(1.2);
+  }
+  
+  .mood-description {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .mood-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .trend-indicator {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .trend-emoji {
+    font-size: 1.2rem;
+    margin-right: 5px;
+  }
+  
+  .components-list {
+    margin-top: 15px;
+  }
+  
+  .component-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+  }
+  
+  .component-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  .component-text {
+    flex: 1;
+  }
+  
+  .insight-card {
+    background-color: #f8f9fa;
+    border-left: 4px solid #6c757d;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .insight-card i {
+    margin-right: 10px;
+    color: #6c757d;
+  }
+  
+  .chart-container {
+    height: 250px;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="text-center">Crypto Mood Meter</h1>
+      <p class="text-center text-muted">Phân tích cảm xúc thị trường bằng các dữ liệu kỹ thuật và chỉ báo</p>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-6 col-md-12 mb-4">
+      <div class="mood-meter-card">
+        <div class="mood-header" style="background-color: {{ widget.current.color }}">
+          <div class="mood-info">
+            <div class="mood-emoji">{{ widget.current.emoji }}</div>
+            <div>
+              <div class="mood-description">{{ widget.current.description }}</div>
+              <div class="text-white-50">Cập nhật: {{ widget.timestamp }}</div>
+            </div>
+          </div>
+          <div>
+            <span class="badge bg-light text-dark">Score: {{ "%.2f"|format(widget.current.score) }}</span>
+          </div>
+        </div>
+        <div class="mood-body">
+          <div class="d-flex align-items-center mb-3">
+            <h4 class="mb-0 me-2">Xu hướng:</h4>
+            <div class="trend-indicator bg-light">
+              <span class="trend-emoji">{{ widget.trend.emoji }}</span>
+              <span>{{ widget.trend.description }} ({{ "%.2f"|format(widget.trend.change) }})</span>
+            </div>
+          </div>
+          
+          <h5>Insights:</h5>
+          {% for insight in widget.insights %}
+          <div class="insight-card">
+            <i class="fas fa-lightbulb"></i>
+            {{ insight }}
+          </div>
+          {% endfor %}
+          
+          <div class="chart-container" id="sentiment-history-chart">
+            <!-- Chart sẽ được render bằng JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-12">
+      <div class="mood-meter-card">
+        <div class="mood-header bg-primary">
+          <h4 class="m-0">Thành phần cảm xúc</h4>
+        </div>
+        <div class="mood-body">
+          <p class="text-muted">Các yếu tố đóng góp vào cảm xúc tổng thể của thị trường:</p>
+          
+          <div class="components-list">
+            {% for component_name, description in widget.components.items() %}
+            <div class="component-item">
+              <div class="component-icon">
+                {% if component_name == 'rsi' %}
+                <i class="fas fa-tachometer-alt"></i>
+                {% elif component_name == 'macd' %}
+                <i class="fas fa-chart-line"></i>
+                {% elif component_name == 'ema' %}
+                <i class="fas fa-chart-area"></i>
+                {% elif component_name == 'bollinger' %}
+                <i class="fas fa-grip-lines"></i>
+                {% elif component_name == 'adx' %}
+                <i class="fas fa-compass"></i>
+                {% elif component_name == 'volume' %}
+                <i class="fas fa-chart-bar"></i>
+                {% elif component_name == 'price_change' %}
+                <i class="fas fa-exchange-alt"></i>
+                {% else %}
+                <i class="fas fa-chart-pie"></i>
+                {% endif %}
+              </div>
+              <div class="component-text">
+                <div class="fw-bold text-capitalize">{{ component_name.replace('_', ' ') }}</div>
+                <div class="text-muted small">{{ description }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          
+          <div class="chart-container" id="sentiment-components-chart">
+            <!-- Chart sẽ được render bằng JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Fetch sentiment history data
+  fetch('/sentiment/api/sentiment/history')
+    .then(response => response.json())
+    .then(data => {
+      const timestamps = data.map(item => item.timestamp);
+      const scores = data.map(item => item.score);
+      const emojis = data.map(item => item.emoji);
+      const levels = data.map(item => item.level);
+      
+      // Render sentiment history chart
+      const ctx = document.getElementById('sentiment-history-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timestamps,
+          datasets: [{
+            label: 'Sentiment Score',
+            data: scores,
+            borderColor: '#2c3e50',
+            backgroundColor: 'rgba(44, 62, 80, 0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: -1,
+              max: 1,
+              ticks: {
+                callback: function(value) {
+                  if (value === -1) return 'Extremely Bearish';
+                  if (value === 0) return 'Neutral';
+                  if (value === 1) return 'Extremely Bullish';
+                  return '';
+                }
+              }
+            },
+            x: {
+              ticks: {
+                maxTicksLimit: 5,
+                maxRotation: 0
+              }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const index = context.dataIndex;
+                  const score = scores[index];
+                  const emoji = emojis[index];
+                  const level = levels[index].replace('_', ' ');
+                  return [`Score: ${score.toFixed(2)}`, `Mood: ${emoji} ${level}`];
+                }
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching sentiment history:', error));
+  
+  // Prepare component chart data
+  const componentLabels = [];
+  const componentData = [];
+  const componentColors = [];
+  
+  {% for component_name, description in widget.components.items() %}
+    componentLabels.push('{{ component_name.replace('_', ' ') }}');
+    // Get score from hidden field
+    {% if component_name in widget.components %}
+      // This is dummy data for now, should be replaced with actual component scores
+      componentData.push(Math.random() * 2 - 1); // Random value between -1 and 1
+      
+      // Assign colors based on value
+      if (componentData[componentData.length - 1] > 0.5) {
+        componentColors.push('#27ae60');
+      } else if (componentData[componentData.length - 1] > 0) {
+        componentColors.push('#3498db');
+      } else if (componentData[componentData.length - 1] > -0.5) {
+        componentColors.push('#f1c40f');
+      } else {
+        componentColors.push('#e74c3c');
+      }
+    {% endif %}
+  {% endfor %}
+  
+  // Render component chart if we have data
+  if (componentLabels.length > 0) {
+    const componentCtx = document.getElementById('sentiment-components-chart').getContext('2d');
+    new Chart(componentCtx, {
+      type: 'bar',
+      data: {
+        labels: componentLabels,
+        datasets: [{
+          label: 'Component Score',
+          data: componentData,
+          backgroundColor: componentColors,
+          borderColor: 'rgba(0, 0, 0, 0.1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            min: -1,
+            max: 1,
+            ticks: {
+              callback: function(value) {
+                if (value === -1) return 'Bearish';
+                if (value === 0) return 'Neutral';
+                if (value === 1) return 'Bullish';
+                return '';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

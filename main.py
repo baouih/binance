@@ -19,6 +19,12 @@ from telegram_notifier import TelegramNotifier
 # Thêm Binance API
 from binance_api import BinanceAPI
 
+# Thêm module Data Processor
+from data_processor import DataProcessor
+
+# Thêm route sentiment
+from routes.sentiment_route import register_blueprint as register_sentiment_bp
+
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('main')
@@ -2120,6 +2126,9 @@ def on_close_position(data):
         socketio.emit('bot_status_update', bot_status)
         return {'success': True, 'message': 'Vị thế đã được đóng'}
     return {'success': False, 'message': 'Không tìm thấy vị thế'}
+
+# Đăng ký các blueprint
+register_sentiment_bp(app)
 
 if __name__ == "__main__":
     # Bắt đầu tác vụ nền

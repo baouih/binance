@@ -1,0 +1,123 @@
+{
+    "current_sentiment": {
+        "level": "slightly_bearish",
+        "score": -0.1423814953744494,
+        "components": {
+            "rsi": {
+                "score": -0.1492091226779481,
+                "description": "RSI = 44.0"
+            },
+            "macd": {
+                "score": 1.0,
+                "description": "MACD Hist = 38.1698"
+            },
+            "ema": {
+                "score": 0,
+                "description": "EMA kh\u00f4ng c\u1eaft nhau"
+            },
+            "bollinger": {
+                "score": -0.8251952899963205,
+                "description": "BB Position = 0.09"
+            },
+            "adx": {
+                "score": 0,
+                "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
+            },
+            "volume": {
+                "score": -0.8426302559885445,
+                "description": "Volume change = -61.5%"
+            },
+            "price_change": {
+                "score": -0.7287855812018664,
+                "description": "24h change = -9.26%"
+            }
+        },
+        "emoji": "\ud83d\ude1f",
+        "color": "#f1c40f",
+        "description": "H\u01a1i ti\u00eau c\u1ef1c",
+        "timestamp": "2025-03-04 15:25:13"
+    },
+    "historical_data": [
+        {
+            "level": "slightly_bearish",
+            "score": -0.1423814953744494,
+            "components": {
+                "rsi": {
+                    "score": -0.1492091226779481,
+                    "description": "RSI = 44.0"
+                },
+                "macd": {
+                    "score": 1.0,
+                    "description": "MACD Hist = 38.1698"
+                },
+                "ema": {
+                    "score": 0,
+                    "description": "EMA kh\u00f4ng c\u1eaft nhau"
+                },
+                "bollinger": {
+                    "score": -0.8251952899963205,
+                    "description": "BB Position = 0.09"
+                },
+                "adx": {
+                    "score": 0,
+                    "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
+                },
+                "volume": {
+                    "score": -0.8426302559885445,
+                    "description": "Volume change = -61.5%"
+                },
+                "price_change": {
+                    "score": -0.7287855812018664,
+                    "description": "24h change = -9.26%"
+                }
+            },
+            "emoji": "\ud83d\ude1f",
+            "color": "#f1c40f",
+            "description": "H\u01a1i ti\u00eau c\u1ef1c",
+            "timestamp": "2025-03-04 15:25:10"
+        },
+        {
+            "level": "slightly_bearish",
+            "score": -0.1423814953744494,
+            "components": {
+                "rsi": {
+                    "score": -0.1492091226779481,
+                    "description": "RSI = 44.0"
+                },
+                "macd": {
+                    "score": 1.0,
+                    "description": "MACD Hist = 38.1698"
+                },
+                "ema": {
+                    "score": 0,
+                    "description": "EMA kh\u00f4ng c\u1eaft nhau"
+                },
+                "bollinger": {
+                    "score": -0.8251952899963205,
+                    "description": "BB Position = 0.09"
+                },
+                "adx": {
+                    "score": 0,
+                    "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
+                },
+                "volume": {
+                    "score": -0.8426302559885445,
+                    "description": "Volume change = -61.5%"
+                },
+                "price_change": {
+                    "score": -0.7287855812018664,
+                    "description": "24h change = -9.26%"
+                }
+            },
+            "emoji": "\ud83d\ude1f",
+            "color": "#f1c40f",
+            "description": "H\u01a1i ti\u00eau c\u1ef1c",
+            "timestamp": "2025-03-04 15:25:13"
+        }
+    ],
+    "last_updated": "2025-03-04 15:25:13",
+    "metadata": {
+        "version": "1.0",
+        "created_at": "2025-03-04 15:24:53"
+    }
+}
