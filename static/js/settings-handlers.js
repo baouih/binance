@@ -9,16 +9,16 @@ import { showAlert, showLoading, hideLoading, validateForm, fetchAPI } from './u
 
 // Các API endpoint
 const API_ENDPOINTS = {
-    GENERAL_SETTINGS: '/api/v1/settings/general',
-    API_SETTINGS: '/api/v1/settings/api',
-    TEST_API_CONNECTION: '/api/v1/test-connection',
-    TRADING_COINS: '/api/v1/trading/coins',
-    RISK_SETTINGS: '/api/v1/settings/risk',
-    TELEGRAM_SETTINGS: '/api/v1/settings/telegram',
-    TEST_TELEGRAM: '/api/v1/test-telegram',
-    NOTIFICATION_SETTINGS: '/api/v1/settings/notifications',
-    ADVANCED_SETTINGS: '/api/v1/settings/advanced',
-    LOG_ENTRIES: '/api/v1/logs'
+    GENERAL_SETTINGS: '/api/account/settings',
+    API_SETTINGS: '/api/account/settings',
+    TEST_API_CONNECTION: '/api/binance/test',
+    TRADING_COINS: '/api/trading/coins',
+    RISK_SETTINGS: '/api/security/settings',
+    TELEGRAM_SETTINGS: '/api/notification/settings',
+    TEST_TELEGRAM: '/api/telegram/test', // <-- Đã sửa lại đúng endpoint
+    NOTIFICATION_SETTINGS: '/api/notification/settings',
+    ADVANCED_SETTINGS: '/api/security/settings',
+    LOG_ENTRIES: '/api/logs'
 };
 
 /**
