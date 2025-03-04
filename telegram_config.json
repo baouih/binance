@@ -1,1 +1,1 @@
-{"enabled": true, "bot_token": "test_token", "chat_id": "test_chat_id", "min_interval": 5}
+{"enabled": true, "bot_token": "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM", "chat_id": "1834332146", "min_interval": 5, "notify_new_trades": true, "notify_closed_trades": true, "notify_error_status": true, "notify_daily_summary": false}

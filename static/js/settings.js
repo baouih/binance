@@ -143,10 +143,12 @@ document.addEventListener('DOMContentLoaded', function() {
             window.hideLoading();
             
             // Kiểm tra dữ liệu có tồn tại không
-            if (data) {
+            if (data && data.enabled !== undefined) {
                 // Kích hoạt công tắc nếu enabled = true
                 if (enableTelegramNotifications) {
-                    enableTelegramNotifications.checked = data.enabled === true;
+                    // Set tình trạng của công tắc chính xác theo giá trị từ server
+                    enableTelegramNotifications.checked = Boolean(data.enabled);
+                    console.log('Đặt trạng thái công tắc Telegram:', Boolean(data.enabled));
                 }
                 
                 // Đặt giá trị token, sử dụng giá trị từ server hoặc mặc định
@@ -162,22 +164,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Cập nhật các checkbox thông báo nếu có
                 if (document.getElementById('notify-new-trades')) {
                     document.getElementById('notify-new-trades').checked = 
-                        data.notify_new_trades === undefined ? true : data.notify_new_trades;
+                        data.notify_new_trades === undefined ? true : Boolean(data.notify_new_trades);
                 }
                 
                 if (document.getElementById('notify-closed-trades')) {
                     document.getElementById('notify-closed-trades').checked = 
-                        data.notify_closed_trades === undefined ? true : data.notify_closed_trades;
+                        data.notify_closed_trades === undefined ? true : Boolean(data.notify_closed_trades);
                 }
                 
                 if (document.getElementById('notify-error-status')) {
                     document.getElementById('notify-error-status').checked = 
-                        data.notify_error_status === undefined ? true : data.notify_error_status;
+                        data.notify_error_status === undefined ? true : Boolean(data.notify_error_status);
                 }
                 
                 if (document.getElementById('notify-daily-summary')) {
                     document.getElementById('notify-daily-summary').checked = 
-                        data.notify_daily_summary === undefined ? false : data.notify_daily_summary;
+                        data.notify_daily_summary === undefined ? false : Boolean(data.notify_daily_summary);
                 }
                 
                 // Cập nhật khoảng thời gian tối thiểu nếu có
@@ -190,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log('Đã tải cấu hình Telegram thành công:', data);
             } else {
-                console.error('Không tìm thấy dữ liệu cấu hình Telegram');
+                console.error('Không tìm thấy dữ liệu cấu hình Telegram hoặc dữ liệu không hợp lệ:', data);
                 
                 // Đặt giá trị mặc định khi không có dữ liệu
                 if (telegramBotToken) telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";

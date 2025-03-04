@@ -197,10 +197,10 @@ def get_telegram_config():
             with open(telegram_config_path, 'w') as f:
                 json.dump(config, f)
         
-        return jsonify(config)
+        return jsonify({"success": True, "data": config})
     except Exception as e:
         logger.error(f"Lỗi khi lấy cấu hình Telegram: {str(e)}")
-        return jsonify({'error': f"Lỗi: {str(e)}"}), 500
+        return jsonify({'success': False, 'message': f"Lỗi: {str(e)}"}), 500
         
 @config_bp.route('/api/telegram/config', methods=['POST'])
 def update_telegram_config():
