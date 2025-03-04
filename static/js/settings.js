@@ -41,7 +41,65 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Load Telegram configuration on page load
-    loadTelegramConfig(); // Gọi hàm này để tải cấu hình Telegram từ máy chủ
+    function loadTelegramConfig() {
+        // Tải cấu hình Telegram từ máy chủ
+        fetch('/api/telegram/config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    console.log('Đã tải cấu hình Telegram:', data.data);
+                    
+                    // Cập nhật UI với dữ liệu từ máy chủ
+                    if (enableTelegramNotifications) {
+                        enableTelegramNotifications.checked = data.data.enabled;
+                        
+                        // Hiển thị/ẩn phần cài đặt dựa trên trạng thái
+                        const telegramSettings = document.getElementById('telegramSettings');
+                        if (telegramSettings) {
+                            telegramSettings.style.display = data.data.enabled ? 'block' : 'none';
+                        }
+                    }
+                    
+                    if (telegramBotToken && data.data.bot_token) {
+                        telegramBotToken.value = data.data.bot_token;
+                    }
+                    
+                    if (telegramChatId && data.data.chat_id) {
+                        telegramChatId.value = data.data.chat_id;
+                    }
+                    
+                    // Cập nhật trạng thái các checkbox thông báo
+                    updateNotificationCheckboxes(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải cấu hình Telegram:', error);
+            });
+    }
+    
+    function updateNotificationCheckboxes(config) {
+        // Danh sách ánh xạ giữa setting và ID checkbox
+        const checkboxMappings = {
+            'notify_new_trades': 'notifyTradingSignals',
+            'notify_position_opened': 'notifyPositionOpened',
+            'notify_position_closed': 'notifyPositionClosed',
+            'notify_bot_status': 'notifyBotStatus',
+            'notify_error_status': 'notifyErrors',
+            'notify_daily_summary': 'notifyDailyReport'
+        };
+        
+        // Cập nhật trạng thái các checkbox dựa trên cấu hình
+        for (const [setting, checkboxId] of Object.entries(checkboxMappings)) {
+            const checkbox = document.getElementById(checkboxId);
+            if (checkbox && setting in config) {
+                checkbox.checked = config[setting];
+                console.log(`Cập nhật ${checkboxId}: ${config[setting]}`);
+            }
+        }
+    }
+    
+    // Gọi hàm để tải cấu hình Telegram từ máy chủ
+    loadTelegramConfig();
     
     // Quản lý sự kiện khi bật/tắt thông báo Telegram
     if (enableTelegramNotifications) {
@@ -308,6 +366,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const notifyBotStatus = document.getElementById('notifyBotStatus')?.checked || false;
         const notifyErrors = document.getElementById('notifyErrors')?.checked || false;
         const notifyDailyReport = document.getElementById('notifyDailyReport')?.checked || false;
+        
+        console.log('Lưu cài đặt Telegram:', { 
+            notifyTradingSignals, 
+            notifyPositionOpened, 
+            notifyPositionClosed, 
+            notifyBotStatus, 
+            notifyErrors, 
+            notifyDailyReport 
+        });
         
         // Prepare data for API
         const data = {
