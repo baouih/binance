@@ -894,7 +894,7 @@ def generate_initial_fake_data():
     
     # Tạo một số vị thế mẫu
     for i in range(3):
-        symbol = random.choice(fake_symbols)
+        symbol = random.choice(available_symbols)
         side = random.choice(['BUY', 'SELL'])
         entry_price = market_prices[symbol]
         quantity = random.uniform(0.01, 0.5)
@@ -932,7 +932,7 @@ def generate_initial_fake_data():
     
     # Tạo một số giao dịch đã hoàn thành
     for i in range(20):
-        symbol = random.choice(fake_symbols)
+        symbol = random.choice(available_symbols)
         side = random.choice(['BUY', 'SELL'])
         entry_price = market_prices[symbol] * (1 + random.uniform(-0.1, 0.1))
         exit_price = entry_price * (1 + random.uniform(-0.05, 0.05))
@@ -1020,7 +1020,7 @@ def background_tasks():
     # Chạy các tác vụ nền
     while True:
         try:
-            update_fake_data()
+            update_market_prices()
             generate_fake_signal()
             
             # Cập nhật tuổi của các vị thế
@@ -1412,7 +1412,7 @@ def get_market():
         # Xây dựng phản hồi từ dữ liệu thực
         market_response = {
             'market': market_data_api,  # Sử dụng dữ liệu API làm chính
-            'symbols': fake_symbols,
+            'symbols': available_symbols,
             'selected_symbols': selected_trading_coins,
             'timestamp': format_vietnam_time(),
             'success': True
@@ -1423,7 +1423,7 @@ def get_market():
         market_response = {
             'market': market_data,
             'api_data': market_data_api,
-            'symbols': fake_symbols,
+            'symbols': available_symbols,
             'selected_symbols': selected_trading_coins,
             'timestamp': format_vietnam_time(),
             'success': True
@@ -1549,7 +1549,7 @@ def get_trading_coins():
     return jsonify({
         'success': True,
         'selected_coins': selected_trading_coins,
-        'available_coins': fake_symbols
+        'available_coins': available_symbols
     })
 
 @app.route('/api/trading/coins', methods=['POST'])
@@ -1557,8 +1557,8 @@ def set_trading_coins():
     global selected_trading_coins
     data = request.json
     if 'coins' in data and isinstance(data['coins'], list):
-        # Đảm bảo chỉ chọn các đồng coin có trong danh sách giả lập
-        selected_trading_coins = [coin for coin in data['coins'] if coin in fake_symbols]
+        # Đảm bảo chỉ chọn các đồng coin có trong danh sách
+        selected_trading_coins = [coin for coin in data['coins'] if coin in available_symbols]
         
         # Nếu không có đồng coin nào được chọn, mặc định chọn BTCUSDT
         if len(selected_trading_coins) == 0:
@@ -1805,7 +1805,7 @@ def market():
         'timestamp': format_vietnam_time()
     }
     
-    return render_template('market.html', bot_status=bot_status, fake_prices=market_prices, market_data=market_data, fake_symbols=fake_symbols, api_data=api_market_data)
+    return render_template('market.html', bot_status=bot_status, fake_prices=market_prices, market_data=market_data, fake_symbols=available_symbols, api_data=api_market_data)
 
 @app.route('/position')
 def position():
@@ -1821,7 +1821,7 @@ def settings():
                            bot_status=bot_status, 
                            telegram_config=telegram_config,
                            selected_trading_coins=selected_trading_coins,
-                           available_coins=fake_symbols)
+                           available_coins=available_symbols)
 
 @app.route('/cli')
 def cli():
