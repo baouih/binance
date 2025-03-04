@@ -300,7 +300,7 @@ def open_position(signal):
         'take_profit': take_profit,
         'unrealized_pnl': 0,
         'unrealized_pnl_percent': 0,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'timestamp': format_vietnam_time(),
         'age': 0,  # Tuổi vị thế tính bằng giây
         'signal_id': signal['id'],
         'strategy': signal['strategy']
@@ -376,7 +376,7 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
         'pnl': pnl,
         'pnl_percent': pnl_percent,
         'entry_time': position['timestamp'],
-        'exit_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'exit_time': format_vietnam_time(),
         'duration': position['age'],  # Thời gian giữ vị thế
         'strategy': position['strategy'],
         'reason': reason,
@@ -664,7 +664,7 @@ def background_tasks():
             # Gửi dữ liệu cập nhật qua SocketIO
             socketio.emit('market_update', {
                 'prices': fake_prices,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                'timestamp': format_vietnam_time()
             })
             
             socketio.emit('bot_status_update', bot_status)
@@ -678,7 +678,7 @@ def background_tasks():
                 socketio.emit('pnl_update', {
                     'total_pnl': total_pnl,
                     'total_pnl_percent': (total_pnl / bot_status['balance']) * 100,
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    'timestamp': format_vietnam_time()
                 })
             
             # Gửi hiệu suất
@@ -859,7 +859,7 @@ def get_bot_status():
 def start_bot():
     bot_status['running'] = True
     bot_status['status'] = 'running'
-    bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    bot_status['last_update'] = format_vietnam_time()
     add_system_message("Bot đã được khởi động!")
     return jsonify({'success': True, 'status': bot_status['status']})
 
@@ -867,7 +867,7 @@ def start_bot():
 def stop_bot():
     bot_status['running'] = False
     bot_status['status'] = 'stopped'
-    bot_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    bot_status['last_update'] = format_vietnam_time()
     add_system_message("Bot đã được dừng!")
     return jsonify({'success': True, 'status': bot_status['status']})
 
