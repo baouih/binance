@@ -648,8 +648,13 @@
                 document.getElementById('tradeDetailStrategy').textContent = '{{ trade.strategy }}';
                 
                 const pnlEl = document.getElementById('tradeDetailPnl');
-                pnlEl.textContent = `${{{ trade.pnl }} >= 0 ? '+' : ''}${{ trade.pnl|round(2) }} ({{ trade.pnl_percent|round(2) }}%)`;
-                pnlEl.className = {{ trade.pnl }} >= 0 ? 'info-value text-success' : 'info-value text-danger';
+                {% if trade.pnl >= 0 %}
+                    pnlEl.textContent = `+${{ trade.pnl|round(2) }} ({{ trade.pnl_percent|round(2) }}%)`;
+                    pnlEl.className = 'info-value text-success';
+                {% else %}
+                    pnlEl.textContent = `-${{ (trade.pnl * -1)|round(2) }} ({{ trade.pnl_percent|round(2) }}%)`;
+                    pnlEl.className = 'info-value text-danger';
+                {% endif %}
                 
                 document.getElementById('tradeDetailTime').textContent = '{{ trade.exit_time }}';
                 document.getElementById('tradeDetailEntryPrice').textContent = '${{ trade.entry_price|round(2) }}';
