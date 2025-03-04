@@ -392,11 +392,36 @@ function fetchAPI(url, options = {}, showLoadingIndicator = true, successCallbac
             
             // Hiển thị thông báo lỗi
             console.error('API Error:', error);
-            showAlert('danger', `Lỗi: ${error.message || 'Đã xảy ra lỗi khi kết nối đến máy chủ'}`);
+            
+            // Xử lý các mã lỗi HTTP cụ thể
+            let errorMessage = 'Đã xảy ra lỗi khi kết nối đến máy chủ';
+            let errorType = 'danger';
+            
+            if (error.message) {
+                if (error.message.includes('HTTP error! Status: 404')) {
+                    errorMessage = 'API không tồn tại hoặc đường dẫn không chính xác (404)';
+                } else if (error.message.includes('HTTP error! Status: 401')) {
+                    errorMessage = 'Lỗi xác thực, vui lòng đăng nhập lại (401)';
+                    // Có thể chuyển hướng đến trang đăng nhập ở đây
+                } else if (error.message.includes('HTTP error! Status: 403')) {
+                    errorMessage = 'Bạn không có quyền truy cập API này (403)';
+                } else if (error.message.includes('HTTP error! Status: 500')) {
+                    errorMessage = 'Lỗi máy chủ, vui lòng thử lại sau hoặc liên hệ hỗ trợ (500)';
+                } else if (error.message.includes('HTTP error! Status: 502') || 
+                         error.message.includes('HTTP error! Status: 503') || 
+                         error.message.includes('HTTP error! Status: 504')) {
+                    errorMessage = 'Máy chủ tạm thời không khả dụng, vui lòng thử lại sau';
+                    errorType = 'warning';
+                } else {
+                    errorMessage = `Lỗi: ${error.message}`;
+                }
+            }
+            
+            showAlert(errorType, errorMessage);
             
             // Gọi error callback nếu có
             if (errorCallback) {
-                errorCallback(error);
+                errorCallback(error, errorMessage);
             }
             
             throw error;
