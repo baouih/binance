@@ -1053,15 +1053,24 @@ def telegram_config_api():
 
 @app.route('/test-telegram', methods=['POST'])
 def test_telegram():
-    if not telegram_config['enabled'] or not telegram_config['bot_token'] or not telegram_config['chat_id']:
-        return jsonify({'success': False, 'message': 'Telegram chưa được cấu hình'})
+    data = request.json
     
-    result = telegram_notifier.send_message("🧪 Đây là tin nhắn kiểm tra từ BinanceTrader Bot")
+    if not data or 'bot_token' not in data or 'chat_id' not in data:
+        return jsonify({'success': False, 'message': 'Thiếu thông tin Bot Token hoặc Chat ID'})
+    
+    # Tạo một notifier tạm thời với thông tin từ người dùng
+    temp_notifier = TelegramNotifier(
+        token=data['bot_token'],
+        chat_id=data['chat_id']
+    )
+    
+    # Gửi tin nhắn test
+    result = temp_notifier.send_message("🧪 Đây là tin nhắn kiểm tra từ BinanceTrader Bot")
     
     if result:
         return jsonify({'success': True, 'message': 'Đã gửi tin nhắn kiểm tra thành công'})
     else:
-        return jsonify({'success': False, 'message': 'Không thể gửi tin nhắn kiểm tra'})
+        return jsonify({'success': False, 'message': 'Không thể gửi tin nhắn kiểm tra. Vui lòng kiểm tra Bot Token và Chat ID'})
 
 # Thêm các route điều hướng
 @app.route('/strategies')
