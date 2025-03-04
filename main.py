@@ -1053,6 +1053,88 @@ def get_signals():
 def get_positions():
     return jsonify({'success': True, 'positions': positions})
 
+@app.route('/api/position/<position_id>')
+def get_position_detail(position_id):
+    for position in positions:
+        if position['id'] == position_id:
+            return jsonify({'success': True, 'position': position})
+    return jsonify({'success': False, 'message': 'Không tìm thấy vị thế'}), 404
+
+@app.route('/api/position/<position_id>/analyze', methods=['GET'])
+def analyze_position(position_id):
+    for position in positions:
+        if position['id'] == position_id:
+            # Tạo phân tích giả lập
+            analysis = {
+                'position': position,
+                'market_conditions': {
+                    'volatility': random.uniform(0.5, 5.0),
+                    'trend_strength': random.uniform(0, 100),
+                    'volume_profile': random.choice(['increasing', 'decreasing', 'flat']),
+                    'support_levels': [position['entry_price'] * 0.97, position['entry_price'] * 0.95],
+                    'resistance_levels': [position['entry_price'] * 1.03, position['entry_price'] * 1.05]
+                },
+                'indicators': {
+                    'rsi': random.uniform(30, 70),
+                    'macd_signal': random.choice(['bullish', 'bearish', 'neutral']),
+                    'ema_trend': random.choice(['uptrend', 'downtrend', 'sideways'])
+                },
+                'recommendation': {
+                    'action': random.choice(['hold', 'take_profit', 'stop_loss', 'trailing_stop']),
+                    'reason': 'Dựa trên phân tích kỹ thuật và điều kiện thị trường hiện tại.',
+                    'confidence': random.uniform(60, 95)
+                }
+            }
+            return jsonify({'success': True, 'analysis': analysis})
+    return jsonify({'success': False, 'message': 'Không tìm thấy vị thế'}), 404
+
+@app.route('/api/position/<position_id>/update', methods=['POST'])
+def update_position(position_id):
+    data = request.json
+    for i, position in enumerate(positions):
+        if position['id'] == position_id:
+            # Cập nhật stop loss và take profit
+            if 'stop_loss' in data:
+                positions[i]['stop_loss'] = float(data['stop_loss'])
+            if 'take_profit' in data:
+                positions[i]['take_profit'] = float(data['take_profit'])
+            return jsonify({'success': True, 'position': positions[i]})
+    return jsonify({'success': False, 'message': 'Không tìm thấy vị thế'}), 404
+    
+@app.route('/api/open-position', methods=['POST'])
+def open_new_position():
+    data = request.json
+    if not data:
+        return jsonify({'success': False, 'message': 'Không có dữ liệu được gửi lên'}), 400
+        
+    # Tạo vị thế mới
+    try:
+        new_position = {
+            'id': str(uuid.uuid4())[:8],
+            'symbol': data.get('symbol', 'BTCUSDT'),
+            'type': data.get('side', 'BUY'),
+            'entry_price': data.get('entry_price', fake_prices.get(data.get('symbol', 'BTCUSDT'), 0)),
+            'current_price': fake_prices.get(data.get('symbol', 'BTCUSDT'), 0),
+            'quantity': data.get('quantity', 0.1),
+            'stop_loss': data.get('stop_loss', 0),
+            'take_profit': data.get('take_profit', 0),
+            'leverage': data.get('leverage', 1),
+            'unrealized_pnl': 0,
+            'pnl': 0,
+            'pnl_percent': 0,
+            'timestamp': format_vietnam_time(),
+            'entry_time': format_vietnam_time(),
+            'age': 0,
+            'strategy': data.get('strategy', 'Manual')
+        }
+        
+        positions.append(new_position)
+        add_system_message(f"Đã mở vị thế {new_position['type']} cho {new_position['symbol']} tại giá {new_position['entry_price']:.2f}")
+        
+        return jsonify({'success': True, 'position': new_position})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Lỗi khi mở vị thế: {str(e)}'}), 500
+
 @app.route('/api/trades')
 def get_trades():
     return jsonify({'success': True, 'trades': trades})
