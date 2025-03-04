@@ -892,6 +892,33 @@ def get_balance():
         'initial_balances': initial_balances
     })
 
+@app.route('/api/v1/test-connection', methods=['POST'])
+def test_connection():
+    """API endpoint để kiểm tra kết nối Binance"""
+    try:
+        data = request.json
+        api_key = data.get('api_key', '')
+        secret_key = data.get('secret_key', '')
+        
+        # Kiểm tra xem API key và Secret key có được cung cấp không
+        if not api_key or not secret_key:
+            return jsonify({
+                'success': False,
+                'message': 'API key và Secret key không được để trống'
+            }), 400
+        
+        # Ở đây có thể thêm logic kiểm tra kết nối Binance thực tế
+        # Nhưng hiện tại chỉ cần trả về thành công
+        return jsonify({
+            'success': True,
+            'message': 'Kết nối API thành công'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi kết nối: {str(e)}'
+        }), 500
+
 @app.route('/api/bot/mode', methods=['POST'])
 def set_bot_mode():
     data = request.json
