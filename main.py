@@ -718,20 +718,111 @@ def index():
     account_data = {
         'balance': bot_status['balance'],
         'available': bot_status['balance'],
-        'positions': positions
+        'positions': positions,
+        'change_24h': random.uniform(-5, 5),
+        'change_7d': random.uniform(-10, 15),
+        'total_profit': random.uniform(-500, 1500),
+        'total_profit_percent': random.uniform(-5, 15),
+        'unrealized_pnl': sum(p.get('unrealized_pnl', 0) for p in positions) if positions else 0
     }
     
     market_data = {
         'btc_price': fake_prices.get('BTCUSDT', 0),
         'eth_price': fake_prices.get('ETHUSDT', 0),
         'sol_price': fake_prices.get('SOLUSDT', 25.0),
-        'bnb_price': fake_prices.get('BNBUSDT', 0)
+        'bnb_price': fake_prices.get('BNBUSDT', 0),
+        'btc_change_24h': random.uniform(-5, 5),
+        'eth_change_24h': random.uniform(-5, 5),
+        'market_mode': random.choice(['Uptrend', 'Downtrend', 'Sideways']),
+        'market_strength': random.uniform(30, 80),
+        'volatility_level': random.choice(['Low', 'Medium', 'High']),
+        'volatility_value': random.uniform(20, 70)
     }
+    
+    # Dữ liệu chiến lược
+    strategy_stats = {
+        'win_rate': random.uniform(50, 70),
+        'profit_factor': random.uniform(1.2, 2.5),
+        'expectancy': random.uniform(0.1, 0.5),
+        'avg_win': random.uniform(50, 150),
+        'avg_loss': random.uniform(30, 80),
+        'best_pair': random.choice(['BTCUSDT', 'ETHUSDT', 'SOLUSDT']),
+        'worst_pair': random.choice(['DOGEUSDT', 'ADAUSDT', 'XRPUSDT'])
+    }
+    
+    # Dữ liệu hiệu suất
+    performance_stats = {
+        'total_trades': random.randint(20, 100),
+        'winning_trades': random.randint(15, 60),
+        'losing_trades': random.randint(5, 40),
+        'best_trade': random.uniform(100, 500),
+        'worst_trade': random.uniform(-300, -50),
+        'avg_holding_time': f"{random.randint(1, 12)} giờ",
+        'success_rate': random.uniform(50, 75)
+    }
+    
+    # Dữ liệu thống kê giao dịch
+    trade_stats = {
+        'avg_win': random.uniform(50, 200),
+        'avg_loss': random.uniform(30, 100),
+        'largest_win': random.uniform(300, 1000),
+        'largest_loss': random.uniform(200, 500),
+        'win_rate': random.uniform(50, 75),
+        'profit_factor': random.uniform(1.2, 3.0),
+        'avg_trade_time': f"{random.randint(2, 10)}h {random.randint(10, 59)}m",
+        'total_fees': random.uniform(50, 500)
+    }
+    
+    # Dữ liệu theo dõi
+    watchlist = {
+        'BTCUSDT': {
+            'price': fake_prices.get('BTCUSDT', 36500),
+            'change_24h': random.uniform(-5, 5),
+            'alerts': [
+                {'price': 35000, 'condition': 'below', 'active': True},
+                {'price': 40000, 'condition': 'above', 'active': True}
+            ]
+        },
+        'ETHUSDT': {
+            'price': fake_prices.get('ETHUSDT', 2400),
+            'change_24h': random.uniform(-5, 5),
+            'alerts': [
+                {'price': 2200, 'condition': 'below', 'active': True},
+                {'price': 2600, 'condition': 'above', 'active': True}
+            ]
+        },
+        'SOLUSDT': {
+            'price': fake_prices.get('SOLUSDT', 115),
+            'change_24h': random.uniform(-5, 5),
+            'alerts': [
+                {'price': 100, 'condition': 'below', 'active': True}
+            ]
+        }
+    }
+    
+    # Danh sách hoạt động gần đây
+    activities = [
+        {'type': 'trade', 'time': '14:25', 'description': 'Mở vị thế BUY BTCUSDT tại $71250.50', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'},
+        {'type': 'system', 'time': '14:15', 'description': 'Thị trường được phát hiện trong chế độ Uptrend', 'icon': 'bi-graph-up', 'class': 'text-primary'},
+        {'type': 'trade', 'time': '13:45', 'description': 'Đóng vị thế SELL ETHUSDT P/L: -$25.50 (-1.2%)', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
+        {'type': 'trade', 'time': '13:30', 'description': 'Mở vị thế SELL ETHUSDT tại $3155.75', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
+        {'type': 'system', 'time': '13:00', 'description': 'Bot đã bắt đầu theo dõi SOLUSDT', 'icon': 'bi-plus-circle', 'class': 'text-info'},
+        {'type': 'trade', 'time': '12:45', 'description': 'Đóng vị thế BUY BTCUSDT P/L: +$350.00 (+1.75%)', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'}
+    ]
     
     return render_template('index.html', 
                           bot_status=bot_status, 
                           account_data=account_data,
-                          market_data=market_data)
+                          market_data=market_data,
+                          fake_prices=fake_prices,
+                          signals=signals,
+                          strategy_stats=strategy_stats,
+                          performance_stats=performance_stats,
+                          activities=activities,
+                          positions=positions,
+                          system_messages=system_messages,
+                          watchlist=watchlist,
+                          trade_stats=trade_stats)
 
 @app.route('/bot-status', methods=['GET'])
 def get_bot_status():
@@ -887,35 +978,41 @@ def test_telegram():
 # Thêm các route điều hướng
 @app.route('/strategies')
 def strategies():
-    return render_template('strategies.html', bot_status=bot_status)
+    return render_template('strategies.html', bot_status=bot_status, fake_prices=fake_prices)
 
 @app.route('/backtest')
 def backtest():
-    return render_template('backtest.html', bot_status=bot_status)
+    return render_template('backtest.html', bot_status=bot_status, fake_prices=fake_prices)
 
 @app.route('/trades')
 def trades_page():
-    return render_template('trades.html', bot_status=bot_status)
+    return render_template('trades.html', bot_status=bot_status, trades=trades, fake_prices=fake_prices)
 
 @app.route('/market')
 def market():
-    return render_template('market.html', bot_status=bot_status)
+    market_data = {
+        'btc_price': fake_prices.get('BTCUSDT', 0),
+        'eth_price': fake_prices.get('ETHUSDT', 0),
+        'sol_price': fake_prices.get('SOLUSDT', 25.0),
+        'bnb_price': fake_prices.get('BNBUSDT', 0)
+    }
+    return render_template('market.html', bot_status=bot_status, fake_prices=fake_prices, market_data=market_data)
 
 @app.route('/position')
 def position():
-    return render_template('position.html', bot_status=bot_status)
+    return render_template('position.html', bot_status=bot_status, positions=positions, fake_prices=fake_prices)
 
 @app.route('/settings')
 def settings():
-    return render_template('settings.html', bot_status=bot_status)
+    return render_template('settings.html', bot_status=bot_status, telegram_config=telegram_config)
 
 @app.route('/cli')
 def cli():
-    return render_template('cli.html', bot_status=bot_status)
+    return render_template('cli.html', bot_status=bot_status, system_messages=system_messages)
 
 @app.route('/trading-report')
 def trading_report():
-    return render_template('trading_report.html', bot_status=bot_status)
+    return render_template('trading_report.html', bot_status=bot_status, trades=trades, performance_data=performance_data)
 
 # Các kết nối Socket.IO
 @socketio.on('connect')

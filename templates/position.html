@@ -1,475 +1,939 @@
-<!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Vị thế - Bot Giao Dịch Crypto</title>
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Thanh điều hướng bên trái -->
-            <div class="col-md-2 sidebar py-3">
-                <div class="d-flex flex-column align-items-center mb-4">
-                    <h3 class="h5 text-center">Crypto Trader Bot</h3>
-                    <div class="badge rounded-pill 
-                        {% if bot_status.mode == 'demo' %}bg-info{% elif bot_status.mode == 'testnet' %}bg-warning{% else %}bg-danger{% endif %}
-                        text-white p-2 mt-2 mb-3">
-                        <i class="bi {% if bot_status.mode == 'demo' %}bi-layers{% elif bot_status.mode == 'testnet' %}bi-bug{% else %}bi-broadcast{% endif %} me-1"></i>
-                        {% if bot_status.mode == 'demo' %}Chế độ Demo{% elif bot_status.mode == 'testnet' %}Testnet{% else %}Live{% endif %}
-                    </div>
-                </div>
-                <div class="list-group rounded-3">
-                    <a href="/" class="list-group-item list-group-item-action">
-                        <i class="bi bi-speedometer2 me-2"></i> Trang chủ
-                    </a>
-                    <a href="/strategies" class="list-group-item list-group-item-action">
-                        <i class="bi bi-shuffle me-2"></i> Chiến lược
-                    </a>
-                    <a href="/backtest" class="list-group-item list-group-item-action">
-                        <i class="bi bi-bar-chart-line me-2"></i> Backtest
-                    </a>
-                    <a href="/market" class="list-group-item list-group-item-action">
-                        <i class="bi bi-graph-up me-2"></i> Thị trường
-                    </a>
-                    <a href="/trades" class="list-group-item list-group-item-action">
-                        <i class="bi bi-clipboard-data me-2"></i> Giao dịch
-                    </a>
-                    <a href="/position" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-arrow-left-right me-2"></i> Vị thế
-                    </a>
-                    <a href="/settings" class="list-group-item list-group-item-action">
-                        <i class="bi bi-gear me-2"></i> Cài đặt
-                    </a>
-                    <a href="/account" class="list-group-item list-group-item-action">
-                        <i class="bi bi-person me-2"></i> Tài khoản
-                    </a>
-                    <a href="/trading_report" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-earmark-text me-2"></i> Báo cáo
-                    </a>
-                    <a href="/cli" class="list-group-item list-group-item-action">
-                        <i class="bi bi-terminal me-2"></i> CLI
-                    </a>
-                </div>
-                <div class="mt-auto pt-4 text-center">
-                    <div class="d-flex justify-content-center gap-2 mb-3">
-                        <button class="btn btn-sm btn-outline-secondary language-btn" data-lang="vi">
-                            <img src="{{ url_for('static', filename='img/vi.svg') }}" alt="Tiếng Việt" width="20">
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary language-btn" data-lang="en">
-                            <img src="{{ url_for('static', filename='img/en.svg') }}" alt="English" width="20">
-                        </button>
-                    </div>
-                    <div class="bot-status small">
-                        <span class="badge {{ 'bg-success' if bot_status.running else 'bg-danger' }}">
-                            <i class="bi {{ 'bi-play-fill' if bot_status.running else 'bi-stop-fill' }}"></i>
-                            {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
-                        </span>
-                        <div class="text-muted mt-1 small last-update">
-                            Cập nhật: {{ bot_status.last_update }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+{% extends 'common_layout.html' %}
 
-            <!-- Nội dung chính -->
-            <div class="col-md-10 main-content bg-dark">
-                <!-- Phần trên - tiêu đề trang và các nút điều khiển -->
-                <div class="row page-header align-items-center mb-4">
-                    <div class="col-md-6">
-                        <h1 class="h2">Quản lý Vị thế</h1>
-                        <p class="text-muted">Theo dõi và quản lý các vị thế giao dịch hiện tại</p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <button class="btn btn-primary" id="newPositionBtn">
-                            <i class="bi bi-plus-circle"></i> Vị thế mới
-                        </button>
-                        <button class="btn btn-outline-secondary" id="refreshPositionsBtn">
-                            <i class="bi bi-arrow-clockwise"></i> Làm mới
-                        </button>
-                    </div>
+{% set active_page = 'position' %}
+
+{% block title %}Quản lý vị thế - Bot Giao Dịch Crypto{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Quản lý vị thế</h2>
+            
+            <!-- API Mode Indicator -->
+            <div class="d-flex align-items-center mb-3">
+                {% if bot_status.mode == 'demo' %}
+                <div class="status-badge bg-secondary me-2">
+                    <i class="bi bi-life-preserver me-1"></i> Demo Mode
                 </div>
-
-                <!-- Phần thông tin tổng quan vị thế -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card bg-dark border-primary">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-wallet2"></i> Tổng vị thế</h5>
-                                <h2 class="text-primary">{{ positions|length }}</h2>
-                                <div class="text-muted">Tổng giá trị: ${{ performance_data.total_profit }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-dark border-success">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-graph-up-arrow"></i> Tỷ lệ thắng</h5>
-                                <h2 class="text-success">{{ performance_data.win_rate }}%</h2>
-                                <div class="text-muted">Thắng: {{ performance_data.winning_trades }} / Thua: {{ performance_data.losing_trades }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-dark border-info">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-currency-exchange"></i> Profit Factor</h5>
-                                <h2 class="text-info">{{ performance_data.profit_factor }}</h2>
-                                <div class="text-muted">Expectancy: {{ performance_data.expectancy }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-dark border-warning">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="bi bi-arrow-down-right"></i> Drawdown Max</h5>
-                                <h2 class="text-warning">{{ performance_data.max_drawdown }}%</h2>
-                                <div class="text-muted">Thời gian giữ TB: {{ performance_data.avg_holding_time }}</div>
-                            </div>
-                        </div>
-                    </div>
+                {% elif bot_status.mode == 'testnet' %}
+                <div class="status-badge testnet me-2">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Testnet Mode
                 </div>
-
-                <!-- Tab điều hướng giữa vị thế hiện tại và lịch sử -->
-                <ul class="nav nav-tabs mb-4" id="positionTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-positions" type="button" role="tab" aria-controls="active-positions" aria-selected="true">
-                            <i class="bi bi-lightning-charge"></i> Vị thế hiện tại
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#position-history" type="button" role="tab" aria-controls="position-history" aria-selected="false">
-                            <i class="bi bi-clock-history"></i> Lịch sử vị thế
-                        </button>
-                    </li>
-                </ul>
-
-                <!-- Nội dung các tab -->
-                <div class="tab-content" id="positionTabContent">
-                    <!-- Tab vị thế hiện tại -->
-                    <div class="tab-pane fade show active" id="active-positions" role="tabpanel" aria-labelledby="active-tab">
-                        <div class="table-responsive">
-                            <table class="table table-hover position-table">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Loại</th>
-                                        <th>Giá Vào</th>
-                                        <th>Giá Hiện tại</th>
-                                        <th>Số lượng</th>
-                                        <th>Đòn bẩy</th>
-                                        <th>P/L</th>
-                                        <th>P/L %</th>
-                                        <th>SL/TP</th>
-                                        <th>Trạng thái</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for position in positions %}
-                                    <tr>
-                                        <td class="fw-bold">{{ position.symbol }}</td>
-                                        <td>
-                                            <span class="badge {{ 'bg-success' if position.type == 'LONG' else 'bg-danger' }}">
-                                                {{ position.type }}
-                                            </span>
-                                        </td>
-                                        <td>${{ position.entry_price }}</td>
-                                        <td>${{ position.current_price }}</td>
-                                        <td>{{ position.quantity }}</td>
-                                        <td>{{ position.leverage }}x</td>
-                                        <td class="{{ 'text-success' if position.pnl >= 0 else 'text-danger' }}">
-                                            ${{ position.pnl }}
-                                        </td>
-                                        <td class="{{ 'text-success' if position.pnl_percent >= 0 else 'text-danger' }}">
-                                            {{ position.pnl_percent }}%
-                                        </td>
-                                        <td>
-                                            <small>SL: ${{ position.stop_loss }}</small><br>
-                                            <small>TP: ${{ position.take_profit }}</small>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ position.status }}</span>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-danger close-position-btn" data-position-id="{{ position.id }}">
-                                                    <i class="bi bi-x-circle"></i> Đóng
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-secondary edit-position-btn" data-position-id="{{ position.id }}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Tab lịch sử vị thế -->
-                    <div class="tab-pane fade" id="position-history" role="tabpanel" aria-labelledby="history-tab">
-                        <div class="table-responsive">
-                            <table class="table table-hover history-table">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Loại</th>
-                                        <th>Giá Vào</th>
-                                        <th>Giá Ra</th>
-                                        <th>Số lượng</th>
-                                        <th>Đòn bẩy</th>
-                                        <th>P/L</th>
-                                        <th>P/L %</th>
-                                        <th>Thời gian giữ</th>
-                                        <th>Lý do thoát</th>
-                                        <th>Chiến lược</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for position in closed_positions %}
-                                    <tr>
-                                        <td class="fw-bold">{{ position.symbol }}</td>
-                                        <td>
-                                            <span class="badge {{ 'bg-success' if position.type == 'LONG' else 'bg-danger' }}">
-                                                {{ position.type }}
-                                            </span>
-                                        </td>
-                                        <td>${{ position.entry_price }}</td>
-                                        <td>${{ position.exit_price }}</td>
-                                        <td>{{ position.quantity }}</td>
-                                        <td>{{ position.leverage }}x</td>
-                                        <td class="{{ 'text-success' if position.pnl >= 0 else 'text-danger' }}">
-                                            ${{ position.pnl }}
-                                        </td>
-                                        <td class="{{ 'text-success' if position.pnl_percent >= 0 else 'text-danger' }}">
-                                            {{ position.pnl_percent }}%
-                                        </td>
-                                        <td>{{ position.duration }}</td>
-                                        <td>
-                                            <span class="badge {{ 'bg-success' if position.exit_reason == 'take_profit' else 'bg-danger' if position.exit_reason == 'stop_loss' else 'bg-secondary' }}">
-                                                {{ position.exit_reason }}
-                                            </span>
-                                        </td>
-                                        <td>{{ position.strategy }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                {% else %}
+                <div class="status-badge live me-2">
+                    <i class="bi bi-check-circle-fill me-1"></i> Live Mode
+                </div>
+                {% endif %}
+                
+                <div class="status-badge {{ 'connected' if bot_status.api_connected else 'disconnected' }} me-2">
+                    <i class="bi {{ 'bi-plug-fill' if bot_status.api_connected else 'bi-plug' }} me-1"></i>
+                    {{ 'Đã kết nối' if bot_status.api_connected else 'Chưa kết nối' }}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal đóng vị thế -->
-    <div class="modal fade" id="closePositionModal" tabindex="-1" aria-labelledby="closePositionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-dark">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title" id="closePositionModalLabel">Xác nhận đóng vị thế</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn đóng vị thế <span id="positionSymbol" class="fw-bold"></span>?</p>
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i> Hành động này sẽ đóng vị thế với giá thị trường hiện tại.
+    <div class="row">
+        <!-- Left Column - Open Positions -->
+        <div class="col-md-8">
+            <div class="info-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Vị thế đang mở</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" id="refreshPositionsBtn">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            Làm mới
+                        </button>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                Mở vị thế mới
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for symbol in fake_symbols %}
+                                <li><a class="dropdown-item open-position-btn" href="#" data-symbol="{{ symbol }}">{{ symbol }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                    <input type="hidden" id="positionIdToClose">
                 </div>
-                <div class="modal-footer border-top border-secondary">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger" id="confirmCloseBtn">Đóng vị thế</button>
+                
+                <div id="openPositions">
+                    {% if account_data.positions and account_data.positions|length > 0 %}
+                        {% for position in account_data.positions %}
+                        <div class="position-card mb-3 {% if position.pnl > 0 %}profit{% elif position.pnl < 0 %}loss{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="mb-0">{{ position.symbol }}</h5>
+                                    <span class="badge bg-{{ 'success' if position.type == 'LONG' else 'danger' }}">
+                                        {{ position.type }}
+                                    </span>
+                                    <span class="badge bg-secondary ms-1">
+                                        x{{ position.leverage|default(1) }}
+                                    </span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="info-value">
+                                        ${{ position.current_price|round(2) }}
+                                    </div>
+                                    <div class="price-change {{ 'positive' if position.pnl_percent > 0 else 'negative' if position.pnl_percent < 0 else '' }}">
+                                        {{ position.pnl_percent|round(2) }}%
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 col-6">
+                                    <div class="info-label">Giá vào</div>
+                                    <div>${{ position.entry_price|round(2) }}</div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="info-label">Khối lượng</div>
+                                    <div>{{ position.quantity }}</div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="info-label">Stop Loss</div>
+                                    <div>${{ position.stop_loss|round(2) }}</div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="info-label">Take Profit</div>
+                                    <div>${{ position.take_profit|round(2) }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="info-label">P/L</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="info-value {% if position.pnl > 0 %}text-success{% elif position.pnl < 0 %}text-danger{% endif %}">
+                                        {{ position.pnl|round(2) }} USD ({{ position.pnl_percent|round(2) }}%)
+                                    </div>
+                                    <div>
+                                        <span class="badge {% if position.pnl > 0 %}bg-success{% elif position.pnl < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {% if position.pnl > 0 %}Lợi nhuận{% elif position.pnl < 0 %}Lỗ{% else %}Hòa vốn{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-label">Risk/Reward</div>
+                                    {% set risk = position.entry_price - position.stop_loss if position.type == 'LONG' else position.stop_loss - position.entry_price %}
+                                    {% set reward = position.take_profit - position.entry_price if position.type == 'LONG' else position.entry_price - position.take_profit %}
+                                    {% set risk_reward_ratio = (reward / risk)|round(2) if risk > 0 else 0 %}
+                                    <div>{{ risk_reward_ratio }}:1</div>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <div class="info-label">Thời gian giữ</div>
+                                    <div>{{ position.entry_time|default('2025-02-28 18:30:00') }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-sm btn-outline-danger close-position-btn" data-position-id="{{ position.id }}">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Đóng vị thế
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary edit-position-btn" data-position-id="{{ position.id }}" data-bs-toggle="modal" data-bs-target="#editPositionModal">
+                                    <i class="bi bi-pencil me-1"></i>
+                                    Chỉnh sửa SL/TP
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary analyze-position-btn" data-position-id="{{ position.id }}">
+                                    <i class="bi bi-graph-up me-1"></i>
+                                    Phân tích
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-wallet2 fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">Không có vị thế nào đang mở</p>
+                            <p class="text-muted">Bạn có thể mở vị thế mới bằng cách nhấn nút "Mở vị thế mới" ở trên</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column - Position Stats and Risk Management -->
+        <div class="col-md-4">
+            <!-- Account Summary -->
+            <div class="info-card">
+                <h5 class="mb-3">Tài khoản</h5>
+                
+                <div class="row mb-3">
+                    <div class="col-7">
+                        <div class="info-label">Số dư khả dụng</div>
+                        <div class="info-value">${{ account_data.balance|default(bot_status.balance, true)|round(2) }}</div>
+                        {% if bot_status.mode == 'testnet' %}
+                        <div class="testnet-balance">
+                            <i class="bi bi-info-circle me-1"></i> Số dư testnet (không phải tiền thật)
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-5">
+                        <div class="info-label">Số vị thế</div>
+                        <div class="info-value">{{ account_data.positions|default([])|length }}</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="info-label">Unrealized P/L</div>
+                    {% set total_pnl = 0 %}
+                    {% if account_data.positions %}
+                        {% for position in account_data.positions %}
+                            {% set total_pnl = total_pnl + position.pnl %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="info-value {% if total_pnl > 0 %}text-success{% elif total_pnl < 0 %}text-danger{% endif %}">
+                        ${{ total_pnl|round(2) }}
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="info-label">Margin sử dụng</div>
+                    {% set used_margin = 0 %}
+                    {% if account_data.positions %}
+                        {% for position in account_data.positions %}
+                            {% set used_margin = used_margin + (position.entry_price * position.quantity / position.leverage|default(1)) %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="info-value">${{ used_margin|round(2) }} ({{ (used_margin / account_data.balance|default(bot_status.balance) * 100)|round(2) }}%)</div>
+                </div>
+            </div>
+            
+            <!-- Risk Management -->
+            <div class="info-card">
+                <h5 class="mb-3">Quản lý rủi ro</h5>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <div class="info-label">Rủi ro mỗi lệnh</div>
+                        <div class="info-value">2.5%</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">Đòn bẩy tối đa</div>
+                        <div class="info-value">x{{ account_data.max_leverage|default(10) }}</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="info-label">Rủi ro danh mục</div>
+                    <div class="progress" style="height: 20px;">
+                        {% set portfolio_risk = (account_data.positions|default([])|length * 2.5)|round(2) %}
+                        <div class="progress-bar {% if portfolio_risk <= 10 %}bg-success{% elif portfolio_risk <= 20 %}bg-warning{% else %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ portfolio_risk }}%;" 
+                             aria-valuenow="{{ portfolio_risk }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ portfolio_risk }}%
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small>0%</small>
+                        <small>Rủi ro hiện tại: {{ portfolio_risk }}%</small>
+                        <small>30%</small>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="info-label">Đề xuất quản lý rủi ro</div>
+                    <ul class="mb-0">
+                        <li>Số lệnh tối đa: {{ (30 / 2.5)|round(0, 'floor') }}</li>
+                        <li>Size vị thế tối đa: ${{ (account_data.balance|default(bot_status.balance) * 0.1)|round(2) }}</li>
+                        <li>Stop loss tối thiểu: 2% từ giá vào</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Position Distribution -->
+            <div class="info-card">
+                <h5 class="mb-3">Phân bố vị thế</h5>
+                
+                <div class="mb-3">
+                    <div class="info-label">Theo loại</div>
+                    <div class="progress" style="height: 20px;">
+                        {% set long_positions = 0 %}
+                        {% set short_positions = 0 %}
+                        {% if account_data.positions %}
+                            {% for position in account_data.positions %}
+                                {% if position.type == 'LONG' %}
+                                    {% set long_positions = long_positions + 1 %}
+                                {% else %}
+                                    {% set short_positions = short_positions + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% set long_percent = 0 %}
+                        {% set short_percent = 0 %}
+                        {% if account_data.positions|default([])|length > 0 %}
+                            {% set long_percent = (long_positions / account_data.positions|length * 100)|round(0) %}
+                            {% set short_percent = (short_positions / account_data.positions|length * 100)|round(0) %}
+                        {% endif %}
+                        
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ long_percent }}%;" aria-valuenow="{{ long_percent }}" aria-valuemin="0" aria-valuemax="100">
+                            Long {% if long_percent > 0 %}({{ long_percent }}%){% endif %}
+                        </div>
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ short_percent }}%;" aria-valuenow="{{ short_percent }}" aria-valuemin="0" aria-valuemax="100">
+                            Short {% if short_percent > 0 %}({{ short_percent }}%){% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="info-label">Theo token</div>
+                    <div id="tokenDistributionChart" style="height: 200px;"></div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal chỉnh sửa vị thế -->
-    <div class="modal fade" id="editPositionModal" tabindex="-1" aria-labelledby="editPositionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-dark">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title" id="editPositionModalLabel">Chỉnh sửa vị thế</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editPositionForm">
-                        <input type="hidden" id="editPositionId">
-                        <div class="mb-3">
+<!-- Open Position Modal -->
+<div class="modal fade" id="openPositionModal" tabindex="-1" aria-labelledby="openPositionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="openPositionModalLabel">Mở vị thế mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="openPositionForm">
+                    <div class="mb-3">
+                        <label for="symbolSelect" class="form-label">Cặp giao dịch</label>
+                        <select class="form-select" id="symbolSelect" required>
+                            {% for symbol in fake_symbols %}
+                            <option value="{{ symbol }}">{{ symbol }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Loại</label>
+                        <div class="d-flex">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="positionType" id="typeLong" value="BUY" checked>
+                                <label class="form-check-label" for="typeLong">Long</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="positionType" id="typeShort" value="SELL">
+                                <label class="form-check-label" for="typeShort">Short</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="entryPrice" class="form-label">Giá vào</label>
+                            <input type="number" class="form-control" id="entryPrice" placeholder="0.00" step="0.01" required>
+                        </div>
+                        <div class="col">
+                            <label for="positionSize" class="form-label">Kích thước (%)</label>
+                            <input type="number" class="form-control" id="positionSize" placeholder="2.5" value="2.5" min="0.1" max="100" step="0.1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="stopLoss" class="form-label">Stop Loss</label>
+                            <input type="number" class="form-control" id="stopLoss" placeholder="0.00" step="0.01" required>
+                        </div>
+                        <div class="col">
+                            <label for="takeProfit" class="form-label">Take Profit</label>
+                            <input type="number" class="form-control" id="takeProfit" placeholder="0.00" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="leverageInput" class="form-label">Đòn bẩy: <span id="leverageValue">1x</span></label>
+                        <input type="range" class="form-range" min="1" max="10" step="1" value="1" id="leverageInput">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="useTrailingStop">
+                            <label class="form-check-label" for="useTrailingStop">
+                                Sử dụng Trailing Stop
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card mb-3">
+                        <h6>Thông tin vị thế</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="info-label">Khối lượng</div>
+                                <div id="calculatedQuantity">0.00</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-label">Rủi ro</div>
+                                <div id="calculatedRisk">$0.00 (0%)</div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <div class="info-label">Risk/Reward</div>
+                                <div id="calculatedRR">0:1</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-label">Margin</div>
+                                <div id="calculatedMargin">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="submitOpenPosition">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Mở vị thế
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Position Modal -->
+<div class="modal fade" id="editPositionModal" tabindex="-1" aria-labelledby="editPositionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPositionModalLabel">Chỉnh sửa vị thế</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPositionForm">
+                    <input type="hidden" id="editPositionId">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 id="editPositionSymbol">BTCUSDT</h6>
+                                <span class="badge bg-success" id="editPositionType">LONG</span>
+                            </div>
+                            <div>
+                                <div class="info-value" id="editPositionPrice">$71250.00</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="editEntryPrice" class="form-label">Giá vào</label>
+                            <input type="number" class="form-control" id="editEntryPrice" placeholder="0.00" step="0.01" readonly>
+                        </div>
+                        <div class="col">
+                            <label for="editQuantity" class="form-label">Khối lượng</label>
+                            <input type="number" class="form-control" id="editQuantity" placeholder="0.00" step="0.001" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col">
                             <label for="editStopLoss" class="form-label">Stop Loss</label>
-                            <input type="number" class="form-control" id="editStopLoss" step="0.01">
+                            <input type="number" class="form-control" id="editStopLoss" placeholder="0.00" step="0.01" required>
                         </div>
-                        <div class="mb-3">
+                        <div class="col">
                             <label for="editTakeProfit" class="form-label">Take Profit</label>
-                            <input type="number" class="form-control" id="editTakeProfit" step="0.01">
+                            <input type="number" class="form-control" id="editTakeProfit" placeholder="0.00" step="0.01" required>
                         </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="editTrailingStop">
-                            <label class="form-check-label" for="editTrailingStop">Trailing Stop</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editUseTrailingStop">
+                            <label class="form-check-label" for="editUseTrailingStop">
+                                Sử dụng Trailing Stop
+                            </label>
                         </div>
-                        <div class="mb-3">
-                            <label for="editTrailingStopAmount" class="form-label">Khoảng cách Trailing Stop (%)</label>
-                            <input type="number" class="form-control" id="editTrailingStopAmount" min="0.1" step="0.1" value="1.0">
+                    </div>
+                    
+                    <div class="info-card mb-3">
+                        <h6>Thông tin vị thế</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="info-label">P/L hiện tại</div>
+                                <div id="editCurrentPnl" class="text-success">+$350.00 (4.2%)</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-label">Risk/Reward mới</div>
+                                <div id="editCalculatedRR">2.5:1</div>
+                            </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-top border-secondary">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="savePositionChangesBtn">Lưu thay đổi</button>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="submitEditPosition">
+                    <i class="bi bi-save me-1"></i>
+                    Lưu thay đổi
+                </button>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Xử lý sự kiện khi nút đóng vị thế được nhấn
-            document.querySelectorAll('.close-position-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const positionId = this.getAttribute('data-position-id');
-                    const positionRow = this.closest('tr');
-                    const symbol = positionRow.querySelector('td:first-child').textContent;
-                    
-                    // Hiển thị modal xác nhận
-                    document.getElementById('positionSymbol').textContent = symbol;
-                    document.getElementById('positionIdToClose').value = positionId;
-                    const closeModal = new bootstrap.Modal(document.getElementById('closePositionModal'));
-                    closeModal.show();
-                });
-            });
-            
-            // Xử lý sự kiện khi nút chỉnh sửa vị thế được nhấn
-            document.querySelectorAll('.edit-position-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const positionId = this.getAttribute('data-position-id');
-                    // Trong một ứng dụng thực tế, bạn sẽ lấy dữ liệu thực tế từ server
-                    // Ở đây chúng ta sẽ sử dụng dữ liệu giả lập cho demo
-                    
-                    // Tìm vị thế trong bảng
-                    const positionRow = this.closest('tr');
-                    const stopLossText = positionRow.querySelector('td:nth-child(9) small:first-child').textContent;
-                    const takeProfitText = positionRow.querySelector('td:nth-child(9) small:last-child').textContent;
-                    
-                    // Trích xuất giá trị
-                    const stopLoss = parseFloat(stopLossText.replace('SL: $', ''));
-                    const takeProfit = parseFloat(takeProfitText.replace('TP: $', ''));
-                    
-                    // Điền thông tin vào form
-                    document.getElementById('editPositionId').value = positionId;
-                    document.getElementById('editStopLoss').value = stopLoss;
-                    document.getElementById('editTakeProfit').value = takeProfit;
-                    
-                    // Hiển thị modal chỉnh sửa
-                    const editModal = new bootstrap.Modal(document.getElementById('editPositionModal'));
-                    editModal.show();
-                });
-            });
-            
-            // Xử lý sự kiện khi nút xác nhận đóng vị thế được nhấn
-            document.getElementById('confirmCloseBtn').addEventListener('click', function() {
-                const positionId = document.getElementById('positionIdToClose').value;
-                
-                // Gọi API để đóng vị thế
-                fetch('/api/positions/close', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Token distribution chart
+        let tokenDistCtx = document.getElementById('tokenDistributionChart').getContext('2d');
+        let tokenDistribution = new Chart(tokenDistCtx, {
+            type: 'pie',
+            data: {
+                labels: [{% for position in account_data.positions|default([]) %}'{{ position.symbol }}',{% endfor %}],
+                datasets: [{
+                    label: 'Phân bố vị thế',
+                    data: [{% for position in account_data.positions|default([]) %}{{ position.entry_price * position.quantity }},{% endfor %}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(199, 199, 199, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(199, 199, 199, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 10
+                        }
                     },
-                    body: JSON.stringify({ position_id: positionId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Ẩn modal
-                        bootstrap.Modal.getInstance(document.getElementById('closePositionModal')).hide();
-                        
-                        // Xóa vị thế khỏi bảng hoặc làm mới trang
-                        const positionRow = document.querySelector(`button[data-position-id="${positionId}"]`).closest('tr');
-                        positionRow.remove();
-                        
-                        // Hiển thị thông báo thành công
-                        alert('Vị thế đã được đóng thành công!');
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = (value / total * 100).toFixed(2);
+                                return `${context.label}: $${value.toFixed(2)} (${percentage}%)`;
+                            }
+                        }
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi đóng vị thế');
-                });
-            });
-            
-            // Xử lý sự kiện khi nút lưu thay đổi được nhấn
-            document.getElementById('savePositionChangesBtn').addEventListener('click', function() {
-                const positionId = document.getElementById('editPositionId').value;
-                const stopLoss = document.getElementById('editStopLoss').value;
-                const takeProfit = document.getElementById('editTakeProfit').value;
-                const trailingStop = document.getElementById('editTrailingStop').checked;
-                const trailingStopAmount = document.getElementById('editTrailingStopAmount').value;
-                
-                // Giả lập cập nhật thành công
-                // Ẩn modal
-                bootstrap.Modal.getInstance(document.getElementById('editPositionModal')).hide();
-                
-                // Cập nhật giá trị hiển thị trong bảng
-                const positionRow = document.querySelector(`button[data-position-id="${positionId}"]`).closest('tr');
-                positionRow.querySelector('td:nth-child(9) small:first-child').textContent = `SL: $${stopLoss}`;
-                positionRow.querySelector('td:nth-child(9) small:last-child').textContent = `TP: $${takeProfit}`;
-                
-                // Hiển thị thông báo thành công
-                alert('Vị thế đã được cập nhật thành công!');
-            });
-            
-            // Xử lý sự kiện khi nút làm mới được nhấn
-            document.getElementById('refreshPositionsBtn').addEventListener('click', function() {
-                // Giả lập làm mới bằng cách tải lại trang
-                window.location.reload();
-            });
-            
-            // Xử lý sự kiện khi nút vị thế mới được nhấn
-            document.getElementById('newPositionBtn').addEventListener('click', function() {
-                alert('Tính năng này đang được phát triển. Vui lòng thử lại sau!');
-            });
-            
-            // Khởi tạo các nút thay đổi ngôn ngữ
-            document.querySelectorAll('.language-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    changeLanguage(lang);
-                });
-            });
-            
-            // Hàm thay đổi ngôn ngữ
-            function changeLanguage(lang) {
-                fetch('/api/language', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ language: lang })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Làm mới trang để áp dụng ngôn ngữ mới
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                }
             }
         });
-    </script>
-</body>
-</html>
+
+        // Open Position Modal
+        const openPositionBtns = document.querySelectorAll('.open-position-btn');
+        const openPositionModal = new bootstrap.Modal(document.getElementById('openPositionModal'));
+        
+        openPositionBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const symbol = this.dataset.symbol;
+                document.getElementById('symbolSelect').value = symbol;
+                updatePositionCalculations();
+                openPositionModal.show();
+            });
+        });
+        
+        // Leverage input change
+        const leverageInput = document.getElementById('leverageInput');
+        const leverageValue = document.getElementById('leverageValue');
+        
+        leverageInput.addEventListener('input', function() {
+            leverageValue.textContent = this.value + 'x';
+            updatePositionCalculations();
+        });
+        
+        // Position size calculations
+        const entryPrice = document.getElementById('entryPrice');
+        const positionSize = document.getElementById('positionSize');
+        const stopLoss = document.getElementById('stopLoss');
+        const takeProfit = document.getElementById('takeProfit');
+        const typeLong = document.getElementById('typeLong');
+        const typeShort = document.getElementById('typeShort');
+        
+        // Update calculations when inputs change
+        [entryPrice, positionSize, stopLoss, takeProfit, typeLong, typeShort, leverageInput].forEach(el => {
+            el.addEventListener('change', updatePositionCalculations);
+            el.addEventListener('input', updatePositionCalculations);
+        });
+        
+        // Function to update position calculations
+        function updatePositionCalculations() {
+            const price = parseFloat(entryPrice.value) || 0;
+            const size = parseFloat(positionSize.value) || 0;
+            const sl = parseFloat(stopLoss.value) || 0;
+            const tp = parseFloat(takeProfit.value) || 0;
+            const isLong = typeLong.checked;
+            const leverage = parseInt(leverageInput.value) || 1;
+            
+            // Account balance from the page (demo data)
+            const balance = {{ account_data.balance|default(bot_status.balance, true) }};
+            
+            // Calculate quantity, risk, R/R ratio, and margin
+            let quantity = 0;
+            let risk = 0;
+            let riskPercent = 0;
+            let rrRatio = 0;
+            let margin = 0;
+            
+            if (price > 0 && sl > 0) {
+                // Calculate risk
+                const riskAmount = balance * (size / 100);
+                
+                // Calculate price difference for stop loss
+                let slDiff = 0;
+                if (isLong) {
+                    slDiff = price - sl;
+                    if (slDiff <= 0) {
+                        slDiff = price * 0.01; // Default to 1% if invalid
+                    }
+                } else {
+                    slDiff = sl - price;
+                    if (slDiff <= 0) {
+                        slDiff = price * 0.01; // Default to 1% if invalid
+                    }
+                }
+                
+                // Calculate quantity
+                quantity = (riskAmount / slDiff);
+                
+                // Apply leverage
+                quantity = quantity * leverage;
+                
+                // Calculate actual risk
+                risk = slDiff * quantity / leverage;
+                riskPercent = (risk / balance) * 100;
+                
+                // Calculate R/R ratio
+                if (tp > 0) {
+                    let tpDiff = 0;
+                    if (isLong) {
+                        tpDiff = tp - price;
+                    } else {
+                        tpDiff = price - tp;
+                    }
+                    
+                    if (slDiff > 0) {
+                        rrRatio = tpDiff / slDiff;
+                    }
+                }
+                
+                // Calculate margin
+                margin = (price * quantity) / leverage;
+            }
+            
+            // Update UI
+            document.getElementById('calculatedQuantity').textContent = quantity.toFixed(4);
+            document.getElementById('calculatedRisk').textContent = `$${risk.toFixed(2)} (${riskPercent.toFixed(2)}%)`;
+            document.getElementById('calculatedRR').textContent = `${rrRatio.toFixed(2)}:1`;
+            document.getElementById('calculatedMargin').textContent = `$${margin.toFixed(2)}`;
+        }
+        
+        // Submit Open Position
+        document.getElementById('submitOpenPosition').addEventListener('click', function() {
+            // Validate form
+            const form = document.getElementById('openPositionForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Get form data
+            const symbol = document.getElementById('symbolSelect').value;
+            const type = document.querySelector('input[name="positionType"]:checked').value;
+            const price = parseFloat(entryPrice.value);
+            const size = parseFloat(positionSize.value);
+            const sl = parseFloat(stopLoss.value);
+            const tp = parseFloat(takeProfit.value);
+            const leverage = parseInt(leverageInput.value);
+            const useTrailingStop = document.getElementById('useTrailingStop').checked;
+            
+            // Show loading
+            showLoading();
+            
+            // Send API request to open position
+            fetch('/api/open-position', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    symbol: symbol,
+                    type: type,
+                    entry_price: price,
+                    position_size: size,
+                    stop_loss: sl,
+                    take_profit: tp,
+                    leverage: leverage,
+                    use_trailing_stop: useTrailingStop
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Thành công', 'Vị thế đã được mở', 'success');
+                    
+                    // Close modal and reload page
+                    openPositionModal.hide();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Lỗi', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        });
+        
+        // Close Position
+        const closePositionBtns = document.querySelectorAll('.close-position-btn');
+        
+        closePositionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const positionId = this.dataset.positionId;
+                
+                if (confirm('Bạn có chắc chắn muốn đóng vị thế này?')) {
+                    // Show loading
+                    showLoading();
+                    
+                    // Send API request to close position
+                    fetch(`/api/close-position/${positionId}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Thành công', 'Vị thế đã được đóng', 'success');
+                            
+                            // Reload page
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showToast('Lỗi', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+                    })
+                    .finally(() => {
+                        hideLoading();
+                    });
+                }
+            });
+        });
+        
+        // Edit Position Modal
+        const editPositionBtns = document.querySelectorAll('.edit-position-btn');
+        const editPositionModal = new bootstrap.Modal(document.getElementById('editPositionModal'));
+        
+        editPositionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const positionId = this.dataset.positionId;
+                
+                // Find position data
+                {% if account_data.positions %}
+                    {% for position in account_data.positions %}
+                        if ('{{ position.id }}' === positionId) {
+                            // Fill form with position data
+                            document.getElementById('editPositionId').value = '{{ position.id }}';
+                            document.getElementById('editPositionSymbol').textContent = '{{ position.symbol }}';
+                            document.getElementById('editPositionType').textContent = '{{ position.type }}';
+                            document.getElementById('editPositionType').className = 'badge bg-{{ 'success' if position.type == 'LONG' else 'danger' }}';
+                            document.getElementById('editPositionPrice').textContent = '${{ position.current_price|round(2) }}';
+                            document.getElementById('editEntryPrice').value = '{{ position.entry_price }}';
+                            document.getElementById('editQuantity').value = '{{ position.quantity }}';
+                            document.getElementById('editStopLoss').value = '{{ position.stop_loss }}';
+                            document.getElementById('editTakeProfit').value = '{{ position.take_profit }}';
+                            
+                            // Update PNL display
+                            const pnlEl = document.getElementById('editCurrentPnl');
+                            const pnl = {{ position.pnl|default(0) }};
+                            const pnlPercent = {{ position.pnl_percent|default(0) }};
+                            pnlEl.textContent = `${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)`;
+                            pnlEl.className = pnl >= 0 ? 'text-success' : 'text-danger';
+                            
+                            // Calculate R/R ratio
+                            updateEditRRRatio();
+                        }
+                    {% endfor %}
+                {% endif %}
+            });
+        });
+        
+        // Update R/R ratio when SL or TP changes
+        const editStopLoss = document.getElementById('editStopLoss');
+        const editTakeProfit = document.getElementById('editTakeProfit');
+        
+        [editStopLoss, editTakeProfit].forEach(el => {
+            el.addEventListener('change', updateEditRRRatio);
+            el.addEventListener('input', updateEditRRRatio);
+        });
+        
+        function updateEditRRRatio() {
+            const entryPrice = parseFloat(document.getElementById('editEntryPrice').value) || 0;
+            const sl = parseFloat(document.getElementById('editStopLoss').value) || 0;
+            const tp = parseFloat(document.getElementById('editTakeProfit').value) || 0;
+            const type = document.getElementById('editPositionType').textContent;
+            
+            let rrRatio = 0;
+            
+            if (entryPrice > 0 && sl > 0 && tp > 0) {
+                let slDiff = 0;
+                let tpDiff = 0;
+                
+                if (type === 'LONG') {
+                    slDiff = entryPrice - sl;
+                    tpDiff = tp - entryPrice;
+                } else {
+                    slDiff = sl - entryPrice;
+                    tpDiff = entryPrice - tp;
+                }
+                
+                if (slDiff > 0) {
+                    rrRatio = tpDiff / slDiff;
+                }
+            }
+            
+            document.getElementById('editCalculatedRR').textContent = `${rrRatio.toFixed(2)}:1`;
+        }
+        
+        // Submit Edit Position
+        document.getElementById('submitEditPosition').addEventListener('click', function() {
+            // Validate form
+            const form = document.getElementById('editPositionForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const positionId = document.getElementById('editPositionId').value;
+            const sl = parseFloat(document.getElementById('editStopLoss').value);
+            const tp = parseFloat(document.getElementById('editTakeProfit').value);
+            const useTrailingStop = document.getElementById('editUseTrailingStop').checked;
+            
+            // Show loading
+            showLoading();
+            
+            // Send API request to update position
+            fetch(`/api/update-position/${positionId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    stop_loss: sl,
+                    take_profit: tp,
+                    use_trailing_stop: useTrailingStop
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Thành công', 'Vị thế đã được cập nhật', 'success');
+                    
+                    // Close modal and reload page
+                    editPositionModal.hide();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Lỗi', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        });
+        
+        // Refresh Positions Button
+        document.getElementById('refreshPositionsBtn').addEventListener('click', function() {
+            // Show loading
+            showLoading();
+            
+            // Send API request to get positions
+            fetch('/api/positions')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Thành công', 'Vị thế đã được làm mới', 'success');
+                    
+                    // Reload page
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showToast('Lỗi', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        });
+        
+        // Analyze Position Button
+        const analyzePositionBtns = document.querySelectorAll('.analyze-position-btn');
+        
+        analyzePositionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const positionId = this.dataset.positionId;
+                
+                // Show loading
+                showLoading();
+                
+                // Send API request to analyze position
+                fetch(`/api/analyze-position/${positionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Here you would show analysis results
+                        // For demo purposes, we'll just show a toast
+                        showToast('Phân tích vị thế', 'Phân tích vị thế thành công', 'success');
+                    } else {
+                        showToast('Lỗi', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
+                })
+                .finally(() => {
+                    hideLoading();
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,1450 +1,849 @@
-<!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Giao Dịch Crypto - Control Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+{% extends 'common_layout.html' %}
 
-        /* Card styles */
-        .info-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+{% set active_page = 'dashboard' %}
 
-        .info-label {
-            color: #8b949e;
-            font-size: 0.9rem;
-        }
+{% block title %}Trang chủ - Bot Giao Dịch Crypto{% endblock %}
 
-        .info-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* Status badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-right: 10px;
-        }
-
-        .status-badge i {
-            margin-right: 5px;
-        }
-        
-        .status-badge.testnet {
-            background-color: #ff8800;
-            color: #000;
-        }
-
-        .status-badge.connected {
-            background-color: #238636;
-            color: white;
-        }
-
-        .status-badge.disconnected {
-            background-color: #f85149;
-            color: white;
-        }
-
-        .status-badge.testnet {
-            background-color: #fd7e14;
-            color: white;
-        }
-
-        .status-badge.live {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        /* Messages container */
-        .messages-container {
-            height: 300px;
-            overflow-y: auto;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-        }
-
-        .message {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 6px;
-            background-color: rgba(30, 37, 46, 0.8);
-            transition: background-color 0.3s ease;
-        }
-        
-        .message:hover {
-            background-color: rgba(36, 44, 54, 0.8);
-        }
-        
-        .message-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .message-info { border-left: 2px solid #0d6efd; }
-        .message-success { border-left: 2px solid #198754; }
-        .message-warning { border-left: 2px solid #ffc107; }
-        .message-error { border-left: 2px solid #dc3545; }
-        
-        .bg-info { background-color: #0d6efd !important; }
-        .bg-success { background-color: #198754 !important; }
-        .bg-warning { background-color: #ffc107 !important; color: #000 !important; }
-        .bg-error { background-color: #dc3545 !important; }
-
-        .message-content {
-            font-size: 0.9rem;
-            margin-bottom: 3px;
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            color: #8b949e;
-            display: block;
-        }
-
-        /* Loading button state */
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .btn-loading:after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            left: 50%;
-            margin-top: -8px;
-            margin-left: -8px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Tabs */
-        .nav-pills .nav-link {
-            color: #8b949e;
-            background: none;
-            border: 1px solid #30363d;
-            margin-right: 5px;
-        }
-
-        .nav-pills .nav-link.active {
-            background-color: #238636;
-            border-color: #238636;
-            color: white;
-        }
-
-        /* Help text */
-        .help-text {
-            color: #8b949e;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        .alert-testnet {
-            background-color: rgba(253, 126, 20, 0.1);
-            border-color: #fd7e14;
-            color: #fd7e14;
-        }
-
-        /* New styles for improved UI */
-        .bot-status {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .bot-status.running {
-            background: rgba(25, 135, 84, 0.1);
-            color: #198754;
-            border: 1px solid #198754;
-        }
-
-        .bot-status.stopped {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-
-
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            padding: 0.25rem 0.5rem;
-            border-radius: 50%;
-            background: #dc3545;
-            color: white;
-            font-size: 0.75rem;
-        }
-
-        .api-guide {
-            background: rgba(13, 110, 253, 0.1);
-            border: 1px solid #0d6efd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .api-guide ol {
-            margin-bottom: 0;
-            padding-left: 20px;
-        }
-
-        .info-card.highlight {
-            border-color: #198754;
-            box-shadow: 0 0 0 1px #198754;
-        }
-
-        .testnet-balance {
-            font-size: 0.9rem;
-            color: #fd7e14;
-            margin-top: 5px;
-        }
-
-        .btn {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-
-        /* Toast notification */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-        }
-
-        .toast {
-            background: #323232;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        .btn-success.active {
-            background-color: #157347;
-            border-color: #146c43;
-        }
-
-        .btn-danger.active {
-            background-color: #bb2d3b;
-            border-color: #b02a37;
-        }
-        .toast.bg-success {
-            background-color: #198754;
-        }
-        .toast.bg-danger {
-            background-color: #dc3545;
-        }
-
-        /* Status handling improvements */
-        .status-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .connection-status {
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .connection-status.connected {
-            background-color: rgba(25, 135, 84, 0.1);
-            color: #198754;
-            border: 1px solid #198754;
-        }
-
-        .connection-status.disconnected {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-
-        /* Button states */
-        .btn {
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn.loading {
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .btn.loading .spinner-border {
-            display: inline-block !important;
-        }
-
-        .btn.loading .button-text,
-        .btn.loading .bi {
-            display: none;
-        }
-
-        /* Toast improvements */
-        .toast {
-            min-width: 300px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Mini chart styles */
-        .mini-chart {
-            margin-bottom: 5px;
-        }
-        
-        .price-change {
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: 12px;
-            padding: 2px 8px;
-        }
-        
-        .price-change.positive {
-            background-color: rgba(25, 135, 84, 0.1);
-            color: #198754;
-        }
-        
-        .price-change.negative {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="container py-4">
-        <!-- Header -->
-        <header class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-currency-bitcoin fs-3 me-2"></i>
-                <span class="fs-4">Bot Giao Dịch Crypto</span>
-            </div>
-
-            <div class="d-flex align-items-center gap-3">
-                <!-- Testnet Badge -->
-                <div class="status-badge testnet">
-                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                    Testnet
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Bảng điều khiển</h2>
+            
+            <!-- Status Cards -->
+            <div class="status-cards d-flex flex-wrap gap-4 mb-3">
+                <div class="status-card">
+                    {% if bot_status.running %}
+                    <div class="status-badge running">
+                        <i class="bi bi-play-circle-fill me-1"></i>
+                        Đang chạy
+                    </div>
+                    {% else %}
+                    <div class="status-badge stopped">
+                        <i class="bi bi-stop-circle-fill me-1"></i>
+                        Đã dừng
+                    </div>
+                    {% endif %}
                 </div>
                 
-                <!-- Bot Status -->
-                <div class="bot-status {{ 'running' if bot_status.running else 'stopped' }}">
-                    <i class="bi {{ 'bi-play-circle-fill' if bot_status.running else 'bi-stop-circle-fill' }} me-2"></i>
-                    {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
+                {% if bot_status.mode == 'demo' %}
+                <div class="status-badge bg-secondary">
+                    <i class="bi bi-life-preserver me-1"></i> Demo Mode
                 </div>
-
-                <!-- Control Button -->
-                <button id="controlButton" type="button"
-                        class="btn {{ 'btn-danger' if bot_status.running else 'btn-success' }} btn-lg"
-                        onclick="handleControlButton(this)">
-                    <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} me-2"></i>
-                    <span class="button-text">{{ 'Dừng Bot' if bot_status.running else 'Khởi động Bot' }}</span>
-                    <div class="spinner-border spinner-border-sm d-none" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+                {% elif bot_status.mode == 'testnet' %}
+                <div class="status-badge testnet">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Testnet Mode
+                </div>
+                {% else %}
+                <div class="status-badge live">
+                    <i class="bi bi-check-circle-fill me-1"></i> Live Mode
+                </div>
+                {% endif %}
+                
+                <div class="status-badge {{ 'connected' if bot_status.api_connected else 'disconnected' }}">
+                    <i class="bi {{ 'bi-plug-fill' if bot_status.api_connected else 'bi-plug' }} me-1"></i>
+                    {{ 'API đã kết nối' if bot_status.api_connected else 'API chưa kết nối' }}
+                </div>
+                
+                <div class="status-badge info">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Cập nhật lần cuối: {{ bot_status.last_update|default('2025-03-03 14:30:45') }}
+                </div>
+            </div>
+            
+            <!-- Bot Controls -->
+            <div class="bot-controls mb-4">
+                {% if bot_status.running %}
+                <button class="btn btn-danger" id="stopBotBtn">
+                    <i class="bi bi-stop-circle me-2"></i>
+                    Dừng Bot
                 </button>
-            </div>
-        </header>
-
-        <div class="row">
-            <!-- Left Column -->
-            <div class="col-md-4">
-                <div class="info-card">
-                    <h5 class="mb-3">Cấu hình Bot</h5>
-
-                    <!-- API Config -->
-                    <div class="mb-4">
-                        <label class="form-label">Binance API</label>
-                        <div class="api-guide mb-3">
-                            <h6><i class="bi bi-info-circle me-2"></i>Hướng dẫn kết nối API</h6>
-                            <ol>
-                                <li>Đăng nhập vào tài khoản <a href="https://testnet.binancefuture.com/" target="_blank">Binance Testnet</a></li>
-                                <li>Tạo API key với quyền đọc và giao dịch</li>
-                                <li>Sao chép API Key và Secret Key vào form dưới đây</li>
-                                <li>Nhấn "Lưu cấu hình" để kết nối</li>
-                            </ol>
-                            <div class="alert alert-testnet mt-2 mb-0">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Lưu ý:</strong> Bot đang chạy ở chế độ Testnet (thử nghiệm). Giao dịch trên Testnet không ảnh hưởng đến tài khoản thật của bạn.
-                            </div>
-                        </div>
-                        
-                        <div class="input-group mb-2">
-                            <span class="input-group-text">
-                                <i class="bi bi-key"></i>
-                            </span>
-                            <input type="text" class="form-control" id="apiKey" placeholder="API Key">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="bi bi-key-fill"></i>
-                            </span>
-                            <input type="password" class="form-control" id="apiSecret" placeholder="API Secret">
-                        </div>
-                    </div>
-
-                    <!-- Trade Config -->
-                    <div class="mb-4">
-                        <label class="form-label">Loại giao dịch</label>
-                        <select class="form-select" id="tradingType">
-                            <option value="futures">Futures (Đòn bẩy)</option>
-                            <option value="spot">Spot (Thông thường)</option>
-                        </select>
-                    </div>
-
-                    <!-- Risk Config -->
-                    <div class="mb-4">
-                        <label class="form-label">Mức độ rủi ro</label>
-                        <select class="form-select" id="riskLevel">
-                            <option value="low">Thấp (2x)</option>
-                            <option value="medium" selected>Trung bình (5x)</option>
-                            <option value="high">Cao (10x)</option>
-                        </select>
-                        <div class="mt-3">
-                            <div class="alert alert-info">
-                                <h6 class="mb-2">Chi tiết mức rủi ro</h6>
-                                <div id="riskDetails">
-                                    <p class="mb-1"><strong>Đòn bẩy:</strong> 5x</p>
-                                    <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> 2.5% tài khoản</p>
-                                    <p class="mb-1"><strong>Số lệnh tối đa:</strong> 4 lệnh</p>
-                                    <p class="mb-0"><strong>Target lợi nhuận:</strong> 2% mỗi ngày</p>
-                                </div>
-                                <hr>
-                                <div class="risk-explanation mt-2">
-                                    <h6 class="mb-2"><i class="bi bi-shield-exclamation me-1"></i>Hiểu về đòn bẩy & rủi ro</h6>
-                                    <ul class="mb-0 ps-3">
-                                        <li>Đòn bẩy 5x nghĩa là với $100, bạn có thể giao dịch $500</li>
-                                        <li>Rủi ro mỗi lệnh 2.5% nghĩa là mỗi giao dịch chỉ có thể mất tối đa 2.5% tổng số dư của bạn</li>
-                                        <li>Đòn bẩy cao hơn = lợi nhuận tiềm năng lớn hơn, NHƯNG rủi ro cũng lớn hơn</li>
-                                        <li>Nếu đặt 4 lệnh cùng lúc, rủi ro tối đa là 10% tài khoản</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Save Button -->
-                    <div class="text-end">
-                        <button id="saveConfigBtn" type="button"
-                                class="btn btn-primary btn-lg"
-                                onclick="handleSaveConfig(this)">
-                            <i class="bi bi-save me-2"></i>
-                            <span class="button-text">Lưu cấu hình</span>
-                            <div class="spinner-border spinner-border-sm d-none" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="col-md-8">
-                <!-- Account Info -->
-                <div class="info-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Thông tin tài khoản</h5>
-                        <div class="status-badge testnet">
-                            <i class="bi bi-currency-exchange me-1"></i>
-                            Testnet
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="info-label">Số dư tài khoản</div>
-                            <div class="info-value large-value">
-                                $<span id="accountBalance">{{ '{:.2f}'.format(account_data.balance|default(0)) }}</span>
-                            </div>
-                            <div class="testnet-balance mt-1">
-                                <i class="bi bi-info-circle-fill me-1"></i>
-                                Tài khoản Testnet (thử nghiệm)
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-label">Tiền có thể sử dụng</div>
-                            <div class="info-value large-value">
-                                $<span id="availableBalance">{{ '{:.2f}'.format(account_data.available|default(0)) }}</span>
-                            </div>
-                            <div class="form-text mt-1">
-                                <a href="https://testnet.binancefuture.com/en/futures/BTCUSDT" target="_blank">
-                                    <i class="bi bi-arrow-up-right-square me-1"></i>
-                                    Nạp tiền Testnet
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-label">Vị thế mở</div>
-                            <div class="info-value large-value" id="openPositions">{{ account_data.positions|length|default(0) }}</div>
-                            <div class="form-text mt-1">
-                                <a href="#" id="viewPositionsLink">
-                                    <i class="bi bi-list-ul me-1"></i>
-                                    Xem chi tiết
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Current Config Summary -->
-                    <div class="current-config-summary mt-3 p-3 rounded">
-                        <h6 class="mb-2"><i class="bi bi-gear-fill me-2"></i>Cấu hình hiện tại</h6>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="config-item">
-                                    <i class="bi bi-graph-up me-1"></i>
-                                    <span class="label">Đòn bẩy:</span>
-                                    <span class="value fw-bold" id="currentLeverage">x100</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="config-item">
-                                    <i class="bi bi-shield-exclamation me-1"></i>
-                                    <span class="label">Rủi ro mỗi lệnh:</span>
-                                    <span class="value fw-bold" id="currentRiskPerTrade">10%</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="config-item">
-                                    <i class="bi bi-grid-3x3 me-1"></i>
-                                    <span class="label">Số lệnh tối đa:</span>
-                                    <span class="value fw-bold" id="currentMaxPositions">10</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Market Data -->
-                <div class="info-card mb-4">
-                    <h5 class="mb-3">Thị trường</h5>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="info-label">BTC/USDT</div>
-                                <div class="price-change positive">+2.5%</div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div class="info-value" id="btcPrice">
-                                    ${{ '{:.2f}'.format(market_data.btc_price|default(0)) }}
-                                </div>
-                                <div class="mini-chart">
-                                    <svg width="80" height="30" viewBox="0 0 80 30">
-                                        <path d="M0,15 L10,14 L20,18 L30,12 L40,15 L50,9 L60,11 L70,7 L80,5" 
-                                            fill="none" stroke="#198754" stroke-width="2"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <a href="https://testnet.binancefuture.com/en/futures/BTCUSDT" class="btn btn-sm btn-outline-primary w-100 mt-2" target="_blank">
-                                <i class="bi bi-graph-up-arrow me-1"></i>
-                                Xem biểu đồ
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="info-label">ETH/USDT</div>
-                                <div class="price-change negative">-1.2%</div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div class="info-value" id="ethPrice">
-                                    ${{ '{:.2f}'.format(market_data.eth_price|default(0)) }}
-                                </div>
-                                <div class="mini-chart">
-                                    <svg width="80" height="30" viewBox="0 0 80 30">
-                                        <path d="M0,10 L10,12 L20,8 L30,14 L40,16 L50,19 L60,17 L70,20 L80,25" 
-                                            fill="none" stroke="#dc3545" stroke-width="2"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <a href="https://testnet.binancefuture.com/en/futures/ETHUSDT" class="btn btn-sm btn-outline-primary w-100 mt-2" target="_blank">
-                                <i class="bi bi-graph-up-arrow me-1"></i>
-                                Xem biểu đồ
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="info-label">SOL/USDT</div>
-                                <div class="price-change positive">+3.7%</div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div class="info-value" id="solPrice">
-                                    ${{ '{:.2f}'.format(market_data.sol_price|default(0)) }}
-                                </div>
-                                <div class="mini-chart">
-                                    <svg width="80" height="30" viewBox="0 0 80 30">
-                                        <path d="M0,20 L10,17 L20,15 L30,10 L40,13 L50,8 L60,5 L70,7 L80,3" 
-                                            fill="none" stroke="#198754" stroke-width="2"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <a href="https://testnet.binancefuture.com/en/futures/SOLUSDT" class="btn btn-sm btn-outline-primary w-100 mt-2" target="_blank">
-                                <i class="bi bi-graph-up-arrow me-1"></i>
-                                Xem biểu đồ
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="info-label">BNB/USDT</div>
-                                <div class="price-change positive">+0.9%</div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div class="info-value" id="bnbPrice">
-                                    ${{ '{:.2f}'.format(market_data.bnb_price|default(0)) }}
-                                </div>
-                                <div class="mini-chart">
-                                    <svg width="80" height="30" viewBox="0 0 80 30">
-                                        <path d="M0,15 L10,14 L20,16 L30,13 L40,14 L50,12 L60,10 L70,11 L80,9" 
-                                            fill="none" stroke="#198754" stroke-width="2"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <a href="https://testnet.binancefuture.com/en/futures/BNBUSDT" class="btn btn-sm btn-outline-primary w-100 mt-2" target="_blank">
-                                <i class="bi bi-graph-up-arrow me-1"></i>
-                                Xem biểu đồ
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Configuration -->
-                <div class="info-card mb-4">
-                    <h5 class="mb-3">Cấu hình rủi ro</h5>
-
-                    <!-- Leverage Slider -->
-                    <div class="mb-4">
-                        <label class="form-label d-flex justify-content-between">
-                            <span>Đòn bẩy</span>
-                            <span id="leverageValue">x10</span>
-                        </label>
-                        <input type="range" class="form-range" id="leverage"
-                               min="1" max="100" step="1" value="10">
-                        <div class="form-text">
-                            Kéo để điều chỉnh đòn bẩy từ x1 đến x100
-                        </div>
-                    </div>
-
-                    <!-- Account Risk Slider -->
-                    <div class="mb-4">
-                        <label class="form-label d-flex justify-content-between">
-                            <span>Rủi ro mỗi lệnh</span>
-                            <span id="riskPerTradeValue">2.5%</span>
-                        </label>
-                        <input type="range" class="form-range" id="riskPerTrade"
-                               min="0.1" max="10" step="0.1" value="2.5">
-                        <div class="form-text">
-                            % tài khoản tối đa cho mỗi lệnh
-                        </div>
-                    </div>
-
-                    <!-- Position Limit -->
-                    <div class="mb-4">
-                        <label class="form-label d-flex justify-content-between">
-                            <span>Số lệnh tối đa</span>
-                            <span id="maxPositionsValue">4</span>
-                        </label>
-                        <input type="range" class="form-range" id="maxPositions"
-                               min="1" max="10" step="1" value="4">
-                    </div>
-                </div>
-
-                <!-- System Log -->
-                <div class="info-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0 d-flex align-items-center">
-                            <i class="bi bi-journal-text me-2"></i>
-                            Nhật ký hệ thống
-                            <span class="badge bg-secondary rounded-pill ms-2" id="logCount">{{ messages|length }}</span>
-                        </h5>
-                        <div>
-                            <button id="filterLogsBtn" class="btn btn-sm btn-outline-primary me-2" 
-                                    data-bs-toggle="dropdown">
-                                <i class="bi bi-funnel me-1"></i>
-                                Lọc
-                            </button>
-                            <div class="dropdown-menu p-2">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="showInfoLogs" checked>
-                                    <label class="form-check-label" for="showInfoLogs">
-                                        <span class="badge bg-primary">Thông tin</span>
-                                    </label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="showSuccessLogs" checked>
-                                    <label class="form-check-label" for="showSuccessLogs">
-                                        <span class="badge bg-success">Thành công</span>
-                                    </label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="showWarningLogs" checked>
-                                    <label class="form-check-label" for="showWarningLogs">
-                                        <span class="badge bg-warning text-dark">Cảnh báo</span>
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="showErrorLogs" checked>
-                                    <label class="form-check-label" for="showErrorLogs">
-                                        <span class="badge bg-danger">Lỗi</span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary"
-                                    onclick="clearLogs()">
-                                <i class="bi bi-trash me-1"></i>
-                                Xóa nhật ký
-                            </button>
-                        </div>
-                    </div>
-                    <div class="messages-container" id="messages">
-                        {% for message in messages %}
-                        <div class="message message-{{ message.level }}">
-                            <div class="d-flex">
-                                <span class="message-badge badge me-2 bg-{{ message.level }}">
-                                    <i class="bi {{ 'bi-info-circle' if message.level == 'info' 
-                                                  else ('bi-check-circle' if message.level == 'success'
-                                                  else ('bi-exclamation-triangle' if message.level == 'warning'
-                                                  else 'bi-x-circle')) }}"></i>
-                                </span>
-                                <div class="flex-grow-1">
-                                    <div class="message-content">{{ message.content }}</div>
-                                    <span class="message-time">{{ message.timestamp }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                <button class="btn btn-secondary" id="restartBotBtn">
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Khởi động lại
+                </button>
+                {% else %}
+                <button class="btn btn-success" id="startBotBtn">
+                    <i class="bi bi-play-circle me-2"></i>
+                    Khởi động Bot
+                </button>
+                {% endif %}
+                <button class="btn btn-outline-primary" id="refreshStatusBtn">
+                    <i class="bi bi-arrow-repeat me-2"></i>
+                    Làm mới trạng thái
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-
-    <script>
-        // Debug logging
-        function debugLog(action, data) {
-            console.log(`[DEBUG] ${action}:`, data);
-        }
-
-        // Elements
-        const elements = {
-            connectionStatus: document.querySelector('.connection-status'),
-            botStatus: document.querySelector('.bot-status'),
-            controlButton: document.getElementById('controlButton'),
-            saveConfigBtn: document.getElementById('saveConfigBtn'),
-            leverage: document.getElementById('leverage'),
-            leverageValue: document.getElementById('leverageValue'),
-            riskPerTrade: document.getElementById('riskPerTrade'),
-            riskPerTradeValue: document.getElementById('riskPerTradeValue'),
-            maxPositions: document.getElementById('maxPositions'),
-            maxPositionsValue: document.getElementById('maxPositionsValue'),
-            messagesContainer: document.getElementById('messages'),
-            riskLevel: document.getElementById('riskLevel'),
-            riskDetails: document.getElementById('riskDetails')
-        };
-
-        // State
-        let state = {
-            isConnected: true,
-            botRunning: {{ 'true' if bot_status.running else 'false' }},
-            reconnectAttempts: 0,
-            maxReconnectAttempts: 5
-        };
-
-        // Risk Configuration Event Listeners
-        elements.leverage.addEventListener('input', (e) => {
-            elements.leverageValue.textContent = `x${e.target.value}`;
-        });
-
-        elements.riskPerTrade.addEventListener('input', (e) => {
-            elements.riskPerTradeValue.textContent = `${e.target.value}%`;
-        });
-
-        elements.maxPositions.addEventListener('input', (e) => {
-            elements.maxPositionsValue.textContent = e.target.value;
-        });
-
-        // Socket setup with improved error handling
-        const socket = io({
-            reconnection: true,
-            reconnectionAttempts: state.maxReconnectAttempts,
-            reconnectionDelay: 2000,
-            reconnectionDelayMax: 5000,
-            timeout: 10000
-        });
-
-        // Socket event handlers
-        socket.on('connect', () => {
-            debugLog('Socket connected', { reconnectAttempts: state.reconnectAttempts });
-            state.isConnected = true;
-            state.reconnectAttempts = 0;
-            updateConnectionStatus(true);
-        });
-
-        socket.on('disconnect', (reason) => {
-            debugLog('Socket disconnected', { reason, reconnectAttempts: state.reconnectAttempts });
-            state.isConnected = false;
-
-            if (state.reconnectAttempts >= state.maxReconnectAttempts) {
-                updateConnectionStatus(false);
-                showToast('Mất kết nối tới máy chủ', 'error');
-            }
-        });
-
-        socket.on('reconnect_attempt', (attempt) => {
-            debugLog('Reconnect attempt', { attempt });
-            state.reconnectAttempts = attempt;
-        });
-
-        socket.on('reconnect_failed', () => {
-            debugLog('Reconnect failed');
-            showToast('Không thể kết nối lại với máy chủ', 'error');
-            updateConnectionStatus(false);
-        });
-
-        // Socket data updates
-        socket.on('connection_status', (status) => {
-            debugLog('Received connection status', status);
-            state.isConnected = status.is_connected;
-            updateConnectionStatus(status.is_connected);
-        });
-
-        socket.on('bot_status_update', (status) => {
-            debugLog('Received bot status', status);
-            state.botRunning = status.running;
-            updateBotStatus(status);
-        });
-
-        socket.on('account_data', (data) => {
-            debugLog('Received account data', data);
-            updateAccountData(data);
-        });
-
-        socket.on('market_data', (data) => {
-            debugLog('Received market data', data);
-            updateMarketData(data);
-        });
-        
-        socket.on('new_message', (message) => {
-            debugLog('Received new message', message);
-            addMessage(message);
-            
-            // Kiểm tra nếu là thông báo giao dịch mới
-            if (message.content.includes('Lệnh mới') || message.content.includes('Đã mở vị thế')) {
-                notifyNewTrade(message);
-                document.getElementById('logCount').textContent = parseInt(document.getElementById('logCount').textContent || '0') + 1;
-            }
-        });
-        
-        socket.on('new_trade', (trade) => {
-            debugLog('Received new trade', trade);
-            notifyNewTrade({
-                content: `Lệnh mới: ${trade.symbol} ${trade.side} tại $${trade.entry_price}`,
-                level: 'success',
-                timestamp: new Date().toLocaleString()
-            });
-        });
-
-        // UI update functions
-        function updateConnectionStatus(connected) {
-            if (!elements.connectionStatus) return;
-
-            elements.connectionStatus.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
-            elements.connectionStatus.innerHTML = `
-                <i class="bi ${connected ? 'bi-wifi' : 'bi-wifi-off'}"></i>
-                <span>${connected ? 'Đã kết nối API' : 'Chưa kết nối API'}</span>
-            `;
-
-            elements.controlButton.disabled = !connected;
-        }
-
-
-        function setButtonLoading(button, isLoading) {
-            debugLog('setButtonLoading', { button: button.id, isLoading });
-
-            const spinner = button.querySelector('.spinner-border');
-            const text = button.querySelector('.button-text');
-            const icon = button.querySelector('.bi');
-
-            button.disabled = isLoading;
-            if (isLoading) {
-                spinner.classList.remove('d-none');
-                text.classList.add('d-none');
-                icon.classList.add('d-none');
-                button.classList.add('loading');
-            } else {
-                spinner.classList.add('d-none');
-                text.classList.remove('d-none');
-                icon.classList.remove('d-none');
-                button.classList.remove('loading');
-            }
-        }
-
-        // Action handlers
-        async function handleControlButton(button) {
-            debugLog('handleControlButton', 'start');
-            
-            try {
-                if (!button) {
-                    button = document.getElementById('controlButton');
-                }
+    <div class="row">
+        <!-- Account Summary -->
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="info-card h-100">
+                <h5 class="mb-3">Tài khoản</h5>
                 
-                if (button.disabled) {
-                    debugLog('Button disabled', true);
-                    return;
-                }
-                
-                // Hiển thị loading spinner
-                setButtonLoading(button, true);
-                
-                // Tìm text trong button
-                const buttonText = button.querySelector('.button-text').textContent;
-                const action = buttonText.includes('Dừng') ? 'stop' : 'start';
-                debugLog('Action', action);
-                
-                showToast('Đang ' + (action === 'start' ? 'khởi động' : 'dừng') + ' bot...', 'info');
-                
-                // Sử dụng XHR thay vì fetch để kiểm tra vấn đề
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/api/bot/control', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function() {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        const data = JSON.parse(xhr.responseText);
-                        debugLog('API response', data);
-                        
-                        if (data.success) {
-                            const botStatus = document.querySelector('.bot-status');
-                            
-                            if (action === 'start') {
-                                button.querySelector('.button-text').textContent = 'Dừng Bot';
-                                button.querySelector('i').className = 'bi bi-stop-fill me-2';
-                                button.classList.remove('btn-success');
-                                button.classList.add('btn-danger');
-                                
-                                if (botStatus) {
-                                    botStatus.classList.remove('stopped');
-                                    botStatus.classList.add('running');
-                                    botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
-                                }
-                            } else {
-                                button.querySelector('.button-text').textContent = 'Khởi động Bot';
-                                button.querySelector('i').className = 'bi bi-play-fill me-2';
-                                button.classList.remove('btn-danger');
-                                button.classList.add('btn-success');
-                                
-                                if (botStatus) {
-                                    botStatus.classList.remove('running');
-                                    botStatus.classList.add('stopped');
-                                    botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
-                                }
-                            }
-                            
-                            showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
-                        } else {
-                            showToast(`Lỗi: ${data.message || 'Không thể thực hiện hành động'}`, 'error');
-                        }
-                    } else {
-                        showToast(`Lỗi server: ${xhr.status}`, 'error');
-                    }
+                <div class="mb-3">
+                    <div class="info-label">Số dư</div>
+                    <h3 class="info-value">
+                        ${{ account_data.balance|default(bot_status.balance)|round(2) }}
+                        {% if bot_status.mode == 'testnet' or bot_status.mode == 'demo' %}
+                        <span class="badge {{ 'bg-secondary' if bot_status.mode == 'demo' else 'testnet-badge' }}">{{ bot_status.mode }}</span>
+                        {% endif %}
+                    </h3>
                     
-                    // Dừng loading state
-                    setTimeout(() => setButtonLoading(button, false), 500);
-                };
-                
-                xhr.onerror = function(e) {
-                    debugLog('XHR error', e);
-                    showToast('Lỗi kết nối tới server', 'error');
-                    setTimeout(() => setButtonLoading(button, false), 500);
-                };
-                
-                // Gửi request
-                xhr.send(JSON.stringify({action}));
-                return;
-                
-                // Phần fetch cũ
-                /*
-                const response = await fetch('/api/bot/control', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({action})
-                });
-                */
-
-                const data = await response.json();
-
-                if (data.success) {
-                    if (action === 'start') {
-                        button.classList.remove('btn-success');
-                        button.classList.add('btn-danger');
-                        button.innerHTML = '<i class="bi bi-stop-fill me-2"></i>Dừng Bot';
-
-                        botStatus.classList.remove('stopped');
-                        botStatus.classList.add('running');
-                        botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
-                    } else {
-                        button.classList.remove('btn-danger');
-                        button.classList.add('btn-success');
-                        button.innerHTML = '<i class="bi bi-play-fill me-2"></i>Khởi động Bot';
-
-                        botStatus.classList.remove('running');
-                        botStatus.classList.add('stopped');
-                        botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
-                    }
-
-                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                showToast('Lỗi kết nối tới máy chủ', 'error');
-            } finally {
-                button.disabled = false;
-            }
-        }
-
-        async function handleSaveConfig(button) {
-            try {
-                debugLog('handleSaveConfig', 'start');
-
-                const apiKey = document.getElementById('apiKey').value;
-                const apiSecret = document.getElementById('apiSecret').value;
-                const leverage = elements.leverage.value;
-                const riskPerTrade = elements.riskPerTrade.value;
-                const maxPositions = elements.maxPositions.value;
-
-                if (!apiKey || !apiSecret) {
-                    showToast('Vui lòng nhập API Key và Secret', 'error');
-                    return;
-                }
-
-                setButtonLoading(button, true);
-
-                const config = {
-                    api_key: apiKey,
-                    api_secret: apiSecret,
-                    trading_type: document.getElementById('tradingType').value,
-                    risk_profile: elements.riskLevel.value,
-                    leverage: leverage,
-                    risk_per_trade: riskPerTrade,
-                    max_positions: maxPositions
-                };
-
-                debugLog('Sending config', config);
-                
-                // Lưu vào localStorage
-                try {
-                    // Lưu API key vào localStorage (bảo mật) trước khi gửi đến server
-                    localStorage.setItem('binance_api_key', apiKey);
-                    localStorage.setItem('binance_api_secret', apiSecret);
-                    localStorage.setItem('binance_leverage', leverage);
-                    localStorage.setItem('binance_risk_per_trade', riskPerTrade);
-                    localStorage.setItem('binance_max_positions', maxPositions);
-                    localStorage.setItem('binance_trading_type', document.getElementById('tradingType').value);
-                    localStorage.setItem('binance_risk_profile', elements.riskLevel.value);
-                    
-                    debugLog('Saved config to localStorage', true);
-                } catch (storageErr) {
-                    debugLog('Failed to save to localStorage', storageErr);
-                }
-
-                const response = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-
-                const data = await response.json();
-                debugLog('Save config response', data);
-
-                if (data.success) {
-                    showToast('Đã lưu cấu hình thành công', 'success');
-                    state.isConnected = data.config.is_connected;
-                    updateConnectionStatus(state.isConnected);
-                    
-                    // Cập nhật hiển thị cấu hình hiện tại
-                    document.getElementById('currentLeverage').textContent = 'x' + leverage;
-                    document.getElementById('currentRiskPerTrade').textContent = riskPerTrade + '%';
-                    document.getElementById('currentMaxPositions').textContent = maxPositions;
-                } else {
-                    showToast(`Lỗi: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                debugLog('Save config error', error);
-                showToast(`Lỗi kết nối: ${error.message}`, 'error');
-            } finally {
-                setTimeout(() => setButtonLoading(button, false), 500);
-            }
-        }
-
-        function clearLogs() {
-            elements.messagesContainer.innerHTML = '';
-            addMessage({
-                content: 'Đã xóa nhật ký hệ thống',
-                level: 'info',
-                timestamp: new Date().toLocaleString()
-            });
-        }
-
-        // Helper functions
-        function showToast(message, type = 'success') {
-            debugLog('showToast', { message, type });
-
-            const toastContainer = document.querySelector('.toast-container') || (() => {
-                const container = document.createElement('div');
-                container.className = 'toast-container position-fixed top-0 end-0 p-3';
-                document.body.appendChild(container);
-                return container;
-            })();
-
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            `;
-
-            toastContainer.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
-            bsToast.show();
-
-            toast.addEventListener('hidden.bs.toast', () => toast.remove());
-        }
-
-        function addMessage(message) {
-            const messageHTML = `
-                <div class="message message-${message.level}">
-                    <div class="d-flex">
-                        <span class="message-badge badge me-2 bg-${message.level}">
-                            <i class="bi ${message.level === 'info' 
-                                ? 'bi-info-circle' 
-                                : (message.level === 'success'
-                                   ? 'bi-check-circle' 
-                                   : (message.level === 'warning'
-                                     ? 'bi-exclamation-triangle'
-                                     : 'bi-x-circle'))}"></i>
-                        </span>
-                        <div class="flex-grow-1">
-                            <div class="message-content">${message.content}</div>
-                            <span class="message-time">${message.timestamp}</span>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div>
+                            <span class="info-label">Thay đổi 24h:</span>
+                            <span class="{{ 'text-success' if account_data.change_24h|default(0) >= 0 else 'text-danger' }}">
+                                {{ '+' if account_data.change_24h|default(0) >= 0 else '' }}{{ account_data.change_24h|default(0)|round(2) }}%
+                            </span>
+                        </div>
+                        <div class="text-end">
+                            <span class="info-label">Thay đổi 7d:</span>
+                            <span class="{{ 'text-success' if account_data.change_7d|default(0) >= 0 else 'text-danger' }}">
+                                {{ '+' if account_data.change_7d|default(0) >= 0 else '' }}{{ account_data.change_7d|default(0)|round(2) }}%
+                            </span>
                         </div>
                     </div>
                 </div>
-            `;
-            elements.messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-        }
-
-        function updateAccountData(data) {
-            document.getElementById('accountBalance').textContent = data.balance.toFixed(2);
-            document.getElementById('availableBalance').textContent = data.available.toFixed(2);
-            document.getElementById('openPositions').textContent = data.positions?.length || 0;
-        }
-
-        function updateMarketData(data) {
-            document.getElementById('btcPrice').textContent = `$${data.btc_price.toFixed(2)}`;
-            document.getElementById('ethPrice').textContent = `$${data.eth_price.toFixed(2)}`;
-            document.getElementById('solPrice').textContent = `$${data.sol_price.toFixed(2)}`;
-            document.getElementById('bnbPrice').textContent = `$${data.bnb_price.toFixed(2)}`;
-        }
-        
-        function notifyNewTrade(message) {
-            // Thêm thông báo âm thanh khi có giao dịch mới
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(e => console.log('Không thể phát âm thanh thông báo:', e));
-            
-            // Hiển thị thông báo desktop nếu được hỗ trợ
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("Giao dịch mới", {
-                    body: message.content,
-                    icon: "https://cdn-icons-png.flaticon.com/512/5499/5499403.png"
-                });
-            } else if ("Notification" in window && Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        new Notification("Giao dịch mới", {
-                            body: message.content,
-                            icon: "https://cdn-icons-png.flaticon.com/512/5499/5499403.png"
-                        });
-                    }
-                });
-            }
-            
-            // Hiển thị thông báo trong ứng dụng
-            showToast(message.content, 'success');
-        }
-
-        // Risk level changes
-        elements.riskLevel.addEventListener('change', function() {
-            const levels = {
-                low: { leverage: 2, riskPerTrade: 1, maxTrades: 10, dailyTarget: 1 },
-                medium: { leverage: 5, riskPerTrade: 2.5, maxTrades: 4, dailyTarget: 2 },
-                high: { leverage: 10, riskPerTrade: 5, maxTrades: 2, dailyTarget: 3 }
-            };
-
-            const level = levels[this.value];
-            elements.riskDetails.innerHTML = `
-                <p class="mb-1"><strong>Đòn bẩy:</strong> ${level.leverage}x</p>
-                <p class="mb-1"><strong>Rủi ro mỗi lệnh:</strong> ${level.riskPerTrade}% tài khoản</p>
-                <p class="mb-1"><strong>Số lệnh tối đa:</strong> ${level.maxTrades} lệnh</p>
-                <p class="mb-0"><strong>Target lợi nhuận:</strong> ${level.dailyTarget}% mỗi ngày</p>
-            `;
-        });
-
-        // Filter logs
-        document.getElementById('showInfoLogs').addEventListener('change', filterLogs);
-        document.getElementById('showSuccessLogs').addEventListener('change', filterLogs);
-        document.getElementById('showWarningLogs').addEventListener('change', filterLogs);
-        document.getElementById('showErrorLogs').addEventListener('change', filterLogs);
-        
-        function filterLogs() {
-            const showInfo = document.getElementById('showInfoLogs').checked;
-            const showSuccess = document.getElementById('showSuccessLogs').checked;
-            const showWarning = document.getElementById('showWarningLogs').checked;
-            const showError = document.getElementById('showErrorLogs').checked;
-            
-            const messages = elements.messagesContainer.querySelectorAll('.message');
-            
-            messages.forEach(message => {
-                if (message.classList.contains('message-info')) {
-                    message.style.display = showInfo ? 'block' : 'none';
-                } else if (message.classList.contains('message-success')) {
-                    message.style.display = showSuccess ? 'block' : 'none';
-                } else if (message.classList.contains('message-warning')) {
-                    message.style.display = showWarning ? 'block' : 'none';
-                } else if (message.classList.contains('message-error')) {
-                    message.style.display = showError ? 'block' : 'none';
-                }
-            });
-        }
-        
-        // Initialize on load
-        window.addEventListener('load', () => {
-            // Yêu cầu quyền thông báo
-            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-                Notification.requestPermission();
-            }
-            
-            // Tải cấu hình từ localStorage nếu có
-            try {
-                const savedApiKey = localStorage.getItem('binance_api_key');
-                const savedApiSecret = localStorage.getItem('binance_api_secret');
-                const savedLeverage = localStorage.getItem('binance_leverage');
-                const savedRiskPerTrade = localStorage.getItem('binance_risk_per_trade');
-                const savedMaxPositions = localStorage.getItem('binance_max_positions');
-                const savedTradingType = localStorage.getItem('binance_trading_type');
-                const savedRiskProfile = localStorage.getItem('binance_risk_profile');
                 
-                if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
-                if (savedApiSecret) document.getElementById('apiSecret').value = savedApiSecret;
-                if (savedLeverage) elements.leverage.value = savedLeverage;
-                if (savedRiskPerTrade) elements.riskPerTrade.value = savedRiskPerTrade;
-                if (savedMaxPositions) elements.maxPositions.value = savedMaxPositions;
-                if (savedTradingType) document.getElementById('tradingType').value = savedTradingType;
-                if (savedRiskProfile) elements.riskLevel.value = savedRiskProfile;
-                
-                // Cập nhật hiển thị cấu hình nếu có
-                if (savedLeverage) document.getElementById('currentLeverage').textContent = 'x' + savedLeverage;
-                if (savedRiskPerTrade) document.getElementById('currentRiskPerTrade').textContent = savedRiskPerTrade + '%';
-                if (savedMaxPositions) document.getElementById('currentMaxPositions').textContent = savedMaxPositions;
-                
-                // Hiển thị thông báo nếu tải được cấu hình
-                if (savedApiKey && savedApiSecret) {
-                    showToast('Đã tải cấu hình từ trình duyệt của bạn', 'success');
-                }
-            } catch (e) {
-                console.log('Không thể tải cấu hình từ localStorage:', e);
-            }
-            
-            // Khởi tạo giao diện
-            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-            elements.riskLevel.dispatchEvent(new Event('change'));
-            elements.leverage.dispatchEvent(new Event('input'));
-            elements.riskPerTrade.dispatchEvent(new Event('input'));
-            elements.maxPositions.dispatchEvent(new Event('input'));
-            
-            // Thêm sự kiện xem chi tiết vị thế
-            document.getElementById('viewPositionsLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                // Đây sẽ là nơi mở modal hiển thị chi tiết vị thế
-                showToast('Tính năng này đang được phát triển', 'info');
-            });
-            
-            // Fix: Thêm event listener trực tiếp cho nút khởi động bot và wrapper
-            const controlButton = document.getElementById('controlButton');
-            const buttonWrapper = document.querySelector('.control-button-wrapper');
-            
-            if (controlButton) {
-                console.log('Đã tìm thấy nút điều khiển bot, thêm event listener');
-                
-                // Xóa event click cũ (nếu có)
-                controlButton.onclick = null;
-                
-                // Tạo hàm xử lý riêng cho nút
-                const handleBotControl = function(e) {
-                    if (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    console.log('Đã gọi hàm xử lý nút điều khiển bot');
-                    
-                    // Xử lý trực tiếp thay vì gọi handleControlButton()
-                    const button = document.getElementById('controlButton');
-                    if (!button || button.disabled) {
-                        console.log('Nút không tồn tại hoặc đang bị disabled');
-                        return;
-                    }
-                    
-                    button.disabled = true;
-                    console.log('Button đã disabled trong quá trình xử lý');
-
-                    try {
-                        const action = button.getAttribute('data-action') || (button.textContent.includes('Dừng') ? 'stop' : 'start');
-                        console.log('Hành động:', action);
-
-                        console.log('Gửi request đến /api/bot/control với action =', action);
-                        showToast('Đang ' + (action === 'start' ? 'khởi động' : 'dừng') + ' bot...', 'info');
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="info-label">Lợi nhuận tích lũy</div>
+                        <span class="{{ 'text-success' if account_data.total_profit|default(0) >= 0 else 'text-danger' }}">
+                            ${{ account_data.total_profit|default(0)|round(2) }}
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        {% set profit_percent = account_data.total_profit_percent|default(2.8) %}
+                        {% set progress_class = "bg-success" if profit_percent >= 0 else "bg-danger" %}
+                        {% set progress_width = (profit_percent|abs)|string + '%' %}
                         
-                        // Sử dụng XHR thay vì fetch để kiểm tra vấn đề
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('POST', '/api/bot/control', true);
-                        xhr.setRequestHeader('Content-Type', 'application/json');
-                        xhr.onload = function() {
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                const data = JSON.parse(xhr.responseText);
-                                if (data.success) {
-                                    if (action === 'start') {
-                                        button.classList.remove('btn-success');
-                                        button.classList.add('btn-danger');
-                                        button.innerHTML = '<i class="bi bi-stop-fill me-2"></i>Dừng Bot';
-                                        button.setAttribute('data-action', 'stop');
+                        <div class="progress-bar {{ progress_class }}" role="progressbar" 
+                             style="width: {{ progress_width }}" 
+                             aria-valuenow="{{ profit_percent|abs }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="info-label">Vị thế đang mở</div>
+                        <div>{{ account_data.positions|default([])|length }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">P/L chưa chốt</div>
+                        <div class="{{ 'text-success' if account_data.unrealized_pnl|default(0) >= 0 else 'text-danger' }}">
+                            ${{ account_data.unrealized_pnl|default(0)|round(2) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Market Overview -->
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="info-card h-100">
+                <h5 class="mb-3">Tổng quan thị trường</h5>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="info-label mb-1">BTC/USDT</div>
+                            <div class="info-value">${{ market_data.btc_price|default(fake_prices.BTCUSDT)|round(2) }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="price-change {{ 'positive' if market_data.btc_change_24h|default(0) > 0 else 'negative' if market_data.btc_change_24h|default(0) < 0 else '' }}">
+                                {{ market_data.btc_change_24h|default(0)|round(2) }}%
+                            </div>
+                            <div class="small text-muted">24h</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="info-label mb-1">ETH/USDT</div>
+                            <div class="info-value">${{ market_data.eth_price|default(fake_prices.ETHUSDT)|round(2) }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="price-change {{ 'positive' if market_data.eth_change_24h|default(0) > 0 else 'negative' if market_data.eth_change_24h|default(0) < 0 else '' }}">
+                                {{ market_data.eth_change_24h|default(0)|round(2) }}%
+                            </div>
+                            <div class="small text-muted">24h</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="info-label">Chế độ thị trường</div>
+                    <div class="d-flex align-items-center">
+                        <div class="market-mode {{ market_data.market_mode|default('uptrend')|lower }}">
+                            <i class="bi {{ 'bi-graph-up-arrow' if market_data.market_mode|default('uptrend') == 'uptrend' else 'bi-graph-down-arrow' if market_data.market_mode|default('uptrend') == 'downtrend' else 'bi-arrow-left-right' }}"></i>
+                            {{ market_data.market_mode|default('Uptrend') }}
+                        </div>
+                        <div class="ms-2 small">
+                            ({{ market_data.market_strength|default(72) }}%)
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="info-label">Biến động</div>
+                    <div class="d-flex align-items-center">
+                        <div class="volatility-meter {{ market_data.volatility_level|default('medium')|lower }}">
+                            <i class="bi bi-activity"></i>
+                            {{ market_data.volatility_level|default('Medium') }}
+                        </div>
+                        <div class="progress ms-2 flex-grow-1" style="height: 6px;">
+                            {% set volatility = market_data.volatility_value|default(45) %}
+                            <div class="progress-bar 
+                                {% if volatility < 30 %}bg-success
+                                {% elif volatility < 70 %}bg-warning
+                                {% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ volatility }}%;" 
+                                 aria-valuenow="{{ volatility }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Current Strategy -->
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="info-card h-100">
+                <h5 class="mb-3">Chiến lược hiện tại</h5>
+                
+                <div class="mb-3">
+                    <div class="info-label">Chiến lược đang dùng</div>
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0 me-2">{{ bot_status.active_strategy|default('RSI Strategy') }}</h5>
+                        {% if bot_status.strategy_mode == 'auto' %}
+                        <span class="badge bg-info">Tự động</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="info-label">Hiệu suất gần đây</div>
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Win rate:</span>
+                        <div class="progress flex-grow-1" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ strategy_stats.win_rate|default(62.5) }}%;" 
+                                 aria-valuenow="{{ strategy_stats.win_rate|default(62.5) }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <span class="ms-2">{{ strategy_stats.win_rate|default(62.5) }}%</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="info-label">Tín hiệu gần nhất</div>
+                    <table class="table table-sm signals-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Tín hiệu</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for signal in signals|default([
+                                {'symbol': 'BTCUSDT', 'signal': 'buy', 'time': '14:25'},
+                                {'symbol': 'ETHUSDT', 'signal': 'sell', 'time': '14:15'},
+                                {'symbol': 'SOLUSDT', 'signal': 'neutral', 'time': '14:10'}
+                            ]) %}
+                            <tr>
+                                <td>{{ signal.symbol }}</td>
+                                <td>
+                                    <span class="badge {{ 'bg-success' if signal.signal == 'buy' else 'bg-danger' if signal.signal == 'sell' else 'bg-secondary' }}">
+                                        {{ signal.signal|upper }}
+                                    </span>
+                                </td>
+                                <td>{{ signal.time }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="/strategies" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-gear me-1"></i>
+                        Cấu hình chiến lược
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="info-card h-100">
+                <h5 class="mb-3">Hoạt động gần đây</h5>
+                
+                <div class="activity-list">
+                    {% for activity in activities|default([
+                        {'type': 'trade', 'time': '14:25', 'description': 'Mở vị thế BUY BTCUSDT tại $71250.50', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'},
+                        {'type': 'system', 'time': '14:15', 'description': 'Thị trường được phát hiện trong chế độ Uptrend', 'icon': 'bi-graph-up', 'class': 'text-primary'},
+                        {'type': 'trade', 'time': '13:45', 'description': 'Đóng vị thế SELL ETHUSDT P/L: -$25.50 (-1.2%)', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
+                        {'type': 'trade', 'time': '13:30', 'description': 'Mở vị thế SELL ETHUSDT tại $3155.75', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
+                        {'type': 'system', 'time': '13:00', 'description': 'Bot đã bắt đầu theo dõi SOLUSDT', 'icon': 'bi-plus-circle', 'class': 'text-info'},
+                        {'type': 'trade', 'time': '12:45', 'description': 'Đóng vị thế BUY BTCUSDT P/L: +$350.00 (+1.75%)', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'}
+                    ]) %}
+                    <div class="activity-item">
+                        <div class="activity-icon {{ activity.class }}">
+                            <i class="bi {{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-time">{{ activity.time }}</div>
+                            <div class="activity-description">{{ activity.description }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-grid mt-3">
+                    <a href="/trades" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-clock-history me-1"></i>
+                        Xem tất cả
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Portfolio Performance -->
+        <div class="col-md-8 mb-4">
+            <div class="info-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Hiệu suất danh mục</h5>
+                    
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary period-btn active" data-period="1w">1 Tuần</button>
+                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="1m">1 Tháng</button>
+                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="3m">3 Tháng</button>
+                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="1y">1 Năm</button>
+                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="all">Tất cả</button>
+                    </div>
+                </div>
+                
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                
+                <div class="row mt-3 stats-row">
+                    <div class="col-md-3 col-6">
+                        <div class="info-label">Tổng giao dịch</div>
+                        <div class="info-value">{{ performance_stats.total_trades|default(24) }}</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-label">Win rate</div>
+                        <div class="info-value">{{ performance_stats.win_rate|default(62.5) }}%</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-label">Profit factor</div>
+                        <div class="info-value">{{ performance_stats.profit_factor|default(1.85) }}</div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-label">Drawdown tối đa</div>
+                        <div class="info-value">{{ performance_stats.max_drawdown|default(12.3) }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Open Positions -->
+        <div class="col-md-4 mb-4">
+            <div class="info-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Vị thế đang mở</h5>
+                    
+                    <a href="/position" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-wallet2 me-1"></i>
+                        Quản lý vị thế
+                    </a>
+                </div>
+                
+                {% if account_data.positions and account_data.positions|length > 0 %}
+                    {% for position in account_data.positions %}
+                    <div class="position-summary mb-3 p-3 rounded 
+                        {% if position.pnl > 0 %}bg-success bg-opacity-10 border-success{% 
+                        elif position.pnl < 0 %}bg-danger bg-opacity-10 border-danger{% 
+                        else %}bg-secondary bg-opacity-10 border-secondary{% endif %} border-opacity-25 border-start border-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">{{ position.symbol }}</h6>
+                                <span class="badge bg-{{ 'success' if position.type == 'LONG' else 'danger' }}">
+                                    {{ position.type }}
+                                </span>
+                                <span class="badge bg-secondary">
+                                    x{{ position.leverage|default(1) }}
+                                </span>
+                            </div>
+                            <div class="text-end">
+                                <div class="{{ 'text-success' if position.pnl > 0 else 'text-danger' if position.pnl < 0 else '' }}">
+                                    ${{ position.pnl|round(2) }} ({{ position.pnl_percent|round(2) }}%)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small">
+                                <div>Giá vào: ${{ position.entry_price|round(2) }}</div>
+                                <div>Giá hiện tại: ${{ position.current_price|round(2) }}</div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-danger close-position-btn" data-position-id="{{ position.id }}">
+                                    Đóng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-wallet2 fs-1 text-muted"></i>
+                    <p class="mt-3 text-muted">Không có vị thế nào đang mở</p>
+                </div>
+                {% endif %}
+                
+                {% if account_data.positions and account_data.positions|length > 3 %}
+                <div class="d-grid mt-3">
+                    <a href="/position" class="btn btn-outline-secondary btn-sm">
+                        Xem tất cả vị thế ({{ account_data.positions|length }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Market Watchlist -->
+        <div class="col-md-6 mb-4">
+            <div class="info-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Watchlist</h5>
+                    
+                    <button class="btn btn-sm btn-outline-secondary add-watchlist-btn">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Thêm
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-sm watchlist-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Giá</th>
+                                <th>24h %</th>
+                                <th>Tín hiệu</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for symbol, data in watchlist.items() %}
+                            <tr>
+                                <td>{{ symbol }}</td>
+                                <td>${{ data.price|round(2) }}</td>
+                                <td class="{{ 'text-success' if data.change_24h > 0 else 'text-danger' if data.change_24h < 0 else '' }}">
+                                    {{ '+' if data.change_24h > 0 else '' }}{{ data.change_24h|round(2) }}%
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'bg-success' if data.signal == 'BUY' else 'bg-danger' if data.signal == 'SELL' else 'bg-secondary' }}">
+                                        {{ data.signal }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary create-position-btn" data-symbol="{{ symbol }}">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-grid mt-3">
+                    <a href="/market" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Phân tích thị trường
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trade Statistics -->
+        <div class="col-md-6 mb-4">
+            <div class="info-card">
+                <h5 class="mb-3">Thống kê giao dịch</h5>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-label">Phân bố giao dịch</div>
+                        <div class="chart-container" style="height: 180px;">
+                            <canvas id="tradeDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-label">Lý do đóng vị thế</div>
+                        <div class="chart-container" style="height: 180px;">
+                            <canvas id="exitReasonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-label">Thời gian giao dịch trung bình</div>
+                        <div class="info-value">{{ trade_stats.avg_trade_time|default('5h 23m') }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-label">Lợi nhuận / Lệnh</div>
+                        <div class="info-value">${{ trade_stats.avg_profit_per_trade|default(28.75)|round(2) }}</div>
+                    </div>
+                </div>
+                
+                <div class="d-grid mt-3">
+                    <a href="/trades" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-bar-chart me-1"></i>
+                        Xem báo cáo chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-                                        const botStatus = document.querySelector('.bot-status');
-                                        if (botStatus) {
-                                            botStatus.classList.remove('stopped');
-                                            botStatus.classList.add('running');
-                                            botStatus.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i>Đang chạy';
-                                        }
-                                    } else {
-                                        button.classList.remove('btn-danger');
-                                        button.classList.add('btn-success');
-                                        button.innerHTML = '<i class="bi bi-play-fill me-2"></i>Khởi động Bot';
-                                        button.setAttribute('data-action', 'start');
-
-                                        const botStatus = document.querySelector('.bot-status');
-                                        if (botStatus) {
-                                            botStatus.classList.remove('running');
-                                            botStatus.classList.add('stopped');
-                                            botStatus.innerHTML = '<i class="bi bi-stop-circle-fill me-2"></i>Đã dừng';
-                                        }
-                                    }
-
-                                    showToast(action === 'start' ? 'Bot đã được khởi động' : 'Bot đã dừng lại', 'success');
-                                } else {
-                                    showToast(`Lỗi: ${data.message}`, 'error');
-                                }
-                            } else {
-                                showToast('Lỗi kết nối tới máy chủ: ' + xhr.status, 'error');
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Bot Control Buttons
+        const startBotBtn = document.getElementById('startBotBtn');
+        const stopBotBtn = document.getElementById('stopBotBtn');
+        const restartBotBtn = document.getElementById('restartBotBtn');
+        const refreshStatusBtn = document.getElementById('refreshStatusBtn');
+        
+        if (startBotBtn) {
+            startBotBtn.addEventListener('click', function() {
+                showLoading();
+                
+                // In a real app, this would send an API request to start the bot
+                setTimeout(() => {
+                    hideLoading();
+                    showToast('Thành công', 'Bot đã được khởi động', 'success');
+                    
+                    // Reload page to reflect new bot status
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }, 1000);
+            });
+        }
+        
+        if (stopBotBtn) {
+            stopBotBtn.addEventListener('click', function() {
+                showLoading();
+                
+                // In a real app, this would send an API request to stop the bot
+                setTimeout(() => {
+                    hideLoading();
+                    showToast('Thông báo', 'Bot đã được dừng lại', 'info');
+                    
+                    // Reload page to reflect new bot status
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }, 1000);
+            });
+        }
+        
+        if (restartBotBtn) {
+            restartBotBtn.addEventListener('click', function() {
+                showLoading();
+                
+                // In a real app, this would send an API request to restart the bot
+                setTimeout(() => {
+                    hideLoading();
+                    showToast('Thành công', 'Bot đã được khởi động lại', 'success');
+                    
+                    // Reload page to reflect new bot status
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }, 1000);
+            });
+        }
+        
+        if (refreshStatusBtn) {
+            refreshStatusBtn.addEventListener('click', function() {
+                showLoading();
+                
+                // In a real app, this would fetch the current bot status
+                setTimeout(() => {
+                    hideLoading();
+                    showToast('Thành công', 'Trạng thái đã được cập nhật', 'success');
+                    
+                    // Reload page to reflect updated status
+                    window.location.reload();
+                }, 1000);
+            });
+        }
+        
+        // Performance Chart
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', '11/01', '12/01', '13/01', '14/01', '15/01', '16/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01', '23/01', '24/01', '25/01', '26/01', '27/01', '28/01'],
+                datasets: [{
+                    label: 'Bot Performance',
+                    data: [0, 0.5, 1.2, 1.8, 2.5, 2.1, 2.8, 3.5, 4.2, 3.8, 4.5, 5.2, 6.1, 5.8, 6.5, 7.2, 8.0, 8.8, 9.5, 9.0, 9.8, 10.5, 11.2, 11.8, 12.5, 13.2, 14.0, 14.5],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'BTC Performance',
+                    data: [0, 0.2, 0.5, 0.9, 1.5, 2.0, 2.2, 1.8, 2.5, 3.2, 3.8, 4.0, 4.2, 3.8, 4.3, 4.9, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.2, 10.8, 11.2],
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.0)',
+                    tension: 0.4,
+                    fill: false,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
                             }
-                            button.disabled = false;
-                        };
-                        xhr.onerror = function() {
-                            showToast('Lỗi kết nối tới máy chủ', 'error');
-                            button.disabled = false;
-                        };
-                        xhr.send(JSON.stringify({action}));
-                    } catch (error) {
-                        console.error('Lỗi khi xử lý nút:', error);
-                        showToast('Lỗi kết nối tới máy chủ', 'error');
-                        button.disabled = false;
+                        }
+                    },
+                    legend: {
+                        position: 'top',
                     }
-                };
-                
-                // Thêm sự kiện cho button
-                controlButton.addEventListener('click', handleBotControl);
-                controlButton.addEventListener('touchend', handleBotControl);
-                
-                // Thêm sự kiện cho wrapper
-                if (buttonWrapper) {
-                    console.log('Đã tìm thấy wrapper cho nút, thêm event listener');
-                    buttonWrapper.addEventListener('click', handleBotControl);
-                    buttonWrapper.addEventListener('touchend', handleBotControl);
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
                 }
-                
-                // Thêm nút khởi động bot cố định ở góc màn hình cho thiết bị di động
-                if (window.innerWidth <= 768) {
-                    const floatingButton = document.createElement('div');
-                    floatingButton.className = 'floating-control-button';
-                    floatingButton.innerHTML = controlButton.getAttribute('data-action') === 'stop' ?
-                        '<i class="bi bi-stop-fill"></i>' : '<i class="bi bi-play-fill"></i>';
-                    
-                    floatingButton.addEventListener('click', handleBotControl);
-                    floatingButton.addEventListener('touchend', handleBotControl);
-                    
-                    document.body.appendChild(floatingButton);
-                    console.log('Đã thêm nút điều khiển nổi cho thiết bị di động');
-                }
-            } else {
-                console.error('Không tìm thấy nút điều khiển bot với id "controlButton"');
             }
         });
-    </script>
-</body>
-</html>
+        
+        // Trade Distribution Chart
+        const tradeDistCtx = document.getElementById('tradeDistributionChart').getContext('2d');
+        const tradeDistributionChart = new Chart(tradeDistCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'AVAXUSDT', 'Other'],
+                datasets: [{
+                    data: [42, 28, 15, 10, 5],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Exit Reason Chart
+        const exitReasonCtx = document.getElementById('exitReasonChart').getContext('2d');
+        const exitReasonChart = new Chart(exitReasonCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Take Profit', 'Stop Loss', 'Trailing Stop', 'Manual'],
+                datasets: [{
+                    data: [45, 30, 15, 10],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(220, 53, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(108, 117, 125, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(108, 117, 125, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Period buttons for performance chart
+        const periodBtns = document.querySelectorAll('.period-btn');
+        
+        periodBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                periodBtns.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get selected period
+                const period = this.getAttribute('data-period');
+                
+                // Update chart data based on period
+                updatePerformanceChart(period);
+            });
+        });
+        
+        // Function to update performance chart based on selected period
+        function updatePerformanceChart(period) {
+            // In a real app, this would fetch data for the selected period
+            // For demo, we'll just show different data for each period
+            
+            let labels = [];
+            let botData = [];
+            let btcData = [];
+            
+            switch(period) {
+                case '1w':
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    botData = [0, 0.8, 1.5, 2.2, 3.0, 3.5, 4.2];
+                    btcData = [0, 0.5, 1.0, 1.8, 2.3, 2.8, 3.0];
+                    break;
+                case '1m':
+                    labels = Array.from({length: 30}, (_, i) => `${i+1}`);
+                    botData = Array.from({length: 30}, (_, i) => i * 0.5);
+                    btcData = Array.from({length: 30}, (_, i) => i * 0.4);
+                    break;
+                case '3m':
+                    labels = ['Jan', 'Feb', 'Mar'];
+                    botData = [5, 12, 18];
+                    btcData = [4, 10, 14];
+                    break;
+                case '1y':
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    botData = [2, 5, 9, 12, 15, 18, 22, 26, 30, 35, 42, 48];
+                    btcData = [1, 3, 6, 9, 13, 16, 19, 22, 25, 28, 32, 38];
+                    break;
+                case 'all':
+                    labels = ['2020', '2021', '2022', '2023', '2024', '2025'];
+                    botData = [15, 48, 35, 68, 92, 125];
+                    btcData = [12, 40, 28, 55, 75, 100];
+                    break;
+            }
+            
+            // Update chart data
+            performanceChart.data.labels = labels;
+            performanceChart.data.datasets[0].data = botData;
+            performanceChart.data.datasets[1].data = btcData;
+            
+            // Update chart
+            performanceChart.update();
+        }
+        
+        // Close position buttons
+        const closePositionBtns = document.querySelectorAll('.close-position-btn');
+        
+        closePositionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const positionId = this.getAttribute('data-position-id');
+                
+                if (confirm('Bạn có chắc chắn muốn đóng vị thế này?')) {
+                    showLoading();
+                    
+                    // In a real app, this would send an API request to close the position
+                    setTimeout(() => {
+                        hideLoading();
+                        showToast('Thành công', 'Vị thế đã được đóng', 'success');
+                        
+                        // Remove the position from the UI or reload the page
+                        // For demo, we'll reload the page
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }, 1000);
+                }
+            });
+        });
+        
+        // Create position buttons
+        const createPositionBtns = document.querySelectorAll('.create-position-btn');
+        
+        createPositionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const symbol = this.getAttribute('data-symbol');
+                
+                // In a real app, this would redirect to the position page with the symbol pre-selected
+                // or open a modal to create a new position
+                window.location.href = `/position?symbol=${symbol}`;
+            });
+        });
+    });
+</script>
+{% endblock %}
