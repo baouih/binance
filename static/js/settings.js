@@ -148,13 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Cập nhật UI với dữ liệu từ server
                 enableTelegramNotifications.checked = data.enabled;
                 
-                if (data.bot_token) {
-                    telegramBotToken.value = data.bot_token;
-                }
+                // Đặt giá trị token, sử dụng giá trị từ server hoặc mặc định
+                telegramBotToken.value = data.bot_token || "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
                 
-                if (data.chat_id) {
-                    telegramChatId.value = data.chat_id;
-                }
+                // Đặt giá trị chat ID, sử dụng giá trị từ server hoặc mặc định
+                telegramChatId.value = data.chat_id || "1834332146";
                 
                 if (data.min_interval) {
                     const minIntervalInput = document.getElementById('notify-min-interval');
@@ -173,6 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
             window.hideLoading();
             
             console.error('Lỗi kết nối khi tải cấu hình Telegram:', error);
+            
+            // Đặt giá trị mặc định khi không thể tải từ server
+            telegramBotToken.value = "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM";
+            telegramChatId.value = "1834332146";
         });
     }
     
