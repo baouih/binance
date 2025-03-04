@@ -558,6 +558,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {% if active_page == 'sentiment' %}active{% endif %}" href="/sentiment/mood">
+                    <i class="bi bi-emoji-smile"></i> Mood Meter
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {% if active_page == 'settings' %}active{% endif %}" href="/settings">
                     <i class="bi bi-sliders"></i> Cài đặt
                 </a>
@@ -605,6 +610,10 @@
         <a class="nav-link {% if active_page == 'trades' %}active{% endif %}" href="/trades">
             <i class="bi bi-clipboard-data"></i>
             <span>Giao dịch</span>
+        </a>
+        <a class="nav-link {% if active_page == 'sentiment' %}active{% endif %}" href="/sentiment/mood">
+            <i class="bi bi-emoji-smile"></i>
+            <span>Mood Meter</span>
         </a>
         <a class="nav-link {% if active_page == 'settings' %}active{% endif %}" href="/settings">
             <i class="bi bi-sliders"></i>
