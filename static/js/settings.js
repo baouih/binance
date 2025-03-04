@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Notification settings elements
     const enableTelegramNotifications = document.getElementById('enable-telegram-notifications');
-    const telegramBotToken = document.getElementById('telegram-bot-token');
-    const telegramChatId = document.getElementById('telegram-chat-id');
-    const testTelegramButton = document.getElementById('test-telegram-button');
-    const saveNotificationButton = document.getElementById('save-notification-button');
+    const telegramBotToken = document.getElementById('telegramBotToken');
+    const telegramChatId = document.getElementById('telegramChatId');
+    const testTelegramBtn = document.getElementById('testTelegramBtn');
+    const saveTelegramSettings = document.getElementById('saveTelegramSettings');
     
     // Security settings elements
     const saveSecurityButton = document.getElementById('save-security-button');
@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
         saveApiButton.addEventListener('click', saveApiSettings);
     }
     
-    if (testTelegramButton) {
-        testTelegramButton.addEventListener('click', testTelegramNotification);
+    if (testTelegramBtn) {
+        testTelegramBtn.addEventListener('click', testTelegramNotification);
     }
     
-    if (saveNotificationButton) {
-        saveNotificationButton.addEventListener('click', saveNotificationSettings);
+    if (saveTelegramSettings) {
+        saveTelegramSettings.addEventListener('click', saveNotificationSettings);
     }
     
     if (saveSecurityButton) {
