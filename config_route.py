@@ -178,8 +178,10 @@ def get_telegram_config():
         
         # Đọc cấu hình Telegram
         if os.path.exists(telegram_config_path):
+            # Đọc trực tiếp từ file để đảm bảo lấy dữ liệu mới nhất
             with open(telegram_config_path, 'r') as f:
                 config = json.load(f)
+                logger.info(f"Đọc cấu hình Telegram từ file: {config}")
         else:
             # Cấu hình mặc định nếu file không tồn tại
             config = {
@@ -196,6 +198,7 @@ def get_telegram_config():
             # Lưu cấu hình mặc định
             with open(telegram_config_path, 'w') as f:
                 json.dump(config, f)
+                logger.info(f"Tạo file cấu hình Telegram mặc định: {config}")
         
         return jsonify({"success": True, "data": config})
     except Exception as e:

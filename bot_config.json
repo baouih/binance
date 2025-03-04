@@ -1,1 +1,5 @@
-{"trading_type": "futures", "leverage": 10, "risk_per_trade": 2.5, "max_positions": 4}
+{
+  "mode": "demo",
+  "account_type": "futures",
+  "balance": 10000.0
+}
