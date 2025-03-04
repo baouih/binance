@@ -36,6 +36,19 @@ class TelegramNotifier:
         self.base_url = "https://api.telegram.org/bot"
         self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN")
         self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+        
+        # Fix token format - ensure it starts with number and not letter
+        if self.token and not self.token.split(':')[0].isdigit():
+            logger.warning(f"Token format không hợp lệ: {self.token}")
+            # Thử tìm số trong token
+            import re
+            numbers = re.findall(r'\d+', self.token)
+            if numbers:
+                # Thử tạo lại định dạng token
+                self.token = f"{numbers[0]}:{self.token.split(':')[-1]}" if ':' in self.token else self.token
+                logger.info(f"Đã điều chỉnh token: {self.token}")
+        
+        # Enabled chỉ khi cả hai đều có giá trị
         self.enabled = bool(self.token and self.chat_id)
         
         if not self.enabled:
