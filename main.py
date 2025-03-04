@@ -42,7 +42,7 @@ bot_status = {
     'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'uptime': 0,
     'version': '1.0.0',
-    'mode': 'demo',  # demo, testnet, live
+    'mode': 'testnet',  # demo, testnet, live - Đã cập nhật mặc định thành testnet
     'last_signal': None,
     'balance': 10000.0,
     'account_type': 'futures',
@@ -778,6 +778,7 @@ def load_config():
             with open(ACCOUNT_CONFIG_PATH, 'r') as f:
                 account_config = json.load(f)
                 # Cập nhật mode từ api_mode trong cấu hình tài khoản
+                logger.info("Đã tải cấu hình tài khoản từ account_config.json")
                 if 'api_mode' in account_config:
                     bot_status['mode'] = account_config['api_mode']
                 if 'account_type' in account_config:
