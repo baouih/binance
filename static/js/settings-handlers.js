@@ -309,14 +309,16 @@ function setupApiSettingsHandlers() {
                                     <div class="alert alert-info small mb-0">
                                         <i class="bi bi-info-circle me-1"></i> Gợi ý: Kiểm tra cấu hình endpoints hoặc cài đặt server API.
                                     </div>
-                                </div>`;
+                                </div>
+                                <div class="mb-5"></div><!-- Thêm khoảng trống dưới để tránh menu che khuất -->`;
                         } else {
                             // Hiển thị các lỗi khác
                             apiStatusElem.innerHTML = `
                                 <div class="api-status api-status-error p-3 mb-2">
                                     <h6 class="error-text mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Lỗi kết nối API</h6>
                                     <p class="mb-0">${error.message}</p>
-                                </div>`;
+                                </div>
+                                <div class="mb-5"></div><!-- Thêm khoảng trống dưới để tránh menu che khuất -->`;
                         }
                     }
                 });

@@ -27,6 +27,7 @@ function showAlert(type, message, timeout = 5000, targetSelector = null) {
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
     alertDiv.style.pointerEvents = 'auto'; // Đảm bảo có thể click vào alert
+    alertDiv.style.zIndex = '1500'; // Thiết lập z-index cao để đảm bảo hiển thị trên các phần tử khác
     
     // Thêm biểu tượng phù hợp
     let icon = 'info-circle';
@@ -61,10 +62,11 @@ function showAlert(type, message, timeout = 5000, targetSelector = null) {
             container.style.top = '80px'; // Đặt cao hơn để tránh menu
             container.style.left = '50%';
             container.style.transform = 'translateX(-50%)';
-            container.style.zIndex = '1060'; // Tăng z-index
+            container.style.zIndex = '1500'; // Tăng z-index cao hơn menu dưới
             container.style.width = '80%';
             container.style.maxWidth = '500px';
             container.style.pointerEvents = 'none'; // Cho phép click xuyên qua phần trong suốt
+            container.style.marginBottom = '60px'; // Tạo khoảng cách với menu dưới
             document.body.insertBefore(container, document.body.firstChild);
         }
     }
@@ -113,7 +115,7 @@ function showToast(title, message, type = 'info', autohide = 5000) {
         toastContainer = document.createElement('div');
         toastContainer.id = 'toastContainer';
         toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        toastContainer.style.zIndex = '1060';
+        toastContainer.style.zIndex = '1500'; // Tăng z-index cao hơn để hiển thị trên menu
         document.body.appendChild(toastContainer);
     }
     

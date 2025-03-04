@@ -277,12 +277,12 @@ canvas {
 /* API connection status */
 .api-status {
     margin-top: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 40px; /* Tăng margin để không bị che bởi menu dưới */
     padding: 12px;
     border-radius: 6px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     position: relative;
-    z-index: 10;
+    z-index: 999; /* Tăng z-index để hiển thị trên menu */
 }
 
 .api-status-success {
