@@ -56,7 +56,13 @@ telegram_config = {
     'bot_token': DEFAULT_BOT_TOKEN,
     'chat_id': DEFAULT_CHAT_ID,
     'min_interval': 5,  # Khoảng thời gian tối thiểu giữa các thông báo (phút)
-    'last_notification': None
+    'last_notification': None,
+    'notify_new_trades': True,
+    'notify_position_opened': True,
+    'notify_position_closed': True,
+    'notify_bot_status': True,
+    'notify_error_status': True,
+    'notify_daily_summary': False
 }
 
 # Khởi tạo Telegram Notifier
