@@ -912,6 +912,7 @@ def get_balance():
     })
 
 @app.route('/api/v1/test-connection', methods=['POST'])
+@app.route('/api/test_connection', methods=['POST'])
 def test_connection():
     """API endpoint để kiểm tra kết nối Binance"""
     global bot_status
@@ -1088,6 +1089,7 @@ def telegram_config_api():
         })
 
 @app.route('/test-telegram', methods=['POST'])
+@app.route('/api/telegram/test', methods=['POST'])
 def test_telegram():
     data = request.json
     
