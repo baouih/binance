@@ -498,6 +498,87 @@ function setupRiskSettingsHandlers() {
 /**
  * Thiết lập các handler cho phần Telegram
  */
+/**
+ * Tải cấu hình Telegram từ server
+ */
+function loadTelegramConfig() {
+    // Hiển thị loading
+    showLoading('Đang tải cấu hình Telegram...');
+    
+    // Tải cấu hình Telegram
+    fetchAPI(API_ENDPOINTS.TELEGRAM_SETTINGS, {
+        method: 'GET'
+    }, false)
+        .then(data => {
+            hideLoading();
+            
+            console.log('Dữ liệu cấu hình Telegram:', data);
+            
+            // Lấy dữ liệu từ response
+            const configData = data.success && data.data ? data.data : data;
+            
+            // Cập nhật trạng thái các phần tử UI
+            updateTelegramUIFromConfig(configData);
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Lỗi khi tải cấu hình Telegram:', error);
+        });
+}
+
+/**
+ * Cập nhật UI dựa trên cấu hình Telegram
+ */
+function updateTelegramUIFromConfig(config) {
+    // Kiểm tra dữ liệu có tồn tại không
+    if (!config) {
+        console.error('Không tìm thấy dữ liệu cấu hình Telegram');
+        return;
+    }
+    
+    // Cập nhật công tắc bật/tắt Telegram
+    const telegramEnabledSwitch = document.getElementById('telegramEnabledSwitch');
+    if (telegramEnabledSwitch) {
+        telegramEnabledSwitch.checked = Boolean(config.enabled);
+    }
+    
+    // Hiển thị/ẩn phần cài đặt Telegram dựa trên trạng thái
+    const telegramSettings = document.getElementById('telegramSettings');
+    if (telegramSettings) {
+        telegramSettings.style.display = Boolean(config.enabled) ? 'block' : 'none';
+    }
+    
+    // Cập nhật token và chat ID
+    const tokenInput = document.getElementById('telegramBotToken');
+    if (tokenInput && config.bot_token) {
+        tokenInput.value = config.bot_token;
+    }
+    
+    const chatIdInput = document.getElementById('telegramChatId');
+    if (chatIdInput && config.chat_id) {
+        chatIdInput.value = config.chat_id;
+    }
+    
+    // Cập nhật các checkbox thông báo chi tiết
+    const notifyMappings = {
+        'notify_new_trades': 'notifyTradingSignals',
+        'notify_position_opened': 'notifyPositionOpened',
+        'notify_position_closed': 'notifyPositionClosed',
+        'notify_bot_status': 'notifyBotStatus',
+        'notify_error_status': 'notifyErrors',
+        'notify_daily_summary': 'notifyDailyReport'
+    };
+    
+    // Cập nhật từng checkbox
+    for (const [serverKey, elementId] of Object.entries(notifyMappings)) {
+        const checkbox = document.getElementById(elementId);
+        if (checkbox && config.hasOwnProperty(serverKey)) {
+            checkbox.checked = Boolean(config[serverKey]);
+            console.log(`Đã cập nhật ${elementId}: ${config[serverKey]}`);
+        }
+    }
+}
+
 function setupTelegramSettingsHandlers() {
     // Toggle Telegram settings visibility
     const telegramEnabledSwitch = document.getElementById('telegramEnabledSwitch');
@@ -509,19 +590,51 @@ function setupTelegramSettingsHandlers() {
         });
     }
     
+    // Tải cấu hình Telegram khi trang được tải
+    loadTelegramConfig();
+    
     // Save Telegram settings
     const saveTelegramSettingsBtn = document.getElementById('saveTelegramSettings');
     if (saveTelegramSettingsBtn) {
         saveTelegramSettingsBtn.addEventListener('click', function () {
             // Check if Telegram is enabled
-            if (!telegramEnabledSwitch?.checked) {
-                showAlert('success', 'Cài đặt Telegram đã được lưu. Thông báo Telegram đã tắt.');
+            const enabled = telegramEnabledSwitch?.checked || false;
+            
+            // Nếu tắt thông báo, lưu config với enabled=false
+            if (!enabled) {
+                // Hiển thị loading
+                showLoading('Đang lưu cài đặt Telegram...');
+                
+                // Gửi API request tắt thông báo
+                fetchAPI(API_ENDPOINTS.TELEGRAM_SETTINGS, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        enabled: false
+                    })
+                }, false)
+                .then(data => {
+                    hideLoading();
+                    showAlert('success', 'Đã tắt thông báo Telegram thành công!');
+                })
+                .catch(() => {
+                    hideLoading();
+                    // Message already shown by fetchAPI
+                });
+                
                 return;
             }
             
             // Lấy các giá trị
             const botToken = document.getElementById('telegramBotToken')?.value;
             const chatId = document.getElementById('telegramChatId')?.value;
+            
+            // Lấy các cài đặt thông báo chi tiết
+            const notifyTradingSignals = document.getElementById('notifyTradingSignals')?.checked || false;
+            const notifyPositionOpened = document.getElementById('notifyPositionOpened')?.checked || false;
+            const notifyPositionClosed = document.getElementById('notifyPositionClosed')?.checked || false;
+            const notifyBotStatus = document.getElementById('notifyBotStatus')?.checked || false;
+            const notifyErrors = document.getElementById('notifyErrors')?.checked || false;
+            const notifyDailyReport = document.getElementById('notifyDailyReport')?.checked || false;
             
             // Validate
             if (!botToken || !chatId) {
@@ -538,7 +651,13 @@ function setupTelegramSettingsHandlers() {
                 body: JSON.stringify({
                     enabled: true,
                     bot_token: botToken,
-                    chat_id: chatId
+                    chat_id: chatId,
+                    notify_new_trades: notifyTradingSignals,
+                    notify_position_opened: notifyPositionOpened,
+                    notify_position_closed: notifyPositionClosed,
+                    notify_bot_status: notifyBotStatus,
+                    notify_error_status: notifyErrors,
+                    notify_daily_summary: notifyDailyReport
                 })
             }, false)
                 .then(data => {
