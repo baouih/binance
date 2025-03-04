@@ -179,25 +179,43 @@ def get_telegram_config():
         # Đọc cấu hình Telegram
         if os.path.exists(telegram_config_path):
             # Đọc trực tiếp từ file để đảm bảo lấy dữ liệu mới nhất
-            with open(telegram_config_path, 'r') as f:
-                config = json.load(f)
-                logger.info(f"Đọc cấu hình Telegram từ file: {config}")
+            try:
+                with open(telegram_config_path, 'r') as f:
+                    config = json.load(f)
+                    logger.info(f"Đọc cấu hình Telegram từ file: {config}")
+            except json.JSONDecodeError:
+                logger.error(f"File cấu hình Telegram không đúng định dạng JSON: {telegram_config_path}")
+                config = {}
         else:
             # Cấu hình mặc định nếu file không tồn tại
-            config = {
-                'enabled': False,
-                'bot_token': '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM',
-                'chat_id': '1834332146',
-                'min_interval': 5,
-                'notify_new_trades': True,
-                'notify_closed_trades': True,
-                'notify_error_status': True,
-                'notify_daily_summary': False
-            }
+            config = {}
             
-            # Lưu cấu hình mặc định
+        # Đảm bảo các giá trị mặc định nếu không có
+        if 'enabled' not in config:
+            config['enabled'] = False
+        if 'bot_token' not in config:
+            config['bot_token'] = '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM'
+        if 'chat_id' not in config:
+            config['chat_id'] = '1834332146'
+        if 'min_interval' not in config:
+            config['min_interval'] = 5
+        if 'notify_new_trades' not in config:
+            config['notify_new_trades'] = True
+        if 'notify_position_opened' not in config:
+            config['notify_position_opened'] = True
+        if 'notify_position_closed' not in config:
+            config['notify_position_closed'] = True
+        if 'notify_bot_status' not in config:
+            config['notify_bot_status'] = True
+        if 'notify_error_status' not in config:
+            config['notify_error_status'] = True
+        if 'notify_daily_summary' not in config:
+            config['notify_daily_summary'] = False
+            
+        # Lưu cấu hình mặc định nếu file không tồn tại
+        if not os.path.exists(telegram_config_path):
             with open(telegram_config_path, 'w') as f:
-                json.dump(config, f)
+                json.dump(config, f, indent=2)
                 logger.info(f"Tạo file cấu hình Telegram mặc định: {config}")
         
         return jsonify({"success": True, "data": config})
@@ -217,20 +235,53 @@ def update_telegram_config():
         # Lưu cấu hình vào telegram_config.json
         config_file = 'telegram_config.json'
         
-        # Tạo hoặc cập nhật cấu hình
-        config = {
-            'enabled': data.get('enabled', False),
-            'bot_token': data.get('bot_token', '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM'),
-            'chat_id': data.get('chat_id', '1834332146'),
-            'min_interval': data.get('min_interval', 5),
-            'notify_new_trades': data.get('notify_new_trades', True),
-            'notify_closed_trades': data.get('notify_closed_trades', True), 
-            'notify_error_status': data.get('notify_error_status', True),
-            'notify_daily_summary': data.get('notify_daily_summary', False)
-        }
+        # Đọc cấu hình hiện tại nếu đã tồn tại
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    existing_config = json.load(f)
+            except:
+                existing_config = {}
+        else:
+            existing_config = {}
+            
+        # Tạo hoặc cập nhật cấu hình, chỉ cập nhật các trường đã gửi
+        config = existing_config.copy()
+        
+        # Cập nhật các trường được gửi từ client
+        if 'enabled' in data:
+            config['enabled'] = data.get('enabled')
+        if 'bot_token' in data:
+            config['bot_token'] = data.get('bot_token')
+        if 'chat_id' in data:
+            config['chat_id'] = data.get('chat_id')
+        if 'min_interval' in data:
+            config['min_interval'] = data.get('min_interval')
+        if 'notify_new_trades' in data:
+            config['notify_new_trades'] = data.get('notify_new_trades')
+        if 'notify_position_opened' in data:
+            config['notify_position_opened'] = data.get('notify_position_opened')
+        if 'notify_position_closed' in data:
+            config['notify_position_closed'] = data.get('notify_position_closed')
+        if 'notify_bot_status' in data:
+            config['notify_bot_status'] = data.get('notify_bot_status')
+        if 'notify_error_status' in data:
+            config['notify_error_status'] = data.get('notify_error_status')
+        if 'notify_daily_summary' in data:
+            config['notify_daily_summary'] = data.get('notify_daily_summary')
+            
+        # Đảm bảo các giá trị mặc định nếu không có
+        if 'enabled' not in config:
+            config['enabled'] = False
+        if 'bot_token' not in config:
+            config['bot_token'] = '8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM'
+        if 'chat_id' not in config:
+            config['chat_id'] = '1834332146'
+        if 'min_interval' not in config:
+            config['min_interval'] = 5
         
         with open(config_file, 'w') as f:
-            json.dump(config, f)
+            json.dump(config, f, indent=2)
         
         logger.info(f"Đã cập nhật cấu hình Telegram thành công!")
         
