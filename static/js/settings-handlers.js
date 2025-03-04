@@ -281,6 +281,33 @@ function setupApiSettingsHandlers() {
                     if (apiStatusElem) {
                         apiStatusElem.innerHTML = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Kết nối thành công</span>';
                     }
+                    
+                    // Cập nhật trạng thái kết nối API trên toàn bộ giao diện
+                    const apiStatusBadges = document.querySelectorAll('.status-badge');
+                    apiStatusBadges.forEach(badge => {
+                        if (badge.classList.contains('connected') || badge.classList.contains('disconnected')) {
+                            badge.classList.remove('disconnected');
+                            badge.classList.add('connected');
+                            
+                            // Cập nhật nội dung
+                            const badgeIcon = badge.querySelector('i');
+                            if (badgeIcon) {
+                                badgeIcon.classList.remove('bi-plug');
+                                badgeIcon.classList.add('bi-plug-fill');
+                            }
+                            
+                            // Cập nhật text
+                            badge.innerHTML = badge.innerHTML.replace('Chưa kết nối', 'Đã kết nối');
+                        }
+                    });
+                    
+                    // Thay đổi nút từ "Lưu cấu hình API" thành "Đã kết nối"
+                    const saveApiBtn = document.getElementById('saveApiSettings');
+                    if (saveApiBtn) {
+                        saveApiBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Đã kết nối';
+                        saveApiBtn.classList.remove('btn-primary');
+                        saveApiBtn.classList.add('btn-success');
+                    }
                 })
                 .catch((error, errorMessage) => {
                     hideLoading();

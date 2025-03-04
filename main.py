@@ -42,7 +42,9 @@ bot_status = {
     'mode': 'demo',  # demo, testnet, live
     'last_signal': None,
     'balance': 10000.0,
-    'account_type': 'futures'
+    'account_type': 'futures',
+    'api_connected': False,
+    'last_api_check': None
 }
 
 # Cấu hình Telegram
@@ -895,6 +897,7 @@ def get_balance():
 @app.route('/api/v1/test-connection', methods=['POST'])
 def test_connection():
     """API endpoint để kiểm tra kết nối Binance"""
+    global bot_status
     try:
         data = request.json
         api_key = data.get('api_key', '')
@@ -909,11 +912,32 @@ def test_connection():
         
         # Ở đây có thể thêm logic kiểm tra kết nối Binance thực tế
         # Nhưng hiện tại chỉ cần trả về thành công
+        
+        # Cập nhật trạng thái kết nối API
+        bot_status['api_connected'] = True
+        bot_status['last_api_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Lưu thông báo hệ thống
+        add_system_message("Kết nối API thành công")
+        
+        # Phát sóng cập nhật trạng thái bot qua socketio
+        socketio.emit('bot_status_update', bot_status)
+        
         return jsonify({
             'success': True,
-            'message': 'Kết nối API thành công'
+            'message': 'Kết nối API thành công',
+            'status': {
+                'api_connected': True,
+                'last_check': bot_status['last_api_check']
+            }
         })
     except Exception as e:
+        # Cập nhật trạng thái kết nối API
+        bot_status['api_connected'] = False
+        
+        # Lưu thông báo hệ thống
+        add_system_message(f"Lỗi kết nối API: {str(e)}")
+        
         return jsonify({
             'success': False,
             'message': f'Lỗi kết nối: {str(e)}'
