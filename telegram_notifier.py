@@ -30,6 +30,24 @@ class TelegramNotifier:
         self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM")
         self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "1834332146")
         self.api_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+        
+        # Màu cho các loại thông báo
+        self.colors = {
+            'info': '🔵',
+            'success': '🟢',
+            'warning': '🟠',
+            'error': '🔴',
+            'trade_entry': '🟢',
+            'trade_exit': '🟣',
+            'trade_profit': '💰',
+            'trade_loss': '📉',
+            'market_alert': '⚠️',
+            'system': '⚙️',
+            'test': '🧪',
+            'alert': '⚠️',
+            'trade': '💰',
+            'signal': '📊'
+        }
     
     def set_token(self, token: str):
         """
