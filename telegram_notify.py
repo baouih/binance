@@ -51,6 +51,21 @@ class TelegramNotifier:
         # Enabled chỉ khi cả hai đều có giá trị
         self.enabled = bool(self.token and self.chat_id)
         
+        # Màu cho các loại thông báo
+        self.colors = {
+            'info': '🔵',
+            'success': '🟢',
+            'warning': '🟠',
+            'error': '🔴',
+            'trade_entry': '🟢',
+            'trade_exit': '🟣',
+            'test': '🧪',
+            'system': '⚙️',
+            'alert': '⚠️',
+            'trade': '💰',
+            'signal': '📊'
+        }
+        
         if not self.enabled:
             logger.warning("Telegram không được kích hoạt. Thiếu token hoặc chat_id.")
     
