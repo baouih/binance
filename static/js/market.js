@@ -3,7 +3,11 @@
  * 
  * This script handles fetching real-time market data from Binance API 
  * and rendering charts and updates for the market page.
+ * Uses UI helpers from ui-helpers.js for consistent user experience.
  */
+
+// Import UI helpers
+import { showAlert, showToast, showLoading, hideLoading, fetchAPI } from './ui-helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Market.js loaded');
@@ -40,6 +44,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const value = this.getAttribute('data-value');
             document.getElementById('timeframe-text').textContent = this.textContent;
             chartConfig.timeframe = value;
+            
+            // Set all options as inactive
+            timeframeOptions.forEach(opt => {
+                opt.classList.remove('active');
+            });
+            
+            // Set current option as active
+            this.classList.add('active');
+            
+            // Show loading toast
+            showToast('Đang cập nhật', `Đang tải dữ liệu khung thời gian ${this.textContent}`, 'info');
+            
             loadMarketData();
         });
     });
@@ -63,6 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update chart type
             chartConfig.type = chartType;
             
+            // Show toast notification
+            showToast('Đang cập nhật', `Đang chuyển sang biểu đồ dạng ${this.textContent}`, 'info');
+            
             // Reinitialize chart
             if (marketChart) {
                 marketChart.destroy();
@@ -74,7 +93,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listener to refresh button
     if (refreshMarketButton) {
         refreshMarketButton.addEventListener('click', function() {
-            loadMarketData();
+            // Update button state to show loading
+            const originalText = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tải...';
+            this.disabled = true;
+            
+            // Show toast notification
+            showToast('Đang cập nhật', 'Đang làm mới dữ liệu thị trường', 'info');
+            
+            // Load market data
+            loadMarketData()
+                .finally(() => {
+                    // Restore button state
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                });
         });
     }
     
@@ -83,8 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
         autoRefreshToggle.addEventListener('change', function() {
             if (this.checked) {
                 enableAutoRefresh();
+                showToast('Thông báo', 'Đã bật tự động làm mới dữ liệu (30 giây/lần)', 'success');
             } else {
                 disableAutoRefresh();
+                showToast('Thông báo', 'Đã tắt tự động làm mới dữ liệu', 'info');
             }
         });
         
@@ -173,15 +208,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     /**
      * Load market overview data
+     * @returns {Promise} Promise that resolves when data is loaded
      */
     function loadMarketData() {
-        // Show loading indicator
-        document.body.classList.add('loading');
-        
-        // Fetch real-time data from API
-        fetch(`/api/market/data?timeframe=${chartConfig.timeframe}`)
-            .then(response => response.json())
-            .then(data => {
+        // Sử dụng hàm fetchAPI từ ui-helpers.js
+        return fetchAPI(`/api/market/data?timeframe=${chartConfig.timeframe}`, {}, true, 
+            // Success callback
+            (data) => {
                 // Update BTC price and change
                 const btcPrice = document.getElementById('btc-price');
                 if (btcPrice && data.btc_price) {
@@ -206,40 +239,90 @@ document.addEventListener('DOMContentLoaded', function() {
                     bnbPrice.textContent = `$${data.bnb_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 }
                 
-                // Hide loading indicator
-                document.body.classList.remove('loading');
+                // Update price changes and colors
+                document.querySelectorAll('.price-change').forEach(el => {
+                    const change = parseFloat(el.textContent);
+                    el.classList.remove('positive', 'negative');
+                    if (change > 0) {
+                        el.classList.add('positive');
+                    } else if (change < 0) {
+                        el.classList.add('negative');
+                    }
+                });
+                
+                // Show success notification
+                showToast('Thông báo', 'Dữ liệu thị trường đã được cập nhật', 'success');
                 
                 // Also update chart data
                 loadChartData();
-            })
-            .catch(error => {
-                console.error('Error fetching market data:', error);
-                document.body.classList.remove('loading');
-                
-                // Show error toast
-                showToast('error', 'Lỗi khi tải dữ liệu thị trường');
-            });
+            },
+            // Error callback
+            (error) => {
+                showAlert('danger', `Lỗi khi tải dữ liệu thị trường: ${error.message}`);
+            }
+        );
     }
     
     /**
      * Load chart data from API
+     * @returns {Promise} Promise that resolves when chart data is loaded
      */
     function loadChartData() {
-        if (!marketChart) return;
+        if (!marketChart) return Promise.resolve();
         
-        // Fetch chart data from API
-        fetch(`/api/market/chart?symbol=${chartConfig.symbol}&timeframe=${chartConfig.timeframe}`)
-            .then(response => response.json())
-            .then(data => {
+        // Hiển thị trạng thái loading cho biểu đồ
+        const chartContainer = marketChartElement.closest('.info-card');
+        if (chartContainer) {
+            chartContainer.classList.add('loading');
+            
+            // Thêm overlay loading nếu chưa có
+            if (!chartContainer.querySelector('.chart-loading')) {
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'chart-loading d-flex align-items-center justify-content-center';
+                loadingOverlay.innerHTML = `
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                `;
+                chartContainer.querySelector('#priceChartContainer').appendChild(loadingOverlay);
+            }
+        }
+        
+        // Sử dụng fetchAPI nhưng không hiển thị loading toàn màn hình
+        return fetchAPI(`/api/market/chart?symbol=${chartConfig.symbol}&timeframe=${chartConfig.timeframe}`, {}, false, 
+            // Success callback
+            (data) => {
                 if (data.labels && data.prices) {
                     updateChart(data.labels, data.prices);
                 } else {
                     console.error('Invalid chart data format:', data);
+                    showAlert('warning', 'Định dạng dữ liệu biểu đồ không hợp lệ');
                 }
-            })
-            .catch(error => {
+                
+                // Xóa trạng thái loading
+                if (chartContainer) {
+                    chartContainer.classList.remove('loading');
+                    const loadingOverlay = chartContainer.querySelector('.chart-loading');
+                    if (loadingOverlay) {
+                        loadingOverlay.remove();
+                    }
+                }
+            },
+            // Error callback
+            (error) => {
                 console.error('Error fetching chart data:', error);
-            });
+                showAlert('danger', `Lỗi khi tải dữ liệu biểu đồ: ${error.message}`);
+                
+                // Xóa trạng thái loading
+                if (chartContainer) {
+                    chartContainer.classList.remove('loading');
+                    const loadingOverlay = chartContainer.querySelector('.chart-loading');
+                    if (loadingOverlay) {
+                        loadingOverlay.remove();
+                    }
+                }
+            }
+        );
     }
     
     /**
