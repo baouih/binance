@@ -212,6 +212,10 @@ function setupApiSettingsHandlers() {
             // Hiển thị loading
             showLoading('Đang lưu cài đặt API...');
             
+            // Lưu dữ liệu vào localStorage để tránh mất khi refresh trang
+            localStorage.setItem('api_key', apiKey);
+            localStorage.setItem('secret_key', secretKey);
+            
             // Gửi API request
             fetchAPI(API_ENDPOINTS.API_SETTINGS, {
                 method: 'POST',
@@ -223,6 +227,12 @@ function setupApiSettingsHandlers() {
                 .then(data => {
                     hideLoading();
                     showAlert('success', 'Cài đặt API đã được lưu thành công!');
+                    
+                    // Xóa thông báo lỗi nếu có
+                    const apiErrorContainer = document.getElementById('apiErrorContainer');
+                    if (apiErrorContainer) {
+                        apiErrorContainer.innerHTML = '';
+                    }
                 })
                 .catch(() => {
                     hideLoading();
@@ -303,6 +313,21 @@ function setupApiSettingsHandlers() {
                     
                     // Thông báo người dùng cần lưu cấu hình thay vì tự động cập nhật
                     showAlert('info', 'Kết nối API thành công! Hãy nhấn nút "Lưu cấu hình API" để lưu lại thông tin.');
+                    
+                    // Hiển thị thông báo trong container lỗi
+                    const apiErrorContainer = document.getElementById('apiErrorContainer');
+                    if (apiErrorContainer) {
+                        apiErrorContainer.innerHTML = `
+                            <div class="alert alert-success">
+                                <h6 class="mb-1"><i class="bi bi-check-circle-fill me-2"></i>Kết nối API thành công!</h6>
+                                <p class="mb-0">Vui lòng nhấp vào nút "Lưu cấu hình API" để hoàn tất cài đặt.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Lưu dữ liệu API vào localStorage để không mất khi refresh trang
+                    localStorage.setItem('temp_api_key', apiKey);
+                    localStorage.setItem('temp_secret_key', secretKey);
                 })
                 .catch((error, errorMessage) => {
                     hideLoading();
