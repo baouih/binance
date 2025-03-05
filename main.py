@@ -849,8 +849,11 @@ def load_config():
                            f"notify_daily_summary={telegram_config['notify_daily_summary']}")
                 
                 # Cập nhật notifier
-                telegram_notifier.set_token(telegram_config['bot_token'])
-                telegram_notifier.set_chat_id(telegram_config['chat_id'])
+                # Khởi tạo lại notifier với token và chat_id mới
+                telegram_notifier = TelegramNotifier(
+                    token=telegram_config['bot_token'],
+                    chat_id=telegram_config['chat_id']
+                )
                 
                 logger.info(f"Đã tải cấu hình Telegram từ {TELEGRAM_CONFIG_PATH}")
         else:
@@ -862,8 +865,11 @@ def load_config():
         # Trong trường hợp lỗi, vẫn đảm bảo sử dụng giá trị mặc định
         telegram_config['bot_token'] = DEFAULT_BOT_TOKEN
         telegram_config['chat_id'] = DEFAULT_CHAT_ID
-        telegram_notifier.set_token(DEFAULT_BOT_TOKEN)
-        telegram_notifier.set_chat_id(DEFAULT_CHAT_ID)
+        # Khởi tạo lại notifier với token và chat_id mặc định
+        telegram_notifier = TelegramNotifier(
+            token=DEFAULT_BOT_TOKEN,
+            chat_id=DEFAULT_CHAT_ID
+        )
 
 # Lưu cấu hình vào file
 def save_config():
@@ -1151,9 +1157,9 @@ def background_tasks():
                 except Exception as e:
                     bg_logger.error(f"Lỗi khi chạy chiến thuật giao dịch: {str(e)}")
             
-            # Tạo tín hiệu giả nếu bot đang chạy và không có dữ liệu từ chiến thuật thật
-            elif bot_status['running'] and len(signals) < 5:
-                generate_fake_signal()
+            # Tạm thời tắt tạo tín hiệu giả để tránh nhầm lẫn với tín hiệu thật
+            # elif bot_status['running'] and len(signals) < 5:
+            #     generate_fake_signal()
             
             # Gửi dữ liệu cập nhật qua SocketIO
             socketio.emit('market_update', {
