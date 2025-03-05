@@ -1,41 +1,38 @@
 #!/bin/bash
 
 # Script tự động khởi động dịch vụ cập nhật dữ liệu thị trường
-# Được thiết kế để chạy khi Replit khởi động
+# Được chạy khi Replit khởi động
 
-# Thư mục hiện tại
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd "$SCRIPT_DIR"
+# Thiết lập môi trường
+export PATH=$PATH:/home/runner/.local/bin
 
-# Tên file PID
-PID_FILE="market_updater.pid"
+# Đường dẫn đến log
+LOG_FILE="auto_start_market_updater.log"
+
+# Ghi log
+echo "$(date) - Bắt đầu khởi động dịch vụ cập nhật dữ liệu thị trường" >> $LOG_FILE
 
 # Kiểm tra xem dịch vụ đã chạy chưa
+PID_FILE="market_updater.pid"
+
 if [ -f "$PID_FILE" ]; then
-    PID=$(cat "$PID_FILE")
-    if ps -p $PID > /dev/null; then
-        echo "Dịch vụ cập nhật dữ liệu thị trường đã chạy với PID: $PID"
+    PID=$(cat $PID_FILE)
+    if kill -0 $PID 2>/dev/null; then
+        echo "$(date) - Dịch vụ đã đang chạy với PID $PID" >> $LOG_FILE
         exit 0
     else
-        echo "Phát hiện file PID lỗi, đang xóa..."
-        rm -f "$PID_FILE"
+        echo "$(date) - PID file tồn tại nhưng dịch vụ không chạy, xóa PID file" >> $LOG_FILE
+        rm -f $PID_FILE
     fi
 fi
 
 # Khởi động dịch vụ trong nền
-echo "Khởi động dịch vụ cập nhật dữ liệu thị trường..."
-nohup python schedule_market_updates.py > market_scheduler_output.log 2>&1 &
+echo "$(date) - Khởi động dịch vụ cập nhật dữ liệu thị trường" >> $LOG_FILE
+nohup python3 start_market_updater.py > market_updater_nohup.log 2>&1 &
 
-# Lưu PID
-echo $! > "$PID_FILE"
-echo "Dịch vụ đã khởi động với PID: $(cat $PID_FILE)"
+# Ghi log thành công
+echo "$(date) - Dịch vụ đã được khởi động với PID $!" >> $LOG_FILE
 
-# Thiết lập quyền thực thi
-chmod +x market_data_updater.py
-chmod +x schedule_market_updates.py
-
-# Chạy cập nhật ngay lập tức
-echo "Đang chạy cập nhật dữ liệu thị trường ngay lập tức..."
-python market_data_updater.py
-
-echo "Hoàn thành khởi động dịch vụ cập nhật dữ liệu thị trường"
+# Thông báo ra màn hình console
+echo "Dịch vụ cập nhật dữ liệu thị trường đã được khởi động."
+echo "Log: tail -f market_updater_nohup.log"
