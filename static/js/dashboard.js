@@ -94,11 +94,23 @@ function fetchAllData() {
  * Fetch market data from API
  */
 function fetchMarketData() {
+    // Thử lấy dữ liệu thị trường từ API
     fetch(API_ENDPOINTS.MARKET)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                console.warn('Market data endpoint error:', response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log('Market data:', data);
-            updatePrices(data);
+            // Xử lý dữ liệu ngay cả khi không đầy đủ
+            try {
+                updatePrices(data);
+            } catch (e) {
+                console.error('Error updating prices:', e);
+                // Tiếp tục ngay cả khi có lỗi
+            }
         })
         .catch(error => {
             console.error('Error fetching market data:', error);
@@ -617,11 +629,50 @@ function updateAccountBalance(currentBalance, accountBalance, initialBalances) {
  * Update prices displayed in the UI
  */
 function updatePrices(data) {
-    // Update current prices in open positions
+    // Kiểm tra xem data có phải là object và không phải null
+    if (!data || typeof data !== 'object') {
+        console.warn('Invalid market data format:', data);
+        return;
+    }
+    
+    console.log('Updating prices with data:', data);
+    
+    // Tìm kiếm giá trong nhiều mẫu dữ liệu có thể
+    // Ví dụ: data.btc_price hoặc data.BTCUSDT hoặc data['BTCUSDT']
     document.querySelectorAll('[data-price-symbol]').forEach(elem => {
         const symbol = elem.getAttribute('data-price-symbol');
+        if (!symbol) return;
+        
+        let price = null;
+        
+        // Kiểm tra nhiều định dạng dữ liệu có thể
         if (data[symbol]) {
-            elem.textContent = formatPrice(data[symbol]);
+            // Định dạng 1: data.BTCUSDT trực tiếp
+            price = data[symbol];
+        } else if (data[symbol.toLowerCase()]) {
+            // Định dạng 2: data.btcusdt
+            price = data[symbol.toLowerCase()];
+        } else {
+            // Định dạng 3: data.btc_price cho BTCUSDT
+            const baseCurrency = symbol.replace('USDT', '').toLowerCase();
+            const priceKey = `${baseCurrency}_price`;
+            if (data[priceKey]) {
+                price = data[priceKey];
+            }
+        }
+        
+        // Cập nhật giá nếu tìm thấy
+        if (price !== null) {
+            try {
+                elem.textContent = formatPrice(price);
+                elem.classList.add('highlight-update');
+                // Xóa highlight sau 1 giây
+                setTimeout(() => {
+                    elem.classList.remove('highlight-update');
+                }, 1000);
+            } catch (e) {
+                console.error('Error formatting price for', symbol, price, e);
+            }
         }
     });
 }

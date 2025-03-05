@@ -292,24 +292,57 @@
                 <h5 class="mb-3">Hoạt động gần đây</h5>
                 
                 <div class="activity-list">
-                    {% for activity in activities|default([
-                        {'type': 'trade', 'time': '14:25', 'description': 'Mở vị thế BUY BTCUSDT tại $71250.50', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'},
-                        {'type': 'system', 'time': '14:15', 'description': 'Thị trường được phát hiện trong chế độ Uptrend', 'icon': 'bi-graph-up', 'class': 'text-primary'},
-                        {'type': 'trade', 'time': '13:45', 'description': 'Đóng vị thế SELL ETHUSDT P/L: -$25.50 (-1.2%)', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
-                        {'type': 'trade', 'time': '13:30', 'description': 'Mở vị thế SELL ETHUSDT tại $3155.75', 'icon': 'bi-arrow-down-circle-fill', 'class': 'text-danger'},
-                        {'type': 'system', 'time': '13:00', 'description': 'Bot đã bắt đầu theo dõi SOLUSDT', 'icon': 'bi-plus-circle', 'class': 'text-info'},
-                        {'type': 'trade', 'time': '12:45', 'description': 'Đóng vị thế BUY BTCUSDT P/L: +$350.00 (+1.75%)', 'icon': 'bi-arrow-up-circle-fill', 'class': 'text-success'}
-                    ]) %}
+                    {# Hiển thị hoạt động từ vị thế thực #}
+                    {% if account_data.activities and account_data.activities|length > 0 %}
+                        {% for activity in account_data.activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon {{ activity.class }}">
+                                    <i class="bi {{ activity.icon }}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-time">{{ activity.time }}</div>
+                                    <div class="activity-description">{{ activity.description }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {% for position in account_data.positions %}
+                            <div class="activity-item">
+                                <div class="activity-icon {% if position.type == 'LONG' %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="bi {% if position.type == 'LONG' %}bi-arrow-up-circle-fill{% else %}bi-arrow-down-circle-fill{% endif %}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-time">
+                                        {% if position.entry_time and ' ' in position.entry_time %}
+                                            {{ position.entry_time.split(' ')[1] }}
+                                        {% else %}
+                                            12:00
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-description">
+                                        {% if position.type == 'LONG' %}
+                                            Mở vị thế BUY {{ position.symbol }} tại ${{ '{:,.2f}'.format(position.entry_price) }}
+                                        {% else %}
+                                            Mở vị thế SELL {{ position.symbol }} tại ${{ '{:,.2f}'.format(position.entry_price) }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {# Hiển thị thông báo mặc định nếu không có vị thế #}
+                    {% if not account_data.positions or account_data.positions|length == 0 %}
                     <div class="activity-item">
-                        <div class="activity-icon {{ activity.class }}">
-                            <i class="bi {{ activity.icon }}"></i>
+                        <div class="activity-icon text-info">
+                            <i class="bi bi-play-circle"></i>
                         </div>
                         <div class="activity-content">
-                            <div class="activity-time">{{ activity.time }}</div>
-                            <div class="activity-description">{{ activity.description }}</div>
+                            <div class="activity-time">12:00</div>
+                            <div class="activity-description">Bot đã bắt đầu hoạt động</div>
                         </div>
                     </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
                 
                 <div class="d-grid mt-3">

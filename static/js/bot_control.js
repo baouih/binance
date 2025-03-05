@@ -163,14 +163,30 @@ function showToast(type, message) {
  */
 function updateBotStatus() {
     // Cập nhật trạng thái bot từ API
-    fetch('/api/bot/status')
-        .then(response => response.json())
+    // Thử endpoint mới trước, nếu lỗi thì sử dụng endpoint cũ
+    fetch('/api/bot/status/check')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Status check failed');
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log('Bot status checked:', data);
+            console.log('Bot status checked (new endpoint):', data);
             updateBotStatusUI(null, data);
         })
         .catch(error => {
-            console.error('Error checking bot status:', error);
+            console.warn('Error using new endpoint, trying old one:', error);
+            // Thử endpoint cũ nếu endpoint mới thất bại
+            fetch('/api/bot/status')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Bot status checked (old endpoint):', data);
+                    updateBotStatusUI(null, data);
+                })
+                .catch(error => {
+                    console.error('Error checking bot status:', error);
+                });
         });
 }
 
@@ -180,16 +196,32 @@ function updateBotStatus() {
  * @param {Object} data - Dữ liệu trạng thái từ API (nếu đã có)
  */
 function updateBotStatusUI(action, statusData = null) {
-    // Nếu không có dữ liệu, lấy từ API
+    // Nếu không có dữ liệu, lấy từ API mới
     if (!statusData) {
-        fetch('/api/bot/status')
-            .then(response => response.json())
+        // Thử endpoint mới trước
+        fetch('/api/bot/status/check')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Status check failed');
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Bot status updated:', data);
+                console.log('Bot status updated (new endpoint):', data);
                 updateBotUIElements(data);
             })
             .catch(error => {
-                console.error('Error updating UI:', error);
+                console.warn('Error using new endpoint for UI update, trying old one:', error);
+                // Thử endpoint cũ nếu endpoint mới thất bại
+                fetch('/api/bot/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Bot status updated (old endpoint):', data);
+                        updateBotUIElements(data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating UI:', error);
+                    });
             });
     } else {
         // Nếu đã có dữ liệu, sử dụng trực tiếp
@@ -202,6 +234,7 @@ function updateBotStatusUI(action, statusData = null) {
  * @param {Object} data - Dữ liệu trạng thái từ API
  */
 function updateBotUIElements(data) {
+    console.log('Updating UI with bot status:', data);
     // Cập nhật trạng thái hiển thị
     const statusIndicator = document.querySelector('.bot-status-indicator');
     if (statusIndicator) {
@@ -210,7 +243,9 @@ function updateBotUIElements(data) {
         
         // Tạo badge mới dựa trên trạng thái
         let badge;
-        if (data.status === 'running') {
+        // Cập nhật trạng thái có thể là data.status hoặc data.running
+        const isRunning = data.status === 'running' || data.running === true;
+        if (isRunning) {
             badge = `<span class="badge rounded-pill text-bg-success">
                 <i class="fas fa-circle-notch fa-spin me-1"></i> Đang chạy
             </span>`;
@@ -234,7 +269,8 @@ function updateBotUIElements(data) {
         const startBtn = dropdownMenu.querySelector('.start-bot-btn');
         const stopBtn = dropdownMenu.querySelector('.stop-bot-btn');
         
-        if (data.status === 'running') {
+        const isRunning = data.status === 'running' || data.running === true;
+        if (isRunning) {
             // Ẩn start, hiện stop
             if (startBtn) startBtn.parentElement.style.display = 'none';
             if (stopBtn) stopBtn.parentElement.style.display = 'block';
@@ -253,7 +289,8 @@ function updateBotUIElements(data) {
     
     const statusDotElements = document.querySelectorAll('[id="status-dot"]');
     statusDotElements.forEach(element => {
-        if (data.status === 'running') {
+        const isRunning = data.status === 'running' || data.running === true;
+        if (isRunning) {
             element.style.backgroundColor = 'var(--bs-success)';
         } else if (data.status === 'restarting') {
             element.style.backgroundColor = 'var(--bs-warning)';
@@ -264,7 +301,8 @@ function updateBotUIElements(data) {
     
     const statusTextElements = document.querySelectorAll('[id="status-text"]');
     statusTextElements.forEach(element => {
-        if (data.status === 'running') {
+        const isRunning = data.status === 'running' || data.running === true;
+        if (isRunning) {
             element.textContent = 'Đang chạy';
         } else if (data.status === 'restarting') {
             element.textContent = 'Đang khởi động lại';
@@ -276,7 +314,8 @@ function updateBotUIElements(data) {
     // Cập nhật nút mobile nếu có
     const mobileBotToggle = document.getElementById('mobileBotToggle');
     if (mobileBotToggle) {
-        if (data.status === 'running') {
+        const isRunning = data.status === 'running' || data.running === true;
+        if (isRunning) {
             mobileBotToggle.classList.remove('btn-success');
             mobileBotToggle.classList.add('btn-danger');
             mobileBotToggle.innerHTML = '<i class="fas fa-stop-circle"></i> Dừng Bot';

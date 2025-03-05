@@ -247,6 +247,13 @@ body {
     background-color: rgba(220, 53, 69, 0.2);
 }
 
+/* Giá cập nhật highlight */
+.highlight-update {
+    transition: background-color 1s ease;
+    background-color: rgba(40, 167, 69, 0.3); /* Màu xanh lá nhạt */
+    border-radius: 4px;
+}
+
 /* Loading Indicator */
 .loading-spinner {
     width: 3rem;

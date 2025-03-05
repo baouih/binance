@@ -154,9 +154,51 @@ def index():
         
         # Đảm bảo dữ liệu tài khoản có đầy đủ thông tin vị thế
         current_account_data = ACCOUNT_DATA.copy()
-        if 'positions' not in current_account_data or not current_account_data['positions']:
+        
+        # Đọc dữ liệu vị thế từ active_positions.json
+        active_positions = {}
+        try:
+            with open('active_positions.json', 'r', encoding='utf-8') as f:
+                active_positions = json.load(f)
+        except Exception as e:
+            logger.error(f"Không thể đọc active_positions.json: {e}")
+            
+        # Chuyển đổi dữ liệu từ active_positions.json sang định dạng positions
+        positions_list = []
+        for symbol, position in active_positions.items():
+            # Tính P/L
+            entry_price = float(position.get('entry_price', 0))
+            current_price = float(position.get('current_price', 0))
+            side = position.get('side', 'LONG')
+            leverage = int(position.get('leverage', 1))
+            quantity = float(position.get('quantity', 0))
+            
+            # Tính P/L và P/L %
+            if side == 'LONG':
+                pnl = (current_price - entry_price) * quantity
+                pnl_percent = (current_price - entry_price) / entry_price * 100 * leverage
+            else:  # SHORT
+                pnl = (entry_price - current_price) * quantity
+                pnl_percent = (entry_price - current_price) / entry_price * 100 * leverage
+                
+            positions_list.append({
+                'id': f"pos_{symbol}",
+                'symbol': symbol,
+                'type': side,
+                'entry_price': entry_price,
+                'current_price': current_price,
+                'quantity': quantity,
+                'leverage': leverage,
+                'pnl': pnl,
+                'pnl_percent': pnl_percent,
+                'entry_time': position.get('entry_time', ''),
+                'stop_loss': position.get('stop_loss', 0),
+                'take_profit': position.get('take_profit', 0)
+            })
+            
+        if not positions_list:
             # Thêm dữ liệu vị thế giả lập nếu không có
-            current_account_data['positions'] = [
+            positions_list = [
                 {
                     'id': 'pos1',
                     'symbol': 'BTCUSDT',
@@ -170,22 +212,41 @@ def index():
                     'entry_time': '2025-02-28 18:30:00',
                     'stop_loss': 68000,
                     'take_profit': 80000
-                },
-                {
-                    'id': 'pos2',
-                    'symbol': 'SOLUSDT',
-                    'type': 'LONG',
-                    'entry_price': 125,
-                    'current_price': 137.5,
-                    'quantity': 1,
-                    'leverage': 1,
-                    'pnl': 12.5,
-                    'pnl_percent': 10,
-                    'entry_time': '2025-02-28 20:10:00',
-                    'stop_loss': 115,
-                    'take_profit': 150
                 }
             ]
+            
+        current_account_data['positions'] = positions_list
+        
+        # Tạo danh sách hoạt động gần đây từ vị thế hiện tại
+        recent_activities = []
+        for position in positions_list:
+            activity_type = "Mở vị thế mới"
+            icon_class = "text-success" if position['type'] == 'LONG' else "text-danger"
+            icon = "bi-arrow-up-right-circle" if position['type'] == 'LONG' else "bi-arrow-down-right-circle"
+            description = f"Mở {position['type']} {position['symbol']} tại ${position['entry_price']:.2f}"
+            
+            # Lấy thời gian từ entry_time hoặc mặc định là hiện tại
+            time_str = position.get('entry_time', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            try:
+                if isinstance(time_str, str):
+                    time_obj = datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                    time_display = time_obj.strftime('%H:%M')
+                else:
+                    time_display = "12:00"
+            except:
+                time_display = "12:00"
+                
+            recent_activities.append({
+                'type': activity_type,
+                'class': icon_class,
+                'icon': icon,
+                'description': description,
+                'time': time_display,
+                'position_id': position.get('id')
+            })
+        
+        # Đảm bảo activities được sắp xếp theo thời gian mới nhất (giả sử entry_time mới nhất ở đầu)
+        current_account_data['activities'] = recent_activities
         
         return render_template('index.html', 
                             bot_status=current_bot_status,
@@ -1799,8 +1860,28 @@ def get_bot_status():
     updated_status = get_bot_status_from_config()
     # Cập nhật BOT_STATUS toàn cục
     BOT_STATUS.update(updated_status)
-    logger.debug(f"Trạng thái bot hiện tại: {BOT_STATUS}")
-    return jsonify(BOT_STATUS)
+    # Thêm trường status cho frontend
+    response_data = BOT_STATUS.copy()
+    response_data['status'] = 'running' if BOT_STATUS.get('running', False) else 'stopped'
+    logger.debug(f"Trạng thái bot hiện tại: {response_data}")
+    return jsonify(response_data)
+    
+@app.route('/api/bot/status/check', methods=['GET'])
+def check_bot_status():
+    """Endpoint mới kiểm tra trạng thái của bot"""
+    updated_status = get_bot_status_from_config()
+    BOT_STATUS.update(updated_status)
+    # Tạo response với trạng thái rõ ràng
+    response_data = {
+        'running': BOT_STATUS.get('running', False),
+        'status': 'running' if BOT_STATUS.get('running', False) else 'stopped',
+        'mode': BOT_STATUS.get('mode', 'demo'),
+        'version': BOT_STATUS.get('version', '1.0.0'),
+        'active_symbols': BOT_STATUS.get('active_symbols', []),
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    logger.info(f"Kiểm tra trạng thái bot: {response_data}")
+    return jsonify(response_data)
 
 
 @app.route('/api/account', methods=['GET'])
