@@ -1,0 +1,119 @@
+{
+    "version": "1.0.1",
+    "description": "Cấu hình nâng cao cho quản lý rủi ro",
+    "risk_settings": {
+        "default_leverage": 10,
+        "min_leverage": 3,
+        "max_leverage": 20,
+        "risk_per_trade": 1.0,
+        "max_risk_per_day": 5.0,
+        "max_positions_per_symbol": 1,
+        "max_open_positions": 5,
+        "max_drawdown_pct": 10.0,
+        "position_sizing_method": "risk_based",
+        "enable_auto_deleveraging": true,
+        "dynamic_leverage_adjustment": true
+    },
+    "stop_loss_settings": {
+        "enable_dynamic_stop_loss": true,
+        "base_stop_loss_pct": 2.0,
+        "atr_period": 14,
+        "atr_multiplier": 1.5,
+        "minimum_stop_loss_pct": 1.0,
+        "maximum_stop_loss_pct": 5.0,
+        "adjust_for_volatility": true,
+        "volatility_adjustment_factor": 0.5
+    },
+    "take_profit_settings": {
+        "enable_dynamic_take_profit": true,
+        "base_take_profit_pct": 3.0,
+        "risk_reward_ratio": 2.0,
+        "atr_multiplier": 2.0,
+        "minimum_take_profit_pct": 1.5,
+        "maximum_take_profit_pct": 10.0,
+        "enable_partial_take_profit": true,
+        "partial_tp_levels": [
+            {"pct": 1.5, "size": 0.3},
+            {"pct": 3.0, "size": 0.3},
+            {"pct": 5.0, "size": 0.4}
+        ]
+    },
+    "trailing_stop_settings": {
+        "enable_trailing_stop": true,
+        "activation_pct": 0.5,
+        "callback_pct": 0.25,
+        "dynamic_trailing": true,
+        "atr_multiplier": 1.0,
+        "step_size_pct": 0.1,
+        "min_price_movement_pct": 0.05,
+        "escalator_mode": true,
+        "timeframe_upgrade": true,
+        "timeframe_upgrade_trigger_pct": 2.0,
+        "upgrade_timeframe_map": {
+            "1m": "5m",
+            "5m": "15m",
+            "15m": "1h",
+            "1h": "4h",
+            "4h": "1d"
+        }
+    },
+    "market_condition_adjustments": {
+        "trending": {
+            "leverage_adjustment": 0.0,
+            "stop_loss_adjustment": 0.5,
+            "take_profit_adjustment": 0.7,
+            "risk_per_trade_adjustment": 0.0
+        },
+        "ranging": {
+            "leverage_adjustment": -0.2,
+            "stop_loss_adjustment": -0.3,
+            "take_profit_adjustment": -0.2,
+            "risk_per_trade_adjustment": -0.1
+        },
+        "volatile": {
+            "leverage_adjustment": -0.5,
+            "stop_loss_adjustment": 0.5,
+            "take_profit_adjustment": 0.3,
+            "risk_per_trade_adjustment": -0.3
+        },
+        "quiet": {
+            "leverage_adjustment": 0.0,
+            "stop_loss_adjustment": -0.2,
+            "take_profit_adjustment": -0.1,
+            "risk_per_trade_adjustment": 0.0
+        }
+    },
+    "circuit_breakers": {
+        "enable_circuit_breakers": true,
+        "max_consecutive_losses": 3,
+        "daily_loss_threshold_pct": 3.0,
+        "pause_duration_minutes": 60,
+        "reduce_position_size_after_loss": true,
+        "position_size_reduction_factor": 0.5,
+        "reset_after_profitable_trade": true
+    },
+    "notification_thresholds": {
+        "profit_notification_threshold": 5.0,
+        "loss_notification_threshold": 3.0,
+        "drawdown_notification_threshold": 5.0,
+        "leverage_change_notification": true,
+        "risk_adjustment_notification": true,
+        "position_close_notification_priority": "high"
+    },
+    "special_position_handling": {
+        "BTCUSDT": {
+            "max_leverage": 5,
+            "risk_per_trade": 0.5,
+            "atr_multiplier_sl": 1.2,
+            "atr_multiplier_tp": 2.0
+        },
+        "ETHUSDT": {
+            "max_leverage": 5,
+            "risk_per_trade": 0.5,
+            "atr_multiplier_sl": 1.3,
+            "atr_multiplier_tp": 2.2
+        }
+    },
+    "last_updated": "2025-03-05",
+    "update_frequency": "daily"
+}

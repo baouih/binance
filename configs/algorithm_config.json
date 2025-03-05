@@ -47,17 +47,22 @@
         }
     },
     "risk_management": {
-        "default_risk_per_trade": 1.0,
-        "max_risk_per_day": 5.0,
-        "max_open_positions": 5,
+        "default_risk_per_trade": 0.7,
+        "max_risk_per_day": 3.0,
+        "max_open_positions": 3,
         "max_positions_per_symbol": 1,
         "market_volatility_adjustment": true,
         "stop_loss_atr_multiplier": 1.5,
-        "take_profit_atr_multiplier": 2.5,
+        "take_profit_atr_multiplier": 2.0,
         "trailing_stop_enabled": true,
         "trailing_stop_activation": 1.0,
-        "trailing_stop_callback": 0.3,
-        "min_profit_to_adjust_stop": 0.5
+        "trailing_stop_callback": 0.5,
+        "min_profit_to_adjust_stop": 0.5,
+        "position_sizing_method": "risk_based",
+        "enable_partial_take_profit": true,
+        "max_consecutive_losses": 3,
+        "reduce_position_size_after_loss": true,
+        "position_size_reduction_factor": 0.5
     },
     "signal_filters": {
         "min_signal_strength": 0.3,
