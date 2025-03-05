@@ -25,8 +25,8 @@ from data_processor import DataProcessor
 # Thêm chiến thuật giao dịch nâng cao
 from strategy_integration import StrategyIntegration
 
-# Thêm route sentiment
-from routes.sentiment_route import register_blueprint as register_sentiment_bp
+# Thêm các route
+from routes import sentiment_route, update_route
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -35,6 +35,24 @@ logger = logging.getLogger('main')
 # Khởi tạo ứng dụng Flask
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "binance_trader_bot_secret")
+
+# Đăng ký các routes
+sentiment_route.register_blueprint(app)
+update_route.register_blueprint(app)
+logger.info("Đã đăng ký tất cả các blueprint routes")
+
+# Route kiểm tra hệ thống cập nhật
+@app.route('/test_update')
+def test_update():
+    return jsonify({
+        'status': 'success',
+        'message': 'Hệ thống cập nhật đang hoạt động',
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    })
+
+# Tạo các thư mục cần thiết cho hệ thống cập nhật
+os.makedirs("update_packages", exist_ok=True)
+os.makedirs("backups", exist_ok=True)
 
 # Khởi tạo SocketIO với CORS và async mode
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', ping_timeout=60, ping_interval=25)
@@ -2261,8 +2279,7 @@ def on_close_position(data):
         return {'success': True, 'message': 'Vị thế đã được đóng'}
     return {'success': False, 'message': 'Không tìm thấy vị thế'}
 
-# Đăng ký các blueprint
-register_sentiment_bp(app)
+# Blueprint đã được đăng ký ở phần đầu file
 
 def run_app():
     # Bắt đầu tác vụ nền

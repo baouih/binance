@@ -2386,6 +2386,22 @@ register_update_routes()
 os.makedirs("update_packages", exist_ok=True)
 os.makedirs("backups", exist_ok=True)
 
+# Thêm route trực tiếp để kiểm tra
+@app.route('/test_update')
+def test_update():
+    """Route để kiểm tra trang cập nhật"""
+    try:
+        from update_manager import UpdateManager
+        manager = UpdateManager()
+        return render_template('updates.html',
+                        current_version=manager.get_current_version(),
+                        available_updates=manager.get_available_updates(),
+                        update_history=manager.get_update_history(),
+                        backups=manager.get_available_backups())
+    except Exception as e:
+        logger.error(f"Lỗi khi hiển thị trang test_update: {str(e)}")
+        return f"Lỗi: {str(e)}", 500
+
 
 if __name__ == '__main__':
     # Đảm bảo threading daemon được dừng khi nhấn Ctrl+C
