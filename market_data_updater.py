@@ -31,8 +31,8 @@ logger = logging.getLogger("market_updater")
 # Import các module cần thiết
 try:
     from binance_api import BinanceAPI
-    from app.data_processor import DataProcessor
-    from multi_timeframe_analyzer import MultiTimeframeAnalyzer
+    from data_processor import DataProcessor
+    from custom_multi_timeframe import MultiTimeframeAnalyzer
     from composite_indicator import CompositeIndicator
     from liquidity_analyzer import LiquidityAnalyzer
     from market_regime_detector import MarketRegimeDetector

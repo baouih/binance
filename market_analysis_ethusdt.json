@@ -1,0 +1,351 @@
+{
+  "symbol": "ETHUSDT",
+  "primary_timeframe": "1h",
+  "analysis_time": "2025-03-05T06:17:46.411938",
+  "current_price": 2161.78,
+  "signals": {
+    "mtf": 0,
+    "ci": 0
+  },
+  "market_regime": {
+    "regime": "volatile",
+    "description": "Th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng m\u1ea1nh - bi\u1ebfn \u0111\u1ed9ng cao v\u00e0 kh\u00f4ng \u1ed5n \u0111\u1ecbnh, n\u00ean th\u1eadn tr\u1ecdng v\u00e0 s\u1eed d\u1ee5ng chi\u1ebfn l\u01b0\u1ee3c qu\u1ea3n l\u00fd r\u1ee7i ro ch\u1eb7t ch\u1ebd"
+  },
+  "multi_timeframe": {
+    "symbol": "ETHUSDT",
+    "signal": 0,
+    "confidence": 0.0,
+    "position_size_factor": 0.5,
+    "raw_signal": 0.0,
+    "signal_description": "TRUNG L\u1eacP",
+    "rsi_analysis": {
+      "1m": {
+        "rsi": 51.142091639798416,
+        "weight": 0.05
+      },
+      "5m": {
+        "rsi": 50.89929225374976,
+        "weight": 0.1
+      },
+      "15m": {
+        "rsi": 50.16942588827569,
+        "weight": 0.15
+      },
+      "1h": {
+        "rsi": 69.16549196504087,
+        "weight": 0.25
+      },
+      "4h": {
+        "rsi": 51.43722361084407,
+        "weight": 0.3
+      },
+      "1d": {
+        "rsi": NaN,
+        "weight": 0.45
+      }
+    },
+    "trend_analysis": {
+      "1m": {
+        "trend": 0,
+        "ema_short": 2166.8807786893667,
+        "ema_medium": 2167.4691100592686,
+        "ema_long": 2167.207177512439,
+        "close": 2161.77,
+        "weight": 0.05
+      },
+      "5m": {
+        "trend": 0,
+        "ema_short": 2163.0835131687018,
+        "ema_medium": 2162.653373036782,
+        "ema_long": 2161.982340120519,
+        "close": 2161.77,
+        "weight": 0.1
+      },
+      "15m": {
+        "trend": 2,
+        "ema_short": 2160.972269726217,
+        "ema_medium": 2160.785182840283,
+        "ema_long": 2149.0652335559016,
+        "close": 2161.77,
+        "weight": 0.15
+      },
+      "1h": {
+        "trend": 0,
+        "ema_short": 2162.4612395945237,
+        "ema_medium": 2146.921947087047,
+        "ema_long": 2153.9040846044386,
+        "close": 2181.35,
+        "weight": 0.25
+      },
+      "4h": {
+        "trend": 0,
+        "ema_short": 2149.326719775824,
+        "ema_medium": 2176.9152532410626,
+        "ema_long": 2316.1009728215,
+        "close": 2181.35,
+        "weight": 0.3
+      },
+      "1d": {
+        "trend": -2,
+        "ema_short": 2250.7671801600004,
+        "ema_medium": 2353.8488149998784,
+        "ema_long": 2436.2910042766503,
+        "close": 2181.35,
+        "weight": 0.45
+      }
+    },
+    "macd_analysis": {
+      "1m": {
+        "macd": -0.33611121550893586,
+        "macd_signal": 0.14343959025347447,
+        "macd_hist": -0.4795508057624103,
+        "weight": 0.05
+      },
+      "5m": {
+        "macd": 0.30060668610713037,
+        "macd_signal": 0.053566522439597565,
+        "macd_hist": 0.2470401636675328,
+        "weight": 0.1
+      },
+      "15m": {
+        "macd": 1.4235987843658222,
+        "macd_signal": 2.5128916509710884,
+        "macd_hist": -1.0892928666052661,
+        "weight": 0.15
+      },
+      "1h": {
+        "macd": 11.938566513517799,
+        "macd_signal": 5.6140995174824955,
+        "macd_hist": 6.324466996035303,
+        "weight": 0.25
+      },
+      "4h": {
+        "macd": -45.78653789963073,
+        "macd_signal": -62.01162730458126,
+        "macd_hist": 16.22508940495053,
+        "weight": 0.3
+      },
+      "1d": {
+        "macd": -90.10744060547904,
+        "macd_signal": -54.445485561073255,
+        "macd_hist": -35.66195504440579,
+        "weight": 0.45
+      }
+    },
+    "volatility": 12.833901775273374,
+    "summary": "TRUNG L\u1eacP v\u1edbi \u0111\u1ed9 tin c\u1eady 0.0% (H\u1ec7 s\u1ed1 v\u1ecb th\u1ebf: 0.50)"
+  },
+  "composite_indicator": {
+    "composite_score": -0.030323842040135173,
+    "signal": 0,
+    "confidence": 3.032384204013517,
+    "individual_scores": {
+      "rsi": -0.346802550807557,
+      "macd": 0.3,
+      "bbands": 0.13225091910409809,
+      "volume_trend": -0.2
+    },
+    "weighted_scores": {
+      "rsi": -0.06926609824368633,
+      "macd": 0.061021294963994846,
+      "bbands": 0.021707498650092933,
+      "volume_trend": -0.036144767046519664
+    },
+    "signal_description": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
+    "summary": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG v\u1edbi \u0111\u1ed9 tin c\u1eady 3.0%"
+  },
+  "liquidity_analysis": {
+    "current_price": 2172.545,
+    "best_bid": 2161.76,
+    "best_ask": 2183.33,
+    "spread": 21.56999999999971,
+    "spread_pct": 0.9928447972308839,
+    "bid_ask_ratio": 0.73194829483267,
+    "market_pressure": "sell",
+    "high_liquidity_zones": [
+      {
+        "price": 2161.4463636363635,
+        "value": 114672864.09480001,
+        "quantity": 53053.8,
+        "type": "bid",
+        "strength": 100,
+        "price_range": [
+          2160.5773456363636,
+          2162.3153816363633
+        ]
+      },
+      {
+        "price": 2184.131754385965,
+        "value": 96269035.756,
+        "quantity": 44075.842000000004,
+        "type": "ask",
+        "strength": 100,
+        "price_range": [
+          2183.262736385965,
+          2185.000772385965
+        ]
+      }
+    ],
+    "liquidity_grab_zones": [
+      {
+        "price": 2161.4463636363635,
+        "value": 114672864.09480001,
+        "quantity": 53053.8,
+        "type": "bid",
+        "strength": 100,
+        "price_range": [
+          2160.5773456363636,
+          2162.3153816363633
+        ],
+        "grab_type": "support",
+        "grab_strength": 94.89141243857475,
+        "distance_pct": 0.5108587561425247
+      },
+      {
+        "price": 2184.131754385965,
+        "value": 96269035.756,
+        "quantity": 44075.842000000004,
+        "type": "ask",
+        "strength": 100,
+        "price_range": [
+          2183.262736385965,
+          2185.000772385965
+        ],
+        "grab_type": "resistance",
+        "grab_strength": 94.66673675989914,
+        "distance_pct": 0.533326324010086
+      }
+    ],
+    "total_bid_value": 116246504.35148,
+    "total_ask_value": 158817918.11271998
+  },
+  "entry_points": [
+    {
+      "price": 2249.42552,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 4.054803239937634
+    },
+    {
+      "price": 2073.40148,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 4.087785472089999
+    },
+    {
+      "price": 2016.04,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 6.741235191532866
+    },
+    {
+      "price": 1996.61,
+      "type": "buy",
+      "strength": 80,
+      "distance_pct": 7.640035711477173
+    },
+    {
+      "price": 2460.07724,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 13.799212682200238
+    },
+    {
+      "price": 2510.52,
+      "type": "sell",
+      "strength": 60,
+      "distance_pct": 16.132613552783138
+    },
+    {
+      "price": 2630.33,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 21.674831272522052
+    },
+    {
+      "price": 2740.0,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 26.747988916489728
+    },
+    {
+      "price": 2800.58276,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 29.550449862843863
+    },
+    {
+      "price": 3029.88,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 40.157371043172965
+    },
+    {
+      "price": 3030.0,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 40.16292204998682
+    },
+    {
+      "price": 3042.97652,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 40.763194974488506
+    },
+    {
+      "price": 3064.86,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 41.775489529413406
+    },
+    {
+      "price": 3138.8,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 45.19583489455401
+    },
+    {
+      "price": 3142.0,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 45.34386174292362
+    },
+    {
+      "price": 3160.0,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 46.176512765002755
+    },
+    {
+      "price": 3180.0,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 47.1016805673129
+    },
+    {
+      "price": 3187.25852,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 47.4374480171341
+    },
+    {
+      "price": 3198.68,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 47.96578729467056
+    },
+    {
+      "price": 3250.0,
+      "type": "sell",
+      "strength": 80,
+      "distance_pct": 50.3397678753984
+    },
+    {
+      "price": 3250.0,
+      "type": "sell",
+      "strength": 80,
+      "distance_pct": 50.3397678753984
+    }
+  ],
+  "summary": "Th\u1ecb tr\u01b0\u1eddng \u0111ang \u1edf giai \u0111o\u1ea1n volatile. T\u00edn hi\u1ec7u CH\u1edc \u0110\u1ee2I v\u1edbi \u0111\u1ed9 tin c\u1eady 359.4%. \u00c1p l\u1ef1c b\u00e1n y\u1ebfu (t\u1ef7 l\u1ec7 bid/ask: 0.73). Bi\u1ebfn \u0111\u1ed9ng cao (12.83%). \u0110\u1ec1 xu\u1ea5t theo d\u00f5i th\u00eam."
+}

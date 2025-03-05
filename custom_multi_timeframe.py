@@ -114,6 +114,13 @@ class MultiTimeframeAnalyzer:
             macd_signal = df['macd_signal'].iloc[-1] if 'macd_signal' in df.columns else 0
             macd_hist = macd_val - macd_signal
             
+            # Lấy giá trị MACD trước đó nếu có
+            macd_hist_prev = 0
+            if len(df) > 1 and 'macd' in df.columns and 'macd_signal' in df.columns:
+                macd_val_prev = df['macd'].iloc[-2]
+                macd_signal_prev = df['macd_signal'].iloc[-2]
+                macd_hist_prev = macd_val_prev - macd_signal_prev
+            
             # Tính độ mạnh của tín hiệu (0-100)
             strength = 0
             if trend > 0:  # Xu hướng tăng
