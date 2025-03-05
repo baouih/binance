@@ -216,6 +216,57 @@ class DataProcessor:
         
         return df
     
+    def get_historical_data(self, symbol: str, interval: str, lookback_days: int = 30) -> pd.DataFrame:
+        """
+        Lấy dữ liệu lịch sử cho một cặp tiền tệ trong khoảng thời gian xác định
+        
+        Args:
+            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
+            interval (str): Khung thời gian (ví dụ: '1h', '4h', '1d')
+            lookback_days (int): Số ngày lấy dữ liệu lịch sử
+            
+        Returns:
+            pd.DataFrame: DataFrame chứa dữ liệu lịch sử
+        """
+        try:
+            # Tính số lượng candlestick cần lấy
+            intervals_per_day = {
+                '1m': 24 * 60,
+                '3m': 24 * 20,
+                '5m': 24 * 12,
+                '15m': 24 * 4,
+                '30m': 24 * 2,
+                '1h': 24,
+                '2h': 12,
+                '4h': 6,
+                '6h': 4,
+                '8h': 3,
+                '12h': 2,
+                '1d': 1,
+                '3d': 1/3,
+                '1w': 1/7,
+                '1M': 1/30
+            }
+            
+            if interval not in intervals_per_day:
+                interval = '1h'  # Mặc định nếu interval không hợp lệ
+            
+            # Số candlestick cần lấy
+            limit = min(1000, int(lookback_days * intervals_per_day.get(interval, 24)))
+            
+            # Lấy dữ liệu từ API
+            df = self.get_market_data(symbol, interval, limit=limit, use_cache=True)
+            
+            if df is None or (hasattr(df, 'empty') and df.empty):
+                logger.warning(f"Không có dữ liệu lịch sử cho {symbol} với khung thời gian {interval}")
+                return pd.DataFrame()
+            
+            return df
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu lịch sử: {str(e)}")
+            return pd.DataFrame()
+    
     def get_market_summary(self, symbol: str) -> Dict:
         """
         Lấy tóm tắt thị trường cho một cặp tiền tệ
