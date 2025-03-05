@@ -1,0 +1,106 @@
+{
+    "description": "Cấu hình tổng thể cho backtest đầy đủ 6 tháng",
+    "initial_balance": 10000,
+    "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT"],
+    "timeframes": ["15m", "1h", "4h"],
+    "phases": [
+        {
+            "name": "training_phase",
+            "description": "Giai đoạn huấn luyện ban đầu (2 tháng)",
+            "start_date": "2023-09-01",
+            "end_date": "2023-10-31",
+            "config": "configs/backtest_training_config.json",
+            "train_ratio": 0.8,
+            "exploration_rate": 0.7,
+            "ai_weight": 0.0,
+            "symbols": ["BTCUSDT", "ETHUSDT"]
+        },
+        {
+            "name": "optimization_phase",
+            "description": "Giai đoạn tối ưu hóa (2 tháng)",
+            "start_date": "2023-11-01",
+            "end_date": "2023-12-31",
+            "config": "configs/backtest_optimization_config.json",
+            "train_ratio": 0.5,
+            "exploration_rate": 0.4,
+            "ai_weight": 0.2,
+            "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT"]
+        },
+        {
+            "name": "testing_phase",
+            "description": "Giai đoạn kiểm thử mở rộng (2 tháng)",
+            "start_date": "2024-01-01",
+            "end_date": "2024-02-29",
+            "config": "configs/backtest_testing_config.json",
+            "train_ratio": 0.2,
+            "exploration_rate": 0.1,
+            "ai_weight": 0.3,
+            "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT"]
+        }
+    ],
+    "market_periods": [
+        {
+            "name": "bull_market",
+            "start_date": "2023-10-01",
+            "end_date": "2024-01-31"
+        },
+        {
+            "name": "bear_market",
+            "start_date": "2022-05-01",
+            "end_date": "2022-08-31"
+        },
+        {
+            "name": "crab_market",
+            "start_date": "2023-06-01",
+            "end_date": "2023-09-30"
+        },
+        {
+            "name": "high_volatility",
+            "start_date": "2021-05-01",
+            "end_date": "2021-06-30"
+        }
+    ],
+    "report_settings": {
+        "generate_charts": true,
+        "compare_with_traditional": true,
+        "compare_with_hodl": true,
+        "report_dir": "backtest_reports",
+        "charts_dir": "backtest_charts",
+        "metrics": [
+            "total_trades",
+            "win_rate",
+            "profit_loss",
+            "roi",
+            "max_drawdown",
+            "sharpe_ratio",
+            "sortino_ratio",
+            "profit_factor",
+            "avg_trade_duration",
+            "avg_profit_per_trade",
+            "avg_loss_per_trade"
+        ]
+    },
+    "simulation_settings": {
+        "trade_fee": 0.075,
+        "slippage": 0.05,
+        "risk_per_trade": 1.0,
+        "leverage": 5,
+        "max_positions": 5,
+        "max_daily_trades": 20,
+        "max_drawdown_limit": 20.0,
+        "mode": "futures"
+    },
+    "automated_optimization": {
+        "enabled": true,
+        "parameters_to_optimize": [
+            "risk_per_trade",
+            "ai_weight",
+            "tp_multiplier", 
+            "sl_multiplier",
+            "confidence_threshold"
+        ],
+        "objective_metric": "sharpe_ratio",
+        "optimization_method": "bayesian",
+        "max_iterations": 100
+    }
+}

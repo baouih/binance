@@ -532,5 +532,56 @@ def test_telegram_notification():
     
     return True
 
+def test_telegram_notification():
+    """Hàm test kết nối Telegram"""
+    # Tạo notifier với token và chat_id mặc định
+    notifier = TelegramNotifier()
+    
+    # Gửi thông báo test
+    result = notifier.send_message(
+        f"🧪 ĐÂY LÀ THÔNG BÁO TEST\n\n"
+        f"Bot hoạt động bình thường và có thể gửi thông báo\n"
+        f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        'test'
+    )
+    
+    # In kết quả ra console
+    if result:
+        print("✅ Gửi thông báo test thành công")
+    else:
+        print("❌ Gửi thông báo test thất bại")
+    
+    return result
+
+def main():
+    """Hàm chính khi chạy script từ dòng lệnh"""
+    import sys
+    
+    # Kiểm tra tham số dòng lệnh
+    if len(sys.argv) < 3:
+        print("Cách sử dụng: python telegram_notifier.py <message_type> <message_content>")
+        print("    message_type: info, success, warning, error, etc.")
+        print("    message_content: Nội dung thông báo")
+        print("Ví dụ: python telegram_notifier.py info 'Bot đã khởi động thành công'")
+        return False
+    
+    # Lấy tham số
+    message_type = sys.argv[1]
+    message_content = sys.argv[2]
+    
+    # Tạo notifier với token và chat_id mặc định
+    notifier = TelegramNotifier()
+    
+    # Gửi thông báo
+    result = notifier.send_message(message_content, message_type)
+    
+    # In kết quả ra console
+    if result:
+        print(f"✅ Gửi thông báo {message_type} thành công")
+    else:
+        print(f"❌ Gửi thông báo {message_type} thất bại")
+    
+    return result
+
 if __name__ == "__main__":
-    test_telegram_notification()
+    main()

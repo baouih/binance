@@ -1,0 +1,57 @@
+{
+    "description": "Cấu hình cho giai đoạn huấn luyện ban đầu",
+    "backtest_settings": {
+        "trade_fee": 0.075,
+        "slippage": 0.05,
+        "risk_per_trade": 1.0,
+        "leverage": 5,
+        "max_positions": 3,
+        "mode": "futures"
+    },
+    "ai_settings": {
+        "exploration_rate": 0.7,
+        "ai_weight": 0.0,
+        "confidence_threshold": 0.6
+    },
+    "training_parameters": {
+        "batch_size": 32,
+        "learning_rate": 0.001,
+        "epochs": 50,
+        "validation_split": 0.2,
+        "early_stopping_patience": 5
+    },
+    "market_indicators": {
+        "use_rsi": true,
+        "use_macd": true,
+        "use_bbands": true,
+        "use_ema_cross": true,
+        "use_volume_analysis": true,
+        "use_adx": true
+    },
+    "strategy_weights": {
+        "rsi_strategy": 0.25,
+        "macd_strategy": 0.25,
+        "bbands_strategy": 0.20,
+        "ema_strategy": 0.20,
+        "volume_strategy": 0.10
+    },
+    "trade_exit_conditions": {
+        "take_profit_multiplier": 2.0,
+        "stop_loss_multiplier": 1.0,
+        "trailing_stop_activation": 0.5,
+        "trailing_stop_callback": 0.25,
+        "max_trade_duration_hours": 48
+    },
+    "reporting": {
+        "generate_detailed_trade_log": true,
+        "save_model_checkpoints": true,
+        "performance_metrics": [
+            "win_rate",
+            "roi",
+            "profit_factor",
+            "max_drawdown",
+            "sharpe_ratio",
+            "average_trade_duration"
+        ]
+    }
+}

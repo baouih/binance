@@ -1,0 +1,74 @@
+{
+    "version": "1.0.0",
+    "description": "Cấu hình nâng cao cho hệ thống AI của bot giao dịch",
+    "ai_settings": {
+        "initial_exploration_rate": 0.5,
+        "min_exploration_rate": 0.05,
+        "exploration_decay": 0.995,
+        "batch_size": 32,
+        "memory_size": 10000,
+        "model_update_frequency": 50
+    },
+    "integration_settings": {
+        "ai_weight": 0.3,
+        "traditional_weight": 0.7,
+        "confidence_threshold": 0.65,
+        "market_regime_adjustments": {
+            "trending": {
+                "ai_weight": 0.25,
+                "tp_multiplier": 3.0,
+                "sl_multiplier": 1.0
+            },
+            "ranging": {
+                "ai_weight": 0.3,
+                "tp_multiplier": 2.0,
+                "sl_multiplier": 1.0
+            },
+            "volatile": {
+                "ai_weight": 0.4,
+                "tp_multiplier": 2.5,
+                "sl_multiplier": 1.5
+            },
+            "quiet": {
+                "ai_weight": 0.2,
+                "tp_multiplier": 1.5,
+                "sl_multiplier": 0.8
+            }
+        }
+    },
+    "learning_parameters": {
+        "learning_rate": 0.001,
+        "discount_factor": 0.95,
+        "reward_scaling": 0.01,
+        "max_position_reward": 5.0,
+        "loss_penalty_multiplier": 1.5
+    },
+    "feature_importance": {
+        "price_action": 1.0,
+        "volume": 0.8,
+        "oscillators": 0.7,
+        "trend_indicators": 0.9,
+        "volatility_indicators": 0.6,
+        "market_regime": 1.0
+    },
+    "model_parameters": {
+        "forest_estimators": 100,
+        "gradient_boost_estimators": 100,
+        "max_depth": 6,
+        "min_samples_leaf": 5,
+        "model_type": "ensemble"
+    },
+    "backtest_settings": {
+        "train_test_split": 0.7,
+        "validation_split": 0.2,
+        "performance_metrics": [
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "roi",
+            "max_drawdown",
+            "sharpe_ratio"
+        ]
+    }
+}

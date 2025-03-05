@@ -18,6 +18,7 @@ from market_regime_detector import MarketRegimeDetector
 from data_processor import DataProcessor
 from binance_api import BinanceAPI
 from telegram_notifier import TelegramNotifier
+from deep_reinforcement_trader import DeepReinforcementTrader
 
 # Thiết lập logging
 logging.basicConfig(
@@ -58,6 +59,12 @@ class StrategyIntegration:
             data_processor=self.data_processor,
             config_path=algorithm_config_path,
             account_config_path=account_config_path
+        )
+        
+        # Khởi tạo hệ thống học tăng cường
+        self.deep_trader = DeepReinforcementTrader(
+            data_processor=self.data_processor,
+            market_regime_detector=self.market_regime_detector
         )
         
         # Tạo Telegram notifier
@@ -157,19 +164,67 @@ class StrategyIntegration:
         Returns:
             Dict: Tín hiệu giao dịch
         """
-        # Sử dụng chiến thuật tổng hợp để lấy tín hiệu
-        signal = self.trading_strategy.get_trading_signal(symbol, timeframe)
+        # Lấy chế độ thị trường hiện tại
+        market_regime = self.get_market_regime(symbol, timeframe)
         
-        if signal['success']:
+        # 1. Lấy tín hiệu từ chiến thuật tổng hợp truyền thống
+        traditional_signal = self.trading_strategy.get_trading_signal(symbol, timeframe)
+        
+        # 2. Lấy tín hiệu từ hệ thống học tăng cường
+        ai_signal = self.deep_trader.get_action_for_signal(symbol, timeframe, market_regime)
+        
+        # 3. Kết hợp tín hiệu theo tỷ lệ (70% tín hiệu truyền thống + 30% tín hiệu AI)
+        if traditional_signal['success']:
+            # Lưu tín hiệu từ chiến thuật truyền thống
+            traditional_score = 0.0
+            if traditional_signal['action'] in ['BUY', 'STRONG_BUY']:
+                traditional_score = traditional_signal['confidence'] / 100.0  # Chuyển về tỷ lệ 0-1
+            elif traditional_signal['action'] in ['SELL', 'STRONG_SELL']:
+                traditional_score = -traditional_signal['confidence'] / 100.0
+                
+            # Lấy tín hiệu từ AI
+            ai_score = ai_signal['signal']  # Đã ở định dạng -1.0 đến 1.0
+            
+            # Kết hợp tín hiệu
+            combined_score = 0.7 * traditional_score + 0.3 * ai_score
+            
+            # Xác định hành động từ điểm số kết hợp
+            if combined_score >= 0.7:
+                combined_action = "STRONG_BUY"
+            elif combined_score >= 0.3:
+                combined_action = "BUY"
+            elif combined_score <= -0.7:
+                combined_action = "STRONG_SELL"
+            elif combined_score <= -0.3:
+                combined_action = "SELL"
+            else:
+                combined_action = "HOLD"
+                
+            # Tính độ tin cậy (giá trị tuyệt đối của điểm số, chuyển về %)
+            combined_confidence = min(abs(combined_score) * 100, 100)
+            
+            # Tạo tín hiệu kết hợp
+            combined_signal = traditional_signal.copy()
+            combined_signal['action'] = combined_action
+            combined_signal['confidence'] = combined_confidence
+            combined_signal['original_signal'] = {
+                'traditional': traditional_signal['action'],
+                'ai': ai_signal['action'],
+                'traditional_confidence': traditional_signal['confidence'],
+                'ai_confidence': ai_signal['confidence']
+            }
+            combined_signal['combined_score'] = combined_score
+            combined_signal['ai_details'] = ai_signal['details']
+            
             # Lưu lại lịch sử tín hiệu
             signal_record = {
                 'symbol': symbol,
                 'timeframe': timeframe,
-                'timestamp': signal['timestamp'],
-                'action': signal['action'],
-                'confidence': signal['confidence'],
-                'price': signal['price'],
-                'market_regime': signal['market_regime']
+                'timestamp': combined_signal['timestamp'],
+                'action': combined_signal['action'],
+                'confidence': combined_signal['confidence'],
+                'price': combined_signal['price'],
+                'market_regime': combined_signal['market_regime']
             }
             self.signal_history.append(signal_record)
             
@@ -178,10 +233,46 @@ class StrategyIntegration:
                 self.signal_history.pop(0)
             
             # Ghi log
-            logger.info(f"Tín hiệu giao dịch cho {symbol} {timeframe}: {signal['action']} " +
-                     f"(Độ tin cậy: {signal['confidence']:.2f}%)")
+            logger.info(f"Tín hiệu giao dịch cho {symbol} {timeframe}: {combined_signal['action']} " +
+                     f"(Độ tin cậy: {combined_signal['confidence']:.2f}%, " +
+                     f"Truyền thống: {traditional_signal['action']}, AI: {ai_signal['action']})")
+            
+            return combined_signal
         
-        return signal
+        # Nếu không lấy được tín hiệu truyền thống, sử dụng tín hiệu AI
+        if ai_signal.get('action', 'HOLD') != 'HOLD':
+            signal = {
+                'success': True,
+                'symbol': symbol,
+                'timeframe': timeframe,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'action': ai_signal['action'],
+                'confidence': ai_signal['confidence'],
+                'price': ai_signal.get('price', 0.0),
+                'market_regime': market_regime,
+                'source': 'ai_only',
+                'details': ai_signal['details']
+            }
+            
+            # Lưu lại lịch sử tín hiệu
+            self.signal_history.append({
+                'symbol': symbol,
+                'timeframe': timeframe,
+                'timestamp': signal['timestamp'],
+                'action': signal['action'],
+                'confidence': signal['confidence'],
+                'price': signal['price'],
+                'market_regime': signal['market_regime']
+            })
+            
+            # Ghi log
+            logger.info(f"Tín hiệu giao dịch AI cho {symbol} {timeframe}: {signal['action']} " +
+                     f"(Độ tin cậy: {signal['confidence']:.2f}%)")
+            
+            return signal
+        
+        # Nếu cả hai phương pháp đều không có tín hiệu, trả về tín hiệu trống
+        return traditional_signal
     
     def analyze_all_markets(self) -> Dict[str, Dict]:
         """
@@ -523,16 +614,46 @@ class StrategyIntegration:
     
     def run_strategy_cycle(self) -> Dict:
         """
-        Chạy một chu kỳ của chiến thuật: phân tích, tạo tín hiệu, thực hiện giao dịch
+        Chạy một chu kỳ hoàn chỉnh của chiến thuật giao dịch và quản lý vị thế
+        
+        - Phân tích thị trường
+        - Sinh tín hiệu giao dịch
+        - Thực hiện các lệnh dựa trên tín hiệu
+        - Cập nhật trạng thái các vị thế hiện tại
         
         Returns:
-            Dict: Kết quả của chu kỳ
+            Dict: Kết quả của chu kỳ giao dịch
         """
+
         try:
             logger.info("Bắt đầu chu kỳ chiến thuật mới")
             
             # Cập nhật các vị thế đang mở
             closed_positions = self.update_positions()
+            
+            # Học từ các vị thế đã đóng để cải thiện hiệu suất AI
+            for position in closed_positions:
+                try:
+                    # Chuyển đổi dữ liệu vị thế đã đóng thành định dạng cho học tăng cường
+                    trade_data = {
+                        'symbol': position['symbol'],
+                        'side': position['side'],
+                        'entry_price': position['entry_price'],
+                        'exit_price': position['exit_price'],
+                        'quantity': position['quantity'],
+                        'entry_time': position['entry_time'],
+                        'exit_time': position['exit_time'],
+                        'pnl': position['pnl_pct'],
+                        'profit_loss_percent': position['pnl_pct'],
+                        'timeframe': position.get('timeframe', '1h'),
+                        'confidence': position.get('confidence', 70.0)
+                    }
+                    
+                    # Học từ giao dịch hoàn thành
+                    self.deep_trader.learn_from_trade(trade_data)
+                    logger.info(f"AI đã học từ vị thế đóng: {position['symbol']} {position['side']}, P/L: {position['pnl_pct']:.2f}%")
+                except Exception as e:
+                    logger.error(f"Lỗi khi học từ vị thế đóng: {str(e)}")
             
             # Phân tích tất cả các thị trường
             analysis_results = self.analyze_all_markets()
@@ -588,6 +709,9 @@ class StrategyIntegration:
             if action in signal_counts:
                 signal_counts[action] += 1
         
+        # Lấy thông tin hiệu suất AI
+        ai_performance = self.deep_trader.get_performance_summary()
+        
         return {
             'active_positions': len(self.active_positions),
             'signal_history_count': len(self.signal_history),
@@ -595,6 +719,11 @@ class StrategyIntegration:
             'profit_factor': performance.get('profit_factor', 0),
             'signal_counts': signal_counts,
             'market_regimes': {s: self.trading_strategy.current_regime for s in self.account_config.get('symbols', ['BTCUSDT'])},
+            'ai_win_rate': ai_performance.get('win_rate', 0),
+            'ai_models': ai_performance.get('models', 0),
+            'ai_exploration_rate': ai_performance.get('exploration_rate', 1.0),
+            'ai_memory_size': ai_performance.get('memory_size', 0),
+            'ai_total_trades': ai_performance.get('total_trades', 0),
             'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
