@@ -1,0 +1,64 @@
+{
+    "api_validator_tests": {},
+    "strategy_selector_tests": {
+        "success": false,
+        "details": {
+            "regime_detection": {
+                "trending_detection": "trending",
+                "ranging_detection": "volatile",
+                "volatile_detection": "trending",
+                "test_passed": false
+            },
+            "strategy_selection": {
+                "trending_priority": "trend_following",
+                "ranging_priority": "trend_following",
+                "volatile_priority": "trend_following",
+                "test_passed": false
+            }
+        },
+        "error": "'DataCache' object has no attribute 'get_timestamp'"
+    },
+    "risk_allocator_tests": {},
+    "trailing_stop_tests": {},
+    "comprehensive_tests": {},
+    "summary": {
+        "total_tests": 2,
+        "passed_tests": 0,
+        "failed_tests": 2,
+        "component_results": {
+            "api_validator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "strategy_selector_tests": {
+                "total": 2,
+                "passed": 0,
+                "failed": 2,
+                "success_rate": 0.0
+            },
+            "risk_allocator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "trailing_stop_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "comprehensive_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            }
+        },
+        "timestamp": "2025-03-05 17:46:01",
+        "duration": 0,
+        "overall_success_rate": 0.0
+    }
+}

@@ -1,7 +1,38 @@
 {
-    "initial_balance": 100.0,
-    "risk_profile": "high",
-    "strategy": "trend",
-    "custom_settings": null,
-    "last_updated": "2025-03-03 15:23:37"
+    "base_risk_percentage": 1.0,
+    "max_risk_percentage": 3.0,
+    "min_risk_percentage": 0.2,
+    "volatility_adjustment": {
+        "enabled": true,
+        "high_volatility_threshold": 0.03,
+        "low_volatility_threshold": 0.01,
+        "high_volatility_multiplier": 0.5,
+        "low_volatility_multiplier": 1.5
+    },
+    "drawdown_protection": {
+        "enabled": true,
+        "drawdown_levels": [5, 10, 15, 20],
+        "risk_reduction_percents": [20, 40, 60, 80]
+    },
+    "position_limits": {
+        "max_positions": 5,
+        "max_positions_per_direction": 3,
+        "position_correlation_threshold": 0.7
+    },
+    "capital_allocation": {
+        "method": "equal",
+        "multi_timeframe_weight": {
+            "1m": 0.1,
+            "5m": 0.15,
+            "15m": 0.2,
+            "1h": 0.3,
+            "4h": 0.15,
+            "1d": 0.1
+        }
+    },
+    "liquidity_requirements": {
+        "min_24h_volume": 10000000,
+        "min_orderbook_depth": 1000000,
+        "max_slippage_percent": 0.5
+    }
 }

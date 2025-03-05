@@ -871,6 +871,191 @@ class BinanceAPI:
         }
         
         return self._request('POST', 'leverage', params, signed=True, version='v1')
+        
+    def futures_create_order(self, symbol: str, side: str, type: str, **kwargs) -> Dict:
+        """
+        Tạo lệnh giao dịch mới trên Binance Futures
+        
+        Args:
+            symbol (str): Symbol giao dịch
+            side (str): Phía giao dịch (BUY/SELL)
+            type (str): Loại lệnh (LIMIT/MARKET/STOP/TAKE_PROFIT/...)
+            **kwargs: Các tham số khác tùy thuộc loại lệnh
+                - quantity: Số lượng
+                - price: Giá (cho LIMIT)
+                - stopPrice: Giá kích hoạt (cho STOP, TAKE_PROFIT)
+                - closePosition: Đóng toàn bộ vị thế (True/False)
+                - timeInForce: GTC, IOC, FOK
+            
+        Returns:
+            Dict: Thông tin lệnh đã tạo
+        """
+        params = {
+            'symbol': symbol,
+            'side': side,
+            'type': type,
+        }
+        params.update(kwargs)
+        
+        return self._request('POST', 'order', params, signed=True, version='v1')
+        
+    def futures_cancel_all_orders(self, symbol: str) -> Dict:
+        """
+        Hủy tất cả các lệnh đang mở cho một symbol trên Futures
+        
+        Args:
+            symbol (str): Symbol giao dịch
+            
+        Returns:
+            Dict: Kết quả hủy lệnh
+        """
+        params = {
+            'symbol': symbol
+        }
+        
+        return self._request('DELETE', 'allOpenOrders', params, signed=True, version='v1')
+        
+    def futures_get_position(self, symbol: str = None) -> List[Dict]:
+        """
+        Lấy thông tin vị thế Futures cụ thể
+        
+        Args:
+            symbol (str, optional): Symbol cần lấy thông tin vị thế
+            
+        Returns:
+            List[Dict]: Thông tin vị thế
+        """
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
+            
+        return self._request('GET', 'positionRisk', params, signed=True, version='v2')
+        
+    def futures_close_position(self, symbol: str, side: str = None, quantity: float = None) -> Dict:
+        """
+        Đóng vị thế Futures bằng lệnh MARKET
+        
+        Args:
+            symbol (str): Symbol giao dịch
+            side (str, optional): Phía vị thế ('LONG' hoặc 'SHORT') để xác định lệnh đóng
+            quantity (float, optional): Số lượng đóng, nếu None sẽ đóng toàn bộ vị thế
+            
+        Returns:
+            Dict: Kết quả đóng vị thế
+        """
+        try:
+            # Xác định phía (side) đóng lệnh ngược với vị thế
+            if not side:
+                # Lấy thông tin vị thế hiện tại từ API
+                positions = self.futures_get_position(symbol)
+                if not positions or not isinstance(positions, list):
+                    logger.error(f"Không thể lấy thông tin vị thế cho {symbol}")
+                    return {"error": f"Không thể lấy thông tin vị thế cho {symbol}"}
+                
+                position = None
+                for pos in positions:
+                    if pos.get('symbol') == symbol and float(pos.get('positionAmt', 0)) != 0:
+                        position = pos
+                        break
+                
+                if not position:
+                    logger.warning(f"Không tìm thấy vị thế đang mở cho {symbol}")
+                    return {"error": f"Không tìm thấy vị thế đang mở cho {symbol}"}
+                
+                position_amt = float(position.get('positionAmt', 0))
+                side = "SHORT" if position_amt > 0 else "LONG"  # Đảo ngược để đóng
+                
+                if not quantity:
+                    quantity = abs(position_amt)
+            
+            # Chuyển đổi LONG/SHORT sang BUY/SELL
+            order_side = "SELL" if side == "LONG" else "BUY"
+            
+            # Đặt lệnh MARKET để đóng vị thế
+            result = self.futures_create_order(
+                symbol=symbol,
+                side=order_side,
+                type="MARKET",
+                quantity=quantity,
+                reduceOnly=True  # Đảm bảo rằng lệnh chỉ đóng vị thế hiện có
+            )
+            
+            logger.info(f"Đã đóng vị thế {symbol} với lệnh {order_side} MARKET: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi đóng vị thế {symbol}: {str(e)}")
+            return {"error": str(e)}
+        
+    def futures_set_stop_loss(self, symbol: str, side: str, stop_price: float, 
+                          close_position: bool = True) -> Dict:
+        """
+        Đặt lệnh stop loss cho vị thế Futures
+        
+        Args:
+            symbol (str): Symbol giao dịch
+            side (str): Phía vị thế ('LONG' hoặc 'SHORT') để xác định lệnh đóng
+            stop_price (float): Giá kích hoạt stop loss
+            close_position (bool): Đóng toàn bộ vị thế khi kích hoạt
+            
+        Returns:
+            Dict: Kết quả đặt lệnh
+        """
+        try:
+            # Chuyển đổi LONG/SHORT sang BUY/SELL (đảo ngược vì đây là lệnh đóng)
+            order_side = "SELL" if side == "LONG" else "BUY"
+            
+            # Đặt lệnh stop loss
+            result = self.futures_create_order(
+                symbol=symbol,
+                side=order_side,
+                type="STOP_MARKET",
+                stopPrice=stop_price,
+                closePosition=close_position,
+                timeInForce="GTC"
+            )
+            
+            logger.info(f"Đã đặt stop loss cho {symbol} {side} tại giá {stop_price}: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi đặt stop loss cho {symbol}: {str(e)}")
+            return {"error": str(e)}
+        
+    def futures_set_take_profit(self, symbol: str, side: str, take_profit_price: float, 
+                           close_position: bool = True) -> Dict:
+        """
+        Đặt lệnh take profit cho vị thế Futures
+        
+        Args:
+            symbol (str): Symbol giao dịch
+            side (str): Phía vị thế ('LONG' hoặc 'SHORT') để xác định lệnh đóng
+            take_profit_price (float): Giá kích hoạt take profit
+            close_position (bool): Đóng toàn bộ vị thế khi kích hoạt
+            
+        Returns:
+            Dict: Kết quả đặt lệnh
+        """
+        try:
+            # Chuyển đổi LONG/SHORT sang BUY/SELL (đảo ngược vì đây là lệnh đóng)
+            order_side = "SELL" if side == "LONG" else "BUY"
+            
+            # Đặt lệnh take profit
+            result = self.futures_create_order(
+                symbol=symbol,
+                side=order_side,
+                type="TAKE_PROFIT_MARKET",
+                stopPrice=take_profit_price,
+                closePosition=close_position,
+                timeInForce="GTC"
+            )
+            
+            logger.info(f"Đã đặt take profit cho {symbol} {side} tại giá {take_profit_price}: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi đặt take profit cho {symbol}: {str(e)}")
+            return {"error": str(e)}
 
     def download_historical_data(self, 
                              symbol: str, 

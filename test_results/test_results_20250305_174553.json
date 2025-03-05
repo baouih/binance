@@ -1,0 +1,82 @@
+{
+    "api_validator_tests": {
+        "success": true,
+        "details": {
+            "klines_validation": {
+                "valid_data_result": true,
+                "valid_data_errors": [],
+                "invalid_data_result": false,
+                "invalid_data_errors": [
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 0 c\u00f3 gi\u00e1 th\u1ea5p nh\u1ea5t (34500.0) > gi\u00e1 cao nh\u1ea5t (34000.0)",
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 0 c\u00f3 gi\u00e1 cao nh\u1ea5t (34000.0) < gi\u00e1 m\u1edf/\u0111\u00f3ng c\u1eeda",
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 1 c\u00f3 volume \u00e2m (-1200.0)"
+                ],
+                "test_passed": true
+            },
+            "position_validation": {
+                "valid_data_result": true,
+                "valid_data_errors": [],
+                "invalid_data_result": false,
+                "invalid_data_errors": [
+                    "Thi\u1ebfu tr\u01b0\u1eddng b\u1eaft bu\u1ed9c 'leverage'",
+                    "Tr\u01b0\u1eddng 'positionAmt' kh\u00f4ng ph\u1ea3i l\u00e0 s\u1ed1 h\u1ee3p l\u1ec7"
+                ],
+                "test_passed": true
+            },
+            "data_transformation": {
+                "klines_transformed": true,
+                "position_transformed": true,
+                "test_passed": true
+            },
+            "retry_mechanism": {
+                "success_function": true,
+                "failure_function": true,
+                "test_passed": true
+            }
+        }
+    },
+    "strategy_selector_tests": {},
+    "risk_allocator_tests": {},
+    "trailing_stop_tests": {},
+    "comprehensive_tests": {},
+    "summary": {
+        "total_tests": 4,
+        "passed_tests": 4,
+        "failed_tests": 0,
+        "component_results": {
+            "api_validator_tests": {
+                "total": 4,
+                "passed": 4,
+                "failed": 0,
+                "success_rate": 100.0
+            },
+            "strategy_selector_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "risk_allocator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "trailing_stop_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "comprehensive_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            }
+        },
+        "timestamp": "2025-03-05 17:45:53",
+        "duration": 0,
+        "overall_success_rate": 100.0
+    }
+}

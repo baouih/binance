@@ -1,0 +1,40 @@
+=== Báo cáo test hệ thống giao dịch ===
+Thời gian: 2025-03-05 17:46:13
+Thời gian chạy: 0.00 giây
+
+Tổng số test: 0
+Số test thành công: 0
+Số test thất bại: 0
+Tỷ lệ thành công: 0.00%
+
+Chi tiết theo thành phần:
+- api_validator_tests:
+  + Tổng số test: 0
+  + Số test thành công: 0
+  + Số test thất bại: 0
+  + Tỷ lệ thành công: 0.00%
+
+- strategy_selector_tests:
+  + Tổng số test: 0
+  + Số test thành công: 0
+  + Số test thất bại: 0
+  + Tỷ lệ thành công: 0.00%
+
+- risk_allocator_tests:
+  + Tổng số test: 0
+  + Số test thành công: 0
+  + Số test thất bại: 0
+  + Tỷ lệ thành công: 0.00%
+
+- trailing_stop_tests:
+  + Tổng số test: 0
+  + Số test thành công: 0
+  + Số test thất bại: 0
+  + Tỷ lệ thành công: 0.00%
+
+- comprehensive_tests:
+  + Tổng số test: 0
+  + Số test thành công: 0
+  + Số test thất bại: 0
+  + Tỷ lệ thành công: 0.00%
+

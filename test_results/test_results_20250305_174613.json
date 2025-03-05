@@ -1,0 +1,51 @@
+{
+    "api_validator_tests": {},
+    "strategy_selector_tests": {},
+    "risk_allocator_tests": {
+        "success": false,
+        "details": {},
+        "error": "'DataCache' object has no attribute 'get_timestamp'"
+    },
+    "trailing_stop_tests": {},
+    "comprehensive_tests": {},
+    "summary": {
+        "total_tests": 0,
+        "passed_tests": 0,
+        "failed_tests": 0,
+        "component_results": {
+            "api_validator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "strategy_selector_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "risk_allocator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "trailing_stop_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "comprehensive_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            }
+        },
+        "timestamp": "2025-03-05 17:46:13",
+        "duration": 0,
+        "overall_success_rate": 0
+    }
+}

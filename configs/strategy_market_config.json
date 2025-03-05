@@ -1,0 +1,190 @@
+{
+    "trending": {
+        "strategies": {
+            "trend_following": 0.7,
+            "breakout": 0.2,
+            "momentum": 0.1
+        },
+        "risk_adjustment": 1.2,
+        "position_sizing": "normal"
+    },
+    "ranging": {
+        "strategies": {
+            "mean_reversion": 0.6,
+            "support_resistance": 0.3,
+            "range_trading": 0.1
+        },
+        "risk_adjustment": 0.8,
+        "position_sizing": "reduced"
+    },
+    "volatile": {
+        "strategies": {
+            "breakout": 0.4,
+            "volatility_based": 0.4,
+            "momentum": 0.2
+        },
+        "risk_adjustment": 0.6,
+        "position_sizing": "reduced"
+    },
+    "quiet": {
+        "strategies": {
+            "mean_reversion": 0.4,
+            "support_resistance": 0.4,
+            "range_trading": 0.2
+        },
+        "risk_adjustment": 1.0,
+        "position_sizing": "normal"
+    },
+    "strategy_parameters": {
+        "trend_following": {
+            "trending": {
+                "ema_fast": 12,
+                "ema_slow": 26,
+                "adx_period": 14,
+                "adx_threshold": 25
+            },
+            "ranging": {
+                "ema_fast": 8,
+                "ema_slow": 21,
+                "adx_period": 14,
+                "adx_threshold": 20
+            },
+            "volatile": {
+                "ema_fast": 5,
+                "ema_slow": 15,
+                "adx_period": 14,
+                "adx_threshold": 30
+            },
+            "quiet": {
+                "ema_fast": 12,
+                "ema_slow": 26,
+                "adx_period": 14,
+                "adx_threshold": 20
+            }
+        },
+        "breakout": {
+            "trending": {
+                "period": 20,
+                "atr_multiplier": 2.5
+            },
+            "ranging": {
+                "period": 10,
+                "atr_multiplier": 2.0
+            },
+            "volatile": {
+                "period": 5,
+                "atr_multiplier": 3.0
+            },
+            "quiet": {
+                "period": 30,
+                "atr_multiplier": 2.0
+            }
+        },
+        "momentum": {
+            "trending": {
+                "rsi_period": 14,
+                "rsi_overbought": 70,
+                "rsi_oversold": 30
+            },
+            "ranging": {
+                "rsi_period": 14,
+                "rsi_overbought": 65,
+                "rsi_oversold": 35
+            },
+            "volatile": {
+                "rsi_period": 7,
+                "rsi_overbought": 75,
+                "rsi_oversold": 25
+            },
+            "quiet": {
+                "rsi_period": 21,
+                "rsi_overbought": 70,
+                "rsi_oversold": 30
+            }
+        },
+        "mean_reversion": {
+            "trending": {
+                "bb_period": 20,
+                "bb_std_dev": 2.0
+            },
+            "ranging": {
+                "bb_period": 20,
+                "bb_std_dev": 2.0
+            },
+            "volatile": {
+                "bb_period": 10,
+                "bb_std_dev": 3.0
+            },
+            "quiet": {
+                "bb_period": 30,
+                "bb_std_dev": 1.5
+            }
+        },
+        "support_resistance": {
+            "trending": {
+                "lookback_period": 100,
+                "price_threshold": 0.5
+            },
+            "ranging": {
+                "lookback_period": 50,
+                "price_threshold": 0.3
+            },
+            "volatile": {
+                "lookback_period": 30,
+                "price_threshold": 0.7
+            },
+            "quiet": {
+                "lookback_period": 150,
+                "price_threshold": 0.3
+            }
+        },
+        "range_trading": {
+            "trending": {
+                "period": 14,
+                "stoch_k": 14,
+                "stoch_d": 3,
+                "overbought": 80,
+                "oversold": 20
+            },
+            "ranging": {
+                "period": 14,
+                "stoch_k": 14,
+                "stoch_d": 3,
+                "overbought": 80,
+                "oversold": 20
+            },
+            "volatile": {
+                "period": 5,
+                "stoch_k": 5,
+                "stoch_d": 3,
+                "overbought": 85,
+                "oversold": 15
+            },
+            "quiet": {
+                "period": 21,
+                "stoch_k": 21,
+                "stoch_d": 5,
+                "overbought": 75,
+                "oversold": 25
+            }
+        },
+        "volatility_based": {
+            "trending": {
+                "atr_period": 14,
+                "atr_multiplier": 1.5
+            },
+            "ranging": {
+                "atr_period": 14,
+                "atr_multiplier": 1.0
+            },
+            "volatile": {
+                "atr_period": 7,
+                "atr_multiplier": 2.0
+            },
+            "quiet": {
+                "atr_period": 21,
+                "atr_multiplier": 1.0
+            }
+        }
+    }
+}
