@@ -1036,8 +1036,8 @@ def background_tasks():
     # Tải cấu hình
     load_config()
     
-    # Tạo dữ liệu mẫu
-    generate_initial_fake_data()
+    # Tạm thời tắt tạo dữ liệu mẫu demo để tránh nhầm lẫn
+    # generate_initial_fake_data()
     
     # Cấu hình logger cho hàm background_tasks
     bg_logger = logging.getLogger('background_tasks')
