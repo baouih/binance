@@ -99,7 +99,7 @@ class MarketDataUpdater:
             logger.info(f"Đã kết nối tới Binance API ({testnet and 'testnet' or 'mainnet'})")
             
             # Khởi tạo các thành phần phân tích
-            self.data_processor = DataProcessor()  # DataProcessor sẽ tự khởi tạo BinanceAPI
+            self.data_processor = DataProcessor(binance_api=self.binance_api)  # Truyền BinanceAPI vào
             self.mtf_analyzer = MultiTimeframeAnalyzer(
                 binance_api=self.binance_api,
                 data_processor=self.data_processor,

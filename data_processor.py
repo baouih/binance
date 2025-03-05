@@ -25,15 +25,16 @@ logger = logging.getLogger(__name__)
 class DataProcessor:
     """Lớp xử lý dữ liệu thị trường"""
     
-    def __init__(self, cache_dir: str = 'data/cache'):
+    def __init__(self, binance_api: BinanceAPI = None, cache_dir: str = 'data/cache'):
         """
         Khởi tạo bộ xử lý dữ liệu
         
         Args:
+            binance_api (BinanceAPI, optional): Đối tượng BinanceAPI để kết nối với Binance
             cache_dir (str): Thư mục lưu cache dữ liệu
         """
         self.cache_dir = cache_dir
-        self.binance_api = BinanceAPI()
+        self.binance_api = binance_api if binance_api else BinanceAPI()
         self.data_cache = {}
         
         # Đảm bảo thư mục cache tồn tại
