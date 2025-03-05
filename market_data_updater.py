@@ -147,7 +147,8 @@ class MarketDataUpdater:
             # Lấy dữ liệu lịch sử
             df = self.data_processor.get_historical_data(symbol, timeframe, lookback_days=30)
             
-            if df is None or df.empty:
+            # Kiểm tra nếu df là None hoặc là list rỗng hoặc DataFrame rỗng
+            if df is None or (hasattr(df, 'empty') and df.empty) or (isinstance(df, list) and len(df) == 0):
                 logger.error(f"Không thể lấy dữ liệu lịch sử cho {symbol}")
                 return False
             
@@ -232,6 +233,7 @@ class MarketDataUpdater:
             summary += f"Tín hiệu {signal} với độ tin cậy {confidence:.1f}%. "
             
             # Thông tin thanh khoản
+            pressure = "trung tính"
             if liq and 'market_pressure' in liq:
                 pressure = "mua" if liq.get('market_pressure') == 'buy' else "bán"
                 bid_ask_ratio = liq.get('bid_ask_ratio', 1.0)
@@ -241,8 +243,6 @@ class MarketDataUpdater:
             volatility = 0
             if mtf and 'volatility' in mtf:
                 volatility = mtf.get('volatility', 0)
-            elif 'volatility' in analysis:
-                volatility = analysis.get('volatility', 0)
             
             if volatility > 0:
                 vol_level = "cao" if volatility > 1.5 else "trung bình" if volatility > 0.8 else "thấp"
