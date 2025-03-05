@@ -51,6 +51,9 @@
                         <a class="nav-link" href="/settings"><i class="fas fa-cog me-1"></i> Cài đặt</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="/update"><i class="fas fa-cloud-download-alt me-1"></i> Cập nhật</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/cli"><i class="fas fa-terminal me-1"></i> CLI</a>
                     </li>
                 </ul>
@@ -134,7 +137,7 @@
                     <span>BinanceTrader Bot &copy; 2025</span>
                 </div>
                 <div>
-                    <span>Version 3.2.1</span>
+                    <span>Version {% if bot_status and bot_status.version %}{{ bot_status.version }}{% else %}1.0.0{% endif %}</span>
                 </div>
                 <div>
                     <a href="#" class="text-secondary me-2"><i class="fab fa-github"></i></a>

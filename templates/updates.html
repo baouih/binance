@@ -1,0 +1,571 @@
+{% extends "layout.html" %}
+{% block title %}Quản lý cập nhật hệ thống{% endblock %}
+
+{% block styles %}
+<style>
+  .version-tag {
+    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background-color: #4CAF50;
+    color: white;
+    margin-left: 10px;
+  }
+  
+  .card {
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .update-actions .btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .history-entry {
+    padding: 10px;
+    border-left: 3px solid #4CAF50;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .history-entry.rollback {
+    border-left-color: #FFC107;
+  }
+  
+  .backup-card {
+    border-left: 3px solid #2196F3;
+  }
+  
+  .progress-container {
+    display: none;
+    margin-top: 20px;
+  }
+  
+  .loading-text {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mt-4">
+    <div class="col-12">
+      <h2>Quản lý cập nhật hệ thống <span class="version-tag">v{{ current_version }}</span></h2>
+      <p>Quản lý các bản cập nhật, tạo gói cập nhật mới, và quản lý sao lưu</p>
+    </div>
+  </div>
+  
+  <div class="row mt-3">
+    <div class="col-md-8">
+      <!-- Cập nhật hiện có -->
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Cập nhật có sẵn</h5>
+        </div>
+        <div class="card-body">
+          {% if available_updates %}
+            <div class="list-group">
+              {% for update in available_updates %}
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ update.filename }}</h5>
+                    <small>{{ update.created_time }}</small>
+                  </div>
+                  <p class="mb-1">Phiên bản: {{ update.version }}</p>
+                  <p class="mb-1">Kích thước: {{ (update.size / 1024)|round(1) }} KB</p>
+                  <div class="update-actions">
+                    <button class="btn btn-sm btn-success apply-update" data-filename="{{ update.filename }}">Áp dụng cập nhật</button>
+                    <a href="{{ url_for('update.download_update', filename=update.filename) }}" class="btn btn-sm btn-info">Tải xuống</a>
+                    <button class="btn btn-sm btn-danger delete-update" data-filename="{{ update.filename }}">Xóa</button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              Không có cập nhật nào khả dụng. Bạn đang sử dụng phiên bản mới nhất hoặc chưa có gói cập nhật nào được tải lên.
+            </div>
+          {% endif %}
+          
+          <div class="mt-3">
+            <a href="{{ url_for('update.create_update') }}" class="btn btn-primary">Tạo cập nhật mới</a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadUpdateModal">
+              Tải lên gói cập nhật
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tiến trình -->
+      <div id="progress-container" class="progress-container mt-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Đang xử lý...</h5>
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+            </div>
+            <p id="loading-text" class="loading-text mt-2">Đang áp dụng cập nhật, vui lòng đợi...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Lịch sử cập nhật -->
+      <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Lịch sử cập nhật</h5>
+        </div>
+        <div class="card-body">
+          {% if update_history %}
+            <div class="timeline">
+              {% for entry in update_history %}
+                <div class="history-entry {% if entry.rollback %}rollback{% endif %}">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Phiên bản {{ entry.version }}</h5>
+                    <small>{{ entry.update_time }}</small>
+                  </div>
+                  <p class="mb-1">Từ phiên bản: {{ entry.previous_version }}</p>
+                  {% if entry.description %}
+                    <p class="mb-1">{{ entry.description }}</p>
+                  {% endif %}
+                  {% if entry.rollback %}
+                    <span class="badge bg-warning">Rollback</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              Chưa có lịch sử cập nhật nào.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <!-- Các bản sao lưu hiện có -->
+      <div class="card backup-card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Bản sao lưu</h5>
+        </div>
+        <div class="card-body">
+          {% if backups %}
+            <div class="list-group">
+              {% for backup in backups %}
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ backup.filename }}</h5>
+                    <small>{{ backup.created_time }}</small>
+                  </div>
+                  <p class="mb-1">Kích thước: {{ (backup.size / 1024)|round(1) }} KB</p>
+                  <div class="update-actions">
+                    <button class="btn btn-sm btn-warning rollback-button" data-filename="{{ backup.filename }}">Quay lại phiên bản này</button>
+                    <a href="{{ url_for('update.download_backup', filename=backup.filename) }}" class="btn btn-sm btn-info">Tải xuống</a>
+                    <button class="btn btn-sm btn-danger delete-backup" data-filename="{{ backup.filename }}">Xóa</button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              Không có bản sao lưu nào.
+            </div>
+          {% endif %}
+          
+          <div class="mt-3">
+            <button id="create-backup-btn" class="btn btn-primary">Tạo bản sao lưu mới</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Thông tin hệ thống -->
+      <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Thông tin hệ thống</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Phiên bản hiện tại
+              <span class="badge bg-primary">{{ current_version }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Số bản cập nhật có sẵn
+              <span class="badge bg-success">{{ available_updates|length }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Số bản sao lưu
+              <span class="badge bg-info">{{ backups|length }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Cập nhật cuối
+              <span class="badge bg-secondary">{{ update_history[0].update_time if update_history else 'Chưa có' }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal tải lên gói cập nhật -->
+<div class="modal fade" id="uploadUpdateModal" tabindex="-1" aria-labelledby="uploadUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadUpdateModalLabel">Tải lên gói cập nhật</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadUpdateForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="updateFile" class="form-label">Chọn file cập nhật (.zip)</label>
+            <input class="form-control" type="file" id="updateFile" name="update_file" accept=".zip">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" id="uploadUpdateBtn">Tải lên</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xác nhận áp dụng cập nhật -->
+<div class="modal fade" id="confirmApplyModal" tabindex="-1" aria-labelledby="confirmApplyModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmApplyModalLabel">Xác nhận áp dụng cập nhật</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn áp dụng cập nhật này?</p>
+        <p>Hệ thống sẽ tự động tạo bản sao lưu trước khi cập nhật.</p>
+        <p>Gói cập nhật: <strong id="update-filename"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="confirmApplyBtn">Áp dụng cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xác nhận rollback -->
+<div class="modal fade" id="confirmRollbackModal" tabindex="-1" aria-labelledby="confirmRollbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmRollbackModalLabel">Xác nhận quay lại phiên bản cũ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn quay lại phiên bản cũ này?</p>
+        <p>Hệ thống sẽ tự động tạo bản sao lưu của phiên bản hiện tại trước khi rollback.</p>
+        <p>Bản sao lưu: <strong id="backup-filename"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-warning" id="confirmRollbackBtn">Quay lại phiên bản cũ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xác nhận xóa cập nhật -->
+<div class="modal fade" id="confirmDeleteUpdateModal" tabindex="-1" aria-labelledby="confirmDeleteUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteUpdateModalLabel">Xác nhận xóa gói cập nhật</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn xóa gói cập nhật này?</p>
+        <p>Gói cập nhật: <strong id="delete-update-filename"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteUpdateBtn">Xóa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xác nhận xóa backup -->
+<div class="modal fade" id="confirmDeleteBackupModal" tabindex="-1" aria-labelledby="confirmDeleteBackupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteBackupModalLabel">Xác nhận xóa bản sao lưu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn xóa bản sao lưu này?</p>
+        <p>Bản sao lưu: <strong id="delete-backup-filename"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBackupBtn">Xóa</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý tải lên gói cập nhật
+    document.getElementById('uploadUpdateBtn').addEventListener('click', function() {
+      const fileInput = document.getElementById('updateFile');
+      
+      if (fileInput.files.length === 0) {
+        alert('Vui lòng chọn file cập nhật');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('update_file', fileInput.files[0]);
+      
+      // Hiển thị tiến trình
+      document.getElementById('progress-container').style.display = 'block';
+      document.getElementById('loading-text').textContent = 'Đang tải lên gói cập nhật...';
+      
+      fetch('{{ url_for("update.upload_update") }}', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('progress-container').style.display = 'none';
+        
+        if (data.status === 'success') {
+          alert('Đã tải lên gói cập nhật thành công');
+          // Tải lại trang để hiển thị gói cập nhật mới
+          window.location.reload();
+        } else {
+          alert('Lỗi khi tải lên gói cập nhật: ' + data.message);
+        }
+      })
+      .catch(error => {
+        document.getElementById('progress-container').style.display = 'none';
+        alert('Lỗi: ' + error);
+      });
+    });
+    
+    // Xử lý áp dụng cập nhật
+    document.querySelectorAll('.apply-update').forEach(button => {
+      button.addEventListener('click', function() {
+        const filename = this.getAttribute('data-filename');
+        document.getElementById('update-filename').textContent = filename;
+        
+        // Hiển thị modal xác nhận
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmApplyModal'));
+        confirmModal.show();
+        
+        // Lưu filename để sử dụng sau
+        document.getElementById('confirmApplyBtn').setAttribute('data-filename', filename);
+      });
+    });
+    
+    // Xử lý xác nhận áp dụng cập nhật
+    document.getElementById('confirmApplyBtn').addEventListener('click', function() {
+      const filename = this.getAttribute('data-filename');
+      
+      // Ẩn modal xác nhận
+      const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmApplyModal'));
+      confirmModal.hide();
+      
+      // Hiển thị tiến trình
+      document.getElementById('progress-container').style.display = 'block';
+      document.getElementById('loading-text').textContent = 'Đang áp dụng cập nhật, vui lòng đợi...';
+      
+      fetch('{{ url_for("update.apply_update", filename="") }}' + filename, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('progress-container').style.display = 'none';
+        
+        if (data.status === 'success') {
+          alert('Đã áp dụng cập nhật thành công lên phiên bản ' + data.version);
+          // Tải lại trang sau 2 giây để đảm bảo máy chủ đã khởi động lại
+          setTimeout(() => window.location.reload(), 2000);
+        } else {
+          alert('Lỗi khi áp dụng cập nhật: ' + data.message);
+        }
+      })
+      .catch(error => {
+        document.getElementById('progress-container').style.display = 'none';
+        alert('Lỗi: ' + error);
+      });
+    });
+    
+    // Xử lý rollback
+    document.querySelectorAll('.rollback-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const filename = this.getAttribute('data-filename');
+        document.getElementById('backup-filename').textContent = filename;
+        
+        // Hiển thị modal xác nhận
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmRollbackModal'));
+        confirmModal.show();
+        
+        // Lưu filename để sử dụng sau
+        document.getElementById('confirmRollbackBtn').setAttribute('data-filename', filename);
+      });
+    });
+    
+    // Xử lý xác nhận rollback
+    document.getElementById('confirmRollbackBtn').addEventListener('click', function() {
+      const filename = this.getAttribute('data-filename');
+      
+      // Ẩn modal xác nhận
+      const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmRollbackModal'));
+      confirmModal.hide();
+      
+      // Hiển thị tiến trình
+      document.getElementById('progress-container').style.display = 'block';
+      document.getElementById('loading-text').textContent = 'Đang quay lại phiên bản cũ, vui lòng đợi...';
+      
+      fetch('{{ url_for("update.rollback_update", filename="") }}' + filename, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('progress-container').style.display = 'none';
+        
+        if (data.status === 'success') {
+          alert('Đã quay lại phiên bản ' + data.version + ' thành công');
+          // Tải lại trang sau 2 giây để đảm bảo máy chủ đã khởi động lại
+          setTimeout(() => window.location.reload(), 2000);
+        } else {
+          alert('Lỗi khi quay lại phiên bản cũ: ' + data.message);
+        }
+      })
+      .catch(error => {
+        document.getElementById('progress-container').style.display = 'none';
+        alert('Lỗi: ' + error);
+      });
+    });
+    
+    // Xử lý tạo bản sao lưu mới
+    document.getElementById('create-backup-btn').addEventListener('click', function() {
+      // Hiển thị tiến trình
+      document.getElementById('progress-container').style.display = 'block';
+      document.getElementById('loading-text').textContent = 'Đang tạo bản sao lưu, vui lòng đợi...';
+      
+      fetch('{{ url_for("update.create_backup") }}', {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('progress-container').style.display = 'none';
+        
+        if (data.status === 'success') {
+          alert('Đã tạo bản sao lưu thành công');
+          window.location.reload();
+        } else {
+          alert('Lỗi khi tạo bản sao lưu: ' + data.message);
+        }
+      })
+      .catch(error => {
+        document.getElementById('progress-container').style.display = 'none';
+        alert('Lỗi: ' + error);
+      });
+    });
+    
+    // Xử lý xóa gói cập nhật
+    document.querySelectorAll('.delete-update').forEach(button => {
+      button.addEventListener('click', function() {
+        const filename = this.getAttribute('data-filename');
+        document.getElementById('delete-update-filename').textContent = filename;
+        
+        // Hiển thị modal xác nhận
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteUpdateModal'));
+        confirmModal.show();
+        
+        // Lưu filename để sử dụng sau
+        document.getElementById('confirmDeleteUpdateBtn').setAttribute('data-filename', filename);
+      });
+    });
+    
+    // Xử lý xác nhận xóa gói cập nhật
+    document.getElementById('confirmDeleteUpdateBtn').addEventListener('click', function() {
+      const filename = this.getAttribute('data-filename');
+      
+      // Ẩn modal xác nhận
+      const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteUpdateModal'));
+      confirmModal.hide();
+      
+      fetch('{{ url_for("update.delete_update", filename="") }}' + filename, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Đã xóa gói cập nhật thành công');
+          window.location.reload();
+        } else {
+          alert('Lỗi khi xóa gói cập nhật: ' + data.message);
+        }
+      })
+      .catch(error => {
+        alert('Lỗi: ' + error);
+      });
+    });
+    
+    // Xử lý xóa bản sao lưu
+    document.querySelectorAll('.delete-backup').forEach(button => {
+      button.addEventListener('click', function() {
+        const filename = this.getAttribute('data-filename');
+        document.getElementById('delete-backup-filename').textContent = filename;
+        
+        // Hiển thị modal xác nhận
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteBackupModal'));
+        confirmModal.show();
+        
+        // Lưu filename để sử dụng sau
+        document.getElementById('confirmDeleteBackupBtn').setAttribute('data-filename', filename);
+      });
+    });
+    
+    // Xử lý xác nhận xóa bản sao lưu
+    document.getElementById('confirmDeleteBackupBtn').addEventListener('click', function() {
+      const filename = this.getAttribute('data-filename');
+      
+      // Ẩn modal xác nhận
+      const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteBackupModal'));
+      confirmModal.hide();
+      
+      fetch('{{ url_for("update.delete_backup", filename="") }}' + filename, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Đã xóa bản sao lưu thành công');
+          window.location.reload();
+        } else {
+          alert('Lỗi khi xóa bản sao lưu: ' + data.message);
+        }
+      })
+      .catch(error => {
+        alert('Lỗi: ' + error);
+      });
+    });
+  });
+</script>
+{% endblock %}

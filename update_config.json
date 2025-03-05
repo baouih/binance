@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+    "last_update": null,
+    "update_history": [],
+    "auto_update": false,
+    "update_check_interval": 86400,
+    "update_server": "https://update.example.com",
+    "update_token": "",
+    "protected_files": [
+        ".env",
+        ".env.example",
+        "account_config.json",
+        "update_config.json"
+    ],
+    "update_packages_folder": "update_packages",
+    "backups_folder": "backups",
+    "system_name": "BinanceTraderBot",
+    "maintainer": "Replit Team"
+}

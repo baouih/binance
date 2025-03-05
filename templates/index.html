@@ -292,21 +292,11 @@
                 <h5 class="mb-3">Hoạt động gần đây</h5>
                 
                 <div class="activity-list">
+                    {# DEBUG #}
+                    <!-- Debug thông tin: {{ account_data.activities|length if account_data.activities else 0 }} activities -->
+                    
                     {# Hiển thị hoạt động từ vị thế thực #}
-                    {% if account_data.activities and account_data.activities|length > 0 %}
-                        {% for activity in account_data.activities %}
-                            <div class="activity-item">
-                                <div class="activity-icon {{ activity.class }}">
-                                    <i class="bi {{ activity.icon }}"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-time">{{ activity.time }}</div>
-                                    <div class="activity-description">{{ activity.description }}</div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        {% for position in account_data.positions %}
+                    {% for position in account_data.positions %}
                             <div class="activity-item">
                                 <div class="activity-icon {% if position.type == 'LONG' %}text-success{% else %}text-danger{% endif %}">
                                     <i class="bi {% if position.type == 'LONG' %}bi-arrow-up-circle-fill{% else %}bi-arrow-down-circle-fill{% endif %}"></i>
@@ -329,7 +319,6 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    {% endif %}
                     
                     {# Hiển thị thông báo mặc định nếu không có vị thế #}
                     {% if not account_data.positions or account_data.positions|length == 0 %}

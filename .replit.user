@@ -1,0 +1,5 @@
+# Cấu hình tùy chọn của người dùng
+# File này sẽ không bị ghi đè khi deploy
+
+# Chạy script khởi động khi Replit bắt đầu
+onBoot = ["bash", "startup.sh"]

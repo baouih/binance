@@ -8,6 +8,9 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 import binance_api
 from account_type_selector import AccountTypeSelector
 
+# Jinja2 custom filter
+from datetime import datetime as dt
+
 # Đường dẫn file cấu hình tài khoản
 ACCOUNT_CONFIG_PATH = 'account_config.json'
 
@@ -19,6 +22,24 @@ logger = logging.getLogger('main')
 # Khởi tạo Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
+
+# Jinja2 custom filter cho datetime
+@app.template_filter('datetime')
+def format_datetime(value):
+    """Jinja2 filter để định dạng timestamp thành datetime"""
+    if isinstance(value, (int, float)):
+        return dt.fromtimestamp(value).strftime('%Y-%m-%d %H:%M:%S')
+    return value
+
+# Jinja2 custom filter để tăng phiên bản
+@app.template_filter('increment_version')
+def increment_version(version):
+    """Jinja2 filter để tự động tăng phiên bản"""
+    if not version:
+        return "1.0.1"
+    version_parts = version.split(".")
+    version_parts[-1] = str(int(version_parts[-1]) + 1)
+    return ".".join(version_parts)
 
 # Hàm để lấy trạng thái bot từ cấu hình tài khoản
 def get_bot_status_from_config():
@@ -39,8 +60,19 @@ def get_bot_status_from_config():
     # Trả về full status
     status = {
         'running': bot_running,
-        'mode': 'testnet'  # Mặc định
+        'mode': 'testnet',  # Mặc định
+        'version': '1.0.0'  # Mặc định
     }
+    
+    # Lấy phiên bản từ update_config.json
+    if os.path.exists('update_config.json'):
+        try:
+            with open('update_config.json', 'r') as f:
+                update_config = json.load(f)
+                status['version'] = update_config.get('version', '1.0.0')
+                logger.debug(f"Đọc phiên bản từ update_config.json: {status['version']}")
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc update_config.json: {str(e)}")
     
     # Nếu có file status, lấy thêm thông tin
     if os.path.exists('bot_status.json'):
@@ -48,8 +80,8 @@ def get_bot_status_from_config():
             with open('bot_status.json', 'r') as f:
                 saved_status = json.load(f)
                 status.update(saved_status)
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc bot_status.json: {str(e)}")
             
     # Tính uptime nếu bot đang chạy
     uptime = '0d 0h 0m'
@@ -138,6 +170,9 @@ def index():
         # Thêm timestamp vào dữ liệu để tránh cache
         now = datetime.datetime.now()
         version = f"v{now.hour}{now.minute}{now.second}"
+        
+        # Log chi tiết để debug
+        logger.info(f"====== START INDEX RENDERING at {now} =======")
         
         # Cập nhật BOT_STATUS từ cấu hình tài khoản mới nhất
         BOT_STATUS.update(get_bot_status_from_config())
@@ -245,7 +280,8 @@ def index():
                     time_display = time_obj.strftime('%H:%M')
                 else:
                     time_display = "12:00"
-            except:
+            except Exception as e:
+                logger.error(f"Lỗi xử lý thời gian: {str(e)}")
                 time_display = "12:00"
                 
             recent_activities.append({
@@ -256,6 +292,9 @@ def index():
                 'time': time_display,
                 'position_id': position.get('id')
             })
+            
+            # Log thông tin hoạt động
+            logger.info(f"Đã thêm hoạt động: {description} lúc {time_display}")
         
         # Thêm hoạt động bot khởi động nếu không có vị thế
         if not positions_list:
@@ -270,6 +309,11 @@ def index():
         
         # Đảm bảo activities được sắp xếp theo thời gian mới nhất (giả sử entry_time mới nhất ở đầu)
         current_account_data['activities'] = recent_activities
+        
+        # Debug activities
+        logger.info(f"Danh sách activities: {len(current_account_data['activities'])}")
+        for act in current_account_data['activities']:
+            logger.info(f"Activity: {act['description']} at {act['time']}")
         
         return render_template('index.html', 
                             bot_status=current_bot_status,
@@ -1773,6 +1817,25 @@ def account():
                           bot_status=BOT_STATUS)
 
 
+@app.route('/updates')
+def updates():
+    """Trang quản lý cập nhật"""
+    try:
+        from update_manager import UpdateManager
+        update_manager = UpdateManager()
+        return render_template('updates.html', 
+                            bot_status=BOT_STATUS,
+                            current_version=update_manager.get_current_version(),
+                            available_updates=update_manager.get_available_updates(),
+                            update_history=update_manager.get_update_history(),
+                            backups=update_manager.get_available_backups())
+    except Exception as e:
+        logger.error(f"Lỗi khi tải trang updates: {e}")
+        return render_template('error.html', 
+                            error_message=f"Không thể tải trang cập nhật: {str(e)}",
+                            bot_status=BOT_STATUS)
+
+
 @app.route('/trading_report')
 def trading_report():
     """Trang báo cáo giao dịch"""
@@ -2305,6 +2368,23 @@ if BOT_STATUS['running'] == False and os.path.exists('bot_status.json'):
                 BOT_STATUS.update(saved_status)
     except Exception as e:
         logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
+
+
+# Đăng ký updates route blueprint
+def register_update_routes():
+    try:
+        from routes import update_route
+        update_route.register_blueprint(app)
+        logger.info("Đã đăng ký blueprint update_route")
+    except Exception as e:
+        logger.error(f"Lỗi khi đăng ký update_route: {e}")
+
+# Đăng ký các blueprints
+register_update_routes()
+
+# Tạo các thư mục cần thiết cho hệ thống cập nhật
+os.makedirs("update_packages", exist_ok=True)
+os.makedirs("backups", exist_ok=True)
 
 
 if __name__ == '__main__':

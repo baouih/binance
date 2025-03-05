@@ -1,0 +1,174 @@
+{% extends "layout.html" %}
+{% block title %}Tạo gói cập nhật mới{% endblock %}
+
+{% block styles %}
+<style>
+  .file-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .file-checkbox {
+    margin-right: 10px;
+  }
+  
+  .version-info {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    margin-bottom: 20px;
+  }
+  
+  .current-version {
+    font-weight: bold;
+    color: #28a745;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">Tạo gói cập nhật mới</h2>
+      
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('update.update_home') }}">Quản lý cập nhật</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Tạo gói cập nhật mới</li>
+        </ol>
+      </nav>
+      
+      <div class="version-info">
+        <p>Phiên bản hiện tại: <span class="current-version">{{ current_version }}</span></p>
+        <p>Ví dụ cách đánh phiên bản:</p>
+        <ul>
+          <li>1.0.1 - Phiên bản vá lỗi</li>
+          <li>1.1.0 - Phiên bản tính năng mới</li>
+          <li>2.0.0 - Phiên bản nâng cấp lớn</li>
+        </ul>
+      </div>
+      
+      <form action="{{ url_for('update.create_update') }}" method="post">
+        <div class="mb-3">
+          <label for="version" class="form-label">Phiên bản mới <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="version" name="version" placeholder="Ví dụ: 1.0.1" required>
+          <div class="form-text">Phiên bản mới phải lớn hơn phiên bản hiện tại ({{ current_version }}).</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Mô tả cập nhật</label>
+          <textarea class="form-control" id="description" name="description" rows="3" placeholder="Mô tả những thay đổi trong phiên bản này"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Chọn các file cần đưa vào gói cập nhật</label>
+          <div class="form-text mb-2">Nếu không chọn file nào, hệ thống sẽ tự động bao gồm tất cả các file Python và thư mục quan trọng.</div>
+          
+          <div class="file-list">
+            {% for file in available_files %}
+              <div class="form-check">
+                <input class="form-check-input file-checkbox" type="checkbox" name="files" value="{{ file }}" id="file-{{ loop.index }}">
+                <label class="form-check-label" for="file-{{ loop.index }}">
+                  {{ file }}
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="select-all">
+            <label class="form-check-label" for="select-all">
+              Chọn tất cả
+            </label>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="package-type" class="form-label">Loại gói cập nhật</label>
+          <select class="form-select" id="package-type" name="package_type">
+            <option value="full" selected>Đầy đủ (Bao gồm tất cả các file cần thiết)</option>
+            <option value="incremental">Tăng dần (Chỉ bao gồm các file đã thay đổi)</option>
+          </select>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('update.update_home') }}" class="btn btn-secondary">Quay lại</a>
+          <button type="submit" class="btn btn-primary">Tạo gói cập nhật</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý chọn tất cả
+    const selectAllCheckbox = document.getElementById('select-all');
+    const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+    
+    selectAllCheckbox.addEventListener('change', function() {
+      const isChecked = this.checked;
+      
+      fileCheckboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+      });
+    });
+    
+    // Kiểm tra nếu tất cả các checkbox đã được chọn
+    function updateSelectAllCheckbox() {
+      const allChecked = Array.from(fileCheckboxes).every(checkbox => checkbox.checked);
+      const someChecked = Array.from(fileCheckboxes).some(checkbox => checkbox.checked);
+      
+      selectAllCheckbox.checked = allChecked;
+      selectAllCheckbox.indeterminate = someChecked && !allChecked;
+    }
+    
+    fileCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectAllCheckbox);
+    });
+    
+    // Kiểm tra phiên bản
+    const versionInput = document.getElementById('version');
+    const currentVersion = "{{ current_version }}";
+    
+    function compareVersions(version1, version2) {
+      const parts1 = version1.split('.').map(Number);
+      const parts2 = version2.split('.').map(Number);
+      
+      for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+        const part1 = parts1[i] || 0;
+        const part2 = parts2[i] || 0;
+        
+        if (part1 > part2) return 1;
+        if (part1 < part2) return -1;
+      }
+      
+      return 0;
+    }
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+      const newVersion = versionInput.value.trim();
+      
+      if (!newVersion) {
+        alert('Vui lòng nhập phiên bản mới');
+        event.preventDefault();
+        return;
+      }
+      
+      if (compareVersions(newVersion, currentVersion) <= 0) {
+        alert(`Phiên bản mới (${newVersion}) phải lớn hơn phiên bản hiện tại (${currentVersion})`);
+        event.preventDefault();
+        return;
+      }
+    });
+  });
+</script>
+{% endblock %}
