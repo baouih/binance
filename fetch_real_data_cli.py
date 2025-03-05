@@ -1,384 +1,691 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Script lấy dữ liệu thực từ Binance API và kiểm tra tính khớp với giao diện web
+Command Line Interface cho việc tải dữ liệu thực tế từ Binance
+
+Script này cung cấp một giao diện dòng lệnh tương tác để tải dữ liệu giá từ Binance API.
+Người dùng có thể lựa chọn các cặp tiền, khung thời gian và thời gian trong giao diện menu đơn giản.
 """
 
 import os
 import sys
 import json
-import time
 import logging
-from datetime import datetime
-from pprint import pprint
+import time
+from datetime import datetime, timedelta
+try:
+    import pandas as pd
+    from binance.client import Client
+    from tqdm import tqdm
+    from dotenv import load_dotenv
+except ImportError:
+    print("Thiếu các thư viện cần thiết. Đang cài đặt...")
+    import subprocess
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pandas", "python-binance", "tqdm", "python-dotenv"])
+    import pandas as pd
+    from binance.client import Client
+    from tqdm import tqdm
+    from dotenv import load_dotenv
 
-# Thêm thư mục gốc vào đường dẫn để import các module
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-
-# Import các module cần thiết từ dự án
-from binance_api import BinanceAPI
-import config_route
-
-# Cấu hình logging
+# Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
+    handlers=[
+        logging.FileHandler("fetch_real_data_cli.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
 )
-logger = logging.getLogger("fetch_real_data")
+logger = logging.getLogger('fetch_real_data_cli')
 
-# Đường dẫn đến file cấu hình
-ACCOUNT_CONFIG_PATH = 'account_config.json'
+# Tải biến môi trường
+load_dotenv()
+API_KEY = os.getenv('BINANCE_API_KEY')
+API_SECRET = os.getenv('BINANCE_API_SECRET')
 
-def load_account_config():
-    """Tải cấu hình tài khoản từ file"""
+# Sử dụng API keys trong account config nếu có
+try:
+    with open('account_config.json', 'r') as f:
+        account_config = json.load(f)
+        if not API_KEY and account_config.get('api_key'):
+            API_KEY = account_config.get('api_key')
+        if not API_SECRET and account_config.get('api_secret'):
+            API_SECRET = account_config.get('api_secret')
+except (FileNotFoundError, json.JSONDecodeError):
+    pass
+
+# Định nghĩa các mục menu
+MAIN_MENU = """
+===== MENU TẢI DỮ LIỆU BINANCE =====
+1. Tải dữ liệu cho một cặp tiền cụ thể
+2. Tải dữ liệu cho nhiều cặp tiền
+3. Tải dữ liệu từ cấu hình backtest
+4. Tải dữ liệu mẫu cho demo
+5. Kiểm tra dữ liệu đã tải
+6. Thoát
+Chọn một tùy chọn (1-6): """
+
+def get_binance_client():
+    """Tạo và trả về một client Binance"""
     try:
-        with open(ACCOUNT_CONFIG_PATH, 'r') as file:
-            return json.load(file)
+        client = Client(API_KEY, API_SECRET)
+        # Kiểm tra kết nối
+        server_time = client.get_server_time()
+        logger.info(f"Đã kết nối đến Binance. Server time: {datetime.fromtimestamp(server_time['serverTime']/1000)}")
+        return client
     except Exception as e:
-        logger.error(f"Lỗi khi tải cấu hình tài khoản: {str(e)}")
+        logger.error(f"Lỗi kết nối đến Binance: {str(e)}")
         return None
 
-def initialize_binance_api():
-    """Khởi tạo Binance API với thông tin API key từ cấu hình"""
-    config = load_account_config()
-    if not config:
-        logger.error("Không thể tải cấu hình tài khoản")
-        return None
-    
-    api_key = config.get('api_key', '')
-    api_secret = config.get('api_secret', '')
-    api_mode = config.get('api_mode', 'demo')
-    
-    if not api_key or not api_secret:
-        logger.error("API key hoặc API secret không được cấu hình")
-        return None
-    
-    is_testnet = api_mode == 'testnet'
-    logger.info(f"Khởi tạo Binance API với api_mode={api_mode}, is_testnet={is_testnet}")
-    
+def get_historical_klines(client, symbol, interval, start_str, end_str=None):
+    """Lấy dữ liệu lịch sử từ Binance"""
     try:
-        binance_client = BinanceAPI(
-            api_key=api_key,
-            api_secret=api_secret,
-            testnet=is_testnet
+        klines = client.get_historical_klines(
+            symbol=symbol,
+            interval=interval,
+            start_str=start_str,
+            end_str=end_str
         )
-        return binance_client
+        return klines
     except Exception as e:
-        logger.error(f"Lỗi khi khởi tạo Binance API: {str(e)}")
-        return None
+        logger.error(f"Lỗi lấy dữ liệu lịch sử cho {symbol} {interval}: {str(e)}")
+        return []
 
-def get_account_info(client):
-    """Lấy thông tin tài khoản từ Binance API"""
-    config = load_account_config()
-    account_type = config.get('account_type', 'futures')
+def klines_to_dataframe(klines):
+    """Chuyển đổi dữ liệu klines sang DataFrame"""
+    columns = [
+        'timestamp', 'open', 'high', 'low', 'close', 'volume',
+        'close_time', 'quote_asset_volume', 'number_of_trades',
+        'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+    ]
+    df = pd.DataFrame(klines, columns=columns)
     
-    logger.info(f"Lấy thông tin tài khoản loại {account_type}")
+    # Chuyển đổi kiểu dữ liệu
+    numeric_columns = ['open', 'high', 'low', 'close', 'volume', 
+                      'quote_asset_volume', 'number_of_trades',
+                      'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume']
     
-    try:
-        if account_type == 'futures':
-            account_info = client.get_futures_account()
+    for col in numeric_columns:
+        df[col] = pd.to_numeric(df[col])
+    
+    # Chuyển đổi timestamp
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
+    
+    return df
+
+def save_to_csv(df, symbol, interval, output_dir='data'):
+    """Lưu DataFrame vào file CSV"""
+    # Tạo thư mục nếu chưa tồn tại
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    file_path = f"{output_dir}/{symbol}_{interval}.csv"
+    df.to_csv(file_path, index=False)
+    logger.info(f"Đã lưu {len(df)} dòng dữ liệu vào {file_path}")
+    return file_path
+
+def fetch_single_pair(client, symbol, interval, start_date, end_date, output_dir, retry_count=3):
+    """Lấy dữ liệu cho một cặp tiền và khung thời gian cụ thể"""
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+    
+    logger.info(f"Đang lấy dữ liệu {symbol} {interval} từ {start_date} đến {end_date}...")
+    
+    for attempt in range(retry_count):
+        try:
+            klines = get_historical_klines(
+                client=client,
+                symbol=symbol,
+                interval=interval,
+                start_str=start_date,
+                end_str=end_date
+            )
             
-            # Kiểm tra nếu account_info là string (chứa lỗi) thì chuyển sang dictionary
-            if isinstance(account_info, str):
-                account_info = {"error": account_info}
-            elif not isinstance(account_info, dict):
-                account_info = {"error": str(account_info)}
+            if klines:
+                df = klines_to_dataframe(klines)
+                file_path = save_to_csv(df, symbol, interval, output_dir)
                 
-            # Xử lý lỗi trong account_info
-            if "error" in account_info:
-                logger.warning(f"Không lấy được thông tin tài khoản thực, sử dụng dữ liệu giả lập")
-                # Tạo fake data để test
-                account_info = {
-                    "totalWalletBalance": "10000.00000000",
-                    "totalUnrealizedProfit": "0.00000000",
-                    "totalMarginBalance": "10000.00000000",
-                    "totalPositionInitialMargin": "0.00000000",
-                    "availableBalance": "10000.00000000",
-                    "maxWithdrawAmount": "10000.00000000"
+                result = {
+                    "file_path": file_path,
+                    "candles": len(df),
+                    "start_date": df['timestamp'].min().strftime('%Y-%m-%d %H:%M:%S'),
+                    "end_date": df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S')
                 }
-            
-            # Lấy thông tin vị thế
-            positions = client.get_futures_position_risk()
-            
-            # Kiểm tra nếu positions không phải list thì chuyển thành list trống
-            if not isinstance(positions, list):
-                logger.warning(f"Không lấy được thông tin vị thế thực, sử dụng dữ liệu giả lập")
-                positions = []
-            
-            # In thông tin gỡ lỗi
-            logger.info(f"Dữ liệu tài khoản futures: {json.dumps(account_info, indent=2)}")
-            logger.info(f"Số lượng vị thế: {len(positions)}")
-            
-            # Lọc vị thế có số lượng > 0
-            active_positions = []
-            for pos in positions:
-                try:
-                    position_amt = float(pos.get('positionAmt', 0))
-                    if abs(position_amt) > 0:
-                        active_positions.append(pos)
-                except (TypeError, ValueError) as e:
-                    logger.error(f"Lỗi khi xử lý vị thế: {str(e)}")
-                    continue
-            
-            if active_positions:
-                logger.info(f"Số lượng vị thế hoạt động: {len(active_positions)}")
-                for pos in active_positions:
-                    logger.info(f"Vị thế {pos.get('symbol', 'Unknown')}: {pos.get('positionAmt', '0')} @ {pos.get('entryPrice', '0')}")
-            else:
-                logger.info("Không có vị thế hoạt động")
-            
-            return {
-                'account_info': account_info,
-                'positions': positions,
-                'active_positions': active_positions
-            }
-        else:  # spot
-            account_info = client.get_account()
-            
-            # In thông tin gỡ lỗi
-            logger.info(f"Dữ liệu tài khoản spot: {json.dumps(account_info, indent=2)}")
-            
-            # Lọc các tài sản có số dư > 0
-            active_assets = []
-            for asset in account_info.get('balances', []):
-                free = float(asset.get('free', 0))
-                locked = float(asset.get('locked', 0))
-                total = free + locked
                 
-                if total > 0:
-                    active_assets.append({
-                        'asset': asset['asset'],
-                        'free': free,
-                        'locked': locked,
-                        'total': total
-                    })
+                print(f"✅ Đã tải thành công {len(df)} nến cho {symbol} {interval}")
+                return result, len(df)
             
-            logger.info(f"Số lượng tài sản có số dư: {len(active_assets)}")
-            for asset in active_assets:
-                logger.info(f"Tài sản {asset['asset']}: Free={asset['free']}, Locked={asset['locked']}")
-            
-            return {
-                'account_info': account_info,
-                'active_assets': active_assets
-            }
-    except Exception as e:
-        logger.error(f"Lỗi khi lấy thông tin tài khoản: {str(e)}")
-        return None
+            print(f"⚠️ Thử lại lần {attempt+1}/{retry_count}...")
+            time.sleep(2)
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu {symbol} {interval}: {str(e)}")
+            print(f"❌ Lỗi: {str(e)}")
+            print(f"⚠️ Thử lại lần {attempt+1}/{retry_count}...")
+            time.sleep(5)
+    
+    print(f"❌ Không thể tải dữ liệu cho {symbol} {interval} sau {retry_count} lần thử")
+    return None, 0
 
-def get_market_data(client):
-    """Lấy dữ liệu thị trường từ Binance API"""
-    logger.info("Lấy dữ liệu thị trường")
+def select_symbol():
+    """Chọn cặp tiền"""
+    popular_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT']
     
-    try:
-        # Lấy thông tin giá hiện tại của một số cặp tiền phổ biến
-        symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'DOGEUSDT', 'XRPUSDT']
-        market_data = {}
-        
-        for symbol in symbols:
-            # Lấy giá hiện tại
-            ticker = client.get_symbol_ticker(symbol=symbol)
-            
-            # Lấy thông tin 24h ticker
-            ticker_24h = client.get_24h_ticker(symbol=symbol)
-            
-            market_data[symbol] = {
-                'price': float(ticker.get('price', 0)),
-                'price_change_24h': float(ticker_24h.get('priceChange', 0)),
-                'price_change_percent_24h': float(ticker_24h.get('priceChangePercent', 0)),
-                'high_24h': float(ticker_24h.get('highPrice', 0)),
-                'low_24h': float(ticker_24h.get('lowPrice', 0)),
-                'volume_24h': float(ticker_24h.get('volume', 0)),
-                'quote_volume_24h': float(ticker_24h.get('quoteVolume', 0))
-            }
-        
-        logger.info(f"Đã lấy dữ liệu thị trường cho {len(symbols)} cặp tiền")
-        return market_data
-    except Exception as e:
-        logger.error(f"Lỗi khi lấy dữ liệu thị trường: {str(e)}")
-        return None
+    print("\n===== CHỌN CẶP TIỀN =====")
+    print("Các cặp phổ biến:")
+    for i, symbol in enumerate(popular_symbols, 1):
+        print(f"{i}. {symbol}")
+    print(f"{len(popular_symbols)+1}. Nhập cặp tiền khác")
+    
+    choice = int(input(f"Chọn một tùy chọn (1-{len(popular_symbols)+1}): "))
+    
+    if 1 <= choice <= len(popular_symbols):
+        return popular_symbols[choice-1]
+    else:
+        return input("Nhập mã cặp tiền (ví dụ: BTCUSDT): ").upper()
 
-def get_recent_trades(client, limit=20):
-    """Lấy lịch sử giao dịch gần đây"""
-    config = load_account_config()
-    account_type = config.get('account_type', 'futures')
+def select_interval():
+    """Chọn khung thời gian"""
+    intervals = ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h', '1d', '3d', '1w', '1M']
     
-    logger.info(f"Lấy lịch sử giao dịch gần đây (loại tài khoản: {account_type})")
+    print("\n===== CHỌN KHUNG THỜI GIAN =====")
+    for i, interval in enumerate(intervals, 1):
+        print(f"{i}. {interval}")
     
-    try:
-        if account_type == 'futures':
-            # Lấy lịch sử giao dịch futures
-            # Cần đảm bảo API hiện có hỗ trợ hàm này
-            # Nếu không, cần sửa lại binance_api.py để thêm hàm này
-            if hasattr(client, 'get_account_trades'):
-                recent_trades = []
-                symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']
-                
-                for symbol in symbols:
-                    trades = client.get_account_trades(symbol=symbol, limit=limit)
-                    if trades:
-                        recent_trades.extend(trades)
-                
-                # Sắp xếp theo thời gian gần nhất
-                recent_trades.sort(key=lambda x: int(x.get('time', 0)), reverse=True)
-                
-                # Giới hạn số lượng
-                recent_trades = recent_trades[:limit]
-                
-                logger.info(f"Đã lấy {len(recent_trades)} giao dịch gần đây")
-                return recent_trades
-            else:
-                logger.error("API hiện tại không hỗ trợ hàm get_account_trades")
-                return None
+    choice = int(input(f"Chọn một tùy chọn (1-{len(intervals)}): "))
+    
+    if 1 <= choice <= len(intervals):
+        return intervals[choice-1]
+    else:
+        return '1h'  # Mặc định
+
+def select_time_range():
+    """Chọn khoảng thời gian"""
+    now = datetime.now()
+    time_ranges = {
+        '1 tuần gần đây': (now - timedelta(days=7)).strftime('%Y-%m-%d'),
+        '1 tháng gần đây': (now - timedelta(days=30)).strftime('%Y-%m-%d'),
+        '3 tháng gần đây': (now - timedelta(days=90)).strftime('%Y-%m-%d'),
+        '6 tháng gần đây': (now - timedelta(days=180)).strftime('%Y-%m-%d'),
+        '1 năm gần đây': (now - timedelta(days=365)).strftime('%Y-%m-%d'),
+        'Tùy chỉnh': 'custom'
+    }
+    
+    print("\n===== CHỌN KHOẢNG THỜI GIAN =====")
+    options = list(time_ranges.keys())
+    for i, option in enumerate(options, 1):
+        print(f"{i}. {option}")
+    
+    choice = int(input(f"Chọn một tùy chọn (1-{len(options)}): "))
+    
+    if 1 <= choice <= len(options):
+        option = options[choice-1]
+        start_date = time_ranges[option]
+        
+        if start_date == 'custom':
+            print("\nNhập thời gian tùy chỉnh (định dạng: YYYY-MM-DD)")
+            start_date = input("Thời gian bắt đầu: ")
+            end_date = input("Thời gian kết thúc (Enter để sử dụng thời gian hiện tại): ")
+            if not end_date:
+                end_date = now.strftime('%Y-%m-%d')
         else:
-            # Lấy lịch sử giao dịch spot
-            recent_trades = []
-            symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']
-            
-            for symbol in symbols:
-                trades = client.get_my_trades(symbol=symbol, limit=limit)
-                if trades:
-                    recent_trades.extend(trades)
-            
-            # Sắp xếp theo thời gian gần nhất
-            recent_trades.sort(key=lambda x: int(x.get('time', 0)), reverse=True)
-            
-            # Giới hạn số lượng
-            recent_trades = recent_trades[:limit]
-            
-            logger.info(f"Đã lấy {len(recent_trades)} giao dịch gần đây")
-            return recent_trades
-    except Exception as e:
-        logger.error(f"Lỗi khi lấy lịch sử giao dịch: {str(e)}")
-        return None
+            end_date = now.strftime('%Y-%m-%d')
+        
+        return start_date, end_date
+    else:
+        # Mặc định: 1 tháng gần đây
+        return (now - timedelta(days=30)).strftime('%Y-%m-%d'), now.strftime('%Y-%m-%d')
 
-def compare_web_data(real_data):
-    """So sánh dữ liệu thực với dữ liệu hiển thị trên web"""
-    logger.info("Bắt đầu so sánh dữ liệu thực với dữ liệu web hiển thị")
+def select_output_dir():
+    """Chọn thư mục đầu ra"""
+    default_dirs = ['test_data', 'real_data', 'backtest_data', 'data']
     
-    # TODO: Implement logic to compare real data with web data
-    # Cần lấy dữ liệu từ các API endpoint của webapp để so sánh
+    print("\n===== CHỌN THƯ MỤC ĐẦU RA =====")
+    for i, dir_name in enumerate(default_dirs, 1):
+        print(f"{i}. {dir_name}")
+    print(f"{len(default_dirs)+1}. Nhập thư mục khác")
+    
+    choice = int(input(f"Chọn một tùy chọn (1-{len(default_dirs)+1}): "))
+    
+    if 1 <= choice <= len(default_dirs):
+        return default_dirs[choice-1]
+    else:
+        return input("Nhập đường dẫn thư mục đầu ra: ")
+
+def load_backtest_config():
+    """Tải cấu hình backtest từ file"""
+    config_file = 'backtest_master_config.json'
+    if not os.path.exists(config_file):
+        print(f"❌ Không tìm thấy file cấu hình {config_file}")
+        return None
     
     try:
-        # Giả định có các hàm để lấy dữ liệu từ webapp
-        # Trong thực tế, cần sử dụng requests để gọi các API endpoint
-        # Hoặc truy cập trực tiếp vào database nếu có
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+        return config
+    except Exception as e:
+        print(f"❌ Lỗi khi đọc file cấu hình: {str(e)}")
+        return None
+
+def fetch_data_from_backtest_config():
+    """Tải dữ liệu dựa trên cấu hình backtest"""
+    config = load_backtest_config()
+    if not config:
+        return
+    
+    symbols = config.get('symbols', ['BTCUSDT'])
+    timeframes = config.get('timeframes', ['1h'])
+    phases = config.get('phases', [])
+    
+    print("\n===== TẢI DỮ LIỆU TỪ CẤU HÌNH BACKTEST =====")
+    print(f"Đã tìm thấy {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+    print(f"Cặp tiền: {', '.join(symbols)}")
+    print(f"Khung thời gian: {', '.join(timeframes)}")
+    print(f"Số giai đoạn: {len(phases)}")
+    
+    if not phases:
+        print("❌ Không tìm thấy thông tin giai đoạn trong cấu hình")
+        return
+    
+    print("\nChọn giai đoạn để tải dữ liệu:")
+    for i, phase in enumerate(phases, 1):
+        print(f"{i}. {phase.get('name')} ({phase.get('start_date')} đến {phase.get('end_date')})")
+    print(f"{len(phases)+1}. Tất cả các giai đoạn")
+    
+    choice = int(input(f"Chọn một tùy chọn (1-{len(phases)+1}): "))
+    
+    # Lấy client Binance
+    client = get_binance_client()
+    if not client:
+        print("❌ Không thể kết nối đến Binance API")
+        return
+    
+    # Xử lý lựa chọn
+    phases_to_fetch = []
+    if 1 <= choice <= len(phases):
+        phases_to_fetch = [phases[choice-1]]
+    elif choice == len(phases)+1:
+        phases_to_fetch = phases
+    else:
+        print("❌ Lựa chọn không hợp lệ")
+        return
+    
+    # Tải dữ liệu cho từng giai đoạn
+    total_files = 0
+    total_candles = 0
+    
+    for phase in phases_to_fetch:
+        phase_name = phase.get('name', 'unknown')
+        start_date = phase.get('start_date')
+        end_date = phase.get('end_date')
+        output_dir = f"test_data/{phase_name.lower().replace(' ', '_')}"
         
-        web_account_data = {} # Thay thế bằng dữ liệu thực từ webapp
-        web_market_data = {} # Thay thế bằng dữ liệu thực từ webapp
+        print(f"\n===== TẢI DỮ LIỆU CHO GIAI ĐOẠN: {phase_name} =====")
+        print(f"Khoảng thời gian: {start_date} đến {end_date}")
+        print(f"Lưu vào thư mục: {output_dir}")
         
-        # So sánh dữ liệu
-        discrepancies = []
+        # Tạo thư mục nếu chưa tồn tại
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
         
-        # Ví dụ so sánh
-        if 'account_info' in real_data:
-            # So sánh số dư tài khoản
-            real_balance = float(real_data['account_info'].get('totalWalletBalance', 0))
-            web_balance = web_account_data.get('balance', 0)
+        # Tổng số cặp cần tải
+        total_pairs = len(symbols) * len(timeframes)
+        progress_bar = tqdm(total=total_pairs, desc=f"Giai đoạn {phase_name}", unit="pair")
+        
+        # Tải dữ liệu cho từng cặp
+        for symbol in symbols:
+            for interval in timeframes:
+                result, candles = fetch_single_pair(
+                    client=client,
+                    symbol=symbol,
+                    interval=interval,
+                    start_date=start_date,
+                    end_date=end_date,
+                    output_dir=output_dir,
+                    retry_count=3
+                )
+                
+                if result:
+                    total_files += 1
+                    total_candles += candles
+                
+                progress_bar.update(1)
+                progress_bar.set_description(f"Giai đoạn {phase_name}: {symbol} {interval}")
+                
+                # Tránh rate limit
+                time.sleep(0.5)
+        
+        progress_bar.close()
+    
+    print(f"\n✅ Hoàn tất! Đã tải {total_files} file với tổng cộng {total_candles} nến")
+
+def fetch_data_for_single_pair():
+    """Tải dữ liệu cho một cặp tiền cụ thể"""
+    # Chọn cặp tiền
+    symbol = select_symbol()
+    
+    # Chọn khung thời gian
+    interval = select_interval()
+    
+    # Chọn khoảng thời gian
+    start_date, end_date = select_time_range()
+    
+    # Chọn thư mục đầu ra
+    output_dir = select_output_dir()
+    
+    # Tóm tắt lựa chọn
+    print("\n===== TÓM TẮT LỰA CHỌN =====")
+    print(f"Cặp tiền: {symbol}")
+    print(f"Khung thời gian: {interval}")
+    print(f"Thời gian: {start_date} đến {end_date}")
+    print(f"Thư mục đầu ra: {output_dir}")
+    
+    confirm = input("\nXác nhận tải dữ liệu? (y/n): ")
+    if confirm.lower() != 'y':
+        print("❌ Đã hủy tải dữ liệu")
+        return
+    
+    # Lấy client Binance
+    client = get_binance_client()
+    if not client:
+        print("❌ Không thể kết nối đến Binance API")
+        return
+    
+    # Tải dữ liệu
+    fetch_single_pair(
+        client=client,
+        symbol=symbol,
+        interval=interval,
+        start_date=start_date,
+        end_date=end_date,
+        output_dir=output_dir,
+        retry_count=3
+    )
+
+def fetch_data_for_multiple_pairs():
+    """Tải dữ liệu cho nhiều cặp tiền"""
+    # Danh sách cặp tiền phổ biến
+    popular_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 
+                       'XRPUSDT', 'DOGEUSDT', 'DOTUSDT', 'LINKUSDT']
+    
+    print("\n===== CHỌN CẶP TIỀN =====")
+    print("Nhập số thứ tự của các cặp tiền, cách nhau bởi dấu cách:")
+    for i, symbol in enumerate(popular_symbols, 1):
+        print(f"{i}. {symbol}")
+    
+    selections = input(f"Lựa chọn (ví dụ: 1 2 3) hoặc 'all' để chọn tất cả: ")
+    
+    if selections.lower() == 'all':
+        selected_symbols = popular_symbols
+    else:
+        try:
+            indices = [int(x) - 1 for x in selections.split()]
+            selected_symbols = [popular_symbols[i] for i in indices if 0 <= i < len(popular_symbols)]
+        except:
+            print("❌ Lựa chọn không hợp lệ")
+            return
+    
+    if not selected_symbols:
+        print("❌ Không có cặp tiền nào được chọn")
+        return
+    
+    # Chọn khung thời gian
+    print("\n===== CHỌN KHUNG THỜI GIAN =====")
+    intervals = ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h', '1d']
+    for i, interval in enumerate(intervals, 1):
+        print(f"{i}. {interval}")
+    
+    selections = input(f"Lựa chọn (ví dụ: 6 7 8) hoặc 'common' cho các khung phổ biến: ")
+    
+    if selections.lower() == 'common':
+        selected_intervals = ['15m', '1h', '4h']
+    else:
+        try:
+            indices = [int(x) - 1 for x in selections.split()]
+            selected_intervals = [intervals[i] for i in indices if 0 <= i < len(intervals)]
+        except:
+            print("❌ Lựa chọn không hợp lệ")
+            return
+    
+    if not selected_intervals:
+        print("❌ Không có khung thời gian nào được chọn")
+        return
+    
+    # Chọn khoảng thời gian
+    start_date, end_date = select_time_range()
+    
+    # Chọn thư mục đầu ra
+    output_dir = select_output_dir()
+    
+    # Tóm tắt lựa chọn
+    print("\n===== TÓM TẮT LỰA CHỌN =====")
+    print(f"Cặp tiền ({len(selected_symbols)}): {', '.join(selected_symbols)}")
+    print(f"Khung thời gian ({len(selected_intervals)}): {', '.join(selected_intervals)}")
+    print(f"Thời gian: {start_date} đến {end_date}")
+    print(f"Thư mục đầu ra: {output_dir}")
+    
+    confirm = input("\nXác nhận tải dữ liệu? (y/n): ")
+    if confirm.lower() != 'y':
+        print("❌ Đã hủy tải dữ liệu")
+        return
+    
+    # Lấy client Binance
+    client = get_binance_client()
+    if not client:
+        print("❌ Không thể kết nối đến Binance API")
+        return
+    
+    # Tải dữ liệu
+    total_files = 0
+    total_candles = 0
+    total_pairs = len(selected_symbols) * len(selected_intervals)
+    
+    progress_bar = tqdm(total=total_pairs, desc="Tải dữ liệu", unit="pair")
+    
+    for symbol in selected_symbols:
+        for interval in selected_intervals:
+            result, candles = fetch_single_pair(
+                client=client,
+                symbol=symbol,
+                interval=interval,
+                start_date=start_date,
+                end_date=end_date,
+                output_dir=output_dir,
+                retry_count=3
+            )
             
-            if abs(real_balance - web_balance) > 0.01:
-                discrepancies.append({
-                    'field': 'balance',
-                    'real_value': real_balance,
-                    'web_value': web_balance,
-                    'difference': real_balance - web_balance
+            if result:
+                total_files += 1
+                total_candles += candles
+            
+            progress_bar.update(1)
+            progress_bar.set_description(f"Tải dữ liệu: {symbol} {interval}")
+            
+            # Tránh rate limit
+            time.sleep(0.5)
+    
+    progress_bar.close()
+    print(f"\n✅ Hoàn tất! Đã tải {total_files}/{total_pairs} file với tổng cộng {total_candles} nến")
+
+def fetch_demo_data():
+    """Tải dữ liệu mẫu cho demo"""
+    # Bộ dữ liệu mẫu
+    demo_data = [
+        {'symbol': 'BTCUSDT', 'interval': '15m', 'days': 30},
+        {'symbol': 'BTCUSDT', 'interval': '1h', 'days': 90},
+        {'symbol': 'ETHUSDT', 'interval': '15m', 'days': 30},
+        {'symbol': 'ETHUSDT', 'interval': '1h', 'days': 90}
+    ]
+    
+    # Chọn thư mục đầu ra
+    output_dir = 'demo_data'
+    print(f"\n===== TẢI DỮ LIỆU MẪU CHO DEMO =====")
+    print(f"Thư mục đầu ra: {output_dir}")
+    print("Sẽ tải 4 bộ dữ liệu mẫu cho BTC và ETH với các khung thời gian 15m và 1h")
+    
+    confirm = input("\nXác nhận tải dữ liệu mẫu? (y/n): ")
+    if confirm.lower() != 'y':
+        print("❌ Đã hủy tải dữ liệu")
+        return
+    
+    # Lấy client Binance
+    client = get_binance_client()
+    if not client:
+        print("❌ Không thể kết nối đến Binance API")
+        return
+    
+    # Tải dữ liệu mẫu
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+    
+    total_files = 0
+    total_candles = 0
+    
+    for item in demo_data:
+        symbol = item['symbol']
+        interval = item['interval']
+        days = item['days']
+        
+        now = datetime.now()
+        start_date = (now - timedelta(days=days)).strftime('%Y-%m-%d')
+        end_date = now.strftime('%Y-%m-%d')
+        
+        print(f"\nĐang tải {symbol} {interval} cho {days} ngày gần đây...")
+        result, candles = fetch_single_pair(
+            client=client,
+            symbol=symbol,
+            interval=interval,
+            start_date=start_date,
+            end_date=end_date,
+            output_dir=output_dir,
+            retry_count=3
+        )
+        
+        if result:
+            total_files += 1
+            total_candles += candles
+        
+        # Tránh rate limit
+        time.sleep(0.5)
+    
+    print(f"\n✅ Hoàn tất! Đã tải {total_files}/4 file với tổng cộng {total_candles} nến")
+
+def check_downloaded_data():
+    """Kiểm tra dữ liệu đã tải"""
+    print("\n===== KIỂM TRA DỮ LIỆU ĐÃ TẢI =====")
+    
+    # Các thư mục cần kiểm tra
+    dirs = ['test_data', 'real_data', 'backtest_data', 'data', 'demo_data']
+    
+    # Thống kê
+    total_files = 0
+    total_size = 0
+    
+    # Tổng hợp
+    summary = {}
+    
+    # Kiểm tra từng thư mục
+    for dir_name in dirs:
+        if not os.path.exists(dir_name):
+            continue
+        
+        print(f"\nThư mục: {dir_name}")
+        
+        # Lấy danh sách file CSV
+        csv_files = []
+        for root, _, files in os.walk(dir_name):
+            for file in files:
+                if file.endswith('.csv'):
+                    file_path = os.path.join(root, file)
+                    csv_files.append(file_path)
+        
+        if not csv_files:
+            print("  Không có file CSV nào")
+            continue
+        
+        # Hiển thị danh sách và thống kê
+        for file_path in csv_files:
+            file_size = os.path.getsize(file_path) / 1024  # KB
+            total_size += file_size
+            total_files += 1
+            
+            # Đọc file để đếm số dòng
+            try:
+                with open(file_path, 'r') as f:
+                    lines = sum(1 for _ in f) - 1  # Trừ header
+            except:
+                lines = 0
+            
+            # Lấy tên file
+            file_name = os.path.basename(file_path)
+            
+            # Phân tích tên file để lấy symbol và interval
+            parts = file_name.split('_')
+            if len(parts) >= 2:
+                symbol = parts[0]
+                interval = parts[1].replace('.csv', '')
+                
+                # Cập nhật tổng hợp
+                if symbol not in summary:
+                    summary[symbol] = {}
+                if interval not in summary[symbol]:
+                    summary[symbol][interval] = []
+                
+                summary[symbol][interval].append({
+                    'file': file_path,
+                    'candles': lines,
+                    'size_kb': round(file_size, 2)
                 })
-        
-        return discrepancies
-    except Exception as e:
-        logger.error(f"Lỗi khi so sánh dữ liệu: {str(e)}")
-        return None
-
-def generate_debug_report(account_data, market_data, trades_data=None):
-    """Tạo báo cáo gỡ lỗi từ dữ liệu thực"""
-    try:
-        # Tạo thư mục để lưu báo cáo nếu chưa tồn tại
-        debug_dir = 'debug_reports'
-        os.makedirs(debug_dir, exist_ok=True)
-        
-        # Tạo tên file dựa trên thời gian hiện tại
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        report_file = os.path.join(debug_dir, f'debug_report_{timestamp}.json')
-        
-        # Tổng hợp dữ liệu
-        report_data = {
-            'timestamp': timestamp,
-            'account_data': account_data,
-            'market_data': market_data,
-            'trades_data': trades_data
-        }
-        
-        # Lưu báo cáo
-        with open(report_file, 'w', encoding='utf-8') as f:
-            json.dump(report_data, f, indent=2, default=str)
-        
-        logger.info(f"Đã tạo báo cáo gỡ lỗi: {report_file}")
-        return report_file
-    except Exception as e:
-        logger.error(f"Lỗi khi tạo báo cáo gỡ lỗi: {str(e)}")
-        return None
+            
+            print(f"  {file_name}: {lines} nến, {round(file_size, 2)} KB")
+    
+    # Hiển thị tổng hợp
+    print("\n===== TỔNG HỢP =====")
+    print(f"Tổng số file: {total_files}")
+    print(f"Tổng dung lượng: {round(total_size / 1024, 2)} MB")
+    
+    # Hiển thị chi tiết theo symbol
+    print("\n===== CHI TIẾT THEO CẶP TIỀN =====")
+    for symbol in sorted(summary.keys()):
+        print(f"\n{symbol}:")
+        for interval in sorted(summary[symbol].keys()):
+            files = summary[symbol][interval]
+            total_candles = sum(f['candles'] for f in files)
+            print(f"  {interval}: {len(files)} file, {total_candles} nến")
 
 def main():
     """Hàm chính"""
-    logger.info("Bắt đầu lấy dữ liệu thực từ Binance API")
+    # Hiển thị header
+    print("\n" + "="*50)
+    print("  CÔNG CỤ TẢI DỮ LIỆU GIÁ CRYPTO TỪ BINANCE")
+    print("  Phiên bản 1.0 - (c) 2025")
+    print("="*50)
     
-    # Khởi tạo API client
-    client = initialize_binance_api()
-    if not client:
-        logger.error("Không thể khởi tạo Binance API client")
-        return
-    
-    # Lấy thông tin tài khoản
-    account_data = get_account_info(client)
-    
-    # Lấy dữ liệu thị trường
-    market_data = get_market_data(client)
-    
-    # Lấy lịch sử giao dịch
-    trades_data = get_recent_trades(client)
-    
-    # So sánh dữ liệu với webapp
-    # discrepancies = compare_web_data(account_data)
-    
-    # Tạo báo cáo gỡ lỗi
-    report_file = generate_debug_report(account_data, market_data, trades_data)
-    
-    # Hiển thị kết quả
-    logger.info("Kết quả kiểm tra dữ liệu:")
-    
-    if account_data:
-        if 'account_info' in account_data and 'totalWalletBalance' in account_data['account_info']:
-            logger.info(f"Số dư tài khoản: {account_data['account_info']['totalWalletBalance']} USDT")
-        elif 'account_info' in account_data and 'balances' in account_data['account_info']:
-            usdt_balance = 0
-            for asset in account_data['account_info']['balances']:
-                if asset['asset'] == 'USDT':
-                    usdt_balance = float(asset['free']) + float(asset['locked'])
-                    break
-            logger.info(f"Số dư USDT: {usdt_balance}")
-        
-        if 'active_positions' in account_data:
-            logger.info(f"Số lượng vị thế đang mở: {len(account_data['active_positions'])}")
-    
-    if market_data:
-        logger.info(f"Giá BTC hiện tại: {market_data.get('BTCUSDT', {}).get('price', 0)} USDT")
-        logger.info(f"Giá ETH hiện tại: {market_data.get('ETHUSDT', {}).get('price', 0)} USDT")
-    
-    if trades_data:
-        logger.info(f"Số lượng giao dịch gần đây: {len(trades_data)}")
-    
-    """
-    if discrepancies:
-        logger.warning(f"Phát hiện {len(discrepancies)} khác biệt giữa dữ liệu thực và dữ liệu web")
-        for i, d in enumerate(discrepancies, 1):
-            logger.warning(f"Khác biệt #{i}: {d['field']} - Thực tế: {d['real_value']}, Web: {d['web_value']}")
-    else:
-        logger.info("Không phát hiện khác biệt giữa dữ liệu thực và dữ liệu web")
-    """
-    
-    if report_file:
-        logger.info(f"Báo cáo gỡ lỗi đã được lưu vào: {report_file}")
+    while True:
+        try:
+            choice = input(MAIN_MENU)
+            
+            if choice == '1':
+                fetch_data_for_single_pair()
+            elif choice == '2':
+                fetch_data_for_multiple_pairs()
+            elif choice == '3':
+                fetch_data_from_backtest_config()
+            elif choice == '4':
+                fetch_demo_data()
+            elif choice == '5':
+                check_downloaded_data()
+            elif choice == '6':
+                print("\nCảm ơn bạn đã sử dụng công cụ tải dữ liệu. Tạm biệt!")
+                break
+            else:
+                print("\n❌ Lựa chọn không hợp lệ. Vui lòng thử lại.")
+            
+            print("\n" + "-"*50)
+        except Exception as e:
+            print(f"\n❌ Lỗi không xác định: {str(e)}")
+            logger.exception("Lỗi không xác định")
 
 if __name__ == "__main__":
     main()

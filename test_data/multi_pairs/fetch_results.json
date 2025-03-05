@@ -1,0 +1,97 @@
+{
+  "time": "2025-03-05 02:55:57",
+  "symbols": {
+    "BTCUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/BTCUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "ETHUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/ETHUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "BNBUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/BNBUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "SOLUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/SOLUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "ADAUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/ADAUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "XRPUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/XRPUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "DOGEUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/DOGEUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "DOTUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/DOTUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    },
+    "LINKUSDT": {
+      "1h": {
+        "file_path": "test_data/multi_pairs/LINKUSDT_1h.csv",
+        "candles": 25,
+        "start_date": "2024-02-28 00:00:00",
+        "end_date": "2024-02-29 00:00:00"
+      }
+    }
+  },
+  "params": {
+    "start_date": "2024-02-28",
+    "end_date": "2024-02-29",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "SOLUSDT",
+      "ADAUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "DOTUSDT",
+      "LINKUSDT"
+    ],
+    "intervals": [
+      "1h"
+    ]
+  },
+  "total_files": 9,
+  "total_candles": 225
+}

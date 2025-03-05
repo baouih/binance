@@ -2218,15 +2218,26 @@ def on_close_position(data):
 # Đăng ký các blueprint
 register_sentiment_bp(app)
 
-if __name__ == "__main__":
+def run_app():
     # Bắt đầu tác vụ nền
     background_thread = threading.Thread(target=background_tasks)
     background_thread.daemon = True
     background_thread.start()
     
     # Khởi chạy ứng dụng
-    # Nếu chạy trực tiếp bằng Python
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False, log_output=True)
+
+if __name__ == "__main__":
+    # Khởi động dịch vụ keep-alive để giữ bot chạy liên tục
+    try:
+        from keep_alive import keep_alive
+        keep_alive()
+        logger.info("Đã kích hoạt keep-alive để duy trì hoạt động")
+    except Exception as e:
+        logger.warning(f"Không thể khởi động keep-alive: {str(e)}")
+    
+    # Khởi chạy ứng dụng chính
+    run_app()
 
 # Cần định nghĩa như thế này để gunicorn có thể tìm thấy app
 # Khi khởi động bằng gunicorn, tác vụ nền vẫn cần được bắt đầu

@@ -68,12 +68,28 @@ def check_process_running(pid_file):
     
     try:
         with open(pid_file, 'r') as f:
-            pid = int(f.read().strip())
+            pid_str = f.read().strip()
+            if not pid_str:
+                return False
+            pid = int(pid_str)
             
         # Kiểm tra tiến trình có tồn tại không
-        os.kill(pid, 0)
-        return True
-    except (OSError, ValueError):
+        try:
+            os.kill(pid, 0)
+            
+            # Kiểm tra thêm qua /proc (Linux) hoặc ps (Unix)
+            if sys.platform.startswith('linux'):
+                return os.path.exists(f"/proc/{pid}")
+            else:
+                import subprocess
+                result = subprocess.run(["ps", "-p", str(pid)], capture_output=True)
+                return result.returncode == 0
+                
+        except OSError:
+            return False
+            
+    except (OSError, ValueError, Exception) as e:
+        logger.error(f"Lỗi khi kiểm tra tiến trình: {e}")
         return False
 
 def start_backtest():
@@ -94,11 +110,22 @@ def start_backtest():
             config = json.load(f)
             
         # Khởi động backtest trong nền
+        env = os.environ.copy()
+        # Chắc chắn PYTHONPATH được thiết lập đúng
+        env["PYTHONPATH"] = os.path.dirname(os.path.abspath(__file__))
+        
+        # Thêm các thiết lập môi trường cần thiết
+        env["BACKTEST_MODE"] = "comprehensive"
+        env["NOTIFIER_ENABLED"] = "true"
+        
         with open(BACKTEST_LOG, 'w') as log_file:
             process = subprocess.Popen(
                 [sys.executable, BACKTEST_SCRIPT],
                 stdout=log_file,
-                stderr=log_file
+                stderr=log_file,
+                env=env,
+                # Đảm bảo chạy trong thư mục hiện tại
+                cwd=os.path.dirname(os.path.abspath(__file__))
             )
             
         # Lưu PID
