@@ -1,0 +1,100 @@
+{
+    "version": "1.0.0",
+    "description": "Cấu hình thanh khoản và phân loại cặp giao dịch",
+    "last_updated": "2025-03-05",
+    "liquidity_tiers": {
+        "tier_1_high_liquidity": {
+            "symbols": ["BTCUSDT", "ETHUSDT"],
+            "description": "Cặp tiền thanh khoản rất cao, ổn định",
+            "max_position_size_usd": 10000,
+            "max_leverage": 20,
+            "min_daily_volume_usd": 100000000,
+            "spread_threshold": 0.05,
+            "risk_multiplier": 1.0
+        },
+        "tier_2_medium_liquidity": {
+            "symbols": ["BNBUSDT", "SOLUSDT", "ADAUSDT", "XRPUSDT", "LINKUSDT", "DOTUSDT", "AVAXUSDT"],
+            "description": "Cặp tiền thanh khoản cao",
+            "max_position_size_usd": 5000,
+            "max_leverage": 15,
+            "min_daily_volume_usd": 50000000,
+            "spread_threshold": 0.1,
+            "risk_multiplier": 0.8
+        },
+        "tier_3_moderate_liquidity": {
+            "symbols": ["LTCUSDT", "DOGEUSDT", "MATICUSDT", "ATOMUSDT", "UNIUSDT", "ETCUSDT", "TRXUSDT"],
+            "description": "Cặp tiền thanh khoản trung bình",
+            "max_position_size_usd": 2500,
+            "max_leverage": 10,
+            "min_daily_volume_usd": 20000000,
+            "spread_threshold": 0.15,
+            "risk_multiplier": 0.6
+        },
+        "tier_4_low_liquidity": {
+            "symbols": ["XLMUSDT", "EOSUSDT", "BCHUSDT", "FILUSDT", "VETUSDT", "ICPUSDT", "NEARUSDT"],
+            "description": "Cặp tiền thanh khoản thấp hơn",
+            "max_position_size_usd": 1000,
+            "max_leverage": 5,
+            "min_daily_volume_usd": 5000000,
+            "spread_threshold": 0.25,
+            "risk_multiplier": 0.4
+        }
+    },
+    "volume_thresholds": {
+        "very_high": 100000000,
+        "high": 50000000,
+        "medium": 20000000,
+        "low": 5000000,
+        "very_low": 1000000
+    },
+    "spread_thresholds": {
+        "very_tight": 0.05,
+        "tight": 0.1,
+        "moderate": 0.2,
+        "wide": 0.5,
+        "very_wide": 1.0
+    },
+    "order_book_depth_thresholds": {
+        "very_deep": 10000000,
+        "deep": 5000000,
+        "moderate": 1000000,
+        "shallow": 500000,
+        "very_shallow": 100000
+    },
+    "minimum_requirements": {
+        "min_daily_volume_usd": 5000000,
+        "max_acceptable_spread": 0.5,
+        "min_order_book_depth": 500000,
+        "min_market_cap_usd": 100000000
+    },
+    "trading_hour_adjustments": {
+        "active_hours": {
+            "start": "09:00",
+            "end": "22:00",
+            "timezone": "UTC",
+            "volume_multiplier": 1.0
+        },
+        "quiet_hours": {
+            "start": "22:00",
+            "end": "09:00",
+            "timezone": "UTC",
+            "volume_multiplier": 0.7
+        }
+    },
+    "auto_exclude": {
+        "enable_auto_exclusion": true,
+        "min_volume_threshold": 1000000,
+        "max_spread_threshold": 1.0,
+        "max_price_impact_1m_usd": 0.5,
+        "exclusion_review_period_hours": 24
+    },
+    "dynamic_adjustments": {
+        "enable_dynamic_tier_adjustment": true,
+        "adjustment_period_hours": 12,
+        "volume_change_threshold_pct": 30,
+        "spread_change_threshold_pct": 50,
+        "depth_change_threshold_pct": 40
+    },
+    "blacklisted_symbols": [],
+    "whitelisted_symbols": []
+}

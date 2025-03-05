@@ -1,11 +1,26 @@
 {
     "running": true,
-    "start_time": "2025-03-03 08:11:00",
-    "active_strategies": ["trend_following", "mean_reversion"],
-    "version": "1.0.0",
+    "start_time": "2025-03-05 05:23:08",
+    "active_strategies": ["trend_following", "mean_reversion", "breakout", "momentum"],
+    "version": "1.0.1",
     "mode": "testnet",
     "account_type": "futures",
     "strategy_mode": "auto",
-    "last_action": "Bot đã được khởi động với chế độ chiến lược: auto",
-    "last_update": "2025-03-03 08:13:35"
+    "active_symbols": ["BTCUSDT", "ETHUSDT"],
+    "monitored_symbols": [
+        "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT", 
+        "XRPUSDT", "LINKUSDT", "AVAXUSDT", "DOTUSDT", "MATICUSDT", 
+        "LTCUSDT", "DOGEUSDT", "ATOMUSDT", "UNIUSDT"
+    ],
+    "trailing_stop_mode": "escalator",
+    "enhanced_features": {
+        "dynamic_leverage": true,
+        "adaptive_timeframes": true,
+        "market_regime_detection": true,
+        "multi_symbol_trading": true,
+        "signal_filtering": true
+    },
+    "balance": 13069.09,
+    "last_action": "Bot đã được nâng cấp để hỗ trợ giao dịch nhiều cặp tiền",
+    "last_update": "2025-03-05 05:30:10"
 }

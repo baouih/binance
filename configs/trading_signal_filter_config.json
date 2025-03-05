@@ -1,0 +1,190 @@
+{
+    "version": "1.0.0",
+    "description": "Cấu hình bộ lọc tín hiệu giao dịch để giảm số lượng tín hiệu giả",
+    "last_updated": "2025-03-05",
+    
+    "global_settings": {
+        "enable_signal_filtering": true,
+        "min_confidence_threshold": 70,
+        "max_signals_per_day": 10,
+        "signal_cooldown_minutes": 30,
+        "conflicting_signal_handling": "highest_confidence",
+        "alternative_methods": ["newest_signal", "most_profitable_pair", "fixed_priority"]
+    },
+    
+    "confirmation_requirements": {
+        "min_confirming_indicators": 2,
+        "indicator_weights": {
+            "trend": 1.0,
+            "momentum": 0.8,
+            "volatility": 0.7,
+            "volume": 0.6
+        },
+        "timeframe_confirmation": {
+            "enable": true,
+            "required_timeframes": 2,
+            "timeframe_weights": {
+                "1m": 0.4,
+                "5m": 0.5,
+                "15m": 0.7,
+                "1h": 1.0,
+                "4h": 1.2,
+                "1d": 1.5
+            }
+        }
+    },
+    
+    "market_condition_filters": {
+        "trending_market": {
+            "enabled": true,
+            "preferred_strategies": ["trend_following", "momentum"],
+            "avoid_strategies": ["mean_reversion"],
+            "signal_confidence_multiplier": 1.2
+        },
+        "ranging_market": {
+            "enabled": true,
+            "preferred_strategies": ["mean_reversion", "breakout"],
+            "avoid_strategies": ["trend_following"],
+            "signal_confidence_multiplier": 1.0
+        },
+        "volatile_market": {
+            "enabled": true,
+            "preferred_strategies": ["breakout"],
+            "avoid_strategies": ["mean_reversion"],
+            "signal_confidence_multiplier": 0.8
+        },
+        "quiet_market": {
+            "enabled": true,
+            "preferred_strategies": ["mean_reversion"],
+            "avoid_strategies": ["breakout"],
+            "signal_confidence_multiplier": 0.9
+        }
+    },
+    
+    "volume_filters": {
+        "enable_volume_check": true,
+        "min_recent_volume_percentile": 40,
+        "volume_surge_threshold": 1.5,
+        "volume_filter_timeframes": ["1h", "4h"],
+        "volume_confirmation_required": true
+    },
+    
+    "time_filters": {
+        "enable_time_filtering": true,
+        "timezone": "UTC",
+        "restricted_hours": [
+            {"start": "23:00", "end": "02:00", "confidence_multiplier": 0.7}
+        ],
+        "weekend_adjustment": {
+            "enable": true,
+            "confidence_multiplier": 0.8
+        },
+        "high_activity_hours": [
+            {"start": "08:00", "end": "11:00", "confidence_multiplier": 1.1},
+            {"start": "13:00", "end": "16:00", "confidence_multiplier": 1.1}
+        ]
+    },
+    
+    "volatility_filters": {
+        "enable_volatility_check": true,
+        "atr_period": 14,
+        "high_volatility_percentile": 80,
+        "low_volatility_percentile": 20,
+        "extreme_volatility_reject": true,
+        "min_volatility_requirement": true
+    },
+    
+    "liquidity_filters": {
+        "enable_liquidity_check": true,
+        "min_24h_volume_usd": 50000000,
+        "min_order_book_depth": 1000000,
+        "max_spread_percentage": 0.5,
+        "check_slippage_impact": true,
+        "max_slippage_tolerance": 0.3
+    },
+    
+    "support_resistance_filters": {
+        "enable_sr_check": true,
+        "proximity_threshold_pct": 1.0,
+        "respect_major_levels": true,
+        "sr_identification_method": "price_action",
+        "alternative_methods": ["fibonacci", "pivot_points", "moving_averages"]
+    },
+    
+    "pair_specific_settings": {
+        "BTCUSDT": {
+            "min_confidence_threshold": 75,
+            "confirming_indicators": 3,
+            "strategy_preference": "trend_following",
+            "additional_filters": ["correlation_btc_dominance"]
+        },
+        "ETHUSDT": {
+            "min_confidence_threshold": 70,
+            "confirming_indicators": 2,
+            "strategy_preference": "trend_following",
+            "additional_filters": ["gas_price_check"]
+        },
+        "high_volatility_pairs": {
+            "pairs": ["SOLUSDT", "AVAXUSDT", "DOTUSDT"],
+            "min_confidence_threshold": 80,
+            "confirming_indicators": 3,
+            "signal_cooldown_minutes": 60
+        },
+        "medium_volatility_pairs": {
+            "pairs": ["XRPUSDT", "LINKUSDT", "BNBUSDT"],
+            "min_confidence_threshold": 75,
+            "confirming_indicators": 2,
+            "signal_cooldown_minutes": 45
+        }
+    },
+    
+    "historical_performance_filters": {
+        "enable_historical_check": true,
+        "min_win_rate": 55,
+        "min_profit_factor": 1.2,
+        "lookback_periods": 20,
+        "min_sample_size": 10,
+        "strategy_specific_thresholds": {
+            "trend_following": {
+                "trending_market": {
+                    "min_win_rate": 60,
+                    "min_profit_factor": 1.5
+                },
+                "ranging_market": {
+                    "min_win_rate": 45,
+                    "min_profit_factor": 0.9
+                }
+            },
+            "mean_reversion": {
+                "trending_market": {
+                    "min_win_rate": 45,
+                    "min_profit_factor": 0.9
+                },
+                "ranging_market": {
+                    "min_win_rate": 60,
+                    "min_profit_factor": 1.5
+                }
+            }
+        }
+    },
+    
+    "correlation_filters": {
+        "enable_correlation_check": true,
+        "max_portfolio_correlation": 0.7,
+        "reference_assets": {
+            "crypto": ["BTCUSDT", "ETHUSDT"],
+            "traditional": ["SPY", "QQQ", "DXY"]
+        },
+        "negatively_correlated_bonus": 1.2,
+        "highly_correlated_penalty": 0.7
+    },
+    
+    "adaptive_settings": {
+        "enable_adaptive_filtering": true,
+        "adjustment_frequency": "daily",
+        "performance_based_adjustments": true,
+        "market_condition_based_adjustments": true,
+        "min_threshold_limit": 60,
+        "max_threshold_limit": 90
+    }
+}

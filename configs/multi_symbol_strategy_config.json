@@ -1,0 +1,274 @@
+{
+    "version": "1.0.0",
+    "description": "Cấu hình chiến lược giao dịch cho nhiều cặp tiền",
+    "last_updated": "2025-03-05",
+    
+    "global_settings": {
+        "max_active_pairs": 5,
+        "entry_allocation": {
+            "strategy": "equal_risk",
+            "alternatives": ["equal_allocation", "market_cap_weighted", "volatility_weighted", "custom_weighted"]
+        },
+        "correlation_handling": {
+            "enable_correlation_check": true,
+            "max_correlation_threshold": 0.7,
+            "min_required_diversification": 3,
+            "protected_pairs": ["BTCUSDT", "ETHUSDT"]
+        },
+        "exit_handling": {
+            "exit_sequence": "worst_performers_first",
+            "alternatives": ["oldest_positions_first", "profit_target_priority", "fixed_sequence"]
+        }
+    },
+    
+    "pair_specific_strategies": {
+        "BTCUSDT": {
+            "primary_strategies": ["trend_following", "breakout"],
+            "secondary_strategies": ["mean_reversion", "momentum"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend", "adx"],
+                "momentum": ["rsi", "macd", "stochastic"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv", "vwap"]
+            },
+            "risk_profile": "medium",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 30.0
+        },
+        "ETHUSDT": {
+            "primary_strategies": ["trend_following", "breakout"],
+            "secondary_strategies": ["mean_reversion", "momentum"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend", "adx"],
+                "momentum": ["rsi", "macd", "stochastic"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv", "vwap"]
+            },
+            "risk_profile": "medium",
+            "max_leverage": 15,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 20.0
+        },
+        "XRPUSDT": {
+            "primary_strategies": ["breakout", "momentum"],
+            "secondary_strategies": ["mean_reversion", "trend_following"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium_high",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 10.0
+        },
+        "LINKUSDT": {
+            "primary_strategies": ["trend_following", "momentum"],
+            "secondary_strategies": ["breakout", "mean_reversion"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 10.0
+        },
+        "SOLUSDT": {
+            "primary_strategies": ["momentum", "breakout"],
+            "secondary_strategies": ["trend_following"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium_high",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 10.0
+        },
+        "AVAXUSDT": {
+            "primary_strategies": ["trend_following", "momentum"],
+            "secondary_strategies": ["breakout"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium_high",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 5.0
+        },
+        "DOTUSDT": {
+            "primary_strategies": ["trend_following", "mean_reversion"],
+            "secondary_strategies": ["breakout", "momentum"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium",
+            "max_leverage": 10,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 5.0
+        },
+        "default": {
+            "primary_strategies": ["trend_following"],
+            "secondary_strategies": ["momentum", "breakout"],
+            "primary_timeframes": ["1h", "4h"],
+            "secondary_timeframes": ["15m", "1d"],
+            "indicators": {
+                "trend": ["ema_cross", "supertrend"],
+                "momentum": ["rsi", "macd"],
+                "volatility": ["bollinger_bands", "atr"],
+                "volume": ["obv"]
+            },
+            "risk_profile": "medium",
+            "max_leverage": 5,
+            "position_sizing": "capital_percentage",
+            "capital_allocation_pct": 3.0
+        }
+    },
+    
+    "strategy_profiles": {
+        "trend_following": {
+            "description": "Theo xu hướng, lợi thế khi thị trường trendy",
+            "parameters": {
+                "ema_short": 9,
+                "ema_long": 21,
+                "supertrend_factor": 3,
+                "supertrend_atr_period": 10,
+                "adx_period": 14,
+                "adx_threshold": 25
+            },
+            "market_condition_preference": "trending",
+            "timeframe_preference": ["1h", "4h", "1d"]
+        },
+        "momentum": {
+            "description": "Tận dụng động lượng giá trong một hướng",
+            "parameters": {
+                "rsi_period": 14,
+                "rsi_overbought": 70,
+                "rsi_oversold": 30,
+                "macd_fast": 12,
+                "macd_slow": 26,
+                "macd_signal": 9
+            },
+            "market_condition_preference": "trending",
+            "timeframe_preference": ["15m", "1h", "4h"]
+        },
+        "breakout": {
+            "description": "Tận dụng đột phá khỏi vùng tích lũy",
+            "parameters": {
+                "bollinger_period": 20,
+                "bollinger_std": 2,
+                "atr_period": 14,
+                "atr_multiplier": 1.5,
+                "volume_threshold": 1.5
+            },
+            "market_condition_preference": "ranging_to_trending",
+            "timeframe_preference": ["1h", "4h"]
+        },
+        "mean_reversion": {
+            "description": "Tận dụng việc giá quay về trung bình",
+            "parameters": {
+                "rsi_period": 14,
+                "rsi_overbought": 75,
+                "rsi_oversold": 25,
+                "bollinger_period": 20,
+                "bollinger_std": 2.5
+            },
+            "market_condition_preference": "ranging",
+            "timeframe_preference": ["15m", "1h"]
+        }
+    },
+    
+    "risk_profiles": {
+        "low": {
+            "risk_per_trade": 0.5,
+            "max_drawdown": 3.0,
+            "max_leverage": 3,
+            "stop_loss_atr_multiplier": 2.0,
+            "take_profit_ratio": 1.5,
+            "trailing_stop_activation": 0.8
+        },
+        "medium": {
+            "risk_per_trade": 1.0,
+            "max_drawdown": 5.0,
+            "max_leverage": 10,
+            "stop_loss_atr_multiplier": 1.5,
+            "take_profit_ratio": 2.0,
+            "trailing_stop_activation": 0.5
+        },
+        "medium_high": {
+            "risk_per_trade": 1.5,
+            "max_drawdown": 7.0,
+            "max_leverage": 15,
+            "stop_loss_atr_multiplier": 1.2,
+            "take_profit_ratio": 2.5,
+            "trailing_stop_activation": 0.4
+        },
+        "high": {
+            "risk_per_trade": 2.0,
+            "max_drawdown": 10.0,
+            "max_leverage": 20,
+            "stop_loss_atr_multiplier": 1.0,
+            "take_profit_ratio": 3.0,
+            "trailing_stop_activation": 0.3
+        }
+    },
+    
+    "market_condition_detection": {
+        "trending": {
+            "adx_min": 25,
+            "directional_strength": 0.5,
+            "volatility_range": [0.5, 1.5]
+        },
+        "ranging": {
+            "adx_max": 20,
+            "price_range_factor": 0.03,
+            "volatility_range": [0.3, 0.8]
+        },
+        "volatile": {
+            "atr_percentile": 80,
+            "volume_surge": 1.5,
+            "price_movement_threshold": 3.0
+        },
+        "quiet": {
+            "atr_percentile": 20,
+            "volume_decrease": 0.7,
+            "price_movement_threshold": 0.5
+        }
+    },
+    
+    "portfolio_rebalancing": {
+        "enable_rebalancing": true,
+        "rebalance_frequency": "daily",
+        "rebalance_threshold_pct": 20.0,
+        "max_rebalance_positions": 2,
+        "high_priority_pairs": ["BTCUSDT", "ETHUSDT"],
+        "rebalance_method": "gradual"
+    }
+}

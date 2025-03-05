@@ -7,7 +7,15 @@
         "BNBUSDT",
         "SOLUSDT",
         "ADAUSDT",
-        "DOGEUSDT"
+        "XRPUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "DOTUSDT",
+        "MATICUSDT",
+        "LTCUSDT",
+        "DOGEUSDT",
+        "ATOMUSDT",
+        "UNIUSDT"
     ],
     "timeframes": [
         "1m",
