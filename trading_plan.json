@@ -1,88 +1,34 @@
 {
   "symbol": "BTCUSDT",
   "timeframe": "1h",
-  "analysis_time": "2025-02-28T17:21:24.358718",
-  "current_price": 42074.7375,
+  "analysis_time": "2025-03-05T06:02:05.347061",
+  "current_price": 174185.66,
   "signal": "SELL",
   "confidence": 100,
   "market_regime": "ranging",
   "primary_action": "STRONG_SELL",
   "entry_levels": [
     {
-      "price": 42342.50411327106,
-      "distance_pct": 0.636407091716397,
-      "type": "SELL",
-      "description": "B\u00e1n t\u1ea1i 42342.50"
-    },
-    {
-      "price": 42383.24972516936,
-      "distance_pct": 0.7332481282131676,
-      "type": "SELL",
-      "description": "B\u00e1n t\u1ea1i 42383.25"
-    },
-    {
-      "price": 42445.99760325333,
-      "distance_pct": 0.8823824587220005,
-      "type": "SELL",
-      "description": "B\u00e1n t\u1ea1i 42446.00"
-    },
-    {
-      "price": 42074.7375,
+      "price": 174185.66,
       "distance_pct": 0,
       "type": "SELL",
-      "description": "B\u00e1n t\u1ea1i gi\u00e1 th\u1ecb tr\u01b0\u1eddng 42074.74"
+      "description": "B\u00e1n t\u1ea1i gi\u00e1 th\u1ecb tr\u01b0\u1eddng 174185.66"
     }
   ],
   "take_profit_levels": [
     {
-      "price": 40712.30370845495,
-      "distance_pct": 3.850033055331677,
-      "entry_price": 42342.50411327106,
-      "description": "TP t\u1ea1i 40712.30 (-3.9%)"
-    },
-    {
-      "price": 40751.480600826566,
-      "distance_pct": 3.8500330553316733,
-      "entry_price": 42383.24972516936,
-      "description": "TP t\u1ea1i 40751.48 (-3.9%)"
-    },
-    {
-      "price": 40811.81266486279,
-      "distance_pct": 3.8500330553316724,
-      "entry_price": 42445.99760325333,
-      "description": "TP t\u1ea1i 40811.81 (-3.9%)"
-    },
-    {
-      "price": 40454.846198305975,
-      "distance_pct": 3.850033055331665,
-      "entry_price": 42074.7375,
-      "description": "TP t\u1ea1i 40454.85 (-3.9%)"
+      "price": 143567.52998970385,
+      "distance_pct": 17.57787065266805,
+      "entry_price": 174185.66,
+      "description": "TP t\u1ea1i 143567.53 (-17.6%)"
     }
   ],
   "stop_loss_levels": [
     {
-      "price": 42994.5842751975,
-      "distance_pct": 1.5400132221326568,
-      "entry_price": 42342.50411327106,
-      "description": "SL t\u1ea1i 42994.58 (+1.5%)"
-    },
-    {
-      "price": 43035.95737490647,
-      "distance_pct": 1.5400132221326692,
-      "entry_price": 42383.24972516936,
-      "description": "SL t\u1ea1i 43035.96 (+1.5%)"
-    },
-    {
-      "price": 43099.671578609545,
-      "distance_pct": 1.5400132221326623,
-      "entry_price": 42445.99760325333,
-      "description": "SL t\u1ea1i 43099.67 (+1.5%)"
-    },
-    {
-      "price": 42722.69402067761,
-      "distance_pct": 1.5400132221326623,
-      "entry_price": 42074.7375,
-      "description": "SL t\u1ea1i 42722.69 (+1.5%)"
+      "price": 186432.91200411844,
+      "distance_pct": 7.031148261067203,
+      "entry_price": 174185.66,
+      "description": "SL t\u1ea1i 186432.91 (+7.0%)"
     }
   ],
   "position_sizing": 1.0,
@@ -90,7 +36,7 @@
   "notes": [
     "T\u00edn hi\u1ec7u B\u00c1N v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%",
     "Th\u1ecb tr\u01b0\u1eddng \u0111ang trong v\u00f9ng t\u00edch l\u0169y, c\u00e2n nh\u1eafc gi\u1ea3m v\u1ecb th\u1ebf",
-    "Bi\u1ebfn \u0111\u1ed9ng th\u1ea5p (0.73%), c\u00f3 th\u1ec3 t\u0103ng k\u00edch th\u01b0\u1edbc v\u1ecb th\u1ebf"
+    "Bi\u1ebfn \u0111\u1ed9ng th\u1ea5p (0.81%), c\u00f3 th\u1ec3 t\u0103ng k\u00edch th\u01b0\u1edbc v\u1ecb th\u1ebf"
   ],
-  "summary": "B\u00c1N M\u1ea0NH BTCUSDT v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%. V\u00e0o l\u1ec7nh t\u1ea1i 42342.50 (c\u00e1ch 0.6%). TP: 40712.30, SL: 42994.58, RR: 2.50. T\u00edn hi\u1ec7u B\u00c1N v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%"
+  "summary": "B\u00c1N M\u1ea0NH BTCUSDT v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%. V\u00e0o l\u1ec7nh t\u1ea1i gi\u00e1 th\u1ecb tr\u01b0\u1eddng 174185.66. TP: 143567.53, SL: 186432.91, RR: 2.50. T\u00edn hi\u1ec7u B\u00c1N v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%"
 }

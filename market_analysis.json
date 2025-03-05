@@ -1,8 +1,8 @@
 {
   "symbol": "BTCUSDT",
   "primary_timeframe": "1h",
-  "analysis_time": "2025-02-28T17:21:22.510014",
-  "current_price": 42074.7375,
+  "analysis_time": "2025-03-05T06:02:02.036003",
+  "current_price": 174185.66,
   "signals": {
     "mtf": -1,
     "ci": -0.5
@@ -22,34 +22,34 @@
     "trend_analysis": {
       "15m": {
         "trend": -2,
-        "ema20": 42074.737500000076,
-        "ema50": 42074.73750000018,
-        "ema200": 42077.17582017629,
-        "close": 42074.7375,
+        "ema20": 43546.415000000066,
+        "ema50": 43546.41500000018,
+        "ema200": 43548.77219677272,
+        "close": 43546.415,
         "weight": 0.15
       },
       "1h": {
         "trend": -2,
-        "ema20": 42074.737500000076,
-        "ema50": 42074.73750000018,
-        "ema200": 42077.17582017629,
-        "close": 42074.7375,
+        "ema20": 43546.415000000066,
+        "ema50": 43546.41500000018,
+        "ema200": 43548.77219677272,
+        "close": 43546.415,
         "weight": 0.25
       },
       "4h": {
         "trend": -2,
-        "ema20": 42074.737500000076,
-        "ema50": 42074.73750000018,
-        "ema200": 42077.17582017629,
-        "close": 42074.7375,
+        "ema20": 43546.415000000066,
+        "ema50": 43546.41500000018,
+        "ema200": 43548.77219677272,
+        "close": 43546.415,
         "weight": 0.3
       },
       "1d": {
         "trend": -2,
-        "ema20": 42054.392500000016,
-        "ema50": 42054.392500000205,
-        "ema200": 42056.829641140794,
-        "close": 42054.3925,
+        "ema20": 43546.415000000066,
+        "ema50": 43546.41500000018,
+        "ema200": 43548.77219677272,
+        "close": 43546.415,
         "weight": 0.4
       }
     },
@@ -71,731 +71,797 @@
     "summary": "B\u00c1N nh\u1eb9 v\u1edbi \u0111\u1ed9 tin c\u1eady 20.0%"
   },
   "liquidity_analysis": {
-    "current_price": 84108.785,
-    "best_bid": 84066.73060750001,
-    "best_ask": 84150.8393925,
-    "spread": 84.10878499998944,
-    "spread_pct": 0.09999999999998745,
-    "bid_ask_ratio": 1.3250883361343604,
+    "current_price": 87076.47,
+    "best_bid": 87032.931765,
+    "best_ask": 87120.008235,
+    "spread": 87.07646999999997,
+    "spread_pct": 0.09999999999999996,
+    "bid_ask_ratio": 1.2554751108734938,
     "market_pressure": "buy",
     "high_liquidity_zones": [
       {
-        "price": 84056.21700937502,
-        "value": 191878.2589443858,
-        "quantity": 2.28259411396557,
+        "price": 87022.04720624999,
+        "value": 112492.49898910159,
+        "quantity": 1.2925624439731385,
         "type": "bid",
         "strength": 100,
         "price_range": [
-          84022.57349537502,
-          84089.86052337501
+          86987.21661825,
+          87056.87779424999
         ]
       },
       {
-        "price": 84213.92098125,
-        "value": 70313.48860385064,
-        "quantity": 0.83494983628061,
+        "price": 87130.89279375001,
+        "value": 99467.20179582252,
+        "quantity": 1.1416638571608329,
         "type": "ask",
         "strength": 100,
         "price_range": [
-          84180.27746725001,
-          84247.56449525
+          87096.06220575001,
+          87165.72338175001
         ]
       },
       {
-        "price": 84161.35299062499,
-        "value": 59978.80981182509,
-        "quantity": 0.7126990398348747,
-        "type": "ask",
-        "strength": 85.30199681848872,
+        "price": 86967.6244125,
+        "value": 97790.9339224323,
+        "quantity": 1.124358138585539,
+        "type": "bid",
+        "strength": 86.93107078357856,
         "price_range": [
-          84127.709476625,
-          84194.99650462499
+          86932.7938245,
+          87002.45500049999
         ]
       },
       {
-        "price": 84277.00257,
-        "value": 41020.83223392333,
-        "quantity": 0.4867834761295403,
-        "type": "ask",
-        "strength": 58.33991890949479,
+        "price": 86902.31705999999,
+        "value": 65473.6549906611,
+        "quantity": 0.7534025326867478,
+        "type": "bid",
+        "strength": 58.20268513814799,
         "price_range": [
-          84243.359056,
-          84310.64608399999
+          86867.48647199999,
+          86937.14764799998
         ]
       },
       {
-        "price": 84340.08415875,
-        "value": 34283.38657996255,
-        "quantity": 0.4064756409623941,
+        "price": 87185.31558750001,
+        "value": 55716.656104536436,
+        "quantity": 0.6390292199331918,
         "type": "ask",
-        "strength": 48.757908703857225,
+        "strength": 56.015103570427826,
         "price_range": [
-          84306.44064475001,
-          84373.72767275
+          87150.48499950001,
+          87220.1461755
+        ]
+      },
+      {
+        "price": 87250.62294000002,
+        "value": 38113.92986274222,
+        "quantity": 0.43679323998921193,
+        "type": "ask",
+        "strength": 38.31808794720005,
+        "price_range": [
+          87215.79235200002,
+          87285.45352800001
         ]
       }
     ],
     "liquidity_grab_zones": [
       {
-        "price": 84056.21700937502,
-        "value": 191878.2589443858,
-        "quantity": 2.28259411396557,
+        "price": 87022.04720624999,
+        "value": 112492.49898910159,
+        "quantity": 1.2925624439731385,
         "type": "bid",
         "strength": 100,
         "price_range": [
-          84022.57349537502,
-          84089.86052337501
+          86987.21661825,
+          87056.87779424999
         ],
         "grab_type": "support",
-        "grab_strength": 99.37500000000017,
-        "distance_pct": 0.0624999999999835
+        "grab_strength": 99.37499999999989,
+        "distance_pct": 0.06250000000001252
       },
       {
-        "price": 84213.92098125,
-        "value": 70313.48860385064,
-        "quantity": 0.83494983628061,
+        "price": 87130.89279375001,
+        "value": 99467.20179582252,
+        "quantity": 1.1416638571608329,
         "type": "ask",
         "strength": 100,
         "price_range": [
-          84180.27746725001,
-          84247.56449525
+          87096.06220575001,
+          87165.72338175001
         ],
         "grab_type": "resistance",
-        "grab_strength": 98.74999999999999,
-        "distance_pct": 0.1250000000000016
+        "grab_strength": 99.37499999999989,
+        "distance_pct": 0.06250000000001252
       },
       {
-        "price": 84161.35299062499,
-        "value": 59978.80981182509,
-        "quantity": 0.7126990398348747,
-        "type": "ask",
-        "strength": 85.30199681848872,
+        "price": 86967.6244125,
+        "value": 97790.9339224323,
+        "quantity": 1.124358138585539,
+        "type": "bid",
+        "strength": 86.93107078357856,
         "price_range": [
-          84127.709476625,
-          84194.99650462499
+          86932.7938245,
+          87002.45500049999
         ],
-        "grab_type": "resistance",
-        "grab_strength": 84.7688593383733,
-        "distance_pct": 0.0624999999999835
+        "grab_type": "support",
+        "grab_strength": 85.84443239878375,
+        "distance_pct": 0.1250000000000083
       },
       {
-        "price": 84277.00257,
-        "value": 41020.83223392333,
-        "quantity": 0.4867834761295403,
-        "type": "ask",
-        "strength": 58.33991890949479,
+        "price": 86902.31705999999,
+        "value": 65473.6549906611,
+        "quantity": 0.7534025326867478,
+        "type": "bid",
+        "strength": 58.20268513814799,
         "price_range": [
-          84243.359056,
-          84310.64608399999
+          86867.48647199999,
+          86937.14764799998
+        ],
+        "grab_type": "support",
+        "grab_strength": 57.038631435384936,
+        "distance_pct": 0.20000000000001666
+      },
+      {
+        "price": 87185.31558750001,
+        "value": 55716.656104536436,
+        "quantity": 0.6390292199331918,
+        "type": "ask",
+        "strength": 56.015103570427826,
+        "price_range": [
+          87150.48499950001,
+          87220.1461755
         ],
         "grab_type": "resistance",
-        "grab_strength": 57.17312053130494,
-        "distance_pct": 0.19999999999999218
+        "grab_strength": 55.31491477579743,
+        "distance_pct": 0.1250000000000083
       }
     ],
-    "total_bid_value": 484934.7831477342,
-    "total_ask_value": 365964.11720174033
+    "total_bid_value": 492407.8214546219,
+    "total_ask_value": 392208.3498031517
   },
   "entry_points": [
     {
-      "price": 41640.55458143907,
+      "price": 43052.83050235347,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9840539690614485
+      "distance_pct": 1.1334675831444
     },
     {
-      "price": 41554.10752305374,
+      "price": 42998.829279182544,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1896140859632265
+      "distance_pct": 1.2574760076517357
     },
     {
-      "price": 41690.65107365978,
+      "price": 42839.356123346224,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8649308781246198
+      "distance_pct": 1.6236902088352778
     },
     {
-      "price": 41683.77840576779,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 0.8812732088145347
-    },
-    {
-      "price": 41531.5216321732,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 1.2433204636752302
-    },
-    {
-      "price": 42383.24972516936,
+      "price": 43864.92625083314,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.7819806817310581
+      "distance_pct": 0.7314293285294248
     },
     {
-      "price": 41685.4218316456,
+      "price": 43189.54216033163,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8773653509663684
+      "distance_pct": 0.8195228922251642
     },
     {
-      "price": 41558.24096339846,
+      "price": 42968.175973866106,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.179785290208495
+      "distance_pct": 1.327868266845606
     },
     {
-      "price": 41620.87236808485,
+      "price": 43013.404145960805,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0308557706906665
+      "distance_pct": 1.22400627936696
     },
     {
-      "price": 41529.47808691386,
+      "price": 43183.585861745596,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2481797545551006
+      "distance_pct": 0.8332009380207414
     },
     {
-      "price": 41589.55065873029,
+      "price": 43112.96427650226,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1053348143590798
+      "distance_pct": 0.9953763667979161
     },
     {
-      "price": 41452.47882973799,
+      "price": 43071.64388627827,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.4312742010528603
+      "distance_pct": 1.0902645228585035
     },
     {
-      "price": 41494.234128952325,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 1.331985406869632
-    },
-    {
-      "price": 41597.02534885958,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 1.0875609513094846
-    },
-    {
-      "price": 41685.19611400243,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 0.8779020788317725
-    },
-    {
-      "price": 42342.50411327106,
+      "price": 43909.74321780475,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.6850927956480634
+      "distance_pct": 0.8343470244444968
     },
     {
-      "price": 41656.35094819915,
+      "price": 43248.170166664015,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9464922167187463
+      "distance_pct": 0.6848895215277451
     },
     {
-      "price": 41655.26159328533,
+      "price": 43867.25707756765,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.7367818397166553
+    },
+    {
+      "price": 43173.29520451984,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9490825642402804
+      "distance_pct": 0.8568324062501149
     },
     {
-      "price": 42472.87069909089,
+      "price": 43891.23328453063,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9950879663542606
+      "distance_pct": 0.7918408083205682
     },
     {
-      "price": 41723.97787997319,
+      "price": 43990.945525080024,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 1.0208200263558387
+    },
+    {
+      "price": 43240.61897575372,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.7856839687478903
+      "distance_pct": 0.7022300785180124
     },
     {
-      "price": 41720.38107497714,
+      "price": 43085.64507585446,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.7942367138530542
+      "distance_pct": 1.0581121870664696
     },
     {
-      "price": 41622.899733891674,
+      "price": 43084.60277187607,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0260349524923644
+      "distance_pct": 1.060505734223894
     },
     {
-      "price": 42445.99760325333,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9311871601838707
-    },
-    {
-      "price": 41671.833497036045,
+      "price": 43053.63151899142,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9096766835092363
+      "distance_pct": 1.1316281283053593
     },
     {
-      "price": 41540.20391654563,
+      "price": 43025.42628414975,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.222675095007904
+      "distance_pct": 1.196398637752966
     },
     {
-      "price": 42465.41319726603,
+      "price": 43976.36016344241,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9773549749078667
+      "distance_pct": 0.9873261976730145
     },
     {
-      "price": 41620.83520827861,
+      "price": 43014.55738498369,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0309441319866741
+      "distance_pct": 1.2213579809412864
     },
     {
-      "price": 41589.49629491478,
+      "price": 43952.72891793485,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9330593986550922
+    },
+    {
+      "price": 43116.40316374646,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1054640846023887
+      "distance_pct": 0.9874793051357802
     },
     {
-      "price": 41606.24325202942,
+      "price": 44003.05843414287,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 1.0486361142309153
+    },
+    {
+      "price": 43120.65051872182,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0656419492222715
+      "distance_pct": 0.9777256779419844
     },
     {
-      "price": 41503.04586492717,
+      "price": 43156.57883872732,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.3110322187458396
+      "distance_pct": 0.895219873490574
     },
     {
-      "price": 41708.67565575532,
+      "price": 43991.586742760745,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 1.0222925188232916
+    },
+    {
+      "price": 42909.17056936032,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8220707129336804
+      "distance_pct": 1.4633682948175624
     },
     {
-      "price": 41773.23556318053,
+      "price": 43968.87126705987,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9701286938542886
+    },
+    {
+      "price": 43969.93489767008,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9725712154951851
+    },
+    {
+      "price": 42976.874296057205,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.668555459027184
+      "distance_pct": 1.3078934372503352
     },
     {
-      "price": 42463.80772387859,
+      "price": 43865.31127708724,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9735373632578096
+      "distance_pct": 0.7323135029306972
     },
     {
-      "price": 41715.560347085695,
+      "price": 42934.78340790947,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.805699792035533
+      "distance_pct": 1.4045509649658476
     },
     {
-      "price": 41602.70491330396,
+      "price": 43904.75846614787,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.8229000392979944
+    },
+    {
+      "price": 42954.90265073757,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0740556689673735
+      "distance_pct": 1.3583491299167414
     },
     {
-      "price": 42484.2325950381,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 1.02210511075174
-    },
-    {
-      "price": 41740.01691213398,
+      "price": 43161.59232171658,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.7475451889265149
+      "distance_pct": 0.8837069097041041
     },
     {
-      "price": 41686.78441941856,
+      "price": 43982.532960000055,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 1.001501409473212
+    },
+    {
+      "price": 42821.364553015184,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8741252904353373
+      "distance_pct": 1.6650060561467954
     },
     {
-      "price": 41565.47763532926,
+      "price": 42973.45511447057,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1625774041813584
+      "distance_pct": 1.3157452468347433
     },
     {
-      "price": 42456.913251456775,
+      "price": 43906.462199020025,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9571431841674414
+      "distance_pct": 0.8268124919583483
     },
     {
-      "price": 41687.47448828672,
+      "price": 43070.860943653905,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.872484394378728
+      "distance_pct": 1.0920624725275234
     },
     {
-      "price": 41651.31164859777,
+      "price": 43113.30657068512,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.958475030645677
+      "distance_pct": 0.994590322337399
     },
     {
-      "price": 42474.22868543007,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9983170852606357
-    },
-    {
-      "price": 41573.930611180236,
+      "price": 43127.103844351725,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1424773020315668
+      "distance_pct": 0.962906259099116
     },
     {
-      "price": 41382.865721750626,
+      "price": 43031.949056295794,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.596805323604129
+      "distance_pct": 1.1814197419103418
     },
     {
-      "price": 41711.23722632794,
+      "price": 43095.1743569152,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8159796237029516
+      "distance_pct": 1.0362291432826298
     },
     {
-      "price": 41510.603653643106,
+      "price": 43145.722799647745,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2930607578195217
+      "distance_pct": 0.9201496847725718
     },
     {
-      "price": 41641.199309648546,
+      "price": 43139.07565337182,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9825208873281335
+      "distance_pct": 0.9354141934030108
     },
     {
-      "price": 41522.09947872653,
+      "price": 43002.28302861756,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2657251469593143
+      "distance_pct": 1.2495448164503125
     },
     {
-      "price": 41569.5253083202,
+      "price": 43221.209355626204,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.152952552292379
+      "distance_pct": 0.7468023357922725
     },
     {
-      "price": 41584.19961283303,
+      "price": 43096.727836536804,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1180589213528012
+      "distance_pct": 1.0326617322303044
     },
     {
-      "price": 41626.291532366675,
+      "price": 43161.398845890995,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0179696868367007
+      "distance_pct": 0.8841512076459236
     },
     {
-      "price": 41620.145121033915,
+      "price": 43977.87850138987,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9908129093746662
+    },
+    {
+      "price": 42963.03010717198,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.032585071740335
+      "distance_pct": 1.3396852366102245
     },
     {
-      "price": 42461.94454775203,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9691069672496775
-    },
-    {
-      "price": 41664.616734487056,
+      "price": 43106.941519803964,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9268372275570173
+      "distance_pct": 1.0092070270217115
     },
     {
-      "price": 41592.35175306829,
+      "price": 43069.37430359257,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.098674168059173
+      "distance_pct": 1.095476393194315
     },
     {
-      "price": 41675.916507594746,
+      "price": 43059.04916314322,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8999678033757258
+      "distance_pct": 1.119187048708321
     },
     {
-      "price": 41521.84987527044,
+      "price": 44005.384444298164,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 1.0539775646242373
+    },
+    {
+      "price": 42980.94317317211,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.266318672251803
+      "distance_pct": 1.298549666666908
     },
     {
-      "price": 41725.80628583816,
+      "price": 43087.02281101814,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.7813362520023129
+      "distance_pct": 1.0549483556381376
     },
     {
-      "price": 42487.574940072394,
+      "price": 43144.33112412853,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 0.9233455288373897
+    },
+    {
+      "price": 43088.534600148334,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.0514766826423412
+    },
+    {
+      "price": 43918.84912011301,
       "type": "sell",
-      "strength": 99.0625,
-      "distance_pct": 1.030052782411237
+      "strength": 100,
+      "distance_pct": 0.8552578211386821
     },
     {
-      "price": 42498.225275727724,
+      "price": 43123.07846359376,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 0.9721501446358811
+    },
+    {
+      "price": 43143.209487308675,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 0.9259212559548831
+    },
+    {
+      "price": 44012.801039919796,
       "type": "sell",
-      "strength": 91.875,
-      "distance_pct": 1.0553779268782018
+      "strength": 98.4,
+      "distance_pct": 1.0710090369546947
     },
     {
-      "price": 42501.81885453132,
+      "price": 44020.12011967708,
       "type": "sell",
-      "strength": 89.0625,
-      "distance_pct": 1.0639230005077713
+      "strength": 94.4,
+      "distance_pct": 1.0878165738260595
     },
     {
-      "price": 42506.08882346776,
+      "price": 44026.443409404295,
       "type": "sell",
-      "strength": 86.25,
-      "distance_pct": 1.074076443900029
+      "strength": 90.4,
+      "distance_pct": 1.1023373781843915
     },
     {
-      "price": 42508.940714083314,
+      "price": 44030.21169836239,
       "type": "sell",
-      "strength": 84.375,
-      "distance_pct": 1.0808578772914432
+      "strength": 87.2,
+      "distance_pct": 1.1109908780375881
     },
     {
-      "price": 42509.206326809486,
+      "price": 44033.04308722649,
       "type": "sell",
-      "strength": 84.0625,
-      "distance_pct": 1.0814894705933142
+      "strength": 84.8,
+      "distance_pct": 1.1174928802439663
     },
     {
-      "price": 42513.68895759844,
+      "price": 44058.69077724974,
       "type": "sell",
-      "strength": 81.5625,
-      "distance_pct": 1.0921485968402396
+      "strength": 68.4,
+      "distance_pct": 1.176390243030896
     },
     {
-      "price": 42525.59182652814,
+      "price": 44068.764677847495,
       "type": "sell",
-      "strength": 74.0625,
-      "distance_pct": 1.1204521062291928
+      "strength": 64.4,
+      "distance_pct": 1.1995239512770328
     },
     {
-      "price": 42529.94467665433,
+      "price": 44068.95134671208,
       "type": "sell",
-      "strength": 71.25,
-      "distance_pct": 1.1308026305559675
+      "strength": 64.4,
+      "distance_pct": 1.199952617711646
     },
     {
-      "price": 42539.553723380406,
+      "price": 44069.26122676762,
       "type": "sell",
-      "strength": 66.5625,
-      "distance_pct": 1.1536517223032157
+      "strength": 64.4,
+      "distance_pct": 1.2006642263608205
     },
     {
-      "price": 42537.163536818196,
+      "price": 44071.52565508982,
       "type": "sell",
-      "strength": 66.25,
-      "distance_pct": 1.1479681624652984
+      "strength": 63.6,
+      "distance_pct": 1.2058642602148042
     },
     {
-      "price": 42544.80116696219,
+      "price": 44079.18547774744,
       "type": "sell",
-      "strength": 64.0625,
-      "distance_pct": 1.166129476159215
+      "strength": 60.8,
+      "distance_pct": 1.2234542791810428
     },
     {
-      "price": 42546.2354078818,
+      "price": 44086.247564461,
       "type": "sell",
-      "strength": 62.8125,
-      "distance_pct": 1.1695399187654436
+      "strength": 58.4,
+      "distance_pct": 1.239671657152492
     },
     {
-      "price": 42555.0955350176,
+      "price": 44087.62988170948,
       "type": "sell",
-      "strength": 59.0625,
-      "distance_pct": 1.1906081749191815
+      "strength": 57.6,
+      "distance_pct": 1.242846010881673
     },
     {
-      "price": 42560.080073759986,
+      "price": 44092.20462483868,
       "type": "sell",
-      "strength": 55.625,
-      "distance_pct": 1.2024607744838638
+      "strength": 56.0,
+      "distance_pct": 1.253351452326632
     },
     {
-      "price": 42570.0599473951,
+      "price": 44098.43929404494,
       "type": "sell",
-      "strength": 52.1875,
-      "distance_pct": 1.2261916454864943
+      "strength": 53.6,
+      "distance_pct": 1.2676687484949998
     },
     {
-      "price": 42569.38708436616,
+      "price": 44105.02258019608,
       "type": "sell",
-      "strength": 52.1875,
-      "distance_pct": 1.2245916627285849
+      "strength": 48.8,
+      "distance_pct": 1.2827866087164144
     },
     {
-      "price": 42580.511372555586,
+      "price": 44117.06035717638,
       "type": "sell",
-      "strength": 48.4375,
-      "distance_pct": 1.2510438060794338
+      "strength": 42.0,
+      "distance_pct": 1.3104301632554085
     },
     {
-      "price": 42579.72777910304,
+      "price": 44126.232272902555,
       "type": "sell",
-      "strength": 48.4375,
-      "distance_pct": 1.249180520448705
+      "strength": 39.2,
+      "distance_pct": 1.3314925531815962
     },
     {
-      "price": 42582.73912983434,
+      "price": 44128.34164482977,
       "type": "sell",
-      "strength": 46.5625,
-      "distance_pct": 1.256341129727034
+      "strength": 38.4,
+      "distance_pct": 1.3363365154853075
     },
     {
-      "price": 42589.56112515266,
+      "price": 44130.91322437661,
       "type": "sell",
-      "strength": 42.1875,
-      "distance_pct": 1.2725629674775478
+      "strength": 37.2,
+      "distance_pct": 1.3422418915003822
     },
     {
-      "price": 42603.33781167413,
+      "price": 44144.64958142523,
       "type": "sell",
-      "strength": 36.5625,
-      "distance_pct": 1.3053221769262933
+      "strength": 32.4,
+      "distance_pct": 1.3737860657995056
     },
     {
-      "price": 42605.988842919265,
+      "price": 44154.425748729205,
       "type": "sell",
-      "strength": 35.625,
-      "distance_pct": 1.3116259922652869
+      "strength": 30.0,
+      "distance_pct": 1.3962360592237142
     },
     {
-      "price": 42610.26294118094,
+      "price": 44168.651149112215,
       "type": "sell",
-      "strength": 35.0,
-      "distance_pct": 1.321789254668077
+      "strength": 28.0,
+      "distance_pct": 1.4289032727773658
     },
     {
-      "price": 42610.74899430124,
+      "price": 44191.45707355823,
       "type": "sell",
-      "strength": 34.6875,
-      "distance_pct": 1.3229450272078924
+      "strength": 23.6,
+      "distance_pct": 1.4812748042708686
     },
     {
-      "price": 42617.932454784284,
+      "price": 44211.862677381054,
       "type": "sell",
-      "strength": 31.25,
-      "distance_pct": 1.3400263831757468
+      "strength": 19.6,
+      "distance_pct": 1.528134238791076
     },
     {
-      "price": 42650.340849421846,
+      "price": 44238.5677182594,
       "type": "sell",
-      "strength": 22.5,
-      "distance_pct": 1.4170894263229312
+      "strength": 14.4,
+      "distance_pct": 1.5894597023874408
     },
     {
-      "price": 42683.7884543022,
+      "price": 44259.081707408775,
       "type": "sell",
-      "strength": 17.1875,
-      "distance_pct": 1.4966235793376381
+      "strength": 12.0,
+      "distance_pct": 1.636568033002888
     },
     {
-      "price": 42753.13711603074,
+      "price": 44361.461486106135,
       "type": "sell",
-      "strength": 8.75,
-      "distance_pct": 1.661525882298115
+      "strength": 4.0,
+      "distance_pct": 1.8716729864126214
     },
     {
-      "price": 42804.516938322544,
-      "type": "sell",
-      "strength": 3.125,
-      "distance_pct": 1.7837005690250836
-    },
-    {
-      "price": 84056.21700937502,
-      "strength": 99.37500000000017,
-      "distance_pct": 0.0624999999999835,
-      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 84056.22 (c\u00e1ch 0.06%)",
-      "rr_ratio": 0.3752345215759495,
-      "tp_price": 84213.92098125,
-      "sl_price": 83635.93592432814,
-      "trade_quality": 38.56709662288853,
+      "price": 87022.04720624999,
+      "strength": 99.37499999999989,
+      "distance_pct": 0.06250000000001252,
+      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 87022.05 (c\u00e1ch 0.06%)",
+      "rr_ratio": 0.250156347717373,
+      "tp_price": 87130.89279375001,
+      "sl_price": 86586.93697021874,
+      "trade_quality": 35.648897748593996,
       "source": "liquidity"
     },
     {
-      "price": 84213.92098125,
-      "strength": 98.74999999999999,
-      "distance_pct": 0.1250000000000016,
-      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84213.92 (c\u00e1ch 0.13%)",
-      "rr_ratio": 0.37453183520597255,
-      "tp_price": 84056.21700937502,
-      "sl_price": 84634.99058615624,
-      "trade_quality": 38.363202247190536,
+      "price": 86967.6244125,
+      "strength": 85.84443239878375,
+      "distance_pct": 0.1250000000000083,
+      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 86967.62 (c\u00e1ch 0.13%)",
+      "rr_ratio": 0.37546933667087895,
+      "tp_price": 87130.89279375001,
+      "sl_price": 86532.78629043749,
+      "trade_quality": 34.5134048135034,
       "source": "liquidity"
     },
     {
-      "price": 84161.35299062499,
-      "strength": 84.7688593383733,
-      "distance_pct": 0.0624999999999835,
-      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84161.35 (c\u00e1ch 0.06%)",
-      "rr_ratio": 0.249843847595193,
-      "tp_price": 84056.21700937502,
-      "sl_price": 84582.1597555781,
-      "trade_quality": 31.25976460975544,
+      "price": 86902.31705999999,
+      "strength": 57.038631435384936,
+      "distance_pct": 0.20000000000001666,
+      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 86902.32 (c\u00e1ch 0.20%)",
+      "rr_ratio": 0.5260521042084723,
+      "tp_price": 87130.89279375001,
+      "sl_price": 86467.80547469998,
+      "trade_quality": 29.384911073903346,
       "source": "liquidity"
     },
     {
-      "price": 84277.00257,
-      "strength": 57.17312053130494,
-      "distance_pct": 0.19999999999999218,
-      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84277.00 (c\u00e1ch 0.20%)",
-      "rr_ratio": 0.5239520958083462,
-      "tp_price": 84056.21700937502,
-      "sl_price": 84698.38758284999,
-      "trade_quality": 29.37626250669601,
+      "price": 87130.89279375001,
+      "strength": 99.37499999999989,
+      "distance_pct": 0.06250000000001252,
+      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87130.89 (c\u00e1ch 0.06%)",
+      "rr_ratio": 0.2498438475953119,
+      "tp_price": 87022.04720624999,
+      "sl_price": 87566.54725771875,
+      "trade_quality": 35.64160680824619,
+      "source": "liquidity"
+    },
+    {
+      "price": 87185.31558750001,
+      "strength": 55.31491477579743,
+      "distance_pct": 0.1250000000000083,
+      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87185.32 (c\u00e1ch 0.13%)",
+      "rr_ratio": 0.37453183520604816,
+      "tp_price": 87022.04720624999,
+      "sl_price": 87621.24216543749,
+      "trade_quality": 25.332676679931538,
       "source": "liquidity"
     }
   ],
   "risk_management": {
-    "stop_loss_pct": 1.5400132221326697,
-    "take_profit_pct": 3.850033055331674,
+    "stop_loss_pct": 7.03114826106722,
+    "take_profit_pct": 17.57787065266805,
     "position_size_pct": 1.0,
     "trailing_stop": true,
-    "trailing_stop_activation": 1.925016527665837,
-    "trailing_stop_callback": 0.6160052888530679,
-    "volatility_percent": 0.6160052888530678,
+    "trailing_stop_activation": 8.788935326334025,
+    "trailing_stop_callback": 2.812459304426888,
+    "volatility_percent": 2.812459304426888,
     "regime_multiplier": 1.0
   },
-  "current_volatility": 308.00264442653395,
+  "current_volatility": 1406.229652213444,
   "signal_strength": -0.8125,
-  "summary": "Th\u1ecb tr\u01b0\u1eddng \u0111ang \u1edf giai \u0111o\u1ea1n ranging. T\u00edn hi\u1ec7u B\u00c1N v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%. \u00c1p l\u1ef1c mua m\u1ea1nh (t\u1ef7 l\u1ec7 bid/ask: 1.33). Bi\u1ebfn \u0111\u1ed9ng th\u1ea5p (0.73%). \u0110\u1ec1 xu\u1ea5t B\u00c1N g\u1ea7n 42342.50.",
+  "summary": "Th\u1ecb tr\u01b0\u1eddng \u0111ang \u1edf giai \u0111o\u1ea1n ranging. T\u00edn hi\u1ec7u B\u00c1N v\u1edbi \u0111\u1ed9 tin c\u1eady 100.0%. \u00c1p l\u1ef1c mua m\u1ea1nh (t\u1ef7 l\u1ec7 bid/ask: 1.26). Bi\u1ebfn \u0111\u1ed9ng th\u1ea5p (0.81%). \u0110\u1ec1 xu\u1ea5t B\u00c1N khi gi\u00e1 ph\u1ee5c h\u1ed3i l\u00ean cao h\u01a1n.",
   "trading_recommendation": {
     "signal": -0.5,
     "signal_text": "B\u00c1N nh\u1eb9",
     "confidence": 20.000000000000004,
     "composite_score": -0.20000000000000004,
     "score_trend": "\u0111i ngang",
-    "price": 42074.7375,
+    "price": 174185.66,
     "individual_signals": {
       "volume_trend": {
         "score": -0.2,
@@ -804,150 +870,168 @@
     },
     "description": "B\u00c1N nh\u1eb9 v\u1edbi \u0111\u1ed9 tin c\u1eady 20.0%. \u0110i\u1ec3m t\u1ed5ng h\u1ee3p -0.20 \u0111ang c\u00f3 xu h\u01b0\u1edbng \u0111i ngang.",
     "action": "B\u00c1N",
-    "take_profit": 41906.438550000006,
-    "stop_loss": 42158.886975,
-    "action_details": "B\u00c1N t\u1ea1i 42074.74, M\u1ee5c ti\u00eau: 41906.44, D\u1eebng l\u1ed7: 42158.89, T\u1ef7 l\u1ec7 RR: 2.00"
+    "take_profit": 173488.91736,
+    "stop_loss": 174534.03132,
+    "action_details": "B\u00c1N t\u1ea1i 174185.66, M\u1ee5c ti\u00eau: 173488.92, D\u1eebng l\u1ed7: 174534.03, T\u1ef7 l\u1ec7 RR: 2.00"
   },
   "liquidity_events": {
-    "current_price": 84108.785,
+    "current_price": 87076.47,
     "events": [
       {
-        "price": 84056.21700937502,
+        "price": 87022.04720624999,
         "type": "bid",
         "strength": 100,
-        "distance_pct": 0.0624999999999835,
-        "value": 191878.2589443858,
+        "distance_pct": 0.06250000000001252,
+        "value": 112492.49898910159,
         "event_type": "strong_support_close",
-        "description": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84056.22)",
+        "description": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87022.05)",
         "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 gi\u1ea3m \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 t\u0103ng"
       },
       {
-        "price": 84213.92098125,
+        "price": 87130.89279375001,
         "type": "ask",
         "strength": 100,
-        "distance_pct": 0.1250000000000016,
-        "value": 70313.48860385064,
+        "distance_pct": 0.06250000000001252,
+        "value": 99467.20179582252,
         "event_type": "strong_resistance_close",
-        "description": "Kh\u00e1ng c\u1ef1 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84213.92)",
+        "description": "Kh\u00e1ng c\u1ef1 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87130.89)",
         "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 t\u0103ng \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 gi\u1ea3m"
       },
       {
-        "price": 84161.35299062499,
-        "type": "ask",
-        "strength": 85.30199681848872,
-        "distance_pct": 0.0624999999999835,
-        "value": 59978.80981182509,
-        "event_type": "strong_resistance_close",
-        "description": "Kh\u00e1ng c\u1ef1 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84161.35)",
-        "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 t\u0103ng \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 gi\u1ea3m"
+        "price": 86967.6244125,
+        "type": "bid",
+        "strength": 86.93107078357856,
+        "distance_pct": 0.1250000000000083,
+        "value": 97790.9339224323,
+        "event_type": "strong_support_close",
+        "description": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (86967.62)",
+        "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 gi\u1ea3m \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 t\u0103ng"
       }
     ],
     "event_count": 3,
-    "bid_ask_ratio": 1.3250883361343604,
-    "warning": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84056.22)"
+    "bid_ask_ratio": 1.2554751108734938,
+    "warning": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87022.05)"
   },
   "liquidity_recommendations": {
-    "current_price": 84108.785,
+    "current_price": 87076.47,
     "market_pressure": "buy",
     "buy_entries": [
       {
-        "price": 84056.21700937502,
-        "strength": 99.37500000000017,
-        "distance_pct": 0.0624999999999835,
-        "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 84056.22 (c\u00e1ch 0.06%)",
-        "rr_ratio": 0.3752345215759495,
-        "tp_price": 84213.92098125,
-        "sl_price": 83635.93592432814,
-        "trade_quality": 38.56709662288853,
+        "price": 87022.04720624999,
+        "strength": 99.37499999999989,
+        "distance_pct": 0.06250000000001252,
+        "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 87022.05 (c\u00e1ch 0.06%)",
+        "rr_ratio": 0.250156347717373,
+        "tp_price": 87130.89279375001,
+        "sl_price": 86586.93697021874,
+        "trade_quality": 35.648897748593996,
+        "source": "liquidity"
+      },
+      {
+        "price": 86967.6244125,
+        "strength": 85.84443239878375,
+        "distance_pct": 0.1250000000000083,
+        "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 86967.62 (c\u00e1ch 0.13%)",
+        "rr_ratio": 0.37546933667087895,
+        "tp_price": 87130.89279375001,
+        "sl_price": 86532.78629043749,
+        "trade_quality": 34.5134048135034,
+        "source": "liquidity"
+      },
+      {
+        "price": 86902.31705999999,
+        "strength": 57.038631435384936,
+        "distance_pct": 0.20000000000001666,
+        "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 86902.32 (c\u00e1ch 0.20%)",
+        "rr_ratio": 0.5260521042084723,
+        "tp_price": 87130.89279375001,
+        "sl_price": 86467.80547469998,
+        "trade_quality": 29.384911073903346,
         "source": "liquidity"
       }
     ],
     "sell_entries": [
       {
-        "price": 84213.92098125,
-        "strength": 98.74999999999999,
-        "distance_pct": 0.1250000000000016,
-        "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84213.92 (c\u00e1ch 0.13%)",
-        "rr_ratio": 0.37453183520597255,
-        "tp_price": 84056.21700937502,
-        "sl_price": 84634.99058615624,
-        "trade_quality": 38.363202247190536,
+        "price": 87130.89279375001,
+        "strength": 99.37499999999989,
+        "distance_pct": 0.06250000000001252,
+        "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87130.89 (c\u00e1ch 0.06%)",
+        "rr_ratio": 0.2498438475953119,
+        "tp_price": 87022.04720624999,
+        "sl_price": 87566.54725771875,
+        "trade_quality": 35.64160680824619,
         "source": "liquidity"
       },
       {
-        "price": 84161.35299062499,
-        "strength": 84.7688593383733,
-        "distance_pct": 0.0624999999999835,
-        "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84161.35 (c\u00e1ch 0.06%)",
-        "rr_ratio": 0.249843847595193,
-        "tp_price": 84056.21700937502,
-        "sl_price": 84582.1597555781,
-        "trade_quality": 31.25976460975544,
-        "source": "liquidity"
-      },
-      {
-        "price": 84277.00257,
-        "strength": 57.17312053130494,
-        "distance_pct": 0.19999999999999218,
-        "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84277.00 (c\u00e1ch 0.20%)",
-        "rr_ratio": 0.5239520958083462,
-        "tp_price": 84056.21700937502,
-        "sl_price": 84698.38758284999,
-        "trade_quality": 29.37626250669601,
+        "price": 87185.31558750001,
+        "strength": 55.31491477579743,
+        "distance_pct": 0.1250000000000083,
+        "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87185.32 (c\u00e1ch 0.13%)",
+        "rr_ratio": 0.37453183520604816,
+        "tp_price": 87022.04720624999,
+        "sl_price": 87621.24216543749,
+        "trade_quality": 25.332676679931538,
         "source": "liquidity"
       }
     ],
     "take_profit_levels": [
       {
-        "price": 84056.21700937502,
+        "price": 87022.04720624999,
         "strength": 100,
-        "distance_pct": 0.0624999999999835,
+        "distance_pct": 0.06250000000001252,
         "position_type": "sell",
-        "description": "TP cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84056.22 (c\u00e1ch 0.06%)"
+        "description": "TP cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87022.05 (c\u00e1ch 0.06%)"
       },
       {
-        "price": 84213.92098125,
+        "price": 87130.89279375001,
         "strength": 100,
-        "distance_pct": 0.1250000000000016,
+        "distance_pct": 0.06250000000001252,
         "position_type": "buy",
-        "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 84213.92 (c\u00e1ch 0.13%)"
+        "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 87130.89 (c\u00e1ch 0.06%)"
       },
       {
-        "price": 84161.35299062499,
-        "strength": 85.30199681848872,
-        "distance_pct": 0.0624999999999835,
-        "position_type": "buy",
-        "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 84161.35 (c\u00e1ch 0.06%)"
+        "price": 86967.6244125,
+        "strength": 86.93107078357856,
+        "distance_pct": 0.1250000000000083,
+        "position_type": "sell",
+        "description": "TP cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 86967.62 (c\u00e1ch 0.13%)"
       }
     ],
     "stop_loss_levels": [
       {
-        "price": 83635.93592432814,
+        "price": 86586.93697021874,
         "position_type": "buy",
-        "entry_price": 84056.21700937502,
-        "distance_pct": 0.5000000000000074,
-        "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 83635.94 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+        "entry_price": 87022.04720624999,
+        "distance_pct": 0.5000000000000009,
+        "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 86586.94 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
       },
       {
-        "price": 84634.99058615624,
-        "position_type": "sell",
-        "entry_price": 84213.92098125,
-        "distance_pct": 0.49999999999998684,
-        "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84634.99 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+        "price": 86532.78629043749,
+        "position_type": "buy",
+        "entry_price": 86967.6244125,
+        "distance_pct": 0.5000000000000018,
+        "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 86532.79 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
       },
       {
-        "price": 84582.1597555781,
-        "position_type": "sell",
-        "entry_price": 84161.35299062499,
-        "distance_pct": 0.49999999999998807,
-        "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84582.16 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+        "price": 86467.80547469998,
+        "position_type": "buy",
+        "entry_price": 86902.31705999999,
+        "distance_pct": 0.500000000000003,
+        "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 86467.81 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
       },
       {
-        "price": 84698.38758284999,
+        "price": 87566.54725771875,
         "position_type": "sell",
-        "entry_price": 84277.00257,
-        "distance_pct": 0.499999999999989,
-        "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84698.39 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+        "entry_price": 87130.89279375001,
+        "distance_pct": 0.4999999999999821,
+        "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87566.55 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+      },
+      {
+        "price": 87621.24216543749,
+        "position_type": "sell",
+        "entry_price": 87185.31558750001,
+        "distance_pct": 0.4999999999999812,
+        "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87621.24 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
       }
     ],
     "summary": "\u00c1p l\u1ef1c mua m\u1ea1nh. Xem x\u00e9t m\u1edf v\u1ecb th\u1ebf MUA t\u1ea1i c\u00e1c \u0111i\u1ec3m h\u1ed7 tr\u1ee3."

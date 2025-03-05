@@ -1,28 +1,28 @@
 {
-  "current_price": 84149.475,
+  "current_price": 87092.83,
   "events": [
     {
-      "price": 84096.881578125,
+      "price": 87038.39698125,
       "type": "bid",
       "strength": 100,
-      "distance_pct": 0.06250000000000525,
-      "value": 175169.91334643986,
+      "distance_pct": 0.06250000000000207,
+      "value": 84949.71707144956,
       "event_type": "strong_support_close",
-      "description": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84096.88)",
+      "description": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87038.40)",
       "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 gi\u1ea3m \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 t\u0103ng"
     },
     {
-      "price": 84202.06842187501,
+      "price": 87147.26301875,
       "type": "ask",
       "strength": 100,
-      "distance_pct": 0.06250000000000525,
-      "value": 119291.0655125553,
+      "distance_pct": 0.06250000000000207,
+      "value": 131838.22324723806,
       "event_type": "strong_resistance_close",
-      "description": "Kh\u00e1ng c\u1ef1 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84202.07)",
+      "description": "Kh\u00e1ng c\u1ef1 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87147.26)",
       "potential_action": "Gi\u00e1 c\u00f3 th\u1ec3 t\u0103ng \u0111\u1ec3 l\u1ea5y thanh kho\u1ea3n, sau \u0111\u00f3 gi\u1ea3m"
     }
   ],
   "event_count": 2,
-  "bid_ask_ratio": 0.9149828034952446,
-  "warning": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (84096.88)"
+  "bid_ask_ratio": 0.8662136054245203,
+  "warning": "H\u1ed7 tr\u1ee3 m\u1ea1nh g\u1ea7n gi\u00e1 hi\u1ec7n t\u1ea1i (87038.40)"
 }

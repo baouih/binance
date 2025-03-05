@@ -1,548 +1,620 @@
 {
   "entry_points": [
     {
-      "price": 41675.627340076164,
+      "price": 43247.05402876887,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9485743313879
+      "distance_pct": 0.6874526209129499
     },
     {
-      "price": 41581.83179097526,
+      "price": 43051.13715904102,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1715003784034168
+      "distance_pct": 1.1373561772168408
     },
     {
-      "price": 41555.63333682221,
+      "price": 43112.56768248445,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2337668492353437
+      "distance_pct": 0.9962871054151122
     },
     {
-      "price": 42525.183546018445,
+      "price": 43950.695099004595,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 1.0705855170657732
+      "distance_pct": 0.9283889362754532
     },
     {
-      "price": 41735.56658449036,
+      "price": 43091.46254220936,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8061153453652316
+      "distance_pct": 1.044752955646616
     },
     {
-      "price": 41696.25426308463,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 0.8995498472578081
-    },
-    {
-      "price": 41764.75446551684,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 0.7367438346660258
-    },
-    {
-      "price": 41630.37166642237,
-      "type": "buy",
-      "strength": 100,
-      "distance_pct": 1.0561345357832226
-    },
-    {
-      "price": 42503.02041457703,
+      "price": 43930.83061186059,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 1.0179098908864972
+      "distance_pct": 0.8827721222529793
     },
     {
-      "price": 41577.29886543568,
+      "price": 43213.865477974614,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1822738871854435
+      "distance_pct": 0.7636668185552977
     },
     {
-      "price": 42513.24787112382,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 1.042217722983581
-    },
-    {
-      "price": 41496.117881159975,
+      "price": 43148.0856939145,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.3752186067471677
+      "distance_pct": 0.9147235336950227
     },
     {
-      "price": 41526.64282422607,
+      "price": 43104.17041220831,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.3026692698295013
+      "distance_pct": 1.0155705993057997
     },
     {
-      "price": 42495.9879279816,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 1.0011956176354004
-    },
-    {
-      "price": 41620.11190997414,
+      "price": 42995.667669779454,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.080519135801767
+      "distance_pct": 1.2647363283993578
     },
     {
-      "price": 41692.00041386699,
+      "price": 42966.33089207504,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9096600689024209
+      "distance_pct": 1.3321053132042178
     },
     {
-      "price": 41683.118547837104,
+      "price": 43073.41711415281,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9307698049521961
+      "distance_pct": 1.0861924818545632
     },
     {
-      "price": 41641.920392583466,
+      "price": 43180.76432679033,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0286864116895242
+      "distance_pct": 0.8396803117080194
     },
     {
-      "price": 41695.59610535735,
+      "price": 42984.61114216098,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9011141059231911
+      "distance_pct": 1.2901265416200594
     },
     {
-      "price": 41697.72150845328,
+      "price": 43182.99635647339,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8960626113156925
+      "distance_pct": 0.8345546780983216
     },
     {
-      "price": 41621.79668874667,
+      "price": 43018.690271609,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0765148831964422
+      "distance_pct": 1.2118672188996584
     },
     {
-      "price": 41616.81070536027,
+      "price": 43964.8932667343,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9609936127561878
+    },
+    {
+      "price": 43114.572780512906,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.088365185022795
+      "distance_pct": 0.9916825977226703
     },
     {
-      "price": 41464.5094999448,
+      "price": 43179.21048718277,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.4503429761271962
+      "distance_pct": 0.8432485494322142
     },
     {
-      "price": 42442.8522801617,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.8749068967137279
-    },
-    {
-      "price": 41481.2843301957,
+      "price": 43165.88327342355,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.41047384978767
+      "distance_pct": 0.8738531669632353
     },
     {
-      "price": 42370.48076804152,
+      "price": 43924.379984207095,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.7028998530092195
+      "distance_pct": 0.8679588990439142
     },
     {
-      "price": 42509.5002607851,
+      "price": 43878.02677343321,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 1.0333106909700753
+      "distance_pct": 0.7615133724170116
     },
     {
-      "price": 41671.91217310295,
+      "price": 43055.84111239758,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9574042545055714
+      "distance_pct": 1.1265540173684074
     },
     {
-      "price": 41568.64019771199,
+      "price": 43178.37382669202,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2028531426678857
+      "distance_pct": 0.8451698568251411
     },
     {
-      "price": 42464.868717421035,
+      "price": 43905.89595635442,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9272338714437195
+      "distance_pct": 0.8255121721372898
     },
     {
-      "price": 42482.03750530552,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9680393259863233
-    },
-    {
-      "price": 41639.1122214728,
+      "price": 42863.64985779487,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0353606568007723
+      "distance_pct": 1.5679020700214417
     },
     {
-      "price": 42476.40409424444,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9546502678583267
-    },
-    {
-      "price": 41783.24331737049,
+      "price": 43166.993482760685,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.6928009536114413
+      "distance_pct": 0.8713036819203509
     },
     {
-      "price": 42497.27997306591,
+      "price": 43979.4976376011,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 1.0042664510168529
+      "distance_pct": 0.9945310942384183
     },
     {
-      "price": 41570.25544286819,
+      "price": 43942.69391362335,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9100150118519463
+    },
+    {
+      "price": 42817.47847351863,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1990141522138131
+      "distance_pct": 1.6739300502265635
     },
     {
-      "price": 41385.32821681497,
+      "price": 43895.07901775259,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.8006721512037016
+    },
+    {
+      "price": 43014.66776903353,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.638534959808212
+      "distance_pct": 1.22110449497731
     },
     {
-      "price": 41490.97280380107,
+      "price": 43947.05260888787,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9200243209179627
+    },
+    {
+      "price": 43168.890215154905,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.3874470308909954
+      "distance_pct": 0.8669480251017134
     },
     {
-      "price": 41552.76474010071,
+      "price": 43912.837622668434,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.8414530166683828
+    },
+    {
+      "price": 42987.85858083312,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2405847092909146
+      "distance_pct": 1.2826691225141769
     },
     {
-      "price": 42503.20426806089,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 1.0183468597062157
-    },
-    {
-      "price": 41625.599719402126,
+      "price": 42976.36746084847,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0674761324366604
+      "distance_pct": 1.3090573337702502
     },
     {
-      "price": 41534.52018967565,
+      "price": 43135.39232291224,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.283946953499959
+      "distance_pct": 0.9438725945356545
     },
     {
-      "price": 41684.136386486694,
+      "price": 43981.436670216426,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.99898388929703
+    },
+    {
+      "price": 43093.590683184026,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.928350684334771
+      "distance_pct": 1.039865892096916
     },
     {
-      "price": 41503.027321880334,
+      "price": 43947.31773621737,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9206331593940985
+    },
+    {
+      "price": 43890.75066395234,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.7907325182850089
+    },
+    {
+      "price": 43118.226361004934,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.3587967794681282
+      "distance_pct": 0.9832925144241308
     },
     {
-      "price": 42515.9227067456,
+      "price": 43883.97798702303,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 1.0485750665600668
+      "distance_pct": 0.7751797410258133
     },
     {
-      "price": 41603.99803617293,
+      "price": 43069.06705396497,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1188173516877453
+      "distance_pct": 1.0961819613279948
     },
     {
-      "price": 41672.39108322908,
+      "price": 43863.57264128969,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.7283208991823786
+    },
+    {
+      "price": 43015.98741288419,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9562660177521591
+      "distance_pct": 1.2180740644569932
     },
     {
-      "price": 42470.841846183605,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9414303444759498
-    },
-    {
-      "price": 41775.647259688536,
+      "price": 43086.04654466215,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.7108546792751039
+      "distance_pct": 1.0571902539803746
     },
     {
-      "price": 42474.79523821681,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.9508264625936285
-    },
-    {
-      "price": 41687.56694849002,
+      "price": 42943.37886887932,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9201971884197305
+      "distance_pct": 1.384812345908796
     },
     {
-      "price": 41561.02709195688,
+      "price": 43862.087999436284,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.7249115672008434
+    },
+    {
+      "price": 43107.285198397156,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.220947386880604
+      "distance_pct": 1.0084178034009113
     },
     {
-      "price": 42494.742801030465,
+      "price": 43818.39143803098,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 0.9982362956642612
+      "distance_pct": 0.624566770952279
     },
     {
-      "price": 42511.36067956082,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 1.0377323912260135
-    },
-    {
-      "price": 41699.2403466114,
+      "price": 43062.03911325603,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8924527535997236
+      "distance_pct": 1.1123209264045464
     },
     {
-      "price": 41629.667472405716,
+      "price": 42897.61534615302,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0578082099604
+      "distance_pct": 1.489903712732682
     },
     {
-      "price": 41597.47001525404,
+      "price": 43067.924586020396,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1343326497187625
+      "distance_pct": 1.0988055250463336
     },
     {
-      "price": 41626.08317763647,
+      "price": 42857.34987997644,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.0663270860894396
+      "distance_pct": 1.5823693409056951
     },
     {
-      "price": 42380.21351235466,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 0.7260318911191268
-    },
-    {
-      "price": 41562.66832600804,
+      "price": 43139.631056220875,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.217046628019875
+      "distance_pct": 0.9341387661398217
     },
     {
-      "price": 41735.80566289484,
+      "price": 43134.268833683425,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.8055471222016849
+      "distance_pct": 0.9464525755256215
     },
     {
-      "price": 41574.77879302022,
+      "price": 43874.449462896206,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.7532984354652497
+    },
+    {
+      "price": 43193.24163521494,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.188263401476445
+      "distance_pct": 0.8110274170332122
     },
     {
-      "price": 41383.730839735545,
+      "price": 43959.61374274095,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 0.9488697123309637
+    },
+    {
+      "price": 43010.170477291045,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.642331482791683
+      "distance_pct": 1.2314320770354015
     },
     {
-      "price": 42530.230334341504,
+      "price": 43866.62372364478,
       "type": "sell",
-      "strength": 98.88888888888889,
-      "distance_pct": 1.0825803353889047
+      "strength": 100,
+      "distance_pct": 0.7353274055849991
     },
     {
-      "price": 42532.395978079185,
-      "type": "sell",
-      "strength": 97.77777777777777,
-      "distance_pct": 1.0877274708586877
+      "price": 43067.10729428551,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.1006823540226929
     },
     {
-      "price": 42535.46684754623,
+      "price": 43964.35268549596,
       "type": "sell",
-      "strength": 95.18518518518519,
-      "distance_pct": 1.0950260772184932
+      "strength": 100,
+      "distance_pct": 0.959752221844107
     },
     {
-      "price": 42536.15133062671,
+      "price": 43956.94599764482,
       "type": "sell",
-      "strength": 95.18518518518519,
-      "distance_pct": 1.0966529039585928
+      "strength": 100,
+      "distance_pct": 0.9427435017206786
     },
     {
-      "price": 42548.28770391326,
-      "type": "sell",
-      "strength": 87.03703703703704,
-      "distance_pct": 1.1254977025424229
+      "price": 42981.90021700794,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.2963519109255277
     },
     {
-      "price": 42552.50622578992,
-      "type": "sell",
-      "strength": 86.92307692307692,
-      "distance_pct": 1.1355239608801269
+      "price": 42983.39196246591,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.2929262662244196
     },
     {
-      "price": 42549.26360986593,
+      "price": 43938.67687891136,
       "type": "sell",
-      "strength": 85.55555555555556,
-      "distance_pct": 1.1278171607509726
+      "strength": 100,
+      "distance_pct": 0.9007902921775813
     },
     {
-      "price": 42568.06371486255,
-      "type": "sell",
-      "strength": 73.46153846153847,
-      "distance_pct": 1.1724998043363755
+      "price": 42957.58432037752,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.3521909429799877
     },
     {
-      "price": 42583.19760812392,
-      "type": "sell",
-      "strength": 66.92307692307692,
-      "distance_pct": 1.2084688778484147
+      "price": 42822.99867727572,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.661253452722302
     },
     {
-      "price": 42592.94344473797,
-      "type": "sell",
-      "strength": 61.15384615384615,
-      "distance_pct": 1.2316320327321475
+      "price": 43131.703018332686,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 0.9523447146391152
     },
     {
-      "price": 42595.0823020921,
+      "price": 43980.44182236048,
       "type": "sell",
-      "strength": 60.38461538461539,
-      "distance_pct": 1.2367155043857343
+      "strength": 100,
+      "distance_pct": 0.9966993203929183
     },
     {
-      "price": 42595.26387005077,
-      "type": "sell",
-      "strength": 60.38461538461539,
-      "distance_pct": 1.2371470411449719
+      "price": 43103.039274813265,
+      "type": "buy",
+      "strength": 100,
+      "distance_pct": 1.0181681435469154
     },
     {
-      "price": 42596.60452768323,
+      "price": 43947.576524006494,
       "type": "sell",
-      "strength": 59.23076923076923,
-      "distance_pct": 1.2403334130919466
+      "strength": 100,
+      "distance_pct": 0.9212274397478941
     },
     {
-      "price": 42598.36465270466,
+      "price": 43990.60146371788,
       "type": "sell",
-      "strength": 58.46153846153846,
-      "distance_pct": 1.244516742866561
+      "strength": 95.625,
+      "distance_pct": 1.0200299237443093
     },
     {
-      "price": 42607.7231409191,
+      "price": 43996.87680535264,
       "type": "sell",
-      "strength": 53.46153846153846,
-      "distance_pct": 1.266759277866197
+      "strength": 92.5,
+      "distance_pct": 1.034440620089244
     },
     {
-      "price": 42611.61005453146,
+      "price": 43997.801889261034,
       "type": "sell",
-      "strength": 52.69230769230769,
-      "distance_pct": 1.2759973951862662
+      "strength": 90.3125,
+      "distance_pct": 1.0365649830440313
     },
     {
-      "price": 42613.46749687118,
+      "price": 44003.51518519962,
       "type": "sell",
-      "strength": 51.92307692307692,
-      "distance_pct": 1.2804120212780272
+      "strength": 88.4375,
+      "distance_pct": 1.0496849974897333
     },
     {
-      "price": 42625.587437183094,
+      "price": 44010.01350444258,
       "type": "sell",
-      "strength": 44.23076923076923,
-      "distance_pct": 1.309217763231657
+      "strength": 85.3125,
+      "distance_pct": 1.0646077396786304
     },
     {
-      "price": 42633.09064558895,
+      "price": 44013.926442198484,
       "type": "sell",
-      "strength": 41.92307692307692,
-      "distance_pct": 1.3270508118771889
+      "strength": 81.5625,
+      "distance_pct": 1.073593411072952
     },
     {
-      "price": 42638.66299985243,
-      "type": "sell",
-      "strength": 40.76923076923077,
-      "distance_pct": 1.3402947549047135
+      "price": 42739.38457173123,
+      "type": "buy",
+      "strength": 80.0,
+      "distance_pct": 1.853264908876591
     },
     {
-      "price": 42638.79025367092,
+      "price": 44023.811058768195,
       "type": "sell",
-      "strength": 40.76923076923077,
-      "distance_pct": 1.3405972019930479
+      "strength": 77.1875,
+      "distance_pct": 1.0962924474223517
     },
     {
-      "price": 42661.746269103205,
+      "price": 44032.895377304565,
       "type": "sell",
-      "strength": 31.53846153846154,
-      "distance_pct": 1.3951572938588201
+      "strength": 70.9375,
+      "distance_pct": 1.1171536791365355
     },
     {
-      "price": 42724.796192173715,
+      "price": 44035.018598139744,
       "type": "sell",
-      "strength": 16.153846153846153,
-      "distance_pct": 1.5450095016604968
+      "strength": 70.0,
+      "distance_pct": 1.1220294440764953
     },
     {
-      "price": 42760.155526570175,
+      "price": 44045.60173717078,
       "type": "sell",
-      "strength": 11.153846153846153,
-      "distance_pct": 1.6290488480651184
+      "strength": 64.0625,
+      "distance_pct": 1.1463325676080973
+    },
+    {
+      "price": 44054.9023964027,
+      "type": "sell",
+      "strength": 59.375,
+      "distance_pct": 1.1676906041581132
+    },
+    {
+      "price": 44064.76033665822,
+      "type": "sell",
+      "strength": 55.9375,
+      "distance_pct": 1.190328381011888
+    },
+    {
+      "price": 44073.05235733231,
+      "type": "sell",
+      "strength": 50.625,
+      "distance_pct": 1.2093701796859904
+    },
+    {
+      "price": 44085.96675766106,
+      "type": "sell",
+      "strength": 45.3125,
+      "distance_pct": 1.2390268123358907
+    },
+    {
+      "price": 44087.62131480872,
+      "type": "sell",
+      "strength": 44.6875,
+      "distance_pct": 1.2428263378482893
+    },
+    {
+      "price": 44099.29605231864,
+      "type": "sell",
+      "strength": 42.5,
+      "distance_pct": 1.2696362084425097
+    },
+    {
+      "price": 44111.47682251571,
+      "type": "sell",
+      "strength": 37.1875,
+      "distance_pct": 1.2976081326458415
+    },
+    {
+      "price": 44122.41989568137,
+      "type": "sell",
+      "strength": 33.125,
+      "distance_pct": 1.3227378090282973
+    },
+    {
+      "price": 44125.75987632028,
+      "type": "sell",
+      "strength": 32.1875,
+      "distance_pct": 1.3304077415334328
+    },
+    {
+      "price": 44148.71482541213,
+      "type": "sell",
+      "strength": 21.875,
+      "distance_pct": 1.3831214932667284
+    },
+    {
+      "price": 44150.81078430975,
+      "type": "sell",
+      "strength": 21.25,
+      "distance_pct": 1.3879346538854056
+    },
+    {
+      "price": 44273.1860375144,
+      "type": "sell",
+      "strength": 4.375,
+      "distance_pct": 1.668957220736544
+    },
+    {
+      "price": 44300.39475225545,
+      "type": "sell",
+      "strength": 3.4375,
+      "distance_pct": 1.7314393211368855
     }
   ],
   "avoid_zones": [],
-  "current_price": 42074.7375,
+  "current_price": 43546.415,
   "best_entry_points": [
     {
-      "price": 41675.627340076164,
+      "price": 43247.05402876887,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9485743313879
+      "distance_pct": 0.6874526209129499
     },
     {
-      "price": 41581.83179097526,
+      "price": 43051.13715904102,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.1715003784034168
+      "distance_pct": 1.1373561772168408
     },
     {
-      "price": 41555.63333682221,
+      "price": 43112.56768248445,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 1.2337668492353437
+      "distance_pct": 0.9962871054151122
     }
   ]
 }

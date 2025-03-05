@@ -1,84 +1,101 @@
 {
-  "current_price": 84149.475,
+  "current_price": 87092.83,
   "market_pressure": "neutral",
   "buy_entries": [
     {
-      "price": 84096.881578125,
-      "strength": 99.37499999999994,
-      "distance_pct": 0.06250000000000525,
-      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 84096.88 (c\u00e1ch 0.06%)",
-      "rr_ratio": 0.25015634771734035,
-      "tp_price": 84202.06842187501,
-      "sl_price": 83676.39717023437,
-      "trade_quality": 35.64889774859325
+      "price": 87038.39698125,
+      "strength": 99.37499999999999,
+      "distance_pct": 0.06250000000000207,
+      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 87038.40 (c\u00e1ch 0.06%)",
+      "rr_ratio": 0.25015634771732914,
+      "tp_price": 87147.26301875,
+      "sl_price": 86603.20499634375,
+      "trade_quality": 35.648897748593
+    },
+    {
+      "price": 86983.9639625,
+      "strength": 65.23852631675078,
+      "distance_pct": 0.12500000000000414,
+      "description": "V\u00f9ng h\u1ed7 tr\u1ee3 m\u1ea1nh 86983.96 (c\u00e1ch 0.13%)",
+      "rr_ratio": 0.375469336670856,
+      "tp_price": 87147.26301875,
+      "sl_price": 86549.0441426875,
+      "trade_quality": 28.331632988892974
     }
   ],
   "sell_entries": [
     {
-      "price": 84202.06842187501,
-      "strength": 99.37499999999994,
-      "distance_pct": 0.06250000000000525,
-      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84202.07 (c\u00e1ch 0.06%)",
-      "rr_ratio": 0.24984384759527914,
-      "tp_price": 84096.881578125,
-      "sl_price": 84623.07876398438,
-      "trade_quality": 35.64160680824544
+      "price": 87147.26301875,
+      "strength": 99.37499999999999,
+      "distance_pct": 0.06250000000000207,
+      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87147.26 (c\u00e1ch 0.06%)",
+      "rr_ratio": 0.24984384759526385,
+      "tp_price": 87038.39698125,
+      "sl_price": 87582.99933384375,
+      "trade_quality": 35.64160680824509
     },
     {
-      "price": 84254.66184375001,
-      "strength": 61.237174293544626,
-      "distance_pct": 0.1250000000000105,
-      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 84254.66 (c\u00e1ch 0.13%)",
-      "rr_ratio": 0.3745318352060321,
-      "tp_price": 84096.881578125,
-      "sl_price": 84675.93515296876,
-      "trade_quality": 27.10935453525532
+      "price": 87201.6960375,
+      "strength": 68.30778165020882,
+      "distance_pct": 0.12500000000000414,
+      "description": "V\u00f9ng kh\u00e1ng c\u1ef1 m\u1ea1nh 87201.70 (c\u00e1ch 0.13%)",
+      "rr_ratio": 0.37453183520601263,
+      "tp_price": 87038.39698125,
+      "sl_price": 87637.7045176875,
+      "trade_quality": 29.230536742254127
     }
   ],
   "take_profit_levels": [
     {
-      "price": 84096.881578125,
+      "price": 87038.39698125,
       "strength": 100,
-      "distance_pct": 0.06250000000000525,
+      "distance_pct": 0.06250000000000207,
       "position_type": "sell",
-      "description": "TP cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84096.88 (c\u00e1ch 0.06%)"
+      "description": "TP cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87038.40 (c\u00e1ch 0.06%)"
     },
     {
-      "price": 84202.06842187501,
+      "price": 87147.26301875,
       "strength": 100,
-      "distance_pct": 0.06250000000000525,
+      "distance_pct": 0.06250000000000207,
       "position_type": "buy",
-      "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 84202.07 (c\u00e1ch 0.06%)"
+      "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 87147.26 (c\u00e1ch 0.06%)"
     },
     {
-      "price": 84254.66184375001,
-      "strength": 62.01232839852627,
-      "distance_pct": 0.1250000000000105,
+      "price": 87201.6960375,
+      "strength": 69.17243711413555,
+      "distance_pct": 0.12500000000000414,
       "position_type": "buy",
-      "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 84254.66 (c\u00e1ch 0.13%)"
+      "description": "TP cho v\u1ecb th\u1ebf MUA t\u1ea1i 87201.70 (c\u00e1ch 0.13%)"
     }
   ],
   "stop_loss_levels": [
     {
-      "price": 83676.39717023437,
+      "price": 86603.20499634375,
       "position_type": "buy",
-      "entry_price": 84096.881578125,
-      "distance_pct": 0.500000000000008,
-      "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 83676.40 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+      "entry_price": 87038.39698125,
+      "distance_pct": 0.5000000000000049,
+      "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 86603.20 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
     },
     {
-      "price": 84623.07876398438,
+      "price": 86549.0441426875,
+      "position_type": "buy",
+      "entry_price": 86983.9639625,
+      "distance_pct": 0.4999999999999932,
+      "description": "SL cho v\u1ecb th\u1ebf MUA t\u1ea1i 86549.04 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+    },
+    {
+      "price": 87582.99933384375,
       "position_type": "sell",
-      "entry_price": 84202.06842187501,
+      "entry_price": 87147.26301875,
+      "distance_pct": 0.4999999999999946,
+      "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87583.00 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+    },
+    {
+      "price": 87637.7045176875,
+      "position_type": "sell",
+      "entry_price": 87201.6960375,
       "distance_pct": 0.4999999999999896,
-      "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84623.08 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
-    },
-    {
-      "price": 84675.93515296876,
-      "position_type": "sell",
-      "entry_price": 84254.66184375001,
-      "distance_pct": 0.49999999999998906,
-      "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 84675.94 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
+      "description": "SL cho v\u1ecb th\u1ebf B\u00c1N t\u1ea1i 87637.70 (c\u00e1ch \u0111i\u1ec3m v\u00e0o 0.50%)"
     }
   ],
   "summary": "Th\u1ecb tr\u01b0\u1eddng c\u00e2n b\u1eb1ng. Theo d\u00f5i v\u00e0 ch\u1edd \u0111\u1ee3i t\u00edn hi\u1ec7u r\u00f5 r\u00e0ng h\u01a1n."
