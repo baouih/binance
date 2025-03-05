@@ -1,8 +1,8 @@
 {
   "symbol": "BTCUSDT",
   "primary_timeframe": "1h",
-  "analysis_time": "2025-03-05T06:17:42.121888",
-  "current_price": 86744.5,
+  "analysis_time": "2025-03-05T06:20:40.079379",
+  "current_price": 87193.9,
   "signals": {
     "mtf": 0,
     "ci": 0
@@ -14,21 +14,21 @@
   "multi_timeframe": {
     "symbol": "BTCUSDT",
     "signal": 0,
-    "confidence": 16.065365279527374,
+    "confidence": 16.075813241229646,
     "position_size_factor": 0.5,
-    "raw_signal": 0.23076923076923075,
+    "raw_signal": 0.15384615384615385,
     "signal_description": "TRUNG L\u1eacP",
     "rsi_analysis": {
       "1m": {
-        "rsi": 49.97739680773372,
+        "rsi": 49.84150518942693,
         "weight": 0.05
       },
       "5m": {
-        "rsi": 50.41767631679627,
+        "rsi": 41.13706044891931,
         "weight": 0.1
       },
       "15m": {
-        "rsi": 47.4865666687413,
+        "rsi": 42.71229404309256,
         "weight": 0.15
       },
       "1h": {
@@ -36,7 +36,7 @@
         "weight": 0.25
       },
       "4h": {
-        "rsi": 54.590667546417485,
+        "rsi": 54.51418500198987,
         "weight": 0.3
       },
       "1d": {
@@ -46,27 +46,27 @@
     },
     "trend_analysis": {
       "1m": {
-        "trend": 2,
-        "ema_short": 86926.26367082473,
-        "ema_medium": 86913.72807466678,
-        "ema_long": 86900.02996035796,
-        "close": 87146.2,
+        "trend": -2,
+        "ema_short": 86845.58731946227,
+        "ema_medium": 86873.7981914715,
+        "ema_long": 86884.30690853472,
+        "close": 86744.5,
         "weight": 0.05
       },
       "5m": {
-        "trend": 0,
-        "ema_short": 86855.60393242477,
-        "ema_medium": 86876.21298310463,
-        "ema_long": 86974.86100629678,
-        "close": 87146.2,
+        "trend": -2,
+        "ema_short": 86758.64714593982,
+        "ema_medium": 86825.63576976453,
+        "ema_long": 86950.54747545965,
+        "close": 86744.5,
         "weight": 0.1
       },
       "15m": {
-        "trend": 1,
-        "ema_short": 86915.41236154047,
-        "ema_medium": 86986.57116925369,
-        "ema_long": 86557.6179807498,
-        "close": 87146.2,
+        "trend": 0,
+        "ema_short": 86835.07236154046,
+        "ema_medium": 86950.0529874355,
+        "ema_long": 86543.27155217837,
+        "close": 86744.5,
         "weight": 0.15
       },
       "1h": {
@@ -79,38 +79,38 @@
       },
       "4h": {
         "trend": 0,
-        "ema_short": 85988.11902656648,
-        "ema_medium": 85720.52995223818,
-        "ema_long": 86772.86063202677,
-        "close": 86744.5,
+        "ema_short": 85978.63902656648,
+        "ema_medium": 85716.2208613291,
+        "ema_long": 86771.16777488391,
+        "close": 86697.1,
         "weight": 0.3
       },
       "1d": {
         "trend": -1,
-        "ema_short": 86458.24443520003,
-        "ema_medium": 87205.55892148222,
-        "ema_long": 87914.88956262045,
-        "close": 86744.5,
+        "ema_short": 86448.76443520002,
+        "ema_medium": 87201.24983057314,
+        "ema_long": 87913.19670547759,
+        "close": 86697.1,
         "weight": 0.45
       }
     },
     "macd_analysis": {
       "1m": {
-        "macd": 9.364845307427458,
-        "macd_signal": 0.2614038500783997,
-        "macd_hist": 9.103441457349058,
+        "macd": -21.702485908564995,
+        "macd_signal": -8.511641388238285,
+        "macd_hist": -13.19084452032671,
         "weight": 0.05
       },
       "5m": {
-        "macd": -44.3533976872277,
-        "macd_signal": -72.62727624985666,
-        "macd_hist": 28.273878562628965,
+        "macd": -78.43096784551744,
+        "macd_signal": -79.74986072283669,
+        "macd_hist": 1.318892877319243,
         "weight": 0.1
       },
       "15m": {
-        "macd": -20.46763366262894,
-        "macd_signal": 35.69559125345108,
-        "macd_hist": -56.16322491608002,
+        "macd": -52.51207810707274,
+        "macd_signal": 29.286702364562316,
+        "macd_hist": -81.79878047163506,
         "weight": 0.15
       },
       "1h": {
@@ -120,330 +120,305 @@
         "weight": 0.25
       },
       "4h": {
-        "macd": 50.578292262827745,
-        "macd_signal": -240.26683499551964,
-        "macd_hist": 290.84512725834736,
+        "macd": 46.79709568164253,
+        "macd_signal": -241.0230743117567,
+        "macd_hist": 287.8201699933992,
         "weight": 0.3
       },
       "1d": {
-        "macd": -704.7669353109668,
-        "macd_signal": -530.8865435342574,
-        "macd_hist": -173.88039177670942,
+        "macd": -708.5481318921666,
+        "macd_signal": -531.6427828504973,
+        "macd_hist": -176.9053490416693,
         "weight": 0.45
       }
     },
-    "volatility": 7.952678756682177,
+    "volatility": 7.9529771751868275,
     "summary": "TRUNG L\u1eacP v\u1edbi \u0111\u1ed9 tin c\u1eady 16.1% (H\u1ec7 s\u1ed1 v\u1ecb th\u1ebf: 0.50)"
   },
   "composite_indicator": {
-    "composite_score": 0.07744440248824663,
+    "composite_score": 0.009907228439815343,
     "signal": 0,
-    "confidence": 7.744440248824663,
+    "confidence": 0.9907228439815343,
     "individual_scores": {
-      "rsi": -0.3139456606618737,
+      "rsi": -0.27944692123796616,
       "macd": 0.3,
-      "bbands": 0.12372327061486016,
-      "volume_trend": 0.2
+      "bbands": 0.2190758349972276,
+      "volume_trend": -0.2
     },
     "weighted_scores": {
-      "rsi": -0.06278913213237473,
+      "rsi": -0.05588938424759324,
       "macd": 0.06,
-      "bbands": 0.024744654122972033,
-      "volume_trend": 0.04000000000000001
+      "bbands": 0.04381516699944552,
+      "volume_trend": -0.04000000000000001
     },
     "signal_description": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
-    "summary": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG v\u1edbi \u0111\u1ed9 tin c\u1eady 7.7%"
+    "summary": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG v\u1edbi \u0111\u1ed9 tin c\u1eady 1.0%"
   },
   "liquidity_analysis": {
-    "current_price": 87013.45000000001,
-    "best_bid": 86875.3,
-    "best_ask": 87151.6,
-    "spread": 276.3000000000029,
-    "spread_pct": 0.31753711638833176,
-    "bid_ask_ratio": 0.8223890281758758,
+    "current_price": 86820.75,
+    "best_bid": 86678.5,
+    "best_ask": 86963.0,
+    "spread": 284.5,
+    "spread_pct": 0.32768664173023154,
+    "bid_ask_ratio": 0.9916254472839894,
     "market_pressure": "neutral",
     "high_liquidity_zones": [
       {
-        "price": 86674.15714285713,
-        "value": 488169329.8667,
-        "quantity": 5632.2609999999995,
+        "price": 86663.9088235294,
+        "value": 983135601.5333999,
+        "quantity": 11343.582,
         "type": "bid",
         "strength": 100,
         "price_range": [
-          86639.35176285713,
-          86708.96252285714
+          86629.1805235294,
+          86698.6371235294
         ]
       },
       {
-        "price": 87190.52,
-        "value": 465562761.6874,
-        "quantity": 5339.5199999999995,
+        "price": 87260.99759036144,
+        "value": 470866867.4191,
+        "quantity": 5396.052,
         "type": "ask",
         "strength": 100,
         "price_range": [
-          87155.71462,
-          87225.32538000001
+          87226.26929036144,
+          87295.72589036144
         ]
       },
       {
-        "price": 87251.421686747,
-        "value": 463432149.9909,
-        "quantity": 5311.327,
+        "price": 87215.2506329114,
+        "value": 401591323.6807,
+        "quantity": 4604.585,
         "type": "ask",
-        "strength": 99.5423577932269,
+        "strength": 85.28765803418898,
         "price_range": [
-          87216.61630674699,
-          87286.227066747
-        ]
-      },
-      {
-        "price": 86618.35294117648,
-        "value": 373891758.6728,
-        "quantity": 4316.51,
-        "type": "bid",
-        "strength": 76.59058769113891,
-        "price_range": [
-          86583.54756117647,
-          86653.15832117648
+          87180.5223329114,
+          87249.9789329114
         ]
       }
     ],
     "liquidity_grab_zones": [
       {
-        "price": 87190.52,
-        "value": 465562761.6874,
-        "quantity": 5339.5199999999995,
-        "type": "ask",
-        "strength": 100,
-        "price_range": [
-          87155.71462,
-          87225.32538000001
-        ],
-        "grab_type": "resistance",
-        "grab_strength": 97.96502724578795,
-        "distance_pct": 0.2034972754212049
-      },
-      {
-        "price": 87251.421686747,
-        "value": 463432149.9909,
-        "quantity": 5311.327,
-        "type": "ask",
-        "strength": 99.5423577932269,
-        "price_range": [
-          87216.61630674699,
-          87286.227066747
-        ],
-        "grab_type": "resistance",
-        "grab_strength": 96.81998983898235,
-        "distance_pct": 0.2734883937448559
-      },
-      {
-        "price": 86674.15714285713,
-        "value": 488169329.8667,
-        "quantity": 5632.2609999999995,
+        "price": 86663.9088235294,
+        "value": 983135601.5333999,
+        "quantity": 11343.582,
         "type": "bid",
         "strength": 100,
         "price_range": [
-          86639.35176285713,
-          86708.96252285714
+          86629.1805235294,
+          86698.6371235294
         ],
         "grab_type": "support",
-        "grab_strength": 96.10068492695235,
-        "distance_pct": 0.3899315073047653
+        "grab_strength": 98.19350585579375,
+        "distance_pct": 0.18064941442062651
       },
       {
-        "price": 86618.35294117648,
-        "value": 373891758.6728,
-        "quantity": 4316.51,
-        "type": "bid",
-        "strength": 76.59058769113891,
+        "price": 87260.99759036144,
+        "value": 470866867.4191,
+        "quantity": 5396.052,
+        "type": "ask",
+        "strength": 100,
         "price_range": [
-          86583.54756117647,
-          86653.15832117648
+          87226.26929036144,
+          87295.72589036144
         ],
-        "grab_type": "support",
-        "grab_strength": 73.1128821260412,
-        "distance_pct": 0.4540643530667223
+        "grab_type": "resistance",
+        "grab_strength": 94.9292353456813,
+        "distance_pct": 0.5070764654318691
+      },
+      {
+        "price": 87215.2506329114,
+        "value": 401591323.6807,
+        "quantity": 4604.585,
+        "type": "ask",
+        "strength": 85.28765803418898,
+        "price_range": [
+          87180.5223329114,
+          87249.9789329114
+        ],
+        "grab_type": "resistance",
+        "grab_strength": 81.41231313403338,
+        "distance_pct": 0.4543851935296535
       }
     ],
-    "total_bid_value": 916421754.7011,
-    "total_ask_value": 1114340930.2697
+    "total_bid_value": 1037502064.7178,
+    "total_ask_value": 1046264058.2283001
   },
   "entry_points": [
     {
       "price": 86300.0,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9738527367591222
+      "distance_pct": 0.4366711468241836
     },
     {
       "price": 86300.0,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 0.9738527367591222
-    },
-    {
-      "price": 89482.9412,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 2.678457854219287
-    },
-    {
-      "price": 89999.8,
-      "type": "sell",
-      "strength": 100,
-      "distance_pct": 3.2715347446376204
+      "distance_pct": 0.4366711468241836
     },
     {
       "price": 84277.60380000001,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 3.294479665215873
+      "distance_pct": 2.769886650091993
+    },
+    {
+      "price": 89482.9412,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 3.23545192867897
+    },
+    {
+      "price": 89999.8,
+      "type": "sell",
+      "strength": 100,
+      "distance_pct": 3.8317460500585527
     },
     {
       "price": 82520.7,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 5.310463609898943
+      "distance_pct": 4.796806589869464
     },
     {
       "price": 81457.3,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 6.5306768775667265
+      "distance_pct": 6.0236390800486825
     },
     {
       "price": 79561.8,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 8.70569497881207
+      "distance_pct": 8.210455880062527
     },
     {
       "price": 79413.6,
       "type": "buy",
       "strength": 100,
-      "distance_pct": 8.87574915058973
+      "distance_pct": 8.381432535173076
     },
     {
       "price": 95712.2794,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 9.826399475838427
+      "distance_pct": 10.422168588519645
     },
     {
       "price": 97306.4,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 11.655595551052393
+      "distance_pct": 12.2612874011433
     },
     {
       "price": 97524.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 11.905283727697606
+      "distance_pct": 12.51233004724355
     },
     {
       "price": 98000.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 12.45147661410899
+      "distance_pct": 13.061485835587833
     },
     {
       "price": 98300.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 12.795715828233817
+      "distance_pct": 13.407592424880448
     },
     {
       "price": 98300.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 12.795715828233817
+      "distance_pct": 13.407592424880448
     },
     {
       "price": 99100.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 13.713687065900013
+      "distance_pct": 14.330543329660758
     },
     {
       "price": 99299.6,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 13.942720889697735
+      "distance_pct": 14.560819580403454
     },
     {
       "price": 100746.95000000001,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 15.60350297824295
+      "distance_pct": 16.230610820445683
     },
     {
       "price": 101000.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 15.893868755357227
+      "distance_pct": 16.52255172851399
     },
     {
       "price": 101000.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 15.893868755357227
+      "distance_pct": 16.52255172851399
     },
     {
       "price": 102222.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 17.296069820892342
+      "distance_pct": 17.932359235565915
     },
     {
       "price": 104500.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 19.90999292014683
+      "distance_pct": 20.560461936927844
     },
     {
       "price": 104600.0,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 20.02473932485511
+      "distance_pct": 20.67583080002538
     },
     {
       "price": 105781.6206,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 21.380606480647444
+      "distance_pct": 22.039053052371692
     },
     {
       "price": 106999.9,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 22.77853829144898
+      "distance_pct": 23.444568145503204
     },
     {
       "price": 112949.6262,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 29.605635195935225
+      "distance_pct": 30.308699619859595
     },
     {
       "price": 117216.29620000001,
       "type": "sell",
       "strength": 100,
-      "distance_pct": 34.501485621701775
+      "distance_pct": 35.23110829098336
     },
     {
       "price": 119252.0,
       "type": "sell",
       "strength": 60,
-      "distance_pct": 36.83738254271148
+      "distance_pct": 37.579676621076736
     },
     {
       "price": 122080.3,
       "type": "sell",
       "strength": 20,
-      "distance_pct": 40.08275510707562
+      "distance_pct": 40.84265417606442
     }
   ],
-  "summary": "Th\u1ecb tr\u01b0\u1eddng \u0111ang \u1edf giai \u0111o\u1ea1n ranging. T\u00edn hi\u1ec7u CH\u1edc \u0110\u1ee2I v\u1edbi \u0111\u1ed9 tin c\u1eady 774.4%. \u00c1p l\u1ef1c b\u00e1n y\u1ebfu (t\u1ef7 l\u1ec7 bid/ask: 0.82). Bi\u1ebfn \u0111\u1ed9ng cao (7.95%). \u0110\u1ec1 xu\u1ea5t theo d\u00f5i th\u00eam."
+  "summary": "Th\u1ecb tr\u01b0\u1eddng \u0111ang \u1edf giai \u0111o\u1ea1n ranging. T\u00edn hi\u1ec7u CH\u1edc \u0110\u1ee2I v\u1edbi \u0111\u1ed9 tin c\u1eady 99.1%. \u00c1p l\u1ef1c b\u00e1n y\u1ebfu (t\u1ef7 l\u1ec7 bid/ask: 0.99). Bi\u1ebfn \u0111\u1ed9ng cao (7.95%). \u0110\u1ec1 xu\u1ea5t theo d\u00f5i th\u00eam."
 }

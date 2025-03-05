@@ -1,21 +1,34 @@
 {
-  "timestamp": "2025-03-05T06:17:46.415171",
+  "timestamp": "2025-03-05T06:20:40.084529",
   "recommendations": {
-    "timestamp": "2025-03-05T06:17:42.124411",
+    "timestamp": "2025-03-05T06:17:46.415171",
     "recommendations": {
-      "timestamp": "2025-03-05T06:17:41.882244",
+      "timestamp": "2025-03-05T06:17:42.124411",
       "recommendations": {
-        "timestamp": "2025-03-05T06:16:54.601099",
+        "timestamp": "2025-03-05T06:17:41.882244",
         "recommendations": {
+          "timestamp": "2025-03-05T06:16:54.601099",
+          "recommendations": {
+            "BTCUSDT": {
+              "signal": 0,
+              "signal_text": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
+              "confidence": 8.969961360606876,
+              "price": 86963.0,
+              "action": "CH\u1edc \u0110\u1ee2I",
+              "take_profit": 0,
+              "stop_loss": 0,
+              "timestamp": "2025-03-05T06:16:54.600957"
+            }
+          },
           "BTCUSDT": {
             "signal": 0,
             "signal_text": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
-            "confidence": 8.969961360606876,
-            "price": 86963.0,
+            "confidence": 7.744440248824663,
+            "price": 87148.7,
             "action": "CH\u1edc \u0110\u1ee2I",
             "take_profit": 0,
             "stop_loss": 0,
-            "timestamp": "2025-03-05T06:16:54.600957"
+            "timestamp": "2025-03-05T06:17:41.882186"
           }
         },
         "BTCUSDT": {
@@ -26,29 +39,29 @@
           "action": "CH\u1edc \u0110\u1ee2I",
           "take_profit": 0,
           "stop_loss": 0,
-          "timestamp": "2025-03-05T06:17:41.882186"
+          "timestamp": "2025-03-05T06:17:42.124351"
         }
       },
-      "BTCUSDT": {
+      "ETHUSDT": {
         "signal": 0,
         "signal_text": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
-        "confidence": 7.744440248824663,
-        "price": 87148.7,
+        "confidence": 3.593541227894882,
+        "price": 2161.77,
         "action": "CH\u1edc \u0110\u1ee2I",
         "take_profit": 0,
         "stop_loss": 0,
-        "timestamp": "2025-03-05T06:17:42.124351"
+        "timestamp": "2025-03-05T06:17:46.414985"
       }
     },
-    "ETHUSDT": {
+    "BTCUSDT": {
       "signal": 0,
       "signal_text": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
-      "confidence": 3.593541227894882,
-      "price": 2161.77,
+      "confidence": 0.9907228439815343,
+      "price": 86678.5,
       "action": "CH\u1edc \u0110\u1ee2I",
       "take_profit": 0,
       "stop_loss": 0,
-      "timestamp": "2025-03-05T06:17:46.414985"
+      "timestamp": "2025-03-05T06:20:40.084479"
     }
   }
 }
