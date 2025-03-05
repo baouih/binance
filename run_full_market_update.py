@@ -56,7 +56,7 @@ def update_market_data_for_symbol(symbol):
 
 def create_single_symbol_updater():
     """Tạo script cập nhật cho một symbol"""
-    script_content = """#!/usr/bin/env python3
+    script_content = '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -66,7 +66,7 @@ from market_data_updater import MarketDataUpdater
 # Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler("update_single_symbol.log"),
         logging.StreamHandler(sys.stdout)
@@ -84,7 +84,7 @@ def main():
     logger.info(f"Bắt đầu cập nhật dữ liệu thị trường cho {symbol}")
     
     updater = MarketDataUpdater()
-    success = updater.update_market_analysis(symbol, timeframe='1h')
+    success = updater.update_market_analysis(symbol, timeframe="1h")
     
     if success:
         logger.info(f"Cập nhật thành công dữ liệu thị trường cho {symbol}")
@@ -95,7 +95,7 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-"""
+'''
     
     try:
         with open('update_single_symbol.py', 'w') as f:

@@ -1,29 +1,29 @@
 {
   "signal": 0,
   "signal_text": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG",
-  "confidence": 0.9907228439815343,
-  "composite_score": 0.009907228439815343,
+  "confidence": 8.969961360606876,
+  "composite_score": 0.08969961360606876,
   "score_trend": "\u0111i ngang",
-  "price": 86678.5,
+  "price": 86963.0,
   "individual_signals": {
     "rsi": {
-      "score": -0.27944692123796616,
-      "weighted_score": -0.05588938424759324
+      "score": -0.30231666575387495,
+      "weighted_score": -0.06046333315077499
     },
     "macd": {
       "score": 0.3,
       "weighted_score": 0.06
     },
     "bbands": {
-      "score": 0.2190758349972276,
-      "weighted_score": 0.04381516699944552
+      "score": 0.16111512017814997,
+      "weighted_score": 0.032223024035629995
     },
     "volume_trend": {
-      "score": -0.2,
-      "weighted_score": -0.04000000000000001
+      "score": 0.2,
+      "weighted_score": 0.04000000000000001
     }
   },
-  "description": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG v\u1edbi \u0111\u1ed9 tin c\u1eady 1.0%. \u0110i\u1ec3m t\u1ed5ng h\u1ee3p 0.01 \u0111ang c\u00f3 xu h\u01b0\u1edbng \u0111i ngang.",
+  "description": "KH\u00d4NG H\u00c0NH \u0110\u1ed8NG v\u1edbi \u0111\u1ed9 tin c\u1eady 9.0%. \u0110i\u1ec3m t\u1ed5ng h\u1ee3p 0.09 \u0111ang c\u00f3 xu h\u01b0\u1edbng \u0111i ngang.",
   "action": "CH\u1edc \u0110\u1ee2I",
   "action_details": "Kh\u00f4ng c\u00f3 t\u00edn hi\u1ec7u r\u00f5 r\u00e0ng, ti\u1ebfp t\u1ee5c theo d\u00f5i th\u1ecb tr\u01b0\u1eddng."
 }
