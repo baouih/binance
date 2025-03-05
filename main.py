@@ -84,7 +84,15 @@ telegram_notifier = TelegramNotifier(
 )
 
 # Danh sách các đồng coin được hỗ trợ
-available_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT', 'DOTUSDT']
+# Tải danh sách cặp tiền từ account_config.json
+try:
+    with open('account_config.json', 'r') as f:
+        account_config = json.load(f)
+        available_symbols = account_config.get('symbols', ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT', 'DOTUSDT'])
+    logger.info(f"Đã tải danh sách {len(available_symbols)} cặp tiền từ account_config.json")
+except Exception as e:
+    logger.error(f"Lỗi khi tải danh sách cặp tiền: {str(e)}")
+    available_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT', 'XRPUSDT', 'DOTUSDT']
 # Dữ liệu giá sẽ được lấy từ API thực tế
 market_prices = {}
 
@@ -272,8 +280,9 @@ def get_market_data_from_api():
             'data_source': 'binance_api'
         }
         
-        # Log dữ liệu đã lấy được
-        logger.info(f"Đã lấy dữ liệu thị trường từ API: BTC price={btc_price}, ETH price={eth_price}")
+        # Log dữ liệu đã lấy được (hiển thị tất cả các cặp tiền đã cập nhật)
+        price_info = ", ".join([f"{symbol}={price:.2f}" for symbol, price in list(all_prices.items())[:5]])
+        logger.info(f"Đã lấy dữ liệu thị trường từ API: {price_info} (và {len(all_prices)-5 if len(all_prices)>5 else 0} cặp khác)")
         
         return market_data
     except Exception as e:
@@ -1076,16 +1085,47 @@ def background_tasks():
     startup_message = "Bot đã khởi động thành công!"
     add_system_message(startup_message)
     
-    # Gửi thông báo khởi động qua Telegram nếu được bật
-    if telegram_config.get('enabled') and telegram_config.get('notify_bot_status', True):
+    # Gửi thông báo khởi động qua Telegram nếu được bật - chỉ gửi một lần
+    startup_file = "bot_start_time.txt"
+    current_time = time.time()
+    
+    # Kiểm tra nếu đã khởi động trong 5 phút qua thì không gửi lại
+    send_startup_notification = True
+    if os.path.exists(startup_file):
         try:
+            with open(startup_file, 'r') as f:
+                last_startup_time = float(f.read().strip())
+                # Nếu khởi động trong vòng 5 phút (300 giây), không gửi thông báo mới
+                if current_time - last_startup_time < 300:
+                    send_startup_notification = False
+                    logger.info("Bot đã khởi động trong 5 phút qua, bỏ qua thông báo Telegram")
+        except Exception:
+            # Nếu có lỗi đọc file, gửi lại thông báo
+            pass
+    
+    # Ghi thời gian khởi động hiện tại
+    try:
+        with open(startup_file, 'w') as f:
+            f.write(str(current_time))
+    except Exception as e:
+        logger.error(f"Lỗi khi ghi thời gian khởi động: {str(e)}")
+    
+    # Gửi thông báo khởi động nếu cần thiết
+    if send_startup_notification and telegram_config.get('enabled') and telegram_config.get('notify_bot_status', True):
+        try:
+            # Lấy danh sách các cặp tiền đang theo dõi từ account_config
+            symbols_list = ", ".join(available_symbols[:8])
+            if len(available_symbols) > 8:
+                symbols_list += f" và {len(available_symbols) - 8} cặp khác"
+                
             # Tạo thông báo chi tiết khi khởi động
             bot_startup_message = (
                 f"🤖 *BOT GIAO DỊCH ĐÃ KHỞI ĐỘNG*\n\n"
                 f"⏰ Thời gian: `{format_vietnam_time()}`\n"
                 f"💰 Số dư: `{bot_status['balance']:.2f} USDT`\n"
-                f"🔄 Chế độ giao dịch: `{bot_status.get('trading_mode', 'Demo')}`\n"
-                f"👁️ Trạng thái: `Đang hoạt động, chờ tín hiệu`\n\n"
+                f"🔄 Chế độ giao dịch: `{bot_status.get('mode', 'Demo').upper()}`\n"
+                f"👁️ Trạng thái: `Đang hoạt động, chờ tín hiệu`\n"
+                f"📊 Theo dõi: `{symbols_list}`\n\n"
                 f"_Bot sẽ tự động thông báo khi có tín hiệu giao dịch mới_"
             )
             telegram_notifier.send_message(bot_startup_message)

@@ -3,6 +3,7 @@ import logging
 import json
 import datetime
 import re
+import threading
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 import binance_api
 from account_type_selector import AccountTypeSelector
@@ -31,9 +32,25 @@ def get_bot_status_from_config():
             with open('bot_status.json', 'r') as f:
                 saved_status = json.load(f)
                 bot_running = saved_status.get('running', False)
+                logger.debug(f"Đọc trạng thái bot từ file: running={bot_running}")
     except Exception as e:
         logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
     
+    # Trả về full status
+    status = {
+        'running': bot_running,
+        'mode': 'testnet'  # Mặc định
+    }
+    
+    # Nếu có file status, lấy thêm thông tin
+    if os.path.exists('bot_status.json'):
+        try:
+            with open('bot_status.json', 'r') as f:
+                saved_status = json.load(f)
+                status.update(saved_status)
+        except:
+            pass
+            
     # Tính uptime nếu bot đang chạy
     uptime = '0d 0h 0m'
     if bot_running and os.path.exists('bot_start_time.txt'):
@@ -50,18 +67,15 @@ def get_bot_status_from_config():
         except Exception as e:
             logger.error(f"Lỗi khi tính uptime: {str(e)}")
     
-    status = {
-        'status': 'running' if bot_running else 'stopped',
+    # Thêm thông tin uptime và chi tiết bổ sung
+    status.update({
         'uptime': uptime,
         'last_update': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'version': '1.0.0',
-        'active_strategies': ['RSI', 'MACD', 'BB'],
-        'mode': 'testnet',  # mặc định 'testnet' - sẽ được cập nhật từ cấu hình
-        'account_type': 'futures',  # mặc định 'futures' - sẽ được cập nhật từ cấu hình
-        'strategy_mode': 'auto',  # mặc định 'auto' - sẽ được cập nhật từ cấu hình
+        'version': status.get('version', '1.0.0'),
         'last_action': 'Bot đang chạy' if bot_running else 'Bot đang dừng'
-    }
+    })
     
+    # Kiểm tra xem đã có thông tin cấu hình tài khoản từ file chưa
     try:
         if os.path.exists('account_config.json'):
             with open('account_config.json', 'r') as f:
@@ -73,6 +87,7 @@ def get_bot_status_from_config():
     except Exception as e:
         logger.error(f"Lỗi khi đọc cấu hình bot: {str(e)}")
     
+    logger.debug(f"Trạng thái bot đầy đủ: {status}")
     return status
 
 # Khởi tạo trạng thái bot
@@ -1780,6 +1795,11 @@ def close_position():
 @app.route('/api/bot/status', methods=['GET'])
 def get_bot_status():
     """Lấy trạng thái hiện tại của bot"""
+    # Luôn đọc trạng thái mới nhất từ file
+    updated_status = get_bot_status_from_config()
+    # Cập nhật BOT_STATUS toàn cục
+    BOT_STATUS.update(updated_status)
+    logger.debug(f"Trạng thái bot hiện tại: {BOT_STATUS}")
     return jsonify(BOT_STATUS)
 
 
@@ -2111,32 +2131,90 @@ def execute_cli_command():
 # Tác vụ nền
 def update_market_data():
     """Cập nhật dữ liệu thị trường theo định kỳ"""
-    # Trong tương lai, gọi API để lấy dữ liệu thị trường
-    pass
+    global BOT_STATUS
+    try:
+        # Cập nhật BOT_STATUS từ file
+        BOT_STATUS.update(get_bot_status_from_config())
+        logger.debug(f"Đã cập nhật BOT_STATUS từ file, trạng thái bot: {BOT_STATUS.get('running', False)}")
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật BOT_STATUS: {str(e)}")
+    
+    # TODO: Cập nhật dữ liệu thị trường khác nếu cần
 
 
 def update_account_data():
     """Cập nhật dữ liệu tài khoản theo định kỳ"""
-    # Trong tương lai, gọi API để lấy dữ liệu tài khoản
-    pass
+    global BOT_STATUS
+    try:
+        # Cập nhật BOT_STATUS từ file
+        BOT_STATUS.update(get_bot_status_from_config())
+        logger.debug(f"Đã cập nhật BOT_STATUS từ file, số dư: {BOT_STATUS.get('balance', 0)} USDT")
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật BOT_STATUS: {str(e)}")
+    
+    # TODO: Cập nhật dữ liệu tài khoản khác nếu cần
 
 
 # Khởi động tác vụ nền và đăng ký blueprint
 logger.info("Đã đăng ký blueprint cho cấu hình")
 
+# Thiết lập tác vụ nền để cập nhật trạng thái
+def background_tasks():
+    """Chạy các tác vụ nền theo định kỳ"""
+    logger.info("Bắt đầu các tác vụ nền để cập nhật dữ liệu")
+    
+    # Cập nhật dữ liệu thị trường mỗi 10 giây
+    try:
+        update_market_data()
+        global market_task
+        from threading import Timer
+        market_task = Timer(10.0, background_tasks)
+        market_task.daemon = True
+        market_task.start()
+        logger.debug("Đã lên lịch tác vụ nền tiếp theo trong 10 giây")
+    except Exception as e:
+        logger.error(f"Lỗi trong tác vụ nền: {str(e)}")
+
 # Kiểm tra môi trường
 if os.environ.get('TESTING') == 'true':
     logger.info("Auto-start bot is disabled in testing environment")
 else:
-    # Khởi động tự động nếu được cấu hình
-    pass
+    # Khởi động tác vụ nền
+    import threading
+    market_task = None
+    
+    try:
+        background_tasks()
+        logger.info("Đã khởi động tác vụ nền để cập nhật dữ liệu")
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động tác vụ nền: {str(e)}")
 
 logger.info("Background tasks started")
 
 # Trong trường hợp bot đang chạy nhưng trạng thái không đồng bộ
-if BOT_STATUS['running'] == False:
-    logger.info("Bot has stopped but status is still 'running'. Updating status...")
+if BOT_STATUS['running'] == False and os.path.exists('bot_status.json'):
+    try:
+        with open('bot_status.json', 'r') as f:
+            saved_status = json.load(f)
+            if saved_status.get('running', False):
+                logger.info("Phát hiện trạng thái bot không khớp. Cập nhật BOT_STATUS...")
+                BOT_STATUS.update(saved_status)
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái bot: {str(e)}")
 
 
 if __name__ == '__main__':
+    # Đảm bảo threading daemon được dừng khi nhấn Ctrl+C
+    import atexit
+    
+    def cleanup():
+        """Hàm dọn dẹp khi ứng dụng dừng"""
+        global market_task
+        if market_task:
+            logger.info("Dừng tác vụ nền...")
+            market_task.cancel()
+    
+    atexit.register(cleanup)
+    
+    # Khởi động ứng dụng Flask
     app.run(host='0.0.0.0', port=5000, debug=True)

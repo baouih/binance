@@ -387,6 +387,24 @@ class MarketDataUpdater:
             logger.error(f"Lỗi khi cập nhật khuyến nghị tổng hợp: {e}")
             return False
     
+    def update_symbol(self, symbol: str, primary_timeframe: str = '1h') -> bool:
+        """
+        Cập nhật phân tích thị trường cho một cặp giao dịch cụ thể
+        
+        Args:
+            symbol (str): Mã cặp giao dịch
+            primary_timeframe (str): Khung thời gian chính
+            
+        Returns:
+            bool: True nếu cập nhật thành công, False nếu không
+        """
+        start_time = time.time()
+        success = self.update_market_analysis(symbol, primary_timeframe)
+        duration = time.time() - start_time
+        
+        logger.info(f"Cập nhật {symbol}: {'Thành công' if success else 'Thất bại'} ({duration:.2f}s)")
+        return success
+            
     def update_all_symbols(self, primary_timeframe: str = '1h') -> Dict[str, bool]:
         """
         Cập nhật phân tích thị trường cho tất cả các cặp giao dịch
