@@ -1,0 +1,170 @@
+{
+    "version": "1.0.0",
+    "description": "Cấu hình điều chỉnh đòn bẩy động theo điều kiện thị trường",
+    
+    "leverage_limits": {
+        "global_min_leverage": 3,
+        "global_max_leverage": 20,
+        "default_leverage": 10,
+        "symbol_specific_limits": {
+            "BTCUSDT": {
+                "min_leverage": 3,
+                "max_leverage": 15,
+                "default_leverage": 5
+            },
+            "ETHUSDT": {
+                "min_leverage": 3, 
+                "max_leverage": 20,
+                "default_leverage": 10
+            },
+            "BNBUSDT": {
+                "min_leverage": 3,
+                "max_leverage": 15,
+                "default_leverage": 8
+            },
+            "SOLUSDT": {
+                "min_leverage": 3,
+                "max_leverage": 20,
+                "default_leverage": 10
+            }
+        }
+    },
+    
+    "volatility_adjustments": {
+        "enable_volatility_based_adjustment": true,
+        "volatility_indicator": "atr",
+        "atr_period": 14,
+        "atr_timeframe": "1h",
+        "reference_period": 30,
+        "high_volatility_threshold": 1.5,
+        "extreme_volatility_threshold": 2.5,
+        "low_volatility_threshold": 0.7,
+        "adjustment_map": {
+            "extreme_volatility": {
+                "leverage_multiplier": 0.5,
+                "max_leverage_cap": 5
+            },
+            "high_volatility": {
+                "leverage_multiplier": 0.7,
+                "max_leverage_cap": 10
+            },
+            "normal_volatility": {
+                "leverage_multiplier": 1.0,
+                "max_leverage_cap": null
+            },
+            "low_volatility": {
+                "leverage_multiplier": 1.2,
+                "max_leverage_cap": null
+            }
+        }
+    },
+    
+    "trend_adjustments": {
+        "enable_trend_based_adjustment": true,
+        "trend_indicator": "adx",
+        "adx_period": 14,
+        "adx_timeframe": "4h",
+        "strong_trend_threshold": 30,
+        "very_strong_trend_threshold": 50,
+        "weak_trend_threshold": 20,
+        "with_trend_leverage_bonus": 0.2,
+        "against_trend_leverage_penalty": 0.3,
+        "sideway_market_leverage_modifier": 0.0
+    },
+    
+    "position_size_correlation": {
+        "enable_size_based_adjustment": true,
+        "reference_balance": 10000,
+        "large_position_threshold_pct": 5.0,
+        "very_large_position_threshold_pct": 10.0,
+        "large_position_leverage_penalty": 0.2,
+        "very_large_position_leverage_penalty": 0.4,
+        "small_position_threshold_pct": 1.0,
+        "small_position_leverage_bonus": 0.1
+    },
+    
+    "market_regime_adjustments": {
+        "enable_regime_based_adjustment": true,
+        "trending_market_leverage_multiplier": 1.0,
+        "ranging_market_leverage_multiplier": 0.8,
+        "volatile_market_leverage_multiplier": 0.6,
+        "quiet_market_leverage_multiplier": 1.2
+    },
+    
+    "symbol_risk_tiers": {
+        "tier_1_high_liquidity": {
+            "symbols": ["BTCUSDT", "ETHUSDT"],
+            "leverage_modifier": 0.0
+        },
+        "tier_2_medium_liquidity": {
+            "symbols": ["BNBUSDT", "SOLUSDT", "ADAUSDT"],
+            "leverage_modifier": -0.1
+        },
+        "tier_3_low_liquidity": {
+            "symbols": ["DOGEUSDT"],
+            "leverage_modifier": -0.2
+        }
+    },
+    
+    "performance_based_adjustments": {
+        "enable_performance_adjustment": true,
+        "lookback_periods": 10,
+        "min_trades_required": 5,
+        "positive_streak_threshold": 3,
+        "negative_streak_threshold": 2,
+        "positive_streak_bonus": 0.1,
+        "negative_streak_penalty": 0.2,
+        "reset_after_trend_change": true
+    },
+    
+    "balance_protection": {
+        "enable_balance_protection": true,
+        "drawdown_based_adjustment": true,
+        "small_drawdown_threshold": 5.0,
+        "medium_drawdown_threshold": 10.0,
+        "large_drawdown_threshold": 15.0,
+        "small_drawdown_leverage_penalty": 0.1,
+        "medium_drawdown_leverage_penalty": 0.3,
+        "large_drawdown_leverage_penalty": 0.5,
+        "reset_after_recovery": true,
+        "recovery_threshold_pct": 2.0
+    },
+    
+    "time_based_adjustments": {
+        "enable_time_based_adjustment": false,
+        "low_risk_hours": [
+            {"start": "09:00", "end": "16:00", "leverage_modifier": 0.1}
+        ],
+        "high_risk_hours": [
+            {"start": "00:00", "end": "03:00", "leverage_modifier": -0.2}
+        ],
+        "weekend_leverage_modifier": -0.2,
+        "reference_timezone": "UTC"
+    },
+    
+    "combined_factor_adjustments": {
+        "calculation_method": "multiplicative",
+        "min_combined_multiplier": 0.3,
+        "max_combined_multiplier": 1.5,
+        "adaptive_adjustment": true,
+        "adjustment_smoothing_periods": 3
+    },
+    
+    "notifications": {
+        "notify_on_leverage_change": true,
+        "notification_threshold": 1,
+        "include_adjustment_reasons": true,
+        "log_all_adjustments": true,
+        "log_details": true
+    },
+    
+    "safety_controls": {
+        "prevent_rapid_changes": true,
+        "max_adjustment_per_period": 0.3,
+        "adjustment_cooldown_minutes": 60,
+        "force_manual_confirmation_threshold": 0.5,
+        "emergency_deleveraging_on_rapid_drawdown": true,
+        "rapid_drawdown_threshold_pct": 10.0,
+        "emergency_leverage_cap": 2
+    }
+}

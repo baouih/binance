@@ -1,0 +1,135 @@
+{
+    "version": "1.0.0",
+    "description": "Bộ lọc tín hiệu nâng cao để giảm thiểu tín hiệu sai trong các điều kiện thị trường khác nhau",
+    
+    "signal_strength_settings": {
+        "minimum_score": 0.3,
+        "strong_signal_threshold": 0.7,
+        "combination_method": "weighted_average",
+        "filter_weak_signals": true,
+        "override_threshold": 0.85
+    },
+    
+    "confirmation_requirements": {
+        "multi_timeframe_enabled": true,
+        "timeframe_weights": {
+            "1m": 0.05,
+            "5m": 0.1,
+            "15m": 0.15,
+            "1h": 0.3,
+            "4h": 0.25,
+            "1d": 0.15
+        },
+        "minimum_timeframe_agreement": 0.6,
+        "required_timeframes": ["15m", "1h"],
+        "multi_indicator_confirmation": true,
+        "minimum_indicator_agreement": 0.5
+    },
+    
+    "trend_filters": {
+        "trend_detection_enabled": true,
+        "minimum_trend_strength": 25,
+        "counter_trend_penalty": 0.5,
+        "with_trend_bonus": 0.2,
+        "trend_indicators": ["ema", "macd", "adx"],
+        "ignore_signals_against_strong_trend": true
+    },
+    
+    "volatility_filters": {
+        "volatility_adjustment_enabled": true,
+        "high_volatility_threshold": 2.0,
+        "low_volatility_threshold": 0.5,
+        "high_volatility_signal_multiplier": 0.8,
+        "low_volatility_signal_multiplier": 0.7,
+        "volatility_indicator": "atr",
+        "atr_period": 14,
+        "atr_normalize_period": 100
+    },
+    
+    "volume_filters": {
+        "volume_check_enabled": true,
+        "minimum_volume_percentile": 30,
+        "volume_confirmation_required": true,
+        "high_volume_threshold": 2.0,
+        "high_volume_bonus": 0.2,
+        "low_volume_threshold": 0.5,
+        "low_volume_penalty": 0.3,
+        "volume_lookback_periods": 20
+    },
+    
+    "price_action_filters": {
+        "rejection_detection": true,
+        "false_breakout_detection": true,
+        "engulfing_pattern_check": true,
+        "doji_detection": true,
+        "key_level_proximity_check": true,
+        "key_level_types": ["support", "resistance", "fibonacci", "pivot"],
+        "proximity_threshold": 0.01
+    },
+    
+    "noise_reduction": {
+        "signal_smoothing": true,
+        "smoothing_period": 3,
+        "minimum_signal_duration": 2,
+        "consecutive_signals_required": 2,
+        "ignore_choppy_markets": true,
+        "choppiness_indicator": "cci",
+        "choppiness_threshold": 100
+    },
+    
+    "market_regime_filters": {
+        "regime_based_filtering": true,
+        "trending_regime": {
+            "preferred_indicators": ["macd", "ema_cross", "adx"],
+            "indicator_weights": {"macd": 0.4, "ema_cross": 0.4, "adx": 0.2},
+            "minimum_adx_value": 25,
+            "signal_threshold_adjustment": 0.0
+        },
+        "ranging_regime": {
+            "preferred_indicators": ["rsi", "bollinger", "stochastic"],
+            "indicator_weights": {"rsi": 0.4, "bollinger": 0.4, "stochastic": 0.2},
+            "overbought_threshold": 70,
+            "oversold_threshold": 30,
+            "signal_threshold_adjustment": 0.1
+        },
+        "volatile_regime": {
+            "preferred_indicators": ["atr", "bollinger", "adx"],
+            "indicator_weights": {"atr": 0.3, "bollinger": 0.4, "adx": 0.3},
+            "volatility_threshold": 1.5,
+            "signal_threshold_adjustment": 0.2
+        },
+        "quiet_regime": {
+            "preferred_indicators": ["bollinger", "macd", "rsi"],
+            "indicator_weights": {"bollinger": 0.4, "macd": 0.3, "rsi": 0.3},
+            "narrow_range_threshold": 0.6,
+            "signal_threshold_adjustment": 0.1
+        }
+    },
+    
+    "time_filters": {
+        "avoid_news_events": true,
+        "news_event_buffer_minutes": 60,
+        "avoid_rollover_periods": true,
+        "rollover_buffer_minutes": 30,
+        "avoid_low_liquidity_periods": true,
+        "low_liquidity_time_ranges": [
+            {"start": "00:00", "end": "01:00", "adjustment": 0.5},
+            {"start": "12:00", "end": "13:00", "adjustment": 0.7}
+        ]
+    },
+    
+    "quality_scoring": {
+        "score_signals": true,
+        "scoring_factors": {
+            "signal_strength": 0.3,
+            "confirmation_level": 0.2,
+            "trend_alignment": 0.2,
+            "volume_support": 0.15,
+            "volatility_appropriateness": 0.1,
+            "price_action_confirmation": 0.05
+        },
+        "minimum_quality_score": 0.6,
+        "record_signal_performance": true,
+        "performance_based_adjustment": true
+    }
+}
