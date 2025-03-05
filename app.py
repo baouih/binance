@@ -160,12 +160,16 @@ def index():
         try:
             with open('active_positions.json', 'r', encoding='utf-8') as f:
                 active_positions = json.load(f)
+            logger.info(f"Đã đọc active_positions.json, có {len(active_positions)} vị thế")
         except Exception as e:
             logger.error(f"Không thể đọc active_positions.json: {e}")
             
         # Chuyển đổi dữ liệu từ active_positions.json sang định dạng positions
         positions_list = []
         for symbol, position in active_positions.items():
+            # Debug thông tin vị thế
+            logger.info(f"Đang xử lý vị thế {symbol}: {position}")
+            
             # Tính P/L
             entry_price = float(position.get('entry_price', 0))
             current_price = float(position.get('current_price', 0))
@@ -180,11 +184,14 @@ def index():
             else:  # SHORT
                 pnl = (entry_price - current_price) * quantity
                 pnl_percent = (entry_price - current_price) / entry_price * 100 * leverage
+            
+            # Log kết quả tính toán
+            logger.info(f"Vị thế {symbol} {side}: Entry {entry_price}, Current {current_price}, P/L {pnl:.2f} ({pnl_percent:.2f}%)")
                 
             positions_list.append({
                 'id': f"pos_{symbol}",
                 'symbol': symbol,
-                'type': side,
+                'type': side,  # Lưu ý: template sử dụng 'type' nhưng dữ liệu gốc là 'side'
                 'entry_price': entry_price,
                 'current_price': current_price,
                 'quantity': quantity,
@@ -217,13 +224,18 @@ def index():
             
         current_account_data['positions'] = positions_list
         
+        # Debug: In ra danh sách vị thế
+        logger.info(f"Số lượng vị thế: {len(positions_list)}")
+        for pos in positions_list:
+            logger.info(f"Debug Vị thế: {pos['symbol']} {pos['type']} at {pos['entry_price']}")
+            
         # Tạo danh sách hoạt động gần đây từ vị thế hiện tại
         recent_activities = []
         for position in positions_list:
             activity_type = "Mở vị thế mới"
             icon_class = "text-success" if position['type'] == 'LONG' else "text-danger"
-            icon = "bi-arrow-up-right-circle" if position['type'] == 'LONG' else "bi-arrow-down-right-circle"
-            description = f"Mở {position['type']} {position['symbol']} tại ${position['entry_price']:.2f}"
+            icon = "bi-arrow-up-circle-fill" if position['type'] == 'LONG' else "bi-arrow-down-circle-fill"
+            description = f"Mở vị thế {position['type']} {position['symbol']} tại ${position['entry_price']:.2f}"
             
             # Lấy thời gian từ entry_time hoặc mặc định là hiện tại
             time_str = position.get('entry_time', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -243,6 +255,17 @@ def index():
                 'description': description,
                 'time': time_display,
                 'position_id': position.get('id')
+            })
+        
+        # Thêm hoạt động bot khởi động nếu không có vị thế
+        if not positions_list:
+            recent_activities.append({
+                'type': 'Bot startup',
+                'class': 'text-info',
+                'icon': 'bi-play-circle',
+                'description': 'Bot đã bắt đầu hoạt động',
+                'time': datetime.datetime.now().strftime('%H:%M'),
+                'position_id': None
             })
         
         # Đảm bảo activities được sắp xếp theo thời gian mới nhất (giả sử entry_time mới nhất ở đầu)
