@@ -54,8 +54,18 @@ def test_update():
 os.makedirs("update_packages", exist_ok=True)
 os.makedirs("backups", exist_ok=True)
 
-# Khởi tạo SocketIO với CORS và async mode
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', ping_timeout=60, ping_interval=25)
+# Import eventlet và thực hiện monkey patch để đảm bảo tương thích với gunicorn
+try:
+    import eventlet
+    eventlet.monkey_patch()
+    async_mode = 'eventlet'
+except ImportError:
+    async_mode = 'threading'
+    print("Eventlet không khả dụng, sử dụng threading mode")
+
+# Khởi tạo SocketIO với CORS và async mode (sử dụng eventlet cho tính tương thích với gunicorn)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, ping_timeout=60, ping_interval=25)
+logger.info(f"SocketIO đã được khởi tạo với chế độ {async_mode}")
 
 # Đường dẫn đến các file cấu hình
 ACCOUNT_CONFIG_PATH = 'account_config.json'
@@ -2302,10 +2312,13 @@ if __name__ == "__main__":
     # Khởi chạy ứng dụng chính
     run_app()
 
-# Cần định nghĩa như thế này để gunicorn có thể tìm thấy app
-# Khi khởi động bằng gunicorn, tác vụ nền vẫn cần được bắt đầu
+# Cần định nghĩa như thế này để gunicorn có thể tìm thấy app và socketio
+# Khi khởi động bằng gunicorn, cần đảm bảo tác vụ nền được chạy
+# Vì app đã được định nghĩa, gunicorn sẽ dùng nó làm entry point
 if not os.environ.get('RUNNING_BACKGROUND_TASKS'):
     os.environ['RUNNING_BACKGROUND_TASKS'] = 'True'
+    import sys
+    logger.info("Khởi động tác vụ nền cho ứng dụng")
     background_thread = threading.Thread(target=background_tasks)
     background_thread.daemon = True
     background_thread.start()
