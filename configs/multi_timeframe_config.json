@@ -1,0 +1,24 @@
+{
+    "timeframe_weights": {
+        "5m": 0.1,
+        "15m": 0.15,
+        "1h": 0.4,
+        "4h": 0.25,
+        "1d": 0.1
+    },
+    "primary_timeframe": "1h",
+    "conflict_resolution": "weighted_average",
+    "significance_threshold": 20,
+    "entry_exit_preferences": {
+        "entry_points": "primary_timeframe",
+        "take_profit": "most_conservative",
+        "stop_loss": "most_conservative"
+    },
+    "market_regime_influence": {
+        "enabled": true,
+        "trending_up_boost": 10,
+        "trending_down_boost": 10,
+        "volatile_discount": 5,
+        "ranging_discount": 0
+    }
+}

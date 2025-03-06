@@ -1,0 +1,171 @@
+{
+    "symbols_to_analyze": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "BNBUSDT",
+        "XRPUSDT",
+        "ADAUSDT",
+        "DOGEUSDT",
+        "MATICUSDT",
+        "SOLUSDT",
+        "DOTUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "LINKUSDT",
+        "UNIUSDT",
+        "ATOMUSDT"
+    ],
+    "timeframes": [
+        "5m",
+        "15m",
+        "1h",
+        "4h",
+        "1d"
+    ],
+    "primary_timeframe": "1h",
+    "indicators": {
+        "moving_averages": {
+            "enabled": true,
+            "periods": [
+                20,
+                50,
+                100,
+                200
+            ],
+            "types": [
+                "SMA",
+                "EMA"
+            ]
+        },
+        "oscillators": {
+            "enabled": true,
+            "rsi": {
+                "enabled": true,
+                "period": 14,
+                "overbought": 70,
+                "oversold": 30
+            },
+            "macd": {
+                "enabled": true,
+                "fast_period": 12,
+                "slow_period": 26,
+                "signal_period": 9
+            },
+            "stochastic": {
+                "enabled": true,
+                "k_period": 14,
+                "d_period": 3,
+                "smooth_k": 3
+            }
+        },
+        "volume": {
+            "enabled": true,
+            "vwap": true,
+            "obv": true
+        },
+        "volatility": {
+            "enabled": true,
+            "bollinger_bands": {
+                "enabled": true,
+                "period": 20,
+                "std_dev": 2.0
+            },
+            "atr": {
+                "enabled": true,
+                "period": 14
+            }
+        },
+        "support_resistance": {
+            "enabled": true,
+            "lookback_periods": 100,
+            "zone_threshold": 0.02
+        }
+    },
+    "market_regimes": {
+        "detection": {
+            "enabled": true,
+            "lookback_periods": 30,
+            "update_frequency": "daily"
+        },
+        "regimes": [
+            "trending_up",
+            "trending_down",
+            "ranging",
+            "high_volatility",
+            "low_volatility"
+        ]
+    },
+    "strategy_settings": {
+        "entry_conditions": {
+            "trending_market": {
+                "indicators": [
+                    "moving_averages",
+                    "macd",
+                    "volume"
+                ],
+                "confirmation_count": 2
+            },
+            "ranging_market": {
+                "indicators": [
+                    "rsi",
+                    "bollinger_bands",
+                    "support_resistance"
+                ],
+                "confirmation_count": 2
+            },
+            "volatile_market": {
+                "indicators": [
+                    "atr",
+                    "obv",
+                    "support_resistance"
+                ],
+                "confirmation_count": 3
+            }
+        },
+        "exit_conditions": {
+            "take_profit": {
+                "default_percentage": 5.0,
+                "adjust_by_volatility": true
+            },
+            "stop_loss": {
+                "default_percentage": 3.0,
+                "adjust_by_volatility": true
+            },
+            "trailing_stop": {
+                "enabled": true,
+                "activation_percentage": 1.0,
+                "callback_percentage": 0.5
+            },
+            "indicator_based": {
+                "enabled": true,
+                "indicators": [
+                    "rsi",
+                    "macd",
+                    "bollinger_bands"
+                ]
+            }
+        },
+        "risk_management": {
+            "max_risk_per_trade": 1.0,
+            "max_trades_per_day": 5,
+            "max_active_trades": 3,
+            "correlation_threshold": 0.7
+        }
+    },
+    "analysis_thresholds": {
+        "strong_buy": 80,
+        "buy": 60,
+        "neutral": 40,
+        "sell": 20,
+        "strong_sell": 0
+    },
+    "no_trade_reasons_categories": [
+        "market_conditions",
+        "technical_indicators",
+        "risk_management",
+        "volatility",
+        "liquidity",
+        "correlation",
+        "fundamental"
+    ]
+}

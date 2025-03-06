@@ -1,0 +1,694 @@
+{
+    "symbol": "BTCUSDT",
+    "timestamp": "",
+    "integrated_result": {
+        "symbol": "BTCUSDT",
+        "integrated_score": 69,
+        "recommendation": "buy",
+        "entry_exit_points": {
+            "long": {
+                "entry_points": [
+                    90365.40000000001
+                ],
+                "exit_points": {
+                    "take_profit": [
+                        92128.75
+                    ],
+                    "stop_loss": [
+                        89461.74600000001
+                    ]
+                },
+                "reasoning": [
+                    "Price near support level (90310.88) (5m)",
+                    "Price near support level (89679.97) (15m)",
+                    "Price near support level (90365.40) (1h)",
+                    "MACD bullish crossover (histogram: 549.755415) (4h)",
+                    "Price near support level (89817.60) (4h)",
+                    "MACD bullish crossover (histogram: 55.838798) (1d)"
+                ]
+            },
+            "short": {
+                "entry_points": [
+                    91262.2
+                ],
+                "exit_points": {
+                    "take_profit": [
+                        90365.40000000001
+                    ],
+                    "stop_loss": [
+                        93050.0375
+                    ]
+                },
+                "reasoning": [
+                    "MACD bearish crossover (histogram: -170.833666) (5m)",
+                    "MACD bearish crossover (histogram: -375.506704) (15m)",
+                    "MACD bearish crossover (histogram: -380.258006) (1h)",
+                    "Price near resistance level (92128.75) (4h)",
+                    "Price near resistance level (92224.00) (1d)"
+                ]
+            }
+        },
+        "conflict_info": {
+            "has_conflict": false,
+            "conflicts": [],
+            "resolution_method": "weighted_average"
+        },
+        "timeframe_breakdown": {
+            "5m": {
+                "score": 75,
+                "recommendation": "buy",
+                "weight": 0.1
+            },
+            "15m": {
+                "score": 75,
+                "recommendation": "buy",
+                "weight": 0.15
+            },
+            "1h": {
+                "score": 75,
+                "recommendation": "buy",
+                "weight": 0.4
+            },
+            "4h": {
+                "score": 50,
+                "recommendation": "neutral",
+                "weight": 0.25
+            },
+            "1d": {
+                "score": 75,
+                "recommendation": "buy",
+                "weight": 0.1
+            }
+        }
+    },
+    "individual_timeframe_analyses": {
+        "5m": {
+            "symbol": "BTCUSDT",
+            "timeframe": "5m",
+            "timestamp": "2025-03-06 09:01:11",
+            "price": {
+                "current": 91502.0,
+                "open": 92199.9,
+                "high": 92199.9,
+                "low": 90000.1,
+                "close": 91262.2,
+                "volume": 351.745
+            },
+            "indicators": {
+                "moving_averages": {
+                    "sma_20": 93707.365,
+                    "ema_20": 93125.62393129116,
+                    "sma_50": 95016.81800000001,
+                    "ema_50": 93611.5786424956,
+                    "sma_100": 92652.506,
+                    "ema_100": 93062.1182405741,
+                    "sma_200": 91562.106,
+                    "ema_200": 91890.2914653461
+                },
+                "oscillators": {
+                    "rsi": 51.20887132359993,
+                    "macd": {
+                        "macd": -727.6462505998061,
+                        "signal": -556.8125845978839,
+                        "histogram": -170.8336660019222
+                    },
+                    "stochastic": {
+                        "k": 24.639731393179574,
+                        "d": 28.577321503135533
+                    }
+                },
+                "volume": {
+                    "obv": 1483907.4329999988,
+                    "current": 351.745,
+                    "sma_20": 3355.7610499999996,
+                    "relative": 0.10481824979761299
+                },
+                "volatility": {
+                    "bollinger_bands": {
+                        "upper": 105314.61318945835,
+                        "middle": 93707.365,
+                        "lower": 82100.11681054166,
+                        "width": 0.24773395750607963
+                    },
+                    "atr": 10332.264285714278,
+                    "atr_percent": 11.321515683069528
+                }
+            },
+            "support_resistance": {
+                "current_price": 91262.2,
+                "resistance_levels": [
+                    114519.96,
+                    112633.2,
+                    108934.3,
+                    106708.1,
+                    104800.0,
+                    102464.4,
+                    98146.2,
+                    94459.93333333333,
+                    90223.45000000001
+                ],
+                "support_levels": [
+                    66000.0,
+                    68052.0,
+                    70000.0,
+                    73011.2,
+                    75200.0,
+                    77975.05,
+                    82550.8,
+                    86000.0,
+                    88814.38999999998,
+                    90310.88333333335,
+                    96193.15
+                ],
+                "nearest_resistance": 94459.93333333333,
+                "nearest_support": 90310.88333333335
+            },
+            "market_regime": "high_volatility",
+            "volatility": 11.321515683069528,
+            "entry_exit_points": {
+                "long": {
+                    "entry_points": [
+                        90310.88333333335
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            94459.93333333333
+                        ],
+                        "stop_loss": [
+                            89407.77450000001
+                        ]
+                    },
+                    "reasoning": [
+                        "Price near support level (90310.88)"
+                    ]
+                },
+                "short": {
+                    "entry_points": [
+                        91262.2
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            90310.88333333335
+                        ],
+                        "stop_loss": [
+                            95404.53266666667
+                        ]
+                    },
+                    "reasoning": [
+                        "MACD bearish crossover (histogram: -170.833666)"
+                    ]
+                },
+                "score": {
+                    "long": 25,
+                    "short": 25
+                }
+            },
+            "score": 75,
+            "recommendation": "buy"
+        },
+        "15m": {
+            "symbol": "BTCUSDT",
+            "timeframe": "15m",
+            "timestamp": "2025-03-06 09:01:12",
+            "price": {
+                "current": 91502.0,
+                "open": 92199.9,
+                "high": 92199.9,
+                "low": 90000.1,
+                "close": 91262.2,
+                "volume": 351.745
+            },
+            "indicators": {
+                "moving_averages": {
+                    "sma_20": 92230.0,
+                    "ema_20": 92799.18755947398,
+                    "sma_50": 91589.26200000002,
+                    "ema_50": 91546.97721777137,
+                    "sma_100": 90136.74299999999,
+                    "ema_100": 90252.00964754153,
+                    "sma_200": 87826.12550000001,
+                    "ema_200": 88473.2680133384
+                },
+                "oscillators": {
+                    "rsi": 46.38767299300007,
+                    "macd": {
+                        "macd": 681.9468011939753,
+                        "signal": 1057.4535049124836,
+                        "histogram": -375.50670371850833
+                    },
+                    "stochastic": {
+                        "k": 38.91689579469,
+                        "d": 44.463614907974176
+                    }
+                },
+                "volume": {
+                    "obv": -203624.66300000052,
+                    "current": 351.745,
+                    "sma_20": 8635.24545,
+                    "relative": 0.04073364237724129
+                },
+                "volatility": {
+                    "bollinger_bands": {
+                        "upper": 110904.2273471953,
+                        "middle": 92230.0,
+                        "lower": 73555.7726528047,
+                        "width": 0.4049490913411101
+                    },
+                    "atr": 20793.985714285714,
+                    "atr_percent": 22.784883242224836
+                }
+            },
+            "support_resistance": {
+                "current_price": 91262.2,
+                "resistance_levels": [
+                    113533.16666666667,
+                    102464.4,
+                    100429.2,
+                    97984.7,
+                    93863.5,
+                    89989.80000000002,
+                    87819.44166666665,
+                    84498.93333333333,
+                    83491.825
+                ],
+                "support_levels": [
+                    68100.0,
+                    73011.2,
+                    75200.0,
+                    82675.7,
+                    86275.98571428574,
+                    87466.42,
+                    89679.96666666667
+                ],
+                "nearest_resistance": 93863.5,
+                "nearest_support": 89679.96666666667
+            },
+            "market_regime": "high_volatility",
+            "volatility": 22.784883242224836,
+            "entry_exit_points": {
+                "long": {
+                    "entry_points": [
+                        89679.96666666667
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            93863.5
+                        ],
+                        "stop_loss": [
+                            88783.167
+                        ]
+                    },
+                    "reasoning": [
+                        "Price near support level (89679.97)"
+                    ]
+                },
+                "short": {
+                    "entry_points": [
+                        91262.2
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            89679.96666666667
+                        ],
+                        "stop_loss": [
+                            94802.135
+                        ]
+                    },
+                    "reasoning": [
+                        "MACD bearish crossover (histogram: -375.506704)"
+                    ]
+                },
+                "score": {
+                    "long": 25,
+                    "short": 25
+                }
+            },
+            "score": 75,
+            "recommendation": "buy"
+        },
+        "1h": {
+            "symbol": "BTCUSDT",
+            "timeframe": "1h",
+            "timestamp": "2025-03-06 09:01:14",
+            "price": {
+                "current": 91502.0,
+                "open": 92199.9,
+                "high": 92199.9,
+                "low": 90000.1,
+                "close": 91262.2,
+                "volume": 351.745
+            },
+            "indicators": {
+                "moving_averages": {
+                    "sma_20": 92205.20499999999,
+                    "ema_20": 92001.7365745192,
+                    "sma_50": 88674.766,
+                    "ema_50": 89781.55260406833,
+                    "sma_100": 87024.78100000002,
+                    "ema_100": 88165.42980581685,
+                    "sma_200": 86687.194,
+                    "ema_200": 87715.17842959739
+                },
+                "oscillators": {
+                    "rsi": 50.9593125315428,
+                    "macd": {
+                        "macd": 1129.70090451937,
+                        "signal": 1509.9589103402818,
+                        "histogram": -380.2580058209119
+                    },
+                    "stochastic": {
+                        "k": 51.85991751501914,
+                        "d": 54.32792068416296
+                    }
+                },
+                "volume": {
+                    "obv": 18072629.070999995,
+                    "current": 351.745,
+                    "sma_20": 618657.03305,
+                    "relative": 0.0005685621939281694
+                },
+                "volatility": {
+                    "bollinger_bands": {
+                        "upper": 104059.2625959592,
+                        "middle": 92205.20499999999,
+                        "lower": 80351.14740404078,
+                        "width": 0.2571233933259887
+                    },
+                    "atr": 29804.764285714286,
+                    "atr_percent": 32.65838899973295
+                }
+            },
+            "support_resistance": {
+                "current_price": 91262.2,
+                "resistance_levels": [
+                    112999.6,
+                    100429.2,
+                    93501.0,
+                    90402.43333333333,
+                    88441.64285714286,
+                    86760.0,
+                    84182.38666666667
+                ],
+                "support_levels": [
+                    79763.3,
+                    83777.24705882354,
+                    86300.25,
+                    88942.76666666666,
+                    90365.40000000001
+                ],
+                "nearest_resistance": 93501.0,
+                "nearest_support": 90365.40000000001
+            },
+            "market_regime": "high_volatility",
+            "volatility": 32.65838899973295,
+            "entry_exit_points": {
+                "long": {
+                    "entry_points": [
+                        90365.40000000001
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            93501.0
+                        ],
+                        "stop_loss": [
+                            89461.74600000001
+                        ]
+                    },
+                    "reasoning": [
+                        "Price near support level (90365.40)"
+                    ]
+                },
+                "short": {
+                    "entry_points": [
+                        91262.2
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            90365.40000000001
+                        ],
+                        "stop_loss": [
+                            94436.01
+                        ]
+                    },
+                    "reasoning": [
+                        "MACD bearish crossover (histogram: -380.258006)"
+                    ]
+                },
+                "score": {
+                    "long": 25,
+                    "short": 25
+                }
+            },
+            "score": 75,
+            "recommendation": "buy"
+        },
+        "4h": {
+            "symbol": "BTCUSDT",
+            "timeframe": "4h",
+            "timestamp": "2025-03-06 09:01:15",
+            "price": {
+                "current": 91502.0,
+                "open": 89732.1,
+                "high": 108888.0,
+                "low": 86999.0,
+                "close": 91262.2,
+                "volume": 37681.456
+            },
+            "indicators": {
+                "moving_averages": {
+                    "sma_20": 87490.155,
+                    "ema_20": 87926.60907143365,
+                    "sma_50": 86479.894,
+                    "ema_50": 88065.30648053595,
+                    "sma_100": 91312.183,
+                    "ema_100": 90506.17498457505,
+                    "sma_200": 95457.65400000001,
+                    "ema_200": 94111.50925826606
+                },
+                "oscillators": {
+                    "rsi": 69.09119074666938,
+                    "macd": {
+                        "macd": 1155.048015859924,
+                        "signal": 605.2926012779687,
+                        "histogram": 549.7554145819552
+                    },
+                    "stochastic": {
+                        "k": 51.031736375325146,
+                        "d": 50.68875938163681
+                    }
+                },
+                "volume": {
+                    "obv": 17893437.698,
+                    "current": 37681.456,
+                    "sma_20": 1765608.4192500003,
+                    "relative": 0.021341910011964275
+                },
+                "volatility": {
+                    "bollinger_bands": {
+                        "upper": 93495.66600607662,
+                        "middle": 87490.155,
+                        "lower": 81484.64399392338,
+                        "width": 0.13728426943755254
+                    },
+                    "atr": 18331.842857142856,
+                    "atr_percent": 20.087005197269907
+                }
+            },
+            "support_resistance": {
+                "current_price": 91262.2,
+                "resistance_levels": [
+                    101870.88571428573,
+                    99513.4,
+                    97814.31999999999,
+                    92128.75,
+                    90174.9,
+                    88319.7,
+                    84195.0
+                ],
+                "support_levels": [
+                    80268.5,
+                    83760.225,
+                    86845.79999999999,
+                    89817.6,
+                    96146.44285714284,
+                    97898.22499999998,
+                    100142.2
+                ],
+                "nearest_resistance": 92128.75,
+                "nearest_support": 89817.6
+            },
+            "market_regime": "high_volatility",
+            "volatility": 20.087005197269907,
+            "entry_exit_points": {
+                "long": {
+                    "entry_points": [
+                        91262.2,
+                        89817.6
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            92128.75
+                        ],
+                        "stop_loss": [
+                            88919.424
+                        ]
+                    },
+                    "reasoning": [
+                        "MACD bullish crossover (histogram: 549.755415)",
+                        "Price near support level (89817.60)"
+                    ]
+                },
+                "short": {
+                    "entry_points": [
+                        92128.75
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            89817.6
+                        ],
+                        "stop_loss": [
+                            93050.0375
+                        ]
+                    },
+                    "reasoning": [
+                        "Price near resistance level (92128.75)"
+                    ]
+                },
+                "score": {
+                    "long": 50,
+                    "short": 25
+                }
+            },
+            "score": 50,
+            "recommendation": "neutral"
+        },
+        "1d": {
+            "symbol": "BTCUSDT",
+            "timeframe": "1d",
+            "timestamp": "2025-03-06 09:01:16",
+            "price": {
+                "current": 91502.0,
+                "open": 90719.8,
+                "high": 114701.0,
+                "low": 64911.0,
+                "close": 91262.2,
+                "volume": 1597375.425
+            },
+            "indicators": {
+                "moving_averages": {
+                    "sma_20": 92223.48,
+                    "ema_20": 91402.39145781586,
+                    "sma_50": 97582.228,
+                    "ema_50": 94770.60134175848,
+                    "sma_100": 97933.065,
+                    "ema_100": 93382.8087307486,
+                    "sma_200": 83215.335,
+                    "ema_200": 86208.22274037873
+                },
+                "oscillators": {
+                    "rsi": 35.627127456476,
+                    "macd": {
+                        "macd": -2955.2955066479917,
+                        "signal": -3011.134304551041,
+                        "histogram": 55.83879790304945
+                    },
+                    "stochastic": {
+                        "k": 39.520603006544775,
+                        "d": 28.193949527307698
+                    }
+                },
+                "volume": {
+                    "obv": 27671527.608,
+                    "current": 1597375.425,
+                    "sma_20": 2157361.2994000004,
+                    "relative": 0.740430184524149
+                },
+                "volatility": {
+                    "bollinger_bands": {
+                        "upper": 103237.78956502087,
+                        "middle": 92223.48,
+                        "lower": 81209.17043497913,
+                        "width": 0.23886128706097126
+                    },
+                    "atr": 14667.32857142857,
+                    "atr_percent": 16.071635980097533
+                }
+            },
+            "support_resistance": {
+                "current_price": 91262.2,
+                "resistance_levels": [
+                    104455.025,
+                    102689.92499999999,
+                    100105.06666666667,
+                    98119.13333333335,
+                    92224.0,
+                    75890.0,
+                    72800.0,
+                    68135.75,
+                    64167.76666666666,
+                    62657.0,
+                    59870.75,
+                    57430.0
+                ],
+                "support_levels": [
+                    56093.05,
+                    57909.4,
+                    60126.9,
+                    62543.649999999994,
+                    66934.63333333333,
+                    75404.2,
+                    84057.2,
+                    93917.525,
+                    95457.92,
+                    97282.03333333333,
+                    99790.06666666665,
+                    101324.3
+                ],
+                "nearest_resistance": 92224.0,
+                "nearest_support": 84057.2
+            },
+            "market_regime": "high_volatility",
+            "volatility": 16.071635980097533,
+            "entry_exit_points": {
+                "long": {
+                    "entry_points": [
+                        91262.2
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            92224.0
+                        ],
+                        "stop_loss": [
+                            83216.628
+                        ]
+                    },
+                    "reasoning": [
+                        "MACD bullish crossover (histogram: 55.838798)"
+                    ]
+                },
+                "short": {
+                    "entry_points": [
+                        92224.0
+                    ],
+                    "exit_points": {
+                        "take_profit": [
+                            84057.2
+                        ],
+                        "stop_loss": [
+                            93146.24
+                        ]
+                    },
+                    "reasoning": [
+                        "Price near resistance level (92224.00)"
+                    ]
+                },
+                "score": {
+                    "long": 25,
+                    "short": 25
+                }
+            },
+            "score": 75,
+            "recommendation": "buy"
+        }
+    }
+}

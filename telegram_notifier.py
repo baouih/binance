@@ -20,6 +20,7 @@ logger = logging.getLogger("telegram_notifier")
 # Đường dẫn đến file cấu hình
 CONFIG_FILE = '.env'
 TELEGRAM_CONFIG_FILE = 'telegram_config.json'
+NOTIFICATION_CONFIG_FILE = 'configs/telegram_notification_config.json'
 
 class TelegramNotifier:
     """Lớp quản lý gửi thông báo qua Telegram"""
@@ -36,10 +37,19 @@ class TelegramNotifier:
         self.config_file = config_file
         self.token = token
         self.chat_id = chat_id
+        self.last_notifications = {}  # Dictionary lưu các thông báo đã gửi gần đây
+        self.notification_config = {
+            "cache_duration_seconds": 300,  # Mặc định 5 phút
+            "enable_double_notification_prevention": True,  # Mặc định bật
+            "notification_types": ["trade", "position", "error", "warning", "info"]  # Các loại thông báo cần lọc
+        }
         
         # Nếu không cung cấp token hoặc chat_id, đọc từ file cấu hình
         if not token or not chat_id:
             self.load_config()
+            
+        # Tải cấu hình thông báo từ file
+        self._load_notification_config()
     
     def load_config(self) -> bool:
         """
@@ -115,6 +125,18 @@ class TelegramNotifier:
                 logger.error("Không tìm thấy Telegram token hoặc chat ID")
                 return {'ok': False, 'error': 'Missing token or chat ID'}
             
+            # Kiểm tra xem tin nhắn này đã được gửi gần đây chưa (tránh gửi trùng lặp trong 5 phút)
+            message_hash = hash(message)
+            current_time = datetime.datetime.now()
+            
+            # Kiểm tra xem tin nhắn tương tự đã được gửi trong vòng 5 phút không
+            if message_hash in self.last_notifications:
+                last_time = self.last_notifications[message_hash]
+                time_diff = (current_time - last_time).total_seconds()
+                if time_diff < 300:  # 5 phút = 300 giây
+                    logger.info(f"Bỏ qua tin nhắn trùng lặp (đã gửi cách đây {time_diff:.0f}s)")
+                    return {'ok': True, 'skipped': True, 'reason': 'Duplicate message within 5 minutes'}
+            
             url = f"https://api.telegram.org/bot{self.token}/sendMessage"
             
             data = {
@@ -128,6 +150,11 @@ class TelegramNotifier:
             
             if result.get('ok'):
                 logger.info("Đã gửi thông báo Telegram thành công")
+                # Lưu thông tin về tin nhắn vừa gửi
+                self.last_notifications[message_hash] = current_time
+                
+                # Xóa các thông báo cũ hơn 5 phút
+                self._clean_old_notifications()
             else:
                 logger.error(f"Lỗi khi gửi thông báo Telegram: {result.get('description', 'Unknown error')}")
             
@@ -135,6 +162,18 @@ class TelegramNotifier:
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
             return {'ok': False, 'error': str(e)}
+    
+    def _clean_old_notifications(self):
+        """Xóa các thông báo cũ hơn 5 phút để tránh tràn bộ nhớ"""
+        current_time = datetime.datetime.now()
+        to_remove = []
+        
+        for msg_hash, time_sent in self.last_notifications.items():
+            if (current_time - time_sent).total_seconds() >= 300:  # 5 phút = 300 giây
+                to_remove.append(msg_hash)
+        
+        for msg_hash in to_remove:
+            del self.last_notifications[msg_hash]
     
     def send_notification(self, message_type: str, message_content: str) -> Dict:
         """
@@ -168,8 +207,25 @@ class TelegramNotifier:
             formatted_message += f"{message_content}\n\n"
             formatted_message += f"<i>Thời gian: {current_time}</i>"
             
-            # Gửi tin nhắn
-            return self.send_message(formatted_message)
+            # Tạo một key xác định nội dung chính của tin nhắn (không bao gồm thời gian)
+            message_key = f"{message_type}_{message_content}"
+            message_hash = hash(message_key)
+            current_time_obj = datetime.datetime.now()
+            
+            # Kiểm tra xem nội dung chính này đã được gửi trong 5 phút qua chưa
+            if message_hash in self.last_notifications:
+                last_time = self.last_notifications[message_hash]
+                time_diff = (current_time_obj - last_time).total_seconds()
+                if time_diff < 300:  # 5 phút = 300 giây
+                    logger.info(f"Bỏ qua thông báo trùng lặp loại {message_type} (đã gửi cách đây {time_diff:.0f}s)")
+                    return {'ok': True, 'skipped': True, 'reason': 'Duplicate content within 5 minutes'}
+            
+            # Gửi tin nhắn và lưu thời gian gửi của nội dung này
+            result = self.send_message(formatted_message)
+            if result.get('ok') and not result.get('skipped', False):
+                self.last_notifications[message_hash] = current_time_obj
+            
+            return result
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo: {str(e)}")
             return {'ok': False, 'error': str(e)}

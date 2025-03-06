@@ -1,0 +1,38 @@
+{
+    "last_updated": "2025-03-06 09:13:02",
+    "btc_dominance": 0,
+    "total_market_cap": 0,
+    "global_regime": "high_volatility",
+    "symbols_regime": {
+        "BTCUSDT": {
+            "timeframe": "1h",
+            "regime": "high_volatility",
+            "volatility": 32.506021843790414,
+            "last_updated": "2025-03-06 09:13:07"
+        },
+        "ETHUSDT": {
+            "timeframe": "1h",
+            "regime": "trending_up",
+            "volatility": 20.007474005326557,
+            "last_updated": "2025-03-06 08:32:49"
+        },
+        "BNBUSDT": {
+            "timeframe": "1h",
+            "regime": "low_volatility",
+            "volatility": 0.6434782234152773,
+            "last_updated": "2025-03-06 08:32:51"
+        },
+        "XRPUSDT": {
+            "timeframe": "1h",
+            "regime": "low_volatility",
+            "volatility": 0.7820667242398099,
+            "last_updated": "2025-03-06 08:32:52"
+        },
+        "ADAUSDT": {
+            "timeframe": "1h",
+            "regime": "high_volatility",
+            "volatility": 5.829881413467722,
+            "last_updated": "2025-03-06 08:32:53"
+        }
+    }
+}

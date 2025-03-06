@@ -1,648 +1,538 @@
+#!/usr/bin/env python3
 """
-Module phân tích thanh khoản (Liquidity Analysis)
+Module phân tích thanh khoản thị trường (Liquidity Analyzer)
 
-Module này cung cấp các công cụ để phân tích thanh khoản trên thị trường,
-xác định các vùng tập trung lệnh chờ và vùng tập trung thanh khoản cao/thấp.
+Module này cung cấp các hàm phân tích chi tiết về thanh khoản thị trường,
+bao gồm độ sâu của order book, spread, và khối lượng giao dịch,
+để đánh giá liệu một cặp tiền có đủ thanh khoản để giao dịch hay không.
 """
 
+import os
+import json
+import logging
 import numpy as np
 import pandas as pd
-import logging
-import time
-from typing import Dict, List, Tuple, Optional, Union
-from app.binance_api import BinanceAPI
+from typing import Dict, List, Tuple, Optional
+from datetime import datetime, timedelta
 
-# Thiết lập logger
+# Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('liquidity_analyzer')
+logger = logging.getLogger("liquidity_analyzer")
+
+# Đường dẫn lưu cấu hình thanh khoản
+LIQUIDITY_CONFIG_PATH = "configs/liquidity_thresholds.json"
 
 class LiquidityAnalyzer:
-    """
-    Lớp phân tích thanh khoản thị trường để xác định các vùng lệnh chờ tích tụ
-    và các vùng có tiềm năng 'liquidity grab'.
-    """
+    """Lớp phân tích thanh khoản thị trường"""
     
-    def __init__(self, binance_api: BinanceAPI = None, cache_timeout: int = 30):
+    def __init__(self, binance_api=None):
         """
-        Khởi tạo bộ phân tích thanh khoản.
+        Khởi tạo phân tích thanh khoản
         
         Args:
-            binance_api (BinanceAPI): Đối tượng API Binance để lấy dữ liệu
-            cache_timeout (int): Thời gian hết hạn của bộ nhớ cache (giây)
+            binance_api: Đối tượng BinanceAPI (tùy chọn)
         """
         self.binance_api = binance_api
-        self.cache_timeout = cache_timeout
-        self.cache = {}
+        self.config = self._load_or_create_config()
         
-        logger.info("Khởi tạo Bộ phân tích thanh khoản")
-    
-    def get_orderbook(self, symbol: str, limit: int = 500) -> Dict:
+    def _load_or_create_config(self) -> Dict:
         """
-        Lấy dữ liệu order book từ Binance.
+        Tải hoặc tạo cấu hình thanh khoản
+        
+        Returns:
+            Dict: Cấu hình thanh khoản
+        """
+        if os.path.exists(LIQUIDITY_CONFIG_PATH):
+            try:
+                with open(LIQUIDITY_CONFIG_PATH, 'r') as f:
+                    config = json.load(f)
+                logger.info(f"Đã tải cấu hình thanh khoản từ {LIQUIDITY_CONFIG_PATH}")
+                return config
+            except Exception as e:
+                logger.error(f"Lỗi khi tải cấu hình thanh khoản: {str(e)}")
+        
+        # Tạo cấu hình mặc định
+        logger.info("Tạo cấu hình thanh khoản mặc định")
+        
+        config = {
+            "min_liquidity_score": 40,  # Điểm thanh khoản tối thiểu (0-100)
+            "high_importance_threshold": 30,  # Ngưỡng dưới mức này sẽ là lý do high importance
+            "score_weights": {
+                "volume": 0.4,       # Trọng số điểm khối lượng
+                "spread": 0.3,       # Trọng số điểm spread
+                "depth": 0.3         # Trọng số điểm độ sâu order book
+            },
+            "volume_thresholds": {
+                "very_high": 1.5,    # Khối lượng cao hơn 1.5x trung bình
+                "high": 1.0,         # Khối lượng cao hơn trung bình
+                "normal": 0.7,       # Khối lượng > 70% trung bình
+                "low": 0.5,          # Khối lượng > 50% trung bình
+                "very_low": 0.3      # Khối lượng < 30% trung bình
+            },
+            "spread_thresholds": {
+                "very_tight": 0.05,  # Spread < 0.05%
+                "tight": 0.1,        # Spread < 0.1%
+                "normal": 0.2,       # Spread < 0.2%
+                "wide": 0.5,         # Spread < 0.5%
+                "very_wide": 1.0     # Spread > 1.0%
+            },
+            "depth_requirements": {
+                "min_depth_sum": 20,   # Tổng độ sâu tối thiểu
+                "min_depth_ratio": 0.5  # Tỷ lệ độ sâu tối thiểu (ask/bid)
+            },
+            "currency_specific": {
+                "BTC": {
+                    "min_liquidity_score": 30  # BTC có thể giao dịch với thanh khoản thấp hơn
+                },
+                "ETH": {
+                    "min_liquidity_score": 35
+                }
+                # Có thể thêm cấu hình cho các đồng khác
+            },
+            "last_updated": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Lưu cấu hình
+        try:
+            os.makedirs(os.path.dirname(LIQUIDITY_CONFIG_PATH), exist_ok=True)
+            with open(LIQUIDITY_CONFIG_PATH, 'w') as f:
+                json.dump(config, f, indent=4)
+            logger.info(f"Đã tạo cấu hình thanh khoản mặc định tại {LIQUIDITY_CONFIG_PATH}")
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cấu hình thanh khoản: {str(e)}")
+        
+        return config
+    
+    def save_config(self) -> bool:
+        """
+        Lưu cấu hình thanh khoản
+        
+        Returns:
+            bool: True nếu lưu thành công, False nếu lỗi
+        """
+        try:
+            # Cập nhật thời gian
+            self.config["last_updated"] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Đảm bảo thư mục tồn tại
+            os.makedirs(os.path.dirname(LIQUIDITY_CONFIG_PATH), exist_ok=True)
+            
+            # Lưu cấu hình
+            with open(LIQUIDITY_CONFIG_PATH, 'w') as f:
+                json.dump(self.config, f, indent=4)
+            
+            logger.info(f"Đã lưu cấu hình thanh khoản vào {LIQUIDITY_CONFIG_PATH}")
+            return True
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cấu hình thanh khoản: {str(e)}")
+            return False
+    
+    def check_liquidity_conditions(self, symbol: str, timeframe: str = "1h") -> Dict:
+        """
+        Kiểm tra điều kiện thanh khoản cho một cặp tiền
         
         Args:
-            symbol (str): Mã cặp giao dịch
-            limit (int): Số lượng lệnh lớn nhất cho mỗi phía (mua/bán)
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian để phân tích
+            
+        Returns:
+            Dict: Kết quả phân tích thanh khoản
+        """
+        try:
+            # Lấy dữ liệu khối lượng giao dịch
+            df = self._get_ohlcv_data(symbol, timeframe)
+            
+            # Tính toán trung bình khối lượng trong 20 chu kỳ
+            avg_volume = df['volume'].rolling(window=20).mean()
+            current_volume = df['volume'].iloc[-1]
+            
+            # Tính tỷ lệ khối lượng hiện tại so với trung bình
+            volume_ratio = current_volume / avg_volume.iloc[-1] if not np.isnan(avg_volume.iloc[-1]) else 1.0
+            
+            # Lấy dữ liệu order book
+            order_book = self._get_order_book(symbol)
+            
+            # Tính toán độ rộng của spread
+            top_bid = float(order_book['bids'][0][0]) if len(order_book['bids']) > 0 else 0
+            top_ask = float(order_book['asks'][0][0]) if len(order_book['asks']) > 0 else 0
+            
+            if top_bid > 0 and top_ask > 0:
+                spread_pct = (top_ask - top_bid) / top_bid * 100
+            else:
+                spread_pct = 1.0  # Giá trị mặc định
+            
+            # Tính toán độ sâu của order book (tổng khối lượng trong 10 mức giá hàng đầu)
+            bid_depth = sum([float(bid[1]) for bid in order_book['bids'][:10]]) if len(order_book['bids']) >= 10 else 0
+            ask_depth = sum([float(ask[1]) for ask in order_book['asks'][:10]]) if len(order_book['asks']) >= 10 else 0
+            
+            # Tính toán điểm thanh khoản tổng hợp (0-100)
+            liquidity_score = self._calculate_liquidity_score(volume_ratio, spread_pct, bid_depth, ask_depth, symbol)
+            
+            # Xác định ngưỡng thanh khoản tối thiểu cho cặp tiền này
+            base_currency = self._extract_base_currency(symbol)
+            min_score = self.config.get("currency_specific", {}).get(base_currency, {}).get(
+                "min_liquidity_score", self.config.get("min_liquidity_score", 40))
+            
+            # Tạo lý do nếu điểm thanh khoản thấp
+            reasons = []
+            if liquidity_score < min_score:
+                importance = "high" if liquidity_score < self.config.get("high_importance_threshold", 30) else "medium"
+                reasons.append({
+                    "category": "liquidity",
+                    "reason": f"Thanh khoản thấp (điểm: {liquidity_score}/100, ngưỡng: {min_score})",
+                    "importance": importance
+                })
+            
+            # Kiểm tra các yếu tố cụ thể
+            if volume_ratio < self.config.get("volume_thresholds", {}).get("low", 0.5):
+                reasons.append({
+                    "category": "liquidity",
+                    "reason": f"Khối lượng thấp ({volume_ratio:.2f}x so với trung bình)",
+                    "importance": "medium"
+                })
+            
+            if spread_pct > self.config.get("spread_thresholds", {}).get("wide", 0.5):
+                reasons.append({
+                    "category": "liquidity",
+                    "reason": f"Spread rộng ({spread_pct:.2f}%)",
+                    "importance": "medium"
+                })
+            
+            depth_sum = bid_depth + ask_depth
+            depth_ratio = min(bid_depth, ask_depth) / max(bid_depth, ask_depth) if max(bid_depth, ask_depth) > 0 else 0
+            
+            min_depth_sum = self.config.get("depth_requirements", {}).get("min_depth_sum", 20)
+            min_depth_ratio = self.config.get("depth_requirements", {}).get("min_depth_ratio", 0.5)
+            
+            if depth_sum < min_depth_sum:
+                reasons.append({
+                    "category": "liquidity",
+                    "reason": f"Độ sâu order book thấp (tổng: {depth_sum:.2f})",
+                    "importance": "medium"
+                })
+            
+            if depth_ratio < min_depth_ratio:
+                reasons.append({
+                    "category": "liquidity",
+                    "reason": f"Mất cân bằng order book (tỷ lệ: {depth_ratio:.2f})",
+                    "importance": "low"
+                })
+            
+            # Tạo kết quả phân tích
+            return {
+                "score": liquidity_score,
+                "volume_ratio": volume_ratio,
+                "spread_pct": spread_pct,
+                "depth_sum": depth_sum,
+                "depth_ratio": depth_ratio,
+                "reasons": reasons,
+                "is_tradable": liquidity_score >= min_score
+            }
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra thanh khoản cho {symbol}: {str(e)}")
+            # Trả về kết quả mặc định với điểm thanh khoản trung bình
+            return {
+                "score": 50,
+                "volume_ratio": 1.0,
+                "spread_pct": 0.2,
+                "depth_sum": 50,
+                "depth_ratio": 0.7,
+                "reasons": [{
+                    "category": "liquidity",
+                    "reason": f"Lỗi khi phân tích thanh khoản: {str(e)}",
+                    "importance": "low"
+                }],
+                "is_tradable": True,
+                "error": str(e)
+            }
+    
+    def _calculate_liquidity_score(self, volume_ratio: float, spread_pct: float, 
+                                  bid_depth: float, ask_depth: float, symbol: str) -> float:
+        """
+        Tính toán điểm thanh khoản tổng hợp
+        
+        Args:
+            volume_ratio (float): Tỷ lệ khối lượng so với trung bình
+            spread_pct (float): Phần trăm spread
+            bid_depth (float): Độ sâu phía bid
+            ask_depth (float): Độ sâu phía ask
+            symbol (str): Mã cặp tiền
+            
+        Returns:
+            float: Điểm thanh khoản (0-100)
+        """
+        weights = self.config.get("score_weights", {})
+        volume_weight = weights.get("volume", 0.4)
+        spread_weight = weights.get("spread", 0.3)
+        depth_weight = weights.get("depth", 0.3)
+        
+        # 1. Điểm khối lượng (0-100)
+        volume_thresholds = self.config.get("volume_thresholds", {})
+        if volume_ratio >= volume_thresholds.get("very_high", 1.5):
+            volume_points = 100  # Khối lượng rất cao
+        elif volume_ratio >= volume_thresholds.get("high", 1.0):
+            volume_points = 80   # Khối lượng cao
+        elif volume_ratio >= volume_thresholds.get("normal", 0.7):
+            volume_points = 60   # Khối lượng bình thường
+        elif volume_ratio >= volume_thresholds.get("low", 0.5):
+            volume_points = 40   # Khối lượng thấp
+        elif volume_ratio >= volume_thresholds.get("very_low", 0.3):
+            volume_points = 20   # Khối lượng rất thấp
+        else:
+            volume_points = 0    # Khối lượng cực thấp
+        
+        # 2. Điểm spread (0-100)
+        spread_thresholds = self.config.get("spread_thresholds", {})
+        if spread_pct <= spread_thresholds.get("very_tight", 0.05):
+            spread_points = 100  # Spread rất hẹp
+        elif spread_pct <= spread_thresholds.get("tight", 0.1):
+            spread_points = 80   # Spread hẹp
+        elif spread_pct <= spread_thresholds.get("normal", 0.2):
+            spread_points = 60   # Spread trung bình
+        elif spread_pct <= spread_thresholds.get("wide", 0.5):
+            spread_points = 40   # Spread rộng
+        elif spread_pct <= spread_thresholds.get("very_wide", 1.0):
+            spread_points = 20   # Spread rất rộng
+        else:
+            spread_points = 0    # Spread cực rộng
+        
+        # 3. Điểm độ sâu order book (0-100)
+        depth_sum = bid_depth + ask_depth
+        depth_ratio = min(bid_depth, ask_depth) / max(bid_depth, ask_depth) if max(bid_depth, ask_depth) > 0 else 0
+        
+        # Điều chỉnh yêu cầu độ sâu theo cặp tiền
+        base_currency = self._extract_base_currency(symbol)
+        min_depth_sum = self.config.get("currency_specific", {}).get(base_currency, {}).get(
+            "min_depth_sum", self.config.get("depth_requirements", {}).get("min_depth_sum", 20))
+        
+        if depth_sum >= 5 * min_depth_sum and depth_ratio >= 0.7:
+            depth_points = 100  # Độ sâu rất tốt và cân bằng
+        elif depth_sum >= 3 * min_depth_sum and depth_ratio >= 0.6:
+            depth_points = 80   # Độ sâu tốt
+        elif depth_sum >= min_depth_sum and depth_ratio >= 0.5:
+            depth_points = 60   # Độ sâu trung bình
+        elif depth_sum >= 0.5 * min_depth_sum:
+            depth_points = 40   # Độ sâu thấp
+        elif depth_sum >= 0.2 * min_depth_sum:
+            depth_points = 20   # Độ sâu rất thấp
+        else:
+            depth_points = 0    # Độ sâu cực thấp
+        
+        # Tính điểm tổng hợp theo trọng số
+        liquidity_score = (
+            volume_points * volume_weight +
+            spread_points * spread_weight +
+            depth_points * depth_weight
+        )
+        
+        return liquidity_score
+    
+    def _extract_base_currency(self, symbol: str) -> str:
+        """
+        Trích xuất base currency từ mã cặp tiền
+        
+        Args:
+            symbol (str): Mã cặp tiền (ví dụ: BTCUSDT)
+            
+        Returns:
+            str: Base currency (ví dụ: BTC)
+        """
+        # Loại bỏ các đuôi phổ biến
+        common_quote_currencies = ["USDT", "BUSD", "USDC", "USD", "TUSD", "DAI", "FDUSD"]
+        
+        for quote in common_quote_currencies:
+            if symbol.endswith(quote):
+                return symbol[:-len(quote)]
+        
+        # Nếu không tìm thấy, trả về mã ban đầu
+        return symbol
+    
+    def _get_ohlcv_data(self, symbol: str, timeframe: str, limit: int = 100) -> pd.DataFrame:
+        """
+        Lấy dữ liệu OHLCV từ API
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            limit (int): Số lượng nến tối đa
+            
+        Returns:
+            pd.DataFrame: DataFrame chứa dữ liệu OHLCV
+        """
+        if not self.binance_api:
+            # Trả về DataFrame trống với cấu trúc đúng
+            return pd.DataFrame(columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+        
+        try:
+            # Lấy dữ liệu từ API
+            klines = self.binance_api.get_klines(symbol=symbol, interval=timeframe, limit=limit)
+            
+            if not klines:
+                return pd.DataFrame(columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+            
+            # Chuyển đổi thành DataFrame
+            df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 
+                                             'close_time', 'quote_asset_volume', 'number_of_trades',
+                                             'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+            
+            # Chuyển đổi kiểu dữ liệu
+            numeric_columns = ['open', 'high', 'low', 'close', 'volume']
+            df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric)
+            
+            # Chuyển đổi timestamp
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+            
+            return df
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu OHLCV: {str(e)}")
+            # Trả về DataFrame trống với cấu trúc đúng
+            return pd.DataFrame(columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    
+    def _get_order_book(self, symbol: str, limit: int = 20) -> Dict:
+        """
+        Lấy dữ liệu order book từ API
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            limit (int): Số lượng mức giá tối đa
             
         Returns:
             Dict: Dữ liệu order book
         """
-        cache_key = f"{symbol}_orderbook_{limit}"
+        if not self.binance_api:
+            # Trả về cấu trúc trống
+            return {'bids': [], 'asks': []}
         
-        # Kiểm tra cache
-        if cache_key in self.cache:
-            # Kiểm tra xem dữ liệu có cần cập nhật không
-            cached_time, orderbook = self.cache[cache_key]
-            current_time = time.time()
-            
-            # Nếu dữ liệu được cập nhật trong vòng cache_timeout giây qua
-            if current_time - cached_time < self.cache_timeout:
-                return orderbook
-        
-        # Nếu không có trong cache hoặc cần cập nhật, lấy dữ liệu mới
-        if self.binance_api:
-            orderbook = self.binance_api.get_order_book(symbol, limit)
-            
-            # Lưu vào cache
-            self.cache[cache_key] = (time.time(), orderbook)
-            
-            return orderbook
-        else:
-            logger.error("Không thể lấy dữ liệu orderbook vì thiếu binance_api")
-            return None
+        try:
+            # Lấy dữ liệu từ API
+            order_book = self.binance_api.get_order_book(symbol=symbol, limit=limit)
+            return order_book
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy order book: {str(e)}")
+            # Trả về cấu trúc trống
+            return {'bids': [], 'asks': []}
     
-    def analyze_orderbook(self, symbol: str, num_levels: int = 50, 
-                          price_range_pct: float = 2.0) -> Dict:
+    def update_min_liquidity_score(self, currency: str, score: int) -> bool:
         """
-        Phân tích orderbook để xác định các vùng tập trung thanh khoản.
+        Cập nhật điểm thanh khoản tối thiểu cho một đồng tiền
         
         Args:
-            symbol (str): Mã cặp giao dịch
-            num_levels (int): Số lượng level giá để tổng hợp
-            price_range_pct (float): Phạm vi giá xung quanh giá hiện tại để phân tích (%)
+            currency (str): Mã đồng tiền (ví dụ: BTC)
+            score (int): Điểm tối thiểu (0-100)
             
         Returns:
-            Dict: Kết quả phân tích orderbook
+            bool: True nếu thành công, False nếu lỗi
         """
-        # Lấy orderbook
-        orderbook = self.get_orderbook(symbol, limit=500)
-        if not orderbook or 'bids' not in orderbook or 'asks' not in orderbook:
-            logger.error(f"Không thể lấy orderbook cho {symbol}")
-            return None
+        try:
+            # Đảm bảo score nằm trong khoảng 0-100
+            score = max(0, min(score, 100))
+            
+            # Nếu là "default", cập nhật ngưỡng mặc định
+            if currency.lower() == "default":
+                self.config["min_liquidity_score"] = score
+                logger.info(f"Đã cập nhật điểm thanh khoản tối thiểu mặc định: {score}")
+            else:
+                # Cập nhật cho đồng tiền cụ thể
+                if "currency_specific" not in self.config:
+                    self.config["currency_specific"] = {}
+                
+                if currency not in self.config["currency_specific"]:
+                    self.config["currency_specific"][currency] = {}
+                
+                self.config["currency_specific"][currency]["min_liquidity_score"] = score
+                logger.info(f"Đã cập nhật điểm thanh khoản tối thiểu cho {currency}: {score}")
+            
+            # Lưu cấu hình
+            self.save_config()
+            return True
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật điểm thanh khoản tối thiểu: {str(e)}")
+            return False
+    
+    def update_score_weights(self, volume_weight: float, spread_weight: float, depth_weight: float) -> bool:
+        """
+        Cập nhật trọng số điểm thanh khoản
         
-        # Chuyển đổi thành DataFrame
-        bids_df = pd.DataFrame(orderbook['bids'], columns=['price', 'quantity'])
-        asks_df = pd.DataFrame(orderbook['asks'], columns=['price', 'quantity'])
-        
-        # Chuyển đổi kiểu dữ liệu
-        bids_df['price'] = bids_df['price'].astype(float)
-        bids_df['quantity'] = bids_df['quantity'].astype(float)
-        asks_df['price'] = asks_df['price'].astype(float)
-        asks_df['quantity'] = asks_df['quantity'].astype(float)
-        
-        # Tính toán giá trị USD tại mỗi mức giá
-        bids_df['value'] = bids_df['price'] * bids_df['quantity']
-        asks_df['value'] = asks_df['price'] * asks_df['quantity']
-        
-        # Lấy giá hiện tại (giá trung bình giữa bid cao nhất và ask thấp nhất)
-        current_price = (bids_df['price'].iloc[0] + asks_df['price'].iloc[0]) / 2
-        
-        # Tính giới hạn phạm vi giá để phân tích
-        lower_bound = current_price * (1 - price_range_pct / 100)
-        upper_bound = current_price * (1 + price_range_pct / 100)
-        
-        # Lọc dữ liệu trong phạm vi giá
-        bids_df = bids_df[(bids_df['price'] >= lower_bound) & (bids_df['price'] <= current_price)]
-        asks_df = asks_df[(asks_df['price'] <= upper_bound) & (asks_df['price'] >= current_price)]
-        
-        # Phân vùng giá thành các level
-        price_step = (upper_bound - lower_bound) / num_levels
-        
-        # Tạo các bin (khoảng giá)
-        bins = [lower_bound + i * price_step for i in range(num_levels + 1)]
-        
-        # Phân loại bid và ask vào các bin
-        bids_df['price_level'] = pd.cut(bids_df['price'], bins=bins, labels=False)
-        asks_df['price_level'] = pd.cut(asks_df['price'], bins=bins, labels=False)
-        
-        # Tính tổng khối lượng và giá trị trong mỗi bin
-        bid_levels = bids_df.groupby('price_level').agg({
-            'quantity': 'sum',
-            'value': 'sum',
-            'price': 'mean'
-        }).reset_index()
-        
-        ask_levels = asks_df.groupby('price_level').agg({
-            'quantity': 'sum',
-            'value': 'sum',
-            'price': 'mean'
-        }).reset_index()
-        
-        # Tính các vùng thanh khoản cao
-        # Xác định ngưỡng để coi là vùng thanh khoản cao
-        if not bid_levels.empty:
-            bid_value_threshold = bid_levels['value'].mean() + bid_levels['value'].std()
-            high_liquidity_bids = bid_levels[bid_levels['value'] >= bid_value_threshold]
-        else:
-            high_liquidity_bids = pd.DataFrame()
-        
-        if not ask_levels.empty:
-            ask_value_threshold = ask_levels['value'].mean() + ask_levels['value'].std()
-            high_liquidity_asks = ask_levels[ask_levels['value'] >= ask_value_threshold]
-        else:
-            high_liquidity_asks = pd.DataFrame()
-        
-        # Xác định các vùng thanh khoản cao
-        high_liquidity_zones = []
-        
-        for _, row in high_liquidity_bids.iterrows():
-            zone = {
-                'price': row['price'],
-                'value': row['value'],
-                'quantity': row['quantity'],
-                'type': 'bid',
-                'strength': self._calculate_liquidity_strength(row['value'], bid_levels['value']),
-                'price_range': [row['price'] - price_step/2, row['price'] + price_step/2]
+        Args:
+            volume_weight (float): Trọng số khối lượng
+            spread_weight (float): Trọng số spread
+            depth_weight (float): Trọng số độ sâu
+            
+        Returns:
+            bool: True nếu thành công, False nếu lỗi
+        """
+        try:
+            # Chuẩn hóa trọng số
+            total = volume_weight + spread_weight + depth_weight
+            volume_weight = volume_weight / total
+            spread_weight = spread_weight / total
+            depth_weight = depth_weight / total
+            
+            # Cập nhật
+            self.config["score_weights"] = {
+                "volume": volume_weight,
+                "spread": spread_weight,
+                "depth": depth_weight
             }
-            high_liquidity_zones.append(zone)
-        
-        for _, row in high_liquidity_asks.iterrows():
-            zone = {
-                'price': row['price'],
-                'value': row['value'],
-                'quantity': row['quantity'],
-                'type': 'ask',
-                'strength': self._calculate_liquidity_strength(row['value'], ask_levels['value']),
-                'price_range': [row['price'] - price_step/2, row['price'] + price_step/2]
-            }
-            high_liquidity_zones.append(zone)
-        
-        # Sắp xếp các vùng theo độ mạnh
-        high_liquidity_zones = sorted(high_liquidity_zones, key=lambda x: x['strength'], reverse=True)
-        
-        # Tính toán chênh lệch giữa bid và ask (spread)
-        if not bids_df.empty and not asks_df.empty:
-            best_bid = bids_df['price'].iloc[0]
-            best_ask = asks_df['price'].iloc[0]
-            spread = best_ask - best_bid
-            spread_pct = (spread / current_price) * 100
-        else:
-            best_bid = best_ask = spread = spread_pct = None
-        
-        # Tính tỷ lệ bid/ask để xác định áp lực mua/bán
-        total_bid_value = bids_df['value'].sum() if not bids_df.empty else 0
-        total_ask_value = asks_df['value'].sum() if not asks_df.empty else 0
-        
-        # Tránh chia cho 0
-        bid_ask_ratio = total_bid_value / total_ask_value if total_ask_value > 0 else float('inf')
-        
-        # Xác định hướng áp lực thị trường
-        if bid_ask_ratio > 1.2:
-            market_pressure = "buy"  # Áp lực mua
-        elif bid_ask_ratio < 0.8:
-            market_pressure = "sell"  # Áp lực bán
-        else:
-            market_pressure = "neutral"  # Cân bằng
-        
-        # Tìm các vùng "liquidity grab" tiềm năng
-        # Đây là các vùng có thanh khoản cao, nơi giá có thể đảo chiều sau khi chạm vào
-        liquidity_grab_zones = self._identify_liquidity_grab_zones(
-            high_liquidity_zones, current_price
-        )
-        
-        # Tạo kết quả
-        result = {
-            'current_price': current_price,
-            'best_bid': best_bid,
-            'best_ask': best_ask,
-            'spread': spread,
-            'spread_pct': spread_pct,
-            'bid_ask_ratio': bid_ask_ratio,
-            'market_pressure': market_pressure,
-            'high_liquidity_zones': high_liquidity_zones,
-            'liquidity_grab_zones': liquidity_grab_zones,
-            'total_bid_value': total_bid_value,
-            'total_ask_value': total_ask_value
-        }
-        
-        # Ghi log thông tin chính
-        logger.info(f"Phân tích thanh khoản {symbol}: Giá = {current_price:.2f}, "
-                  f"Áp lực thị trường = {market_pressure.upper()}, "
-                  f"Tỷ lệ bid/ask = {bid_ask_ratio:.2f}")
-        
-        logger.info(f"Số vùng thanh khoản cao: {len(high_liquidity_zones)}, "
-                  f"Số vùng liquidity grab: {len(liquidity_grab_zones)}")
-        
-        return result
+            
+            logger.info(f"Đã cập nhật trọng số điểm thanh khoản: volume={volume_weight:.2f}, " +
+                      f"spread={spread_weight:.2f}, depth={depth_weight:.2f}")
+            
+            # Lưu cấu hình
+            self.save_config()
+            return True
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật trọng số điểm thanh khoản: {str(e)}")
+            return False
+
+def main():
+    """Hàm chính để test module"""
     
-    def _calculate_liquidity_strength(self, value: float, all_values: pd.Series) -> float:
-        """
-        Tính toán độ mạnh của một vùng thanh khoản dựa trên giá trị tương đối.
+    try:
+        # Khởi tạo
+        from binance_api import BinanceAPI
+        api = BinanceAPI()
+        liquidity_analyzer = LiquidityAnalyzer(api)
         
-        Args:
-            value (float): Giá trị của vùng thanh khoản
-            all_values (pd.Series): Tất cả các giá trị để so sánh
+        # Test các chức năng
+        symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT", "DOGEUSDT"]
+        
+        print("=== Phân tích thanh khoản ===")
+        for symbol in symbols:
+            result = liquidity_analyzer.check_liquidity_conditions(symbol)
+            tradable = "✅ Có thể giao dịch" if result.get("is_tradable", False) else "❌ Không nên giao dịch"
+            print(f"{symbol}: Điểm = {result.get('score', 0):.2f}, {tradable}")
             
-        Returns:
-            float: Độ mạnh của vùng thanh khoản (0-100)
-        """
-        max_value = all_values.max()
-        
-        if max_value == 0:
-            return 0
-        
-        # Chuẩn hóa về khoảng 0-100
-        return min(100, (value / max_value) * 100)
-    
-    def _identify_liquidity_grab_zones(self, high_liquidity_zones: List[Dict], 
-                                      current_price: float) -> List[Dict]:
-        """
-        Xác định các vùng "liquidity grab" tiềm năng.
-        
-        Args:
-            high_liquidity_zones (List[Dict]): Các vùng thanh khoản cao
-            current_price (float): Giá hiện tại
+            # In chi tiết
+            print(f"  - Khối lượng: {result.get('volume_ratio', 0):.2f}x trung bình")
+            print(f"  - Spread: {result.get('spread_pct', 0):.4f}%")
+            print(f"  - Độ sâu: {result.get('depth_sum', 0):.2f}")
             
-        Returns:
-            List[Dict]: Các vùng "liquidity grab" tiềm năng
-        """
-        liquidity_grab_zones = []
-        
-        for zone in high_liquidity_zones:
-            # Vùng bid có thanh khoản cao dưới giá hiện tại là vùng hỗ trợ tiềm năng
-            if zone['type'] == 'bid' and zone['price'] < current_price:
-                # Càng xa giá hiện tại càng yếu
-                distance_factor = 1 - min(1, (current_price - zone['price']) / current_price * 10)
-                grab_strength = zone['strength'] * distance_factor
-                
-                if grab_strength > 50:  # Chỉ lấy các vùng có độ mạnh trên 50
-                    grab_zone = zone.copy()
-                    grab_zone['grab_type'] = 'support'
-                    grab_zone['grab_strength'] = grab_strength
-                    grab_zone['distance_pct'] = ((current_price - zone['price']) / current_price) * 100
-                    liquidity_grab_zones.append(grab_zone)
+            # In lý do không giao dịch (nếu có)
+            reasons = result.get("reasons", [])
+            if reasons:
+                print("  Lý do không giao dịch:")
+                for reason in reasons:
+                    print(f"  - [{reason.get('importance', 'medium')}] {reason.get('reason', '')}")
             
-            # Vùng ask có thanh khoản cao trên giá hiện tại là vùng kháng cự tiềm năng
-            elif zone['type'] == 'ask' and zone['price'] > current_price:
-                # Càng xa giá hiện tại càng yếu
-                distance_factor = 1 - min(1, (zone['price'] - current_price) / current_price * 10)
-                grab_strength = zone['strength'] * distance_factor
-                
-                if grab_strength > 50:  # Chỉ lấy các vùng có độ mạnh trên 50
-                    grab_zone = zone.copy()
-                    grab_zone['grab_type'] = 'resistance'
-                    grab_zone['grab_strength'] = grab_strength
-                    grab_zone['distance_pct'] = ((zone['price'] - current_price) / current_price) * 100
-                    liquidity_grab_zones.append(grab_zone)
+            print()
         
-        # Sắp xếp theo độ mạnh
-        liquidity_grab_zones = sorted(liquidity_grab_zones, key=lambda x: x['grab_strength'], reverse=True)
+        # Test cập nhật cấu hình
+        print("\n=== Cập nhật cấu hình ===")
+        liquidity_analyzer.update_min_liquidity_score("BTC", 30)
+        liquidity_analyzer.update_min_liquidity_score("ETH", 35)
+        liquidity_analyzer.update_min_liquidity_score("default", 40)
         
-        return liquidity_grab_zones
-    
-    def get_entry_exit_recommendations(self, symbol: str, trade_type: str = 'both',
-                                      max_recommendations: int = 3) -> Dict:
-        """
-        Đưa ra đề xuất điểm vào lệnh và thoát lệnh dựa trên phân tích thanh khoản.
+        # Test cập nhật trọng số
+        liquidity_analyzer.update_score_weights(4, 3, 3)
         
-        Args:
-            symbol (str): Mã cặp giao dịch
-            trade_type (str): Loại giao dịch ('buy', 'sell', 'both')
-            max_recommendations (int): Số lượng đề xuất tối đa cho mỗi loại
-            
-        Returns:
-            Dict: Đề xuất điểm vào lệnh và thoát lệnh
-        """
-        # Phân tích thanh khoản
-        liquidity_analysis = self.analyze_orderbook(symbol)
-        if not liquidity_analysis:
-            logger.error(f"Không thể phân tích thanh khoản cho {symbol}")
-            return None
+        print("\n=== Cấu hình hiện tại ===")
+        import json
+        print(json.dumps(liquidity_analyzer.config, indent=4))
         
-        current_price = liquidity_analysis['current_price']
-        high_liquidity_zones = liquidity_analysis['high_liquidity_zones']
-        liquidity_grab_zones = liquidity_analysis['liquidity_grab_zones']
-        
-        # Tạo đề xuất
-        recommendations = {
-            'current_price': current_price,
-            'market_pressure': liquidity_analysis['market_pressure'],
-            'buy_entries': [],
-            'sell_entries': [],
-            'take_profit_levels': [],
-            'stop_loss_levels': []
-        }
-        
-        # Đề xuất điểm vào lệnh
-        if trade_type in ['buy', 'both']:
-            # Điểm vào mua: vùng hỗ trợ có thanh khoản cao
-            buy_zones = [zone for zone in liquidity_grab_zones 
-                        if zone['grab_type'] == 'support' and zone['price'] < current_price]
-            
-            # Sắp xếp theo độ mạnh và lấy tối đa max_recommendations
-            buy_zones = sorted(buy_zones, key=lambda x: x['grab_strength'], reverse=True)[:max_recommendations]
-            
-            for zone in buy_zones:
-                entry = {
-                    'price': zone['price'],
-                    'strength': zone['grab_strength'],
-                    'distance_pct': zone['distance_pct'],
-                    'description': f"Vùng hỗ trợ mạnh {zone['price']:.2f} (cách {zone['distance_pct']:.2f}%)"
-                }
-                recommendations['buy_entries'].append(entry)
-        
-        if trade_type in ['sell', 'both']:
-            # Điểm vào bán: vùng kháng cự có thanh khoản cao
-            sell_zones = [zone for zone in liquidity_grab_zones 
-                         if zone['grab_type'] == 'resistance' and zone['price'] > current_price]
-            
-            # Sắp xếp theo độ mạnh và lấy tối đa max_recommendations
-            sell_zones = sorted(sell_zones, key=lambda x: x['grab_strength'], reverse=True)[:max_recommendations]
-            
-            for zone in sell_zones:
-                entry = {
-                    'price': zone['price'],
-                    'strength': zone['grab_strength'],
-                    'distance_pct': zone['distance_pct'],
-                    'description': f"Vùng kháng cự mạnh {zone['price']:.2f} (cách {zone['distance_pct']:.2f}%)"
-                }
-                recommendations['sell_entries'].append(entry)
-        
-        # Đề xuất điểm chốt lời và dừng lỗ dựa trên các vùng thanh khoản cao
-        for zone in high_liquidity_zones:
-            if zone['type'] == 'ask' and zone['price'] > current_price:
-                # Vùng ask trên giá hiện tại: tiềm năng điểm chốt lời cho vị thế mua
-                tp = {
-                    'price': zone['price'],
-                    'strength': zone['strength'],
-                    'distance_pct': ((zone['price'] - current_price) / current_price) * 100,
-                    'position_type': 'buy',
-                    'description': f"TP cho vị thế MUA tại {zone['price']:.2f} (cách {((zone['price'] - current_price) / current_price) * 100:.2f}%)"
-                }
-                recommendations['take_profit_levels'].append(tp)
-            
-            elif zone['type'] == 'bid' and zone['price'] < current_price:
-                # Vùng bid dưới giá hiện tại: tiềm năng điểm chốt lời cho vị thế bán
-                tp = {
-                    'price': zone['price'],
-                    'strength': zone['strength'],
-                    'distance_pct': ((current_price - zone['price']) / current_price) * 100,
-                    'position_type': 'sell',
-                    'description': f"TP cho vị thế BÁN tại {zone['price']:.2f} (cách {((current_price - zone['price']) / current_price) * 100:.2f}%)"
-                }
-                recommendations['take_profit_levels'].append(tp)
-        
-        # Sắp xếp các điểm TP và SL theo độ mạnh
-        recommendations['take_profit_levels'] = sorted(
-            recommendations['take_profit_levels'], 
-            key=lambda x: x['strength'], 
-            reverse=True
-        )[:max_recommendations]
-        
-        # Đề xuất các mức dừng lỗ - tìm vùng có thanh khoản thấp
-        if trade_type in ['buy', 'both'] and recommendations['buy_entries']:
-            # Điểm dừng lỗ cho vị thế mua
-            for entry in recommendations['buy_entries']:
-                # Đặt SL dưới mức hỗ trợ 0.5-1%
-                sl_price = entry['price'] * 0.995  # 0.5% dưới điểm vào
-                sl = {
-                    'price': sl_price,
-                    'position_type': 'buy',
-                    'entry_price': entry['price'],
-                    'distance_pct': ((entry['price'] - sl_price) / entry['price']) * 100,
-                    'description': f"SL cho vị thế MUA tại {sl_price:.2f} (cách điểm vào {((entry['price'] - sl_price) / entry['price']) * 100:.2f}%)"
-                }
-                recommendations['stop_loss_levels'].append(sl)
-        
-        if trade_type in ['sell', 'both'] and recommendations['sell_entries']:
-            # Điểm dừng lỗ cho vị thế bán
-            for entry in recommendations['sell_entries']:
-                # Đặt SL trên mức kháng cự 0.5-1%
-                sl_price = entry['price'] * 1.005  # 0.5% trên điểm vào
-                sl = {
-                    'price': sl_price,
-                    'position_type': 'sell',
-                    'entry_price': entry['price'],
-                    'distance_pct': ((sl_price - entry['price']) / entry['price']) * 100,
-                    'description': f"SL cho vị thế BÁN tại {sl_price:.2f} (cách điểm vào {((sl_price - entry['price']) / entry['price']) * 100:.2f}%)"
-                }
-                recommendations['stop_loss_levels'].append(sl)
-        
-        # Tính risk-reward ratio cho mỗi cặp entry-TP
-        if trade_type in ['buy', 'both'] and recommendations['buy_entries'] and recommendations['take_profit_levels']:
-            for entry in recommendations['buy_entries']:
-                # Tìm một TP phù hợp (TP cho vị thế mua)
-                suitable_tps = [tp for tp in recommendations['take_profit_levels'] 
-                              if tp['position_type'] == 'buy' and tp['price'] > entry['price']]
-                
-                if suitable_tps:
-                    tp = suitable_tps[0]  # Lấy TP mạnh nhất
-                    
-                    # Tìm SL tương ứng
-                    suitable_sls = [sl for sl in recommendations['stop_loss_levels'] 
-                                   if sl['position_type'] == 'buy' and sl['entry_price'] == entry['price']]
-                    
-                    if suitable_sls:
-                        sl = suitable_sls[0]
-                        
-                        # Tính RR ratio
-                        reward = tp['price'] - entry['price']
-                        risk = entry['price'] - sl['price']
-                        
-                        if risk > 0:
-                            rr_ratio = reward / risk
-                            entry['rr_ratio'] = rr_ratio
-                            entry['tp_price'] = tp['price']
-                            entry['sl_price'] = sl['price']
-                            entry['trade_quality'] = self._calculate_trade_quality(rr_ratio, entry['strength'])
-        
-        if trade_type in ['sell', 'both'] and recommendations['sell_entries'] and recommendations['take_profit_levels']:
-            for entry in recommendations['sell_entries']:
-                # Tìm một TP phù hợp (TP cho vị thế bán)
-                suitable_tps = [tp for tp in recommendations['take_profit_levels'] 
-                              if tp['position_type'] == 'sell' and tp['price'] < entry['price']]
-                
-                if suitable_tps:
-                    tp = suitable_tps[0]  # Lấy TP mạnh nhất
-                    
-                    # Tìm SL tương ứng
-                    suitable_sls = [sl for sl in recommendations['stop_loss_levels'] 
-                                   if sl['position_type'] == 'sell' and sl['entry_price'] == entry['price']]
-                    
-                    if suitable_sls:
-                        sl = suitable_sls[0]
-                        
-                        # Tính RR ratio
-                        reward = entry['price'] - tp['price']
-                        risk = sl['price'] - entry['price']
-                        
-                        if risk > 0:
-                            rr_ratio = reward / risk
-                            entry['rr_ratio'] = rr_ratio
-                            entry['tp_price'] = tp['price']
-                            entry['sl_price'] = sl['price']
-                            entry['trade_quality'] = self._calculate_trade_quality(rr_ratio, entry['strength'])
-        
-        # Sắp xếp các đề xuất theo chất lượng giao dịch (nếu có)
-        if trade_type in ['buy', 'both'] and recommendations['buy_entries']:
-            recommendations['buy_entries'] = sorted(
-                [entry for entry in recommendations['buy_entries'] if 'trade_quality' in entry],
-                key=lambda x: x['trade_quality'],
-                reverse=True
-            )
-        
-        if trade_type in ['sell', 'both'] and recommendations['sell_entries']:
-            recommendations['sell_entries'] = sorted(
-                [entry for entry in recommendations['sell_entries'] if 'trade_quality' in entry],
-                key=lambda x: x['trade_quality'],
-                reverse=True
-            )
-        
-        # Thêm đề xuất tổng hợp
-        if recommendations['market_pressure'] == 'buy':
-            recommendations['summary'] = "Áp lực mua mạnh. Xem xét mở vị thế MUA tại các điểm hỗ trợ."
-        elif recommendations['market_pressure'] == 'sell':
-            recommendations['summary'] = "Áp lực bán mạnh. Xem xét mở vị thế BÁN tại các điểm kháng cự."
-        else:
-            recommendations['summary'] = "Thị trường cân bằng. Theo dõi và chờ đợi tín hiệu rõ ràng hơn."
-        
-        # Ghi log đề xuất
-        log_msg = f"Phân tích thanh khoản {symbol}: {recommendations['summary']}"
-        if recommendations['buy_entries']:
-            entry = recommendations['buy_entries'][0]
-            log_msg += f" MUA tốt nhất: {entry['price']:.2f}"
-            if 'rr_ratio' in entry:
-                log_msg += f" (RR: {entry['rr_ratio']:.2f})"
-        if recommendations['sell_entries']:
-            entry = recommendations['sell_entries'][0]
-            log_msg += f" BÁN tốt nhất: {entry['price']:.2f}"
-            if 'rr_ratio' in entry:
-                log_msg += f" (RR: {entry['rr_ratio']:.2f})"
-        
-        logger.info(log_msg)
-        
-        return recommendations
-    
-    def _calculate_trade_quality(self, rr_ratio: float, liquidity_strength: float) -> float:
-        """
-        Tính toán chất lượng của một giao dịch tiềm năng.
-        
-        Args:
-            rr_ratio (float): Tỷ lệ risk-reward
-            liquidity_strength (float): Độ mạnh của vùng thanh khoản
-            
-        Returns:
-            float: Điểm chất lượng giao dịch (0-100)
-        """
-        # Trọng số
-        rr_weight = 0.7  # 70% dựa trên RR ratio
-        strength_weight = 0.3  # 30% dựa trên độ mạnh vùng thanh khoản
-        
-        # Tính điểm RR (giới hạn tại 3)
-        rr_score = min(100, rr_ratio * 33.33)
-        
-        # Tính điểm tổng hợp
-        quality = (rr_score * rr_weight) + (liquidity_strength * strength_weight)
-        
-        return quality
-    
-    def detect_liquidity_events(self, symbol: str, event_threshold: float = 1.5) -> Dict:
-        """
-        Phát hiện các sự kiện thanh khoản đáng chú ý, như tích tụ lệnh đột biến.
-        
-        Args:
-            symbol (str): Mã cặp giao dịch
-            event_threshold (float): Ngưỡng để phát hiện sự kiện thanh khoản đột biến
-            
-        Returns:
-            Dict: Các sự kiện thanh khoản đột biến
-        """
-        # Phân tích orderbook
-        orderbook_analysis = self.analyze_orderbook(symbol)
-        if not orderbook_analysis:
-            return None
-        
-        high_liquidity_zones = orderbook_analysis['high_liquidity_zones']
-        current_price = orderbook_analysis['current_price']
-        
-        # Tìm các vùng có thanh khoản đột biến
-        # Vùng có strength > 80 được coi là đột biến
-        liquidity_events = []
-        
-        for zone in high_liquidity_zones:
-            if zone['strength'] > 80:
-                distance_pct = abs(zone['price'] - current_price) / current_price * 100
-                
-                event = {
-                    'price': zone['price'],
-                    'type': zone['type'],
-                    'strength': zone['strength'],
-                    'distance_pct': distance_pct,
-                    'value': zone['value']
-                }
-                
-                # Phân loại sự kiện
-                if zone['type'] == 'bid':
-                    if distance_pct < 1.0:
-                        event['event_type'] = 'strong_support_close'
-                        event['description'] = f"Hỗ trợ mạnh gần giá hiện tại ({zone['price']:.2f})"
-                    else:
-                        event['event_type'] = 'strong_support_distant'
-                        event['description'] = f"Hỗ trợ mạnh cách xa ({zone['price']:.2f}, {distance_pct:.2f}%)"
-                else:  # ask
-                    if distance_pct < 1.0:
-                        event['event_type'] = 'strong_resistance_close'
-                        event['description'] = f"Kháng cự mạnh gần giá hiện tại ({zone['price']:.2f})"
-                    else:
-                        event['event_type'] = 'strong_resistance_distant'
-                        event['description'] = f"Kháng cự mạnh cách xa ({zone['price']:.2f}, {distance_pct:.2f}%)"
-                
-                # Thêm thông tin về khả năng liquidity grab
-                if zone['type'] == 'bid' and distance_pct < 3.0:
-                    event['potential_action'] = "Giá có thể giảm để lấy thanh khoản, sau đó tăng"
-                elif zone['type'] == 'ask' and distance_pct < 3.0:
-                    event['potential_action'] = "Giá có thể tăng để lấy thanh khoản, sau đó giảm"
-                
-                liquidity_events.append(event)
-        
-        # Tính toán chênh lệch bất thường trong bid/ask
-        bid_ask_ratio = orderbook_analysis['bid_ask_ratio']
-        
-        if bid_ask_ratio > event_threshold:
-            # Áp lực mua mạnh bất thường
-            event = {
-                'event_type': 'buying_pressure',
-                'strength': min(100, bid_ask_ratio * 20),  # Chuẩn hóa về thang 0-100
-                'description': f"Áp lực mua cực mạnh (tỷ lệ bid/ask: {bid_ask_ratio:.2f})",
-                'potential_action': "Giá có thể tăng trong ngắn hạn"
-            }
-            liquidity_events.append(event)
-        
-        elif bid_ask_ratio < 1 / event_threshold:
-            # Áp lực bán mạnh bất thường
-            event = {
-                'event_type': 'selling_pressure',
-                'strength': min(100, (1 / bid_ask_ratio) * 20),  # Chuẩn hóa về thang 0-100
-                'description': f"Áp lực bán cực mạnh (tỷ lệ bid/ask: {bid_ask_ratio:.2f})",
-                'potential_action': "Giá có thể giảm trong ngắn hạn"
-            }
-            liquidity_events.append(event)
-        
-        # Sắp xếp các sự kiện theo độ mạnh
-        liquidity_events = sorted(liquidity_events, key=lambda x: x['strength'], reverse=True)
-        
-        result = {
-            'current_price': current_price,
-            'events': liquidity_events,
-            'event_count': len(liquidity_events),
-            'bid_ask_ratio': bid_ask_ratio
-        }
-        
-        # Thêm cảnh báo nếu có
-        if liquidity_events:
-            result['warning'] = liquidity_events[0]['description']
-            
-            # Ghi log cảnh báo
-            logger.warning(f"Phát hiện sự kiện thanh khoản: {result['warning']}")
-        
-        return result
+    except Exception as e:
+        logger.error(f"Lỗi khi chạy test: {str(e)}")
+
+if __name__ == "__main__":
+    main()
