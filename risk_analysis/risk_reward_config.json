@@ -1,0 +1,23 @@
+{
+  "risk_reward_ratios": {
+    "trending": {
+      "take_profit": 2.5,
+      "stop_loss": 1.0
+    },
+    "ranging": {
+      "take_profit": 1.8,
+      "stop_loss": 1.0
+    },
+    "volatile": {
+      "take_profit": 3.0,
+      "stop_loss": 1.0
+    },
+    "quiet": {
+      "take_profit": 2.2,
+      "stop_loss": 1.0
+    }
+  },
+  "base_risk_percentage": 1.0,
+  "min_risk_percentage": 0.5,
+  "max_risk_percentage": 1.5
+}

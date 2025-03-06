@@ -1,0 +1,20 @@
+{
+  "signal_filter": {
+    "trending": {
+      "min_strength": 70,
+      "min_confirmation": 2
+    },
+    "ranging": {
+      "min_strength": 85,
+      "min_confirmation": 3
+    },
+    "volatile": {
+      "min_strength": 90,
+      "min_confirmation": 3
+    },
+    "quiet": {
+      "min_strength": 75,
+      "min_confirmation": 2
+    }
+  }
+}

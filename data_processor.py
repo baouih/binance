@@ -305,8 +305,8 @@ class DataProcessor:
                     klines = self.binance_api.get_historical_klines(
                         symbol=symbol,
                         interval=interval,
-                        start_str=current_start,
-                        end_str=end_timestamp,
+                        start_time=current_start,
+                        end_time=end_timestamp,
                         limit=1000
                     )
                     

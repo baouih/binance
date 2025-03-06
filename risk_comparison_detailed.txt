@@ -1,0 +1,77 @@
+=====================================================
+  BÁO CÁO CHI TIẾT SO SÁNH CÁC MỨC RỦI RO
+  Ngày: 2025-03-06 14:29:55
+=====================================================
+
+1. TỔNG QUAN HIỆU SUẤT
+-----------------------
+
+Mức Rủi ro   Lợi nhuận (%)   Số giao dịch Win rate (%)  Profit Factor   Max DD (%)   Avg. Win     Avg. Loss   
+---------------------------------------------------------------------------------------------------------
+0.5          48.67           17           82.35         2.25            31.67        0.00         -12.95      
+1.5          50.95           3            100.00        ∞               0.00         0.00         0.00        
+
+
+2. PHÂN TÍCH THEO CHẾ ĐỘ THỊ TRƯỜNG
+-----------------------------------
+
+Mức rủi ro: 0.5%
+--------------
+Chế độ       Số giao dịch Win rate (%)  Lợi nhuận (%)   Điều chỉnh rủi ro 
+----------------------------------------------------------------------
+Ranging      11           72.73         6.22            1.00              
+Trending     2            100.00        14.30           1.00              
+Quiet        4            100.00        28.16           1.00              
+
+Mức rủi ro: 1.5%
+--------------
+Chế độ       Số giao dịch Win rate (%)  Lợi nhuận (%)   Điều chỉnh rủi ro 
+----------------------------------------------------------------------
+Ranging      1            100.00        14.22           1.00              
+Quiet        2            100.00        36.73           1.00              
+
+
+
+3. PHÂN TÍCH ĐIỀU CHỈNH RỦI RO THÍCH ỨNG
+----------------------------------------
+
+Mức rủi ro: 0.5%
+--------------
+  Không có dữ liệu về điều chỉnh rủi ro thích ứng.
+
+Mức rủi ro: 1.5%
+--------------
+  Không có dữ liệu về điều chỉnh rủi ro thích ứng.
+
+
+
+4. PHÂN TÍCH GIAO DỊCH CHI TIẾT
+-------------------------------
+
+Mức rủi ro: 0.5%
+--------------
+  Không có dữ liệu giao dịch.
+
+Mức rủi ro: 1.5%
+--------------
+  Không có dữ liệu giao dịch.
+
+
+
+5. KẾT LUẬN VÀ ĐỀ XUẤT
+----------------------
+
+Dựa trên phân tích các mức rủi ro đã test, kết luận như sau:
+
+- Mức rủi ro có lợi nhuận cao nhất: 1.5% (lợi nhuận 50.95%)
+- Mức rủi ro có tỷ lệ thắng cao nhất: 1.5% (win rate 100.00%)
+- Mức rủi ro có profit factor cao nhất (ngoại trừ vô hạn): 0.5% (profit factor 2.25)
+- Mức rủi ro có drawdown thấp nhất: 1.5% (max drawdown 0.00%)
+
+Đề xuất:
+- Mức rủi ro tối ưu đề xuất: 1.5% (win rate ≥ 75%, lợi nhuận cao nhất)
+
+
+=====================================================
+               KẾT THÚC BÁO CÁO
+=====================================================

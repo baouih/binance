@@ -1,0 +1,168 @@
+
+        <html>
+        <head>
+            <title>Báo cáo phân tích mức rủi ro tối ưu</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1, h2, h3 { color: #333366; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { text-align: left; padding: 8px; }
+                th { background-color: #333366; color: white; }
+                tr:nth-child(even) { background-color: #f2f2f2; }
+                .highlight { background-color: #ffffcc; font-weight: bold; }
+                .chart-container { margin: 20px 0; }
+                .risk-0-5 { color: #2E86C1; }
+                .risk-1-0 { color: #27AE60; }
+                .risk-1-5 { color: #F39C12; }
+                .risk-2-0 { color: #E74C3C; }
+                .risk-3-0 { color: #8E44AD; }
+            </style>
+        </head>
+        <body>
+            <h1>Báo cáo phân tích mức rủi ro tối ưu</h1>
+            <p><strong>Thời gian tạo:</strong> 2025-03-06 13:21:26</p>
+            
+            <h2>1. Tổng quan hiệu suất theo mức rủi ro</h2>
+            <table border="1">
+                <tr>
+                    <th>Mức rủi ro (%)</th>
+                    <th>Lợi nhuận TB (%)</th>
+                    <th>Độ lệch chuẩn (%)</th>
+                    <th>Win Rate TB (%)</th>
+                    <th>Drawdown TB (%)</th>
+                    <th>Sharpe Ratio</th>
+                    <th>Số test</th>
+                </tr>
+        
+                <tr>
+                    <td class="risk-0-5">0.5%</td>
+                    <td class="">0.49% (±nan%)</td>
+                    <td>nan%</td>
+                    <td class="">47.17%</td>
+                    <td class="">2.37%</td>
+                    <td class="">1.54</td>
+                    <td>0</td>
+                </tr>
+            
+                <tr>
+                    <td class="risk-1-0">1.0%</td>
+                    <td class="">nan% (±nan%)</td>
+                    <td>nan%</td>
+                    <td class="">41.09%</td>
+                    <td class="">34.79%</td>
+                    <td class="">nan</td>
+                    <td>0</td>
+                </tr>
+            
+                <tr>
+                    <td class="risk-1-5">1.5%</td>
+                    <td class="highlight">0.51% (±nan%)</td>
+                    <td>nan%</td>
+                    <td class="highlight">100.00%</td>
+                    <td class="highlight">0.00%</td>
+                    <td class="highlight">50.95</td>
+                    <td>1</td>
+                </tr>
+            
+                <tr>
+                    <td class="risk-5-0">5.0%</td>
+                    <td class="">nan% (±nan%)</td>
+                    <td>nan%</td>
+                    <td class="">0.00%</td>
+                    <td class="">7.15%</td>
+                    <td class="">nan</td>
+                    <td>0</td>
+                </tr>
+            
+            </table>
+            
+            <h2>2. Mức rủi ro tối ưu theo từng tiêu chí</h2>
+            <table border="1">
+                <tr>
+                    <th>Tiêu chí</th>
+                    <th>Mức rủi ro tối ưu</th>
+                    <th>Giá trị</th>
+                </tr>
+        
+                <tr>
+                    <td>Lợi nhuận cao nhất</td>
+                    <td class="risk-1-5">1.5%</td>
+                    <td>0.51%</td>
+                </tr>
+                <tr>
+                    <td>Win Rate cao nhất</td>
+                    <td class="risk-1-5">1.5%</td>
+                    <td>100.00%</td>
+                </tr>
+                <tr>
+                    <td>Drawdown thấp nhất</td>
+                    <td class="risk-1-5">1.5%</td>
+                    <td>0.00%</td>
+                </tr>
+                <tr>
+                    <td>Sharpe Ratio cao nhất</td>
+                    <td class="risk-1-5">1.5%</td>
+                    <td>50.95</td>
+                </tr>
+        
+            </table>
+            
+            <h2>3. Biểu đồ phân tích</h2>
+            <div class="chart-container">
+                <h3>Tổng quan hiệu suất theo mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_performance_overview.png" alt="Biểu đồ tổng quan hiệu suất" style="width:100%; max-width:1000px;">
+            </div>
+        
+            <div class="chart-container">
+                <h3>Lợi nhuận theo khoảng thời gian và mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_profit_by_period.png" alt="Biểu đồ lợi nhuận theo khoảng thời gian" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Win Rate theo khoảng thời gian và mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_winrate_by_period.png" alt="Biểu đồ win rate theo khoảng thời gian" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bảng tối ưu hóa lợi nhuận</h3>
+                <img src="../../charts/risk_analysis/risk_profit_heatmap.png" alt="Bảng tối ưu hóa lợi nhuận" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bảng tối ưu hóa Sharpe Ratio</h3>
+                <img src="../../charts/risk_analysis/risk_sharpe_heatmap.png" alt="Bảng tối ưu hóa Sharpe Ratio" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>So sánh phân phối lợi nhuận giữa các mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/profit_distribution_comparison.png" alt="Biểu đồ so sánh phân phối lợi nhuận" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <h2>4. Kết luận và đề xuất</h2>
+        
+            <p>Dựa trên phân tích các mức rủi ro khác nhau, chúng ta có thể rút ra các kết luận sau:</p>
+            <ul>
+                <li>Mức rủi ro tối ưu cho lợi nhuận cao nhất: <strong class="risk-1-5">1.5%</strong></li>
+                <li>Mức rủi ro tối ưu cho win rate cao nhất: <strong class="risk-1-5">1.5%</strong></li>
+                <li>Mức rủi ro tối ưu cho drawdown thấp nhất: <strong class="risk-1-5">1.5%</strong></li>
+                <li>Mức rủi ro tối ưu cho Sharpe ratio cao nhất: <strong class="risk-1-5">1.5%</strong></li>
+            </ul>
+            
+            <p><strong>Đề xuất:</strong></p>
+            <p>Mức rủi ro cân bằng nhất (xuất hiện nhiều nhất trong các tiêu chí): <strong class="risk-1-5">1.5%</strong></p>
+            <p>Lý do:</p>
+            <ul>
+        <li>Mức rủi ro này mang lại lợi nhuận cao nhất (0.51%)</li><li>Mức rủi ro này mang lại win rate cao nhất (100.00%)</li><li>Mức rủi ro này mang lại Sharpe ratio tốt nhất (50.95)</li>
+            <li>Mức rủi ro này cung cấp sự cân bằng tốt giữa:
+                <ul>
+                    <li>Lợi nhuận: 0.51%</li>
+                    <li>Win rate: 100.00%</li>
+                    <li>Drawdown: 0.00%</li>
+                    <li>Sharpe ratio: 50.95</li>
+                </ul>
+            </li>
+        
+            </ul>
+        </body>
+        </html>
+        

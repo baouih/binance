@@ -1,706 +1,764 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
-Script tạo báo cáo phân tích rủi ro chi tiết với biểu đồ và tổng hợp kết quả
+Script phân tích chi tiết hiệu suất theo mức rủi ro
 
-Script này đọc dữ liệu kết quả từ thử nghiệm đa mức rủi ro và tạo ra các
-biểu đồ trực quan, bảng so sánh và khuyến nghị mức rủi ro tối ưu cho mỗi
-cặp tiền và trên toàn bộ hệ thống.
+Script này phân tích hiệu suất backtest với các mức rủi ro khác nhau,
+so sánh lợi nhuận, win rate, drawdown, và các metrics khác.
 """
 
 import os
-import sys
 import json
+import glob
 import logging
-import argparse
-import numpy as np
+import sys
+from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.colors as mcolors
-import seaborn as sns
-from typing import Dict, List, Tuple
-from datetime import datetime
+import matplotlib.ticker as mtick
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('risk_analysis_report.log'),
-        logging.StreamHandler()
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('risk_analysis.log')
     ]
 )
-logger = logging.getLogger('risk_analysis_report')
 
-# Đảm bảo các thư mục cần thiết tồn tại
-os.makedirs("risk_analysis", exist_ok=True)
-os.makedirs("risk_analysis/charts", exist_ok=True)
-os.makedirs("backtest_summary", exist_ok=True)
+logger = logging.getLogger('risk_analyzer')
 
-# Định nghĩa các mức rủi ro
-RISK_LEVELS = [0.5, 1.0, 1.5, 2.0, 3.0]
+# Đảm bảo thư mục kết quả tồn tại
+os.makedirs("reports/risk_analysis", exist_ok=True)
+os.makedirs("charts/risk_analysis", exist_ok=True)
 
-def load_summary_data(file_path: str = "backtest_summary/multi_risk_summary.json") -> Dict:
-    """
-    Tải dữ liệu tổng hợp từ file
+class RiskAnalysisReport:
+    """Lớp phân tích và tạo báo cáo chi tiết về hiệu suất theo mức rủi ro"""
     
-    Args:
-        file_path (str): Đường dẫn đến file dữ liệu
+    def __init__(self, results_dir='backtest_results'):
+        """
+        Khởi tạo phân tích
         
-    Returns:
-        Dict: Dữ liệu tổng hợp
-    """
-    try:
-        with open(file_path, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"Lỗi khi tải dữ liệu tổng hợp từ {file_path}: {str(e)}")
-        return {}
-
-def create_risk_performance_charts(summary_data: Dict) -> None:
-    """
-    Tạo biểu đồ hiệu suất theo mức rủi ro
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-    """
-    if not summary_data or "symbols" not in summary_data:
-        logger.warning("Không có dữ liệu để tạo biểu đồ")
-        return
-    
-    optimal_risk = summary_data.get("risk_analysis", {}).get("optimal_risk_by_symbol", {})
-    
-    # Tạo biểu đồ cho từng cặp tiền
-    for symbol, tf_data in summary_data["symbols"].items():
-        logger.info(f"Tạo biểu đồ cho {symbol}...")
+        Args:
+            results_dir (str): Thư mục chứa kết quả backtest
+        """
+        self.results_dir = results_dir
+        self.results = []
+        self.df_results = None
+        self.all_trades = []
+        self.risk_levels = []
         
-        for tf, risk_data in tf_data.items():
-            # Chuẩn bị dữ liệu
-            risks = []
-            profits = []
-            win_rates = []
-            profit_factors = []
+        # Màu sắc cho các mức rủi ro
+        self.risk_colors = {
+            0.5: '#2E86C1',   # Xanh dương
+            1.0: '#27AE60',   # Xanh lá
+            1.5: '#F39C12',   # Cam
+            2.0: '#E74C3C',   # Đỏ
+            3.0: '#8E44AD'    # Tím
+        }
+    
+    def load_results(self, symbol=None, interval=None):
+        """
+        Tải kết quả backtest
+        
+        Args:
+            symbol (str, optional): Lọc theo cặp tiền
+            interval (str, optional): Lọc theo khung thời gian
             
-            for risk_str, metrics in risk_data.items():
-                try:
-                    risk = float(risk_str)
-                    risks.append(risk)
-                    profits.append(metrics.get("profit_pct", 0))
-                    win_rates.append(metrics.get("win_rate", 0))
-                    profit_factors.append(min(metrics.get("profit_factor", 0), 5))  # Giới hạn ở 5 để dễ nhìn
-                except:
-                    continue
-            
-            if not risks:
-                continue
+        Returns:
+            bool: True nếu tải thành công ít nhất một kết quả
+        """
+        pattern = os.path.join(self.results_dir, "*.json")
+        result_files = glob.glob(pattern)
+        
+        if not result_files:
+            logger.warning(f"Không tìm thấy file kết quả nào trong {self.results_dir}")
+            return False
+        
+        logger.info(f"Tìm thấy {len(result_files)} file kết quả trong {self.results_dir}")
+        
+        for file_path in result_files:
+            try:
+                with open(file_path, 'r') as f:
+                    result_data = json.load(f)
                 
-            # Sắp xếp theo mức rủi ro
-            sorted_indices = np.argsort(risks)
-            risks = [risks[i] for i in sorted_indices]
-            profits = [profits[i] for i in sorted_indices]
-            win_rates = [win_rates[i] for i in sorted_indices]
-            profit_factors = [profit_factors[i] for i in sorted_indices]
+                # Lọc theo symbol và interval nếu có
+                if symbol and result_data.get('symbol') != symbol:
+                    continue
+                    
+                if interval and result_data.get('interval') != interval:
+                    continue
+                
+                # Thêm vào danh sách kết quả
+                self.results.append(result_data)
+                
+                # Thu thập các mức rủi ro độc nhất
+                risk = result_data.get('risk_percentage')
+                if risk is not None and risk not in self.risk_levels:
+                    self.risk_levels.append(risk)
+                
+                # Thu thập tất cả các giao dịch
+                if 'trades' in result_data:
+                    for trade in result_data['trades']:
+                        trade['symbol'] = result_data.get('symbol')
+                        trade['interval'] = result_data.get('interval')
+                        trade['risk_percentage'] = result_data.get('risk_percentage')
+                        trade['analysis_period'] = result_data.get('analysis_period')
+                        self.all_trades.append(trade)
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi tải file {file_path}: {str(e)}")
+        
+        # Sắp xếp các mức rủi ro
+        self.risk_levels.sort()
+        
+        logger.info(f"Đã tải {len(self.results)} kết quả thỏa mãn điều kiện")
+        logger.info(f"Mức rủi ro: {self.risk_levels}")
+        
+        if not self.results:
+            return False
+        
+        # Tạo DataFrame từ kết quả
+        self.df_results = pd.DataFrame(self.results)
+        
+        # Thêm trường Sharpe Ratio (Profit/Drawdown)
+        self.df_results['sharpe_ratio'] = self.df_results['profit_percentage'] / self.df_results['max_drawdown'].replace(0, 0.01)
+        
+        return True
+    
+    def create_risk_performance_chart(self):
+        """
+        Tạo biểu đồ hiệu suất theo mức rủi ro
+        """
+        if self.df_results is None or self.df_results.empty:
+            logger.warning("Không có dữ liệu để tạo biểu đồ")
+            return
+        
+        # Phân tích theo mức rủi ro
+        risk_analysis = self.df_results.groupby('risk_percentage').agg({
+            'profit_percentage': ['mean', 'std', 'max', 'min'],
+            'win_rate': ['mean', 'max', 'min'],
+            'max_drawdown': ['mean', 'max', 'min'],
+            'sharpe_ratio': ['mean', 'max', 'min'],
+            'analysis_period': 'count'
+        }).reset_index()
+        
+        # Đổi tên cột cho dễ truy cập
+        risk_analysis.columns = ['risk_percentage', 'profit_mean', 'profit_std', 'profit_max', 'profit_min', 
+                              'win_rate_mean', 'win_rate_max', 'win_rate_min',
+                              'drawdown_mean', 'drawdown_max', 'drawdown_min',
+                              'sharpe_mean', 'sharpe_max', 'sharpe_min',
+                              'test_count']
+        
+        # Tạo biểu đồ tổng quan hiệu suất
+        plt.figure(figsize=(12, 10))
+        
+        # 1. Biểu đồ lợi nhuận trung bình
+        ax1 = plt.subplot(221)
+        bars = ax1.bar(risk_analysis['risk_percentage'], risk_analysis['profit_mean'], 
+                    yerr=risk_analysis['profit_std'], capsize=5, 
+                    color=[self.risk_colors.get(r, '#CCCCCC') for r in risk_analysis['risk_percentage']])
+        
+        # Thêm giá trị lên mỗi cột
+        for bar in bars:
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                   f'{height:.2f}%',
+                   ha='center', va='bottom', rotation=0)
+        
+        ax1.set_title('Lợi nhuận trung bình theo mức rủi ro')
+        ax1.set_xlabel('Mức rủi ro (%)')
+        ax1.set_ylabel('Lợi nhuận (%)')
+        ax1.grid(axis='y', linestyle='--', alpha=0.7)
+        
+        # 2. Biểu đồ win rate
+        ax2 = plt.subplot(222)
+        bars = ax2.bar(risk_analysis['risk_percentage'], risk_analysis['win_rate_mean'],
+                     color=[self.risk_colors.get(r, '#CCCCCC') for r in risk_analysis['risk_percentage']])
+        
+        # Thêm giá trị lên mỗi cột
+        for bar in bars:
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                   f'{height:.1f}%',
+                   ha='center', va='bottom', rotation=0)
+        
+        ax2.set_title('Win Rate trung bình theo mức rủi ro')
+        ax2.set_xlabel('Mức rủi ro (%)')
+        ax2.set_ylabel('Win Rate (%)')
+        ax2.grid(axis='y', linestyle='--', alpha=0.7)
+        
+        # 3. Biểu đồ drawdown
+        ax3 = plt.subplot(223)
+        bars = ax3.bar(risk_analysis['risk_percentage'], risk_analysis['drawdown_mean'],
+                     color=[self.risk_colors.get(r, '#CCCCCC') for r in risk_analysis['risk_percentage']])
+        
+        # Thêm giá trị lên mỗi cột
+        for bar in bars:
+            height = bar.get_height()
+            ax3.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                   f'{height:.2f}%',
+                   ha='center', va='bottom', rotation=0)
+        
+        ax3.set_title('Drawdown trung bình theo mức rủi ro')
+        ax3.set_xlabel('Mức rủi ro (%)')
+        ax3.set_ylabel('Drawdown (%)')
+        ax3.grid(axis='y', linestyle='--', alpha=0.7)
+        
+        # 4. Biểu đồ Sharpe Ratio
+        ax4 = plt.subplot(224)
+        bars = ax4.bar(risk_analysis['risk_percentage'], risk_analysis['sharpe_mean'],
+                     color=[self.risk_colors.get(r, '#CCCCCC') for r in risk_analysis['risk_percentage']])
+        
+        # Thêm giá trị lên mỗi cột
+        for bar in bars:
+            height = bar.get_height()
+            ax4.text(bar.get_x() + bar.get_width()/2., height + 0.02,
+                   f'{height:.2f}',
+                   ha='center', va='bottom', rotation=0)
+        
+        ax4.set_title('Sharpe Ratio trung bình theo mức rủi ro')
+        ax4.set_xlabel('Mức rủi ro (%)')
+        ax4.set_ylabel('Sharpe Ratio')
+        ax4.grid(axis='y', linestyle='--', alpha=0.7)
+        
+        plt.tight_layout()
+        plt.savefig('charts/risk_analysis/risk_performance_overview.png')
+        plt.close()
+        
+        logger.info("Đã lưu biểu đồ hiệu suất theo mức rủi ro")
+        
+        # Tạo biểu đồ so sánh lợi nhuận theo mức rủi ro và khoảng thời gian
+        if 'analysis_period' in self.df_results.columns:
+            periods = self.df_results['analysis_period'].unique()
+            if len(periods) > 1:
+                plt.figure(figsize=(15, 8))
+                
+                # Chuẩn bị dữ liệu
+                pivot_data = self.df_results.pivot_table(
+                    index='analysis_period', 
+                    columns='risk_percentage',
+                    values='profit_percentage',
+                    aggfunc='mean'
+                )
+                
+                # Vẽ biểu đồ
+                ax = pivot_data.plot(kind='bar', figsize=(15, 8), 
+                                   color=[self.risk_colors.get(r, '#CCCCCC') for r in pivot_data.columns])
+                
+                plt.title('Lợi nhuận trung bình theo khoảng thời gian và mức rủi ro')
+                plt.xlabel('Khoảng thời gian')
+                plt.ylabel('Lợi nhuận (%)')
+                plt.legend(title='Mức rủi ro (%)')
+                plt.grid(axis='y', linestyle='--', alpha=0.7)
+                
+                # Thêm giá trị lên mỗi cột
+                for container in ax.containers:
+                    ax.bar_label(container, fmt='%.1f%%', padding=3)
+                
+                plt.tight_layout()
+                plt.savefig('charts/risk_analysis/risk_profit_by_period.png')
+                plt.close()
+                
+                logger.info("Đã lưu biểu đồ lợi nhuận theo khoảng thời gian và mức rủi ro")
+                
+                # Tương tự với Win Rate
+                plt.figure(figsize=(15, 8))
+                
+                # Chuẩn bị dữ liệu
+                pivot_data = self.df_results.pivot_table(
+                    index='analysis_period', 
+                    columns='risk_percentage',
+                    values='win_rate',
+                    aggfunc='mean'
+                )
+                
+                # Vẽ biểu đồ
+                ax = pivot_data.plot(kind='bar', figsize=(15, 8), 
+                                   color=[self.risk_colors.get(r, '#CCCCCC') for r in pivot_data.columns])
+                
+                plt.title('Win Rate trung bình theo khoảng thời gian và mức rủi ro')
+                plt.xlabel('Khoảng thời gian')
+                plt.ylabel('Win Rate (%)')
+                plt.legend(title='Mức rủi ro (%)')
+                plt.grid(axis='y', linestyle='--', alpha=0.7)
+                
+                # Thêm giá trị lên mỗi cột
+                for container in ax.containers:
+                    ax.bar_label(container, fmt='%.1f%%', padding=3)
+                
+                plt.tight_layout()
+                plt.savefig('charts/risk_analysis/risk_winrate_by_period.png')
+                plt.close()
+                
+                logger.info("Đã lưu biểu đồ win rate theo khoảng thời gian và mức rủi ro")
+    
+    def create_profit_distribution_chart(self):
+        """
+        Tạo biểu đồ phân phối lợi nhuận theo mức rủi ro
+        """
+        if not self.all_trades:
+            logger.warning("Không có dữ liệu giao dịch để tạo biểu đồ phân phối")
+            return
+        
+        # Tạo DataFrame từ tất cả giao dịch
+        df_trades = pd.DataFrame(self.all_trades)
+        
+        # Nhóm giao dịch theo mức rủi ro
+        for risk in self.risk_levels:
+            trades_for_risk = df_trades[df_trades['risk_percentage'] == risk]
             
-            # Biểu đồ lợi nhuận theo mức rủi ro
-            plt.figure(figsize=(12, 7))
-            plt.plot(risks, profits, 'o-', linewidth=2, markersize=8)
-            plt.axhline(y=0, color='r', linestyle='--', alpha=0.3)
-            plt.title(f'{symbol} ({tf}) - Lợi nhuận (%) theo mức rủi ro')
-            plt.xlabel('Mức rủi ro (%)')
+            if not trades_for_risk.empty:
+                profits = trades_for_risk['profit_percentage'].values
+                
+                plt.figure(figsize=(10, 6))
+                plt.hist(profits, bins=20, alpha=0.7, color=self.risk_colors.get(risk, '#CCCCCC'))
+                plt.axvline(x=0, color='r', linestyle='--')
+                plt.title(f'Phân phối lợi nhuận - Mức rủi ro {risk}%')
+                plt.xlabel('Lợi nhuận (%)')
+                plt.ylabel('Số lượng giao dịch')
+                plt.grid(axis='y', linestyle='--', alpha=0.7)
+                
+                # Thêm thông tin thống kê
+                mean_profit = profits.mean()
+                median_profit = np.median(profits)
+                positive_pct = (profits > 0).mean() * 100
+                
+                plt.figtext(0.15, 0.85, f'Lợi nhuận TB: {mean_profit:.2f}%', fontsize=10)
+                plt.figtext(0.15, 0.82, f'Lợi nhuận trung vị: {median_profit:.2f}%', fontsize=10)
+                plt.figtext(0.15, 0.79, f'Tỷ lệ lãi: {positive_pct:.1f}%', fontsize=10)
+                
+                plt.tight_layout()
+                plt.savefig(f'charts/risk_analysis/profit_distribution_risk_{risk}.png')
+                plt.close()
+                
+                logger.info(f"Đã lưu biểu đồ phân phối lợi nhuận cho mức rủi ro {risk}%")
+        
+        # Tạo biểu đồ violin để so sánh phân phối giữa các mức rủi ro
+        plt.figure(figsize=(12, 8))
+        
+        # Chuẩn bị dữ liệu cho violin plot
+        data = []
+        labels = []
+        
+        for risk in self.risk_levels:
+            trades_for_risk = df_trades[df_trades['risk_percentage'] == risk]
+            if not trades_for_risk.empty:
+                data.append(trades_for_risk['profit_percentage'].values)
+                labels.append(f"{risk}%")
+        
+        if data:
+            violin_parts = plt.violinplot(data, showmeans=True, showmedians=True)
+            
+            # Tùy chỉnh màu sắc
+            for i, pc in enumerate(violin_parts['bodies']):
+                pc.set_facecolor(self.risk_colors.get(self.risk_levels[i], '#CCCCCC'))
+                pc.set_alpha(0.7)
+            
+            # Thêm đường đánh dấu 0
+            plt.axhline(y=0, color='r', linestyle='--', alpha=0.5)
+            
+            plt.title('So sánh phân phối lợi nhuận theo mức rủi ro')
             plt.ylabel('Lợi nhuận (%)')
-            plt.grid(True, linestyle='--', alpha=0.7)
-            plt.xticks(risks)
-            
-            # Đánh dấu mức rủi ro tối ưu nếu có
-            optimal = optimal_risk.get(symbol)
-            if optimal is not None:
-                try:
-                    optimal_index = risks.index(optimal)
-                    plt.plot(optimal, profits[optimal_index], 'r*', markersize=15)
-                    plt.annotate(f'Tối ưu: {optimal}%', 
-                                xy=(optimal, profits[optimal_index]),
-                                xytext=(5, 10), textcoords='offset points', fontsize=12)
-                except:
-                    pass
+            plt.xticks(np.arange(1, len(labels) + 1), labels)
+            plt.xlabel('Mức rủi ro')
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
             
             plt.tight_layout()
-            plt.savefig(f"risk_analysis/charts/{symbol}_{tf}_risk_profit.png")
+            plt.savefig('charts/risk_analysis/profit_distribution_comparison.png')
             plt.close()
             
-            # Biểu đồ Profit Factor và Win Rate
-            fig, ax1 = plt.subplots(figsize=(12, 7))
-            
-            color = 'tab:blue'
-            ax1.set_xlabel('Mức rủi ro (%)')
-            ax1.set_ylabel('Profit Factor', color=color)
-            ax1.plot(risks, profit_factors, 'o-', color=color, linewidth=2, markersize=8)
-            ax1.tick_params(axis='y', labelcolor=color)
-            ax1.set_xticks(risks)
-            
-            ax2 = ax1.twinx()
-            color = 'tab:red'
-            ax2.set_ylabel('Win Rate (%)', color=color)
-            ax2.plot(risks, win_rates, 'o-', color=color, linewidth=2, markersize=8)
-            ax2.tick_params(axis='y', labelcolor=color)
-            
-            plt.title(f'{symbol} ({tf}) - Profit Factor và Win Rate theo mức rủi ro')
-            fig.tight_layout()
-            plt.savefig(f"risk_analysis/charts/{symbol}_{tf}_pf_winrate.png")
-            plt.close()
-
-def create_optimal_risk_distribution_chart(summary_data: Dict) -> None:
-    """
-    Tạo biểu đồ phân phối mức rủi ro tối ưu
+            logger.info("Đã lưu biểu đồ so sánh phân phối lợi nhuận giữa các mức rủi ro")
     
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-    """
-    if not summary_data or "risk_analysis" not in summary_data:
-        return
-        
-    risk_distribution = summary_data["risk_analysis"].get("risk_distribution", {})
-    
-    if not risk_distribution:
-        return
-    
-    # Chuẩn bị dữ liệu
-    risks = []
-    counts = []
-    
-    for risk_str, count in risk_distribution.items():
-        try:
-            risks.append(float(risk_str))
-            counts.append(count)
-        except:
-            continue
-    
-    if not risks:
-        return
-        
-    # Sắp xếp theo mức rủi ro
-    sorted_indices = np.argsort(risks)
-    risks = [risks[i] for i in sorted_indices]
-    counts = [counts[i] for i in sorted_indices]
-    
-    # Tạo biểu đồ
-    plt.figure(figsize=(12, 7))
-    bars = plt.bar(risks, counts, color='skyblue', width=0.4)
-    
-    # Thêm nhãn trên mỗi cột
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height + 0.1,
-                f'{height:.0f}', ha='center', va='bottom')
-    
-    plt.title('Phân phối mức rủi ro tối ưu', fontsize=16)
-    plt.xlabel('Mức rủi ro (%)', fontsize=14)
-    plt.ylabel('Số lượng cặp tiền', fontsize=14)
-    plt.xticks(risks, [f"{risk}%" for risk in risks], fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tight_layout()
-    plt.savefig("risk_analysis/charts/optimal_risk_distribution.png")
-    plt.close()
-
-def create_best_performers_chart(summary_data: Dict) -> None:
-    """
-    Tạo biểu đồ các cặp tiền có hiệu suất tốt nhất
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-    """
-    if not summary_data or "risk_analysis" not in summary_data:
-        return
-        
-    best_performers = summary_data["risk_analysis"].get("best_performers", [])
-    
-    if not best_performers:
-        return
-    
-    # Lấy top 10
-    top_performers = best_performers[:10]
-    
-    # Chuẩn bị dữ liệu
-    symbols = [f"{p['symbol'].replace('USDT', '')}" for p in top_performers]
-    profits = [p["profit_pct"] for p in top_performers]
-    tf_risk = [f"{p['timeframe']}/{p['risk']}%" for p in top_performers]
-    colors = ['green' if p > 0 else 'red' for p in profits]
-    
-    # Tạo biểu đồ
-    plt.figure(figsize=(14, 8))
-    bars = plt.bar(range(len(symbols)), profits, color=colors)
-    
-    # Thêm nhãn trên mỗi cột
-    for i, bar in enumerate(bars):
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., 
-                height + 0.1 if height >= 0 else height - 0.6,
-                f'{profits[i]:.2f}%\n{tf_risk[i]}', 
-                ha='center', va='bottom' if height >= 0 else 'top',
-                color='black' if height >= 0 else 'white',
-                fontsize=10)
-    
-    plt.title('Top 10 cặp tiền có hiệu suất tốt nhất', fontsize=16)
-    plt.xlabel('Cặp tiền', fontsize=14)
-    plt.ylabel('Lợi nhuận (%)', fontsize=14)
-    plt.xticks(range(len(symbols)), symbols, fontsize=12, rotation=45)
-    plt.yticks(fontsize=12)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.tight_layout()
-    plt.savefig("risk_analysis/charts/best_performers.png")
-    plt.close()
-
-def create_risk_profit_heatmap(summary_data: Dict) -> None:
-    """
-    Tạo heat map lợi nhuận theo mức rủi ro và cặp tiền
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-    """
-    if not summary_data or "symbols" not in summary_data:
-        return
-    
-    # Chọn khung thời gian (ưu tiên 1h nếu có)
-    tf_priority = ['1h', '4h']
-    selected_tf = None
-    
-    for symbol_data in summary_data["symbols"].values():
-        for tf in tf_priority:
-            if tf in symbol_data:
-                selected_tf = tf
-                break
-        if selected_tf:
-            break
-    
-    if not selected_tf:
-        timeframes = set()
-        for symbol_data in summary_data["symbols"].values():
-            timeframes.update(symbol_data.keys())
-        if timeframes:
-            selected_tf = list(timeframes)[0]
-        else:
+    def create_risk_optimization_matrix(self):
+        """
+        Tạo bảng tối ưu hóa mức rủi ro theo các tiêu chí khác nhau
+        """
+        if self.df_results is None or self.df_results.empty:
+            logger.warning("Không có dữ liệu để tạo bảng tối ưu hóa")
             return
-    
-    logger.info(f"Tạo heat map cho khung thời gian {selected_tf}...")
-    
-    # Chuẩn bị dữ liệu
-    symbols = []
-    
-    for symbol, symbol_data in summary_data["symbols"].items():
-        if selected_tf in symbol_data:
-            symbols.append(symbol)
-    
-    if not symbols:
-        return
         
-    # Tạo ma trận dữ liệu
-    risk_profit_data = np.zeros((len(RISK_LEVELS), len(symbols)))
-    
-    for i, risk in enumerate(RISK_LEVELS):
-        for j, symbol in enumerate(symbols):
-            risk_str = str(risk)
-            tf_data = summary_data["symbols"][symbol].get(selected_tf, {})
+        # Kiểm tra nếu có dữ liệu theo khoảng thời gian
+        if 'analysis_period' in self.df_results.columns:
+            periods = self.df_results['analysis_period'].unique()
             
-            if risk_str in tf_data:
-                risk_profit_data[i, j] = tf_data[risk_str].get("profit_pct", 0)
-    
-    # Tạo short names cho cặp tiền
-    symbols_short = [symbol.replace("USDT", "") for symbol in symbols]
-    
-    # Tạo heat map
-    plt.figure(figsize=(18, 10))
-    ax = plt.gca()
-    
-    # Tạo màu tùy chỉnh: đỏ cho âm, xanh lá cho dương
-    cmap = mcolors.LinearSegmentedColormap.from_list(
-        'RedGreen', ['#d13c4b', '#ffffff', '#1e8449'])
-    bounds = np.linspace(-10, 10, 21)  # Giới hạn từ -10% đến 10%
-    norm = mcolors.BoundaryNorm(bounds, cmap.N)
-    
-    im = plt.imshow(risk_profit_data, cmap=cmap, norm=norm, aspect='auto', interpolation='nearest')
-    plt.colorbar(im, label='Lợi nhuận (%)')
-    
-    # Thêm giá trị lên từng ô
-    for i in range(len(RISK_LEVELS)):
-        for j in range(len(symbols_short)):
-            value = risk_profit_data[i, j]
-            text_color = "black" if -2.5 < value < 2.5 else "white"
-            text = plt.text(j, i, f"{value:.1f}",
-                           ha="center", va="center", 
-                           color=text_color, fontsize=10)
-    
-    plt.title(f'Heat Map: Lợi nhuận (%) theo mức rủi ro và cặp tiền ({selected_tf})', fontsize=16)
-    plt.ylabel('Mức rủi ro (%)', fontsize=14)
-    plt.xlabel('Cặp tiền', fontsize=14)
-    plt.yticks(range(len(RISK_LEVELS)), [f"{risk}%" for risk in RISK_LEVELS], fontsize=12)
-    plt.xticks(range(len(symbols_short)), symbols_short, fontsize=12, rotation=45)
-    
-    # Đặt đường kẻ grid cho bảng
-    ax.set_xticks(np.arange(-0.5, len(symbols_short), 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, len(RISK_LEVELS), 1), minor=True)
-    ax.grid(which='minor', color='black', linestyle='-', linewidth=0.5)
-    
-    plt.tight_layout()
-    plt.savefig(f"risk_analysis/charts/risk_profit_heatmap_{selected_tf}.png")
-    plt.close()
-
-def calculate_risk_correlations(summary_data: Dict) -> Dict:
-    """
-    Tính tương quan giữa mức rủi ro và lợi nhuận
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-        
-    Returns:
-        Dict: Tương quan theo cặp tiền
-    """
-    if not summary_data or "symbols" not in summary_data:
-        return {}
-    
-    correlations = {}
-    
-    for symbol, tf_data in summary_data["symbols"].items():
-        symbol_correlations = {}
-        
-        for tf, risk_data in tf_data.items():
-            risks = []
-            profits = []
-            
-            for risk_str, metrics in risk_data.items():
-                try:
-                    risk = float(risk_str)
-                    profit = metrics.get("profit_pct", 0)
-                    
-                    risks.append(risk)
-                    profits.append(profit)
-                except:
-                    continue
-            
-            if len(risks) > 1:
-                # Tính tương quan
-                try:
-                    correlation = np.corrcoef(risks, profits)[0, 1]
-                    symbol_correlations[tf] = correlation
-                except:
-                    pass
-        
-        if symbol_correlations:
-            correlations[symbol] = symbol_correlations
-    
-    return correlations
-
-def generate_risk_recommendations(summary_data: Dict, correlations: Dict) -> Dict:
-    """
-    Tạo khuyến nghị mức rủi ro tối ưu
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-        correlations (Dict): Tương quan mức rủi ro vs lợi nhuận
-        
-    Returns:
-        Dict: Khuyến nghị
-    """
-    if not summary_data or "risk_analysis" not in summary_data:
-        return {}
-    
-    optimal_risks = summary_data["risk_analysis"].get("optimal_risk_by_symbol", {})
-    
-    recommendations = {
-        "global": {
-            "optimal_risk": 0,
-            "description": "",
-            "rationale": ""
-        },
-        "by_symbol": {}
-    }
-    
-    # Tính mức rủi ro trung bình tối ưu
-    if optimal_risks:
-        avg_risk = sum(optimal_risks.values()) / len(optimal_risks)
-        recommendations["global"]["optimal_risk"] = avg_risk
-        
-        # Phân loại xu hướng rủi ro
-        positive_corr = 0
-        negative_corr = 0
-        neutral_corr = 0
-        
-        for symbol, tf_corrs in correlations.items():
-            for tf, corr in tf_corrs.items():
-                if corr > 0.5:
-                    positive_corr += 1
-                elif corr < -0.5:
-                    negative_corr += 1
-                else:
-                    neutral_corr += 1
-        
-        if positive_corr > negative_corr and positive_corr > neutral_corr:
-            trend = "tăng rủi ro tăng lợi nhuận"
-            recommendations["global"]["description"] = f"Xu hướng tổng thể: {trend}. Nên sử dụng mức rủi ro {max(RISK_LEVELS):.1f}%"
-            recommendations["global"]["rationale"] = "Phần lớn các cặp tiền có lợi nhuận tăng khi tăng mức rủi ro"
-        elif negative_corr > positive_corr and negative_corr > neutral_corr:
-            trend = "tăng rủi ro giảm lợi nhuận"
-            recommendations["global"]["description"] = f"Xu hướng tổng thể: {trend}. Nên sử dụng mức rủi ro {min(RISK_LEVELS):.1f}%"
-            recommendations["global"]["rationale"] = "Phần lớn các cặp tiền có lợi nhuận giảm khi tăng mức rủi ro"
-        else:
-            trend = "không rõ ràng"
-            recommendations["global"]["description"] = f"Xu hướng tổng thể: {trend}. Nên sử dụng mức rủi ro trung bình {avg_risk:.1f}%"
-            recommendations["global"]["rationale"] = "Mức rủi ro tối ưu phụ thuộc vào từng cặp tiền cụ thể"
-    
-    # Tạo khuyến nghị cho từng cặp tiền
-    for symbol, tf_corrs in correlations.items():
-        if symbol not in optimal_risks:
-            continue
-            
-        optimal_risk = optimal_risks[symbol]
-        avg_corr = sum(tf_corrs.values()) / len(tf_corrs)
-        
-        recommendation = {
-            "optimal_risk": optimal_risk,
-            "correlation": avg_corr,
-            "description": ""
-        }
-        
-        if avg_corr > 0.7:
-            recommendation["description"] = f"Tương quan mạnh dương ({avg_corr:.2f}): Có thể tăng rủi ro để tăng lợi nhuận"
-        elif avg_corr < -0.7:
-            recommendation["description"] = f"Tương quan mạnh âm ({avg_corr:.2f}): Nên giảm rủi ro để tăng lợi nhuận"
-        elif avg_corr > 0.3:
-            recommendation["description"] = f"Tương quan dương nhẹ ({avg_corr:.2f}): Mức rủi ro {optimal_risk}% là phù hợp"
-        elif avg_corr < -0.3:
-            recommendation["description"] = f"Tương quan âm nhẹ ({avg_corr:.2f}): Mức rủi ro {optimal_risk}% là phù hợp"
-        else:
-            recommendation["description"] = f"Tương quan yếu ({avg_corr:.2f}): Mức rủi ro {optimal_risk}% là tối ưu"
-        
-        recommendations["by_symbol"][symbol] = recommendation
-    
-    return recommendations
-
-def generate_html_report(summary_data: Dict, correlations: Dict, recommendations: Dict) -> str:
-    """
-    Tạo báo cáo HTML
-    
-    Args:
-        summary_data (Dict): Dữ liệu tổng hợp
-        correlations (Dict): Tương quan mức rủi ro vs lợi nhuận
-        recommendations (Dict): Khuyến nghị
-        
-    Returns:
-        str: Nội dung HTML
-    """
-    # CSS style cho báo cáo
-    css = """
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; color: #333; }
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
-        h2 { color: #3498db; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        h3 { color: #2980b9; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:hover { background-color: #f5f5f5; }
-        .positive { color: green; }
-        .negative { color: red; }
-        .neutral { color: orange; }
-        .summary-box { background-color: #f8f9fa; border-left: 4px solid #3498db; padding: 15px; margin: 20px 0; }
-        .chart-container { text-align: center; margin: 30px 0; }
-        .chart-container img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; }
-        .recommendation { background-color: #e8f4fd; border-left: 4px solid #3498db; padding: 15px; margin: 20px 0; }
-    </style>
-    """
-    
-    # Tạo phần header
-    header = f"""
-    <h1>Báo Cáo Phân Tích Rủi Ro Đa Mức</h1>
-    <p style="text-align: center;">Phân tích hiệu suất giao dịch từ thử nghiệm 3 tháng với 5 mức rủi ro khác nhau</p>
-    <p style="text-align: center;"><em>Thời gian tạo: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</em></p>
-    """
-    
-    # Tạo phần tổng quan
-    overview = """
-    <h2>Tổng Quan</h2>
-    """
-    
-    if summary_data:
-        total_symbols = summary_data.get("total_symbols", 0)
-        total_timeframes = summary_data.get("total_timeframes", 0)
-        total_risk_levels = summary_data.get("total_risk_levels", 0)
-        
-        overview += f"""
-        <div class="summary-box">
-            <p><strong>Tổng số cặp tiền:</strong> {total_symbols}</p>
-            <p><strong>Số khung thời gian:</strong> {total_timeframes}</p>
-            <p><strong>Số mức rủi ro:</strong> {total_risk_levels}</p>
-        </div>
-        """
-    
-    # Thêm biểu đồ phân phối mức rủi ro tối ưu
-    overview += """
-    <h3>Phân Phối Mức Rủi Ro Tối Ưu</h3>
-    <div class="chart-container">
-        <img src="charts/optimal_risk_distribution.png" alt="Phân phối mức rủi ro tối ưu">
-    </div>
-    """
-    
-    # Thêm biểu đồ top performers
-    overview += """
-    <h3>Top 10 Cặp Tiền Có Hiệu Suất Tốt Nhất</h3>
-    <div class="chart-container">
-        <img src="charts/best_performers.png" alt="Top 10 cặp tiền có hiệu suất tốt nhất">
-    </div>
-    """
-    
-    # Thêm heat map
-    overview += """
-    <h3>Heat Map: Lợi Nhuận Theo Mức Rủi Ro</h3>
-    <div class="chart-container">
-        <img src="charts/risk_profit_heatmap_1h.png" alt="Heat map lợi nhuận theo mức rủi ro và cặp tiền">
-    </div>
-    """
-    
-    # Tạo phần khuyến nghị
-    recommendation_section = """
-    <h2>Khuyến Nghị Mức Rủi Ro</h2>
-    """
-    
-    if recommendations and "global" in recommendations:
-        global_rec = recommendations["global"]
-        
-        recommendation_section += f"""
-        <div class="recommendation">
-            <h3>Khuyến Nghị Tổng Thể</h3>
-            <p><strong>Mức rủi ro tối ưu:</strong> {global_rec["optimal_risk"]:.2f}%</p>
-            <p><strong>Mô tả:</strong> {global_rec["description"]}</p>
-            <p><strong>Lý do:</strong> {global_rec["rationale"]}</p>
-        </div>
-        """
-    
-    # Tạo bảng khuyến nghị theo cặp tiền
-    if recommendations and "by_symbol" in recommendations:
-        symbol_recs = recommendations["by_symbol"]
-        
-        if symbol_recs:
-            recommendation_section += """
-            <h3>Khuyến Nghị Theo Cặp Tiền</h3>
-            <table>
-                <tr>
-                    <th>Cặp Tiền</th>
-                    <th>Mức Rủi Ro Tối Ưu</th>
-                    <th>Tương Quan</th>
-                    <th>Mô Tả</th>
-                </tr>
-            """
-            
-            for symbol, rec in symbol_recs.items():
-                corr = rec.get("correlation", 0)
-                corr_class = "positive" if corr > 0.3 else "negative" if corr < -0.3 else "neutral"
+            if len(periods) > 1:
+                # Tạo heatmap cho lợi nhuận
+                pivot_profit = self.df_results.pivot_table(
+                    index='analysis_period', 
+                    columns='risk_percentage',
+                    values='profit_percentage',
+                    aggfunc='mean'
+                )
                 
-                recommendation_section += f"""
-                <tr>
-                    <td>{symbol}</td>
-                    <td>{rec["optimal_risk"]}%</td>
-                    <td class="{corr_class}">{corr:.2f}</td>
-                    <td>{rec["description"]}</td>
-                </tr>
-                """
+                plt.figure(figsize=(10, 6))
+                heatmap = plt.pcolor(pivot_profit, cmap='RdYlGn')
+                
+                plt.colorbar(heatmap, label='Lợi nhuận (%)')
+                plt.title('Bảng tối ưu hóa lợi nhuận theo mức rủi ro và khoảng thời gian')
+                plt.xlabel('Mức rủi ro (%)')
+                plt.ylabel('Khoảng thời gian')
+                
+                # Thêm giá trị vào từng ô
+                for i in range(len(pivot_profit.index)):
+                    for j in range(len(pivot_profit.columns)):
+                        plt.text(j + 0.5, i + 0.5, f'{pivot_profit.iloc[i, j]:.2f}%',
+                              ha='center', va='center', color='black')
+                
+                plt.xticks(np.arange(0.5, len(pivot_profit.columns)), pivot_profit.columns)
+                plt.yticks(np.arange(0.5, len(pivot_profit.index)), pivot_profit.index)
+                
+                plt.tight_layout()
+                plt.savefig('charts/risk_analysis/risk_profit_heatmap.png')
+                plt.close()
+                
+                logger.info("Đã lưu bảng tối ưu hóa lợi nhuận")
+                
+                # Tạo heatmap cho Sharpe Ratio
+                pivot_sharpe = self.df_results.pivot_table(
+                    index='analysis_period', 
+                    columns='risk_percentage',
+                    values='sharpe_ratio',
+                    aggfunc='mean'
+                )
+                
+                plt.figure(figsize=(10, 6))
+                heatmap = plt.pcolor(pivot_sharpe, cmap='RdYlGn')
+                
+                plt.colorbar(heatmap, label='Sharpe Ratio')
+                plt.title('Bảng tối ưu hóa Sharpe Ratio theo mức rủi ro và khoảng thời gian')
+                plt.xlabel('Mức rủi ro (%)')
+                plt.ylabel('Khoảng thời gian')
+                
+                # Thêm giá trị vào từng ô
+                for i in range(len(pivot_sharpe.index)):
+                    for j in range(len(pivot_sharpe.columns)):
+                        plt.text(j + 0.5, i + 0.5, f'{pivot_sharpe.iloc[i, j]:.2f}',
+                              ha='center', va='center', color='black')
+                
+                plt.xticks(np.arange(0.5, len(pivot_sharpe.columns)), pivot_sharpe.columns)
+                plt.yticks(np.arange(0.5, len(pivot_sharpe.index)), pivot_sharpe.index)
+                
+                plt.tight_layout()
+                plt.savefig('charts/risk_analysis/risk_sharpe_heatmap.png')
+                plt.close()
+                
+                logger.info("Đã lưu bảng tối ưu hóa Sharpe Ratio")
+    
+    def create_optimal_risk_report(self):
+        """
+        Tạo báo cáo về mức rủi ro tối ưu dựa trên phân tích
+        
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        if self.df_results is None or self.df_results.empty:
+            logger.warning("Không có dữ liệu để tạo báo cáo")
+            return None
+        
+        # Phân tích theo mức rủi ro
+        risk_analysis = self.df_results.groupby('risk_percentage').agg({
+            'profit_percentage': ['mean', 'std', 'max', 'min'],
+            'win_rate': ['mean', 'max', 'min'],
+            'max_drawdown': ['mean', 'max', 'min'],
+            'sharpe_ratio': ['mean', 'max', 'min'],
+            'analysis_period': 'count'
+        }).reset_index()
+        
+        # Đổi tên cột cho dễ truy cập
+        risk_analysis.columns = ['risk_percentage', 'profit_mean', 'profit_std', 'profit_max', 'profit_min', 
+                              'win_rate_mean', 'win_rate_max', 'win_rate_min',
+                              'drawdown_mean', 'drawdown_max', 'drawdown_min',
+                              'sharpe_mean', 'sharpe_max', 'sharpe_min',
+                              'test_count']
+        
+        # Tìm mức rủi ro tối ưu dựa trên các tiêu chí khác nhau
+        optimal_profit_risk = risk_analysis.loc[risk_analysis['profit_mean'].idxmax()]
+        optimal_winrate_risk = risk_analysis.loc[risk_analysis['win_rate_mean'].idxmax()]
+        optimal_drawdown_risk = risk_analysis.loc[risk_analysis['drawdown_mean'].idxmin()]
+        optimal_sharpe_risk = risk_analysis.loc[risk_analysis['sharpe_mean'].idxmax()]
+        
+        # Tạo báo cáo HTML
+        html_content = f"""
+        <html>
+        <head>
+            <title>Báo cáo phân tích mức rủi ro tối ưu</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                h1, h2, h3 {{ color: #333366; }}
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}
+                th, td {{ text-align: left; padding: 8px; }}
+                th {{ background-color: #333366; color: white; }}
+                tr:nth-child(even) {{ background-color: #f2f2f2; }}
+                .highlight {{ background-color: #ffffcc; font-weight: bold; }}
+                .chart-container {{ margin: 20px 0; }}
+                .risk-0-5 {{ color: #2E86C1; }}
+                .risk-1-0 {{ color: #27AE60; }}
+                .risk-1-5 {{ color: #F39C12; }}
+                .risk-2-0 {{ color: #E74C3C; }}
+                .risk-3-0 {{ color: #8E44AD; }}
+            </style>
+        </head>
+        <body>
+            <h1>Báo cáo phân tích mức rủi ro tối ưu</h1>
+            <p><strong>Thời gian tạo:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             
-            recommendation_section += """
+            <h2>1. Tổng quan hiệu suất theo mức rủi ro</h2>
+            <table border="1">
+                <tr>
+                    <th>Mức rủi ro (%)</th>
+                    <th>Lợi nhuận TB (%)</th>
+                    <th>Độ lệch chuẩn (%)</th>
+                    <th>Win Rate TB (%)</th>
+                    <th>Drawdown TB (%)</th>
+                    <th>Sharpe Ratio</th>
+                    <th>Số test</th>
+                </tr>
+        """
+        
+        # Thêm hàng dữ liệu
+        for i, row in risk_analysis.iterrows():
+            risk_class = f"risk-{row['risk_percentage']}".replace('.', '-')
+            
+            # Xác định các giá trị tối ưu
+            profit_highlight = "highlight" if row['risk_percentage'] == optimal_profit_risk['risk_percentage'] else ""
+            winrate_highlight = "highlight" if row['risk_percentage'] == optimal_winrate_risk['risk_percentage'] else ""
+            drawdown_highlight = "highlight" if row['risk_percentage'] == optimal_drawdown_risk['risk_percentage'] else ""
+            sharpe_highlight = "highlight" if row['risk_percentage'] == optimal_sharpe_risk['risk_percentage'] else ""
+            
+            html_content += f"""
+                <tr>
+                    <td class="{risk_class}">{row['risk_percentage']}%</td>
+                    <td class="{profit_highlight}">{row['profit_mean']:.2f}% (±{row['profit_std']:.2f}%)</td>
+                    <td>{row['profit_std']:.2f}%</td>
+                    <td class="{winrate_highlight}">{row['win_rate_mean']:.2f}%</td>
+                    <td class="{drawdown_highlight}">{row['drawdown_mean']:.2f}%</td>
+                    <td class="{sharpe_highlight}">{row['sharpe_mean']:.2f}</td>
+                    <td>{int(row['test_count'])}</td>
+                </tr>
+            """
+        
+        html_content += """
             </table>
-            """
-    
-    # Tạo phần chi tiết
-    detail_section = """
-    <h2>Chi Tiết Theo Cặp Tiền</h2>
-    """
-    
-    if summary_data and "symbols" in summary_data:
-        for symbol in summary_data["symbols"]:
-            detail_section += f"""
-            <h3>{symbol}</h3>
+            
+            <h2>2. Mức rủi ro tối ưu theo từng tiêu chí</h2>
+            <table border="1">
+                <tr>
+                    <th>Tiêu chí</th>
+                    <th>Mức rủi ro tối ưu</th>
+                    <th>Giá trị</th>
+                </tr>
+        """
+        
+        # Thông tin mức rủi ro tối ưu theo từng tiêu chí
+        opt_profit_class = f"risk-{optimal_profit_risk['risk_percentage']}".replace('.', '-')
+        opt_winrate_class = f"risk-{optimal_winrate_risk['risk_percentage']}".replace('.', '-')
+        opt_drawdown_class = f"risk-{optimal_drawdown_risk['risk_percentage']}".replace('.', '-')
+        opt_sharpe_class = f"risk-{optimal_sharpe_risk['risk_percentage']}".replace('.', '-')
+        
+        html_content += f"""
+                <tr>
+                    <td>Lợi nhuận cao nhất</td>
+                    <td class="{opt_profit_class}">{optimal_profit_risk['risk_percentage']}%</td>
+                    <td>{optimal_profit_risk['profit_mean']:.2f}%</td>
+                </tr>
+                <tr>
+                    <td>Win Rate cao nhất</td>
+                    <td class="{opt_winrate_class}">{optimal_winrate_risk['risk_percentage']}%</td>
+                    <td>{optimal_winrate_risk['win_rate_mean']:.2f}%</td>
+                </tr>
+                <tr>
+                    <td>Drawdown thấp nhất</td>
+                    <td class="{opt_drawdown_class}">{optimal_drawdown_risk['risk_percentage']}%</td>
+                    <td>{optimal_drawdown_risk['drawdown_mean']:.2f}%</td>
+                </tr>
+                <tr>
+                    <td>Sharpe Ratio cao nhất</td>
+                    <td class="{opt_sharpe_class}">{optimal_sharpe_risk['risk_percentage']}%</td>
+                    <td>{optimal_sharpe_risk['sharpe_mean']:.2f}</td>
+                </tr>
+        """
+        
+        html_content += """
+            </table>
+            
+            <h2>3. Biểu đồ phân tích</h2>
             <div class="chart-container">
-                <img src="charts/{symbol}_1h_risk_profit.png" alt="{symbol} lợi nhuận theo mức rủi ro">
+                <h3>Tổng quan hiệu suất theo mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_performance_overview.png" alt="Biểu đồ tổng quan hiệu suất" style="width:100%; max-width:1000px;">
             </div>
+        """
+        
+        # Thêm biểu đồ theo khoảng thời gian nếu có
+        if 'analysis_period' in self.df_results.columns and len(self.df_results['analysis_period'].unique()) > 1:
+            html_content += """
             <div class="chart-container">
-                <img src="charts/{symbol}_1h_pf_winrate.png" alt="{symbol} profit factor và win rate">
+                <h3>Lợi nhuận theo khoảng thời gian và mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_profit_by_period.png" alt="Biểu đồ lợi nhuận theo khoảng thời gian" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Win Rate theo khoảng thời gian và mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/risk_winrate_by_period.png" alt="Biểu đồ win rate theo khoảng thời gian" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bảng tối ưu hóa lợi nhuận</h3>
+                <img src="../../charts/risk_analysis/risk_profit_heatmap.png" alt="Bảng tối ưu hóa lợi nhuận" style="width:100%; max-width:1000px;">
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bảng tối ưu hóa Sharpe Ratio</h3>
+                <img src="../../charts/risk_analysis/risk_sharpe_heatmap.png" alt="Bảng tối ưu hóa Sharpe Ratio" style="width:100%; max-width:1000px;">
             </div>
             """
+        
+        # Thêm biểu đồ phân phối lợi nhuận
+        if self.all_trades:
+            html_content += """
+            <div class="chart-container">
+                <h3>So sánh phân phối lợi nhuận giữa các mức rủi ro</h3>
+                <img src="../../charts/risk_analysis/profit_distribution_comparison.png" alt="Biểu đồ so sánh phân phối lợi nhuận" style="width:100%; max-width:1000px;">
+            </div>
+            """
+            
+            for risk in self.risk_levels:
+                df_trades = pd.DataFrame(self.all_trades)
+                trades_for_risk = df_trades[df_trades['risk_percentage'] == risk]
+                
+                if not trades_for_risk.empty:
+                    html_content += f"""
+                    <div class="chart-container">
+                        <h3>Phân phối lợi nhuận - Mức rủi ro {risk}%</h3>
+                        <img src="../../charts/risk_analysis/profit_distribution_risk_{risk}.png" alt="Biểu đồ phân phối lợi nhuận" style="width:100%; max-width:1000px;">
+                    </div>
+                    """
+        
+        # Thêm kết luận và đề xuất
+        html_content += """
+            <h2>4. Kết luận và đề xuất</h2>
+        """
+        
+        # Tìm mức rủi ro cân bằng dựa trên nhiều tiêu chí
+        optimal_risks = [
+            optimal_profit_risk['risk_percentage'],
+            optimal_winrate_risk['risk_percentage'],
+            optimal_sharpe_risk['risk_percentage']
+        ]
+        
+        # Xác định mức rủi ro xuất hiện nhiều nhất trong các tiêu chí
+        from collections import Counter
+        risk_counter = Counter(optimal_risks)
+        most_balanced_risk = risk_counter.most_common(1)[0][0]
+        
+        balance_risk_class = f"risk-{most_balanced_risk}".replace('.', '-')
+        
+        html_content += f"""
+            <p>Dựa trên phân tích các mức rủi ro khác nhau, chúng ta có thể rút ra các kết luận sau:</p>
+            <ul>
+                <li>Mức rủi ro tối ưu cho lợi nhuận cao nhất: <strong class="{opt_profit_class}">{optimal_profit_risk['risk_percentage']}%</strong></li>
+                <li>Mức rủi ro tối ưu cho win rate cao nhất: <strong class="{opt_winrate_class}">{optimal_winrate_risk['risk_percentage']}%</strong></li>
+                <li>Mức rủi ro tối ưu cho drawdown thấp nhất: <strong class="{opt_drawdown_class}">{optimal_drawdown_risk['risk_percentage']}%</strong></li>
+                <li>Mức rủi ro tối ưu cho Sharpe ratio cao nhất: <strong class="{opt_sharpe_class}">{optimal_sharpe_risk['risk_percentage']}%</strong></li>
+            </ul>
+            
+            <p><strong>Đề xuất:</strong></p>
+            <p>Mức rủi ro cân bằng nhất (xuất hiện nhiều nhất trong các tiêu chí): <strong class="{balance_risk_class}">{most_balanced_risk}%</strong></p>
+            <p>Lý do:</p>
+            <ul>
+        """
+        
+        # Đưa ra lý do cụ thể
+        if most_balanced_risk == optimal_profit_risk['risk_percentage']:
+            html_content += f"<li>Mức rủi ro này mang lại lợi nhuận cao nhất ({optimal_profit_risk['profit_mean']:.2f}%)</li>"
+        
+        if most_balanced_risk == optimal_winrate_risk['risk_percentage']:
+            html_content += f"<li>Mức rủi ro này mang lại win rate cao nhất ({optimal_winrate_risk['win_rate_mean']:.2f}%)</li>"
+        
+        if most_balanced_risk == optimal_sharpe_risk['risk_percentage']:
+            html_content += f"<li>Mức rủi ro này mang lại Sharpe ratio tốt nhất ({optimal_sharpe_risk['sharpe_mean']:.2f})</li>"
+        
+        # Thêm thông tin về sự cân bằng giữa rủi ro và phần thưởng
+        most_balanced_idx = risk_analysis[risk_analysis['risk_percentage'] == most_balanced_risk].index[0]
+        html_content += f"""
+            <li>Mức rủi ro này cung cấp sự cân bằng tốt giữa:
+                <ul>
+                    <li>Lợi nhuận: {risk_analysis.iloc[most_balanced_idx]['profit_mean']:.2f}%</li>
+                    <li>Win rate: {risk_analysis.iloc[most_balanced_idx]['win_rate_mean']:.2f}%</li>
+                    <li>Drawdown: {risk_analysis.iloc[most_balanced_idx]['drawdown_mean']:.2f}%</li>
+                    <li>Sharpe ratio: {risk_analysis.iloc[most_balanced_idx]['sharpe_mean']:.2f}</li>
+                </ul>
+            </li>
+        """
+        
+        html_content += """
+            </ul>
+        </body>
+        </html>
+        """
+        
+        # Lưu báo cáo
+        report_path = "reports/risk_analysis/optimal_risk_report.html"
+        with open(report_path, 'w') as f:
+            f.write(html_content)
+        
+        logger.info(f"Đã lưu báo cáo mức rủi ro tối ưu vào {report_path}")
+        
+        return report_path
     
-    # Tạo phần kết luận
-    conclusion = """
-    <h2>Kết Luận</h2>
-    <p>Dựa trên kết quả phân tích các mức rủi ro khác nhau trên tất cả các cặp tiền, có thể rút ra một số kết luận sau:</p>
-    <ol>
-        <li>Mức rủi ro tối ưu khác nhau giữa các cặp tiền và phụ thuộc vào đặc tính của mỗi thị trường.</li>
-        <li>Một số cặp tiền có xu hướng lợi nhuận tăng khi tăng rủi ro, trong khi các cặp khác có xu hướng ngược lại.</li>
-        <li>Việc điều chỉnh mức rủi ro phù hợp cho từng cặp tiền có thể cải thiện đáng kể hiệu suất tổng thể của hệ thống.</li>
-        <li>Mỗi mức rủi ro có những ưu và nhược điểm khác nhau, cần cân nhắc kỹ dựa trên mục tiêu đầu tư và khẩu vị rủi ro.</li>
-    </ol>
-    """
-    
-    # Kết hợp các phần
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Báo Cáo Phân Tích Rủi Ro Đa Mức</title>
-        {css}
-    </head>
-    <body>
-        {header}
-        {overview}
-        {recommendation_section}
-        {detail_section}
-        {conclusion}
-    </body>
-    </html>
-    """
-    
-    return html_content
+    def analyze_and_create_report(self, symbol=None, interval=None):
+        """
+        Phân tích và tạo báo cáo tổng hợp về mức rủi ro tối ưu
+        
+        Args:
+            symbol (str, optional): Lọc theo cặp tiền
+            interval (str, optional): Lọc theo khung thời gian
+            
+        Returns:
+            str: Đường dẫn đến báo cáo hoặc None nếu không có dữ liệu
+        """
+        # Tải kết quả
+        if not self.load_results(symbol, interval):
+            logger.warning("Không thể tải kết quả để phân tích")
+            return None
+        
+        # Tạo biểu đồ hiệu suất
+        self.create_risk_performance_chart()
+        
+        # Tạo biểu đồ phân phối lợi nhuận
+        self.create_profit_distribution_chart()
+        
+        # Tạo bảng tối ưu hóa
+        self.create_risk_optimization_matrix()
+        
+        # Tạo báo cáo
+        report_path = self.create_optimal_risk_report()
+        
+        return report_path
 
 def main():
     """Hàm chính"""
-    parser = argparse.ArgumentParser(description='Tạo báo cáo phân tích rủi ro')
-    parser.add_argument('--input', default='backtest_summary/multi_risk_summary.json', help='File dữ liệu đầu vào')
-    parser.add_argument('--output', default='risk_analysis/risk_analysis_report.html', help='File báo cáo đầu ra')
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Phân tích chi tiết hiệu suất theo mức rủi ro')
+    parser.add_argument('--symbol', type=str, help='Lọc theo cặp tiền')
+    parser.add_argument('--interval', type=str, help='Lọc theo khung thời gian')
+    parser.add_argument('--results-dir', type=str, default='backtest_results',
+                      help='Thư mục chứa kết quả backtest')
+    
     args = parser.parse_args()
     
-    # Tải dữ liệu
-    summary_data = load_summary_data(args.input)
+    analyzer = RiskAnalysisReport(results_dir=args.results_dir)
+    report_path = analyzer.analyze_and_create_report(symbol=args.symbol, interval=args.interval)
     
-    if not summary_data:
-        logger.error("Không thể tải dữ liệu tổng hợp, kết thúc")
-        return
-    
-    logger.info("Tạo biểu đồ phân tích rủi ro...")
-    
-    # Tạo các biểu đồ
-    create_risk_performance_charts(summary_data)
-    create_optimal_risk_distribution_chart(summary_data)
-    create_best_performers_chart(summary_data)
-    create_risk_profit_heatmap(summary_data)
-    
-    # Tính tương quan
-    correlations = calculate_risk_correlations(summary_data)
-    
-    # Tạo khuyến nghị
-    recommendations = generate_risk_recommendations(summary_data, correlations)
-    
-    # Tạo báo cáo HTML
-    html_content = generate_html_report(summary_data, correlations, recommendations)
-    
-    # Lưu báo cáo
-    with open(args.output, 'w') as f:
-        f.write(html_content)
-    
-    logger.info(f"Đã lưu báo cáo HTML: {args.output}")
-    
-    # Lưu khuyến nghị dưới dạng JSON
-    with open("risk_analysis/risk_recommendations.json", 'w') as f:
-        json.dump(recommendations, f, indent=4)
-    
-    logger.info("Đã lưu khuyến nghị: risk_analysis/risk_recommendations.json")
+    if report_path:
+        logger.info(f"Phân tích hoàn tất. Báo cáo được lưu tại: {report_path}")
+    else:
+        logger.error("Không thể tạo báo cáo do thiếu dữ liệu")
 
 if __name__ == "__main__":
     main()
