@@ -1,694 +1,55 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Module Trailing Stop thích ứng cải tiến (Enhanced Adaptive Trailing Stop)
+Module Enhanced Adaptive Trailing Stop (EATS)
 
-Module này mở rộng từ Advanced Trailing Stop, cung cấp các cải tiến như:
-- Bảo vệ lợi nhuận tự động khi đạt ngưỡng
-- Điều chỉnh theo chế độ thị trường
-- Căn chỉnh với các mức hỗ trợ/kháng cự
-- Tự động phân đoạn thoát vị thế theo giai đoạn
+Module này cung cấp các chiến lược trailing stop nâng cao với khả năng tự động
+thích nghi với điều kiện thị trường, bao gồm:
+
+1. Percentage Trailing Stop: Dựa trên % callback, tự động điều chỉnh theo
+   biến động thị trường
+2. Step Trailing Stop: Sử dụng nhiều mức trailing stop tăng dần theo lợi nhuận
+3. ATR-based Trailing Stop: Dựa trên chỉ báo ATR để thích nghi với biến động
+
+Mỗi chiến lược đều hỗ trợ thoát lệnh một phần (partial exit) ở các ngưỡng
+lợi nhuận khác nhau để tối ưu hóa kết quả giao dịch.
 """
 
-import os
-import sys
 import json
-import time
-import math
 import logging
-import datetime
-import numpy as np
+import os
 from typing import Dict, List, Tuple, Optional, Union, Any
-from pathlib import Path
+from datetime import datetime
+import time
+import numpy as np
 
-# Cấu hình logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('enhanced_trailing_stop.log')
-    ]
-)
-logger = logging.getLogger('enhanced_trailing_stop')
-
-# Thêm thư mục gốc vào sys.path
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-# Import module cơ sở
-try:
-    from advanced_trailing_stop import TrailingStopStrategy, AdvancedTrailingStop
-except ImportError:
-    logger.error("Không thể import module advanced_trailing_stop. Hãy đảm bảo bạn đang chạy từ thư mục gốc.")
-    # Định nghĩa lớp giả lập nếu không import được
-    class TrailingStopStrategy:
-        def __init__(self, name: str):
-            self.name = name
-    
-    class AdvancedTrailingStop:
-        def __init__(self, strategy_type: str = "percentage", data_cache = None, config: Dict = None):
-            self.strategy_type = strategy_type
-            self.data_cache = data_cache
-            self.config = config or {}
-
-
-class AdaptiveTrailingStop(TrailingStopStrategy):
-    """
-    Chiến lược trailing stop thích ứng với nhiều yếu tố
-    """
-    
-    def __init__(self, config: Dict = None, data_provider = None):
-        """
-        Khởi tạo chiến lược
-        
-        Args:
-            config (Dict): Cấu hình cho chiến lược
-            data_provider: Nguồn cung cấp dữ liệu thị trường
-        """
-        super().__init__("adaptive")
-        self.config = config or {}
-        self.data_provider = data_provider
-        
-        # Tham số mặc định
-        self.default_config = {
-            'base_callback': 0.02,  # 2% callback cơ sở
-            'regime_multipliers': {
-                'trending': 0.7,  # Callback nhỏ hơn cho xu hướng
-                'ranging': 1.5,   # Callback lớn hơn cho thị trường sideway
-                'volatile': 1.2,  # Callback vừa phải cho thị trường biến động
-                'quiet': 1.0,     # Callback tiêu chuẩn cho thị trường ít biến động
-                'neutral': 1.0    # Mặc định
-            },
-            'profit_protection': {
-                'enabled': True,
-                'min_profit': 0.05,  # 5% lợi nhuận tối thiểu
-                'margin_factor': 0.01  # Đảm bảo lãi ít nhất 1% sau khi kích hoạt
-            },
-            'profit_phases': {
-                'initial': {'threshold': 0.02, 'multiplier': 1.0},       # 0-2%
-                'growing': {'threshold': 0.05, 'multiplier': 0.8},       # 2-5%
-                'substantial': {'threshold': 0.1, 'multiplier': 0.7},    # 5-10%
-                'significant': {'threshold': 0.2, 'multiplier': 0.6},    # 10-20%
-                'major': {'threshold': float('inf'), 'multiplier': 0.5}  # >20%
-            },
-            'sr_alignment': {
-                'enabled': True,
-                'max_distance': 0.02  # Khoảng cách tối đa để căn chỉnh (2%)
-            },
-            'time_factor': {
-                'enabled': True,
-                'reduction_per_day': 0.05  # Giảm 5% callback mỗi ngày
-            },
-            'weights': {
-                'regime': 0.35,
-                'profit': 0.30,
-                'volatility': 0.25,
-                'time': 0.10
-            },
-            'partial_exit': {
-                'enabled': False,
-                'thresholds': [0.05, 0.1, 0.2],  # Các mức lợi nhuận để thoát một phần
-                'percentages': [0.25, 0.25, 0.25]  # Phần trăm vị thế thoát ở mỗi mức
-            }
-        }
-        
-        # Merge cấu hình
-        for key, value in self.default_config.items():
-            if key not in self.config:
-                self.config[key] = value
-            elif isinstance(value, dict) and isinstance(self.config[key], dict):
-                for subkey, subvalue in value.items():
-                    if subkey not in self.config[key]:
-                        self.config[key][subkey] = subvalue
-    
-    def initialize(self, position: Dict) -> Dict:
-        """
-        Khởi tạo tham số cho chiến lược
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            
-        Returns:
-            Dict: Thông tin vị thế đã cập nhật
-        """
-        # Lưu chiến lược
-        position['trailing_type'] = self.name
-        position['trailing_config'] = self.config
-        position['trailing_activated'] = False
-        position['trailing_stop'] = None
-        position['trailing_status'] = "waiting"  # waiting, tracking, active
-        position['trailing_partial_exits'] = []
-        
-        # Lưu giá cao/thấp nhất
-        if position['side'] == 'LONG':
-            position['highest_price'] = position['entry_price']
-            position['lowest_price'] = None
-        else:  # SHORT
-            position['highest_price'] = None
-            position['lowest_price'] = position['entry_price']
-        
-        # Lưu thời gian vào lệnh
-        if 'entry_time' not in position:
-            position['entry_time'] = int(time.time())
-        
-        # Lưu thông tin thị trường
-        if self.data_provider:
-            position['market_regime'] = self._get_market_regime(position['symbol'])
-            position['entry_volatility'] = self._get_volatility(position['symbol'])
-            position['support_resistance_levels'] = self._get_support_resistance_levels(position['symbol'])
-        else:
-            position['market_regime'] = 'neutral'
-            position['entry_volatility'] = 0.02
-            position['support_resistance_levels'] = []
-        
-        return position
-    
-    def _get_market_regime(self, symbol: str) -> str:
-        """
-        Lấy chế độ thị trường hiện tại
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            
-        Returns:
-            str: Chế độ thị trường ('trending', 'ranging', 'volatile', 'quiet', 'neutral')
-        """
-        if not self.data_provider:
-            return 'neutral'
-            
-        try:
-            return self.data_provider.get_market_regime(symbol)
-        except:
-            return 'neutral'
-    
-    def _get_volatility(self, symbol: str) -> float:
-        """
-        Lấy biến động thị trường hiện tại
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            
-        Returns:
-            float: Giá trị biến động (ATR/Price)
-        """
-        if not self.data_provider:
-            return 0.02
-            
-        try:
-            return self.data_provider.get_volatility(symbol)
-        except:
-            return 0.02
-    
-    def _get_support_resistance_levels(self, symbol: str) -> List[float]:
-        """
-        Lấy các mức hỗ trợ/kháng cự gần đó
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            
-        Returns:
-            List[float]: Danh sách các mức giá
-        """
-        if not self.data_provider:
-            return []
-            
-        try:
-            return self.data_provider.get_support_resistance_levels(symbol)
-        except:
-            return []
-    
-    def _update_market_info(self, position: Dict) -> Dict:
-        """
-        Cập nhật thông tin thị trường cho vị thế
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            
-        Returns:
-            Dict: Thông tin vị thế đã cập nhật
-        """
-        if not self.data_provider:
-            return position
-            
-        symbol = position['symbol']
-        
-        try:
-            position['market_regime'] = self._get_market_regime(symbol)
-            position['current_volatility'] = self._get_volatility(symbol)
-            position['support_resistance_levels'] = self._get_support_resistance_levels(symbol)
-        except Exception as e:
-            logger.error(f"Lỗi khi cập nhật thông tin thị trường: {str(e)}")
-        
-        return position
-    
-    def _calculate_highest_profit(self, position: Dict, current_price: float) -> float:
-        """
-        Tính lợi nhuận cao nhất đã đạt được
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            float: Phần trăm lợi nhuận cao nhất
-        """
-        entry_price = position['entry_price']
-        side = position['side']
-        
-        if side == 'LONG':
-            highest_price = position.get('highest_price', entry_price)
-            highest_profit = (highest_price - entry_price) / entry_price
-        else:  # SHORT
-            lowest_price = position.get('lowest_price', entry_price)
-            highest_profit = (entry_price - lowest_price) / entry_price
-            
-        return highest_profit
-    
-    def _calculate_current_profit(self, position: Dict, current_price: float) -> float:
-        """
-        Tính lợi nhuận hiện tại
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            float: Phần trăm lợi nhuận hiện tại
-        """
-        entry_price = position['entry_price']
-        side = position['side']
-        
-        if side == 'LONG':
-            current_profit = (current_price - entry_price) / entry_price
-        else:  # SHORT
-            current_profit = (entry_price - current_price) / entry_price
-            
-        return current_profit
-    
-    def _get_time_in_trade_days(self, position: Dict) -> float:
-        """
-        Tính thời gian trong giao dịch (ngày)
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            
-        Returns:
-            float: Thời gian giao dịch (ngày)
-        """
-        entry_time = position.get('entry_time', int(time.time()))
-        now = int(time.time())
-        
-        days = (now - entry_time) / (24 * 3600)
-        return max(0, days)
-    
-    def _get_profit_phase_multiplier(self, highest_profit: float) -> float:
-        """
-        Lấy hệ số nhân theo giai đoạn lợi nhuận
-        
-        Args:
-            highest_profit (float): Lợi nhuận cao nhất
-            
-        Returns:
-            float: Hệ số nhân
-        """
-        profit_phases = self.config.get('profit_phases', {})
-        
-        for phase, config in profit_phases.items():
-            if highest_profit <= config.get('threshold', 0):
-                return config.get('multiplier', 1.0)
-        
-        # Mặc định cho lợi nhuận rất cao
-        return 0.5
-    
-    def _get_regime_multiplier(self, market_regime: str) -> float:
-        """
-        Lấy hệ số nhân theo chế độ thị trường
-        
-        Args:
-            market_regime (str): Chế độ thị trường
-            
-        Returns:
-            float: Hệ số nhân
-        """
-        regime_multipliers = self.config.get('regime_multipliers', {})
-        return regime_multipliers.get(market_regime, 1.0)
-    
-    def _get_volatility_multiplier(self, current_volatility: float, base_volatility: float) -> float:
-        """
-        Lấy hệ số nhân theo biến động
-        
-        Args:
-            current_volatility (float): Biến động hiện tại
-            base_volatility (float): Biến động cơ sở
-            
-        Returns:
-            float: Hệ số nhân
-        """
-        if base_volatility <= 0:
-            base_volatility = 0.02  # Giá trị mặc định
-            
-        volatility_ratio = current_volatility / base_volatility
-        
-        # Điều chỉnh theo tỷ lệ biến động
-        return min(1.5, max(0.7, volatility_ratio))
-    
-    def _get_time_multiplier(self, days_in_trade: float) -> float:
-        """
-        Lấy hệ số nhân theo thời gian
-        
-        Args:
-            days_in_trade (float): Số ngày trong giao dịch
-            
-        Returns:
-            float: Hệ số nhân
-        """
-        if not self.config.get('time_factor', {}).get('enabled', True):
-            return 1.0
-            
-        reduction_per_day = self.config.get('time_factor', {}).get('reduction_per_day', 0.05)
-        
-        # Giảm dần callback theo thời gian
-        multiplier = max(0.7, 1.0 - (days_in_trade * reduction_per_day))
-        return multiplier
-    
-    def _align_with_support_resistance(self, price: float, side: str, levels: List[float]) -> float:
-        """
-        Căn chỉnh giá với mức hỗ trợ/kháng cự gần nhất
-        
-        Args:
-            price (float): Giá ban đầu
-            side (str): Hướng vị thế ('LONG' hoặc 'SHORT')
-            levels (List[float]): Danh sách các mức hỗ trợ/kháng cự
-            
-        Returns:
-            float: Giá đã căn chỉnh
-        """
-        if not levels or not self.config.get('sr_alignment', {}).get('enabled', True):
-            return price
-            
-        max_distance = self.config.get('sr_alignment', {}).get('max_distance', 0.02)
-        max_distance_abs = price * max_distance
-        
-        # Sắp xếp mức giá theo thứ tự phù hợp
-        if side == 'LONG':
-            # Tìm mức hỗ trợ gần nhất dưới giá
-            suitable_levels = [level for level in levels if level < price]
-            if not suitable_levels:
-                return price
-                
-            # Tìm mức gần nhất
-            best_level = max(suitable_levels)
-            
-            # Kiểm tra khoảng cách
-            if price - best_level <= max_distance_abs:
-                return best_level
-        else:  # SHORT
-            # Tìm mức kháng cự gần nhất trên giá
-            suitable_levels = [level for level in levels if level > price]
-            if not suitable_levels:
-                return price
-                
-            # Tìm mức gần nhất
-            best_level = min(suitable_levels)
-            
-            # Kiểm tra khoảng cách
-            if best_level - price <= max_distance_abs:
-                return best_level
-        
-        return price
-    
-    def _protect_profit(self, trailing_stop: float, entry_price: float, highest_profit: float, side: str) -> float:
-        """
-        Bảo vệ lợi nhuận khi đạt ngưỡng
-        
-        Args:
-            trailing_stop (float): Giá trailing stop ban đầu
-            entry_price (float): Giá vào lệnh
-            highest_profit (float): Lợi nhuận cao nhất
-            side (str): Hướng vị thế ('LONG' hoặc 'SHORT')
-            
-        Returns:
-            float: Giá trailing stop đã điều chỉnh
-        """
-        if not self.config.get('profit_protection', {}).get('enabled', True):
-            return trailing_stop
-            
-        min_profit = self.config.get('profit_protection', {}).get('min_profit', 0.05)
-        margin_factor = self.config.get('profit_protection', {}).get('margin_factor', 0.01)
-        
-        # Chỉ bảo vệ khi lợi nhuận đủ lớn
-        if highest_profit < min_profit:
-            return trailing_stop
-            
-        if side == 'LONG':
-            # Nếu trailing_stop dưới giá vào, điều chỉnh lên
-            # Đảm bảo ít nhất lãi margin_factor
-            min_stop = entry_price * (1 + margin_factor)
-            if trailing_stop < min_stop:
-                return min_stop
-        else:  # SHORT
-            # Nếu trailing_stop trên giá vào, điều chỉnh xuống
-            max_stop = entry_price * (1 - margin_factor)
-            if trailing_stop > max_stop:
-                return max_stop
-        
-        return trailing_stop
-    
-    def _check_partial_exit(self, position: Dict, current_price: float) -> Dict:
-        """
-        Kiểm tra điều kiện thoát một phần vị thế
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            Dict: Thông tin thoát một phần hoặc None nếu không thoát
-        """
-        if not self.config.get('partial_exit', {}).get('enabled', False):
-            return None
-            
-        thresholds = self.config.get('partial_exit', {}).get('thresholds', [])
-        percentages = self.config.get('partial_exit', {}).get('percentages', [])
-        
-        if not thresholds or not percentages or len(thresholds) != len(percentages):
-            return None
-            
-        # Kiểm tra đã thoát ở ngưỡng nào chưa
-        exit_thresholds = [exit_info.get('threshold') for exit_info in position.get('trailing_partial_exits', [])]
-        
-        # Tính lợi nhuận hiện tại
-        current_profit = self._calculate_current_profit(position, current_price)
-        
-        # Kiểm tra các ngưỡng chưa thoát
-        for i, threshold in enumerate(thresholds):
-            if threshold not in exit_thresholds and current_profit >= threshold:
-                # Tính số lượng thoát
-                original_quantity = position.get('original_quantity', position.get('quantity', 0))
-                exit_percentage = percentages[i]
-                exit_quantity = original_quantity * exit_percentage
-                
-                # Kiểm tra số lượng còn lại
-                remaining_quantity = position.get('quantity', 0) - exit_quantity
-                if remaining_quantity <= 0:
-                    return None  # Không đủ số lượng để thoát
-                
-                return {
-                    'threshold': threshold,
-                    'percentage': exit_percentage,
-                    'quantity': exit_quantity,
-                    'price': current_price
-                }
-        
-        return None
-    
-    def update(self, position: Dict, current_price: float) -> Dict:
-        """
-        Cập nhật trailing stop dựa trên giá hiện tại
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            Dict: Thông tin vị thế đã cập nhật
-        """
-        # Cập nhật thông tin thị trường
-        position = self._update_market_info(position)
-        
-        # Lấy các thông tin cần thiết
-        entry_price = position['entry_price']
-        side = position['side']
-        market_regime = position.get('market_regime', 'neutral')
-        base_volatility = position.get('entry_volatility', 0.02)
-        current_volatility = position.get('current_volatility', base_volatility)
-        support_resistance_levels = position.get('support_resistance_levels', [])
-        
-        # Đảm bảo quantity và original_quantity
-        if 'original_quantity' not in position:
-            position['original_quantity'] = position.get('quantity', 0)
-        
-        # Cập nhật giá cao/thấp nhất
-        if side == 'LONG':
-            if position.get('highest_price') is None or current_price > position['highest_price']:
-                position['highest_price'] = current_price
-        else:  # SHORT
-            if position.get('lowest_price') is None or current_price < position['lowest_price']:
-                position['lowest_price'] = current_price
-        
-        # Tính lợi nhuận cao nhất và hiện tại
-        highest_profit = self._calculate_highest_profit(position, current_price)
-        current_profit = self._calculate_current_profit(position, current_price)
-        
-        # Kiểm tra thoát một phần
-        partial_exit = self._check_partial_exit(position, current_price)
-        if partial_exit:
-            # Thêm vào danh sách thoát một phần
-            if 'trailing_partial_exits' not in position:
-                position['trailing_partial_exits'] = []
-            position['trailing_partial_exits'].append(partial_exit)
-            
-            # Cập nhật số lượng
-            position['quantity'] -= partial_exit['quantity']
-            
-            logger.info(f"Thoát một phần {partial_exit['percentage']*100:.0f}% vị thế {position['symbol']} "
-                       f"ở mức lợi nhuận {partial_exit['threshold']*100:.1f}%, "
-                       f"giá: {partial_exit['price']:.2f}")
-        
-        # Tính các hệ số điều chỉnh
-        days_in_trade = self._get_time_in_trade_days(position)
-        profit_multiplier = self._get_profit_phase_multiplier(highest_profit)
-        regime_multiplier = self._get_regime_multiplier(market_regime)
-        volatility_multiplier = self._get_volatility_multiplier(current_volatility, base_volatility)
-        time_multiplier = self._get_time_multiplier(days_in_trade)
-        
-        # Lấy trọng số
-        weights = self.config.get('weights', {
-            'regime': 0.35,
-            'profit': 0.30,
-            'volatility': 0.25,
-            'time': 0.10
-        })
-        
-        # Tính callback tối ưu
-        base_callback = self.config.get('base_callback', 0.02)
-        callback_pct = (
-            base_callback * regime_multiplier * weights.get('regime', 0.35) +
-            base_callback * profit_multiplier * weights.get('profit', 0.30) +
-            base_callback * volatility_multiplier * weights.get('volatility', 0.25) +
-            base_callback * time_multiplier * weights.get('time', 0.10)
-        )
-        
-        # Tính trailing stop
-        if side == 'LONG':
-            # Tính giá trailing stop ban đầu
-            highest_price = position['highest_price']
-            callback_amount = highest_price * callback_pct
-            trailing_stop = highest_price - callback_amount
-            
-            # Bảo vệ lợi nhuận
-            trailing_stop = self._protect_profit(trailing_stop, entry_price, highest_profit, side)
-            
-            # Căn chỉnh với mức hỗ trợ/kháng cự
-            trailing_stop = self._align_with_support_resistance(trailing_stop, side, support_resistance_levels)
-        else:  # SHORT
-            # Tính giá trailing stop ban đầu
-            lowest_price = position['lowest_price']
-            callback_amount = lowest_price * callback_pct
-            trailing_stop = lowest_price + callback_amount
-            
-            # Bảo vệ lợi nhuận
-            trailing_stop = self._protect_profit(trailing_stop, entry_price, highest_profit, side)
-            
-            # Căn chỉnh với mức hỗ trợ/kháng cự
-            trailing_stop = self._align_with_support_resistance(trailing_stop, side, support_resistance_levels)
-        
-        # Cập nhật trạng thái trailing stop
-        old_trailing_stop = position.get('trailing_stop')
-        
-        if current_profit >= 0.01:  # Lãi ít nhất 1%
-            if not position.get('trailing_activated', False):
-                position['trailing_activated'] = True
-                position['trailing_status'] = "active"
-                logger.info(f"Đã kích hoạt trailing stop cho {position['symbol']} ở mức {trailing_stop:.2f}")
-            elif side == 'LONG' and (old_trailing_stop is None or trailing_stop > old_trailing_stop):
-                logger.info(f"Đã cập nhật trailing stop cho {position['symbol']} lên {trailing_stop:.2f}")
-            elif side == 'SHORT' and (old_trailing_stop is None or trailing_stop < old_trailing_stop):
-                logger.info(f"Đã cập nhật trailing stop cho {position['symbol']} xuống {trailing_stop:.2f}")
-        elif current_profit > 0:  # Lãi nhưng chưa đủ kích hoạt
-            position['trailing_status'] = "tracking"
-        
-        # Lưu trailing stop
-        position['trailing_stop'] = trailing_stop
-        
-        # Lưu thông tin phụ
-        position['trailing_factors'] = {
-            'highest_profit': highest_profit,
-            'current_profit': current_profit,
-            'days_in_trade': days_in_trade,
-            'callback_pct': callback_pct,
-            'profit_multiplier': profit_multiplier,
-            'regime_multiplier': regime_multiplier,
-            'volatility_multiplier': volatility_multiplier,
-            'time_multiplier': time_multiplier
-        }
-        
-        return position
-    
-    def should_close(self, position: Dict, current_price: float) -> Tuple[bool, str]:
-        """
-        Kiểm tra xem có nên đóng vị thế không
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            Tuple[bool, str]: (Có nên đóng hay không, Lý do)
-        """
-        # Kiểm tra xem trailing stop đã được kích hoạt chưa
-        if not position.get('trailing_activated', False) or position.get('trailing_stop') is None:
-            # Kiểm tra nếu đang lỗ quá lớn - hỗ trợ stop loss chung
-            entry_price = position['entry_price']
-            side = position['side']
-            
-            if side == 'LONG' and current_price < entry_price * 0.95:
-                return True, f"Giá ({current_price:.2f}) đã giảm quá 5% từ giá vào lệnh ({entry_price:.2f})"
-            elif side == 'SHORT' and current_price > entry_price * 1.05:
-                return True, f"Giá ({current_price:.2f}) đã tăng quá 5% từ giá vào lệnh ({entry_price:.2f})"
-                
-            return False, "Trailing stop chưa kích hoạt"
-        
-        side = position['side']
-        trailing_stop = position['trailing_stop']
-        
-        # Kiểm tra điều kiện đóng vị thế
-        if side == 'LONG' and current_price <= trailing_stop:
-            return True, f"Giá ({current_price:.2f}) đã chạm trailing stop ({trailing_stop:.2f})"
-        elif side == 'SHORT' and current_price >= trailing_stop:
-            return True, f"Giá ({current_price:.2f}) đã chạm trailing stop ({trailing_stop:.2f})"
-        
-        return False, "Giá chưa chạm trailing stop"
-
+# Thiết lập logging
+logging.basicConfig(level=logging.INFO, 
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('trailing_stop')
 
 class EnhancedAdaptiveTrailingStop:
     """
-    Lớp quản lý trailing stop thích ứng cải tiến
+    Lớp quản lý trailing stop thích ứng nâng cao với đa dạng chiến lược
+    và khả năng thích nghi với điều kiện thị trường
     """
     
-    def __init__(self, config_path: str = 'configs/enhanced_trailing_stop_config.json', data_provider = None):
+    def __init__(self, config_path: str = 'configs/trailing_stop_config.json'):
         """
-        Khởi tạo quản lý trailing stop
+        Khởi tạo Enhanced Adaptive Trailing Stop
         
         Args:
-            config_path (str): Đường dẫn file cấu hình
-            data_provider: Nguồn cung cấp dữ liệu thị trường
+            config_path (str): Đường dẫn đến file cấu hình
         """
         self.config_path = config_path
-        self.data_provider = data_provider
         self.config = self._load_config()
-        self.strategy = AdaptiveTrailingStop(self.config, data_provider)
+        self.history = self._load_history()
+        self.current_volatility = 1.0  # Hệ số biến động mặc định
+        self.current_volatility_multiplier = 1.0  # Hệ số nhân biến động mặc định
+        
+        logger.info(f"Đã tải cấu hình từ {config_path}")
+        logger.info("Đã khởi tạo Enhanced Adaptive Trailing Stop")
     
     def _load_config(self) -> Dict:
         """
@@ -697,364 +58,980 @@ class EnhancedAdaptiveTrailingStop:
         Returns:
             Dict: Cấu hình đã tải
         """
-        # Cấu hình mặc định
-        default_config = {
-            'base_callback': 0.02,  # 2% callback cơ sở
-            'regime_multipliers': {
-                'trending': 0.7,  # Callback nhỏ hơn cho xu hướng
-                'ranging': 1.5,   # Callback lớn hơn cho thị trường sideway
-                'volatile': 1.2,  # Callback vừa phải cho thị trường biến động
-                'quiet': 1.0,     # Callback tiêu chuẩn cho thị trường ít biến động
-                'neutral': 1.0    # Mặc định
-            },
-            'profit_protection': {
-                'enabled': True,
-                'min_profit': 0.05,  # 5% lợi nhuận tối thiểu
-                'margin_factor': 0.01  # Đảm bảo lãi ít nhất 1% sau khi kích hoạt
-            },
-            'sr_alignment': {
-                'enabled': True,
-                'max_distance': 0.02  # Khoảng cách tối đa để căn chỉnh (2%)
-            },
-            'partial_exit': {
-                'enabled': True,
-                'thresholds': [0.05, 0.1, 0.2],  # Các mức lợi nhuận để thoát một phần
-                'percentages': [0.25, 0.25, 0.25]  # Phần trăm vị thế thoát ở mỗi mức
-            }
-        }
-        
         try:
-            if os.path.exists(self.config_path):
-                with open(self.config_path, 'r') as f:
-                    loaded_config = json.load(f)
-                logger.info(f"Đã tải cấu hình từ {self.config_path}")
-                
-                # Merge với default config
-                for key, value in loaded_config.items():
-                    default_config[key] = value
-                    
-                return default_config
-            else:
-                # Lưu default config
-                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-                with open(self.config_path, 'w') as f:
-                    json.dump(default_config, f, indent=4)
-                logger.info(f"Đã tạo file cấu hình mặc định tại {self.config_path}")
-                return default_config
-        except Exception as e:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
             logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
-            return default_config
+            # Trả về cấu hình mặc định nếu có lỗi
+            return {
+                "strategies": {
+                    "percentage": {
+                        "trending": {
+                            "activation_percent": 1.0,
+                            "callback_percent": 0.5,
+                            "use_dynamic_callback": True,
+                            "min_callback": 0.3,
+                            "max_callback": 2.0,
+                            "partial_exits": []
+                        },
+                        "ranging": {
+                            "activation_percent": 0.8,
+                            "callback_percent": 0.8,
+                            "use_dynamic_callback": True,
+                            "min_callback": 0.5,
+                            "max_callback": 1.5,
+                            "partial_exits": []
+                        },
+                        "volatile": {
+                            "activation_percent": 1.5,
+                            "callback_percent": 1.0,
+                            "use_dynamic_callback": True,
+                            "min_callback": 0.8,
+                            "max_callback": 3.0,
+                            "partial_exits": []
+                        },
+                        "quiet": {
+                            "activation_percent": 0.5,
+                            "callback_percent": 0.3,
+                            "use_dynamic_callback": False,
+                            "partial_exits": []
+                        }
+                    }
+                },
+                "general": {
+                    "default_strategy": "percentage",
+                    "default_market_regime": "trending",
+                    "log_level": "INFO"
+                }
+            }
     
-    def save_config(self) -> bool:
+    def _load_history(self) -> List[Dict]:
         """
-        Lưu cấu hình vào file
+        Tải lịch sử trailing stop từ file
         
         Returns:
-            bool: True nếu lưu thành công, False nếu không
+            List[Dict]: Lịch sử đã tải hoặc danh sách rỗng
         """
+        history_file = self.config.get('general', {}).get('history_file', 'trailing_stop_history.json')
         try:
-            os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-            with open(self.config_path, 'w') as f:
-                json.dump(self.config, f, indent=4)
-            logger.info(f"Đã lưu cấu hình vào {self.config_path}")
+            with open(history_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.info("Không tìm thấy hoặc không thể tải lịch sử trailing stop")
+            return []
+    
+    def _convert_datetime_to_iso(self, obj):
+        """
+        Chuyển đổi các đối tượng datetime thành chuỗi ISO format
+        
+        Args:
+            obj: Đối tượng cần chuyển đổi
+            
+        Returns:
+            Đối tượng đã chuyển đổi
+        """
+        if isinstance(obj, dict):
+            return {key: self._convert_datetime_to_iso(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_datetime_to_iso(item) for item in obj]
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        else:
+            return obj
+            
+    def _save_history(self) -> bool:
+        """
+        Lưu lịch sử trailing stop vào file
+        
+        Returns:
+            bool: True nếu lưu thành công, False nếu thất bại
+        """
+        if not self.config.get('general', {}).get('save_history', True):
+            return False
+            
+        history_file = self.config.get('general', {}).get('history_file', 'trailing_stop_history.json')
+        max_entries = self.config.get('general', {}).get('max_history_entries', 1000)
+        
+        # Giới hạn số lượng mục lịch sử
+        if len(self.history) > max_entries:
+            self.history = self.history[-max_entries:]
+            
+        try:
+            # Chuyển đổi tất cả các đối tượng datetime trước khi serialize
+            serializable_history = self._convert_datetime_to_iso(self.history)
+            
+            with open(history_file, 'w', encoding='utf-8') as f:
+                json.dump(serializable_history, f, indent=2)
             return True
         except Exception as e:
-            logger.error(f"Lỗi khi lưu cấu hình: {str(e)}")
+            logger.error(f"Lỗi khi lưu lịch sử: {str(e)}")
             return False
     
-    def update_config(self, new_config: Dict) -> bool:
+    def _add_to_history(self, position_info: Dict) -> None:
         """
-        Cập nhật cấu hình
+        Thêm thông tin vị thế vào lịch sử
         
         Args:
-            new_config (Dict): Cấu hình mới
+            position_info (Dict): Thông tin vị thế đã đóng
+        """
+        if not self.config.get('general', {}).get('save_history', True):
+            return
+            
+        entry_time = position_info.get('entry_time')
+        if isinstance(entry_time, datetime):
+            position_info['entry_time'] = entry_time.isoformat()
+            
+        exit_time = position_info.get('exit_time')
+        if isinstance(exit_time, datetime):
+            position_info['exit_time'] = exit_time.isoformat()
+            
+        self.history.append(position_info)
+        self._save_history()
+    
+    def update_volatility(self, volatility: float = None) -> None:
+        """
+        Cập nhật hệ số biến động thị trường
+        
+        Args:
+            volatility (float, optional): Hệ số biến động mới
+        """
+        if volatility is None:
+            return
+            
+        self.current_volatility = volatility
+        self.current_volatility_multiplier = 1.0  # Đặt giá trị mặc định
+        
+        # Áp dụng giới hạn cho hệ số biến động
+        volatility_settings = self.config.get('market_volatility_adjustment', {})
+        if volatility_settings.get('enable', False):
+            low_threshold = volatility_settings.get('low_volatility_threshold', 0.5)
+            high_threshold = volatility_settings.get('high_volatility_threshold', 2.0)
+            
+            if volatility < low_threshold:
+                self.current_volatility_multiplier = volatility_settings.get('low_volatility_multiplier', 0.7)
+            elif volatility > high_threshold:
+                self.current_volatility_multiplier = volatility_settings.get('high_volatility_multiplier', 1.5)
+            else:
+                # Tuyến tính nội suy giữa giá trị thấp và cao
+                range_size = high_threshold - low_threshold
+                position = (volatility - low_threshold) / range_size
+                low_mult = volatility_settings.get('low_volatility_multiplier', 0.7)
+                high_mult = volatility_settings.get('high_volatility_multiplier', 1.5)
+                self.current_volatility_multiplier = low_mult + position * (high_mult - low_mult)
+        else:
+            self.current_volatility_multiplier = 1.0
+    
+    def _get_strategy_config(self, strategy_type: str, market_regime: str) -> Dict:
+        """
+        Lấy cấu hình cho chiến lược và chế độ thị trường cụ thể
+        
+        Args:
+            strategy_type (str): Loại chiến lược
+            market_regime (str): Chế độ thị trường
             
         Returns:
-            bool: True nếu cập nhật thành công, False nếu không
+            Dict: Cấu hình chiến lược
         """
+        default_strategy = self.config.get('general', {}).get('default_strategy', 'percentage')
+        default_regime = self.config.get('general', {}).get('default_market_regime', 'trending')
+        
+        if not strategy_type:
+            strategy_type = default_strategy
+        if not market_regime:
+            market_regime = default_regime
+            
+        # Lấy cấu hình cho chiến lược và chế độ thị trường
         try:
-            # Cập nhật từng phần của config
-            for key, value in new_config.items():
-                if key in self.config:
-                    if isinstance(value, dict) and isinstance(self.config[key], dict):
-                        # Merge nested dict
-                        self.config[key].update(value)
-                    else:
-                        self.config[key] = value
-                else:
-                    self.config[key] = value
-                    
-            # Cập nhật chiến lược
-            self.strategy = AdaptiveTrailingStop(self.config, self.data_provider)
-                    
-            # Lưu config mới
-            return self.save_config()
+            strategy_config = self.config.get('strategies', {}).get(strategy_type, {}).get(market_regime, {})
+            
+            # Nếu không tìm thấy cấu hình cụ thể, sử dụng cấu hình mặc định
+            if not strategy_config:
+                strategy_config = self.config.get('strategies', {}).get(default_strategy, {}).get(default_regime, {})
+                logger.warning(f"Không tìm thấy cấu hình cho {strategy_type}/{market_regime}, sử dụng mặc định")
+            
+            return strategy_config
         except Exception as e:
-            logger.error(f"Lỗi khi cập nhật cấu hình: {str(e)}")
-            return False
+            logger.error(f"Lỗi khi lấy cấu hình chiến lược: {str(e)}")
+            return {}
     
-    def initialize_position(self, position: Dict) -> Dict:
+    def initialize_trailing_stop(self, entry_price: float, side: str, 
+                               strategy_type: str = None, market_regime: str = None) -> Dict:
         """
-        Khởi tạo vị thế với chiến lược trailing stop
+        Khởi tạo trailing stop cho một vị thế mới
         
         Args:
-            position (Dict): Thông tin vị thế
+            entry_price (float): Giá vào lệnh
+            side (str): Hướng vị thế ('LONG' hoặc 'SHORT')
+            strategy_type (str, optional): Loại chiến lược
+            market_regime (str, optional): Chế độ thị trường
             
         Returns:
-            Dict: Thông tin vị thế đã cập nhật
+            Dict: Thông tin trailing stop đã khởi tạo
         """
-        return self.strategy.initialize(position)
+        if not strategy_type:
+            strategy_type = self.config.get('general', {}).get('default_strategy', 'percentage')
+        if not market_regime:
+            market_regime = self.config.get('general', {}).get('default_market_regime', 'trending')
+            
+        strategy_config = self._get_strategy_config(strategy_type, market_regime)
+        
+        # Khởi tạo thông tin vị thế cơ bản
+        position_info = {
+            'entry_price': entry_price,
+            'side': side,
+            'strategy_type': strategy_type,
+            'market_regime': market_regime,
+            'entry_time': datetime.now(),
+            'last_update_time': datetime.now(),
+            'highest_price': entry_price,
+            'lowest_price': entry_price,
+            'stop_price': None,
+            'current_price': entry_price,
+            'status': 'ACTIVE',
+            'trailing_activated': False,
+            'partial_exits': [],
+            'partial_exit_levels': strategy_config.get('partial_exits', []),
+            'profit_pct': 0.0,
+            'max_profit_pct': 0.0,
+            'config': strategy_config
+        }
+        
+        # Thêm thông tin đặc thù cho từng loại chiến lược
+        if strategy_type == 'percentage':
+            position_info['activation_percent'] = strategy_config.get('activation_percent', 1.0)
+            position_info['callback_percent'] = strategy_config.get('callback_percent', 0.5)
+            position_info['use_dynamic_callback'] = strategy_config.get('use_dynamic_callback', False)
+            position_info['min_callback'] = strategy_config.get('min_callback', 0.3)
+            position_info['max_callback'] = strategy_config.get('max_callback', 2.0)
+            
+            # Tính stop price ban đầu (chưa kích hoạt)
+            if side == 'LONG':
+                stop_pct = 1 - position_info['callback_percent'] / 100
+                position_info['stop_price'] = entry_price * stop_pct
+            else:  # SHORT
+                stop_pct = 1 + position_info['callback_percent'] / 100
+                position_info['stop_price'] = entry_price * stop_pct
+                
+        elif strategy_type == 'step':
+            position_info['profit_steps'] = strategy_config.get('profit_steps', [1.0, 2.0, 5.0, 10.0])
+            position_info['callback_steps'] = strategy_config.get('callback_steps', [0.2, 0.5, 1.0, 2.0])
+            position_info['current_step'] = 0
+            
+            # Tính stop price ban đầu (dựa trên step đầu tiên)
+            if side == 'LONG':
+                stop_pct = 1 - position_info['callback_steps'][0] / 100
+                position_info['stop_price'] = entry_price * stop_pct
+            else:  # SHORT
+                stop_pct = 1 + position_info['callback_steps'][0] / 100
+                position_info['stop_price'] = entry_price * stop_pct
+                
+        elif strategy_type == 'atr_based':
+            position_info['atr_multiplier'] = strategy_config.get('atr_multiplier', 2.0)
+            position_info['atr_value'] = strategy_config.get('atr_value', None)  # Sẽ được cập nhật khi có dữ liệu
+            position_info['min_profit_activation'] = strategy_config.get('min_profit_activation', 0.5)
+            
+            # Nếu không có giá trị ATR, sử dụng % callback mặc định
+            if not position_info['atr_value']:
+                atr_default = 0.01 * entry_price  # Giả định ATR là 1% giá
+                position_info['atr_value'] = atr_default
+            
+            # Tính stop price ban đầu
+            atr_distance = position_info['atr_value'] * position_info['atr_multiplier']
+            if side == 'LONG':
+                position_info['stop_price'] = entry_price - atr_distance
+            else:  # SHORT
+                position_info['stop_price'] = entry_price + atr_distance
+        
+        logger.info(f"Đã khởi tạo trailing stop cho vị thế {side}: chiến lược {strategy_type}, chế độ {market_regime}")
+        return position_info
     
-    def update_trailing_stop(self, position: Dict, current_price: float) -> Dict:
+    def update_trailing_stop(self, position_info: Dict, current_price: float, 
+                           atr_value: float = None) -> Dict:
         """
-        Cập nhật trailing stop cho vị thế
+        Cập nhật trailing stop dựa trên giá hiện tại
         
         Args:
-            position (Dict): Thông tin vị thế
+            position_info (Dict): Thông tin vị thế
             current_price (float): Giá hiện tại
+            atr_value (float, optional): Giá trị ATR hiện tại
             
         Returns:
             Dict: Thông tin vị thế đã cập nhật
         """
-        return self.strategy.update(position, current_price)
+        if position_info['status'] != 'ACTIVE':
+            return position_info
+            
+        side = position_info['side']
+        strategy_type = position_info['strategy_type']
+        entry_price = position_info['entry_price']
+        
+        # Cập nhật giá cao nhất/thấp nhất
+        if current_price > position_info['highest_price']:
+            position_info['highest_price'] = current_price
+        if current_price < position_info['lowest_price']:
+            position_info['lowest_price'] = current_price
+            
+        # Cập nhật giá hiện tại và thời gian
+        position_info['current_price'] = current_price
+        position_info['last_update_time'] = datetime.now()
+        
+        # Tính toán phần trăm lợi nhuận hiện tại
+        if side == 'LONG':
+            profit_pct = (current_price - entry_price) / entry_price * 100
+            max_profit_pct = (position_info['highest_price'] - entry_price) / entry_price * 100
+        else:  # SHORT
+            profit_pct = (entry_price - current_price) / entry_price * 100
+            max_profit_pct = (entry_price - position_info['lowest_price']) / entry_price * 100
+            
+        position_info['profit_pct'] = profit_pct
+        position_info['max_profit_pct'] = max_profit_pct
+        
+        # Cập nhật tùy theo chiến lược
+        if strategy_type == 'percentage':
+            self._update_percentage_trailing_stop(position_info, current_price)
+        elif strategy_type == 'step':
+            self._update_step_trailing_stop(position_info, current_price)
+        elif strategy_type == 'atr_based':
+            if atr_value:
+                position_info['atr_value'] = atr_value
+            self._update_atr_trailing_stop(position_info, current_price)
+            
+        # Kiểm tra điều kiện thoát một phần
+        if position_info['partial_exit_levels']:
+            self._check_partial_exits(position_info)
+            
+        return position_info
     
-    def check_stop_condition(self, position: Dict, current_price: float) -> Tuple[bool, str]:
+    def _update_percentage_trailing_stop(self, position_info: Dict, current_price: float) -> None:
+        """
+        Cập nhật trailing stop dựa trên phần trăm
+        
+        Args:
+            position_info (Dict): Thông tin vị thế
+            current_price (float): Giá hiện tại
+        """
+        side = position_info['side']
+        entry_price = position_info['entry_price']
+        activation_percent = position_info['activation_percent']
+        callback_percent = position_info['callback_percent']
+        use_dynamic_callback = position_info['use_dynamic_callback']
+        min_callback = position_info.get('min_callback', 0.3)
+        max_callback = position_info.get('max_callback', 2.0)
+        
+        # Tính profit %
+        if side == 'LONG':
+            profit_pct = (current_price - entry_price) / entry_price * 100
+            # Kiểm tra và cập nhật trailing stop
+            if not position_info['trailing_activated']:
+                # Kiểm tra xem đã đạt ngưỡng kích hoạt chưa
+                if profit_pct >= activation_percent:
+                    position_info['trailing_activated'] = True
+                    
+                    # Tính callback tự động nếu được bật
+                    if use_dynamic_callback:
+                        # Điều chỉnh callback theo profit và volatility
+                        # Công thức: min_callback + (profit/10) * (max-min)
+                        profit_factor = min(1.0, profit_pct / 10)
+                        dynamic_callback = min_callback + profit_factor * (max_callback - min_callback)
+                        # Áp dụng hệ số biến động thị trường
+                        dynamic_callback *= self.current_volatility_multiplier
+                        # Giới hạn trong khoảng min-max
+                        callback_percent = max(min_callback, min(max_callback, dynamic_callback))
+                        position_info['callback_percent'] = callback_percent
+                    
+                    # Tính giá stop mới
+                    position_info['stop_price'] = current_price * (1 - callback_percent/100)
+                    logger.info(f"Kích hoạt percentage trailing stop cho vị thế {side}: giá hiện tại={current_price}, callback={callback_percent}%, stop_price={position_info['stop_price']}")
+            else:
+                # Đã kích hoạt, cập nhật stop nếu giá tăng
+                new_stop_price = current_price * (1 - callback_percent/100)
+                if new_stop_price > position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+        else:  # SHORT
+            profit_pct = (entry_price - current_price) / entry_price * 100
+            # Kiểm tra và cập nhật trailing stop
+            if not position_info['trailing_activated']:
+                # Kiểm tra xem đã đạt ngưỡng kích hoạt chưa
+                if profit_pct >= activation_percent:
+                    position_info['trailing_activated'] = True
+                    
+                    # Tính callback tự động nếu được bật
+                    if use_dynamic_callback:
+                        # Điều chỉnh callback theo profit và volatility
+                        profit_factor = min(1.0, profit_pct / 10)
+                        dynamic_callback = min_callback + profit_factor * (max_callback - min_callback)
+                        # Áp dụng hệ số biến động thị trường
+                        dynamic_callback *= self.current_volatility_multiplier
+                        # Giới hạn trong khoảng min-max
+                        callback_percent = max(min_callback, min(max_callback, dynamic_callback))
+                        position_info['callback_percent'] = callback_percent
+                    
+                    # Tính giá stop mới
+                    position_info['stop_price'] = current_price * (1 + callback_percent/100)
+                    logger.info(f"Kích hoạt percentage trailing stop cho vị thế {side}: giá hiện tại={current_price}, callback={callback_percent}%, stop_price={position_info['stop_price']}")
+            else:
+                # Đã kích hoạt, cập nhật stop nếu giá giảm
+                new_stop_price = current_price * (1 + callback_percent/100)
+                if new_stop_price < position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+    
+    def _update_step_trailing_stop(self, position_info: Dict, current_price: float) -> None:
+        """
+        Cập nhật trailing stop theo bậc thang (step)
+        
+        Args:
+            position_info (Dict): Thông tin vị thế
+            current_price (float): Giá hiện tại
+        """
+        side = position_info['side']
+        entry_price = position_info['entry_price']
+        profit_steps = position_info['profit_steps']
+        callback_steps = position_info['callback_steps']
+        current_step = position_info['current_step']
+        
+        # Tính profit %
+        if side == 'LONG':
+            profit_pct = (current_price - entry_price) / entry_price * 100
+            
+            # Xác định step hiện tại dựa trên profit
+            next_step = current_step
+            for i, step_level in enumerate(profit_steps):
+                if profit_pct >= step_level and i > current_step:
+                    next_step = i
+            
+            # Nếu đã chuyển sang step mới, cập nhật lại stop
+            if next_step > current_step:
+                position_info['current_step'] = next_step
+                position_info['trailing_activated'] = True
+                callback_pct = callback_steps[next_step]
+                position_info['stop_price'] = current_price * (1 - callback_pct/100)
+                logger.info(f"Chuyển sang step {next_step} cho vị thế LONG: profit={profit_pct:.2f}%, callback={callback_pct}%, stop_price={position_info['stop_price']:.2f}")
+            elif position_info['trailing_activated']:
+                # Đã kích hoạt, cập nhật stop nếu giá tăng
+                callback_pct = callback_steps[current_step]
+                new_stop_price = current_price * (1 - callback_pct/100)
+                if new_stop_price > position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+        else:  # SHORT
+            profit_pct = (entry_price - current_price) / entry_price * 100
+            
+            # Xác định step hiện tại dựa trên profit
+            next_step = current_step
+            for i, step_level in enumerate(profit_steps):
+                if profit_pct >= step_level and i > current_step:
+                    next_step = i
+            
+            # Nếu đã chuyển sang step mới, cập nhật lại stop
+            if next_step > current_step:
+                position_info['current_step'] = next_step
+                position_info['trailing_activated'] = True
+                callback_pct = callback_steps[next_step]
+                position_info['stop_price'] = current_price * (1 + callback_pct/100)
+                logger.info(f"Chuyển sang step {next_step} cho vị thế SHORT: profit={profit_pct:.2f}%, callback={callback_pct}%, stop_price={position_info['stop_price']:.2f}")
+            elif position_info['trailing_activated']:
+                # Đã kích hoạt, cập nhật stop nếu giá giảm
+                callback_pct = callback_steps[current_step]
+                new_stop_price = current_price * (1 + callback_pct/100)
+                if new_stop_price < position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+    
+    def _update_atr_trailing_stop(self, position_info: Dict, current_price: float) -> None:
+        """
+        Cập nhật trailing stop dựa trên ATR
+        
+        Args:
+            position_info (Dict): Thông tin vị thế
+            current_price (float): Giá hiện tại
+        """
+        side = position_info['side']
+        entry_price = position_info['entry_price']
+        atr_value = position_info['atr_value']
+        atr_multiplier = position_info['atr_multiplier']
+        min_profit_activation = position_info['min_profit_activation']
+        
+        # Tính profit %
+        if side == 'LONG':
+            profit_pct = (current_price - entry_price) / entry_price * 100
+            
+            # Kiểm tra xem đã đạt ngưỡng kích hoạt chưa
+            if not position_info['trailing_activated']:
+                if profit_pct >= min_profit_activation:
+                    position_info['trailing_activated'] = True
+                    atr_distance = atr_value * atr_multiplier
+                    position_info['stop_price'] = current_price - atr_distance
+                    logger.info(f"Kích hoạt ATR trailing stop cho vị thế LONG: ATR={atr_value:.2f}, multiplier={atr_multiplier}, stop_price={position_info['stop_price']:.2f}")
+            else:
+                # Đã kích hoạt, cập nhật stop nếu giá tăng
+                atr_distance = atr_value * atr_multiplier
+                new_stop_price = current_price - atr_distance
+                if new_stop_price > position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+        else:  # SHORT
+            profit_pct = (entry_price - current_price) / entry_price * 100
+            
+            # Kiểm tra xem đã đạt ngưỡng kích hoạt chưa
+            if not position_info['trailing_activated']:
+                if profit_pct >= min_profit_activation:
+                    position_info['trailing_activated'] = True
+                    atr_distance = atr_value * atr_multiplier
+                    position_info['stop_price'] = current_price + atr_distance
+                    logger.info(f"Kích hoạt ATR trailing stop cho vị thế SHORT: ATR={atr_value:.2f}, multiplier={atr_multiplier}, stop_price={position_info['stop_price']:.2f}")
+            else:
+                # Đã kích hoạt, cập nhật stop nếu giá giảm
+                atr_distance = atr_value * atr_multiplier
+                new_stop_price = current_price + atr_distance
+                if new_stop_price < position_info['stop_price']:
+                    position_info['stop_price'] = new_stop_price
+    
+    def _check_partial_exits(self, position_info: Dict) -> None:
+        """
+        Kiểm tra và xử lý thoát một phần
+        
+        Args:
+            position_info (Dict): Thông tin vị thế
+        """
+        side = position_info['side']
+        entry_price = position_info['entry_price']
+        current_price = position_info['current_price']
+        partial_exits = position_info['partial_exits']
+        partial_exit_levels = position_info['partial_exit_levels']
+        
+        # Tính profit %
+        if side == 'LONG':
+            profit_pct = (current_price - entry_price) / entry_price * 100
+        else:  # SHORT
+            profit_pct = (entry_price - current_price) / entry_price * 100
+            
+        # Kiểm tra từng mức thoát một phần
+        for level in partial_exit_levels:
+            threshold = level.get('threshold', 0)
+            percentage = level.get('percentage', 0)
+            
+            # Kiểm tra xem đã thực hiện thoát ở mức này chưa
+            level_already_executed = False
+            for exit_info in partial_exits:
+                if abs(exit_info.get('threshold', 0) - threshold) < 0.001:
+                    level_already_executed = True
+                    break
+                    
+            # Nếu chưa thực hiện và đã đạt ngưỡng
+            if not level_already_executed and profit_pct >= threshold:
+                # Thêm thông tin thoát một phần vào danh sách
+                partial_exit_info = {
+                    'time': datetime.now(),
+                    'price': current_price,
+                    'threshold': threshold,
+                    'percentage': percentage,
+                    'profit_pct': profit_pct
+                }
+                position_info['partial_exits'].append(partial_exit_info)
+                logger.info(f"Thoát một phần ({percentage*100:.0f}%) tại mức lợi nhuận {threshold}% với giá {current_price}")
+    
+    def check_stop_condition(self, position_info: Dict, current_price: float) -> Tuple[bool, str]:
         """
         Kiểm tra điều kiện đóng vị thế
         
         Args:
-            position (Dict): Thông tin vị thế
+            position_info (Dict): Thông tin vị thế
             current_price (float): Giá hiện tại
             
         Returns:
-            Tuple[bool, str]: (Có nên đóng hay không, Lý do)
+            Tuple[bool, str]: (Có đóng vị thế không, Lý do đóng)
         """
-        return self.strategy.should_close(position, current_price)
+        if position_info['status'] != 'ACTIVE':
+            return False, "Vị thế không còn hoạt động"
+            
+        side = position_info['side']
+        stop_price = position_info['stop_price']
+        
+        # Kiểm tra điều kiện dừng lỗ/chốt lời
+        if side == 'LONG':
+            if current_price <= stop_price and position_info['trailing_activated']:
+                return True, f"Giá ({current_price}) dưới mức trailing stop ({stop_price})"
+        else:  # SHORT
+            if current_price >= stop_price and position_info['trailing_activated']:
+                return True, f"Giá ({current_price}) trên mức trailing stop ({stop_price})"
+                
+        return False, None
     
-    def get_partial_exits(self, position: Dict) -> List[Dict]:
+    def close_position(self, position_info: Dict, current_price: float, exit_reason: str = None) -> Dict:
         """
-        Lấy danh sách các lần thoát một phần
+        Đóng vị thế
         
         Args:
-            position (Dict): Thông tin vị thế
+            position_info (Dict): Thông tin vị thế
+            current_price (float): Giá thoát
+            exit_reason (str, optional): Lý do thoát
             
         Returns:
-            List[Dict]: Danh sách thông tin thoát một phần
+            Dict: Thông tin vị thế đã đóng
         """
-        return position.get('trailing_partial_exits', [])
+        if position_info['status'] != 'ACTIVE':
+            return position_info
+            
+        side = position_info['side']
+        entry_price = position_info['entry_price']
+        
+        # Cập nhật trạng thái và giá thoát
+        position_info['status'] = 'CLOSED'
+        position_info['exit_price'] = current_price
+        position_info['exit_time'] = datetime.now()
+        position_info['exit_reason'] = exit_reason or "Đóng vị thế thủ công"
+        
+        # Tính toán kết quả giao dịch
+        if side == 'LONG':
+            position_info['profit_pct'] = (current_price - entry_price) / entry_price * 100
+            position_info['max_profit_pct'] = (position_info['highest_price'] - entry_price) / entry_price * 100
+        else:  # SHORT
+            position_info['profit_pct'] = (entry_price - current_price) / entry_price * 100
+            position_info['max_profit_pct'] = (entry_price - position_info['lowest_price']) / entry_price * 100
+            
+        # Tính hiệu quả trailing stop
+        if position_info['max_profit_pct'] > 0:
+            position_info['efficiency'] = position_info['profit_pct'] / position_info['max_profit_pct'] * 100
+        else:
+            position_info['efficiency'] = 0
+            
+        # Thêm vào lịch sử
+        self._add_to_history(position_info.copy())
+        
+        logger.info(f"Đóng vị thế {side}: P/L={position_info['profit_pct']:.2f}%, Hiệu quả={position_info['efficiency']:.2f}%, Lý do: {position_info['exit_reason']}")
+        return position_info
     
-    def check_partial_exit(self, position: Dict, current_price: float) -> Optional[Dict]:
+    def get_position_summary(self, position_info: Dict) -> str:
         """
-        Kiểm tra vị thế có cần thoát một phần không
+        Tạo bản tóm tắt vị thế
         
         Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
+            position_info (Dict): Thông tin vị thế
             
         Returns:
-            Optional[Dict]: Thông tin thoát một phần hoặc None nếu không thoát
+            str: Bản tóm tắt
         """
-        return self.strategy._check_partial_exit(position, current_price)
-    
-    def get_trailing_status(self, position: Dict) -> Dict:
-        """
-        Lấy trạng thái chi tiết của trailing stop
+        if not position_info:
+            return "Không có thông tin vị thế"
+            
+        side = position_info.get('side', 'UNKNOWN')
+        strategy_type = position_info.get('strategy_type', 'UNKNOWN')
+        market_regime = position_info.get('market_regime', 'UNKNOWN')
+        status = position_info.get('status', 'UNKNOWN')
+        entry_price = position_info.get('entry_price', 0)
+        current_price = position_info.get('current_price', 0)
+        profit_pct = position_info.get('profit_pct', 0)
+        max_profit_pct = position_info.get('max_profit_pct', 0)
+        efficiency = position_info.get('efficiency', 0) if status == 'CLOSED' else 0
+        stop_price = position_info.get('stop_price', 0)
+        trailing_activated = position_info.get('trailing_activated', False)
+        partial_exits = position_info.get('partial_exits', [])
         
-        Args:
-            position (Dict): Thông tin vị thế
-            
-        Returns:
-            Dict: Trạng thái chi tiết
+        summary = []
+        summary.append(f"Vị thế {side} - {strategy_type.capitalize()}/{market_regime} - {status}")
+        summary.append(f"Giá vào: {entry_price:.2f}, Giá hiện tại: {current_price:.2f}")
+        summary.append(f"Lợi nhuận: {profit_pct:.2f}%, Tối đa: {max_profit_pct:.2f}%")
+        
+        if status == 'CLOSED':
+            summary.append(f"Hiệu quả: {efficiency:.2f}%")
+            summary.append(f"Lý do thoát: {position_info.get('exit_reason', 'Không rõ')}")
+        else:
+            summary.append(f"Trailing stop: {'Đã kích hoạt' if trailing_activated else 'Chưa kích hoạt'}")
+            if trailing_activated:
+                summary.append(f"Stop price: {stop_price:.2f}")
+                
+        if partial_exits:
+            for i, exit_info in enumerate(partial_exits):
+                summary.append(f"Thoát phần {i+1}: {exit_info.get('percentage', 0)*100:.0f}% tại {exit_info.get('threshold', 0)}% lợi nhuận (giá {exit_info.get('price', 0):.2f})")
+                
+        return "\n".join(summary)
+    
+    def get_strategy_types(self) -> List[str]:
         """
+        Lấy danh sách các loại chiến lược có sẵn
+        
+        Returns:
+            List[str]: Danh sách các loại chiến lược
+        """
+        return list(self.config.get('strategies', {}).keys())
+    
+    def get_market_regimes(self) -> List[str]:
+        """
+        Lấy danh sách các chế độ thị trường có sẵn
+        
+        Returns:
+            List[str]: Danh sách các chế độ thị trường
+        """
+        # Lấy danh sách chế độ từ chiến lược đầu tiên
+        first_strategy = next(iter(self.config.get('strategies', {}).values()), {})
+        return list(first_strategy.keys())
+    
+    def get_performance_stats(self) -> Dict:
+        """
+        Lấy thống kê hiệu suất từ lịch sử
+        
+        Returns:
+            Dict: Thống kê hiệu suất
+        """
+        if not self.history:
+            return {
+                'total_trades': 0,
+                'win_rate': 0,
+                'avg_profit': 0,
+                'avg_loss': 0,
+                'expectancy': 0,
+                'efficiency': 0,
+                'strategy_stats': {},
+                'regime_stats': {}
+            }
+            
+        total_trades = len(self.history)
+        profitable_trades = [trade for trade in self.history if trade.get('profit_pct', 0) > 0]
+        win_rate = len(profitable_trades) / total_trades * 100 if total_trades > 0 else 0
+        
+        # Tính trung bình lợi nhuận và thua lỗ
+        profits = [trade.get('profit_pct', 0) for trade in profitable_trades]
+        losses = [trade.get('profit_pct', 0) for trade in self.history if trade.get('profit_pct', 0) <= 0]
+        
+        avg_profit = sum(profits) / len(profits) if profits else 0
+        avg_loss = sum(losses) / len(losses) if losses else 0
+        
+        # Tính expectancy (kỳ vọng lợi nhuận trên mỗi giao dịch)
+        expectancy = (win_rate/100 * avg_profit) - ((100-win_rate)/100 * abs(avg_loss)) if total_trades > 0 else 0
+        
+        # Tính hiệu quả trung bình (% của max profit đạt được)
+        efficiencies = [trade.get('efficiency', 0) for trade in self.history]
+        avg_efficiency = sum(efficiencies) / len(efficiencies) if efficiencies else 0
+        
+        # Thống kê theo chiến lược
+        strategy_stats = {}
+        for trade in self.history:
+            strategy = trade.get('strategy_type', 'unknown')
+            if strategy not in strategy_stats:
+                strategy_stats[strategy] = {'total': 0, 'wins': 0, 'profit_pct': 0}
+            
+            strategy_stats[strategy]['total'] += 1
+            if trade.get('profit_pct', 0) > 0:
+                strategy_stats[strategy]['wins'] += 1
+            strategy_stats[strategy]['profit_pct'] += trade.get('profit_pct', 0)
+            
+        # Tính win rate và avg profit cho mỗi chiến lược
+        for strategy, stats in strategy_stats.items():
+            stats['win_rate'] = stats['wins'] / stats['total'] * 100 if stats['total'] > 0 else 0
+            stats['avg_profit'] = stats['profit_pct'] / stats['total'] if stats['total'] > 0 else 0
+            
+        # Thống kê theo chế độ thị trường
+        regime_stats = {}
+        for trade in self.history:
+            regime = trade.get('market_regime', 'unknown')
+            if regime not in regime_stats:
+                regime_stats[regime] = {'total': 0, 'wins': 0, 'profit_pct': 0}
+            
+            regime_stats[regime]['total'] += 1
+            if trade.get('profit_pct', 0) > 0:
+                regime_stats[regime]['wins'] += 1
+            regime_stats[regime]['profit_pct'] += trade.get('profit_pct', 0)
+            
+        # Tính win rate và avg profit cho mỗi chế độ
+        for regime, stats in regime_stats.items():
+            stats['win_rate'] = stats['wins'] / stats['total'] * 100 if stats['total'] > 0 else 0
+            stats['avg_profit'] = stats['profit_pct'] / stats['total'] if stats['total'] > 0 else 0
+            
         return {
-            'status': position.get('trailing_status', 'waiting'),
-            'activated': position.get('trailing_activated', False),
-            'stop_price': position.get('trailing_stop'),
-            'factors': position.get('trailing_factors', {}),
-            'partial_exits': position.get('trailing_partial_exits', [])
+            'total_trades': total_trades,
+            'win_rate': win_rate,
+            'avg_profit': avg_profit,
+            'avg_loss': avg_loss,
+            'expectancy': expectancy,
+            'efficiency': avg_efficiency,
+            'strategy_stats': strategy_stats,
+            'regime_stats': regime_stats
         }
     
-    def backtest_trailing_stop(self, entry_price: float, price_data: List[float], side: str = 'LONG', 
-                              position_size: float = 1.0, entry_index: int = 0) -> Dict:
+    def backtest_trailing_stop(self, entry_price: float, side: str, price_data: List[float], 
+                             strategy_type: str = None, market_regime: str = None,
+                             atr_value: float = None, entry_index: int = 0) -> Dict:
         """
-        Backtesting trailing stop trên dữ liệu giá
+        Thực hiện backtest trailing stop với dữ liệu giá
         
         Args:
             entry_price (float): Giá vào lệnh
-            price_data (List[float]): Danh sách giá đóng cửa
             side (str): Hướng vị thế ('LONG' hoặc 'SHORT')
-            position_size (float): Kích thước vị thế
-            entry_index (int): Chỉ số của giá vào lệnh trong danh sách
+            price_data (List[float]): Dữ liệu giá
+            strategy_type (str, optional): Loại chiến lược
+            market_regime (str, optional): Chế độ thị trường
+            atr_value (float, optional): Giá trị ATR ban đầu
+            entry_index (int): Chỉ số vào lệnh trong dữ liệu giá
             
         Returns:
             Dict: Kết quả backtest
         """
-        # Tạo vị thế mẫu
-        position = {
-            'symbol': 'BACKTEST',
-            'side': side,
-            'entry_price': entry_price,
-            'quantity': position_size,
-            'original_quantity': position_size,
-            'entry_time': int(time.time()) - (len(price_data) - entry_index) * 3600  # Giả định dữ liệu 1h
-        }
-        
         # Khởi tạo vị thế
-        position = self.initialize_position(position)
+        position_info = self.initialize_trailing_stop(entry_price, side, strategy_type, market_regime)
+        position_info['entry_index'] = entry_index
         
-        # Chạy backtest
-        exit_index = None
-        exit_price = None
-        exit_reason = None
-        partial_exits = []
-        trailing_history = []
-        
-        for i in range(entry_index + 1, len(price_data)):
-            current_price = price_data[i]
+        # Thêm giá trị ATR nếu có
+        if atr_value and strategy_type == 'atr_based':
+            position_info['atr_value'] = atr_value
             
-            # Kiểm tra thoát một phần
-            partial_exit = self.check_partial_exit(position, current_price)
-            if partial_exit:
-                # Lưu thoát một phần
-                partial_exit['index'] = i
-                partial_exits.append(partial_exit)
-                
-                # Cập nhật vị thế
-                position['quantity'] -= partial_exit['quantity']
-                if 'trailing_partial_exits' not in position:
-                    position['trailing_partial_exits'] = []
-                position['trailing_partial_exits'].append(partial_exit)
+        # Lặp qua dữ liệu giá
+        for i, price in enumerate(price_data[entry_index + 1:], start=entry_index + 1):
+            # Cập nhật vị thế với giá mới
+            position_info = self.update_trailing_stop(position_info, price)
             
-            # Cập nhật trailing stop
-            position = self.update_trailing_stop(position, current_price)
-            
-            # Lưu lịch sử
-            trailing_history.append({
-                'index': i,
-                'price': current_price,
-                'trailing_stop': position.get('trailing_stop'),
-                'status': position.get('trailing_status')
-            })
-            
-            # Kiểm tra đóng vị thế
-            should_close, reason = self.check_stop_condition(position, current_price)
+            # Kiểm tra điều kiện dừng
+            should_close, reason = self.check_stop_condition(position_info, price)
             if should_close:
-                exit_index = i
-                exit_price = current_price
-                exit_reason = reason
+                position_info = self.close_position(position_info, price, reason)
+                position_info['exit_index'] = i
                 break
+                
+        # Nếu vị thế vẫn còn mở khi kết thúc dữ liệu, đóng tại giá cuối cùng
+        if position_info['status'] == 'ACTIVE':
+            last_price = price_data[-1]
+            position_info = self.close_position(position_info, last_price, "Kết thúc dữ liệu")
+            position_info['exit_index'] = len(price_data) - 1
+            
+        return position_info
+    
+    def optimize_parameters(self, price_data: List[float], side: str = 'LONG', 
+                          strategy_type: str = None, market_regime: str = None,
+                          param_ranges: Dict = None) -> Dict:
+        """
+        Tối ưu hóa tham số cho chiến lược
         
-        # Tính kết quả
-        pnl = 0
-        if exit_price:
-            if side == 'LONG':
-                # Tính lợi nhuận phần còn lại
-                remaining_pnl = (exit_price - entry_price) * position['quantity']
+        Args:
+            price_data (List[float]): Dữ liệu giá
+            side (str): Hướng vị thế ('LONG' hoặc 'SHORT')
+            strategy_type (str, optional): Loại chiến lược
+            market_regime (str, optional): Chế độ thị trường
+            param_ranges (Dict, optional): Phạm vi các tham số cần tối ưu
+            
+        Returns:
+            Dict: Tham số tối ưu và kết quả
+        """
+        if not strategy_type:
+            strategy_type = self.config.get('general', {}).get('default_strategy', 'percentage')
+        if not market_regime:
+            market_regime = self.config.get('general', {}).get('default_market_regime', 'trending')
+            
+        entry_price = price_data[0]
+        best_result = None
+        best_params = None
+        best_score = float('-inf')
+        
+        # Mặc định param_ranges nếu không được cung cấp
+        if not param_ranges:
+            if strategy_type == 'percentage':
+                param_ranges = {
+                    'activation_percent': [0.5, 1.0, 1.5, 2.0],
+                    'callback_percent': [0.3, 0.5, 0.8, 1.0, 1.5, 2.0],
+                    'use_dynamic_callback': [True, False]
+                }
+            elif strategy_type == 'step':
+                param_ranges = {
+                    'profit_steps': [[0.5, 1.0, 3.0, 5.0], [1.0, 2.0, 5.0, 10.0], [2.0, 4.0, 8.0, 15.0]],
+                    'callback_steps': [[0.2, 0.4, 0.8, 1.5], [0.3, 0.6, 1.2, 2.5], [0.5, 1.0, 2.0, 4.0]]
+                }
+            elif strategy_type == 'atr_based':
+                param_ranges = {
+                    'atr_multiplier': [1.0, 1.5, 2.0, 2.5, 3.0],
+                    'min_profit_activation': [0.5, 1.0, 1.5, 2.0]
+                }
+        
+        # Grid search qua tất cả tổ hợp tham số
+        def grid_search(param_ranges, current_params=None, param_names=None, index=0):
+            nonlocal best_result, best_params, best_score
+            
+            if current_params is None:
+                current_params = {}
+            if param_names is None:
+                param_names = list(param_ranges.keys())
                 
-                # Tính lợi nhuận các phần đã thoát
-                partial_pnl = sum((exit['price'] - entry_price) * exit['quantity'] for exit in partial_exits)
+            # Nếu đã thử tất cả các tham số, chạy backtest
+            if index >= len(param_names):
+                # Sao chép cấu hình hiện tại và áp dụng tham số mới
+                config_copy = self.config.copy()
+                config_copy['strategies'] = {strategy_type: {market_regime: current_params}}
                 
-                pnl = remaining_pnl + partial_pnl
-            else:  # SHORT
-                # Tính lợi nhuận phần còn lại
-                remaining_pnl = (entry_price - exit_price) * position['quantity']
+                # Tạm thời thay đổi cấu hình
+                old_config = self.config
+                self.config = config_copy
                 
-                # Tính lợi nhuận các phần đã thoát
-                partial_pnl = sum((entry_price - exit['price']) * exit['quantity'] for exit in partial_exits)
+                # Chạy backtest
+                result = self.backtest_trailing_stop(entry_price, side, price_data, strategy_type, market_regime)
                 
-                pnl = remaining_pnl + partial_pnl
+                # Khôi phục cấu hình
+                self.config = old_config
+                
+                # Tính điểm (kết hợp lợi nhuận và hiệu quả)
+                profit_pct = result.get('profit_pct', 0)
+                efficiency = result.get('efficiency', 0)
+                score = profit_pct * 0.7 + efficiency * 0.3  # 70% lợi nhuận, 30% hiệu quả
+                
+                # Cập nhật nếu tốt hơn
+                if score > best_score:
+                    best_score = score
+                    best_params = current_params.copy()
+                    best_result = result
+                return
+                
+            # Thử tất cả giá trị của tham số hiện tại
+            param_name = param_names[index]
+            param_values = param_ranges[param_name]
+            
+            for value in param_values:
+                current_params[param_name] = value
+                grid_search(param_ranges, current_params, param_names, index + 1)
+        
+        # Bắt đầu grid search
+        grid_search(param_ranges)
         
         return {
-            'entry_price': entry_price,
-            'exit_price': exit_price,
-            'exit_index': exit_index,
-            'exit_reason': exit_reason,
-            'pnl': pnl,
-            'partial_exits': partial_exits,
-            'trailing_history': trailing_history,
-            'final_position': position
+            'best_params': best_params,
+            'best_result': best_result,
+            'best_score': best_score
         }
 
-
-# Mock data provider cho testing
-class MockDataProvider:
-    def __init__(self):
-        self.market_regime = 'trending'
-        self.volatility = 0.02
-        self.support_resistance_levels = [10000, 10500, 11000, 11500, 12000]
-    
-    def get_market_regime(self, symbol: str) -> str:
-        return self.market_regime
-    
-    def get_volatility(self, symbol: str) -> float:
-        return self.volatility
-    
-    def get_support_resistance_levels(self, symbol: str) -> List[float]:
-        return self.support_resistance_levels
-
-
+    def __str__(self) -> str:
+        """Trả về thông tin tóm tắt"""
+        stats = self.get_performance_stats()
+        strategies = self.get_strategy_types()
+        
+        return (f"Enhanced Adaptive Trailing Stop\n"
+                f"Số giao dịch: {stats['total_trades']}\n"
+                f"Tỷ lệ thắng: {stats['win_rate']:.2f}%\n"
+                f"Chiến lược có sẵn: {', '.join(strategies)}")
+        
 def main():
-    """Hàm chính để test EnhancedAdaptiveTrailingStop"""
-    print("=== Test EnhancedAdaptiveTrailingStop ===\n")
+    """Chức năng chính để demo"""
+    # Tạo ví dụ dữ liệu giá
+    np.random.seed(42)
+    initial_price = 50000.0
+    price_data = [initial_price]
     
-    # Khởi tạo mock data provider
-    mock_provider = MockDataProvider()
+    # Tạo dữ liệu giá xu hướng tăng
+    for i in range(100):
+        drift = 0.001 + 0.0005 * i/100  # Xu hướng tăng nhẹ
+        volatility = 0.005  # Độ biến động
+        price_change = price_data[-1] * (drift + volatility * np.random.normal())
+        price_data.append(max(price_data[-1] + price_change, price_data[-1] * 0.99))  # Không cho giảm quá 1%
     
     # Khởi tạo trailing stop
-    trailing_stop = EnhancedAdaptiveTrailingStop(data_provider=mock_provider)
+    ts = EnhancedAdaptiveTrailingStop()
     
-    # Tạo vị thế mẫu
-    position = {
-        'symbol': 'BTCUSDT',
-        'side': 'LONG',
-        'entry_price': 50000,
-        'quantity': 0.1,
-        'leverage': 5
-    }
+    # Thực hiện backtest
+    result_pct = ts.backtest_trailing_stop(price_data[0], 'LONG', price_data, 'percentage', 'trending')
+    result_step = ts.backtest_trailing_stop(price_data[0], 'LONG', price_data, 'step', 'trending')
     
-    # Khởi tạo vị thế
-    position = trailing_stop.initialize_position(position)
-    print(f"Vị thế ban đầu: {json.dumps(position, indent=2)}")
+    # In kết quả
+    print("Percentage Trailing Stop:")
+    print(f"P/L: {result_pct['profit_pct']:.2f}%")
+    print(f"Hiệu quả: {result_pct['efficiency']:.2f}%")
+    print(f"Số lần thoát một phần: {len(result_pct['partial_exits'])}")
     
-    # Cập nhật trailing stop với các mức giá khác nhau
-    print("\nCập nhật trailing stop với các mức giá tăng dần:")
-    prices = [50500, 51000, 51500, 52000, 51500, 51000, 50500, 50000]
-    
-    for price in prices:
-        position = trailing_stop.update_trailing_stop(position, price)
-        should_close, reason = trailing_stop.check_stop_condition(position, price)
-        
-        status = trailing_stop.get_trailing_status(position)
-        print(f"Giá: {price}, Stop: {status['stop_price']:.2f if status['stop_price'] else None}, "
-              f"Trạng thái: {status['status']}, Kích hoạt: {status['activated']}")
-        
-        if should_close:
-            print(f"Đóng vị thế tại giá {price}: {reason}")
-            break
-    
-    # Backtest
-    print("\nBacktest trailing stop:")
-    price_data = [49500, 50000, 50500, 51000, 51500, 52000, 51500, 51000, 50500, 50000, 49000]
-    
-    result = trailing_stop.backtest_trailing_stop(
-        entry_price=50000,
-        price_data=price_data,
-        side='LONG',
-        position_size=0.1,
-        entry_index=1  # Vào ở index 1 (giá 50000)
-    )
-    
-    print(f"Kết quả backtest:")
-    print(f"Giá vào: {result['entry_price']}, Giá ra: {result['exit_price']}")
-    print(f"Lý do thoát: {result['exit_reason']}")
-    print(f"PnL: {result['pnl']:.2f}")
-    
-    if result['partial_exits']:
-        print(f"Thoát một phần:")
-        for exit in result['partial_exits']:
-            print(f"  Ngưỡng: {exit['threshold']*100:.1f}%, Giá: {exit['price']}, "
-                 f"Số lượng: {exit['quantity']}")
-
+    print("\nStep Trailing Stop:")
+    print(f"P/L: {result_step['profit_pct']:.2f}%")
+    print(f"Hiệu quả: {result_step['efficiency']:.2f}%")
+    print(f"Số lần thoát một phần: {len(result_step['partial_exits'])}")
 
 if __name__ == "__main__":
     main()

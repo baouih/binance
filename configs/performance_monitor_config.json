@@ -1,0 +1,57 @@
+{
+    "tracking": {
+        "track_trades": true,
+        "track_pnl": true,
+        "track_balance": true,
+        "track_drawdown": true,
+        "track_win_rate": true,
+        "track_strategies": true,
+        "track_symbols": true
+    },
+    "reporting": {
+        "daily_reports": true,
+        "weekly_reports": true,
+        "monthly_reports": true,
+        "strategy_reports": true,
+        "symbol_reports": true,
+        "include_charts": true,
+        "email_reports": false,
+        "telegram_reports": false
+    },
+    "alerts": {
+        "drawdown_threshold": 10,
+        "losing_streak_threshold": 5,
+        "profit_target_alert": 5,
+        "low_win_rate_threshold": 40,
+        "balance_drop_threshold": 5,
+        "high_exposure_threshold": 50
+    },
+    "metrics": {
+        "rr_ratio_min": 1.5,
+        "win_rate_min": 45,
+        "profit_factor_min": 1.2,
+        "max_drawdown_acceptable": 20,
+        "target_monthly_return": 10,
+        "expected_trades_per_day": 3
+    },
+    "strategies": {
+        "track_individual_performance": true,
+        "auto_adjust_weights": true,
+        "min_trades_for_evaluation": 20
+    },
+    "data_retention": {
+        "trade_history_max_days": 365,
+        "metrics_history_max_days": 730
+    },
+    "visualization": {
+        "chart_style": "seaborn",
+        "chart_colors": [
+            "#1f77b4",
+            "#ff7f0e",
+            "#2ca02c",
+            "#d62728",
+            "#9467bd"
+        ],
+        "equity_chart_interval": "daily"
+    }
+}

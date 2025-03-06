@@ -2,889 +2,1159 @@
 # -*- coding: utf-8 -*-
 
 """
-Module đánh giá chất lượng tín hiệu giao dịch (Enhanced Signal Quality)
+Module Đánh Giá Chất Lượng Tín Hiệu Nâng Cao (Enhanced Signal Quality)
 
-Module này cung cấp các công cụ để đánh giá chất lượng của tín hiệu giao dịch dựa trên
-nhiều yếu tố bao gồm sức mạnh xu hướng, khối lượng, tương quan với BTC, và phân tích
-đa khung thời gian.
+Module này cung cấp công cụ đánh giá chất lượng tín hiệu giao dịch, sử dụng
+nhiều chỉ báo kỹ thuật, phân tích đa khung thời gian, và tương quan với BTC
+để đưa ra điểm số và mức độ tin cậy của tín hiệu.
 """
 
-import os
-import sys
+import logging
 import json
 import time
-import logging
+import datetime
+import os
+from typing import Dict, List, Tuple, Any, Optional
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple, Optional, Any
-from pathlib import Path
 
 # Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('signal_quality.log')
-    ]
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger('signal_quality')
 
-# Thêm thư mục gốc vào sys.path
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-# Import các module cần thiết
-try:
-    from binance_api import BinanceAPI
-except ImportError:
-    logger.error("Không thể import module binance_api. Hãy đảm bảo bạn đang chạy từ thư mục gốc.")
-    binance_api_available = False
-else:
-    binance_api_available = True
 
 class EnhancedSignalQuality:
     """Lớp đánh giá chất lượng tín hiệu giao dịch nâng cao"""
     
-    def __init__(self, binance_api: Optional[Any] = None, config_path: str = 'configs/signal_quality_config.json'):
+    def __init__(self, binance_api = None, config_path: str = 'configs/signal_quality_config.json'):
         """
-        Khởi tạo đánh giá chất lượng tín hiệu
+        Khởi tạo Enhanced Signal Quality
         
         Args:
-            binance_api: Đối tượng BinanceAPI
-            config_path: Đường dẫn đến file cấu hình
+            binance_api: Đối tượng BinanceAPI để lấy dữ liệu
+            config_path (str): Đường dẫn đến file cấu hình
         """
+        self.config = self._load_config(config_path)
         self.binance_api = binance_api
-        self.config_path = config_path
-        self.config = self._load_config()
-        self.signal_history = []
+        self.cached_data = {}
+        self.evaluation_history = {}
         
-    def _load_config(self) -> Dict:
+        # Đảm bảo thư mục data tồn tại
+        os.makedirs('data', exist_ok=True)
+        
+        # Tải lịch sử đánh giá nếu có
+        self._load_evaluation_history()
+        logger.info("Đã khởi tạo Enhanced Signal Quality")
+    
+    def _load_config(self, config_path: str) -> Dict:
         """
-        Tải cấu hình từ file
+        Tải cấu hình từ file hoặc sử dụng cấu hình mặc định
         
+        Args:
+            config_path (str): Đường dẫn đến file cấu hình
+            
         Returns:
             Dict: Cấu hình đã tải
         """
         default_config = {
-            "weights": {
-                "trend_strength": 0.20,
-                "momentum": 0.15,
-                "volume": 0.15,
-                "price_pattern": 0.15,
-                "higher_timeframe_alignment": 0.15,
-                "btc_alignment": 0.10,
-                "liquidity": 0.05,
-                "market_sentiment": 0.05
+            'indicator_weights': {
+                'trend_strength': 0.25,     # Độ mạnh xu hướng
+                'momentum': 0.20,           # Động lượng (RSI, MACD)
+                'volume_confirmation': 0.15, # Xác nhận khối lượng
+                'price_patterns': 0.15,      # Mẫu hình giá
+                'support_resistance': 0.10,  # Hỗ trợ/kháng cự
+                'btc_alignment': 0.15       # Tương đồng với xu hướng BTC
             },
-            "thresholds": {
-                "strong_signal": 70,
-                "moderate_signal": 50,
-                "weak_signal": 30
+            'multi_timeframe_weights': {
+                '1m': 0.05,
+                '5m': 0.10,
+                '15m': 0.15,
+                '1h': 0.25,
+                '4h': 0.25,
+                '1d': 0.20
             },
-            "timeframes": ["5m", "15m", "1h", "4h", "1d"]
+            'signal_quality_thresholds': {
+                'excellent': 80,
+                'good': 65,
+                'moderate': 50,
+                'weak': 35
+            },
+            'rsi_parameters': {
+                'period': 14,
+                'overbought': 70,
+                'oversold': 30
+            },
+            'macd_parameters': {
+                'fast_period': 12,
+                'slow_period': 26,
+                'signal_period': 9
+            },
+            'adx_parameters': {
+                'period': 14,
+                'strong_trend': 25
+            },
+            'bollinger_parameters': {
+                'period': 20,
+                'std_dev': 2.0
+            },
+            'volume_parameters': {
+                'period': 20,
+                'significant_increase': 1.5
+            },
+            'price_pattern_scores': {
+                'double_bottom': 85,
+                'double_top': 85,
+                'head_shoulders': 80,
+                'inv_head_shoulders': 80,
+                'ascending_triangle': 75,
+                'descending_triangle': 75,
+                'bull_flag': 70,
+                'bear_flag': 70,
+                'cup_handle': 70,
+                'channel_breakout': 65
+            },
+            'btc_correlation_thresholds': {
+                'high': 0.7,    # Tương quan cao
+                'medium': 0.4,  # Tương quan trung bình
+                'low': 0.2      # Tương quan thấp
+            },
+            'cache_timeout': 300  # Thời gian cache dữ liệu (giây)
         }
         
         try:
-            if os.path.exists(self.config_path):
-                with open(self.config_path, 'r') as f:
-                    loaded_config = json.load(f)
-                logger.info(f"Đã tải cấu hình từ {self.config_path}")
-                
-                # Merge với default config
-                for key, value in loaded_config.items():
-                    default_config[key] = value
-                    
-                return default_config
-            else:
-                # Lưu default config
-                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-                with open(self.config_path, 'w') as f:
-                    json.dump(default_config, f, indent=4)
-                logger.info(f"Đã tạo file cấu hình mặc định tại {self.config_path}")
-                return default_config
-        except Exception as e:
-            logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                logger.info(f"Đã tải cấu hình từ {config_path}")
+                return config
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning(f"Không thể tải cấu hình từ {config_path}, sử dụng cấu hình mặc định")
             return default_config
     
-    def save_config(self) -> bool:
-        """
-        Lưu cấu hình vào file
-        
-        Returns:
-            bool: True nếu lưu thành công, False nếu không
-        """
-        try:
-            os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-            with open(self.config_path, 'w') as f:
-                json.dump(self.config, f, indent=4)
-            logger.info(f"Đã lưu cấu hình vào {self.config_path}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu cấu hình: {str(e)}")
-            return False
-    
-    def get_market_data(self, symbol: str, timeframe: str, limit: int = 100) -> Optional[pd.DataFrame]:
-        """
-        Lấy dữ liệu thị trường
-        
-        Args:
-            symbol: Cặp giao dịch
-            timeframe: Khung thời gian
-            limit: Số lượng nến
-            
-        Returns:
-            Optional[pd.DataFrame]: DataFrame chứa dữ liệu hoặc None nếu có lỗi
-        """
-        if not self.binance_api:
-            logger.warning("BinanceAPI không được cung cấp, không thể lấy dữ liệu thị trường")
-            return None
-        
-        try:
-            klines = self.binance_api.get_historical_klines(symbol, timeframe, limit)
-            if not klines:
-                logger.warning(f"Không có dữ liệu cho {symbol} ({timeframe})")
-                return None
-                
-            df = pd.DataFrame(klines, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
-            
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
-                
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            df.set_index('timestamp', inplace=True)
-            
-            return df
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy dữ liệu thị trường cho {symbol} ({timeframe}): {str(e)}")
-            return None
-    
-    def calculate_adx(self, df: pd.DataFrame, period: int = 14) -> float:
-        """
-        Tính toán ADX (Average Directional Index)
-        
-        Args:
-            df: DataFrame chứa dữ liệu giá
-            period: Số chu kỳ tính ADX
-            
-        Returns:
-            float: Giá trị ADX
-        """
-        try:
-            high = df['high'].values
-            low = df['low'].values
-            close = df['close'].values
-            
-            # Tính +DM và -DM
-            plus_dm = np.zeros(len(df))
-            minus_dm = np.zeros(len(df))
-            
-            for i in range(1, len(df)):
-                up_move = high[i] - high[i-1]
-                down_move = low[i-1] - low[i]
-                
-                if up_move > down_move and up_move > 0:
-                    plus_dm[i] = up_move
-                else:
-                    plus_dm[i] = 0
-                    
-                if down_move > up_move and down_move > 0:
-                    minus_dm[i] = down_move
-                else:
-                    minus_dm[i] = 0
-            
-            # Tính True Range
-            tr = np.zeros(len(df))
-            for i in range(1, len(df)):
-                tr[i] = max(
-                    high[i] - low[i],
-                    abs(high[i] - close[i-1]),
-                    abs(low[i] - close[i-1])
-                )
-            
-            # Tính EMA của +DM, -DM, và TR
-            tr_ema = np.zeros(len(df))
-            plus_dm_ema = np.zeros(len(df))
-            minus_dm_ema = np.zeros(len(df))
-            
-            # Khởi tạo giá trị đầu tiên
-            tr_ema[period] = np.mean(tr[1:period+1])
-            plus_dm_ema[period] = np.mean(plus_dm[1:period+1])
-            minus_dm_ema[period] = np.mean(minus_dm[1:period+1])
-            
-            # Tính các giá trị tiếp theo
-            k = 2 / (period + 1)
-            for i in range(period+1, len(df)):
-                tr_ema[i] = tr_ema[i-1] * (1 - k) + tr[i] * k
-                plus_dm_ema[i] = plus_dm_ema[i-1] * (1 - k) + plus_dm[i] * k
-                minus_dm_ema[i] = minus_dm_ema[i-1] * (1 - k) + minus_dm[i] * k
-            
-            # Tính +DI và -DI
-            plus_di = np.zeros(len(df))
-            minus_di = np.zeros(len(df))
-            
-            for i in range(period, len(df)):
-                if tr_ema[i] > 0:
-                    plus_di[i] = 100 * plus_dm_ema[i] / tr_ema[i]
-                    minus_di[i] = 100 * minus_dm_ema[i] / tr_ema[i]
-            
-            # Tính DX và ADX
-            dx = np.zeros(len(df))
-            for i in range(period, len(df)):
-                if (plus_di[i] + minus_di[i]) > 0:
-                    dx[i] = 100 * abs(plus_di[i] - minus_di[i]) / (plus_di[i] + minus_di[i])
-            
-            # Tính ADX (EMA của DX)
-            adx = np.zeros(len(df))
-            adx[2*period-1] = np.mean(dx[period:2*period])
-            
-            for i in range(2*period, len(df)):
-                adx[i] = adx[i-1] * (1 - k) + dx[i] * k
-            
-            # Trả về giá trị ADX cuối cùng
-            return adx[-1]
-        except Exception as e:
-            logger.error(f"Lỗi khi tính ADX: {str(e)}")
-            return 0
-    
-    def calculate_rsi(self, df: pd.DataFrame, period: int = 14) -> float:
-        """
-        Tính toán RSI (Relative Strength Index)
-        
-        Args:
-            df: DataFrame chứa dữ liệu giá
-            period: Số chu kỳ tính RSI
-            
-        Returns:
-            float: Giá trị RSI
-        """
-        try:
-            close = df['close'].values
-            delta = np.diff(close)
-            
-            # Tách thành gain và loss
-            gain = np.where(delta > 0, delta, 0)
-            loss = np.where(delta < 0, -delta, 0)
-            
-            # Tính trung bình gain và loss
-            avg_gain = np.zeros_like(delta)
-            avg_loss = np.zeros_like(delta)
-            
-            avg_gain[period-1] = np.mean(gain[:period])
-            avg_loss[period-1] = np.mean(loss[:period])
-            
-            # Tính các giá trị tiếp theo
-            for i in range(period, len(delta)):
-                avg_gain[i] = (avg_gain[i-1] * (period-1) + gain[i]) / period
-                avg_loss[i] = (avg_loss[i-1] * (period-1) + loss[i]) / period
-            
-            # Tính RS và RSI
-            rs = avg_gain / np.where(avg_loss == 0, 0.001, avg_loss)
-            rsi = 100 - (100 / (1 + rs))
-            
-            # Trả về giá trị RSI cuối cùng
-            return rsi[-1]
-        except Exception as e:
-            logger.error(f"Lỗi khi tính RSI: {str(e)}")
-            return 50
-    
-    def calculate_volume_ratio(self, df: pd.DataFrame, period: int = 20) -> float:
-        """
-        Tính toán tỷ lệ khối lượng hiện tại so với trung bình
-        
-        Args:
-            df: DataFrame chứa dữ liệu giá và khối lượng
-            period: Số chu kỳ tính trung bình
-            
-        Returns:
-            float: Tỷ lệ khối lượng
-        """
-        try:
-            volume = df['volume'].values
-            
-            # Tính trung bình khối lượng
-            avg_volume = np.mean(volume[-period-1:-1])
-            
-            # Tính tỷ lệ
-            volume_ratio = volume[-1] / avg_volume if avg_volume > 0 else 1.0
-            
-            return volume_ratio
-        except Exception as e:
-            logger.error(f"Lỗi khi tính tỷ lệ khối lượng: {str(e)}")
-            return 1.0
-    
-    def calculate_price_action_score(self, df: pd.DataFrame) -> float:
-        """
-        Tính toán điểm mẫu hình giá
-        
-        Args:
-            df: DataFrame chứa dữ liệu giá
-            
-        Returns:
-            float: Điểm mẫu hình giá
-        """
-        try:
-            # Lấy dữ liệu
-            close = df['close'].values
-            high = df['high'].values
-            low = df['low'].values
-            open_price = df['open'].values
-            
-            # Tính body và shadow
-            body = np.abs(close[-1] - open_price[-1])
-            upper_shadow = high[-1] - max(close[-1], open_price[-1])
-            lower_shadow = min(close[-1], open_price[-1]) - low[-1]
-            
-            # Kiểm tra mẫu hình
-            score = 50  # Điểm trung bình
-            
-            # Hammer/Inverted Hammer
-            if (body > 0 and 
-                ((lower_shadow > 2 * body and upper_shadow < 0.5 * body) or  # Hammer
-                 (upper_shadow > 2 * body and lower_shadow < 0.5 * body))):  # Inverted Hammer
-                score += 20
-            
-            # Engulfing
-            if (len(close) > 1 and 
-                ((close[-1] > open_price[-1] and  # Bullish Engulfing
-                  open_price[-1] < close[-2] and
-                  close[-1] > open_price[-2]) or
-                 (close[-1] < open_price[-1] and  # Bearish Engulfing
-                  open_price[-1] > close[-2] and
-                  close[-1] < open_price[-2]))):
-                score += 15
-            
-            # Doji
-            if body < 0.1 * (high[-1] - low[-1]):
-                score += 10
-            
-            # Trend confirmation
-            if (len(close) > 2 and
-                ((close[-1] > close[-2] > close[-3]) or  # Uptrend
-                 (close[-1] < close[-2] < close[-3]))):  # Downtrend
-                score += 15
-            
-            # Range bound
-            if (len(close) > 5 and
-                max(close[-5:]) - min(close[-5:]) < 0.02 * close[-1]):
-                score -= 10
-            
-            # Giới hạn điểm số
-            return max(0, min(100, score))
-        except Exception as e:
-            logger.error(f"Lỗi khi tính điểm mẫu hình giá: {str(e)}")
-            return 50
-    
-    def get_multi_timeframe_alignment(self, symbol: str, base_timeframe: str, higher_timeframes: List[str] = None) -> float:
-        """
-        Kiểm tra độ khớp của tín hiệu với các khung thời gian cao hơn
-        
-        Args:
-            symbol: Cặp giao dịch
-            base_timeframe: Khung thời gian cơ sở
-            higher_timeframes: Danh sách các khung thời gian cao hơn cần kiểm tra
-            
-        Returns:
-            float: Điểm độ khớp (0-100)
-        """
-        if not higher_timeframes:
-            if base_timeframe == '5m':
-                higher_timeframes = ['15m', '1h', '4h']
-            elif base_timeframe == '15m':
-                higher_timeframes = ['1h', '4h', '1d']
-            elif base_timeframe == '1h':
-                higher_timeframes = ['4h', '1d']
-            elif base_timeframe == '4h':
-                higher_timeframes = ['1d']
-            else:
-                higher_timeframes = []
-        
-        if not higher_timeframes:
-            return 50  # Điểm trung bình nếu không có khung thời gian cao hơn
-            
-        # Lấy dữ liệu
-        base_df = self.get_market_data(symbol, base_timeframe)
-        if base_df is None:
-            return 50
-            
-        # Tính các chỉ báo cho khung thời gian cơ sở
-        base_rsi = self.calculate_rsi(base_df)
-        
-        # Xác định xu hướng cơ sở (>50: up, <50: down)
-        base_trend = 'up' if base_rsi > 50 else 'down'
-        
-        # Kiểm tra các khung thời gian cao hơn
-        alignment_scores = []
-        
-        for tf in higher_timeframes:
-            tf_df = self.get_market_data(symbol, tf)
-            if tf_df is None:
-                continue
-                
-            # Tính RSI
-            tf_rsi = self.calculate_rsi(tf_df)
-            
-            # Xác định xu hướng
-            tf_trend = 'up' if tf_rsi > 50 else 'down'
-            
-            # Tính điểm khớp
-            if tf_trend == base_trend:
-                # Khớp xu hướng
-                # Càng xa 50, tín hiệu càng mạnh
-                alignment_score = 50 + abs(tf_rsi - 50)
-            else:
-                # Không khớp xu hướng
-                alignment_score = 50 - abs(tf_rsi - 50)
-                
-            alignment_scores.append(alignment_score)
-        
-        # Tính điểm trung bình
-        if alignment_scores:
-            return sum(alignment_scores) / len(alignment_scores)
-        else:
-            return 50
-    
-    def get_btc_correlation(self, symbol: str, timeframe: str, period: int = 14) -> Tuple[float, float]:
-        """
-        Tính toán tương quan với BTC và sức mạnh xu hướng BTC
-        
-        Args:
-            symbol: Cặp giao dịch
-            timeframe: Khung thời gian
-            period: Số chu kỳ tính tương quan
-            
-        Returns:
-            Tuple[float, float]: (Tương quan, Sức mạnh BTC)
-        """
-        # Nếu là BTC, tương quan = 1
-        if symbol == 'BTCUSDT':
-            btc_df = self.get_market_data('BTCUSDT', timeframe)
-            if btc_df is None:
-                return 1.0, 50
-                
-            btc_rsi = self.calculate_rsi(btc_df)
-            btc_adx = self.calculate_adx(btc_df)
-            
-            btc_strength = min(100, (btc_adx / 25) * 50 + abs(btc_rsi - 50))
-            
-            return 1.0, btc_strength
-        
-        # Lấy dữ liệu
-        symbol_df = self.get_market_data(symbol, timeframe)
-        btc_df = self.get_market_data('BTCUSDT', timeframe)
-        
-        if symbol_df is None or btc_df is None:
-            return 0.0, 50
-            
-        # Đảm bảo có cùng index
-        symbol_close = symbol_df['close'][-period:]
-        btc_close = btc_df['close'][-period:]
-        
-        if len(symbol_close) != period or len(btc_close) != period:
-            return 0.0, 50
-            
-        # Tính % thay đổi
-        symbol_returns = np.diff(symbol_close) / symbol_close[:-1]
-        btc_returns = np.diff(btc_close) / btc_close[:-1]
-        
-        if len(symbol_returns) < 2 or len(btc_returns) < 2:
-            return 0.0, 50
-            
-        # Tính tương quan
-        correlation = np.corrcoef(symbol_returns, btc_returns)[0, 1]
-        
-        # Tính sức mạnh BTC
-        btc_rsi = self.calculate_rsi(btc_df)
-        btc_adx = self.calculate_adx(btc_df)
-        
-        btc_strength = min(100, (btc_adx / 25) * 50 + abs(btc_rsi - 50))
-        
-        return correlation, btc_strength
-    
-    def get_liquidity_score(self, symbol: str, timeframe: str = '1h') -> float:
-        """
-        Tính toán điểm thanh khoản
-        
-        Args:
-            symbol: Cặp giao dịch
-            timeframe: Khung thời gian
-            
-        Returns:
-            float: Điểm thanh khoản (0-100)
-        """
-        try:
-            df = self.get_market_data(symbol, timeframe, limit=24)
-            if df is None:
-                return 50
-                
-            # Tính khối lượng trung bình
-            avg_volume = df['volume'].mean()
-            
-            # Tính spread (ước lượng từ high-low)
-            avg_spread = ((df['high'] - df['low']) / df['close']).mean() * 100
-            
-            # Tính điểm thanh khoản
-            volume_score = min(100, avg_volume / 1000) if symbol == 'BTCUSDT' else min(100, avg_volume / 100)
-            spread_score = 100 - min(100, avg_spread * 20)
-            
-            # Tổng hợp
-            liquidity_score = (volume_score * 0.7 + spread_score * 0.3)
-            
-            return liquidity_score
-        except Exception as e:
-            logger.error(f"Lỗi khi tính điểm thanh khoản: {str(e)}")
-            return 50
-    
-    def get_market_sentiment(self) -> float:
-        """
-        Lấy tâm lý thị trường tổng thể
-        
-        Returns:
-            float: Điểm tâm lý (0-100, >50 tích cực, <50 tiêu cực)
-        """
-        try:
-            # Sử dụng BTC, ETH, và BNB làm chỉ báo tâm lý chung
-            symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
-            timeframe = '1h'
-            
-            sentiments = []
-            
-            for symbol in symbols:
-                df = self.get_market_data(symbol, timeframe)
-                if df is None:
-                    continue
-                    
-                rsi = self.calculate_rsi(df)
-                volume_ratio = self.calculate_volume_ratio(df)
-                
-                # Tính điểm tâm lý cho symbol này
-                symbol_sentiment = (rsi * 0.6 + min(100, volume_ratio * 50) * 0.4)
-                sentiments.append(symbol_sentiment)
-            
-            # Tính trung bình
-            if sentiments:
-                return sum(sentiments) / len(sentiments)
-            else:
-                return 50
-        except Exception as e:
-            logger.error(f"Lỗi khi tính tâm lý thị trường: {str(e)}")
-            return 50
-    
-    def evaluate_signal_quality(self, symbol: str, timeframe: str) -> Tuple[float, Dict]:
+    def evaluate_signal_quality(self, symbol: str, timeframe: str = '1h') -> Tuple[float, Dict]:
         """
         Đánh giá chất lượng tín hiệu giao dịch
         
         Args:
-            symbol: Cặp giao dịch
-            timeframe: Khung thời gian
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
             
         Returns:
-            Tuple[float, Dict]: (Điểm chất lượng, Chi tiết đánh giá)
+            Tuple[float, Dict]: (Điểm chất lượng tổng hợp, Chi tiết đánh giá)
         """
-        try:
-            # Lấy dữ liệu
-            df = self.get_market_data(symbol, timeframe)
-            if df is None:
-                return 0, {'error': f'Không có dữ liệu cho {symbol} ({timeframe})'}
-                
-            # Tính các chỉ báo
-            adx = self.calculate_adx(df)
-            rsi = self.calculate_rsi(df)
-            volume_ratio = self.calculate_volume_ratio(df)
-            price_action_score = self.calculate_price_action_score(df)
-            
-            # Tính các điểm
-            trend_strength = min(100, adx * 4)
-            momentum_score = min(100, abs(rsi - 50) * 2)
-            volume_score = min(100, volume_ratio * 100)
-            
-            # Lấy các yếu tố bổ sung
-            higher_tf_alignment = self.get_multi_timeframe_alignment(symbol, timeframe)
-            btc_correlation, btc_strength = self.get_btc_correlation(symbol, timeframe)
-            
-            # Tính điểm tương quan BTC
-            if symbol != 'BTCUSDT':
-                if abs(btc_correlation) < 0.3:
-                    btc_alignment_score = 80  # Tương quan thấp, tín hiệu độc lập tốt
-                elif btc_correlation > 0.7 and btc_strength > 70:
-                    btc_alignment_score = 90  # BTC mạnh cùng hướng
-                elif btc_correlation > 0.7 and btc_strength < 30:
-                    btc_alignment_score = 20  # BTC yếu, rủi ro cao
-                else:
-                    btc_alignment_score = 50  # Trung tính
-            else:
-                # BTC là chính nó
-                btc_alignment_score = 75
-            
-            # Tính các yếu tố khác
-            liquidity_score = self.get_liquidity_score(symbol, timeframe)
-            market_sentiment = self.get_market_sentiment()
-            
-            # Tổng hợp các điểm
-            component_scores = {
-                'trend_strength': trend_strength,
+        if not self.binance_api:
+            logger.error("Không có BinanceAPI, không thể đánh giá tín hiệu")
+            return 0, {"error": "No BinanceAPI instance provided"}
+        
+        # Lấy dữ liệu
+        data = self._get_data_for_evaluation(symbol, timeframe)
+        if not data:
+            logger.error(f"Không thể lấy dữ liệu cho {symbol} {timeframe}")
+            return 0, {"error": "Failed to get data"}
+        
+        # Đánh giá các thành phần
+        trend_strength_score = self._evaluate_trend_strength(data, symbol, timeframe)
+        momentum_score = self._evaluate_momentum(data, symbol, timeframe)
+        volume_score = self._evaluate_volume_confirmation(data, symbol, timeframe)
+        pattern_score = self._evaluate_price_patterns(data, symbol, timeframe)
+        sr_score = self._evaluate_support_resistance(data, symbol, timeframe)
+        btc_alignment_score = self._evaluate_btc_alignment(data, symbol, timeframe)
+        
+        # Tính tổng hợp với trọng số
+        weights = self.config.get('indicator_weights', {})
+        total_score = (
+            weights.get('trend_strength', 0.25) * trend_strength_score +
+            weights.get('momentum', 0.20) * momentum_score +
+            weights.get('volume_confirmation', 0.15) * volume_score +
+            weights.get('price_patterns', 0.15) * pattern_score +
+            weights.get('support_resistance', 0.10) * sr_score +
+            weights.get('btc_alignment', 0.15) * btc_alignment_score
+        )
+        
+        # Đánh giá đa khung thời gian nếu được yêu cầu
+        multi_tf_score = self._evaluate_multi_timeframe(symbol, timeframe)
+        if multi_tf_score > 0:
+            # Kết hợp với tỷ lệ 70% điểm hiện tại, 30% đánh giá đa khung thời gian
+            total_score = 0.7 * total_score + 0.3 * multi_tf_score
+        
+        # Xác định hướng tín hiệu
+        signal_direction = self._determine_signal_direction(data, symbol, timeframe)
+        
+        # Xác định cường độ tín hiệu
+        signal_strength = self._determine_signal_strength(total_score)
+        
+        # Lưu kết quả đánh giá
+        evaluation_result = {
+            'score': total_score,
+            'signal_direction': signal_direction,
+            'signal_strength': signal_strength,
+            'component_scores': {
+                'trend_strength': trend_strength_score,
                 'momentum': momentum_score,
-                'volume': volume_score,
-                'price_pattern': price_action_score,
-                'higher_timeframe_alignment': higher_tf_alignment,
+                'volume_confirmation': volume_score,
+                'price_patterns': pattern_score,
+                'support_resistance': sr_score,
                 'btc_alignment': btc_alignment_score,
-                'liquidity': liquidity_score,
-                'market_sentiment': market_sentiment
-            }
-            
-            # Lấy trọng số
-            weights = self.config.get('weights', {
-                'trend_strength': 0.20,
-                'momentum': 0.15,
-                'volume': 0.15,
-                'price_pattern': 0.15,
-                'higher_timeframe_alignment': 0.15,
-                'btc_alignment': 0.10,
-                'liquidity': 0.05,
-                'market_sentiment': 0.05
-            })
-            
-            # Tính điểm cuối cùng
-            final_score = sum(component_scores[k] * weights[k] for k in weights)
-            
-            # Xác định hướng tín hiệu
-            signal_direction = 'BUY' if rsi > 50 else 'SELL'
-            
-            # Xác định mức độ mạnh
-            strength_thresholds = self.config.get('thresholds', {
-                'strong_signal': 70,
-                'moderate_signal': 50,
-                'weak_signal': 30
-            })
-            
-            if final_score >= strength_thresholds.get('strong_signal', 70):
-                signal_strength = 'STRONG'
-            elif final_score >= strength_thresholds.get('moderate_signal', 50):
-                signal_strength = 'MODERATE'
-            elif final_score >= strength_thresholds.get('weak_signal', 30):
-                signal_strength = 'WEAK'
-            else:
-                signal_strength = 'VERY_WEAK'
-            
-            # Tạo kết quả chi tiết
-            details = {
-                'timestamp': int(time.time()),
-                'symbol': symbol,
-                'timeframe': timeframe,
-                'final_score': final_score,
-                'signal_direction': signal_direction,
-                'signal_strength': signal_strength,
-                'component_scores': component_scores,
-                'weights': weights,
-                'indicators': {
-                    'adx': adx,
-                    'rsi': rsi,
-                    'volume_ratio': volume_ratio
-                },
-                'btc_correlation': btc_correlation,
-                'btc_strength': btc_strength
-            }
-            
-            # Lưu vào lịch sử
-            self.signal_history.append(details)
-            
-            # Giới hạn kích thước lịch sử
-            if len(self.signal_history) > 1000:
-                self.signal_history = self.signal_history[-1000:]
-            
-            logger.info(f"Đánh giá tín hiệu cho {symbol} ({timeframe}): {final_score:.2f}, hướng: {signal_direction}, mức độ: {signal_strength}")
-            
-            return final_score, details
-        except Exception as e:
-            logger.error(f"Lỗi khi đánh giá chất lượng tín hiệu: {str(e)}")
-            return 0, {'error': str(e)}
+                'multi_timeframe': multi_tf_score
+            },
+            'timestamp': int(time.time()),
+            'symbol': symbol,
+            'timeframe': timeframe,
+            'btc_correlation': self._calculate_btc_correlation(data, timeframe)
+        }
+        
+        # Lưu lịch sử đánh giá
+        self._save_evaluation(symbol, timeframe, evaluation_result)
+        
+        return total_score, evaluation_result
     
-    def get_recent_signals(self, limit: int = 10, symbol: str = None) -> List[Dict]:
+    def _get_data_for_evaluation(self, symbol: str, timeframe: str) -> Optional[pd.DataFrame]:
         """
-        Lấy các tín hiệu gần đây
+        Lấy dữ liệu cần thiết cho đánh giá
         
         Args:
-            limit: Số lượng tín hiệu tối đa
-            symbol: Lọc theo cặp giao dịch
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
             
         Returns:
-            List[Dict]: Danh sách tín hiệu
+            Optional[pd.DataFrame]: DataFrame chứa dữ liệu, hoặc None nếu không lấy được
         """
-        if symbol:
-            filtered = [s for s in self.signal_history if s.get('symbol') == symbol]
-            return filtered[-limit:] if filtered else []
+        cache_key = f"{symbol}_{timeframe}"
+        cache_timeout = self.config.get('cache_timeout', 300)
+        
+        # Kiểm tra cache
+        if cache_key in self.cached_data:
+            cache_time, df = self.cached_data[cache_key]
+            if time.time() - cache_time < cache_timeout:
+                logger.debug(f"Sử dụng dữ liệu cache cho {symbol} {timeframe}")
+                return df
+        
+        try:
+            # Lấy dữ liệu từ API
+            limit = 100  # Số lượng candle cần lấy
+            if self.binance_api is None:
+                logger.error("Đối tượng binance_api không được khởi tạo")
+                return None
+            klines = self.binance_api.get_klines(symbol=symbol, interval=timeframe, limit=limit)
+            
+            # Chuyển đổi thành DataFrame
+            df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 
+                                            'close_time', 'quote_asset_volume', 'number_of_trades', 
+                                            'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+            
+            # Chuyển đổi kiểu dữ liệu
+            numeric_columns = ['open', 'high', 'low', 'close', 'volume', 'quote_asset_volume', 
+                             'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume']
+            for col in numeric_columns:
+                df[col] = pd.to_numeric(df[col])
+            
+            # Thêm các chỉ báo cần thiết
+            df = self._add_indicators(df)
+            
+            # Cache dữ liệu
+            self.cached_data[cache_key] = (time.time(), df)
+            
+            return df
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu cho {symbol} {timeframe}: {str(e)}")
+            return None
+    
+    def _add_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Thêm các chỉ báo kỹ thuật vào DataFrame
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu giá
+            
+        Returns:
+            pd.DataFrame: DataFrame với các chỉ báo đã thêm
+        """
+        # Thêm SMA và EMA
+        df['sma_20'] = df['close'].rolling(window=20).mean()
+        df['sma_50'] = df['close'].rolling(window=50).mean()
+        df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()
+        df['ema_50'] = df['close'].ewm(span=50, adjust=False).mean()
+        
+        # Thêm RSI
+        rsi_period = self.config.get('rsi_parameters', {}).get('period', 14)
+        delta = df['close'].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        avg_gain = gain.rolling(window=rsi_period).mean()
+        avg_loss = loss.rolling(window=rsi_period).mean()
+        rs = avg_gain / avg_loss
+        df['rsi'] = 100 - (100 / (1 + rs))
+        
+        # Thêm MACD
+        macd_params = self.config.get('macd_parameters', {})
+        fast_period = macd_params.get('fast_period', 12)
+        slow_period = macd_params.get('slow_period', 26)
+        signal_period = macd_params.get('signal_period', 9)
+        
+        df['ema_fast'] = df['close'].ewm(span=fast_period, adjust=False).mean()
+        df['ema_slow'] = df['close'].ewm(span=slow_period, adjust=False).mean()
+        df['macd'] = df['ema_fast'] - df['ema_slow']
+        df['macd_signal'] = df['macd'].ewm(span=signal_period, adjust=False).mean()
+        df['macd_hist'] = df['macd'] - df['macd_signal']
+        
+        # Thêm Bollinger Bands
+        bb_params = self.config.get('bollinger_parameters', {})
+        bb_period = bb_params.get('period', 20)
+        bb_std = bb_params.get('std_dev', 2.0)
+        
+        df['bb_middle'] = df['close'].rolling(window=bb_period).mean()
+        df['bb_std'] = df['close'].rolling(window=bb_period).std()
+        df['bb_upper'] = df['bb_middle'] + (df['bb_std'] * bb_std)
+        df['bb_lower'] = df['bb_middle'] - (df['bb_std'] * bb_std)
+        df['bb_width'] = (df['bb_upper'] - df['bb_lower']) / df['bb_middle']
+        
+        # Thêm ATR
+        high_low = df['high'] - df['low']
+        high_close = (df['high'] - df['close'].shift()).abs()
+        low_close = (df['low'] - df['close'].shift()).abs()
+        true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+        df['atr_14'] = true_range.rolling(window=14).mean()
+        
+        # Thêm Volume SMA
+        df['volume_sma_20'] = df['volume'].rolling(window=20).mean()
+        df['volume_ratio'] = df['volume'] / df['volume_sma_20']
+        
+        # Thêm ADX
+        adx_period = self.config.get('adx_parameters', {}).get('period', 14)
+        
+        # Tính True Range
+        df['tr1'] = abs(df['high'] - df['low'])
+        df['tr2'] = abs(df['high'] - df['close'].shift())
+        df['tr3'] = abs(df['low'] - df['close'].shift())
+        df['tr'] = df[['tr1', 'tr2', 'tr3']].max(axis=1)
+        
+        # Tính Directional Movement
+        df['up_move'] = df['high'] - df['high'].shift()
+        df['down_move'] = df['low'].shift() - df['low']
+        
+        df['plus_dm'] = np.where((df['up_move'] > df['down_move']) & (df['up_move'] > 0), df['up_move'], 0)
+        df['minus_dm'] = np.where((df['down_move'] > df['up_move']) & (df['down_move'] > 0), df['down_move'], 0)
+        
+        # Tính Directional Indicators
+        df['plus_di'] = 100 * (df['plus_dm'].rolling(window=adx_period).mean() / df['tr'].rolling(window=adx_period).mean())
+        df['minus_di'] = 100 * (df['minus_dm'].rolling(window=adx_period).mean() / df['tr'].rolling(window=adx_period).mean())
+        
+        # Tính Directional Index
+        df['dx'] = 100 * (abs(df['plus_di'] - df['minus_di']) / (df['plus_di'] + df['minus_di']))
+        
+        # Tính ADX
+        df['adx'] = df['dx'].rolling(window=adx_period).mean()
+        
+        return df
+    
+    def _evaluate_trend_strength(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá độ mạnh xu hướng
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Lấy giá trị ADX
+            adx = df['adx'].iloc[-1]
+            strong_trend = self.config.get('adx_parameters', {}).get('strong_trend', 25)
+            
+            # Kiểm tra xu hướng với EMA
+            ema_20 = df['ema_20'].iloc[-1]
+            ema_50 = df['ema_50'].iloc[-1]
+            ema_trend = 0
+            
+            if ema_20 > ema_50:
+                # Xu hướng tăng
+                ema_trend = (ema_20 / ema_50 - 1) * 100
+            else:
+                # Xu hướng giảm
+                ema_trend = (1 - ema_20 / ema_50) * 100
+            
+            # Điểm ADX - Mạnh khi ADX > 25, rất mạnh khi ADX > 50
+            adx_score = min(100, adx * 2) if adx > strong_trend else (adx / strong_trend) * 50
+            
+            # Điểm EMA - Mạnh khi chênh lệch lớn
+            ema_score = min(100, ema_trend * 10)
+            
+            # Điểm BB Width - Xu hướng mạnh khi BB mở rộng
+            bb_width = df['bb_width'].iloc[-1]
+            bb_width_avg = df['bb_width'].rolling(window=20).mean().iloc[-1]
+            bb_width_score = 100 if bb_width > bb_width_avg * 1.5 else (bb_width / bb_width_avg) * 75
+            
+            # Điểm tổng hợp
+            trend_score = 0.5 * adx_score + 0.3 * ema_score + 0.2 * bb_width_score
+            
+            return trend_score
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá độ mạnh xu hướng cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _evaluate_momentum(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá động lượng (momentum)
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Lấy giá trị RSI
+            rsi = df['rsi'].iloc[-1]
+            rsi_params = self.config.get('rsi_parameters', {})
+            overbought = rsi_params.get('overbought', 70)
+            oversold = rsi_params.get('oversold', 30)
+            
+            # Lấy giá trị MACD
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            macd_hist = df['macd_hist'].iloc[-1]
+            macd_hist_prev = df['macd_hist'].iloc[-2]
+            
+            # Điểm RSI
+            rsi_score = 0
+            if rsi > overbought:
+                # Quá mua
+                rsi_score = 80 - (rsi - overbought)
+            elif rsi < oversold:
+                # Quá bán
+                rsi_score = 80 + (oversold - rsi)
+            else:
+                # Trung tính, điểm cao khi gần quá mua/quá bán
+                rsi_score = 50 + min(abs(rsi - 50), 20)
+            
+            # Điểm MACD
+            macd_score = 0
+            
+            # MACD trên Signal Line
+            if macd > macd_signal:
+                base_score = 60
+                # MACD Histogram đang tăng
+                if macd_hist > macd_hist_prev:
+                    base_score += 20
+                macd_score = base_score + min(abs(macd), 20)
+            else:
+                base_score = 40
+                # MACD Histogram đang giảm
+                if macd_hist < macd_hist_prev:
+                    base_score -= 20
+                macd_score = base_score - min(abs(macd), 20)
+            
+            # Điểm tổng hợp
+            momentum_score = 0.5 * rsi_score + 0.5 * macd_score
+            
+            return momentum_score
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá động lượng cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _evaluate_volume_confirmation(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá xác nhận khối lượng
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Lấy khối lượng gần đây
+            volume = df['volume'].iloc[-1]
+            volume_sma = df['volume_sma_20'].iloc[-1]
+            volume_ratio = df['volume_ratio'].iloc[-1]
+            
+            # Lấy giá gần đây
+            close = df['close'].iloc[-1]
+            close_prev = df['close'].iloc[-2]
+            price_change = (close - close_prev) / close_prev
+            
+            # Lấy tham số
+            vol_params = self.config.get('volume_parameters', {})
+            significant_increase = vol_params.get('significant_increase', 1.5)
+            
+            # Tính điểm khối lượng
+            volume_score = 0
+            
+            # Khối lượng cao hơn trung bình
+            if volume_ratio > 1:
+                base_score = 50 + (volume_ratio - 1) * 25
+                base_score = min(base_score, 90)
+                
+                # Khối lượng tăng mạnh
+                if volume_ratio > significant_increase:
+                    base_score += 10
+                
+                # Xác nhận xu hướng giá
+                if (price_change > 0 and close > df['ema_20'].iloc[-1]) or (price_change < 0 and close < df['ema_20'].iloc[-1]):
+                    base_score += 10
+                
+                volume_score = base_score
+            else:
+                # Khối lượng thấp hơn trung bình
+                volume_score = 50 - (1 - volume_ratio) * 25
+            
+            # Điều chỉnh điểm theo sự đồng thuận giữa khối lượng và giá
+            if (price_change > 0.01 and volume_ratio > 1.3) or (price_change < -0.01 and volume_ratio > 1.3):
+                volume_score = min(volume_score + 10, 100)
+            
+            # Điều chỉnh điểm nếu khối lượng quá thấp
+            if volume_ratio < 0.5:
+                volume_score = max(volume_score - 20, 0)
+            
+            return volume_score
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá xác nhận khối lượng cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _evaluate_price_patterns(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá mẫu hình giá
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Dữ liệu gần đây
+            closes = df['close'].values
+            highs = df['high'].values
+            lows = df['low'].values
+            
+            pattern_scores = self.config.get('price_pattern_scores', {})
+            detected_patterns = []
+            
+            # Kiểm tra gần Bollinger Bands
+            bb_upper = df['bb_upper'].iloc[-1]
+            bb_lower = df['bb_lower'].iloc[-1]
+            close = df['close'].iloc[-1]
+            
+            if close > bb_upper * 0.98:
+                detected_patterns.append(('bollinger_upper_touch', 60))
+            elif close < bb_lower * 1.02:
+                detected_patterns.append(('bollinger_lower_touch', 60))
+            
+            # Kiểm tra nến Doji
+            body_size = abs(df['close'].iloc[-1] - df['open'].iloc[-1])
+            candle_size = df['high'].iloc[-1] - df['low'].iloc[-1]
+            
+            if body_size < candle_size * 0.1:
+                detected_patterns.append(('doji', 70))
+            
+            # Kiểm tra nến Hammer/Inverted Hammer
+            if df['low'].iloc[-1] < df['close'].iloc[-1] < df['open'].iloc[-1]:
+                # Hammer (lower shadow at least 2x body)
+                lower_shadow = df['open'].iloc[-1] - df['low'].iloc[-1]
+                if lower_shadow > body_size * 2:
+                    detected_patterns.append(('hammer', 75))
+            elif df['high'].iloc[-1] > df['open'].iloc[-1] > df['close'].iloc[-1]:
+                # Inverted Hammer (upper shadow at least 2x body)
+                upper_shadow = df['high'].iloc[-1] - df['open'].iloc[-1]
+                if upper_shadow > body_size * 2:
+                    detected_patterns.append(('inverted_hammer', 75))
+            
+            # Kiểm tra giao cắt EMA
+            ema_20 = df['ema_20'].iloc[-1]
+            ema_50 = df['ema_50'].iloc[-1]
+            ema_20_prev = df['ema_20'].iloc[-2]
+            ema_50_prev = df['ema_50'].iloc[-2]
+            
+            if ema_20_prev < ema_50_prev and ema_20 > ema_50:
+                detected_patterns.append(('ema_golden_cross', 80))
+            elif ema_20_prev > ema_50_prev and ema_20 < ema_50:
+                detected_patterns.append(('ema_death_cross', 80))
+            
+            # Nếu không phát hiện mẫu hình, trả về điểm trung bình
+            if not detected_patterns:
+                return 50
+            
+            # Tính điểm trung bình từ các mẫu hình đã phát hiện
+            pattern_score = sum(score for _, score in detected_patterns) / len(detected_patterns)
+            
+            return pattern_score
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá mẫu hình giá cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _evaluate_support_resistance(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá hỗ trợ/kháng cự
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Tìm các mức hỗ trợ/kháng cự
+            close = df['close'].iloc[-1]
+            
+            # Phương pháp đơn giản: tìm các đỉnh, đáy cục bộ
+            highs = df['high'].values
+            lows = df['low'].values
+            
+            # Tìm các đỉnh cục bộ
+            resistance_levels = []
+            for i in range(3, len(highs) - 3):
+                if highs[i] > highs[i-1] and highs[i] > highs[i-2] and highs[i] > highs[i-3] and \
+                   highs[i] > highs[i+1] and highs[i] > highs[i+2] and highs[i] > highs[i+3]:
+                    resistance_levels.append(highs[i])
+            
+            # Tìm các đáy cục bộ
+            support_levels = []
+            for i in range(3, len(lows) - 3):
+                if lows[i] < lows[i-1] and lows[i] < lows[i-2] and lows[i] < lows[i-3] and \
+                   lows[i] < lows[i+1] and lows[i] < lows[i+2] and lows[i] < lows[i+3]:
+                    support_levels.append(lows[i])
+            
+            # Thêm BB Bands làm mức hỗ trợ/kháng cự động
+            resistance_levels.append(df['bb_upper'].iloc[-1])
+            support_levels.append(df['bb_lower'].iloc[-1])
+            
+            # Tính khoảng cách đến mức hỗ trợ/kháng cự gần nhất
+            min_distance_resistance = float('inf')
+            min_distance_support = float('inf')
+            
+            for level in resistance_levels:
+                if level > close:
+                    distance = (level - close) / close
+                    min_distance_resistance = min(min_distance_resistance, distance)
+            
+            for level in support_levels:
+                if level < close:
+                    distance = (close - level) / close
+                    min_distance_support = min(min_distance_support, distance)
+            
+            # Tính điểm dựa trên khoảng cách đến mức hỗ trợ/kháng cự
+            sr_score = 50
+            
+            # Gần mức hỗ trợ
+            if min_distance_support < 0.01:
+                sr_score = 80
+            elif min_distance_support < 0.03:
+                sr_score = 70
+            
+            # Gần mức kháng cự
+            if min_distance_resistance < 0.01:
+                sr_score = 80
+            elif min_distance_resistance < 0.03:
+                sr_score = 70
+            
+            # Nếu giá đang ở giữa hỗ trợ và kháng cự
+            if min_distance_support < 0.05 and min_distance_resistance < 0.05:
+                sr_score = 60
+            
+            return sr_score
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá hỗ trợ/kháng cự cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _evaluate_btc_alignment(self, df: pd.DataFrame, symbol: str, timeframe: str) -> float:
+        """
+        Đánh giá sự phù hợp với xu hướng BTC
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Nếu đây là BTC, điểm là 100
+            if symbol == 'BTCUSDT':
+                return 100
+            
+            # Lấy dữ liệu BTC
+            btc_df = self._get_data_for_evaluation('BTCUSDT', timeframe)
+            if btc_df is None:
+                return 50
+            
+            # Tính tương quan
+            correlation = self._calculate_btc_correlation(df, timeframe, btc_df)
+            
+            # Lấy các chỉ số của BTC và cặp tiền
+            btc_trend = 1 if btc_df['ema_20'].iloc[-1] > btc_df['ema_50'].iloc[-1] else -1
+            coin_trend = 1 if df['ema_20'].iloc[-1] > df['ema_50'].iloc[-1] else -1
+            
+            # Tính điểm căn chỉnh
+            alignment_score = 50
+            
+            # Tương quan cao và cùng xu hướng
+            if correlation > 0.7 and btc_trend == coin_trend:
+                alignment_score = 80 + correlation * 20
+            # Tương quan cao nhưng khác xu hướng
+            elif correlation > 0.7 and btc_trend != coin_trend:
+                alignment_score = 30
+            # Tương quan trung bình và cùng xu hướng
+            elif correlation > 0.4 and btc_trend == coin_trend:
+                alignment_score = 60 + correlation * 20
+            # Tương quan trung bình nhưng khác xu hướng
+            elif correlation > 0.4 and btc_trend != coin_trend:
+                alignment_score = 40
+            # Tương quan thấp
+            else:
+                alignment_score = 50
+            
+            return min(alignment_score, 100)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá sự phù hợp với BTC cho {symbol} {timeframe}: {str(e)}")
+            return 50  # Điểm trung bình
+    
+    def _calculate_btc_correlation(self, df: pd.DataFrame, timeframe: str, btc_df: pd.DataFrame = None) -> float:
+        """
+        Tính hệ số tương quan với BTC
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu cặp tiền
+            timeframe (str): Khung thời gian
+            btc_df (pd.DataFrame, optional): DataFrame dữ liệu BTC
+            
+        Returns:
+            float: Hệ số tương quan (-1 đến 1)
+        """
+        try:
+            # Nếu không có dữ liệu BTC, lấy từ API
+            if btc_df is None:
+                btc_df = self._get_data_for_evaluation('BTCUSDT', timeframe)
+                if btc_df is None:
+                    return 0
+            
+            # Tính lợi nhuận %
+            df_returns = df['close'].pct_change().dropna()
+            btc_returns = btc_df['close'].pct_change().dropna()
+            
+            # Đảm bảo cùng độ dài
+            min_len = min(len(df_returns), len(btc_returns))
+            df_returns = df_returns[-min_len:]
+            btc_returns = btc_returns[-min_len:]
+            
+            # Tính hệ số tương quan
+            correlation = df_returns.corr(btc_returns)
+            return correlation
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi tính hệ số tương quan với BTC: {str(e)}")
+            return 0
+    
+    def _evaluate_multi_timeframe(self, symbol: str, base_timeframe: str) -> float:
+        """
+        Đánh giá đa khung thời gian
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            base_timeframe (str): Khung thời gian cơ sở
+            
+        Returns:
+            float: Điểm đánh giá (0-100)
+        """
+        try:
+            # Xác định các khung thời gian cần kiểm tra
+            all_timeframes = list(self.config.get('multi_timeframe_weights', {}).keys())
+            
+            # Nếu không có đủ khung thời gian, trả về -1 (không đánh giá)
+            if len(all_timeframes) < 2:
+                return -1
+            
+            # Lọc ra các khung thời gian cao hơn
+            higher_timeframes = []
+            tf_order = ['1m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '1d', '3d', '1w']
+            
+            base_index = tf_order.index(base_timeframe) if base_timeframe in tf_order else -1
+            if base_index == -1 or base_index >= len(tf_order) - 1:
+                return -1
+            
+            for tf in all_timeframes:
+                if tf in tf_order and tf_order.index(tf) > base_index:
+                    higher_timeframes.append(tf)
+            
+            if not higher_timeframes:
+                return -1
+            
+            # Đánh giá tín hiệu trên các khung thời gian cao hơn
+            signals = {}
+            for tf in higher_timeframes:
+                tf_data = self._get_data_for_evaluation(symbol, tf)
+                if tf_data is not None:
+                    tf_signal = self._determine_signal_direction(tf_data, symbol, tf)
+                    signals[tf] = tf_signal
+            
+            # Nếu không có đủ dữ liệu, trả về -1
+            if not signals:
+                return -1
+            
+            # Lấy tín hiệu ở khung thời gian cơ sở
+            base_data = self._get_data_for_evaluation(symbol, base_timeframe)
+            if base_data is None:
+                return -1
+            
+            base_signal = self._determine_signal_direction(base_data, symbol, base_timeframe)
+            
+            # Tính điểm phù hợp
+            agreement_score = 0
+            total_weight = 0
+            
+            for tf, signal in signals.items():
+                weight = self.config.get('multi_timeframe_weights', {}).get(tf, 0.1)
+                if signal == base_signal:
+                    agreement_score += 100 * weight
+                elif signal == 'NEUTRAL' or base_signal == 'NEUTRAL':
+                    agreement_score += 50 * weight
+                else:
+                    agreement_score += 0 * weight
+                
+                total_weight += weight
+            
+            if total_weight == 0:
+                return -1
+            
+            return agreement_score / total_weight
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đánh giá đa khung thời gian cho {symbol}: {str(e)}")
+            return -1
+    
+    def _determine_signal_direction(self, df: pd.DataFrame, symbol: str, timeframe: str) -> str:
+        """
+        Xác định hướng tín hiệu giao dịch
+        
+        Args:
+            df (pd.DataFrame): DataFrame dữ liệu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            str: Hướng tín hiệu ('LONG', 'SHORT', 'NEUTRAL')
+        """
+        try:
+            # Lấy giá trị chỉ báo
+            ema_20 = df['ema_20'].iloc[-1]
+            ema_50 = df['ema_50'].iloc[-1]
+            rsi = df['rsi'].iloc[-1]
+            macd = df['macd'].iloc[-1]
+            macd_signal = df['macd_signal'].iloc[-1]
+            close = df['close'].iloc[-1]
+            adx = df['adx'].iloc[-1]
+            
+            # Đếm số tín hiệu cho mỗi hướng
+            long_signals = 0
+            short_signals = 0
+            
+            # EMA Cross
+            if ema_20 > ema_50:
+                long_signals += 1
+            else:
+                short_signals += 1
+            
+            # RSI
+            if rsi > 50:
+                long_signals += 1
+            else:
+                short_signals += 1
+            
+            # MACD
+            if macd > macd_signal:
+                long_signals += 1
+            else:
+                short_signals += 1
+            
+            # Giá vs EMA
+            if close > ema_20:
+                long_signals += 1
+            else:
+                short_signals += 1
+            
+            # ADX - xác định xu hướng rõ ràng
+            has_trend = adx > self.config.get('adx_parameters', {}).get('strong_trend', 25)
+            
+            # Quyết định hướng tín hiệu
+            if long_signals > short_signals and (has_trend or long_signals >= 3):
+                return 'LONG'
+            elif short_signals > long_signals and (has_trend or short_signals >= 3):
+                return 'SHORT'
+            else:
+                return 'NEUTRAL'
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi xác định hướng tín hiệu cho {symbol} {timeframe}: {str(e)}")
+            return 'NEUTRAL'
+    
+    def _determine_signal_strength(self, total_score: float) -> str:
+        """
+        Xác định cường độ tín hiệu dựa trên điểm tổng hợp
+        
+        Args:
+            total_score (float): Điểm tổng hợp
+            
+        Returns:
+            str: Cường độ tín hiệu ('STRONG', 'MODERATE', 'WEAK', 'VERY_WEAK')
+        """
+        thresholds = self.config.get('signal_quality_thresholds', {})
+        
+        if total_score >= thresholds.get('excellent', 80):
+            return 'STRONG'
+        elif total_score >= thresholds.get('good', 65):
+            return 'MODERATE'
+        elif total_score >= thresholds.get('moderate', 50):
+            return 'WEAK'
         else:
-            return self.signal_history[-limit:] if self.signal_history else []
+            return 'VERY_WEAK'
     
-    def save_signal_history(self, file_path: str = 'signal_history.json') -> bool:
+    def _save_evaluation(self, symbol: str, timeframe: str, result: Dict) -> None:
         """
-        Lưu lịch sử tín hiệu vào file
+        Lưu kết quả đánh giá vào lịch sử
         
         Args:
-            file_path: Đường dẫn đến file
-            
-        Returns:
-            bool: True nếu lưu thành công, False nếu không
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            result (Dict): Kết quả đánh giá
         """
+        key = f"{symbol}_{timeframe}"
+        
+        if key not in self.evaluation_history:
+            self.evaluation_history[key] = []
+        
+        # Giới hạn lịch sử lưu trữ (giữ 100 bản ghi gần nhất)
+        if len(self.evaluation_history[key]) >= 100:
+            self.evaluation_history[key].pop(0)
+        
+        self.evaluation_history[key].append(result)
+        
+        # Lưu lịch sử định kỳ
+        self._save_evaluation_history()
+    
+    def _save_evaluation_history(self) -> None:
+        """Lưu lịch sử đánh giá vào file"""
         try:
-            with open(file_path, 'w') as f:
-                json.dump(self.signal_history, f, indent=4)
-            logger.info(f"Đã lưu lịch sử tín hiệu vào {file_path}")
-            return True
+            with open('data/signal_quality_history.json', 'w') as f:
+                json.dump(self.evaluation_history, f)
         except Exception as e:
-            logger.error(f"Lỗi khi lưu lịch sử tín hiệu: {str(e)}")
-            return False
+            logger.error(f"Lỗi khi lưu lịch sử đánh giá: {str(e)}")
     
-    def load_signal_history(self, file_path: str = 'signal_history.json') -> bool:
-        """
-        Tải lịch sử tín hiệu từ file
-        
-        Args:
-            file_path: Đường dẫn đến file
-            
-        Returns:
-            bool: True nếu tải thành công, False nếu không
-        """
+    def _load_evaluation_history(self) -> None:
+        """Tải lịch sử đánh giá từ file"""
         try:
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as f:
-                    self.signal_history = json.load(f)
-                logger.info(f"Đã tải lịch sử tín hiệu từ {file_path}")
-                return True
-            return False
-        except Exception as e:
-            logger.error(f"Lỗi khi tải lịch sử tín hiệu: {str(e)}")
-            return False
+            with open('data/signal_quality_history.json', 'r') as f:
+                self.evaluation_history = json.load(f)
+            logger.info("Đã tải lịch sử đánh giá tín hiệu")
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning("Không tìm thấy hoặc không thể tải lịch sử đánh giá tín hiệu")
+            self.evaluation_history = {}
     
-    def analyze_signal_performance(self, days: int = 30, min_score: float = 70) -> Dict:
+    def get_signal_quality_trend(self, symbol: str, timeframe: str, lookback: int = 10) -> Dict:
         """
-        Phân tích hiệu suất của các tín hiệu
+        Lấy xu hướng chất lượng tín hiệu trong khoảng thời gian gần đây
         
         Args:
-            days: Số ngày cần phân tích
-            min_score: Điểm tín hiệu tối thiểu
+            symbol (str): Mã cặp tiền
+            timeframe (str): Khung thời gian
+            lookback (int): Số kết quả đánh giá gần nhất để phân tích
             
         Returns:
-            Dict: Thông tin phân tích
+            Dict: Kết quả phân tích xu hướng
         """
-        now = int(time.time())
-        start_time = now - days * 24 * 3600
+        key = f"{symbol}_{timeframe}"
         
-        # Lọc tín hiệu trong khoảng thời gian
-        signals = [s for s in self.signal_history 
-                  if s.get('timestamp', 0) >= start_time and s.get('final_score', 0) >= min_score]
-        
-        if not signals:
-            return {'error': 'Không đủ dữ liệu'}
-        
-        # Phân loại theo symbol
-        symbol_signals = {}
-        for s in signals:
-            symbol = s.get('symbol')
-            if symbol not in symbol_signals:
-                symbol_signals[symbol] = []
-            symbol_signals[symbol].append(s)
-        
-        # Phân tích mỗi symbol
-        symbol_analysis = {}
-        for symbol, sym_signals in symbol_signals.items():
-            # Sắp xếp theo thời gian
-            sym_signals.sort(key=lambda x: x.get('timestamp', 0))
-            
-            # Tính số lượng tín hiệu theo hướng
-            buy_signals = [s for s in sym_signals if s.get('signal_direction') == 'BUY']
-            sell_signals = [s for s in sym_signals if s.get('signal_direction') == 'SELL']
-            
-            # Tính điểm trung bình
-            avg_score = sum(s.get('final_score', 0) for s in sym_signals) / len(sym_signals) if sym_signals else 0
-            
-            # Phân tích xu hướng điểm
-            if len(sym_signals) >= 2:
-                first_half = sym_signals[:len(sym_signals)//2]
-                second_half = sym_signals[len(sym_signals)//2:]
-                
-                first_avg = sum(s.get('final_score', 0) for s in first_half) / len(first_half) if first_half else 0
-                second_avg = sum(s.get('final_score', 0) for s in second_half) / len(second_half) if second_half else 0
-                
-                score_trend = second_avg - first_avg
-            else:
-                score_trend = 0
-            
-            symbol_analysis[symbol] = {
-                'total_signals': len(sym_signals),
-                'buy_signals': len(buy_signals),
-                'sell_signals': len(sell_signals),
-                'avg_score': avg_score,
-                'score_trend': score_trend,
-                'trend_direction': 'improving' if score_trend > 5 else ('declining' if score_trend < -5 else 'stable'),
-                'top_signal': max(sym_signals, key=lambda x: x.get('final_score', 0)) if sym_signals else None
+        if key not in self.evaluation_history or not self.evaluation_history[key]:
+            return {
+                'trend': 'unknown',
+                'stability': 0,
+                'current_score': 0,
+                'average_score': 0,
+                'direction_changes': 0,
+                'strength_changes': 0
             }
         
-        # Tổng hợp
-        total_signals = len(signals)
-        avg_score_overall = sum(s.get('final_score', 0) for s in signals) / total_signals if total_signals > 0 else 0
+        history = self.evaluation_history[key]
+        
+        # Lấy các kết quả gần nhất
+        recent_evaluations = history[-lookback:] if len(history) >= lookback else history
+        
+        # Tính các chỉ số
+        scores = [eval_result['score'] for eval_result in recent_evaluations]
+        directions = [eval_result['signal_direction'] for eval_result in recent_evaluations]
+        strengths = [eval_result['signal_strength'] for eval_result in recent_evaluations]
+        
+        current_score = scores[-1] if scores else 0
+        average_score = sum(scores) / len(scores) if scores else 0
+        
+        # Đếm số lần thay đổi hướng
+        direction_changes = sum(1 for i in range(1, len(directions)) if directions[i] != directions[i-1])
+        
+        # Đếm số lần thay đổi cường độ
+        strength_changes = sum(1 for i in range(1, len(strengths)) if strengths[i] != strengths[i-1])
+        
+        # Xác định xu hướng điểm
+        if len(scores) >= 3:
+            first_half = scores[:len(scores)//2]
+            second_half = scores[len(scores)//2:]
+            
+            first_half_avg = sum(first_half) / len(first_half)
+            second_half_avg = sum(second_half) / len(second_half)
+            
+            if second_half_avg > first_half_avg + 5:
+                trend = 'improving'
+            elif second_half_avg < first_half_avg - 5:
+                trend = 'deteriorating'
+            else:
+                trend = 'stable'
+        else:
+            trend = 'insufficient data'
+        
+        # Tính độ ổn định
+        if scores:
+            stability = 100 - (np.std(scores) / average_score * 100 if average_score > 0 else 0)
+        else:
+            stability = 0
         
         return {
-            'period_days': days,
-            'min_score': min_score,
-            'total_signals': total_signals,
-            'avg_score': avg_score_overall,
-            'symbols_analyzed': len(symbol_analysis),
-            'symbol_details': symbol_analysis,
-            'top_symbols': sorted(symbol_analysis.keys(), 
-                                 key=lambda s: symbol_analysis[s]['avg_score'], 
-                                 reverse=True)[:5] if symbol_analysis else []
+            'trend': trend,
+            'stability': stability,
+            'current_score': current_score,
+            'average_score': average_score,
+            'direction_changes': direction_changes,
+            'strength_changes': strength_changes,
+            'data_points': len(recent_evaluations)
         }
+    
+    def get_best_quality_symbols(self, symbols: List[str] = None, timeframe: str = '1h') -> List[Dict]:
+        """
+        Lấy danh sách các cặp tiền có chất lượng tín hiệu tốt nhất
+        
+        Args:
+            symbols (List[str], optional): Danh sách các cặp tiền cần kiểm tra
+            timeframe (str): Khung thời gian
+            
+        Returns:
+            List[Dict]: Danh sách các cặp tiền được xếp hạng theo chất lượng tín hiệu
+        """
+        # Nếu không có danh sách symbols, sử dụng danh sách cặp tiền đã lưu trong lịch sử
+        if symbols is None:
+            symbols = []
+            for key in self.evaluation_history.keys():
+                if key.endswith(f"_{timeframe}"):
+                    symbol = key.split('_')[0]
+                    symbols.append(symbol)
+            
+            # Nếu vẫn không có symbols, trả về danh sách rỗng
+            if not symbols:
+                return []
+        
+        # Đánh giá tất cả các cặp tiền
+        results = []
+        for symbol in symbols:
+            # Kiểm tra xem đã có kết quả mới nhất trong lịch sử chưa
+            key = f"{symbol}_{timeframe}"
+            if key in self.evaluation_history and self.evaluation_history[key]:
+                latest_evaluation = self.evaluation_history[key][-1]
+                
+                # Kiểm tra xem kết quả có quá cũ không (>30 phút)
+                if time.time() - latest_evaluation.get('timestamp', 0) < 1800:
+                    score = latest_evaluation.get('score', 0)
+                    direction = latest_evaluation.get('signal_direction', 'NEUTRAL')
+                    strength = latest_evaluation.get('signal_strength', 'WEAK')
+                else:
+                    # Nếu kết quả quá cũ, đánh giá lại
+                    try:
+                        score, latest_evaluation = self.evaluate_signal_quality(symbol, timeframe)
+                        if not isinstance(latest_evaluation, dict):
+                            logger.error(f"Đánh giá signal quality cho {symbol} không trả về đúng định dạng")
+                            continue
+                        direction = latest_evaluation.get('signal_direction', 'NEUTRAL')
+                        strength = latest_evaluation.get('signal_strength', 'WEAK')
+                    except Exception as e:
+                        logger.error(f"Lỗi khi đánh giá signal quality cho {symbol}: {str(e)}")
+                        continue
+            else:
+                # Nếu chưa có kết quả, đánh giá mới
+                try:
+                    score, latest_evaluation = self.evaluate_signal_quality(symbol, timeframe)
+                    if not isinstance(latest_evaluation, dict):
+                        logger.error(f"Đánh giá signal quality cho {symbol} không trả về đúng định dạng")
+                        continue
+                    direction = latest_evaluation.get('signal_direction', 'NEUTRAL')
+                    strength = latest_evaluation.get('signal_strength', 'WEAK')
+                except Exception as e:
+                    logger.error(f"Lỗi khi đánh giá signal quality cho {symbol}: {str(e)}")
+                    continue
+            
+            results.append({
+                'symbol': symbol,
+                'score': score,
+                'direction': direction,
+                'strength': strength,
+                'btc_correlation': latest_evaluation.get('btc_correlation', 0)
+            })
+        
+        # Sắp xếp theo điểm giảm dần
+        results.sort(key=lambda x: x['score'], reverse=True)
+        
+        return results
 
 
 def main():
-    """Hàm chính để test EnhancedSignalQuality"""
-    # Khởi tạo BinanceAPI
-    try:
-        from binance_api import BinanceAPI
-        binance_api = BinanceAPI()
-    except ImportError:
-        binance_api = None
-        print("Không thể import module binance_api, sẽ chạy với dữ liệu mẫu.")
+    """Hàm chính để test signal quality"""
+    from binance_api import BinanceAPI
     
-    # Khởi tạo EnhancedSignalQuality
-    evaluator = EnhancedSignalQuality(binance_api=binance_api)
+    # Khởi tạo API
+    binance_api = BinanceAPI()
     
-    # Đánh giá tín hiệu cho BTC
-    try:
-        score, details = evaluator.evaluate_signal_quality('BTCUSDT', '1h')
+    # Khởi tạo Signal Quality
+    signal_quality = EnhancedSignalQuality(binance_api=binance_api)
+    
+    # Test với một số cặp tiền
+    symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
+    timeframe = '1h'
+    
+    for symbol in symbols:
+        score, details = signal_quality.evaluate_signal_quality(symbol, timeframe)
+        print(f"{symbol}: Score = {score:.2f}, Direction = {details['signal_direction']}, Strength = {details['signal_strength']}")
         
-        print("\n=== Đánh giá tín hiệu BTC/USDT (1h) ===")
-        print(f"Điểm chất lượng: {score:.2f}")
-        print(f"Hướng tín hiệu: {details['signal_direction']}")
-        print(f"Mức độ mạnh: {details['signal_strength']}")
-        print("\nĐiểm thành phần:")
-        for component, value in details['component_scores'].items():
-            print(f"  {component}: {value:.2f}")
-        
-        print("\nChỉ báo kỹ thuật:")
-        for indicator, value in details['indicators'].items():
-            print(f"  {indicator}: {value:.2f}")
-            
-        print(f"\nTương quan với BTC: {details['btc_correlation']:.2f}")
-    except Exception as e:
-        print(f"Lỗi khi đánh giá tín hiệu: {str(e)}")
+        # In chi tiết
+        print(f"  - Trend Strength: {details['component_scores']['trend_strength']:.2f}")
+        print(f"  - Momentum: {details['component_scores']['momentum']:.2f}")
+        print(f"  - Volume Confirmation: {details['component_scores']['volume_confirmation']:.2f}")
+        print(f"  - BTC Correlation: {details['btc_correlation']:.2f}")
+        print()
     
-    # Phân tích nhiều cặp giao dịch
-    try:
-        if binance_api is not None:
-            symbols = ['ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT']
-            
-            print("\n=== Đánh giá tín hiệu cho nhiều cặp giao dịch ===")
-            for symbol in symbols:
-                score, details = evaluator.evaluate_signal_quality(symbol, '1h')
-                print(f"{symbol}: {score:.2f} - {details['signal_direction']} ({details['signal_strength']})")
-    except Exception as e:
-        print(f"Lỗi khi đánh giá nhiều tín hiệu: {str(e)}")
+    # Test multi-timeframe
+    print("Multi-timeframe analysis:")
+    multi_tf_score = signal_quality._evaluate_multi_timeframe('BTCUSDT', '1h')
+    print(f"Multi-timeframe score: {multi_tf_score:.2f}")
+    
+    # Test get best quality symbols
+    best_symbols = signal_quality.get_best_quality_symbols(symbols, timeframe)
+    print("\nBest quality symbols:")
+    for result in best_symbols:
+        print(f"{result['symbol']}: Score = {result['score']:.2f}, Direction = {result['direction']}")
 
 
 if __name__ == "__main__":

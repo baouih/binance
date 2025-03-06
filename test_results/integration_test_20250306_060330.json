@@ -1,0 +1,86 @@
+{
+    "api_connection": {
+        "status": "failed",
+        "details": [
+            {
+                "symbol": "BTCUSDT",
+                "price": "108691.40",
+                "klines_count": 10
+            },
+            {
+                "symbol": "ETHUSDT",
+                "price": "2300.00",
+                "klines_count": 10
+            },
+            {
+                "symbol": "BNBUSDT",
+                "price": "597.001",
+                "klines_count": 10
+            },
+            "L\u1ed7i khi l\u1ea5y th\u00f4ng tin t\u00e0i kho\u1ea3n: 'BinanceAPI' object has no attribute 'futures_account_balance'"
+        ]
+    },
+    "pnl_calculator": {
+        "status": "failed",
+        "details": [
+            "Sai l\u1ec7ch PnL: Th\u1ef1c t\u1ebf 595.92, Mong \u0111\u1ee3i ~600.0",
+            "Sai l\u1ec7ch PnL: Th\u1ef1c t\u1ebf 596.08, Mong \u0111\u1ee3i ~600.0",
+            "Thi\u1ebfu tr\u01b0\u1eddng trong k\u1ebft qu\u1ea3 partial exits"
+        ]
+    },
+    "leverage_calculator": {
+        "status": "failed",
+        "details": [
+            "Kh\u00f4ng th\u1ec3 t\u00ednh \u0111\u00f2n b\u1ea9y cho BTCUSDT",
+            "Kh\u00f4ng th\u1ec3 t\u00ednh \u0111\u00f2n b\u1ea9y cho ETHUSDT",
+            "Kh\u00f4ng th\u1ec3 t\u00ednh \u0111\u00f2n b\u1ea9y cho BNBUSDT",
+            "Kh\u00f4ng th\u1ec3 t\u00ednh \u0111\u00f2n b\u1ea9y v\u1edbi tham s\u1ed1 kh\u00e1c"
+        ]
+    },
+    "signal_quality": {
+        "status": "failed",
+        "details": [
+            "L\u1ed7i khi ki\u1ec3m tra Enhanced Signal Quality: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all()."
+        ]
+    },
+    "trailing_stop": {
+        "status": "failed",
+        "details": [
+            "L\u1ed7i khi ki\u1ec3m tra Enhanced Adaptive Trailing Stop: 'percentage'"
+        ]
+    },
+    "performance_monitor": {
+        "status": "failed",
+        "details": [
+            {
+                "test_case": "record_trade",
+                "trade_id": "trade_1741241010_BTCUSDT_1",
+                "result": "passed"
+            },
+            {
+                "test_case": "update_metrics",
+                "total_trades": 2,
+                "win_rate": 100.0,
+                "total_pnl": 1191.84,
+                "result": "passed"
+            },
+            {
+                "test_case": "daily_report",
+                "report_path": "reports/daily/report_2025-03-06.json",
+                "result": "passed"
+            },
+            {
+                "test_case": "strategy_recommendations",
+                "status": "success",
+                "result": "passed"
+            },
+            "L\u1ed7i khi ki\u1ec3m tra Performance Monitor: 'seaborn' is not a valid package style, path of style file, URL of style file, or library style name (library styles are listed in `style.available`)"
+        ]
+    },
+    "full_integration": {
+        "status": "failed",
+        "details": [
+            "L\u1ed7i khi ki\u1ec3m tra t\u00edch h\u1ee3p to\u00e0n b\u1ed9 h\u1ec7 th\u1ed1ng: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all()."
+        ]
+    }
+}

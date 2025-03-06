@@ -1,7 +1,137 @@
 {
-    "strategy_type": "percentage",
-    "config": {
+  "strategies": {
+    "percentage": {
+      "trending": {
+        "activation_percent": 1.0,
+        "callback_percent": 0.4,
+        "use_dynamic_callback": true,
+        "min_callback": 0.4,
+        "max_callback": 3.0,
+        "partial_exits": [
+          {"threshold": 3.0, "percentage": 0.3},
+          {"threshold": 5.0, "percentage": 0.5}
+        ]
+      },
+      "ranging": {
         "activation_percent": 0.8,
-        "callback_percent": 0.3
+        "callback_percent": 0.8,
+        "use_dynamic_callback": true,
+        "min_callback": 0.5,
+        "max_callback": 1.5,
+        "partial_exits": [
+          {"threshold": 2.0, "percentage": 0.3},
+          {"threshold": 4.0, "percentage": 0.5}
+        ]
+      },
+      "volatile": {
+        "activation_percent": 2.0,
+        "callback_percent": 1.5,
+        "use_dynamic_callback": true,
+        "min_callback": 1.0,
+        "max_callback": 3.0,
+        "partial_exits": [
+          {"threshold": 4.0, "percentage": 0.3},
+          {"threshold": 8.0, "percentage": 0.5}
+        ]
+      },
+      "quiet": {
+        "activation_percent": 0.5,
+        "callback_percent": 0.3,
+        "use_dynamic_callback": false,
+        "min_callback": 0.3,
+        "max_callback": 0.8,
+        "partial_exits": [
+          {"threshold": 1.5, "percentage": 0.3},
+          {"threshold": 3.0, "percentage": 0.5}
+        ]
+      }
+    },
+    "step": {
+      "trending": {
+        "profit_steps": [1.0, 2.0, 5.0, 10.0],
+        "callback_steps": [0.2, 0.5, 1.0, 2.0],
+        "partial_exits": [
+          {"threshold": 5.0, "percentage": 0.3},
+          {"threshold": 10.0, "percentage": 0.3}
+        ]
+      },
+      "ranging": {
+        "profit_steps": [0.5, 1.0, 3.0, 5.0],
+        "callback_steps": [0.2, 0.5, 1.0, 1.5],
+        "partial_exits": [
+          {"threshold": 3.0, "percentage": 0.3},
+          {"threshold": 5.0, "percentage": 0.3}
+        ]
+      },
+      "volatile": {
+        "profit_steps": [2.0, 5.0, 10.0, 15.0],
+        "callback_steps": [1.0, 2.0, 3.0, 4.0],
+        "partial_exits": [
+          {"threshold": 7.0, "percentage": 0.3},
+          {"threshold": 15.0, "percentage": 0.3}
+        ]
+      },
+      "quiet": {
+        "profit_steps": [0.5, 1.0, 2.0, 3.0],
+        "callback_steps": [0.1, 0.3, 0.5, 0.8],
+        "partial_exits": [
+          {"threshold": 2.0, "percentage": 0.3},
+          {"threshold": 3.0, "percentage": 0.3}
+        ]
+      }
+    },
+    "atr_based": {
+      "trending": {
+        "atr_multiplier": 2.5,
+        "atr_period": 14,
+        "min_profit_activation": 1.0,
+        "partial_exits": [
+          {"threshold": 3.0, "percentage": 0.3},
+          {"threshold": 5.0, "percentage": 0.5}
+        ]
+      },
+      "ranging": {
+        "atr_multiplier": 1.5,
+        "atr_period": 14,
+        "min_profit_activation": 0.8,
+        "partial_exits": [
+          {"threshold": 2.0, "percentage": 0.3},
+          {"threshold": 4.0, "percentage": 0.5}
+        ]
+      },
+      "volatile": {
+        "atr_multiplier": 3.0,
+        "atr_period": 14,
+        "min_profit_activation": 2.0,
+        "partial_exits": [
+          {"threshold": 4.0, "percentage": 0.3},
+          {"threshold": 8.0, "percentage": 0.5}
+        ]
+      },
+      "quiet": {
+        "atr_multiplier": 1.0,
+        "atr_period": 14,
+        "min_profit_activation": 0.5,
+        "partial_exits": [
+          {"threshold": 1.5, "percentage": 0.3},
+          {"threshold": 3.0, "percentage": 0.5}
+        ]
+      }
     }
+  },
+  "general": {
+    "default_strategy": "percentage",
+    "default_market_regime": "trending",
+    "log_level": "INFO",
+    "save_history": true,
+    "history_file": "trailing_stop_history.json",
+    "max_history_entries": 1000
+  },
+  "market_volatility_adjustment": {
+    "enable": true,
+    "low_volatility_threshold": 0.5,
+    "high_volatility_threshold": 2.0,
+    "low_volatility_multiplier": 0.7,
+    "high_volatility_multiplier": 1.5
+  }
 }

@@ -1,0 +1,295 @@
+[
+  {
+    "entry_price": 50000.0,
+    "side": "LONG",
+    "strategy_type": "percentage",
+    "market_regime": "trending",
+    "entry_time": "2025-03-06T07:21:29.260315",
+    "last_update_time": "2025-03-06T07:21:29.260720",
+    "highest_price": 51306.240743015296,
+    "lowest_price": 48457.62878464278,
+    "stop_price": 50828.19350368888,
+    "current_price": 50788.034686611136,
+    "status": "CLOSED",
+    "trailing_activated": true,
+    "partial_exits": [],
+    "partial_exit_levels": [
+      {
+        "threshold": 3.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 5.0,
+        "percentage": 0.5
+      }
+    ],
+    "profit_pct": 1.5760693732222715,
+    "max_profit_pct": 2.6124814860305925,
+    "config": {
+      "activation_percent": 1.0,
+      "callback_percent": 0.4,
+      "use_dynamic_callback": true,
+      "min_callback": 0.4,
+      "max_callback": 3.0,
+      "partial_exits": [
+        {
+          "threshold": 3.0,
+          "percentage": 0.3
+        },
+        {
+          "threshold": 5.0,
+          "percentage": 0.5
+        }
+      ]
+    },
+    "activation_percent": 1.0,
+    "callback_percent": 0.9317526141135142,
+    "use_dynamic_callback": true,
+    "min_callback": 0.4,
+    "max_callback": 3.0,
+    "entry_index": 0,
+    "exit_price": 50788.034686611136,
+    "exit_time": "2025-03-06T07:21:29.260733",
+    "exit_reason": "Gi\u00e1 (50788.034686611136) d\u01b0\u1edbi m\u1ee9c trailing stop (50828.19350368888)",
+    "efficiency": 60.32844181479553
+  },
+  {
+    "entry_price": 50000.0,
+    "side": "SHORT",
+    "strategy_type": "percentage",
+    "market_regime": "trending",
+    "entry_time": "2025-03-06T07:21:29.582316",
+    "last_update_time": "2025-03-06T07:21:29.582594",
+    "highest_price": 51026.99764465011,
+    "lowest_price": 49013.53785821631,
+    "stop_price": 49427.48066915023,
+    "current_price": 50003.18466748173,
+    "status": "CLOSED",
+    "trailing_activated": true,
+    "partial_exits": [],
+    "partial_exit_levels": [
+      {
+        "threshold": 3.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 5.0,
+        "percentage": 0.5
+      }
+    ],
+    "profit_pct": -0.006369334963455913,
+    "max_profit_pct": 1.9729242835673795,
+    "config": {
+      "activation_percent": 1.0,
+      "callback_percent": 0.4,
+      "use_dynamic_callback": true,
+      "min_callback": 0.4,
+      "max_callback": 3.0,
+      "partial_exits": [
+        {
+          "threshold": 3.0,
+          "percentage": 0.3
+        },
+        {
+          "threshold": 5.0,
+          "percentage": 0.5
+        }
+      ]
+    },
+    "activation_percent": 1.0,
+    "callback_percent": 0.8445479127243394,
+    "use_dynamic_callback": true,
+    "min_callback": 0.4,
+    "max_callback": 3.0,
+    "entry_index": 0,
+    "exit_price": 50003.18466748173,
+    "exit_time": "2025-03-06T07:21:29.582604",
+    "exit_reason": "Gi\u00e1 (50003.18466748173) tr\u00ean m\u1ee9c trailing stop (49427.48066915023)",
+    "efficiency": -0.3228372734071215
+  },
+  {
+    "entry_price": 50000.0,
+    "side": "LONG",
+    "strategy_type": "percentage",
+    "market_regime": "ranging",
+    "entry_time": "2025-03-06T07:21:29.799285",
+    "last_update_time": "2025-03-06T07:21:29.799456",
+    "highest_price": 50574.12254084382,
+    "lowest_price": 50000.0,
+    "stop_price": 50263.18044067141,
+    "current_price": 50218.88010424269,
+    "status": "CLOSED",
+    "trailing_activated": true,
+    "partial_exits": [],
+    "partial_exit_levels": [
+      {
+        "threshold": 2.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 4.0,
+        "percentage": 0.5
+      }
+    ],
+    "profit_pct": 0.4377602084853861,
+    "max_profit_pct": 1.1482450816876373,
+    "config": {
+      "activation_percent": 0.8,
+      "callback_percent": 0.8,
+      "use_dynamic_callback": true,
+      "min_callback": 0.5,
+      "max_callback": 1.5,
+      "partial_exits": [
+        {
+          "threshold": 2.0,
+          "percentage": 0.3
+        },
+        {
+          "threshold": 4.0,
+          "percentage": 0.5
+        }
+      ]
+    },
+    "activation_percent": 0.8,
+    "callback_percent": 0.6148245081687638,
+    "use_dynamic_callback": true,
+    "min_callback": 0.5,
+    "max_callback": 1.5,
+    "entry_index": 0,
+    "exit_price": 50218.88010424269,
+    "exit_time": "2025-03-06T07:21:29.799462",
+    "exit_reason": "Gi\u00e1 (50218.88010424269) d\u01b0\u1edbi m\u1ee9c trailing stop (50263.18044067141)",
+    "efficiency": 38.12428334915979
+  },
+  {
+    "entry_price": 50000.0,
+    "side": "LONG",
+    "strategy_type": "percentage",
+    "market_regime": "volatile",
+    "entry_time": "2025-03-06T07:21:30.056774",
+    "last_update_time": "2025-03-06T07:21:30.057047",
+    "highest_price": 51556.01311658059,
+    "lowest_price": 49038.29713294323,
+    "stop_price": 50719.565654822785,
+    "current_price": 50524.892854248974,
+    "status": "CLOSED",
+    "trailing_activated": true,
+    "partial_exits": [],
+    "partial_exit_levels": [
+      {
+        "threshold": 4.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 8.0,
+        "percentage": 0.5
+      }
+    ],
+    "profit_pct": 1.0497857084979478,
+    "max_profit_pct": 3.1120262331611737,
+    "config": {
+      "activation_percent": 2.0,
+      "callback_percent": 1.5,
+      "use_dynamic_callback": true,
+      "min_callback": 1.0,
+      "max_callback": 3.0,
+      "partial_exits": [
+        {
+          "threshold": 4.0,
+          "percentage": 0.3
+        },
+        {
+          "threshold": 8.0,
+          "percentage": 0.5
+        }
+      ]
+    },
+    "activation_percent": 2.0,
+    "callback_percent": 1.6224052466322347,
+    "use_dynamic_callback": true,
+    "min_callback": 1.0,
+    "max_callback": 3.0,
+    "entry_index": 0,
+    "exit_price": 50524.892854248974,
+    "exit_time": "2025-03-06T07:21:30.057060",
+    "exit_reason": "Gi\u00e1 (50524.892854248974) d\u01b0\u1edbi m\u1ee9c trailing stop (50719.565654822785)",
+    "efficiency": 33.73318956349488
+  },
+  {
+    "entry_price": 50000.0,
+    "side": "LONG",
+    "strategy_type": "step",
+    "market_regime": "trending",
+    "entry_time": "2025-03-06T07:21:30.277712",
+    "last_update_time": "2025-03-06T07:21:30.278205",
+    "highest_price": 53314.927170486866,
+    "lowest_price": 47324.019069052214,
+    "stop_price": 52781.777898782,
+    "current_price": 52695.17707934612,
+    "status": "CLOSED",
+    "trailing_activated": true,
+    "partial_exits": [
+      {
+        "time": "2025-03-06T07:21:30.278114",
+        "price": 53160.62662653427,
+        "threshold": 5.0,
+        "percentage": 0.3,
+        "profit_pct": 6.321253253068543
+      }
+    ],
+    "partial_exit_levels": [
+      {
+        "threshold": 5.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 10.0,
+        "percentage": 0.3
+      }
+    ],
+    "profit_pct": 5.3903541586922366,
+    "max_profit_pct": 6.629854340973732,
+    "config": {
+      "profit_steps": [
+        1.0,
+        2.0,
+        5.0,
+        10.0
+      ],
+      "callback_steps": [
+        0.2,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "partial_exits": [
+        {
+          "threshold": 5.0,
+          "percentage": 0.3
+        },
+        {
+          "threshold": 10.0,
+          "percentage": 0.3
+        }
+      ]
+    },
+    "profit_steps": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+    ],
+    "callback_steps": [
+      0.2,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "current_step": 2,
+    "entry_index": 0,
+    "exit_price": 52695.17707934612,
+    "exit_time": "2025-03-06T07:21:30.278218",
+    "exit_reason": "Gi\u00e1 (52695.17707934612) d\u01b0\u1edbi m\u1ee9c trailing stop (52781.777898782)",
+    "efficiency": 81.3042622275854
+  }
+]

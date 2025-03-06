@@ -1,0 +1,33 @@
+=== BÁO CÁO KIỂM THỦ TÍCH HỢP ===
+Thời gian: 2025-03-06 06:07:03
+
+Tổng số test: 7
+Test thành công: 1
+Test thất bại: 6
+
+=== API_CONNECTION - THÀNH CÔNG ===
+
+=== PNL_CALCULATOR - THẤT BẠI ===
+- Sai lệch PnL: Thực tế 595.92, Mong đợi ~600.0
+- Sai lệch PnL: Thực tế 596.08, Mong đợi ~600.0
+- Thiếu trường trong kết quả partial exits
+
+=== LEVERAGE_CALCULATOR - THẤT BẠI ===
+- Không thể tính đòn bẩy cho BTCUSDT
+- Không thể tính đòn bẩy cho ETHUSDT
+- Không thể tính đòn bẩy cho BNBUSDT
+- Không thể tính đòn bẩy với tham số khác
+
+=== SIGNAL_QUALITY - THẤT BẠI ===
+- Lỗi khi kiểm tra Enhanced Signal Quality: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+=== TRAILING_STOP - THẤT BẠI ===
+- Lỗi khi kiểm tra Enhanced Adaptive Trailing Stop: 'percentage'
+
+=== PERFORMANCE_MONITOR - THẤT BẠI ===
+- Lỗi khi kiểm tra Performance Monitor: 'seaborn' is not a valid package style, path of style file, URL of style file, or library style name (library styles are listed in `style.available`)
+
+=== FULL_INTEGRATION - THẤT BẠI ===
+- Lỗi khi kiểm tra tích hợp toàn bộ hệ thống: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+KẾT LUẬN: Có 6 test thất bại. Cần kiểm tra lại.

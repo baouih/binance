@@ -2,1528 +2,2102 @@
 # -*- coding: utf-8 -*-
 
 """
-Module theo dõi hiệu suất (Performance Monitor)
+Module Giám Sát Hiệu Suất (Performance Monitor)
 
-Module này cung cấp các công cụ để theo dõi và phân tích hiệu suất giao dịch,
-bao gồm theo dõi hiệu suất theo chiến lược, cặp giao dịch, và chế độ thị trường,
-cũng như tính toán các chỉ số như Sharpe Ratio, Profit Factor, Win Rate.
+Module này cung cấp các công cụ giám sát và phân tích hiệu suất giao dịch,
+tạo báo cáo, cảnh báo, và đề xuất điều chỉnh chiến lược dựa trên kết quả.
 """
 
-import os
-import sys
+import logging
 import json
 import time
-import math
-import logging
 import datetime
+import os
+import math
+import copy
+import re
+from typing import Dict, List, Tuple, Any, Optional, Union
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Dict, List, Tuple, Optional, Union, Any
-from pathlib import Path
+from collections import defaultdict
 
 # Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('performance_monitor.log')
-    ]
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger('performance_monitor')
 
-# Thêm thư mục gốc vào sys.path
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-# Import calculate_pnl_with_full_details nếu có
-try:
-    from calculate_pnl_with_full_details import PnLCalculator
-    pnl_calculator_available = True
-except ImportError:
-    logger.warning("Không thể import module calculate_pnl_with_full_details")
-    pnl_calculator_available = False
-
-
-class PerformanceMetrics:
-    """Lớp tính toán chỉ số hiệu suất"""
-    
-    @staticmethod
-    def calculate_win_rate(trades: List[Dict]) -> float:
-        """
-        Tính tỷ lệ thắng
-        
-        Args:
-            trades (List[Dict]): Danh sách giao dịch
-            
-        Returns:
-            float: Tỷ lệ thắng (0-1)
-        """
-        if not trades:
-            return 0.0
-        
-        winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-        return len(winning_trades) / len(trades)
-    
-    @staticmethod
-    def calculate_profit_factor(trades: List[Dict]) -> float:
-        """
-        Tính profit factor (tổng lãi / tổng lỗ)
-        
-        Args:
-            trades (List[Dict]): Danh sách giao dịch
-            
-        Returns:
-            float: Profit factor
-        """
-        total_profit = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) > 0)
-        total_loss = sum(abs(t.get('net_pnl', 0)) for t in trades if t.get('net_pnl', 0) < 0)
-        
-        if total_loss == 0:
-            return float('inf') if total_profit > 0 else 0.0
-        
-        return total_profit / total_loss
-    
-    @staticmethod
-    def calculate_sharpe_ratio(returns: List[float], risk_free_rate: float = 0.0) -> float:
-        """
-        Tính Sharpe ratio
-        
-        Args:
-            returns (List[float]): Danh sách lợi nhuận theo kỳ (%)
-            risk_free_rate (float): Lãi suất phi rủi ro
-            
-        Returns:
-            float: Sharpe ratio
-        """
-        if not returns:
-            return 0.0
-        
-        returns_array = np.array(returns)
-        excess_returns = returns_array - risk_free_rate
-        
-        if len(returns) <= 1:
-            return 0.0
-        
-        return (np.mean(excess_returns) / np.std(excess_returns, ddof=1)) * np.sqrt(252)  # Annualized
-    
-    @staticmethod
-    def calculate_sortino_ratio(returns: List[float], risk_free_rate: float = 0.0) -> float:
-        """
-        Tính Sortino ratio
-        
-        Args:
-            returns (List[float]): Danh sách lợi nhuận theo kỳ (%)
-            risk_free_rate (float): Lãi suất phi rủi ro
-            
-        Returns:
-            float: Sortino ratio
-        """
-        if not returns:
-            return 0.0
-        
-        returns_array = np.array(returns)
-        excess_returns = returns_array - risk_free_rate
-        
-        # Chỉ tính downside deviation (chỉ lấy các giá trị âm)
-        negative_returns = excess_returns[excess_returns < 0]
-        
-        if len(negative_returns) == 0:
-            return float('inf') if np.mean(excess_returns) > 0 else 0.0
-        
-        downside_deviation = np.std(negative_returns, ddof=1)
-        if downside_deviation == 0:
-            return 0.0
-        
-        return (np.mean(excess_returns) / downside_deviation) * np.sqrt(252)  # Annualized
-    
-    @staticmethod
-    def calculate_max_drawdown(equity_curve: List[float]) -> Tuple[float, int, int]:
-        """
-        Tính drawdown tối đa
-        
-        Args:
-            equity_curve (List[float]): Đường cong vốn
-            
-        Returns:
-            Tuple[float, int, int]: (drawdown tối đa (%), chỉ số bắt đầu, chỉ số kết thúc)
-        """
-        if not equity_curve:
-            return 0.0, 0, 0
-        
-        equity_array = np.array(equity_curve)
-        max_dd = 0.0
-        max_dd_start = 0
-        max_dd_end = 0
-        
-        highest = equity_array[0]
-        highest_idx = 0
-        
-        for i in range(1, len(equity_array)):
-            if equity_array[i] > highest:
-                highest = equity_array[i]
-                highest_idx = i
-            else:
-                drawdown = (highest - equity_array[i]) / highest * 100
-                if drawdown > max_dd:
-                    max_dd = drawdown
-                    max_dd_start = highest_idx
-                    max_dd_end = i
-        
-        return max_dd, max_dd_start, max_dd_end
-    
-    @staticmethod
-    def calculate_average_profit_loss(trades: List[Dict]) -> Tuple[float, float]:
-        """
-        Tính lợi nhuận/lỗ trung bình
-        
-        Args:
-            trades (List[Dict]): Danh sách giao dịch
-            
-        Returns:
-            Tuple[float, float]: (lợi nhuận trung bình, lỗ trung bình)
-        """
-        profit_trades = [t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) > 0]
-        loss_trades = [t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0]
-        
-        avg_profit = np.mean(profit_trades) if profit_trades else 0.0
-        avg_loss = np.mean(loss_trades) if loss_trades else 0.0
-        
-        return avg_profit, avg_loss
-    
-    @staticmethod
-    def calculate_expectancy(trades: List[Dict]) -> float:
-        """
-        Tính kỳ vọng lợi nhuận trên mỗi giao dịch
-        
-        Args:
-            trades (List[Dict]): Danh sách giao dịch
-            
-        Returns:
-            float: Kỳ vọng lợi nhuận
-        """
-        if not trades:
-            return 0.0
-        
-        win_rate = PerformanceMetrics.calculate_win_rate(trades)
-        avg_profit, avg_loss = PerformanceMetrics.calculate_average_profit_loss(trades)
-        
-        # Tính R-multiple (Lợi nhuận trung bình / Lỗ trung bình)
-        r_multiple = abs(avg_profit / avg_loss) if avg_loss != 0 else 0.0
-        
-        # Expectancy = (Win Rate * R) - (Loss Rate * 1)
-        expectancy = (win_rate * r_multiple) - ((1 - win_rate) * 1)
-        
-        return expectancy
-
 
 class PerformanceMonitor:
-    """Lớp theo dõi và phân tích hiệu suất giao dịch"""
+    """Lớp giám sát và phân tích hiệu suất giao dịch"""
     
-    def __init__(self, data_dir: str = 'performance_data', reports_dir: str = 'reports'):
+    def __init__(self, config_path: str = 'configs/performance_monitor_config.json',
+                binance_api = None, pnl_calculator = None):
         """
         Khởi tạo Performance Monitor
         
         Args:
-            data_dir (str): Thư mục lưu dữ liệu
-            reports_dir (str): Thư mục lưu báo cáo
+            config_path (str): Đường dẫn đến file cấu hình
+            binance_api: Đối tượng BinanceAPI để lấy dữ liệu
+            pnl_calculator: Đối tượng PnLCalculator để tính toán lợi nhuận
         """
-        self.data_dir = data_dir
-        self.reports_dir = reports_dir
-        self.trades = []
-        self.equity_curve = []
-        self.daily_returns = []
-        self.strategy_performance = {}
-        self.symbol_performance = {}
-        self.regime_performance = {}
+        self.config = self._load_config(config_path)
+        self.binance_api = binance_api
+        self.pnl_calculator = pnl_calculator
         
-        # Tạo thư mục lưu dữ liệu nếu chưa có
-        os.makedirs(data_dir, exist_ok=True)
-        os.makedirs(reports_dir, exist_ok=True)
+        # Tạo các thư mục cần thiết
+        os.makedirs('reports', exist_ok=True)
+        os.makedirs('reports/daily', exist_ok=True)
+        os.makedirs('reports/weekly', exist_ok=True)
+        os.makedirs('reports/monthly', exist_ok=True)
+        os.makedirs('reports/strategy', exist_ok=True)
         
-        # Khởi tạo PnLCalculator nếu có
-        self.pnl_calculator = PnLCalculator() if pnl_calculator_available else None
+        # Khởi tạo cache dữ liệu
+        self.position_cache = {}
+        self.trade_history = []
+        self.metrics_history = {}
+        self.alerts = []
+        
+        # Tải dữ liệu nếu có
+        self._load_data()
+        
+        logger.info("Đã khởi tạo Performance Monitor")
     
-    def load_trades(self, file_path: str = None) -> bool:
+    def _load_config(self, config_path: str) -> Dict:
         """
-        Tải dữ liệu giao dịch từ file
+        Tải cấu hình từ file hoặc sử dụng cấu hình mặc định
         
         Args:
-            file_path (str): Đường dẫn file
+            config_path (str): Đường dẫn đến file cấu hình
             
         Returns:
-            bool: True nếu tải thành công, False nếu không
+            Dict: Cấu hình đã tải
         """
-        if file_path is None:
-            file_path = os.path.join(self.data_dir, 'trades.json')
+        default_config = {
+            'tracking': {
+                'track_trades': True,
+                'track_pnl': True,
+                'track_balance': True,
+                'track_drawdown': True,
+                'track_win_rate': True,
+                'track_strategies': True,
+                'track_symbols': True
+            },
+            'reporting': {
+                'daily_reports': True,
+                'weekly_reports': True,
+                'monthly_reports': True,
+                'strategy_reports': True,
+                'symbol_reports': True,
+                'include_charts': True,
+                'email_reports': False,
+                'telegram_reports': False
+            },
+            'alerts': {
+                'drawdown_threshold': 10,  # %
+                'losing_streak_threshold': 5,  # số lượng thua liên tiếp
+                'profit_target_alert': 5,  # % lợi nhuận mục tiêu hằng ngày
+                'low_win_rate_threshold': 40,  # % tỷ lệ thắng thấp cần cảnh báo
+                'balance_drop_threshold': 5,  # % giảm số dư cần cảnh báo
+                'high_exposure_threshold': 50  # % tài khoản trong vị thế
+            },
+            'metrics': {
+                'rr_ratio_min': 1.5,  # Tỷ lệ R/R tối thiểu mong muốn
+                'win_rate_min': 45,  # % tỷ lệ thắng tối thiểu mong muốn
+                'profit_factor_min': 1.2,  # Hệ số lợi nhuận tối thiểu
+                'max_drawdown_acceptable': 20,  # % drawdown tối đa chấp nhận được
+                'target_monthly_return': 10,  # % lợi nhuận hàng tháng mục tiêu
+                'expected_trades_per_day': 3  # Số giao dịch dự kiến mỗi ngày
+            },
+            'strategies': {
+                'track_individual_performance': True,
+                'auto_adjust_weights': True,
+                'min_trades_for_evaluation': 20
+            },
+            'data_retention': {
+                'trade_history_max_days': 365,  # Số ngày lưu trữ lịch sử giao dịch
+                'metrics_history_max_days': 730  # Số ngày lưu trữ chỉ số hiệu suất
+            },
+            'visualization': {
+                'chart_style': 'seaborn',
+                'chart_colors': ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'],
+                'equity_chart_interval': 'daily'  # 'hourly', 'daily', 'weekly'
+            }
+        }
         
         try:
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as f:
-                    self.trades = json.load(f)
-                logger.info(f"Đã tải {len(self.trades)} giao dịch từ {file_path}")
-                return True
-            else:
-                logger.warning(f"File {file_path} không tồn tại")
-                return False
-        except Exception as e:
-            logger.error(f"Lỗi khi tải giao dịch: {str(e)}")
-            return False
-    
-    def save_trades(self, file_path: str = None) -> bool:
-        """
-        Lưu dữ liệu giao dịch vào file
-        
-        Args:
-            file_path (str): Đường dẫn file
-            
-        Returns:
-            bool: True nếu lưu thành công, False nếu không
-        """
-        if file_path is None:
-            file_path = os.path.join(self.data_dir, 'trades.json')
-        
-        try:
-            with open(file_path, 'w') as f:
-                json.dump(self.trades, f, indent=4)
-            logger.info(f"Đã lưu {len(self.trades)} giao dịch vào {file_path}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu giao dịch: {str(e)}")
-            return False
-    
-    def add_trade(self, trade: Dict) -> bool:
-        """
-        Thêm giao dịch mới
-        
-        Args:
-            trade (Dict): Thông tin giao dịch
-            
-        Returns:
-            bool: True nếu thêm thành công, False nếu không
-        """
-        required_fields = ['symbol', 'side', 'entry_price', 'exit_price', 'quantity']
-        if not all(field in trade for field in required_fields):
-            logger.error(f"Giao dịch thiếu thông tin: {trade}")
-            return False
-        
-        # Tính PnL chi tiết nếu có PnLCalculator
-        if self.pnl_calculator:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                logger.info(f"Đã tải cấu hình từ {config_path}")
+                return config
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning(f"Không thể tải cấu hình từ {config_path}, sử dụng cấu hình mặc định")
+            # Lưu cấu hình mặc định
             try:
-                # Tính toán PnL chi tiết
-                pnl_details = self.pnl_calculator.calculate_pnl_with_full_details(
-                    entry_price=trade['entry_price'],
-                    exit_price=trade['exit_price'],
-                    position_size=trade['quantity'],
-                    leverage=trade.get('leverage', 1),
-                    position_side=trade['side'],
-                    entry_time=trade.get('entry_time'),
-                    exit_time=trade.get('exit_time'),
-                    symbol=trade['symbol'],
-                    partial_exits=trade.get('partial_exits')
+                os.makedirs(os.path.dirname(config_path), exist_ok=True)
+                with open(config_path, 'w') as f:
+                    json.dump(default_config, f, indent=4)
+                logger.info(f"Đã lưu cấu hình mặc định vào {config_path}")
+            except Exception as e:
+                logger.error(f"Không thể lưu cấu hình mặc định: {str(e)}")
+            
+            return default_config
+    
+    def _load_data(self) -> None:
+        """Tải dữ liệu từ các file lưu trữ"""
+        # Tải lịch sử giao dịch
+        try:
+            with open('data/trade_history.json', 'r') as f:
+                self.trade_history = json.load(f)
+            logger.info(f"Đã tải lịch sử giao dịch: {len(self.trade_history)} giao dịch")
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.info("Không tìm thấy hoặc không thể tải lịch sử giao dịch")
+        
+        # Tải lịch sử chỉ số
+        try:
+            with open('data/metrics_history.json', 'r') as f:
+                self.metrics_history = json.load(f)
+            logger.info(f"Đã tải lịch sử chỉ số hiệu suất")
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.info("Không tìm thấy hoặc không thể tải lịch sử chỉ số hiệu suất")
+        
+        # Tải lịch sử cảnh báo
+        try:
+            with open('data/performance_alerts.json', 'r') as f:
+                self.alerts = json.load(f)
+            logger.info(f"Đã tải lịch sử cảnh báo: {len(self.alerts)} cảnh báo")
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.info("Không tìm thấy hoặc không thể tải lịch sử cảnh báo")
+    
+    def _save_data(self) -> None:
+        """Lưu dữ liệu vào các file lưu trữ"""
+        # Tạo thư mục nếu chưa tồn tại
+        os.makedirs('data', exist_ok=True)
+        
+        # Lưu lịch sử giao dịch
+        try:
+            with open('data/trade_history.json', 'w') as f:
+                json.dump(self.trade_history, f, indent=4)
+            logger.debug("Đã lưu lịch sử giao dịch")
+        except Exception as e:
+            logger.error(f"Không thể lưu lịch sử giao dịch: {str(e)}")
+        
+        # Lưu lịch sử chỉ số
+        try:
+            with open('data/metrics_history.json', 'w') as f:
+                json.dump(self.metrics_history, f, indent=4)
+            logger.debug("Đã lưu lịch sử chỉ số hiệu suất")
+        except Exception as e:
+            logger.error(f"Không thể lưu lịch sử chỉ số hiệu suất: {str(e)}")
+        
+        # Lưu lịch sử cảnh báo
+        try:
+            with open('data/performance_alerts.json', 'w') as f:
+                json.dump(self.alerts, f, indent=4)
+            logger.debug("Đã lưu lịch sử cảnh báo")
+        except Exception as e:
+            logger.error(f"Không thể lưu lịch sử cảnh báo: {str(e)}")
+    
+    def record_trade(self, trade_data: Dict) -> str:
+        """
+        Ghi nhận giao dịch mới
+        
+        Args:
+            trade_data (Dict): Dữ liệu giao dịch
+                {
+                    'symbol': str,
+                    'side': str,
+                    'entry_time': int,
+                    'exit_time': int,
+                    'entry_price': float,
+                    'exit_price': float,
+                    'position_size': float,
+                    'pnl': float,
+                    'roi': float,
+                    'strategy': str,
+                    'leverage': float,
+                    'fees': float,
+                    'stop_loss': float,
+                    'take_profit': float,
+                    'reason': str,
+                    'tags': List[str],
+                    'notes': str
+                }
+            
+        Returns:
+            str: ID của giao dịch
+        """
+        # Kiểm tra dữ liệu đầu vào tối thiểu
+        required_fields = ['symbol', 'side', 'entry_price', 'exit_price']
+        for field in required_fields:
+            if field not in trade_data:
+                logger.error(f"Thiếu trường dữ liệu {field} khi ghi nhận giao dịch")
+                return ""
+        
+        # Tạo ID giao dịch
+        trade_id = f"trade_{int(time.time())}_{trade_data['symbol']}_{len(self.trade_history)}"
+        
+        # Thêm các trường bổ sung
+        trade_data['trade_id'] = trade_id
+        trade_data['record_time'] = int(time.time())
+        
+        if 'entry_time' not in trade_data:
+            trade_data['entry_time'] = int(time.time()) - 3600  # Mặc định 1 giờ trước
+        
+        if 'exit_time' not in trade_data:
+            trade_data['exit_time'] = int(time.time())
+        
+        # Tính PnL nếu chưa có
+        if 'pnl' not in trade_data and self.pnl_calculator:
+            try:
+                result = self.pnl_calculator.calculate_pnl_with_full_details(
+                    entry_price=trade_data['entry_price'],
+                    exit_price=trade_data['exit_price'],
+                    position_size=trade_data.get('position_size', 1.0),
+                    leverage=trade_data.get('leverage', 1.0),
+                    position_side=trade_data['side'],
+                    symbol=trade_data['symbol'],
+                    entry_time=trade_data['entry_time'],
+                    exit_time=trade_data['exit_time']
                 )
                 
-                # Cập nhật thông tin giao dịch với PnL chi tiết
-                trade.update(pnl_details)
-            except Exception as e:
-                logger.error(f"Lỗi khi tính PnL chi tiết: {str(e)}")
+                trade_data['pnl'] = result['net_pnl']
+                trade_data['roi'] = result['roi_percent']
+                trade_data['fees'] = result['total_fee']
                 
-                # Tính toán PnL đơn giản nếu không tính được chi tiết
-                if 'side' in trade and 'entry_price' in trade and 'exit_price' in trade:
-                    if trade['side'] == 'LONG':
-                        trade['net_pnl'] = (trade['exit_price'] - trade['entry_price']) * trade['quantity']
-                    else:  # SHORT
-                        trade['net_pnl'] = (trade['entry_price'] - trade['exit_price']) * trade['quantity']
-        else:
-            # Tính toán PnL đơn giản
-            if 'side' in trade and 'entry_price' in trade and 'exit_price' in trade:
-                if trade['side'] == 'LONG':
-                    trade['net_pnl'] = (trade['exit_price'] - trade['entry_price']) * trade['quantity']
-                else:  # SHORT
-                    trade['net_pnl'] = (trade['entry_price'] - trade['exit_price']) * trade['quantity']
+                if 'funding_pnl' in result:
+                    trade_data['funding_pnl'] = result['funding_pnl']
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi tính PnL cho giao dịch: {str(e)}")
+                # Tính toán đơn giản nếu không dùng được PnL Calculator
+                if trade_data['side'].upper() == 'LONG':
+                    trade_data['pnl'] = (trade_data['exit_price'] - trade_data['entry_price']) * trade_data.get('position_size', 1.0)
+                else:
+                    trade_data['pnl'] = (trade_data['entry_price'] - trade_data['exit_price']) * trade_data.get('position_size', 1.0)
+                
+                # Tính ROI
+                trade_data['roi'] = (trade_data['pnl'] / (trade_data['entry_price'] * trade_data.get('position_size', 1.0))) * 100
         
-        # Thêm ID nếu chưa có
-        if 'trade_id' not in trade:
-            trade['trade_id'] = f"trade_{int(time.time())}_{len(self.trades)}"
+        # Thêm giao dịch vào lịch sử
+        self.trade_history.append(trade_data)
         
-        # Thêm timestamp nếu chưa có
-        if 'timestamp' not in trade:
-            trade['timestamp'] = int(time.time())
+        # Lưu dữ liệu
+        self._save_data()
         
-        # Thêm vào danh sách
-        self.trades.append(trade)
-        logger.info(f"Đã thêm giao dịch {trade['trade_id']} ({trade['symbol']})")
+        # Cập nhật chỉ số và kiểm tra cảnh báo
+        self.update_metrics()
+        self.check_alerts()
         
-        return True
+        logger.info(f"Đã ghi nhận giao dịch mới: {trade_id}, PnL: {trade_data.get('pnl', 0):.2f}, ROI: {trade_data.get('roi', 0):.2f}%")
+        
+        return trade_id
     
-    def calculate_equity_curve(self, initial_balance: float = 10000.0) -> List[float]:
+    def record_position_update(self, position_data: Dict) -> str:
         """
-        Tính đường cong vốn
+        Ghi nhận cập nhật vị thế (theo dõi vị thế đang mở)
         
         Args:
-            initial_balance (float): Số dư ban đầu
+            position_data (Dict): Dữ liệu vị thế
+                {
+                    'symbol': str,
+                    'side': str,
+                    'entry_time': int,
+                    'entry_price': float,
+                    'current_price': float,
+                    'position_size': float,
+                    'leverage': float,
+                    'unrealized_pnl': float,
+                    'unrealized_roi': float,
+                    'strategy': str,
+                    'stop_loss': float,
+                    'take_profit': float
+                }
             
         Returns:
-            List[float]: Đường cong vốn
+            str: ID của vị thế
         """
-        if not self.trades:
-            return [initial_balance]
+        # Kiểm tra dữ liệu đầu vào tối thiểu
+        required_fields = ['symbol', 'side', 'entry_price', 'current_price']
+        for field in required_fields:
+            if field not in position_data:
+                logger.error(f"Thiếu trường dữ liệu {field} khi ghi nhận vị thế")
+                return ""
         
-        # Sắp xếp giao dịch theo thời gian
-        sorted_trades = sorted(self.trades, key=lambda t: t.get('timestamp', 0))
+        # Tạo ID vị thế
+        position_id = f"{position_data['symbol']}_{position_data['side']}"
         
-        # Tính đường cong vốn
-        equity = [initial_balance]
-        current_balance = initial_balance
+        # Thêm các trường bổ sung
+        position_data['position_id'] = position_id
+        position_data['update_time'] = int(time.time())
         
-        for trade in sorted_trades:
-            if 'net_pnl' in trade:
-                current_balance += trade['net_pnl']
-                equity.append(current_balance)
+        if 'entry_time' not in position_data:
+            position_data['entry_time'] = int(time.time()) - 3600  # Mặc định 1 giờ trước
         
-        self.equity_curve = equity
-        return equity
-    
-    def calculate_daily_returns(self) -> List[float]:
-        """
-        Tính lợi nhuận hàng ngày
-        
-        Returns:
-            List[float]: Lợi nhuận hàng ngày (%)
-        """
-        if not self.equity_curve or len(self.equity_curve) < 2:
-            return []
-        
-        # Tính lợi nhuận tương đối (%)
-        returns = [(self.equity_curve[i] / self.equity_curve[i-1] - 1) * 100 
-                  for i in range(1, len(self.equity_curve))]
-        
-        self.daily_returns = returns
-        return returns
-    
-    def get_trade_statistics(self) -> Dict:
-        """
-        Tính toán các thống kê giao dịch
-        
-        Returns:
-            Dict: Các thống kê giao dịch
-        """
-        if not self.trades:
-            return {
-                'total_trades': 0,
-                'win_rate': 0.0,
-                'profit_factor': 0.0,
-                'expectancy': 0.0,
-                'sharpe_ratio': 0.0,
-                'sortino_ratio': 0.0,
-                'max_drawdown': 0.0,
-                'avg_profit': 0.0,
-                'avg_loss': 0.0,
-                'total_profit': 0.0,
-                'total_loss': 0.0,
-                'net_profit': 0.0,
-                'biggest_winner': 0.0,
-                'biggest_loser': 0.0,
-                'average_trade': 0.0,
-                'average_bars_winners': 0,
-                'average_bars_losers': 0,
-                'trades_per_day': 0.0
-            }
-        
-        # Đảm bảo đã tính equity curve và daily returns
-        if not self.equity_curve:
-            self.calculate_equity_curve()
-        
-        if not self.daily_returns:
-            self.calculate_daily_returns()
-        
-        # Chuẩn bị dữ liệu
-        winning_trades = [t for t in self.trades if t.get('net_pnl', 0) > 0]
-        losing_trades = [t for t in self.trades if t.get('net_pnl', 0) < 0]
-        
-        total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-        total_loss = sum(t.get('net_pnl', 0) for t in losing_trades)
-        net_profit = total_profit + total_loss
-        
-        # Tính các chỉ số
-        win_rate = PerformanceMetrics.calculate_win_rate(self.trades)
-        profit_factor = PerformanceMetrics.calculate_profit_factor(self.trades)
-        expectancy = PerformanceMetrics.calculate_expectancy(self.trades)
-        avg_profit, avg_loss = PerformanceMetrics.calculate_average_profit_loss(self.trades)
-        
-        sharpe_ratio = PerformanceMetrics.calculate_sharpe_ratio(self.daily_returns)
-        sortino_ratio = PerformanceMetrics.calculate_sortino_ratio(self.daily_returns)
-        max_drawdown, _, _ = PerformanceMetrics.calculate_max_drawdown(self.equity_curve)
-        
-        # Tìm giao dịch lời/lỗ nhất
-        biggest_winner = max(self.trades, key=lambda t: t.get('net_pnl', 0)).get('net_pnl', 0) if self.trades else 0.0
-        biggest_loser = min(self.trades, key=lambda t: t.get('net_pnl', 0)).get('net_pnl', 0) if self.trades else 0.0
-        
-        # Tính thời gian trung bình giữ vị thế
-        bars_winners = []
-        bars_losers = []
-        
-        for trade in self.trades:
-            entry_time = trade.get('entry_time')
-            exit_time = trade.get('exit_time')
+        # Tính unrealized PnL nếu chưa có
+        if 'unrealized_pnl' not in position_data:
+            side = position_data['side'].upper()
+            entry_price = position_data['entry_price']
+            current_price = position_data['current_price']
+            position_size = position_data.get('position_size', 1.0)
+            leverage = position_data.get('leverage', 1.0)
             
-            if entry_time and exit_time:
-                bars = (exit_time - entry_time) / 3600  # Giờ
-                
-                if trade.get('net_pnl', 0) > 0:
-                    bars_winners.append(bars)
-                else:
-                    bars_losers.append(bars)
+            if side == 'LONG':
+                unrealized_pnl = (current_price - entry_price) * position_size * leverage
+            else:
+                unrealized_pnl = (entry_price - current_price) * position_size * leverage
+            
+            position_data['unrealized_pnl'] = unrealized_pnl
+            
+            # Tính unrealized ROI
+            margin = (entry_price * position_size) / leverage
+            position_data['unrealized_roi'] = (unrealized_pnl / margin) * 100
         
-        avg_bars_winners = np.mean(bars_winners) if bars_winners else 0
-        avg_bars_losers = np.mean(bars_losers) if bars_losers else 0
+        # Cập nhật vị thế trong cache
+        self.position_cache[position_id] = position_data
+        
+        logger.debug(f"Đã cập nhật vị thế: {position_id}, Unrealized PnL: {position_data.get('unrealized_pnl', 0):.2f}")
+        
+        return position_id
+    
+    def update_metrics(self) -> Dict:
+        """
+        Cập nhật và tính toán các chỉ số hiệu suất
+        
+        Returns:
+            Dict: Các chỉ số hiệu suất hiện tại
+        """
+        # Nếu không có giao dịch, trả về chỉ số mặc định
+        if not self.trade_history:
+            metrics = self._get_default_metrics()
+            self.metrics_history[str(int(time.time()))] = metrics
+            return metrics
+        
+        # Lấy giao dịch trong 24 giờ qua
+        now = int(time.time())
+        one_day_ago = now - 86400
+        one_week_ago = now - 604800
+        one_month_ago = now - 2592000
+        
+        daily_trades = [t for t in self.trade_history if t.get('exit_time', 0) > one_day_ago]
+        weekly_trades = [t for t in self.trade_history if t.get('exit_time', 0) > one_week_ago]
+        monthly_trades = [t for t in self.trade_history if t.get('exit_time', 0) > one_month_ago]
+        
+        # Tính toán chỉ số tổng thể
+        all_trades = self.trade_history
+        all_metrics = self._calculate_metrics(all_trades)
+        
+        # Tính toán chỉ số theo thời gian
+        daily_metrics = self._calculate_metrics(daily_trades)
+        weekly_metrics = self._calculate_metrics(weekly_trades)
+        monthly_metrics = self._calculate_metrics(monthly_trades)
+        
+        # Tính toán chỉ số theo chiến lược
+        strategy_metrics = self._calculate_strategy_metrics(all_trades)
+        
+        # Tính toán chỉ số theo cặp tiền
+        symbol_metrics = self._calculate_symbol_metrics(all_trades)
+        
+        # Tổng hợp tất cả chỉ số
+        metrics = {
+            'timestamp': now,
+            'overall': all_metrics,
+            'daily': daily_metrics,
+            'weekly': weekly_metrics,
+            'monthly': monthly_metrics,
+            'strategies': strategy_metrics,
+            'symbols': symbol_metrics
+        }
+        
+        # Lưu vào lịch sử
+        self.metrics_history[str(now)] = metrics
+        
+        # Lưu dữ liệu
+        self._save_data()
+        
+        return metrics
+    
+    def _get_default_metrics(self) -> Dict:
+        """
+        Tạo chỉ số mặc định khi chưa có giao dịch
+        
+        Returns:
+            Dict: Chỉ số mặc định
+        """
+        default_metrics = {
+            'total_trades': 0,
+            'win_trades': 0,
+            'loss_trades': 0,
+            'win_rate': 0,
+            'profit_factor': 0,
+            'total_pnl': 0,
+            'avg_pnl': 0,
+            'largest_win': 0,
+            'largest_loss': 0,
+            'avg_win': 0,
+            'avg_loss': 0,
+            'avg_trade': 0,
+            'max_drawdown': 0,
+            'max_drawdown_percent': 0,
+            'avg_trade_duration': 0,
+            'trading_expectancy': 0,
+            'sharpe_ratio': 0,
+            'trades_per_day': 0,
+            'consecutive_wins': 0,
+            'consecutive_losses': 0,
+            'win_loss_ratio': 0,
+            'rr_ratio': 0
+        }
+        
+        return default_metrics
+    
+    def _calculate_metrics(self, trades: List[Dict]) -> Dict:
+        """
+        Tính toán các chỉ số hiệu suất từ danh sách giao dịch
+        
+        Args:
+            trades (List[Dict]): Danh sách giao dịch
+            
+        Returns:
+            Dict: Các chỉ số hiệu suất
+        """
+        # Nếu không có giao dịch, trả về chỉ số mặc định
+        if not trades:
+            return self._get_default_metrics()
+        
+        # Tính toán các chỉ số cơ bản
+        total_trades = len(trades)
+        winning_trades = [t for t in trades if t.get('pnl', 0) > 0]
+        losing_trades = [t for t in trades if t.get('pnl', 0) <= 0]
+        
+        win_count = len(winning_trades)
+        loss_count = len(losing_trades)
+        
+        win_rate = (win_count / total_trades) * 100 if total_trades > 0 else 0
+        
+        total_pnl = sum(t.get('pnl', 0) for t in trades)
+        avg_pnl = total_pnl / total_trades if total_trades > 0 else 0
+        
+        # Tính các chỉ số thắng/thua
+        largest_win = max([t.get('pnl', 0) for t in winning_trades]) if winning_trades else 0
+        largest_loss = min([t.get('pnl', 0) for t in losing_trades]) if losing_trades else 0
+        
+        avg_win = sum(t.get('pnl', 0) for t in winning_trades) / win_count if win_count > 0 else 0
+        avg_loss = sum(t.get('pnl', 0) for t in losing_trades) / loss_count if loss_count > 0 else 0
+        
+        # Tính Profit Factor
+        gross_profit = sum(t.get('pnl', 0) for t in winning_trades)
+        gross_loss = abs(sum(t.get('pnl', 0) for t in losing_trades))
+        profit_factor = gross_profit / gross_loss if gross_loss > 0 else 0 if gross_profit == 0 else float('inf')
+        
+        # Tính thời gian giao dịch trung bình
+        durations = []
+        for trade in trades:
+            entry_time = trade.get('entry_time', 0)
+            exit_time = trade.get('exit_time', 0)
+            if entry_time > 0 and exit_time > entry_time:
+                durations.append(exit_time - entry_time)
+        
+        avg_duration = sum(durations) / len(durations) if durations else 0
+        
+        # Tính Drawdown
+        max_drawdown, max_dd_percent = self._calculate_drawdown(trades)
         
         # Tính số giao dịch trung bình mỗi ngày
-        if len(self.trades) >= 2:
-            earliest_trade = min(self.trades, key=lambda t: t.get('timestamp', 0))
-            latest_trade = max(self.trades, key=lambda t: t.get('timestamp', 0))
-            
-            earliest_time = earliest_trade.get('timestamp', 0)
-            latest_time = latest_trade.get('timestamp', 0)
-            
-            days_trading = (latest_time - earliest_time) / (24 * 3600) + 1
-            trades_per_day = len(self.trades) / days_trading if days_trading > 0 else 0
+        if durations:
+            total_trading_seconds = sum(durations)
+            total_trading_days = total_trading_seconds / 86400  # seconds in a day
+            trades_per_day = total_trades / total_trading_days if total_trading_days > 0 else 0
         else:
-            trades_per_day = 0
+            # Nếu không có thông tin thời gian, giả định mỗi giao dịch là 1 ngày
+            trades_per_day = total_trades / total_trades if total_trades > 0 else 0
         
-        return {
-            'total_trades': len(self.trades),
-            'winning_trades': len(winning_trades),
-            'losing_trades': len(losing_trades),
+        # Tính Trading Expectancy
+        expectancy = (win_rate / 100 * avg_win) + ((1 - win_rate / 100) * avg_loss)
+        
+        # Tính Sharpe Ratio (đơn giản hóa)
+        pnl_values = [t.get('pnl', 0) for t in trades]
+        avg_return = sum(pnl_values) / len(pnl_values) if pnl_values else 0
+        std_dev = np.std(pnl_values) if len(pnl_values) > 1 else 1
+        sharpe_ratio = avg_return / std_dev if std_dev > 0 else 0
+        
+        # Tính số lần thắng/thua liên tiếp
+        consecutive_wins, consecutive_losses = self._calculate_streaks(trades)
+        
+        # Tính tỷ lệ thắng/thua
+        win_loss_ratio = win_count / loss_count if loss_count > 0 else float('inf') if win_count > 0 else 0
+        
+        # Tính tỷ lệ R/R
+        rr_ratio = abs(avg_win / avg_loss) if avg_loss != 0 else float('inf') if avg_win > 0 else 0
+        
+        # Tổng hợp các chỉ số
+        metrics = {
+            'total_trades': total_trades,
+            'win_trades': win_count,
+            'loss_trades': loss_count,
             'win_rate': win_rate,
             'profit_factor': profit_factor,
-            'expectancy': expectancy,
-            'sharpe_ratio': sharpe_ratio,
-            'sortino_ratio': sortino_ratio,
-            'max_drawdown': max_drawdown,
-            'avg_profit': avg_profit,
+            'total_pnl': total_pnl,
+            'avg_pnl': avg_pnl,
+            'largest_win': largest_win,
+            'largest_loss': largest_loss,
+            'avg_win': avg_win,
             'avg_loss': avg_loss,
-            'total_profit': total_profit,
-            'total_loss': total_loss,
-            'net_profit': net_profit,
-            'biggest_winner': biggest_winner,
-            'biggest_loser': biggest_loser,
-            'average_trade': net_profit / len(self.trades) if self.trades else 0.0,
-            'average_bars_winners': avg_bars_winners,
-            'average_bars_losers': avg_bars_losers,
-            'trades_per_day': trades_per_day
-        }
-    
-    def analyze_by_strategy(self) -> Dict:
-        """
-        Phân tích hiệu suất theo chiến lược
-        
-        Returns:
-            Dict: Hiệu suất theo chiến lược
-        """
-        result = {}
-        
-        # Phân loại giao dịch theo chiến lược
-        strategy_trades = {}
-        
-        for trade in self.trades:
-            strategy = trade.get('strategy', 'unknown')
-            
-            if strategy not in strategy_trades:
-                strategy_trades[strategy] = []
-                
-            strategy_trades[strategy].append(trade)
-        
-        # Tính hiệu suất cho mỗi chiến lược
-        for strategy, trades in strategy_trades.items():
-            if not trades:
-                continue
-                
-            # Tính các chỉ số cơ bản
-            total_trades = len(trades)
-            winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-            win_rate = len(winning_trades) / total_trades if total_trades > 0 else 0.0
-            
-            total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-            total_loss = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0)
-            net_profit = total_profit + total_loss
-            
-            profit_factor = PerformanceMetrics.calculate_profit_factor(trades)
-            expectancy = PerformanceMetrics.calculate_expectancy(trades)
-            
-            result[strategy] = {
-                'total_trades': total_trades,
-                'win_rate': win_rate,
-                'profit_factor': profit_factor,
-                'expectancy': expectancy,
-                'net_profit': net_profit,
-                'average_trade': net_profit / total_trades if total_trades > 0 else 0.0
-            }
-        
-        self.strategy_performance = result
-        return result
-    
-    def analyze_by_symbol(self) -> Dict:
-        """
-        Phân tích hiệu suất theo cặp giao dịch
-        
-        Returns:
-            Dict: Hiệu suất theo cặp giao dịch
-        """
-        result = {}
-        
-        # Phân loại giao dịch theo cặp
-        symbol_trades = {}
-        
-        for trade in self.trades:
-            symbol = trade.get('symbol', 'unknown')
-            
-            if symbol not in symbol_trades:
-                symbol_trades[symbol] = []
-                
-            symbol_trades[symbol].append(trade)
-        
-        # Tính hiệu suất cho mỗi cặp
-        for symbol, trades in symbol_trades.items():
-            if not trades:
-                continue
-                
-            # Tính các chỉ số cơ bản
-            total_trades = len(trades)
-            winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-            win_rate = len(winning_trades) / total_trades if total_trades > 0 else 0.0
-            
-            total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-            total_loss = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0)
-            net_profit = total_profit + total_loss
-            
-            profit_factor = PerformanceMetrics.calculate_profit_factor(trades)
-            expectancy = PerformanceMetrics.calculate_expectancy(trades)
-            
-            result[symbol] = {
-                'total_trades': total_trades,
-                'win_rate': win_rate,
-                'profit_factor': profit_factor,
-                'expectancy': expectancy,
-                'net_profit': net_profit,
-                'average_trade': net_profit / total_trades if total_trades > 0 else 0.0
-            }
-        
-        self.symbol_performance = result
-        return result
-    
-    def analyze_by_market_regime(self) -> Dict:
-        """
-        Phân tích hiệu suất theo chế độ thị trường
-        
-        Returns:
-            Dict: Hiệu suất theo chế độ thị trường
-        """
-        result = {}
-        
-        # Phân loại giao dịch theo chế độ thị trường
-        regime_trades = {}
-        
-        for trade in self.trades:
-            regime = trade.get('market_regime', 'unknown')
-            
-            if regime not in regime_trades:
-                regime_trades[regime] = []
-                
-            regime_trades[regime].append(trade)
-        
-        # Tính hiệu suất cho mỗi chế độ
-        for regime, trades in regime_trades.items():
-            if not trades:
-                continue
-                
-            # Tính các chỉ số cơ bản
-            total_trades = len(trades)
-            winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-            win_rate = len(winning_trades) / total_trades if total_trades > 0 else 0.0
-            
-            total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-            total_loss = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0)
-            net_profit = total_profit + total_loss
-            
-            profit_factor = PerformanceMetrics.calculate_profit_factor(trades)
-            expectancy = PerformanceMetrics.calculate_expectancy(trades)
-            
-            result[regime] = {
-                'total_trades': total_trades,
-                'win_rate': win_rate,
-                'profit_factor': profit_factor,
-                'expectancy': expectancy,
-                'net_profit': net_profit,
-                'average_trade': net_profit / total_trades if total_trades > 0 else 0.0
-            }
-        
-        self.regime_performance = result
-        return result
-    
-    def analyze_performance_by_time(self) -> Dict:
-        """
-        Phân tích hiệu suất theo thời gian
-        
-        Returns:
-            Dict: Hiệu suất theo thời gian
-        """
-        if not self.trades:
-            return {
-                'daily': {},
-                'weekly': {},
-                'monthly': {}
-            }
-        
-        # Sắp xếp giao dịch theo thời gian
-        sorted_trades = sorted(self.trades, key=lambda t: t.get('timestamp', 0))
-        
-        # Phân loại giao dịch theo ngày, tuần, tháng
-        daily_trades = {}
-        weekly_trades = {}
-        monthly_trades = {}
-        
-        for trade in sorted_trades:
-            timestamp = trade.get('timestamp', 0)
-            if timestamp == 0:
-                continue
-                
-            dt = datetime.datetime.fromtimestamp(timestamp)
-            
-            # Ngày
-            day_key = dt.strftime('%Y-%m-%d')
-            if day_key not in daily_trades:
-                daily_trades[day_key] = []
-            daily_trades[day_key].append(trade)
-            
-            # Tuần
-            week_key = f"{dt.year}-W{dt.isocalendar()[1]}"
-            if week_key not in weekly_trades:
-                weekly_trades[week_key] = []
-            weekly_trades[week_key].append(trade)
-            
-            # Tháng
-            month_key = dt.strftime('%Y-%m')
-            if month_key not in monthly_trades:
-                monthly_trades[month_key] = []
-            monthly_trades[month_key].append(trade)
-        
-        # Tính hiệu suất
-        daily_performance = {}
-        weekly_performance = {}
-        monthly_performance = {}
-        
-        # Hàm hỗ trợ tính hiệu suất
-        def calculate_period_performance(trades):
-            total_trades = len(trades)
-            winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-            win_rate = len(winning_trades) / total_trades if total_trades > 0 else 0.0
-            
-            total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-            total_loss = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0)
-            net_profit = total_profit + total_loss
-            
-            return {
-                'total_trades': total_trades,
-                'win_rate': win_rate,
-                'net_profit': net_profit,
-                'average_trade': net_profit / total_trades if total_trades > 0 else 0.0
-            }
-        
-        # Tính hiệu suất theo ngày
-        for day, trades in daily_trades.items():
-            daily_performance[day] = calculate_period_performance(trades)
-            
-        # Tính hiệu suất theo tuần
-        for week, trades in weekly_trades.items():
-            weekly_performance[week] = calculate_period_performance(trades)
-            
-        # Tính hiệu suất theo tháng
-        for month, trades in monthly_trades.items():
-            monthly_performance[month] = calculate_period_performance(trades)
-        
-        return {
-            'daily': daily_performance,
-            'weekly': weekly_performance,
-            'monthly': monthly_performance
-        }
-    
-    def analyze_position_sizing(self) -> Dict:
-        """
-        Phân tích sizing vị thế
-        
-        Returns:
-            Dict: Phân tích sizing
-        """
-        if not self.trades:
-            return {
-                'average_position_size': 0.0,
-                'average_leverage': 0.0,
-                'average_risk_percentage': 0.0,
-                'size_vs_performance': {}
-            }
-        
-        # Tính kích thước vị thế và đòn bẩy trung bình
-        position_sizes = [t.get('quantity', 0) * t.get('entry_price', 0) for t in self.trades]
-        leverages = [t.get('leverage', 1) for t in self.trades]
-        
-        avg_position_size = np.mean(position_sizes) if position_sizes else 0.0
-        avg_leverage = np.mean(leverages) if leverages else 0.0
-        
-        # Phân nhóm kích thước vị thế
-        size_groups = {
-            'small': [],
-            'medium': [],
-            'large': []
+            'avg_trade': avg_pnl,
+            'max_drawdown': max_drawdown,
+            'max_drawdown_percent': max_dd_percent,
+            'avg_trade_duration': avg_duration,
+            'avg_trade_duration_hours': avg_duration / 3600 if avg_duration > 0 else 0,
+            'trading_expectancy': expectancy,
+            'sharpe_ratio': sharpe_ratio,
+            'trades_per_day': trades_per_day,
+            'consecutive_wins': consecutive_wins,
+            'consecutive_losses': consecutive_losses,
+            'win_loss_ratio': win_loss_ratio,
+            'rr_ratio': rr_ratio
         }
         
-        # Phân loại vị thế
-        if position_sizes:
-            min_size = min(position_sizes)
-            max_size = max(position_sizes)
-            range_size = max_size - min_size
-            
-            if range_size > 0:
-                for trade in self.trades:
-                    position_size = trade.get('quantity', 0) * trade.get('entry_price', 0)
-                    
-                    if position_size < min_size + range_size / 3:
-                        size_groups['small'].append(trade)
-                    elif position_size < min_size + 2 * range_size / 3:
-                        size_groups['medium'].append(trade)
-                    else:
-                        size_groups['large'].append(trade)
-            else:
-                size_groups['medium'] = self.trades
-        
-        # Tính hiệu suất cho mỗi nhóm
-        size_performance = {}
-        
-        for size, trades in size_groups.items():
-            if not trades:
-                continue
-                
-            # Tính các chỉ số
-            total_trades = len(trades)
-            winning_trades = [t for t in trades if t.get('net_pnl', 0) > 0]
-            win_rate = len(winning_trades) / total_trades if total_trades > 0 else 0.0
-            
-            total_profit = sum(t.get('net_pnl', 0) for t in winning_trades)
-            total_loss = sum(t.get('net_pnl', 0) for t in trades if t.get('net_pnl', 0) < 0)
-            net_profit = total_profit + total_loss
-            
-            avg_position = np.mean([t.get('quantity', 0) * t.get('entry_price', 0) for t in trades])
-            
-            size_performance[size] = {
-                'total_trades': total_trades,
-                'win_rate': win_rate,
-                'net_profit': net_profit,
-                'average_trade': net_profit / total_trades if total_trades > 0 else 0.0,
-                'average_position_size': avg_position
-            }
-        
-        # Tính ước lượng % rủi ro trung bình
-        risk_percentages = []
-        
-        for trade in self.trades:
-            entry_price = trade.get('entry_price', 0)
-            stop_loss = trade.get('stop_loss', 0)
-            
-            if entry_price > 0 and stop_loss > 0:
-                if trade.get('side', '') == 'LONG':
-                    risk_pct = (entry_price - stop_loss) / entry_price * 100
-                else:  # SHORT
-                    risk_pct = (stop_loss - entry_price) / entry_price * 100
-                    
-                risk_percentages.append(risk_pct)
-        
-        avg_risk_percentage = np.mean(risk_percentages) if risk_percentages else 0.0
-        
-        return {
-            'average_position_size': avg_position_size,
-            'average_leverage': avg_leverage,
-            'average_risk_percentage': avg_risk_percentage,
-            'size_vs_performance': size_performance
-        }
+        return metrics
     
-    def generate_full_report(self, output_path: str = None) -> str:
+    def _calculate_drawdown(self, trades: List[Dict]) -> Tuple[float, float]:
         """
-        Tạo báo cáo tổng hợp
+        Tính toán drawdown tối đa
         
         Args:
-            output_path (str): Đường dẫn file báo cáo
+            trades (List[Dict]): Danh sách giao dịch
             
         Returns:
-            str: Nội dung báo cáo
+            Tuple[float, float]: (max_drawdown, max_drawdown_percent)
         """
-        if output_path is None:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_path = os.path.join(self.reports_dir, f'performance_report_{timestamp}.html')
+        # Tạo chuỗi thời gian của equity
+        # Sắp xếp giao dịch theo thời gian
+        sorted_trades = sorted(trades, key=lambda x: x.get('exit_time', 0))
         
-        # Kiểm tra đường dẫn
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        # Giả sử ban đầu có 10000 (hoặc dùng số dư ban đầu nếu có)
+        initial_balance = 10000
+        current_balance = initial_balance
+        peak_balance = initial_balance
+        max_drawdown = 0
+        max_dd_percent = 0
         
-        # Phân tích dữ liệu
-        trade_stats = self.get_trade_statistics()
-        self.analyze_by_strategy()
-        self.analyze_by_symbol()
-        self.analyze_by_market_regime()
-        time_analysis = self.analyze_performance_by_time()
-        sizing_analysis = self.analyze_position_sizing()
+        for trade in sorted_trades:
+            pnl = trade.get('pnl', 0)
+            current_balance += pnl
+            
+            # Cập nhật peak balance
+            if current_balance > peak_balance:
+                peak_balance = current_balance
+            
+            # Tính drawdown hiện tại
+            current_drawdown = peak_balance - current_balance
+            current_dd_percent = (current_drawdown / peak_balance) * 100 if peak_balance > 0 else 0
+            
+            # Cập nhật max drawdown
+            if current_drawdown > max_drawdown:
+                max_drawdown = current_drawdown
+                max_dd_percent = current_dd_percent
         
-        # Tạo báo cáo HTML
-        html = """
+        return max_drawdown, max_dd_percent
+    
+    def _calculate_streaks(self, trades: List[Dict]) -> Tuple[int, int]:
+        """
+        Tính toán số lần thắng/thua liên tiếp
+        
+        Args:
+            trades (List[Dict]): Danh sách giao dịch
+            
+        Returns:
+            Tuple[int, int]: (max_win_streak, max_loss_streak)
+        """
+        # Sắp xếp giao dịch theo thời gian
+        sorted_trades = sorted(trades, key=lambda x: x.get('exit_time', 0))
+        
+        current_win_streak = 0
+        current_loss_streak = 0
+        max_win_streak = 0
+        max_loss_streak = 0
+        
+        for trade in sorted_trades:
+            pnl = trade.get('pnl', 0)
+            
+            if pnl > 0:
+                # Thắng
+                current_win_streak += 1
+                current_loss_streak = 0
+                if current_win_streak > max_win_streak:
+                    max_win_streak = current_win_streak
+            else:
+                # Thua
+                current_loss_streak += 1
+                current_win_streak = 0
+                if current_loss_streak > max_loss_streak:
+                    max_loss_streak = current_loss_streak
+        
+        return max_win_streak, max_loss_streak
+    
+    def _calculate_strategy_metrics(self, trades: List[Dict]) -> Dict:
+        """
+        Tính toán chỉ số hiệu suất theo chiến lược
+        
+        Args:
+            trades (List[Dict]): Danh sách giao dịch
+            
+        Returns:
+            Dict: Chỉ số hiệu suất theo chiến lược
+        """
+        # Nhóm các giao dịch theo chiến lược
+        strategies = {}
+        
+        for trade in trades:
+            strategy = trade.get('strategy', 'unknown')
+            if strategy not in strategies:
+                strategies[strategy] = []
+            
+            strategies[strategy].append(trade)
+        
+        # Tính toán chỉ số cho từng chiến lược
+        strategy_metrics = {}
+        
+        for strategy, strategy_trades in strategies.items():
+            strategy_metrics[strategy] = self._calculate_metrics(strategy_trades)
+            strategy_metrics[strategy]['trade_count'] = len(strategy_trades)
+            strategy_metrics[strategy]['percentage_of_total'] = (len(strategy_trades) / len(trades)) * 100 if trades else 0
+        
+        return strategy_metrics
+    
+    def _calculate_symbol_metrics(self, trades: List[Dict]) -> Dict:
+        """
+        Tính toán chỉ số hiệu suất theo cặp tiền
+        
+        Args:
+            trades (List[Dict]): Danh sách giao dịch
+            
+        Returns:
+            Dict: Chỉ số hiệu suất theo cặp tiền
+        """
+        # Nhóm các giao dịch theo cặp tiền
+        symbols = {}
+        
+        for trade in trades:
+            symbol = trade.get('symbol', 'unknown')
+            if symbol not in symbols:
+                symbols[symbol] = []
+            
+            symbols[symbol].append(trade)
+        
+        # Tính toán chỉ số cho từng cặp tiền
+        symbol_metrics = {}
+        
+        for symbol, symbol_trades in symbols.items():
+            symbol_metrics[symbol] = self._calculate_metrics(symbol_trades)
+            symbol_metrics[symbol]['trade_count'] = len(symbol_trades)
+            symbol_metrics[symbol]['percentage_of_total'] = (len(symbol_trades) / len(trades)) * 100 if trades else 0
+        
+        return symbol_metrics
+    
+    def check_alerts(self) -> List[Dict]:
+        """
+        Kiểm tra và tạo cảnh báo dựa trên các ngưỡng đã cấu hình
+        
+        Returns:
+            List[Dict]: Danh sách cảnh báo mới
+        """
+        # Lấy chỉ số hiệu suất mới nhất
+        metrics = self.get_latest_metrics()
+        
+        if not metrics:
+            return []
+        
+        # Lấy cấu hình cảnh báo
+        alert_config = self.config.get('alerts', {})
+        
+        # Danh sách cảnh báo mới
+        new_alerts = []
+        
+        # Kiểm tra drawdown
+        drawdown_threshold = alert_config.get('drawdown_threshold', 10)
+        max_drawdown_percent = metrics.get('overall', {}).get('max_drawdown_percent', 0)
+        
+        if max_drawdown_percent >= drawdown_threshold:
+            alert = {
+                'type': 'drawdown',
+                'level': 'warning',
+                'message': f'Drawdown đạt {max_drawdown_percent:.2f}%, vượt ngưỡng {drawdown_threshold}%',
+                'value': max_drawdown_percent,
+                'threshold': drawdown_threshold,
+                'timestamp': int(time.time())
+            }
+            new_alerts.append(alert)
+        
+        # Kiểm tra chuỗi thua liên tiếp
+        losing_streak_threshold = alert_config.get('losing_streak_threshold', 5)
+        consecutive_losses = metrics.get('overall', {}).get('consecutive_losses', 0)
+        
+        if consecutive_losses >= losing_streak_threshold:
+            alert = {
+                'type': 'losing_streak',
+                'level': 'warning',
+                'message': f'Chuỗi thua liên tiếp đạt {consecutive_losses}, vượt ngưỡng {losing_streak_threshold}',
+                'value': consecutive_losses,
+                'threshold': losing_streak_threshold,
+                'timestamp': int(time.time())
+            }
+            new_alerts.append(alert)
+        
+        # Kiểm tra tỷ lệ thắng thấp
+        low_win_rate_threshold = alert_config.get('low_win_rate_threshold', 40)
+        win_rate = metrics.get('overall', {}).get('win_rate', 0)
+        
+        if win_rate < low_win_rate_threshold and metrics.get('overall', {}).get('total_trades', 0) >= 10:
+            alert = {
+                'type': 'low_win_rate',
+                'level': 'warning',
+                'message': f'Tỷ lệ thắng {win_rate:.2f}%, dưới ngưỡng {low_win_rate_threshold}%',
+                'value': win_rate,
+                'threshold': low_win_rate_threshold,
+                'timestamp': int(time.time())
+            }
+            new_alerts.append(alert)
+        
+        # Lưu cảnh báo mới
+        if new_alerts:
+            self.alerts.extend(new_alerts)
+            self._save_data()
+        
+        return new_alerts
+    
+    def get_latest_metrics(self) -> Dict:
+        """
+        Lấy chỉ số hiệu suất mới nhất
+        
+        Returns:
+            Dict: Chỉ số hiệu suất mới nhất
+        """
+        if not self.metrics_history:
+            return {}
+        
+        latest_timestamp = max(int(ts) for ts in self.metrics_history.keys())
+        return self.metrics_history[str(latest_timestamp)]
+    
+    def create_daily_report(self, date: datetime.date = None) -> str:
+        """
+        Tạo báo cáo hằng ngày
+        
+        Args:
+            date (datetime.date, optional): Ngày cần tạo báo cáo, mặc định là hôm nay
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        # Xác định ngày tạo báo cáo
+        if date is None:
+            date = datetime.date.today()
+        
+        date_str = date.strftime('%Y-%m-%d')
+        
+        # Lấy giao dịch trong ngày
+        start_timestamp = int(datetime.datetime.combine(date, datetime.time.min).timestamp())
+        end_timestamp = int(datetime.datetime.combine(date, datetime.time.max).timestamp())
+        
+        daily_trades = [t for t in self.trade_history if start_timestamp <= t.get('exit_time', 0) <= end_timestamp]
+        
+        # Tính toán chỉ số cho ngày này
+        daily_metrics = self._calculate_metrics(daily_trades)
+        
+        # Tạo báo cáo
+        report = {
+            'date': date_str,
+            'trades': daily_trades,
+            'metrics': daily_metrics,
+            'strategy_metrics': self._calculate_strategy_metrics(daily_trades),
+            'symbol_metrics': self._calculate_symbol_metrics(daily_trades),
+            'alerts': [a for a in self.alerts if start_timestamp <= a.get('timestamp', 0) <= end_timestamp]
+        }
+        
+        # Lưu báo cáo
+        report_path = f'reports/daily/report_{date_str}.json'
+        try:
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=4)
+            logger.info(f"Đã tạo báo cáo hằng ngày: {report_path}")
+        except Exception as e:
+            logger.error(f"Không thể lưu báo cáo hằng ngày: {str(e)}")
+            return ""
+        
+        # Tạo báo cáo HTML nếu cần
+        if self.config.get('reporting', {}).get('include_charts', True):
+            html_report_path = self._create_html_report(report, 'daily', date_str)
+            logger.info(f"Đã tạo báo cáo HTML hằng ngày: {html_report_path}")
+        
+        return report_path
+    
+    def create_weekly_report(self, end_date: datetime.date = None) -> str:
+        """
+        Tạo báo cáo hằng tuần
+        
+        Args:
+            end_date (datetime.date, optional): Ngày cuối tuần, mặc định là hôm nay
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        # Xác định tuần cần tạo báo cáo
+        if end_date is None:
+            end_date = datetime.date.today()
+        
+        # Tính ngày đầu tuần (thứ Hai)
+        start_date = end_date - datetime.timedelta(days=end_date.weekday())
+        
+        week_str = f"{start_date.strftime('%Y-%m-%d')}_{end_date.strftime('%Y-%m-%d')}"
+        
+        # Lấy giao dịch trong tuần
+        start_timestamp = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
+        end_timestamp = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
+        
+        weekly_trades = [t for t in self.trade_history if start_timestamp <= t.get('exit_time', 0) <= end_timestamp]
+        
+        # Tính toán chỉ số cho tuần này
+        weekly_metrics = self._calculate_metrics(weekly_trades)
+        
+        # Tạo báo cáo
+        report = {
+            'start_date': start_date.strftime('%Y-%m-%d'),
+            'end_date': end_date.strftime('%Y-%m-%d'),
+            'trades': weekly_trades,
+            'metrics': weekly_metrics,
+            'strategy_metrics': self._calculate_strategy_metrics(weekly_trades),
+            'symbol_metrics': self._calculate_symbol_metrics(weekly_trades),
+            'alerts': [a for a in self.alerts if start_timestamp <= a.get('timestamp', 0) <= end_timestamp]
+        }
+        
+        # Lưu báo cáo
+        report_path = f'reports/weekly/report_week_{week_str}.json'
+        try:
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=4)
+            logger.info(f"Đã tạo báo cáo hằng tuần: {report_path}")
+        except Exception as e:
+            logger.error(f"Không thể lưu báo cáo hằng tuần: {str(e)}")
+            return ""
+        
+        # Tạo báo cáo HTML nếu cần
+        if self.config.get('reporting', {}).get('include_charts', True):
+            html_report_path = self._create_html_report(report, 'weekly', week_str)
+            logger.info(f"Đã tạo báo cáo HTML hằng tuần: {html_report_path}")
+        
+        return report_path
+    
+    def create_monthly_report(self, year: int = None, month: int = None) -> str:
+        """
+        Tạo báo cáo hằng tháng
+        
+        Args:
+            year (int, optional): Năm, mặc định là năm hiện tại
+            month (int, optional): Tháng, mặc định là tháng hiện tại
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        # Xác định tháng cần tạo báo cáo
+        today = datetime.date.today()
+        if year is None:
+            year = today.year
+        if month is None:
+            month = today.month
+        
+        # Tính ngày đầu và cuối tháng
+        start_date = datetime.date(year, month, 1)
+        if month == 12:
+            end_date = datetime.date(year + 1, 1, 1) - datetime.timedelta(days=1)
+        else:
+            end_date = datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)
+        
+        month_str = f"{year}-{month:02d}"
+        
+        # Lấy giao dịch trong tháng
+        start_timestamp = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
+        end_timestamp = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
+        
+        monthly_trades = [t for t in self.trade_history if start_timestamp <= t.get('exit_time', 0) <= end_timestamp]
+        
+        # Tính toán chỉ số cho tháng này
+        monthly_metrics = self._calculate_metrics(monthly_trades)
+        
+        # Tạo báo cáo
+        report = {
+            'year': year,
+            'month': month,
+            'month_str': month_str,
+            'start_date': start_date.strftime('%Y-%m-%d'),
+            'end_date': end_date.strftime('%Y-%m-%d'),
+            'trades': monthly_trades,
+            'metrics': monthly_metrics,
+            'strategy_metrics': self._calculate_strategy_metrics(monthly_trades),
+            'symbol_metrics': self._calculate_symbol_metrics(monthly_trades),
+            'alerts': [a for a in self.alerts if start_timestamp <= a.get('timestamp', 0) <= end_timestamp]
+        }
+        
+        # Lưu báo cáo
+        report_path = f'reports/monthly/report_month_{month_str}.json'
+        try:
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=4)
+            logger.info(f"Đã tạo báo cáo hằng tháng: {report_path}")
+        except Exception as e:
+            logger.error(f"Không thể lưu báo cáo hằng tháng: {str(e)}")
+            return ""
+        
+        # Tạo báo cáo HTML nếu cần
+        if self.config.get('reporting', {}).get('include_charts', True):
+            html_report_path = self._create_html_report(report, 'monthly', month_str)
+            logger.info(f"Đã tạo báo cáo HTML hằng tháng: {html_report_path}")
+        
+        return report_path
+    
+    def create_strategy_report(self, strategy: str, period: str = 'all') -> str:
+        """
+        Tạo báo cáo theo chiến lược
+        
+        Args:
+            strategy (str): Tên chiến lược
+            period (str): Khoảng thời gian ('all', 'daily', 'weekly', 'monthly')
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        # Xác định khoảng thời gian
+        now = int(time.time())
+        
+        if period == 'daily':
+            start_timestamp = now - 86400
+            period_str = 'daily'
+        elif period == 'weekly':
+            start_timestamp = now - 604800
+            period_str = 'weekly'
+        elif period == 'monthly':
+            start_timestamp = now - 2592000
+            period_str = 'monthly'
+        else:
+            start_timestamp = 0
+            period_str = 'all'
+        
+        # Lấy giao dịch của chiến lược trong khoảng thời gian
+        strategy_trades = [t for t in self.trade_history if t.get('strategy', 'unknown') == strategy and t.get('exit_time', 0) >= start_timestamp]
+        
+        # Tính toán chỉ số cho chiến lược
+        strategy_metrics = self._calculate_metrics(strategy_trades)
+        
+        # Tính chỉ số theo cặp tiền
+        symbol_metrics = self._calculate_symbol_metrics(strategy_trades)
+        
+        # Tạo báo cáo
+        report = {
+            'strategy': strategy,
+            'period': period_str,
+            'trades': strategy_trades,
+            'metrics': strategy_metrics,
+            'symbol_metrics': symbol_metrics,
+            'timestamp': now
+        }
+        
+        # Lưu báo cáo
+        report_path = f'reports/strategy/report_{strategy}_{period_str}.json'
+        try:
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=4)
+            logger.info(f"Đã tạo báo cáo chiến lược: {report_path}")
+        except Exception as e:
+            logger.error(f"Không thể lưu báo cáo chiến lược: {str(e)}")
+            return ""
+        
+        # Tạo báo cáo HTML nếu cần
+        if self.config.get('reporting', {}).get('include_charts', True):
+            html_report_path = self._create_html_report(report, 'strategy', f"{strategy}_{period_str}")
+            logger.info(f"Đã tạo báo cáo HTML chiến lược: {html_report_path}")
+        
+        return report_path
+    
+    def _create_html_report(self, report_data: Dict, report_type: str, report_id: str) -> str:
+        """
+        Tạo báo cáo HTML từ dữ liệu báo cáo
+        
+        Args:
+            report_data (Dict): Dữ liệu báo cáo
+            report_type (str): Loại báo cáo ('daily', 'weekly', 'monthly', 'strategy')
+            report_id (str): Định danh báo cáo
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo HTML
+        """
+        # Tạo thư mục nếu chưa tồn tại
+        report_dir = f'reports/{report_type}'
+        os.makedirs(report_dir, exist_ok=True)
+        
+        html_path = f'{report_dir}/report_{report_id}.html'
+        
+        # Tạo nội dung HTML
+        html_content = self._generate_html_report(report_data, report_type)
+        
+        # Lưu file HTML
+        try:
+            with open(html_path, 'w') as f:
+                f.write(html_content)
+            return html_path
+        except Exception as e:
+            logger.error(f"Không thể lưu báo cáo HTML: {str(e)}")
+            return ""
+    
+    def _generate_html_report(self, report_data: Dict, report_type: str) -> str:
+        """
+        Tạo nội dung HTML cho báo cáo
+        
+        Args:
+            report_data (Dict): Dữ liệu báo cáo
+            report_type (str): Loại báo cáo
+            
+        Returns:
+            str: Nội dung HTML
+        """
+        # Tạo tiêu đề báo cáo
+        if report_type == 'daily':
+            title = f"Báo Cáo Giao Dịch Ngày {report_data.get('date', '')}"
+            period_desc = f"Ngày {report_data.get('date', '')}"
+        elif report_type == 'weekly':
+            title = f"Báo Cáo Giao Dịch Tuần {report_data.get('start_date', '')} đến {report_data.get('end_date', '')}"
+            period_desc = f"Tuần từ {report_data.get('start_date', '')} đến {report_data.get('end_date', '')}"
+        elif report_type == 'monthly':
+            title = f"Báo Cáo Giao Dịch Tháng {report_data.get('month_str', '')}"
+            period_desc = f"Tháng {report_data.get('month_str', '')}"
+        elif report_type == 'strategy':
+            title = f"Báo Cáo Chiến Lược {report_data.get('strategy', '')}"
+            period_desc = f"Giai đoạn: {report_data.get('period', 'all')}"
+        else:
+            title = "Báo Cáo Giao Dịch"
+            period_desc = "Tất cả giai đoạn"
+        
+        # Lấy dữ liệu chỉ số
+        metrics = report_data.get('metrics', {})
+        
+        # Tạo bảng tóm tắt
+        summary_table = self._generate_metrics_table(metrics)
+        
+        # Tạo bảng chiến lược
+        strategy_metrics = report_data.get('strategy_metrics', {})
+        strategy_table = self._generate_strategy_table(strategy_metrics)
+        
+        # Tạo bảng cặp tiền
+        symbol_metrics = report_data.get('symbol_metrics', {})
+        symbol_table = self._generate_symbol_table(symbol_metrics)
+        
+        # Tạo bảng giao dịch
+        trades = report_data.get('trades', [])
+        trades_table = self._generate_trades_table(trades)
+        
+        # Tạo bảng cảnh báo
+        alerts = report_data.get('alerts', [])
+        alerts_table = self._generate_alerts_table(alerts)
+        
+        # Tạo đồ thị (nếu có dữ liệu)
+        # Tạm thời để trống, sẽ cập nhật sau khi có thể tạo đồ thị
+        
+        # Tạo nội dung HTML
+        html_content = f"""
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Trading Performance Report</title>
+            <title>{title}</title>
             <style>
-                body {
+                body {{
                     font-family: Arial, sans-serif;
-                    margin: 20px;
                     line-height: 1.6;
+                    margin: 20px;
                     color: #333;
-                }
-                h1, h2, h3 {
+                }}
+                h1, h2, h3 {{
                     color: #2c3e50;
-                }
-                .section {
+                }}
+                .container {{
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }}
+                .header {{
+                    text-align: center;
                     margin-bottom: 30px;
-                    border: 1px solid #ddd;
-                    padding: 20px;
-                    border-radius: 5px;
-                }
-                table {
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #eee;
+                }}
+                .section {{
+                    margin-bottom: 30px;
+                }}
+                table {{
                     width: 100%;
                     border-collapse: collapse;
                     margin-bottom: 20px;
-                }
-                th, td {
-                    padding: 10px;
-                    border: 1px solid #ddd;
+                }}
+                th, td {{
+                    padding: 12px 15px;
                     text-align: left;
-                }
-                th {
-                    background-color: #f2f2f2;
-                }
-                .positive {
+                    border-bottom: 1px solid #ddd;
+                }}
+                th {{
+                    background-color: #f8f9fa;
+                    font-weight: bold;
+                }}
+                tr:hover {{
+                    background-color: #f5f5f5;
+                }}
+                .positive {{
                     color: green;
-                }
-                .negative {
+                }}
+                .negative {{
                     color: red;
-                }
-                .metrics-container {
+                }}
+                .summary-box {{
                     display: flex;
                     flex-wrap: wrap;
                     justify-content: space-between;
-                }
-                .metric-box {
-                    flex: 0 0 30%;
                     margin-bottom: 20px;
+                }}
+                .metric-card {{
+                    background: #f8f9fa;
+                    border-radius: 8px;
                     padding: 15px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    background-color: #f9f9f9;
-                }
-                .metric-name {
-                    font-weight: bold;
+                    margin-bottom: 15px;
+                    width: calc(33.333% - 20px);
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }}
+                .metric-title {{
+                    font-size: 14px;
+                    color: #666;
                     margin-bottom: 5px;
-                }
-                .metric-value {
-                    font-size: 1.4em;
+                }}
+                .metric-value {{
+                    font-size: 24px;
                     font-weight: bold;
-                }
+                }}
+                .metric-unit {{
+                    font-size: 14px;
+                    color: #666;
+                }}
+                .alert {{
+                    background-color: #fff3cd;
+                    color: #856404;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                    border-radius: 4px;
+                }}
+                @media (max-width: 768px) {{
+                    .metric-card {{
+                        width: calc(50% - 15px);
+                    }}
+                }}
+                @media (max-width: 576px) {{
+                    .metric-card {{
+                        width: 100%;
+                    }}
+                }}
             </style>
         </head>
         <body>
-            <h1>Trading Performance Report</h1>
-            <p>Generated on: """ + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + """</p>
-            
-            <div class="section">
-                <h2>Overall Performance</h2>
-                <div class="metrics-container">
-                    <div class="metric-box">
-                        <div class="metric-name">Total Trades</div>
-                        <div class="metric-value">""" + str(trade_stats['total_trades']) + """</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-name">Win Rate</div>
-                        <div class="metric-value">""" + f"{trade_stats['win_rate']*100:.2f}%" + """</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-name">Profit Factor</div>
-                        <div class="metric-value">""" + f"{trade_stats['profit_factor']:.2f}" + """</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-name">Net Profit</div>
-                        <div class="metric-value """ + ("positive" if trade_stats['net_profit'] > 0 else "negative") + """">""" + f"{trade_stats['net_profit']:.2f}" + """</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-name">Sharpe Ratio</div>
-                        <div class="metric-value">""" + f"{trade_stats['sharpe_ratio']:.2f}" + """</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-name">Max Drawdown</div>
-                        <div class="metric-value negative">""" + f"{trade_stats['max_drawdown']:.2f}%" + """</div>
-                    </div>
+            <div class="container">
+                <div class="header">
+                    <h1>{title}</h1>
+                    <p>Thời gian: {period_desc}</p>
                 </div>
                 
-                <h3>Detailed Statistics</h3>
-                <table>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
-                    <tr>
-                        <td>Total Trades</td>
-                        <td>""" + str(trade_stats['total_trades']) + """</td>
-                    </tr>
-                    <tr>
-                        <td>Winning Trades</td>
-                        <td>""" + str(trade_stats['winning_trades']) + """</td>
-                    </tr>
-                    <tr>
-                        <td>Losing Trades</td>
-                        <td>""" + str(trade_stats['losing_trades']) + """</td>
-                    </tr>
-                    <tr>
-                        <td>Win Rate</td>
-                        <td>""" + f"{trade_stats['win_rate']*100:.2f}%" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Profit Factor</td>
-                        <td>""" + f"{trade_stats['profit_factor']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Expectancy</td>
-                        <td>""" + f"{trade_stats['expectancy']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Sharpe Ratio</td>
-                        <td>""" + f"{trade_stats['sharpe_ratio']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Sortino Ratio</td>
-                        <td>""" + f"{trade_stats['sortino_ratio']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Max Drawdown</td>
-                        <td class="negative">""" + f"{trade_stats['max_drawdown']:.2f}%" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Profit</td>
-                        <td class="positive">""" + f"{trade_stats['avg_profit']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Loss</td>
-                        <td class="negative">""" + f"{trade_stats['avg_loss']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Total Profit</td>
-                        <td class="positive">""" + f"{trade_stats['total_profit']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Total Loss</td>
-                        <td class="negative">""" + f"{trade_stats['total_loss']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Net Profit</td>
-                        <td class="positive">""" + f"{trade_stats['net_profit']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Biggest Winner</td>
-                        <td class="positive">""" + f"{trade_stats['biggest_winner']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Biggest Loser</td>
-                        <td class="negative">""" + f"{trade_stats['biggest_loser']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Trade</td>
-                        <td>""" + f"{trade_stats['average_trade']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Hold Time (Winners)</td>
-                        <td>""" + f"{trade_stats['average_bars_winners']:.2f} hours" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Hold Time (Losers)</td>
-                        <td>""" + f"{trade_stats['average_bars_losers']:.2f} hours" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Trades Per Day</td>
-                        <td>""" + f"{trade_stats['trades_per_day']:.2f}" + """</td>
-                    </tr>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h2>Performance by Strategy</h2>
-                <table>
-                    <tr>
-                        <th>Strategy</th>
-                        <th>Trades</th>
-                        <th>Win Rate</th>
-                        <th>Profit Factor</th>
-                        <th>Net Profit</th>
-                        <th>Avg Profit</th>
-                    </tr>
-        """
-        
-        # Thêm dữ liệu hiệu suất theo chiến lược
-        for strategy, stats in self.strategy_performance.items():
-            html += f"""
-                    <tr>
-                        <td>{strategy}</td>
-                        <td>{stats['total_trades']}</td>
-                        <td>{stats['win_rate']*100:.2f}%</td>
-                        <td>{stats['profit_factor']:.2f}</td>
-                        <td class="{'positive' if stats['net_profit'] > 0 else 'negative'}">{stats['net_profit']:.2f}</td>
-                        <td class="{'positive' if stats['average_trade'] > 0 else 'negative'}">{stats['average_trade']:.2f}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="section">
-                <h2>Performance by Symbol</h2>
-                <table>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Trades</th>
-                        <th>Win Rate</th>
-                        <th>Profit Factor</th>
-                        <th>Net Profit</th>
-                        <th>Avg Profit</th>
-                    </tr>
-        """
-        
-        # Thêm dữ liệu hiệu suất theo cặp giao dịch
-        for symbol, stats in self.symbol_performance.items():
-            html += f"""
-                    <tr>
-                        <td>{symbol}</td>
-                        <td>{stats['total_trades']}</td>
-                        <td>{stats['win_rate']*100:.2f}%</td>
-                        <td>{stats['profit_factor']:.2f}</td>
-                        <td class="{'positive' if stats['net_profit'] > 0 else 'negative'}">{stats['net_profit']:.2f}</td>
-                        <td class="{'positive' if stats['average_trade'] > 0 else 'negative'}">{stats['average_trade']:.2f}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="section">
-                <h2>Performance by Market Regime</h2>
-                <table>
-                    <tr>
-                        <th>Market Regime</th>
-                        <th>Trades</th>
-                        <th>Win Rate</th>
-                        <th>Profit Factor</th>
-                        <th>Net Profit</th>
-                        <th>Avg Profit</th>
-                    </tr>
-        """
-        
-        # Thêm dữ liệu hiệu suất theo chế độ thị trường
-        for regime, stats in self.regime_performance.items():
-            html += f"""
-                    <tr>
-                        <td>{regime}</td>
-                        <td>{stats['total_trades']}</td>
-                        <td>{stats['win_rate']*100:.2f}%</td>
-                        <td>{stats['profit_factor']:.2f}</td>
-                        <td class="{'positive' if stats['net_profit'] > 0 else 'negative'}">{stats['net_profit']:.2f}</td>
-                        <td class="{'positive' if stats['average_trade'] > 0 else 'negative'}">{stats['average_trade']:.2f}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="section">
-                <h2>Position Sizing Analysis</h2>
-                <h3>Position Size Metrics</h3>
-                <table>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
-                    <tr>
-                        <td>Average Position Size</td>
-                        <td>""" + f"{sizing_analysis['average_position_size']:.2f}" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Leverage</td>
-                        <td>""" + f"{sizing_analysis['average_leverage']:.2f}x" + """</td>
-                    </tr>
-                    <tr>
-                        <td>Average Risk Percentage</td>
-                        <td>""" + f"{sizing_analysis['average_risk_percentage']:.2f}%" + """</td>
-                    </tr>
-                </table>
+                <div class="section">
+                    <h2>Tóm Tắt Hiệu Suất</h2>
+                    <div class="summary-box">
+                        <div class="metric-card">
+                            <div class="metric-title">Tổng số giao dịch</div>
+                            <div class="metric-value">{metrics.get('total_trades', 0)}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Tỷ lệ thắng</div>
+                            <div class="metric-value">{metrics.get('win_rate', 0):.2f}<span class="metric-unit">%</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Lợi nhuận</div>
+                            <div class="metric-value {'positive' if metrics.get('total_pnl', 0) >= 0 else 'negative'}">{metrics.get('total_pnl', 0):.2f}<span class="metric-unit"> USDT</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Hệ số lợi nhuận (Profit Factor)</div>
+                            <div class="metric-value">{metrics.get('profit_factor', 0):.2f}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Tỷ lệ R/R</div>
+                            <div class="metric-value">{metrics.get('rr_ratio', 0):.2f}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Drawdown tối đa</div>
+                            <div class="metric-value">{metrics.get('max_drawdown_percent', 0):.2f}<span class="metric-unit">%</span></div>
+                        </div>
+                    </div>
+                    
+                    {summary_table}
+                </div>
                 
-                <h3>Performance by Position Size</h3>
-                <table>
-                    <tr>
-                        <th>Size Category</th>
-                        <th>Trades</th>
-                        <th>Win Rate</th>
-                        <th>Net Profit</th>
-                        <th>Avg Position Size</th>
-                    </tr>
-        """
-        
-        # Thêm dữ liệu hiệu suất theo kích thước vị thế
-        for size, stats in sizing_analysis['size_vs_performance'].items():
-            html += f"""
-                    <tr>
-                        <td>{size}</td>
-                        <td>{stats['total_trades']}</td>
-                        <td>{stats['win_rate']*100:.2f}%</td>
-                        <td class="{'positive' if stats['net_profit'] > 0 else 'negative'}">{stats['net_profit']:.2f}</td>
-                        <td>{stats['average_position_size']:.2f}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="section">
-                <h2>Monthly Performance</h2>
-                <table>
-                    <tr>
-                        <th>Month</th>
-                        <th>Trades</th>
-                        <th>Win Rate</th>
-                        <th>Net Profit</th>
-                        <th>Avg Profit</th>
-                    </tr>
-        """
-        
-        # Thêm dữ liệu hiệu suất theo tháng
-        sorted_months = sorted(time_analysis['monthly'].keys())
-        for month in sorted_months:
-            stats = time_analysis['monthly'][month]
-            html += f"""
-                    <tr>
-                        <td>{month}</td>
-                        <td>{stats['total_trades']}</td>
-                        <td>{stats['win_rate']*100:.2f}%</td>
-                        <td class="{'positive' if stats['net_profit'] > 0 else 'negative'}">{stats['net_profit']:.2f}</td>
-                        <td class="{'positive' if stats['average_trade'] > 0 else 'negative'}">{stats['average_trade']:.2f}</td>
-                    </tr>
-            """
-            
-        html += """
-                </table>
-            </div>
-            
-            <div class="footer">
-                <p>Generated by Performance Monitor v1.0</p>
+                <div class="section">
+                    <h2>Hiệu Suất Theo Chiến Lược</h2>
+                    {strategy_table}
+                </div>
+                
+                <div class="section">
+                    <h2>Hiệu Suất Theo Cặp Tiền</h2>
+                    {symbol_table}
+                </div>
+                
+                <div class="section">
+                    <h2>Danh Sách Giao Dịch</h2>
+                    {trades_table}
+                </div>
+                
+                {f'<div class="section"><h2>Cảnh Báo</h2>{alerts_table}</div>' if alerts else ''}
+                
+                <div class="footer">
+                    <p>Báo cáo tạo lúc: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                </div>
             </div>
         </body>
         </html>
         """
         
-        # Lưu file
-        with open(output_path, 'w') as f:
-            f.write(html)
-        
-        logger.info(f"Đã tạo báo cáo tại {output_path}")
-        
-        return html
+        return html_content
     
-    def plot_equity_curve(self, output_path: str = None) -> str:
+    def _generate_metrics_table(self, metrics: Dict) -> str:
         """
-        Vẽ đường cong vốn
+        Tạo bảng HTML cho chỉ số hiệu suất
         
         Args:
-            output_path (str): Đường dẫn lưu biểu đồ
+            metrics (Dict): Chỉ số hiệu suất
             
         Returns:
-            str: Đường dẫn đến biểu đồ
+            str: Bảng HTML
         """
-        if not self.equity_curve:
-            self.calculate_equity_curve()
-            
-        if len(self.equity_curve) < 2:
-            logger.warning("Không đủ dữ liệu để vẽ đường cong vốn")
-            return ""
-            
-        if output_path is None:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_path = os.path.join(self.reports_dir, f'equity_curve_{timestamp}.png')
-            
-        # Đảm bảo thư mục tồn tại
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        table_html = """
+        <table>
+            <tr>
+                <th>Chỉ số</th>
+                <th>Giá trị</th>
+            </tr>
+            <tr>
+                <td>Tổng số giao dịch</td>
+                <td>{}</td>
+            </tr>
+            <tr>
+                <td>Số giao dịch thắng</td>
+                <td>{}</td>
+            </tr>
+            <tr>
+                <td>Số giao dịch thua</td>
+                <td>{}</td>
+            </tr>
+            <tr>
+                <td>Tỷ lệ thắng</td>
+                <td>{:.2f}%</td>
+            </tr>
+            <tr>
+                <td>Tổng lợi nhuận</td>
+                <td class="{}">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Lợi nhuận trung bình mỗi giao dịch</td>
+                <td class="{}">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Giao dịch thắng lớn nhất</td>
+                <td class="positive">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Giao dịch thua lớn nhất</td>
+                <td class="negative">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Lợi nhuận trung bình (thắng)</td>
+                <td class="positive">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Lỗ trung bình (thua)</td>
+                <td class="negative">$ {:.2f}</td>
+            </tr>
+            <tr>
+                <td>Hệ số lợi nhuận (Profit Factor)</td>
+                <td>{:.2f}</td>
+            </tr>
+            <tr>
+                <td>Drawdown tối đa</td>
+                <td>$ {:.2f} ({:.2f}%)</td>
+            </tr>
+            <tr>
+                <td>Thời gian giao dịch trung bình</td>
+                <td>{:.2f} giờ</td>
+            </tr>
+            <tr>
+                <td>Số giao dịch mỗi ngày</td>
+                <td>{:.2f}</td>
+            </tr>
+            <tr>
+                <td>Chuỗi thắng liên tiếp lớn nhất</td>
+                <td>{}</td>
+            </tr>
+            <tr>
+                <td>Chuỗi thua liên tiếp lớn nhất</td>
+                <td>{}</td>
+            </tr>
+            <tr>
+                <td>Tỷ lệ thắng/thua</td>
+                <td>{:.2f}</td>
+            </tr>
+            <tr>
+                <td>Tỷ lệ R/R</td>
+                <td>{:.2f}</td>
+            </tr>
+        </table>
+        """.format(
+            metrics.get('total_trades', 0),
+            metrics.get('win_trades', 0),
+            metrics.get('loss_trades', 0),
+            metrics.get('win_rate', 0),
+            'positive' if metrics.get('total_pnl', 0) >= 0 else 'negative',
+            metrics.get('total_pnl', 0),
+            'positive' if metrics.get('avg_pnl', 0) >= 0 else 'negative',
+            metrics.get('avg_pnl', 0),
+            metrics.get('largest_win', 0),
+            metrics.get('largest_loss', 0),
+            metrics.get('avg_win', 0),
+            metrics.get('avg_loss', 0),
+            metrics.get('profit_factor', 0),
+            metrics.get('max_drawdown', 0), metrics.get('max_drawdown_percent', 0),
+            metrics.get('avg_trade_duration_hours', 0),
+            metrics.get('trades_per_day', 0),
+            metrics.get('consecutive_wins', 0),
+            metrics.get('consecutive_losses', 0),
+            metrics.get('win_loss_ratio', 0),
+            metrics.get('rr_ratio', 0)
+        )
         
-        # Vẽ biểu đồ
-        plt.figure(figsize=(12, 6))
-        plt.plot(self.equity_curve, label='Equity Curve')
-        plt.title('Equity Curve')
-        plt.xlabel('Trades')
-        plt.ylabel('Equity')
-        plt.grid(True)
-        plt.legend()
-        
-        # Tính và vẽ drawdown
-        equity_array = np.array(self.equity_curve)
-        running_max = np.maximum.accumulate(equity_array)
-        drawdown = (running_max - equity_array) / running_max * 100
-        
-        plt.twinx()
-        plt.plot(drawdown, 'r--', alpha=0.5, label='Drawdown (%)')
-        plt.ylabel('Drawdown (%)')
-        plt.legend(loc='lower right')
-        
-        # Lưu biểu đồ
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
-        
-        logger.info(f"Đã lưu biểu đồ đường cong vốn tại {output_path}")
-        
-        return output_path
+        return table_html
     
-    def plot_win_loss_distribution(self, output_path: str = None) -> str:
+    def _generate_strategy_table(self, strategy_metrics: Dict) -> str:
         """
-        Vẽ biểu đồ phân phối lợi nhuận/lỗ
+        Tạo bảng HTML cho hiệu suất theo chiến lược
         
         Args:
-            output_path (str): Đường dẫn lưu biểu đồ
+            strategy_metrics (Dict): Hiệu suất theo chiến lược
             
         Returns:
-            str: Đường dẫn đến biểu đồ
+            str: Bảng HTML
         """
-        if not self.trades:
-            logger.warning("Không có giao dịch để vẽ biểu đồ phân phối")
+        if not strategy_metrics:
+            return "<p>Không có dữ liệu chiến lược</p>"
+        
+        rows = ""
+        for strategy, metrics in strategy_metrics.items():
+            rows += f"""
+            <tr>
+                <td>{strategy}</td>
+                <td>{metrics.get('trade_count', 0)}</td>
+                <td>{metrics.get('win_rate', 0):.2f}%</td>
+                <td class="{'positive' if metrics.get('total_pnl', 0) >= 0 else 'negative'}">$ {metrics.get('total_pnl', 0):.2f}</td>
+                <td>{metrics.get('profit_factor', 0):.2f}</td>
+                <td>{metrics.get('percentage_of_total', 0):.2f}%</td>
+            </tr>
+            """
+        
+        table_html = f"""
+        <table>
+            <tr>
+                <th>Chiến lược</th>
+                <th>Số giao dịch</th>
+                <th>Tỷ lệ thắng</th>
+                <th>Lợi nhuận</th>
+                <th>Profit Factor</th>
+                <th>% tổng giao dịch</th>
+            </tr>
+            {rows}
+        </table>
+        """
+        
+        return table_html
+    
+    def _generate_symbol_table(self, symbol_metrics: Dict) -> str:
+        """
+        Tạo bảng HTML cho hiệu suất theo cặp tiền
+        
+        Args:
+            symbol_metrics (Dict): Hiệu suất theo cặp tiền
+            
+        Returns:
+            str: Bảng HTML
+        """
+        if not symbol_metrics:
+            return "<p>Không có dữ liệu cặp tiền</p>"
+        
+        rows = ""
+        for symbol, metrics in symbol_metrics.items():
+            rows += f"""
+            <tr>
+                <td>{symbol}</td>
+                <td>{metrics.get('trade_count', 0)}</td>
+                <td>{metrics.get('win_rate', 0):.2f}%</td>
+                <td class="{'positive' if metrics.get('total_pnl', 0) >= 0 else 'negative'}">$ {metrics.get('total_pnl', 0):.2f}</td>
+                <td>{metrics.get('profit_factor', 0):.2f}</td>
+                <td>{metrics.get('percentage_of_total', 0):.2f}%</td>
+            </tr>
+            """
+        
+        table_html = f"""
+        <table>
+            <tr>
+                <th>Cặp tiền</th>
+                <th>Số giao dịch</th>
+                <th>Tỷ lệ thắng</th>
+                <th>Lợi nhuận</th>
+                <th>Profit Factor</th>
+                <th>% tổng giao dịch</th>
+            </tr>
+            {rows}
+        </table>
+        """
+        
+        return table_html
+    
+    def _generate_trades_table(self, trades: List[Dict]) -> str:
+        """
+        Tạo bảng HTML cho danh sách giao dịch
+        
+        Args:
+            trades (List[Dict]): Danh sách giao dịch
+            
+        Returns:
+            str: Bảng HTML
+        """
+        if not trades:
+            return "<p>Không có giao dịch nào</p>"
+        
+        # Sắp xếp giao dịch theo thời gian
+        sorted_trades = sorted(trades, key=lambda x: x.get('exit_time', 0), reverse=True)
+        
+        rows = ""
+        for trade in sorted_trades:
+            entry_time = datetime.datetime.fromtimestamp(trade.get('entry_time', 0)).strftime('%Y-%m-%d %H:%M')
+            exit_time = datetime.datetime.fromtimestamp(trade.get('exit_time', 0)).strftime('%Y-%m-%d %H:%M')
+            
+            rows += f"""
+            <tr>
+                <td>{trade.get('symbol', '')}</td>
+                <td>{trade.get('side', '')}</td>
+                <td>{entry_time}</td>
+                <td>{exit_time}</td>
+                <td>$ {trade.get('entry_price', 0):.4f}</td>
+                <td>$ {trade.get('exit_price', 0):.4f}</td>
+                <td>{trade.get('position_size', 0):.4f}</td>
+                <td class="{'positive' if trade.get('pnl', 0) >= 0 else 'negative'}">$ {trade.get('pnl', 0):.2f}</td>
+                <td class="{'positive' if trade.get('roi', 0) >= 0 else 'negative'}">{trade.get('roi', 0):.2f}%</td>
+                <td>{trade.get('strategy', 'Unknown')}</td>
+            </tr>
+            """
+        
+        table_html = f"""
+        <table>
+            <tr>
+                <th>Cặp tiền</th>
+                <th>Hướng</th>
+                <th>Thời gian vào</th>
+                <th>Thời gian ra</th>
+                <th>Giá vào</th>
+                <th>Giá ra</th>
+                <th>Kích thước</th>
+                <th>Lợi nhuận</th>
+                <th>ROI</th>
+                <th>Chiến lược</th>
+            </tr>
+            {rows}
+        </table>
+        """
+        
+        return table_html
+    
+    def _generate_alerts_table(self, alerts: List[Dict]) -> str:
+        """
+        Tạo bảng HTML cho danh sách cảnh báo
+        
+        Args:
+            alerts (List[Dict]): Danh sách cảnh báo
+            
+        Returns:
+            str: Bảng HTML
+        """
+        if not alerts:
+            return "<p>Không có cảnh báo nào</p>"
+        
+        # Sắp xếp cảnh báo theo thời gian
+        sorted_alerts = sorted(alerts, key=lambda x: x.get('timestamp', 0), reverse=True)
+        
+        rows = ""
+        for alert in sorted_alerts:
+            timestamp = datetime.datetime.fromtimestamp(alert.get('timestamp', 0)).strftime('%Y-%m-%d %H:%M')
+            
+            rows += f"""
+            <tr>
+                <td>{alert.get('type', '')}</td>
+                <td>{alert.get('level', '')}</td>
+                <td>{alert.get('message', '')}</td>
+                <td>{timestamp}</td>
+            </tr>
+            """
+        
+        table_html = f"""
+        <table>
+            <tr>
+                <th>Loại</th>
+                <th>Cấp độ</th>
+                <th>Thông báo</th>
+                <th>Thời gian</th>
+            </tr>
+            {rows}
+        </table>
+        """
+        
+        return table_html
+    
+    def generate_strategy_recommendations(self) -> Dict:
+        """
+        Tạo đề xuất điều chỉnh chiến lược dựa trên hiệu suất
+        
+        Returns:
+            Dict: Các đề xuất điều chỉnh chiến lược
+        """
+        # Lấy chỉ số hiệu suất mới nhất
+        metrics = self.get_latest_metrics()
+        
+        if not metrics:
+            return {
+                'status': 'no_data',
+                'message': 'Không có dữ liệu hiệu suất',
+                'recommendations': []
+            }
+        
+        # Lấy chỉ số hiệu suất theo chiến lược
+        strategy_metrics = metrics.get('strategies', {})
+        
+        # Tạo đề xuất dựa trên hiệu suất
+        recommendations = []
+        
+        # Kiểm tra các ngưỡng mong muốn
+        metrics_thresholds = self.config.get('metrics', {})
+        win_rate_min = metrics_thresholds.get('win_rate_min', 45)
+        profit_factor_min = metrics_thresholds.get('profit_factor_min', 1.2)
+        rr_ratio_min = metrics_thresholds.get('rr_ratio_min', 1.5)
+        
+        for strategy, strategy_data in strategy_metrics.items():
+            # Bỏ qua chiến lược có quá ít giao dịch
+            min_trades = self.config.get('strategies', {}).get('min_trades_for_evaluation', 20)
+            if strategy_data.get('total_trades', 0) < min_trades:
+                continue
+            
+            strategy_recs = []
+            
+            # Kiểm tra tỷ lệ thắng
+            win_rate = strategy_data.get('win_rate', 0)
+            if win_rate < win_rate_min:
+                strategy_recs.append({
+                    'type': 'win_rate',
+                    'message': f'Tỷ lệ thắng ({win_rate:.2f}%) dưới ngưỡng mong muốn ({win_rate_min}%)',
+                    'suggestion': 'Xem xét tinh chỉnh bộ lọc tín hiệu để giảm số lượng giao dịch thua'
+                })
+            
+            # Kiểm tra Profit Factor
+            profit_factor = strategy_data.get('profit_factor', 0)
+            if profit_factor < profit_factor_min:
+                strategy_recs.append({
+                    'type': 'profit_factor',
+                    'message': f'Profit Factor ({profit_factor:.2f}) dưới ngưỡng mong muốn ({profit_factor_min})',
+                    'suggestion': 'Xem xét điều chỉnh take profit và stop loss để cải thiện Profit Factor'
+                })
+            
+            # Kiểm tra tỷ lệ R/R
+            rr_ratio = strategy_data.get('rr_ratio', 0)
+            if rr_ratio < rr_ratio_min:
+                strategy_recs.append({
+                    'type': 'rr_ratio',
+                    'message': f'Tỷ lệ R/R ({rr_ratio:.2f}) dưới ngưỡng mong muốn ({rr_ratio_min})',
+                    'suggestion': 'Xem xét điều chỉnh take profit xa hơn hoặc stop loss gần hơn để cải thiện tỷ lệ R/R'
+                })
+            
+            # Kiểm tra chuỗi thua liên tiếp
+            consecutive_losses = strategy_data.get('consecutive_losses', 0)
+            if consecutive_losses >= 5:
+                strategy_recs.append({
+                    'type': 'consecutive_losses',
+                    'message': f'Chuỗi thua liên tiếp cao ({consecutive_losses})',
+                    'suggestion': 'Xem xét thêm bộ lọc để tránh giao dịch trong điều kiện thị trường bất lợi'
+                })
+            
+            # Thêm đề xuất cho chiến lược này
+            if strategy_recs:
+                recommendations.append({
+                    'strategy': strategy,
+                    'issues': strategy_recs,
+                    'overall_score': self._calculate_strategy_health_score(strategy_data)
+                })
+        
+        # Xếp hạng các chiến lược theo hiệu suất
+        strategy_ranking = []
+        
+        for strategy, strategy_data in strategy_metrics.items():
+            # Bỏ qua chiến lược có quá ít giao dịch
+            if strategy_data.get('total_trades', 0) < 5:
+                continue
+            
+            # Tính điểm tổng hợp
+            score = self._calculate_strategy_health_score(strategy_data)
+            
+            strategy_ranking.append({
+                'strategy': strategy,
+                'score': score,
+                'win_rate': strategy_data.get('win_rate', 0),
+                'profit_factor': strategy_data.get('profit_factor', 0),
+                'total_pnl': strategy_data.get('total_pnl', 0)
+            })
+        
+        # Sắp xếp theo điểm
+        strategy_ranking.sort(key=lambda x: x['score'], reverse=True)
+        
+        return {
+            'status': 'success',
+            'message': 'Đã tạo đề xuất điều chỉnh chiến lược',
+            'recommendations': recommendations,
+            'strategy_ranking': strategy_ranking
+        }
+    
+    def _calculate_strategy_health_score(self, strategy_data: Dict) -> float:
+        """
+        Tính điểm sức khỏe của chiến lược
+        
+        Args:
+            strategy_data (Dict): Dữ liệu hiệu suất của chiến lược
+            
+        Returns:
+            float: Điểm sức khỏe (0-100)
+        """
+        # Lấy các chỉ số quan trọng
+        win_rate = strategy_data.get('win_rate', 0)
+        profit_factor = strategy_data.get('profit_factor', 0)
+        rr_ratio = strategy_data.get('rr_ratio', 0)
+        trades_count = strategy_data.get('total_trades', 0)
+        
+        # Tính điểm từng thành phần
+        win_rate_score = min(win_rate / 50 * 100, 100)  # Tỷ lệ thắng 50% -> 100 điểm
+        
+        profit_factor_score = min(profit_factor / 1.5 * 100, 100)  # Profit Factor 1.5 -> 100 điểm
+        
+        rr_ratio_score = min(rr_ratio / 2 * 100, 100)  # R/R 2.0 -> 100 điểm
+        
+        # Điểm cho số lượng giao dịch (càng nhiều càng đáng tin)
+        trade_count_score = min(trades_count / 50 * 100, 100)  # 50 giao dịch -> 100 điểm
+        
+        # Tính điểm tổng hợp
+        total_score = (
+            win_rate_score * 0.35 +
+            profit_factor_score * 0.3 +
+            rr_ratio_score * 0.25 +
+            trade_count_score * 0.1
+        )
+        
+        return total_score
+    
+    def create_equity_chart(self, period: str = 'all', output_path: str = None) -> str:
+        """
+        Tạo biểu đồ equity curve
+        
+        Args:
+            period (str): Khoảng thời gian ('all', 'daily', 'weekly', 'monthly')
+            output_path (str, optional): Đường dẫn lưu biểu đồ
+            
+        Returns:
+            str: Đường dẫn đến file biểu đồ
+        """
+        # Nếu không có giao dịch, trả về lỗi
+        if not self.trade_history:
+            logger.warning("Không có dữ liệu giao dịch để tạo biểu đồ equity")
             return ""
-            
-        if output_path is None:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_path = os.path.join(self.reports_dir, f'pnl_distribution_{timestamp}.png')
-            
-        # Đảm bảo thư mục tồn tại
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # Lấy dữ liệu PnL
-        pnl_values = [t.get('net_pnl', 0) for t in self.trades]
+        # Xác định khoảng thời gian
+        now = int(time.time())
         
-        # Vẽ biểu đồ
+        if period == 'daily':
+            start_timestamp = now - 86400
+            period_str = 'daily'
+        elif period == 'weekly':
+            start_timestamp = now - 604800
+            period_str = 'weekly'
+        elif period == 'monthly':
+            start_timestamp = now - 2592000
+            period_str = 'monthly'
+        else:
+            start_timestamp = 0
+            period_str = 'all'
+        
+        # Lọc giao dịch trong khoảng thời gian
+        filtered_trades = [t for t in self.trade_history if t.get('exit_time', 0) >= start_timestamp]
+        
+        # Sắp xếp giao dịch theo thời gian
+        sorted_trades = sorted(filtered_trades, key=lambda x: x.get('exit_time', 0))
+        
+        # Tạo dữ liệu cho biểu đồ
+        timestamps = []
+        equity_values = []
+        
+        initial_balance = 10000  # Giả sử ban đầu có 10000
+        current_equity = initial_balance
+        
+        # Thêm điểm đầu tiên
+        if sorted_trades:
+            first_trade_time = sorted_trades[0].get('exit_time', 0)
+            timestamps.append(datetime.datetime.fromtimestamp(first_trade_time - 86400))  # Ngày trước giao dịch đầu tiên
+            equity_values.append(current_equity)
+        
+        # Thêm các điểm giao dịch
+        for trade in sorted_trades:
+            current_equity += trade.get('pnl', 0)
+            timestamps.append(datetime.datetime.fromtimestamp(trade.get('exit_time', 0)))
+            equity_values.append(current_equity)
+        
+        # Tạo figure
         plt.figure(figsize=(12, 6))
         
-        # Histogram
-        plt.hist(pnl_values, bins=30, alpha=0.7, color='skyblue', edgecolor='black')
+        # Thiết lập style
+        plt.style.use(self.config.get('visualization', {}).get('chart_style', 'seaborn'))
         
-        # Thêm đường mean và median
-        plt.axvline(np.mean(pnl_values), color='red', linestyle='dashed', linewidth=1, label=f'Mean: {np.mean(pnl_values):.2f}')
-        plt.axvline(np.median(pnl_values), color='green', linestyle='dashed', linewidth=1, label=f'Median: {np.median(pnl_values):.2f}')
+        # Vẽ đường equity
+        plt.plot(timestamps, equity_values, label='Equity', color='#1f77b4', linewidth=2)
         
-        # Zero line
-        plt.axvline(0, color='black', linestyle='-', linewidth=1)
+        # Vẽ đường peak equity
+        peak_equity = [equity_values[0]]
+        for eq in equity_values[1:]:
+            peak_equity.append(max(peak_equity[-1], eq))
         
-        plt.title('P&L Distribution')
-        plt.xlabel('P&L Value')
-        plt.ylabel('Frequency')
+        plt.plot(timestamps, peak_equity, label='Peak Equity', color='#2ca02c', linestyle='--', linewidth=1)
+        
+        # Đường drawdown
+        drawdown = [(peak - eq) / peak * 100 for peak, eq in zip(peak_equity, equity_values)]
+        
+        # Vẽ drawdown trên biểu đồ phụ
+        ax1 = plt.gca()
+        ax2 = ax1.twinx()
+        ax2.fill_between(timestamps, drawdown, alpha=0.3, color='#d62728')
+        ax2.set_ylabel('Drawdown (%)', color='#d62728')
+        ax2.tick_params(axis='y', labelcolor='#d62728')
+        
+        # Thiết lập tiêu đề và nhãn
+        plt.title(f'Equity Curve ({period_str.capitalize()})')
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Equity')
+        
         plt.grid(True, alpha=0.3)
         plt.legend()
         
-        # Lưu biểu đồ
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
+        # Xác định đường dẫn lưu file
+        if output_path is None:
+            os.makedirs('reports/charts', exist_ok=True)
+            output_path = f'reports/charts/equity_curve_{period_str}.png'
         
-        logger.info(f"Đã lưu biểu đồ phân phối P&L tại {output_path}")
+        # Lưu biểu đồ
+        plt.savefig(output_path, dpi=100, bbox_inches='tight')
+        plt.close()
         
         return output_path
     
-    def plot_monthly_performance(self, output_path: str = None) -> str:
+    def create_win_loss_chart(self, period: str = 'all', output_path: str = None) -> str:
         """
-        Vẽ biểu đồ hiệu suất theo tháng
+        Tạo biểu đồ thống kê thắng/thua
         
         Args:
-            output_path (str): Đường dẫn lưu biểu đồ
+            period (str): Khoảng thời gian ('all', 'daily', 'weekly', 'monthly')
+            output_path (str, optional): Đường dẫn lưu biểu đồ
             
         Returns:
-            str: Đường dẫn đến biểu đồ
+            str: Đường dẫn đến file biểu đồ
         """
-        # Phân tích theo thời gian nếu chưa
-        time_analysis = self.analyze_performance_by_time()
-        monthly_data = time_analysis['monthly']
-        
-        if not monthly_data:
-            logger.warning("Không có dữ liệu tháng để vẽ biểu đồ")
+        # Nếu không có giao dịch, trả về lỗi
+        if not self.trade_history:
+            logger.warning("Không có dữ liệu giao dịch để tạo biểu đồ win/loss")
             return ""
-            
-        if output_path is None:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_path = os.path.join(self.reports_dir, f'monthly_performance_{timestamp}.png')
-            
-        # Đảm bảo thư mục tồn tại
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # Chuẩn bị dữ liệu
-        months = sorted(monthly_data.keys())
-        profits = [monthly_data[m]['net_profit'] for m in months]
-        win_rates = [monthly_data[m]['win_rate'] * 100 for m in months]
-        trade_counts = [monthly_data[m]['total_trades'] for m in months]
+        # Xác định khoảng thời gian
+        now = int(time.time())
+        
+        if period == 'daily':
+            start_timestamp = now - 86400
+            period_str = 'daily'
+        elif period == 'weekly':
+            start_timestamp = now - 604800
+            period_str = 'weekly'
+        elif period == 'monthly':
+            start_timestamp = now - 2592000
+            period_str = 'monthly'
+        else:
+            start_timestamp = 0
+            period_str = 'all'
+        
+        # Lọc giao dịch trong khoảng thời gian
+        filtered_trades = [t for t in self.trade_history if t.get('exit_time', 0) >= start_timestamp]
+        
+        # Tách thành giao dịch thắng và thua
+        winning_trades = [t for t in filtered_trades if t.get('pnl', 0) > 0]
+        losing_trades = [t for t in filtered_trades if t.get('pnl', 0) <= 0]
+        
+        # Tạo dữ liệu cho biểu đồ
+        win_pnls = [t.get('pnl', 0) for t in winning_trades]
+        loss_pnls = [abs(t.get('pnl', 0)) for t in losing_trades]  # Lấy giá trị tuyệt đối
+        
+        # Tạo figure
+        plt.figure(figsize=(12, 6))
+        
+        # Thiết lập style
+        plt.style.use(self.config.get('visualization', {}).get('chart_style', 'seaborn'))
         
         # Vẽ biểu đồ
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         
-        # Profit by month
-        bars = ax1.bar(months, profits, color=['green' if p > 0 else 'red' for p in profits])
-        ax1.set_title('Monthly Net Profit')
-        ax1.set_ylabel('Net Profit')
-        ax1.grid(True, alpha=0.3)
+        # Biểu đồ phân phối lợi nhuận
+        if win_pnls:
+            ax1.hist(win_pnls, bins=20, alpha=0.7, color='green', label='Wins')
+        if loss_pnls:
+            ax1.hist(loss_pnls, bins=20, alpha=0.7, color='red', label='Losses')
         
-        # Add values on bars
-        for bar, value in zip(bars, profits):
-            height = bar.get_height()
-            ax1.text(bar.get_x() + bar.get_width()/2., 
-                    height + (5 if height > 0 else -15),
-                    f'{value:.2f}',
-                    ha='center', va='bottom' if height > 0 else 'top',
-                    rotation=0)
+        ax1.set_title('Phân phối lợi nhuận/lỗ')
+        ax1.set_xlabel('PnL (USDT)')
+        ax1.set_ylabel('Số lượng giao dịch')
+        ax1.legend()
         
-        # Win rate and trade count
-        ax2.bar(months, trade_counts, alpha=0.3, label='Trade Count')
-        ax2.set_xlabel('Month')
-        ax2.set_ylabel('Trade Count')
+        # Biểu đồ thống kê
+        labels = ['Wins', 'Losses']
+        sizes = [len(winning_trades), len(losing_trades)]
+        colors = ['green', 'red']
         
-        ax2b = ax2.twinx()
-        ax2b.plot(months, win_rates, 'ro-', label='Win Rate')
-        ax2b.set_ylabel('Win Rate (%)')
-        ax2b.set_ylim(0, 100)
+        ax2.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+        ax2.axis('equal')
+        ax2.set_title('Tỷ lệ thắng/thua')
         
-        # Combine legends
-        lines1, labels1 = ax2.get_legend_handles_labels()
-        lines2, labels2 = ax2b.get_legend_handles_labels()
-        ax2.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
-        
-        plt.xticks(rotation=45)
+        plt.suptitle(f'Thống kê thắng/thua ({period_str.capitalize()})')
         plt.tight_layout()
-        plt.savefig(output_path)
+        
+        # Xác định đường dẫn lưu file
+        if output_path is None:
+            os.makedirs('reports/charts', exist_ok=True)
+            output_path = f'reports/charts/win_loss_{period_str}.png'
+        
+        # Lưu biểu đồ
+        plt.savefig(output_path, dpi=100, bbox_inches='tight')
         plt.close()
         
-        logger.info(f"Đã lưu biểu đồ hiệu suất theo tháng tại {output_path}")
+        return output_path
+    
+    def analyze_trade_distribution(self) -> Dict:
+        """
+        Phân tích phân phối giao dịch theo giờ và ngày trong tuần
+        
+        Returns:
+            Dict: Kết quả phân tích
+        """
+        # Nếu không có giao dịch, trả về kết quả trống
+        if not self.trade_history:
+            return {
+                'hour_distribution': {},
+                'day_distribution': {},
+                'hour_win_rate': {},
+                'day_win_rate': {}
+            }
+        
+        # Khởi tạo dữ liệu
+        hour_dist = defaultdict(int)
+        day_dist = defaultdict(int)
+        hour_wins = defaultdict(int)
+        day_wins = defaultdict(int)
+        hour_total = defaultdict(int)
+        day_total = defaultdict(int)
+        
+        # Phân tích từng giao dịch
+        for trade in self.trade_history:
+            exit_time = trade.get('exit_time', 0)
+            if exit_time:
+                dt = datetime.datetime.fromtimestamp(exit_time)
+                hour = dt.hour
+                day = dt.strftime('%A')  # Tên ngày trong tuần
+                
+                # Cập nhật phân phối
+                hour_dist[hour] += 1
+                day_dist[day] += 1
+                
+                # Cập nhật tỷ lệ thắng
+                is_win = trade.get('pnl', 0) > 0
+                hour_total[hour] += 1
+                day_total[day] += 1
+                
+                if is_win:
+                    hour_wins[hour] += 1
+                    day_wins[day] += 1
+        
+        # Tính tỷ lệ thắng
+        hour_win_rate = {h: hour_wins[h] / hour_total[h] * 100 if hour_total[h] > 0 else 0 for h in hour_total}
+        day_win_rate = {d: day_wins[d] / day_total[d] * 100 if day_total[d] > 0 else 0 for d in day_total}
+        
+        # Sắp xếp dữ liệu
+        hour_dist_sorted = {h: hour_dist[h] for h in sorted(hour_dist.keys())}
+        day_dist_sorted = {}
+        
+        # Sắp xếp theo thứ trong tuần
+        days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        for day in days_order:
+            if day in day_dist:
+                day_dist_sorted[day] = day_dist[day]
+        
+        return {
+            'hour_distribution': hour_dist_sorted,
+            'day_distribution': day_dist_sorted,
+            'hour_win_rate': {h: hour_win_rate[h] for h in sorted(hour_win_rate.keys())},
+            'day_win_rate': {d: day_win_rate[d] for d in days_order if d in day_win_rate}
+        }
+    
+    def create_trade_distribution_chart(self, output_path: str = None) -> str:
+        """
+        Tạo biểu đồ phân phối giao dịch
+        
+        Args:
+            output_path (str, optional): Đường dẫn lưu biểu đồ
+            
+        Returns:
+            str: Đường dẫn đến file biểu đồ
+        """
+        # Phân tích phân phối giao dịch
+        distribution_data = self.analyze_trade_distribution()
+        
+        if not distribution_data.get('hour_distribution') and not distribution_data.get('day_distribution'):
+            logger.warning("Không có dữ liệu giao dịch để tạo biểu đồ phân phối")
+            return ""
+        
+        # Tạo figure
+        plt.figure(figsize=(14, 10))
+        
+        # Thiết lập style
+        plt.style.use(self.config.get('visualization', {}).get('chart_style', 'seaborn'))
+        
+        # Tạo 4 biểu đồ con
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(14, 10))
+        
+        # Biểu đồ phân phối theo giờ
+        hours = list(distribution_data['hour_distribution'].keys())
+        hour_counts = list(distribution_data['hour_distribution'].values())
+        
+        ax1.bar(hours, hour_counts, color='skyblue')
+        ax1.set_title('Phân phối giao dịch theo giờ')
+        ax1.set_xlabel('Giờ trong ngày')
+        ax1.set_ylabel('Số lượng giao dịch')
+        ax1.set_xticks(range(0, 24))
+        
+        # Biểu đồ phân phối theo ngày
+        days = list(distribution_data['day_distribution'].keys())
+        day_counts = list(distribution_data['day_distribution'].values())
+        
+        ax2.bar(days, day_counts, color='lightgreen')
+        ax2.set_title('Phân phối giao dịch theo ngày')
+        ax2.set_xlabel('Ngày trong tuần')
+        ax2.set_ylabel('Số lượng giao dịch')
+        ax2.tick_params(axis='x', rotation=45)
+        
+        # Biểu đồ tỷ lệ thắng theo giờ
+        hour_win_rates = list(distribution_data['hour_win_rate'].values())
+        
+        ax3.bar(hours, hour_win_rates, color='orange')
+        ax3.set_title('Tỷ lệ thắng theo giờ')
+        ax3.set_xlabel('Giờ trong ngày')
+        ax3.set_ylabel('Tỷ lệ thắng (%)')
+        ax3.set_xticks(range(0, 24))
+        ax3.set_ylim(0, 100)
+        
+        # Biểu đồ tỷ lệ thắng theo ngày
+        day_win_rates = list(distribution_data['day_win_rate'].values())
+        
+        ax4.bar(days, day_win_rates, color='salmon')
+        ax4.set_title('Tỷ lệ thắng theo ngày')
+        ax4.set_xlabel('Ngày trong tuần')
+        ax4.set_ylabel('Tỷ lệ thắng (%)')
+        ax4.tick_params(axis='x', rotation=45)
+        ax4.set_ylim(0, 100)
+        
+        plt.suptitle('Phân tích phân phối giao dịch')
+        plt.tight_layout()
+        
+        # Xác định đường dẫn lưu file
+        if output_path is None:
+            os.makedirs('reports/charts', exist_ok=True)
+            output_path = 'reports/charts/trade_distribution.png'
+        
+        # Lưu biểu đồ
+        plt.savefig(output_path, dpi=100, bbox_inches='tight')
+        plt.close()
         
         return output_path
 
 
 def main():
-    """Hàm chính để test Performance Monitor"""
-    print("=== Test Performance Monitor ===\n")
-    
-    # Khởi tạo monitor
+    """Hàm chính để test PerformanceMonitor"""
     monitor = PerformanceMonitor()
     
-    # Tạo một số giao dịch mẫu
-    trades = [
-        {
-            'trade_id': 'trade_1',
-            'symbol': 'BTCUSDT',
-            'side': 'LONG',
-            'entry_price': 50000,
-            'exit_price': 52000,
-            'quantity': 0.1,
+    # Thêm một số giao dịch mẫu
+    for i in range(20):
+        win = i % 3 != 0  # 2/3 win rate
+        
+        trade_data = {
+            'symbol': f"{'BTC' if i % 2 == 0 else 'ETH'}USDT",
+            'side': 'LONG' if i % 4 < 2 else 'SHORT',
+            'entry_price': 50000 if i % 2 == 0 else 2000,
+            'exit_price': (50000 * (1.03 if win else 0.98)) if i % 2 == 0 else (2000 * (1.04 if win else 0.97)),
+            'position_size': 0.1,
             'leverage': 5,
-            'entry_time': int(time.time()) - 7 * 24 * 3600,  # 7 ngày trước
-            'exit_time': int(time.time()) - 6 * 24 * 3600,   # 6 ngày trước
-            'strategy': 'trend_following',
-            'market_regime': 'trending',
-            'net_pnl': 1000  # (52000 - 50000) * 0.1 * 5
-        },
-        {
-            'trade_id': 'trade_2',
-            'symbol': 'ETHUSDT',
-            'side': 'SHORT',
-            'entry_price': 3000,
-            'exit_price': 3100,
-            'quantity': 0.5,
-            'leverage': 3,
-            'entry_time': int(time.time()) - 5 * 24 * 3600,  # 5 ngày trước
-            'exit_time': int(time.time()) - 4 * 24 * 3600,   # 4 ngày trước
-            'strategy': 'mean_reversion',
-            'market_regime': 'ranging',
-            'net_pnl': -150  # (3000 - 3100) * 0.5 * 3
-        },
-        {
-            'trade_id': 'trade_3',
-            'symbol': 'BTCUSDT',
-            'side': 'LONG',
-            'entry_price': 51000,
-            'exit_price': 51500,
-            'quantity': 0.2,
-            'leverage': 3,
-            'entry_time': int(time.time()) - 3 * 24 * 3600,  # 3 ngày trước
-            'exit_time': int(time.time()) - 2 * 24 * 3600,   # 2 ngày trước
-            'strategy': 'breakout',
-            'market_regime': 'volatile',
-            'net_pnl': 300  # (51500 - 51000) * 0.2 * 3
-        },
-        {
-            'trade_id': 'trade_4',
-            'symbol': 'SOLUSDT',
-            'side': 'SHORT',
-            'entry_price': 100,
-            'exit_price': 90,
-            'quantity': 2,
-            'leverage': 2,
-            'entry_time': int(time.time()) - 1 * 24 * 3600,  # 1 ngày trước
-            'exit_time': int(time.time()) - 12 * 3600,       # 12 giờ trước
-            'strategy': 'trend_following',
-            'market_regime': 'trending',
-            'net_pnl': 40  # (100 - 90) * 2 * 2
+            'strategy': f"Strategy{i % 3 + 1}",
+            'entry_time': int(time.time()) - (86400 * (20 - i)),  # Từ 20 ngày trước đến hiện tại
+            'exit_time': int(time.time()) - (86400 * (20 - i)) + 7200  # +2 giờ
         }
-    ]
+        
+        monitor.record_trade(trade_data)
     
-    # Thêm các giao dịch
-    for trade in trades:
-        monitor.add_trade(trade)
+    # Cập nhật chỉ số
+    metrics = monitor.update_metrics()
+    print("Chỉ số hiệu suất tổng thể:")
+    print(f"Tổng số giao dịch: {metrics['overall']['total_trades']}")
+    print(f"Tỷ lệ thắng: {metrics['overall']['win_rate']:.2f}%")
+    print(f"Tổng lợi nhuận: {metrics['overall']['total_pnl']:.2f}")
+    print(f"Profit Factor: {metrics['overall']['profit_factor']:.2f}")
     
-    # Tính các chỉ số hiệu suất
-    monitor.calculate_equity_curve()
-    monitor.calculate_daily_returns()
+    # Tạo báo cáo hằng ngày
+    daily_report = monitor.create_daily_report()
+    print(f"Đã tạo báo cáo hằng ngày: {daily_report}")
     
-    # Lấy thống kê
-    stats = monitor.get_trade_statistics()
-    print("Thống kê giao dịch:")
-    print(f"Tổng số giao dịch: {stats['total_trades']}")
-    print(f"Tỷ lệ thắng: {stats['win_rate']*100:.2f}%")
-    print(f"Profit Factor: {stats['profit_factor']:.2f}")
-    print(f"Lợi nhuận ròng: {stats['net_profit']:.2f}")
-    print(f"Sharpe Ratio: {stats['sharpe_ratio']:.2f}")
-    print(f"Drawdown tối đa: {stats['max_drawdown']:.2f}%")
+    # Tạo đề xuất chiến lược
+    recommendations = monitor.generate_strategy_recommendations()
+    print("Đề xuất chiến lược:")
+    for rec in recommendations.get('recommendations', []):
+        print(f"Chiến lược: {rec['strategy']}")
+        for issue in rec['issues']:
+            print(f"  - {issue['message']}")
+            print(f"    Đề xuất: {issue['suggestion']}")
     
-    # Phân tích theo chiến lược
-    strategy_perf = monitor.analyze_by_strategy()
-    print("\nHiệu suất theo chiến lược:")
-    for strategy, perf in strategy_perf.items():
-        print(f"{strategy}: Win Rate={perf['win_rate']*100:.2f}%, Profit={perf['net_profit']:.2f}")
+    # Tạo biểu đồ
+    equity_chart = monitor.create_equity_chart()
+    print(f"Đã tạo biểu đồ equity: {equity_chart}")
     
-    # Tạo báo cáo
-    report_path = "example_report.html"
-    monitor.generate_full_report(report_path)
-    print(f"\nĐã tạo báo cáo tại: {report_path}")
+    win_loss_chart = monitor.create_win_loss_chart()
+    print(f"Đã tạo biểu đồ win/loss: {win_loss_chart}")
     
-    # Vẽ đường cong vốn
-    equity_chart = monitor.plot_equity_curve("example_equity.png")
-    print(f"Đã vẽ đường cong vốn tại: {equity_chart}")
-    
-    # Vẽ phân phối lợi nhuận
-    pnl_chart = monitor.plot_win_loss_distribution("example_pnl.png")
-    print(f"Đã vẽ phân phối lợi nhuận tại: {pnl_chart}")
+    distribution_chart = monitor.create_trade_distribution_chart()
+    print(f"Đã tạo biểu đồ phân phối giao dịch: {distribution_chart}")
 
 
 if __name__ == "__main__":

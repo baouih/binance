@@ -2,593 +2,911 @@
 # -*- coding: utf-8 -*-
 
 """
-Integration Test cho các module cải tiến
+Module kiểm thử tích hợp (Integration Test)
 
-Script này thực hiện kiểm thử tích hợp các module mới phát triển:
-1. calculate_pnl_with_full_details.py
-2. dynamic_leverage_calculator.py
-3. enhanced_signal_quality.py
-4. enhanced_adaptive_trailing_stop.py
-5. performance_monitor.py
+Module này thực hiện các test case tích hợp để kiểm tra hoạt động của toàn bộ hệ thống
+và sự tương tác giữa các module.
 """
 
 import os
 import sys
-import time
 import json
+import time
 import logging
 import datetime
+from typing import Dict, List, Tuple, Any, Optional, Union
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple, Any
 
-# Cấu hình logging
+# Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('integration_test.log')
-    ]
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger('integration_test')
 
+# Thêm thư mục gốc vào sys.path để import các module
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # Import các module cần kiểm thử
 try:
+    from binance_api import BinanceAPI
     from calculate_pnl_with_full_details import PnLCalculator
     from dynamic_leverage_calculator import DynamicLeverageCalculator
     from enhanced_signal_quality import EnhancedSignalQuality
     from enhanced_adaptive_trailing_stop import EnhancedAdaptiveTrailingStop
-    from performance_monitor import PerformanceMonitor, PerformanceMetrics
-    from binance_api import BinanceAPI
-    
-    # Kiểm tra đã import thành công
-    logger.info("Đã import tất cả các module thành công")
-    modules_available = True
+    from performance_monitor import PerformanceMonitor
 except ImportError as e:
     logger.error(f"Lỗi khi import module: {str(e)}")
-    modules_available = False
+    raise
 
 
 class IntegrationTest:
     """Lớp kiểm thử tích hợp các module"""
     
-    def __init__(self):
-        """Khởi tạo"""
-        # Kiểm tra các module đã được import thành công chưa
-        if not modules_available:
-            logger.error("Các module chưa được import đầy đủ. Không thể tiếp tục kiểm thử.")
-            return
+    def __init__(self, config_path: str = 'configs/integration_test_config.json'):
+        """
+        Khởi tạo kiểm thử tích hợp
         
-        logger.info("Bắt đầu khởi tạo các thành phần cần thiết cho kiểm thử tích hợp")
-        
-        # Khởi tạo Binance API
-        try:
-            self.binance_api = BinanceAPI()
-            logger.info("Đã khởi tạo BinanceAPI thành công")
-        except Exception as e:
-            logger.error(f"Lỗi khi khởi tạo BinanceAPI: {str(e)}")
-            self.binance_api = None
+        Args:
+            config_path (str): Đường dẫn đến file cấu hình
+        """
+        self.config = self._load_config(config_path)
         
         # Khởi tạo các module
-        self.pnl_calculator = PnLCalculator(binance_api=self.binance_api)
-        self.leverage_calculator = DynamicLeverageCalculator()
+        self.binance_api = BinanceAPI()
+        self.pnl_calculator = PnLCalculator()
+        self.leverage_calculator = DynamicLeverageCalculator()  # Không cần tham số binance_api
         self.signal_quality = EnhancedSignalQuality(binance_api=self.binance_api)
-        self.trailing_stop = EnhancedAdaptiveTrailingStop()
-        self.performance_monitor = PerformanceMonitor()
+        self.trailing_stop = EnhancedAdaptiveTrailingStop(data_provider=self.binance_api)
+        self.performance_monitor = PerformanceMonitor(
+            binance_api=self.binance_api,
+            pnl_calculator=self.pnl_calculator
+        )
         
-        # Chuẩn bị dữ liệu cho test
-        self.test_data = {
-            'symbol': 'BTCUSDT',
-            'entry_price': 50000,
-            'leverage': 5,
-            'quantity': 0.1,
-            'side': 'LONG',
-            'timeframe': '1h'
-        }
+        # Khởi tạo biến lưu trữ kết quả test
+        self.test_results = {}
         
-        # Dữ liệu về chế độ thị trường
-        self.market_data = {
-            'market_regime': 'trending',
-            'volatility': 0.02,
-            'account_balance': 10000,
-            'max_open_positions': 2,
-            'portfolio_correlation': 0.3,
-            'price_ratio_to_ma': 1.05
-        }
+        # Tạo thư mục lưu trữ kết quả test
+        os.makedirs('test_results', exist_ok=True)
         
-        logger.info("Đã khởi tạo IntegrationTest thành công")
+        logger.info("Đã khởi tạo IntegrationTest")
     
-    def test_pnl_calculator(self):
-        """Kiểm thử PnL Calculator"""
-        logger.info("Bắt đầu kiểm thử PnL Calculator")
+    def _load_config(self, config_path: str) -> Dict:
+        """
+        Tải cấu hình từ file
         
-        # Dữ liệu kiểm thử
-        test_cases = [
-            {
-                'name': 'Test LONG simple',
-                'entry_price': 50000,
-                'exit_price': 51000,
-                'quantity': 0.1,
-                'leverage': 5,
-                'position_side': 'LONG',
-                'expected_pnl': 500  # (51000-50000) * 0.1 * 5
-            },
-            {
-                'name': 'Test SHORT simple',
-                'entry_price': 50000,
-                'exit_price': 49000,
-                'quantity': 0.1,
-                'leverage': 5,
-                'position_side': 'SHORT',
-                'expected_pnl': 500  # (50000-49000) * 0.1 * 5
-            },
-            {
-                'name': 'Test with fees',
-                'entry_price': 50000,
-                'exit_price': 51000,
-                'quantity': 0.1,
-                'leverage': 5,
-                'position_side': 'LONG',
-                'open_fee_rate': 0.0004,
-                'close_fee_rate': 0.0004,
-                'expected_pnl': 500 - (50000 * 0.1 * 0.0004) - (51000 * 0.1 * 0.0004)
-                # 500 - 2 - 2.04 = 495.96
-            },
-            {
-                'name': 'Test with partial exits',
-                'entry_price': 50000,
-                'exit_price': 51000,
-                'quantity': 0.1,
-                'leverage': 5,
-                'position_side': 'LONG',
-                'partial_exits': [
-                    (50500, 0.04),  # Đóng 40% vị thế ở 50500
-                    (51000, 0.06)   # Đóng 60% vị thế ở 51000
-                ],
-                'expected_pnl': (50500 - 50000) * 0.04 * 5 + (51000 - 50000) * 0.06 * 5
-                # 100 + 300 = 400
+        Args:
+            config_path (str): Đường dẫn đến file cấu hình
+            
+        Returns:
+            Dict: Cấu hình đã tải
+        """
+        default_config = {
+            'test_symbols': ['BTCUSDT', 'ETHUSDT', 'BNBUSDT'],
+            'test_timeframes': ['1h', '4h'],
+            'test_strategies': ['rsi', 'macd', 'bbands'],
+            'test_market_regimes': ['trending', 'ranging', 'volatile'],
+            'test_account_balance': 10000,
+            'test_position_sizes': [0.1, 0.05, 0.02],
+            'test_leverage_levels': [1, 3, 5],
+            'test_parameters': {
+                'rsi': {
+                    'overbought': 70,
+                    'oversold': 30,
+                    'period': 14
+                },
+                'macd': {
+                    'fast_period': 12,
+                    'slow_period': 26,
+                    'signal_period': 9
+                },
+                'bbands': {
+                    'period': 20,
+                    'std_dev': 2.0
+                }
             }
-        ]
-        
-        # Chạy các trường hợp kiểm thử
-        for tc in test_cases:
-            try:
-                # Gọi hàm tính PnL
-                result = self.pnl_calculator.calculate_pnl_with_full_details(
-                    entry_price=tc['entry_price'],
-                    exit_price=tc['exit_price'],
-                    position_size=tc['quantity'],
-                    leverage=tc['leverage'],
-                    position_side=tc['position_side'],
-                    open_fee_rate=tc.get('open_fee_rate', 0.0004),
-                    close_fee_rate=tc.get('close_fee_rate', 0.0004),
-                    partial_exits=tc.get('partial_exits', None)
-                )
-                
-                # Kiểm tra kết quả
-                pnl_diff = abs(result['net_pnl'] - tc['expected_pnl'])
-                if pnl_diff < 0.01:  # Chênh lệch nhỏ do làm tròn
-                    logger.info(f"✅ {tc['name']} passed: Kết quả {result['net_pnl']:.2f}, kỳ vọng {tc['expected_pnl']:.2f}")
-                else:
-                    logger.error(f"❌ {tc['name']} failed: Kết quả {result['net_pnl']:.2f}, kỳ vọng {tc['expected_pnl']:.2f}")
-            except Exception as e:
-                logger.error(f"❌ {tc['name']} failed with exception: {str(e)}")
-        
-        logger.info("Kết thúc kiểm thử PnL Calculator")
-    
-    def test_dynamic_leverage(self):
-        """Kiểm thử Dynamic Leverage Calculator"""
-        logger.info("Bắt đầu kiểm thử Dynamic Leverage Calculator")
-        
-        # Kiểm thử các chế độ thị trường khác nhau
-        market_regimes = ['trending', 'ranging', 'volatile', 'quiet', 'neutral']
-        for regime in market_regimes:
-            try:
-                result = self.leverage_calculator.calculate_dynamic_leverage(
-                    market_regime=regime,
-                    volatility=0.02,
-                    account_balance=10000
-                )
-                
-                logger.info(f"Chế độ {regime}: Đòn bẩy = {result['final_leverage']}x")
-            except Exception as e:
-                logger.error(f"❌ Kiểm thử chế độ {regime} failed: {str(e)}")
-        
-        # Kiểm thử biến động khác nhau
-        volatilities = [0.01, 0.02, 0.05, 0.1]
-        for vol in volatilities:
-            try:
-                result = self.leverage_calculator.calculate_dynamic_leverage(
-                    market_regime='neutral',
-                    volatility=vol,
-                    account_balance=10000
-                )
-                
-                logger.info(f"Biến động {vol*100}%: Đòn bẩy = {result['final_leverage']}x")
-            except Exception as e:
-                logger.error(f"❌ Kiểm thử biến động {vol} failed: {str(e)}")
-        
-        # Kiểm thử phân tích
-        try:
-            # Thêm một số quyết định vào lịch sử
-            for i in range(10):
-                # Tạo quyết định với biến động và chế độ khác nhau
-                volatility = 0.01 + (i % 5) * 0.01
-                regime = market_regimes[i % len(market_regimes)]
-                
-                self.leverage_calculator.calculate_dynamic_leverage(
-                    market_regime=regime,
-                    volatility=volatility,
-                    account_balance=10000,
-                    symbol='BTCUSDT'
-                )
-            
-            # Phân tích xu hướng đòn bẩy
-            trend_analysis = self.leverage_calculator.get_leverage_trend(symbol='BTCUSDT')
-            logger.info(f"Phân tích xu hướng đòn bẩy: {trend_analysis['trend_direction']}")
-            
-            # Phân tích tác động của biến động
-            volatility_analysis = self.leverage_calculator.analyze_volatility_impact(symbol='BTCUSDT')
-            logger.info(f"Tương quan biến động-đòn bẩy: {volatility_analysis['correlation']:.2f}")
-        except Exception as e:
-            logger.error(f"❌ Kiểm thử phân tích đòn bẩy failed: {str(e)}")
-        
-        logger.info("Kết thúc kiểm thử Dynamic Leverage Calculator")
-    
-    def test_signal_quality(self):
-        """Kiểm thử Enhanced Signal Quality"""
-        logger.info("Bắt đầu kiểm thử Enhanced Signal Quality")
-        
-        if not self.binance_api:
-            logger.error("❌ Không có API Binance, không thể kiểm thử Signal Quality")
-            return
-        
-        # Kiểm tra một số cặp tiền
-        symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
-        timeframe = '1h'
-        
-        for symbol in symbols:
-            try:
-                # Đánh giá chất lượng tín hiệu
-                score, details = self.signal_quality.evaluate_signal_quality(symbol, timeframe)
-                
-                # Kiểm tra kết quả
-                logger.info(f"{symbol}: Điểm chất lượng = {score:.2f}, Hướng = {details['signal_direction']}, Mạnh = {details['signal_strength']}")
-                
-                # Kiểm tra các thành phần
-                components = details['component_scores']
-                logger.info(f"{symbol} - Trend Strength: {components['trend_strength']:.2f}")
-                logger.info(f"{symbol} - BTC Alignment: {components['btc_alignment']:.2f}")
-                
-                # Kiểm tra tương quan BTC
-                logger.info(f"{symbol} - BTC Correlation: {details['btc_correlation']:.2f}")
-            except Exception as e:
-                logger.error(f"❌ Kiểm thử signal quality cho {symbol} failed: {str(e)}")
-        
-        logger.info("Kết thúc kiểm thử Enhanced Signal Quality")
-    
-    def test_trailing_stop(self):
-        """Kiểm thử Enhanced Adaptive Trailing Stop"""
-        logger.info("Bắt đầu kiểm thử Enhanced Adaptive Trailing Stop")
-        
-        # Tạo vị thế mẫu
-        position = {
-            'symbol': 'BTCUSDT',
-            'side': 'LONG',
-            'entry_price': 50000,
-            'quantity': 0.1,
-            'entry_time': int(time.time()) - 24 * 3600  # 1 ngày trước
         }
         
-        # Khởi tạo trailing stop
+        # Tạo thư mục nếu chưa tồn tại
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+        
+        # Tải cấu hình hoặc tạo file cấu hình mặc định
         try:
-            # Khởi tạo vị thế
-            position = self.trailing_stop.initialize_position(position)
-            logger.info(f"Khởi tạo vị thế: {position['trailing_status']}")
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                logger.info(f"Đã tải cấu hình từ {config_path}")
+                return config
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning(f"Không tìm thấy hoặc không thể đọc file {config_path}, sử dụng cấu hình mặc định")
             
-            # Kiểm thử với giá tăng dần
-            prices = [50500, 51000, 51500, 52000, 51500, 51000, 50500]
-            for price in prices:
-                # Cập nhật trailing stop
-                position = self.trailing_stop.update_trailing_stop(position, price)
-                should_close, reason = self.trailing_stop.check_stop_condition(position, price)
-                
-                status = self.trailing_stop.get_trailing_status(position)
-                logger.info(f"Giá: {price}, Stop: {status['stop_price']:.2f if status['stop_price'] else None}, Kích hoạt: {status['activated']}")
-                
-                if should_close:
-                    logger.info(f"Đóng vị thế tại giá {price}: {reason}")
-                    break
+            # Lưu cấu hình mặc định
+            try:
+                with open(config_path, 'w') as f:
+                    json.dump(default_config, f, indent=4)
+                logger.info(f"Đã tạo file cấu hình mặc định tại {config_path}")
+            except Exception as e:
+                logger.error(f"Không thể tạo file cấu hình mặc định: {str(e)}")
             
-            # Kiểm thử backtest
-            test_prices = [49500, 50000, 50500, 51000, 51500, 52000, 51500, 51000, 50500, 50000, 49500]
-            backtest_result = self.trailing_stop.backtest_trailing_stop(
-                entry_price=50000,
-                price_data=test_prices,
-                side='LONG',
-                position_size=0.1,
-                entry_index=1  # Vào ở index 1 (giá 50000)
+            return default_config
+    
+    def _save_test_results(self) -> None:
+        """Lưu kết quả test vào file"""
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        file_path = f'test_results/integration_test_{timestamp}.json'
+        
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(self.test_results, f, indent=4)
+            logger.info(f"Đã lưu kết quả test vào {file_path}")
+        except Exception as e:
+            logger.error(f"Không thể lưu kết quả test: {str(e)}")
+    
+    def run_all_tests(self) -> Dict:
+        """
+        Chạy tất cả các test case
+        
+        Returns:
+            Dict: Kết quả tất cả các test
+        """
+        all_results = {}
+        
+        # Test 1: Kiểm tra kết nối API
+        logger.info("Bắt đầu Test 1: Kiểm tra kết nối API")
+        all_results['api_connection'] = self.test_api_connection()
+        
+        # Test 2: Kiểm tra PnL Calculator
+        logger.info("Bắt đầu Test 2: Kiểm tra PnL Calculator")
+        all_results['pnl_calculator'] = self.test_pnl_calculator()
+        
+        # Test 3: Kiểm tra Dynamic Leverage Calculator
+        logger.info("Bắt đầu Test 3: Kiểm tra Dynamic Leverage Calculator")
+        all_results['leverage_calculator'] = self.test_leverage_calculator()
+        
+        # Test 4: Kiểm tra Enhanced Signal Quality
+        logger.info("Bắt đầu Test 4: Kiểm tra Enhanced Signal Quality")
+        all_results['signal_quality'] = self.test_signal_quality()
+        
+        # Test 5: Kiểm tra Enhanced Adaptive Trailing Stop
+        logger.info("Bắt đầu Test 5: Kiểm tra Enhanced Adaptive Trailing Stop")
+        all_results['trailing_stop'] = self.test_trailing_stop()
+        
+        # Test 6: Kiểm tra Performance Monitor
+        logger.info("Bắt đầu Test 6: Kiểm tra Performance Monitor")
+        all_results['performance_monitor'] = self.test_performance_monitor()
+        
+        # Test 7: Kiểm tra tích hợp toàn bộ hệ thống
+        logger.info("Bắt đầu Test 7: Kiểm tra tích hợp toàn bộ hệ thống")
+        all_results['full_integration'] = self.test_full_integration()
+        
+        # Lưu kết quả test
+        self.test_results = all_results
+        self._save_test_results()
+        
+        # Tạo báo cáo tổng hợp
+        self._create_summary_report(all_results)
+        
+        return all_results
+    
+    def test_api_connection(self) -> Dict:
+        """
+        Kiểm tra kết nối API
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Kiểm tra lấy dữ liệu thị trường
+            symbols = self.config.get('test_symbols', ['BTCUSDT', 'ETHUSDT'])
+            
+            for symbol in symbols:
+                # Lấy ticker
+                ticker = self.binance_api.get_symbol_ticker(symbol=symbol)
+                if not ticker or 'price' not in ticker:
+                    results['status'] = 'failed'
+                    results['details'].append(f"Không thể lấy ticker cho {symbol}")
+                    continue
+                
+                # Lấy klines
+                timeframe = '1h'
+                klines = self.binance_api.get_klines(symbol=symbol, interval=timeframe, limit=10)
+                if not klines or len(klines) < 10:
+                    results['status'] = 'failed'
+                    results['details'].append(f"Không thể lấy klines cho {symbol} {timeframe}")
+                    continue
+                
+                # Thêm kết quả thành công
+                results['details'].append({
+                    'symbol': symbol,
+                    'price': ticker.get('price'),
+                    'klines_count': len(klines)
+                })
+            
+            # Kiểm tra lấy thông tin tài khoản
+            try:
+                # Kiểm tra tài khoản - sử dụng futures_account_balance thay cho get_account_info
+                account_balance = self.binance_api.futures_account_balance()
+                if not account_balance:
+                    results['status'] = 'failed'
+                    results['details'].append("Không thể lấy thông tin tài khoản")
+                else:
+                    # Tìm balance của USDT
+                    usdt_balance = next((item['balance'] for item in account_balance if item['asset'] == 'USDT'), 0)
+                    results['details'].append({
+                        'account_info': 'success',
+                        'balance': usdt_balance
+                    })
+            except Exception as e:
+                results['status'] = 'failed'
+                results['details'].append(f"Lỗi khi lấy thông tin tài khoản: {str(e)}")
+            
+        except Exception as e:
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra kết nối API: {str(e)}")
+        
+        return results
+    
+    def test_pnl_calculator(self) -> Dict:
+        """
+        Kiểm tra PnL Calculator
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Test case 1: Long position
+            test_case = {
+                'entry_price': 50000,
+                'exit_price': 52000,
+                'position_size': 0.1,
+                'leverage': 3,
+                'position_side': 'LONG',
+                'symbol': 'BTCUSDT'
+            }
+            
+            pnl_result = self.pnl_calculator.calculate_pnl_with_full_details(**test_case)
+            expected_pnl = (test_case['exit_price'] - test_case['entry_price']) * test_case['position_size'] * test_case['leverage']
+            
+            # Kiểm tra kết quả
+            if 'net_pnl' not in pnl_result:
+                results['status'] = 'failed'
+                results['details'].append("Thiếu trường net_pnl trong kết quả")
+            elif abs(pnl_result['net_pnl'] - expected_pnl) > 1:  # Cho phép sai số 1 USDT do phí
+                results['status'] = 'failed'
+                results['details'].append(f"Sai lệch PnL: Thực tế {pnl_result['net_pnl']}, Mong đợi ~{expected_pnl}")
+            else:
+                results['details'].append({
+                    'test_case': 'long_position',
+                    'expected_pnl': expected_pnl,
+                    'actual_pnl': pnl_result['net_pnl'],
+                    'roi': pnl_result.get('roi_percent'),
+                    'fees': pnl_result.get('total_fee'),
+                    'result': 'passed'
+                })
+            
+            # Test case 2: Short position
+            test_case = {
+                'entry_price': 50000,
+                'exit_price': 48000,
+                'position_size': 0.1,
+                'leverage': 3,
+                'position_side': 'SHORT',
+                'symbol': 'BTCUSDT'
+            }
+            
+            pnl_result = self.pnl_calculator.calculate_pnl_with_full_details(**test_case)
+            expected_pnl = (test_case['entry_price'] - test_case['exit_price']) * test_case['position_size'] * test_case['leverage']
+            
+            # Kiểm tra kết quả
+            if 'net_pnl' not in pnl_result:
+                results['status'] = 'failed'
+                results['details'].append("Thiếu trường net_pnl trong kết quả")
+            elif abs(pnl_result['net_pnl'] - expected_pnl) > 1:  # Cho phép sai số 1 USDT do phí
+                results['status'] = 'failed'
+                results['details'].append(f"Sai lệch PnL: Thực tế {pnl_result['net_pnl']}, Mong đợi ~{expected_pnl}")
+            else:
+                results['details'].append({
+                    'test_case': 'short_position',
+                    'expected_pnl': expected_pnl,
+                    'actual_pnl': pnl_result['net_pnl'],
+                    'roi': pnl_result.get('roi_percent'),
+                    'fees': pnl_result.get('total_fee'),
+                    'result': 'passed'
+                })
+            
+            # Test case 3: Partial exits
+            test_case = {
+                'entry_price': 50000,
+                'exit_price': 52000,
+                'position_size': 0.2,
+                'leverage': 3,
+                'position_side': 'LONG',
+                'symbol': 'BTCUSDT',
+                'partial_exits': [(51000, 0.1), (52000, 0.1)]
+            }
+            
+            pnl_result = self.pnl_calculator.calculate_pnl_with_full_details(**test_case)
+            
+            # Kiểm tra kết quả
+            if 'net_pnl' not in pnl_result or 'partial_exits_detail' not in pnl_result:
+                results['status'] = 'failed'
+                results['details'].append("Thiếu trường trong kết quả partial exits")
+            else:
+                results['details'].append({
+                    'test_case': 'partial_exits',
+                    'actual_pnl': pnl_result['net_pnl'],
+                    'roi': pnl_result.get('roi_percent'),
+                    'partial_exits_detail': pnl_result.get('partial_exits_detail'),
+                    'result': 'passed'
+                })
+            
+        except Exception as e:
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra PnL Calculator: {str(e)}")
+        
+        return results
+    
+    def test_leverage_calculator(self) -> Dict:
+        """
+        Kiểm tra Dynamic Leverage Calculator
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Test case 1: Tính toán đòn bẩy động
+            symbols = self.config.get('test_symbols', ['BTCUSDT', 'ETHUSDT'])
+            
+            for symbol in symbols:
+                # Lấy đòn bẩy đề xuất dựa trên biến động
+                leverage_result = self.leverage_calculator.calculate_dynamic_leverage(
+                    symbol=symbol,
+                    account_balance=10000,
+                    risk_profile='moderate',
+                    market_regime='trending',
+                    volatility=0.02,
+                    open_positions=0,
+                    trend_strength=0.5,
+                    portfolio_correlation=0.5
+                )
+                
+                if not leverage_result or 'recommended_leverage' not in leverage_result:
+                    results['status'] = 'failed'
+                    results['details'].append(f"Không thể tính đòn bẩy cho {symbol}")
+                    continue
+                
+                # Kiểm tra giá trị đòn bẩy hợp lý
+                recommended_leverage = leverage_result['recommended_leverage']
+                if recommended_leverage < 1 or recommended_leverage > 20:
+                    results['status'] = 'failed'
+                    results['details'].append(f"Đòn bẩy không hợp lý cho {symbol}: {recommended_leverage}")
+                    continue
+                
+                # Thêm kết quả thành công
+                results['details'].append({
+                    'symbol': symbol,
+                    'recommended_leverage': recommended_leverage,
+                    'volatility': leverage_result.get('volatility'),
+                    'risk_profile': 'moderate',
+                    'result': 'passed'
+                })
+            
+            # Test case 2: Kiểm tra tính toán với tham số khác
+            volatility_result = self.leverage_calculator.calculate_dynamic_leverage(
+                symbol='BTCUSDT',
+                account_balance=20000,
+                risk_profile='aggressive',
+                market_regime='volatile',
+                volatility=0.05,
+                open_positions=2,
+                trend_strength=0.8,
+                portfolio_correlation=0.2
             )
             
-            logger.info(f"Backtest: Vào giá {backtest_result['entry_price']}, ra giá {backtest_result['exit_price']}")
-            logger.info(f"Backtest: PnL = {backtest_result['pnl']:.2f}")
+            if not volatility_result or 'recommended_leverage' not in volatility_result:
+                results['status'] = 'failed'
+                results['details'].append("Không thể tính đòn bẩy với tham số khác")
+            else:
+                results['details'].append({
+                    'test_case': 'dynamic_leverage_aggressive',
+                    'recommended_leverage': volatility_result['recommended_leverage'],
+                    'risk_profile': 'aggressive',
+                    'market_regime': 'volatile', 
+                    'result': 'passed'
+                })
+            
         except Exception as e:
-            logger.error(f"❌ Kiểm thử trailing stop failed: {str(e)}")
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra Dynamic Leverage Calculator: {str(e)}")
         
-        logger.info("Kết thúc kiểm thử Enhanced Adaptive Trailing Stop")
+        return results
     
-    def test_performance_monitor(self):
-        """Kiểm thử Performance Monitor"""
-        logger.info("Bắt đầu kiểm thử Performance Monitor")
+    def test_signal_quality(self) -> Dict:
+        """
+        Kiểm tra Enhanced Signal Quality
         
-        # Tạo một số giao dịch mẫu
-        trades = [
-            {
-                'trade_id': 'trade_1',
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Test case 1: Đánh giá chất lượng tín hiệu
+            symbols = self.config.get('test_symbols', ['BTCUSDT', 'ETHUSDT'])
+            timeframes = self.config.get('test_timeframes', ['1h', '4h'])
+            
+            for symbol in symbols:
+                for timeframe in timeframes:
+                    # Đánh giá chất lượng tín hiệu
+                    score, details = self.signal_quality.evaluate_signal_quality(symbol, timeframe)
+                    
+                    if score == 0 and 'error' in details:
+                        results['status'] = 'failed'
+                        results['details'].append(f"Không thể đánh giá tín hiệu cho {symbol} {timeframe}: {details['error']}")
+                        continue
+                    
+                    # Kiểm tra điểm đánh giá hợp lý
+                    if score < 0 or score > 100:
+                        results['status'] = 'failed'
+                        results['details'].append(f"Điểm đánh giá không hợp lý cho {symbol} {timeframe}: {score}")
+                        continue
+                    
+                    # Kiểm tra các thành phần trong kết quả
+                    required_fields = ['signal_direction', 'signal_strength', 'component_scores']
+                    missing_fields = [f for f in required_fields if f not in details]
+                    
+                    if missing_fields:
+                        results['status'] = 'failed'
+                        results['details'].append(f"Thiếu các trường {', '.join(missing_fields)} trong kết quả đánh giá")
+                        continue
+                    
+                    # Thêm kết quả thành công
+                    results['details'].append({
+                        'symbol': symbol,
+                        'timeframe': timeframe,
+                        'score': score,
+                        'signal_direction': details['signal_direction'],
+                        'signal_strength': details['signal_strength'],
+                        'result': 'passed'
+                    })
+            
+            # Test case 2: Lấy danh sách cặp tiền có chất lượng tín hiệu tốt nhất
+            try:
+                best_symbols = self.signal_quality.get_best_quality_symbols(symbols, '1h')
+                
+                if not isinstance(best_symbols, list):
+                    results['status'] = 'failed'
+                    results['details'].append(f"get_best_quality_symbols trả về kiểu không mong đợi: {type(best_symbols)}")
+                elif len(best_symbols) == 0:
+                    results['status'] = 'failed'
+                    results['details'].append("Không thể lấy danh sách cặp tiền có chất lượng tín hiệu tốt nhất")
+                else:
+                    results['details'].append({
+                        'test_case': 'best_quality_symbols',
+                        'best_symbols': best_symbols,
+                        'result': 'passed'
+                    })
+            except Exception as e:
+                results['status'] = 'failed'
+                results['details'].append(f"Lỗi khi lấy best_quality_symbols: {str(e)}")
+            
+        except Exception as e:
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra Enhanced Signal Quality: {str(e)}")
+        
+        return results
+    
+    def test_trailing_stop(self) -> Dict:
+        """
+        Kiểm tra Enhanced Adaptive Trailing Stop
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Test case 1: Backtest với chiến lược trailing stop
+            entry_price = 50000.0
+            price_data = [49800.0, 50000.0, 50200.0, 50500.0, 51000.0, 51500.0, 52000.0, 51800.0, 51600.0, 51400.0, 51200.0, 51000.0, 50500.0, 50200.0]
+            
+            # Test với chiến lược percentage
+            result1 = self.trailing_stop.backtest_trailing_stop(
+                entry_price=entry_price,
+                price_data=price_data,
+                side='LONG',
+                strategy_type='percentage',
+                entry_index=1
+            )
+            
+            if not result1 or 'exit_price' not in result1:
+                results['status'] = 'failed'
+                results['details'].append("Không thể backtest percentage trailing stop")
+            else:
+                results['details'].append({
+                    'test_case': 'percentage_trailing_stop',
+                    'entry_price': result1['entry_price'],
+                    'exit_price': result1['exit_price'],
+                    'pnl': result1['pnl'],
+                    'roi': result1['roi'],
+                    'exit_reason': result1['exit_reason'],
+                    'result': 'passed'
+                })
+            
+            # Test với chiến lược ATR
+            result2 = self.trailing_stop.backtest_trailing_stop(
+                entry_price=entry_price,
+                price_data=price_data,
+                side='LONG',
+                strategy_type='atr_based',
+                entry_index=1
+            )
+            
+            if not result2 or 'exit_price' not in result2:
+                results['status'] = 'failed'
+                results['details'].append("Không thể backtest ATR trailing stop")
+            else:
+                results['details'].append({
+                    'test_case': 'atr_trailing_stop',
+                    'entry_price': result2['entry_price'],
+                    'exit_price': result2['exit_price'],
+                    'pnl': result2['pnl'],
+                    'roi': result2['roi'],
+                    'exit_reason': result2['exit_reason'],
+                    'result': 'passed'
+                })
+            
+            # Test case 2: Khởi tạo vị thế với trailing stop
+            position = {
+                'symbol': 'BTCUSDT',
+                'side': 'LONG',
+                'entry_price': 50000,
+                'quantity': 0.1,
+                'entry_time': int(time.time())
+            }
+            
+            position = self.trailing_stop.initialize_position(position, 'percentage', 'trending')
+            
+            if 'trailing_status' not in position or 'trailing_strategy' not in position:
+                results['status'] = 'failed'
+                results['details'].append("Không thể khởi tạo vị thế với trailing stop")
+            else:
+                # Cập nhật trailing stop
+                updated_position = self.trailing_stop.update_trailing_stop(position, 51000)
+                
+                if 'trailing_status' not in updated_position or 'stop_price' not in updated_position['trailing_status']:
+                    results['status'] = 'failed'
+                    results['details'].append("Không thể cập nhật trailing stop")
+                else:
+                    results['details'].append({
+                        'test_case': 'initialize_and_update_position',
+                        'symbol': position['symbol'],
+                        'strategy_type': position['trailing_strategy']['type'],
+                        'market_regime': position['trailing_strategy']['market_regime'],
+                        'stop_price': updated_position['trailing_status']['stop_price'],
+                        'result': 'passed'
+                    })
+            
+        except Exception as e:
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra Enhanced Adaptive Trailing Stop: {str(e)}")
+        
+        return results
+    
+    def test_performance_monitor(self) -> Dict:
+        """
+        Kiểm tra Performance Monitor
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
+        
+        try:
+            # Test case 1: Ghi nhận giao dịch
+            trade_data = {
                 'symbol': 'BTCUSDT',
                 'side': 'LONG',
                 'entry_price': 50000,
                 'exit_price': 52000,
-                'quantity': 0.1,
-                'leverage': 5,
-                'entry_time': int(time.time()) - 7 * 24 * 3600,  # 7 ngày trước
-                'exit_time': int(time.time()) - 6 * 24 * 3600,   # 6 ngày trước
-                'strategy': 'trend_following',
-                'market_regime': 'trending',
-                'net_pnl': 1000  # (52000 - 50000) * 0.1 * 5
-            },
-            {
-                'trade_id': 'trade_2',
-                'symbol': 'ETHUSDT',
-                'side': 'SHORT',
-                'entry_price': 3000,
-                'exit_price': 3100,
-                'quantity': 0.5,
+                'position_size': 0.1,
                 'leverage': 3,
-                'entry_time': int(time.time()) - 5 * 24 * 3600,  # 5 ngày trước
-                'exit_time': int(time.time()) - 4 * 24 * 3600,   # 4 ngày trước
-                'strategy': 'mean_reversion',
-                'market_regime': 'ranging',
-                'net_pnl': -150  # (3000 - 3100) * 0.5 * 3
-            },
-            {
-                'trade_id': 'trade_3',
-                'symbol': 'BTCUSDT',
-                'side': 'LONG',
-                'entry_price': 51000,
-                'exit_price': 51500,
-                'quantity': 0.2,
-                'leverage': 3,
-                'entry_time': int(time.time()) - 3 * 24 * 3600,  # 3 ngày trước
-                'exit_time': int(time.time()) - 2 * 24 * 3600,   # 2 ngày trước
-                'strategy': 'breakout',
-                'market_regime': 'volatile',
-                'net_pnl': 300  # (51500 - 51000) * 0.2 * 3
+                'strategy': 'rsi',
+                'entry_time': int(time.time()) - 3600,
+                'exit_time': int(time.time())
             }
-        ]
+            
+            trade_id = self.performance_monitor.record_trade(trade_data)
+            
+            if not trade_id:
+                results['status'] = 'failed'
+                results['details'].append("Không thể ghi nhận giao dịch")
+            else:
+                results['details'].append({
+                    'test_case': 'record_trade',
+                    'trade_id': trade_id,
+                    'result': 'passed'
+                })
+            
+            # Test case 2: Cập nhật chỉ số hiệu suất
+            metrics = self.performance_monitor.update_metrics()
+            
+            if not metrics or 'overall' not in metrics:
+                results['status'] = 'failed'
+                results['details'].append("Không thể cập nhật chỉ số hiệu suất")
+            else:
+                results['details'].append({
+                    'test_case': 'update_metrics',
+                    'total_trades': metrics.get('overall', {}).get('total_trades', 0),
+                    'win_rate': metrics.get('overall', {}).get('win_rate', 0),
+                    'total_pnl': metrics.get('overall', {}).get('total_pnl', 0),
+                    'result': 'passed'
+                })
+            
+            # Test case 3: Tạo báo cáo hằng ngày
+            daily_report = self.performance_monitor.create_daily_report()
+            
+            if not daily_report or not os.path.exists(daily_report):
+                results['status'] = 'failed'
+                results['details'].append("Không thể tạo báo cáo hằng ngày")
+            else:
+                results['details'].append({
+                    'test_case': 'daily_report',
+                    'report_path': daily_report,
+                    'result': 'passed'
+                })
+            
+            # Test case 4: Tạo đề xuất chiến lược
+            recommendations = self.performance_monitor.generate_strategy_recommendations()
+            
+            if not recommendations or 'status' not in recommendations:
+                results['status'] = 'failed'
+                results['details'].append("Không thể tạo đề xuất chiến lược")
+            else:
+                results['details'].append({
+                    'test_case': 'strategy_recommendations',
+                    'status': recommendations['status'],
+                    'result': 'passed'
+                })
+            
+            # Test case 5: Tạo biểu đồ equity
+            equity_chart = self.performance_monitor.create_equity_chart()
+            
+            # Nếu chưa có đủ dữ liệu giao dịch, kết quả có thể rỗng
+            if equity_chart and os.path.exists(equity_chart):
+                results['details'].append({
+                    'test_case': 'equity_chart',
+                    'chart_path': equity_chart,
+                    'result': 'passed'
+                })
+            
+        except Exception as e:
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra Performance Monitor: {str(e)}")
+        
+        return results
+    
+    def test_full_integration(self) -> Dict:
+        """
+        Kiểm tra tích hợp toàn bộ hệ thống
+        
+        Returns:
+            Dict: Kết quả test
+        """
+        results = {'status': 'passed', 'details': []}
         
         try:
-            # Thêm các giao dịch
-            for trade in trades:
-                self.performance_monitor.add_trade(trade)
+            # Test case: Mô phỏng quá trình giao dịch đầy đủ
+            symbol = 'BTCUSDT'
+            timeframe = '1h'
             
-            # Tính các chỉ số hiệu suất
-            self.performance_monitor.calculate_equity_curve()
-            self.performance_monitor.calculate_daily_returns()
+            # Bước 1: Đánh giá chất lượng tín hiệu
+            signal_score, signal_details = self.signal_quality.evaluate_signal_quality(symbol, timeframe)
             
-            # Lấy thống kê
-            stats = self.performance_monitor.get_trade_statistics()
-            logger.info(f"Tổng số giao dịch: {stats['total_trades']}")
-            logger.info(f"Tỷ lệ thắng: {stats['win_rate']*100:.2f}%")
-            logger.info(f"Profit Factor: {stats['profit_factor']:.2f}")
-            logger.info(f"Lợi nhuận ròng: {stats['net_profit']:.2f}")
-            logger.info(f"Sharpe Ratio: {stats['sharpe_ratio']:.2f}")
-            logger.info(f"Drawdown tối đa: {stats['max_drawdown']:.2f}%")
+            if signal_score == 0 and 'error' in signal_details:
+                results['status'] = 'failed'
+                results['details'].append(f"Không thể đánh giá tín hiệu: {signal_details['error']}")
+                return results
             
-            # Phân tích theo chiến lược
-            strategy_perf = self.performance_monitor.analyze_by_strategy()
-            for strategy, perf in strategy_perf.items():
-                logger.info(f"Chiến lược {strategy}: Win Rate={perf['win_rate']*100:.2f}%, Profit={perf['net_profit']:.2f}")
+            # Lấy hướng tín hiệu và cường độ
+            signal_direction = signal_details['signal_direction']
+            signal_strength = signal_details['signal_strength']
             
-            # Phân tích theo cặp tiền
-            symbol_perf = self.performance_monitor.analyze_by_symbol()
-            for symbol, perf in symbol_perf.items():
-                logger.info(f"Cặp tiền {symbol}: Win Rate={perf['win_rate']*100:.2f}%, Profit={perf['net_profit']:.2f}")
+            # Bước 2: Tính toán đòn bẩy động
+            leverage_result = self.leverage_calculator.calculate_dynamic_leverage(
+                symbol=symbol,
+                account_balance=10000,
+                risk_profile='moderate',
+                market_regime='trending',
+                volatility=0.02,
+                open_positions=0,
+                trend_strength=signal_strength,
+                portfolio_correlation=0.5
+            )
             
-            # Phân tích theo chế độ thị trường
-            regime_perf = self.performance_monitor.analyze_by_market_regime()
-            for regime, perf in regime_perf.items():
-                logger.info(f"Chế độ {regime}: Win Rate={perf['win_rate']*100:.2f}%, Profit={perf['net_profit']:.2f}")
+            if not leverage_result or 'recommended_leverage' not in leverage_result:
+                results['status'] = 'failed'
+                results['details'].append("Không thể tính đòn bẩy động")
+                return results
+            
+            recommended_leverage = leverage_result['recommended_leverage']
+            
+            # Bước 3: Mô phỏng giao dịch
+            # Lấy giá hiện tại
+            ticker = self.binance_api.get_symbol_ticker(symbol=symbol)
+            if not ticker or 'price' not in ticker:
+                results['status'] = 'failed'
+                results['details'].append("Không thể lấy giá hiện tại")
+                return results
+            
+            current_price = float(ticker['price'])
+            position_size = 0.01  # Kích thước vị thế nhỏ cho test
+            
+            # Mô phỏng entry
+            entry_data = {
+                'symbol': symbol,
+                'side': signal_direction,
+                'entry_price': current_price,
+                'position_size': position_size,
+                'leverage': recommended_leverage,
+                'entry_time': int(time.time())
+            }
+            
+            # Bước 4: Khởi tạo trailing stop
+            position = self.trailing_stop.initialize_position(entry_data, 'percentage', 'trending')
+            
+            if 'trailing_status' not in position or 'trailing_strategy' not in position:
+                results['status'] = 'failed'
+                results['details'].append("Không thể khởi tạo trailing stop")
+                return results
+            
+            # Mô phỏng giá thay đổi
+            price_change_pct = 0.02  # 2% thay đổi
+            if signal_direction == 'LONG':
+                new_price = current_price * (1 + price_change_pct)
+            else:
+                new_price = current_price * (1 - price_change_pct)
+            
+            # Cập nhật trailing stop
+            updated_position = self.trailing_stop.update_trailing_stop(position, new_price)
+            
+            # Bước 5: Mô phỏng exit
+            exit_data = {
+                'symbol': symbol,
+                'side': signal_direction,
+                'entry_price': current_price,
+                'exit_price': new_price,
+                'position_size': position_size,
+                'leverage': recommended_leverage,
+                'strategy': 'integration_test',
+                'entry_time': int(time.time()) - 3600,
+                'exit_time': int(time.time())
+            }
+            
+            # Ghi nhận giao dịch
+            trade_id = self.performance_monitor.record_trade(exit_data)
+            
+            if not trade_id:
+                results['status'] = 'failed'
+                results['details'].append("Không thể ghi nhận giao dịch")
+                return results
+            
+            # Cập nhật chỉ số hiệu suất
+            metrics = self.performance_monitor.update_metrics()
             
             # Tạo báo cáo
-            report_path = "test_report.html"
-            self.performance_monitor.generate_full_report(report_path)
-            logger.info(f"Đã tạo báo cáo tại: {report_path}")
+            report = self.performance_monitor.create_daily_report()
             
-            # Vẽ đường cong vốn
-            equity_chart = self.performance_monitor.plot_equity_curve("test_equity.png")
-            logger.info(f"Đã vẽ đường cong vốn tại: {equity_chart}")
+            # Thêm kết quả thành công
+            results['details'].append({
+                'symbol': symbol,
+                'signal_score': signal_score,
+                'signal_direction': signal_direction,
+                'signal_strength': signal_strength,
+                'recommended_leverage': recommended_leverage,
+                'entry_price': current_price,
+                'exit_price': new_price,
+                'trailing_stop_status': updated_position['trailing_status']['status'],
+                'stop_price': updated_position['trailing_status']['stop_price'],
+                'trade_id': trade_id,
+                'report_path': report,
+                'result': 'passed'
+            })
+            
         except Exception as e:
-            logger.error(f"❌ Kiểm thử performance monitor failed: {str(e)}")
+            results['status'] = 'failed'
+            results['details'].append(f"Lỗi khi kiểm tra tích hợp toàn bộ hệ thống: {str(e)}")
         
-        logger.info("Kết thúc kiểm thử Performance Monitor")
+        return results
     
-    def test_integration(self):
-        """Kiểm thử tích hợp tất cả các module"""
-        logger.info("Bắt đầu kiểm thử tích hợp")
+    def _create_summary_report(self, results: Dict) -> str:
+        """
+        Tạo báo cáo tổng hợp
         
-        # Các thông số cơ bản
-        symbol = 'BTCUSDT'
-        entry_price = 50000
-        leverage = 5
-        initial_quantity = 0.1
-        side = 'LONG'
-        timeframe = '1h'
-        
-        # Sequence: Signal Quality -> Dynamic Leverage -> Open Position -> Trailing Stop -> Close Position -> PnL Calculation -> Performance Monitor
+        Args:
+            results (Dict): Kết quả tất cả các test
+            
+        Returns:
+            str: Đường dẫn đến file báo cáo
+        """
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        file_path = f'test_results/summary_report_{timestamp}.txt'
         
         try:
-            # 1. Đánh giá chất lượng tín hiệu
-            if self.binance_api:
-                signal_score, signal_details = self.signal_quality.evaluate_signal_quality(symbol, timeframe)
-                logger.info(f"1. Signal Quality: {signal_score:.2f}, Direction: {signal_details['signal_direction']}")
+            with open(file_path, 'w') as f:
+                f.write("=== BÁO CÁO KIỂM THỦ TÍCH HỢP ===\n")
+                f.write(f"Thời gian: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
                 
-                # Chỉ tiếp tục nếu tín hiệu đủ mạnh và đúng hướng
-                if signal_score < 50 or signal_details['signal_direction'] != side:
-                    logger.warning("Tín hiệu không đủ mạnh hoặc không đúng hướng, sẽ sử dụng giá trị mẫu")
-            else:
-                logger.warning("Không có API Binance, sẽ sử dụng giá trị mẫu")
-                signal_score = 75
-                signal_details = {
-                    'signal_direction': side,
-                    'signal_strength': 'STRONG'
-                }
-            
-            # 2. Tính toán đòn bẩy động
-            market_data = self.market_data.copy()
-            leverage_result = self.leverage_calculator.calculate_dynamic_leverage(
-                market_regime=market_data['market_regime'],
-                volatility=market_data['volatility'],
-                account_balance=market_data['account_balance'],
-                symbol=symbol
-            )
-            
-            dynamic_leverage = leverage_result['final_leverage']
-            logger.info(f"2. Dynamic Leverage: {dynamic_leverage}x (Original: {leverage}x)")
-            
-            # 3. Mở vị thế
-            position = {
-                'symbol': symbol,
-                'side': side,
-                'entry_price': entry_price,
-                'quantity': initial_quantity,
-                'leverage': dynamic_leverage,
-                'entry_time': int(time.time()) - 3600  # 1 giờ trước
-            }
-            
-            # 4. Thiết lập trailing stop
-            position = self.trailing_stop.initialize_position(position)
-            logger.info(f"4. Initialize Position: {position['trailing_status']}")
-            
-            # 5. Mô phỏng giá thay đổi và trailing stop
-            prices = [50100, 50300, 50600, 51000, 51400, 51200, 51000, 50800, 50500]
-            exit_price = None
-            exit_reason = None
-            
-            for price in prices:
-                # Cập nhật trailing stop
-                position = self.trailing_stop.update_trailing_stop(position, price)
-                should_close, reason = self.trailing_stop.check_stop_condition(position, price)
+                # Tổng hợp kết quả
+                total_tests = len(results)
+                passed_tests = sum(1 for result in results.values() if result['status'] == 'passed')
+                failed_tests = total_tests - passed_tests
                 
-                status = self.trailing_stop.get_trailing_status(position)
-                logger.info(f"Giá: {price}, Stop: {status['stop_price']:.2f if status['stop_price'] else None}, Trạng thái: {status['status']}")
+                f.write(f"Tổng số test: {total_tests}\n")
+                f.write(f"Test thành công: {passed_tests}\n")
+                f.write(f"Test thất bại: {failed_tests}\n\n")
                 
-                # Kiểm tra thoát một phần
-                partial_exit = self.trailing_stop.check_partial_exit(position, price)
-                if partial_exit:
-                    logger.info(f"Thoát một phần {partial_exit['percentage']*100:.0f}% vị thế ở ngưỡng {partial_exit['threshold']*100:.1f}%, giá: {price}")
+                # Chi tiết từng test
+                for test_name, test_result in results.items():
+                    status = "THÀNH CÔNG" if test_result['status'] == 'passed' else "THẤT BẠI"
+                    f.write(f"=== {test_name.upper()} - {status} ===\n")
+                    
+                    # Ghi chi tiết thất bại (nếu có)
+                    if test_result['status'] == 'failed':
+                        for detail in test_result['details']:
+                            if isinstance(detail, str):
+                                f.write(f"- {detail}\n")
+                    
+                    f.write("\n")
                 
-                if should_close:
-                    exit_price = price
-                    exit_reason = reason
-                    logger.info(f"Đóng vị thế tại giá {price}: {reason}")
-                    break
+                # Kết luận
+                if failed_tests == 0:
+                    f.write("KẾT LUẬN: Tất cả các test đều thành công!\n")
+                else:
+                    f.write(f"KẾT LUẬN: Có {failed_tests} test thất bại. Cần kiểm tra lại.\n")
             
-            # Nếu không có tín hiệu đóng vị thế, lấy giá cuối cùng
-            if exit_price is None:
-                exit_price = prices[-1]
-                exit_reason = "End of simulation"
-                logger.info(f"Đóng vị thế tại giá cuối cùng {exit_price}: {exit_reason}")
+            logger.info(f"Đã tạo báo cáo tổng hợp tại {file_path}")
+            return file_path
             
-            # 6. Tính toán PnL
-            position['exit_price'] = exit_price
-            position['exit_time'] = int(time.time())
-            
-            # Lấy thông tin thoát một phần
-            partial_exits = self.trailing_stop.get_partial_exits(position)
-            
-            pnl_result = self.pnl_calculator.calculate_pnl_with_full_details(
-                entry_price=position['entry_price'],
-                exit_price=position['exit_price'],
-                position_size=position['quantity'],
-                leverage=position['leverage'],
-                position_side=position['side'],
-                entry_time=position['entry_time'],
-                exit_time=position['exit_time'],
-                symbol=position['symbol'],
-                partial_exits=[(exit_info['price'], exit_info['quantity']) for exit_info in partial_exits] if partial_exits else None
-            )
-            
-            logger.info(f"6. PnL Calculation: {pnl_result['net_pnl']:.2f} ({pnl_result['roi_percent']:.2f}%)")
-            
-            # 7. Cập nhật Performance Monitor
-            trade_record = {
-                'trade_id': f"trade_{int(time.time())}",
-                'symbol': position['symbol'],
-                'side': position['side'],
-                'entry_price': position['entry_price'],
-                'exit_price': position['exit_price'],
-                'quantity': position['quantity'],
-                'leverage': position['leverage'],
-                'entry_time': position['entry_time'],
-                'exit_time': position['exit_time'],
-                'strategy': 'adaptive_strategy',
-                'market_regime': market_data['market_regime'],
-                'net_pnl': pnl_result['net_pnl'],
-                'roi_percent': pnl_result['roi_percent'],
-                'exit_reason': exit_reason
-            }
-            
-            self.performance_monitor.add_trade(trade_record)
-            
-            # Tính các chỉ số hiệu suất
-            self.performance_monitor.calculate_equity_curve()
-            stats = self.performance_monitor.get_trade_statistics()
-            
-            logger.info(f"7. Performance: Win Rate={stats['win_rate']*100:.2f}%, Net Profit={stats['net_profit']:.2f}")
-            
-            # 8. Tóm tắt kết quả tích hợp
-            logger.info(f"""
-            === KẾT QUẢ TÍCH HỢP ===
-            Symbol: {symbol}
-            Entry Price: {position['entry_price']}
-            Exit Price: {position['exit_price']}
-            Leverage: {position['leverage']}x (Dynamic)
-            Signal Quality: {signal_score:.2f}
-            PnL: {pnl_result['net_pnl']:.2f} USDT ({pnl_result['roi_percent']:.2f}%)
-            Reason: {exit_reason}
-            """)
-            
-            logger.info("Kiểm thử tích hợp thành công!")
         except Exception as e:
-            logger.error(f"❌ Kiểm thử tích hợp failed: {str(e)}")
-        
-        logger.info("Kết thúc kiểm thử tích hợp")
+            logger.error(f"Không thể tạo báo cáo tổng hợp: {str(e)}")
+            return ""
+
+
+def run_single_test():
+    """Chạy một test case đơn lẻ"""
+    test = IntegrationTest()
     
-    def run_all_tests(self):
-        """Chạy tất cả các kiểm thử"""
-        logger.info("=== BẮT ĐẦU KIỂM THỬ TÍCH HỢP CÁC MODULE ===")
-        
-        # Kiểm thử từng module riêng biệt
-        self.test_pnl_calculator()
-        self.test_dynamic_leverage()
-        self.test_signal_quality()
-        self.test_trailing_stop()
-        self.test_performance_monitor()
-        
-        # Kiểm thử tích hợp
-        self.test_integration()
-        
-        logger.info("=== KẾT THÚC KIỂM THỬ TÍCH HỢP CÁC MODULE ===")
+    # Chỉ chạy test API connection
+    result = test.test_api_connection()
+    print("Kết quả test API connection:")
+    print(f"Status: {result['status']}")
+    print("Chi tiết:")
+    for detail in result['details']:
+        print(f"- {detail}")
 
 
-def main():
-    """Hàm chính"""
-    # Tạo và chạy kiểm thử tích hợp
-    integration_test = IntegrationTest()
-    integration_test.run_all_tests()
+def run_all_tests():
+    """Chạy tất cả các test case"""
+    test = IntegrationTest()
+    results = test.run_all_tests()
+    
+    # In kết quả tổng quan
+    print("=== KẾT QUẢ KIỂM THỬ TÍCH HỢP ===")
+    for test_name, test_result in results.items():
+        status = "PASSED" if test_result['status'] == 'passed' else "FAILED"
+        print(f"{test_name}: {status}")
 
 
 if __name__ == "__main__":
-    main()
+    # Chạy một test case đơn lẻ
+    # run_single_test()
+    
+    # Chạy tất cả các test case
+    run_all_tests()

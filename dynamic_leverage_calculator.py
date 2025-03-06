@@ -2,629 +2,890 @@
 # -*- coding: utf-8 -*-
 
 """
-Module tính toán đòn bẩy động (Dynamic Leverage Calculator)
+Module Tính Toán Đòn Bẩy Động (Dynamic Leverage Calculator)
 
-Module này cung cấp các công cụ để tính toán đòn bẩy tối ưu dựa trên nhiều yếu tố
-như chế độ thị trường, biến động, số dư tài khoản, và mức độ tương quan danh mục đầu tư.
+Module này cung cấp công cụ tự động điều chỉnh đòn bẩy dựa trên biến động thị trường,
+chế độ thị trường, và tình trạng tài khoản để tối ưu hóa quản lý rủi ro.
 """
 
-import os
-import sys
+import logging
 import json
 import time
-import math
-import logging
 import datetime
-from typing import Dict, List, Tuple, Optional, Any
-from pathlib import Path
+import os
+import math
+from typing import Dict, List, Tuple, Any, Optional
+import pandas as pd
+import numpy as np
 
 # Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('leverage_calculator.log')
-    ]
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger('leverage_calculator')
+logger = logging.getLogger('dynamic_leverage')
 
-# Thêm thư mục gốc vào sys.path
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-# Import các module cần thiết
-try:
-    from binance_api import BinanceAPI
-except ImportError:
-    logger.error("Không thể import module binance_api. Hãy đảm bảo bạn đang chạy từ thư mục gốc.")
-    binance_api_available = False
-else:
-    binance_api_available = True
 
 class DynamicLeverageCalculator:
     """Lớp tính toán đòn bẩy động dựa trên điều kiện thị trường"""
     
-    def __init__(self, config_path: str = 'configs/dynamic_leverage_config.json'):
+    def __init__(self, config_path: str = 'configs/leverage_config.json'):
         """
-        Khởi tạo Dynamic Leverage Calculator
+        Khởi tạo DynamicLeverageCalculator
         
         Args:
-            config_path: Đường dẫn đến file cấu hình
+            config_path (str): Đường dẫn đến file cấu hình
         """
-        self.config_path = config_path
-        self.config = self._load_config()
-        self.decision_history = []
+        self.config = self._load_config(config_path)
+        self.history = {}
+        self.cached_data = {}
         
-    def _load_config(self) -> Dict:
+        # Đảm bảo thư mục data tồn tại
+        os.makedirs('data', exist_ok=True)
+        
+        # Tải lịch sử nếu có
+        self._load_decision_history()
+        logger.info("Đã khởi tạo Dynamic Leverage Calculator")
+    
+    def _load_config(self, config_path: str) -> Dict:
         """
-        Tải cấu hình từ file
+        Tải cấu hình từ file hoặc sử dụng cấu hình mặc định
         
+        Args:
+            config_path (str): Đường dẫn đến file cấu hình
+            
         Returns:
             Dict: Cấu hình đã tải
         """
         default_config = {
-            "base_leverage": {
-                "conservative": 2.0,
-                "moderate": 3.0,
-                "aggressive": 4.0
+            'default_leverage': 3,
+            'max_leverage': 10,
+            'min_leverage': 1,
+            'market_regime_adjustments': {
+                'trending': 1.2,  # Tăng 20% đòn bẩy trong xu hướng rõ ràng
+                'ranging': 0.8,   # Giảm 20% đòn bẩy trong thị trường sideway
+                'volatile': 0.6,  # Giảm 40% đòn bẩy trong thị trường biến động cao
+                'quiet': 1.0,     # Đòn bẩy cơ sở trong thị trường ít biến động
+                'neutral': 1.0    # Đòn bẩy cơ sở trong thị trường trung tính
             },
-            "regime_multiplier": {
-                "trending": 1.2,
-                "ranging": 0.7,
-                "volatile": 0.5,
-                "quiet": 0.9,
-                "neutral": 1.0
+            'volatility_thresholds': {
+                'low': 0.01,     # Biến động thấp: <1% 
+                'medium': 0.03,  # Biến động trung bình: 1-3%
+                'high': 0.05     # Biến động cao: >5%
             },
-            "max_leverage": 5.0,
-            "min_leverage": 1.0,
-            "weights": {
-                "regime": 0.3,
-                "volatility": 0.25,
-                "balance": 0.1,
-                "positions": 0.15,
-                "correlation": 0.1,
-                "price_to_ma": 0.1
+            'volatility_adjustments': {
+                'low': 1.2,      # Tăng 20% đòn bẩy khi biến động thấp
+                'medium': 1.0,   # Đòn bẩy cơ sở khi biến động trung bình
+                'high': 0.7      # Giảm 30% đòn bẩy khi biến động cao
             },
-            "default_risk_profile": "moderate"
-        }
-        
-        try:
-            if os.path.exists(self.config_path):
-                with open(self.config_path, 'r') as f:
-                    loaded_config = json.load(f)
-                logger.info(f"Đã tải cấu hình từ {self.config_path}")
-                
-                # Merge với default config
-                for key, value in loaded_config.items():
-                    default_config[key] = value
-                    
-                return default_config
-            else:
-                # Lưu default config
-                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-                with open(self.config_path, 'w') as f:
-                    json.dump(default_config, f, indent=4)
-                logger.info(f"Đã tạo file cấu hình mặc định tại {self.config_path}")
-                return default_config
-        except Exception as e:
-            logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
-            return default_config
-    
-    def save_config(self) -> bool:
-        """
-        Lưu cấu hình vào file
-        
-        Returns:
-            bool: True nếu lưu thành công, False nếu không
-        """
-        try:
-            os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-            with open(self.config_path, 'w') as f:
-                json.dump(self.config, f, indent=4)
-            logger.info(f"Đã lưu cấu hình vào {self.config_path}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu cấu hình: {str(e)}")
-            return False
-    
-    def update_config(self, new_config: Dict) -> bool:
-        """
-        Cập nhật cấu hình
-        
-        Args:
-            new_config: Cấu hình mới
-            
-        Returns:
-            bool: True nếu cập nhật thành công, False nếu không
-        """
-        try:
-            # Cập nhật từng phần của config
-            for key, value in new_config.items():
-                if key in self.config:
-                    if isinstance(value, dict) and isinstance(self.config[key], dict):
-                        # Merge nested dict
-                        self.config[key].update(value)
-                    else:
-                        self.config[key] = value
-                else:
-                    self.config[key] = value
-                    
-            # Lưu config mới
-            return self.save_config()
-        except Exception as e:
-            logger.error(f"Lỗi khi cập nhật cấu hình: {str(e)}")
-            return False
-    
-    def calculate_dynamic_leverage(
-        self, market_regime: str, volatility: float, account_balance: float, 
-        risk_profile: str = None, max_open_positions: int = 0, 
-        portfolio_correlation: float = 0, price_ratio_to_ma: float = 1.0,
-        symbol: str = None
-    ) -> Dict:
-        """
-        Tính toán đòn bẩy động dựa trên nhiều yếu tố
-        
-        Args:
-            market_regime: Chế độ thị trường ('trending', 'ranging', etc.)
-            volatility: Biến động thị trường 
-            account_balance: Số dư tài khoản (USDT)
-            risk_profile: Mức độ chấp nhận rủi ro ('conservative', 'moderate', 'aggressive')
-            max_open_positions: Số vị thế đang mở
-            portfolio_correlation: Mức độ tương quan trong danh mục (0-1)
-            price_ratio_to_ma: Tỷ lệ giá hiện tại so với MA200
-            symbol: Cặp giao dịch (nếu có)
-        
-        Returns:
-            Dict: Thông tin đòn bẩy đề xuất và các thành phần
-        """
-        # Kiểm tra và sử dụng cấu hình mặc định nếu cần
-        risk_profile = risk_profile or self.config.get('default_risk_profile', 'moderate')
-        
-        # Lấy đòn bẩy cơ sở theo mức độ rủi ro
-        base_leverage = self.config.get('base_leverage', {}).get(
-            risk_profile, 
-            self.config.get('base_leverage', {}).get('moderate', 3.0)
-        )
-        
-        # Lấy hệ số nhân theo chế độ thị trường
-        regime_multiplier = self.config.get('regime_multiplier', {}).get(
-            market_regime, 
-            self.config.get('regime_multiplier', {}).get('neutral', 1.0)
-        )
-        
-        # Tính hệ số theo biến động (tỷ lệ nghịch)
-        # volatility càng cao, đòn bẩy càng thấp
-        volatility_factor = max(0.5, min(1.2, 0.04/max(volatility, 0.001)))
-        
-        # Tính hệ số theo kích thước tài khoản (tăng nhẹ khi tài khoản lớn)
-        balance_factor = min(1.2, max(0.8, math.log10(max(account_balance, 100)/1000)))
-        
-        # Tính hệ số theo số vị thế đang mở (càng nhiều vị thế, đòn bẩy càng thấp)
-        position_factor = max(0.7, 1.0 - (max_open_positions * 0.05))
-        
-        # Tính hệ số theo tương quan danh mục (càng tương quan, đòn bẩy càng thấp)
-        correlation_factor = max(0.7, 1.0 - max(0, portfolio_correlation) * 0.5)
-        
-        # Tính hệ số theo vị trí giá so với MA (xa MA, giảm đòn bẩy)
-        ma_factor = max(0.8, min(1.2, 1.0 / max(0.7, abs(price_ratio_to_ma - 1.0) * 5)))
-        
-        # Lấy trọng số
-        weights = self.config.get('weights', {
-            'regime': 0.3,
-            'volatility': 0.25,
-            'balance': 0.1,
-            'positions': 0.15,
-            'correlation': 0.1,
-            'price_to_ma': 0.1
-        })
-        
-        # Tính đòn bẩy tối ưu với trọng số
-        optimal_leverage = (
-            base_leverage * regime_multiplier * weights.get('regime', 0.3) +
-            base_leverage * volatility_factor * weights.get('volatility', 0.25) +
-            base_leverage * balance_factor * weights.get('balance', 0.1) +
-            base_leverage * position_factor * weights.get('positions', 0.15) +
-            base_leverage * correlation_factor * weights.get('correlation', 0.1) +
-            base_leverage * ma_factor * weights.get('price_to_ma', 0.1)
-        )
-        
-        # Giới hạn trong phạm vi an toàn
-        min_leverage = self.config.get('min_leverage', 1.0)
-        max_leverage = self.config.get('max_leverage', 5.0)
-        final_leverage = max(min_leverage, min(max_leverage, round(optimal_leverage, 1)))
-        
-        # Lưu quyết định vào lịch sử
-        decision = {
-            'timestamp': int(time.time()),
-            'symbol': symbol,
-            'market_regime': market_regime,
-            'volatility': volatility,
-            'account_balance': account_balance,
-            'risk_profile': risk_profile,
-            'max_open_positions': max_open_positions,
-            'portfolio_correlation': portfolio_correlation,
-            'price_ratio_to_ma': price_ratio_to_ma,
-            'base_leverage': base_leverage,
-            'final_leverage': final_leverage,
-            'factors': {
-                'regime_multiplier': regime_multiplier,
-                'volatility_factor': volatility_factor,
-                'balance_factor': balance_factor,
-                'position_factor': position_factor,
-                'correlation_factor': correlation_factor,
-                'ma_factor': ma_factor
+            'balance_adjustments': {
+                'small': 0.8,    # Giảm 20% đòn bẩy khi balance nhỏ (<$1000)
+                'medium': 1.0,   # Đòn bẩy cơ sở khi balance trung bình ($1000-$10000)
+                'large': 1.2     # Tăng 20% đòn bẩy khi balance lớn (>$10000)
+            },
+            'balance_thresholds': {
+                'small': 1000,   # Ngưỡng balance nhỏ
+                'medium': 10000  # Ngưỡng balance trung bình
+            },
+            'open_positions_adjustments': {
+                'none': 1.0,     # Không có vị thế mở
+                'few': 0.9,      # Ít vị thế mở (1-3)
+                'many': 0.7      # Nhiều vị thế mở (>3)
+            },
+            'open_positions_thresholds': {
+                'few': 3,        # Ngưỡng số vị thế ít
+                'many': 5        # Ngưỡng số vị thế nhiều
+            },
+            'trend_strength_adjustments': {
+                'weak': 0.8,     # Giảm 20% đòn bẩy khi xu hướng yếu
+                'moderate': 1.0, # Đòn bẩy cơ sở khi xu hướng trung bình
+                'strong': 1.2    # Tăng 20% đòn bẩy khi xu hướng mạnh
+            },
+            'portfolio_correlation_adjustments': {
+                'low': 1.1,      # Tăng 10% đòn bẩy khi tương quan thấp (đa dạng hóa tốt)
+                'medium': 1.0,   # Đòn bẩy cơ sở khi tương quan trung bình
+                'high': 0.8      # Giảm 20% đòn bẩy khi tương quan cao (ít đa dạng hóa)
+            },
+            'portfolio_correlation_thresholds': {
+                'low': 0.3,      # Tương quan thấp: <0.3
+                'medium': 0.7    # Tương quan trung bình: 0.3-0.7, cao: >0.7
+            },
+            'risk_profiles': {
+                'conservative': {
+                    'default_leverage': 2,
+                    'max_leverage': 5,
+                    'volatility_adjustments': {
+                        'low': 1.1,
+                        'medium': 0.9,
+                        'high': 0.6
+                    }
+                },
+                'moderate': {
+                    'default_leverage': 5,
+                    'max_leverage': 10,
+                    'volatility_adjustments': {
+                        'low': 1.2,
+                        'medium': 1.0,
+                        'high': 0.7
+                    }
+                },
+                'aggressive': {
+                    'default_leverage': 7,
+                    'max_leverage': 20,
+                    'volatility_adjustments': {
+                        'low': 1.3,
+                        'medium': 1.1,
+                        'high': 0.8
+                    }
+                }
             }
         }
         
-        self.decision_history.append(decision)
-        
-        # Giới hạn kích thước lịch sử
-        if len(self.decision_history) > 1000:
-            self.decision_history = self.decision_history[-1000:]
-            
-        logger.info(f"Đã tính toán đòn bẩy động: {final_leverage}x (chế độ thị trường: {market_regime}, biến động: {volatility:.4f})")
-        
-        return decision
-    
-    def get_recent_decisions(self, limit: int = 10, symbol: str = None) -> List[Dict]:
-        """
-        Lấy các quyết định gần đây
-        
-        Args:
-            limit: Số lượng quyết định tối đa
-            symbol: Lọc theo cặp giao dịch
-            
-        Returns:
-            List[Dict]: Danh sách quyết định
-        """
-        if symbol:
-            filtered = [d for d in self.decision_history if d.get('symbol') == symbol]
-            return filtered[-limit:] if filtered else []
-        else:
-            return self.decision_history[-limit:] if self.decision_history else []
-    
-    def save_decision_history(self, file_path: str = 'leverage_decisions.json') -> bool:
-        """
-        Lưu lịch sử quyết định vào file
-        
-        Args:
-            file_path: Đường dẫn đến file
-            
-        Returns:
-            bool: True nếu lưu thành công, False nếu không
-        """
         try:
-            with open(file_path, 'w') as f:
-                json.dump(self.decision_history, f, indent=4)
-            logger.info(f"Đã lưu lịch sử quyết định vào {file_path}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu lịch sử quyết định: {str(e)}")
-            return False
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                logger.info(f"Đã tải cấu hình từ {config_path}")
+                return config
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning(f"Không thể tải cấu hình từ {config_path}, sử dụng cấu hình mặc định")
+            return default_config
     
-    def load_decision_history(self, file_path: str = 'leverage_decisions.json') -> bool:
+    def calculate_dynamic_leverage(
+        self,
+        market_regime: str = 'neutral',
+        volatility: float = 0.02,
+        account_balance: float = 10000,
+        open_positions: int = 0,
+        trend_strength: float = 0.5,
+        portfolio_correlation: float = 0.5,
+        risk_profile: str = 'moderate',
+        symbol: str = None,
+        timeframe: str = '1h',
+        price_ratio_to_ma: float = 1.0
+    ) -> Dict:
         """
-        Tải lịch sử quyết định từ file
+        Tính toán đòn bẩy động dựa trên các điều kiện thị trường và tài khoản
         
         Args:
-            file_path: Đường dẫn đến file
+            market_regime (str): Chế độ thị trường ('trending', 'ranging', 'volatile', 'quiet', 'neutral')
+            volatility (float): Tỷ lệ biến động thị trường (ví dụ: 0.02 = 2%)
+            account_balance (float): Số dư tài khoản
+            open_positions (int): Số vị thế đang mở
+            trend_strength (float): Độ mạnh xu hướng (0-1)
+            portfolio_correlation (float): Mức độ tương quan danh mục đầu tư (0-1)
+            risk_profile (str): Hồ sơ rủi ro ('conservative', 'moderate', 'aggressive')
+            symbol (str, optional): Mã cặp tiền
+            timeframe (str, optional): Khung thời gian
+            price_ratio_to_ma (float, optional): Tỷ lệ giá hiện tại so với MA
             
         Returns:
-            bool: True nếu tải thành công, False nếu không
+            Dict: Kết quả tính toán đòn bẩy
         """
-        try:
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as f:
-                    self.decision_history = json.load(f)
-                logger.info(f"Đã tải lịch sử quyết định từ {file_path}")
-                return True
-            return False
-        except Exception as e:
-            logger.error(f"Lỗi khi tải lịch sử quyết định: {str(e)}")
-            return False
-    
-    def get_leverage_trend(self, symbol: str = None, days: int = 7) -> Dict:
-        """
-        Phân tích xu hướng đòn bẩy trong khoảng thời gian
+        # Lấy cấu hình cho hồ sơ rủi ro
+        profile_config = self.config.get('risk_profiles', {}).get(risk_profile, {})
         
-        Args:
-            symbol: Cặp giao dịch
-            days: Số ngày cần phân tích
-            
-        Returns:
-            Dict: Thông tin xu hướng đòn bẩy
-        """
-        # Lọc dữ liệu
-        now = int(time.time())
-        start_time = now - days * 24 * 3600
+        # Lấy đòn bẩy cơ sở theo hồ sơ rủi ro hoặc mặc định
+        base_leverage = profile_config.get('default_leverage', self.config.get('default_leverage', 3))
+        max_leverage = profile_config.get('max_leverage', self.config.get('max_leverage', 10))
+        min_leverage = profile_config.get('min_leverage', self.config.get('min_leverage', 1))
         
-        if symbol:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time and d.get('symbol') == symbol]
-        else:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time]
+        # Điều chỉnh theo chế độ thị trường
+        market_regime_factor = self.config.get('market_regime_adjustments', {}).get(market_regime, 1.0)
         
-        if not decisions:
-            return {'error': 'Không đủ dữ liệu'}
+        # Điều chỉnh theo biến động
+        volatility_factor = self._get_volatility_adjustment(volatility, risk_profile)
         
-        # Tính các thống kê
-        leverages = [d.get('final_leverage', 1.0) for d in decisions]
-        avg_leverage = sum(leverages) / len(leverages) if leverages else 1.0
-        max_leverage = max(leverages) if leverages else 1.0
-        min_leverage = min(leverages) if leverages else 1.0
+        # Điều chỉnh theo số dư tài khoản
+        balance_factor = self._get_balance_adjustment(account_balance)
         
-        # Tính xu hướng (hệ số góc)
-        if len(decisions) >= 2:
-            times = [d.get('timestamp', 0) for d in decisions]
-            min_time = min(times)
-            max_time = max(times)
-            
-            if max_time > min_time:
-                # Chuẩn hóa thời gian về 0-1
-                normalized_times = [(t - min_time) / (max_time - min_time) for t in times]
-                
-                # Tính hệ số góc
-                slope = 0
-                n = len(normalized_times)
-                sum_x = sum(normalized_times)
-                sum_y = sum(leverages)
-                sum_xy = sum(x*y for x, y in zip(normalized_times, leverages))
-                sum_xx = sum(x*x for x in normalized_times)
-                
-                slope = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x) if (n * sum_xx - sum_x * sum_x) != 0 else 0
-            else:
-                slope = 0
-        else:
-            slope = 0
+        # Điều chỉnh theo số vị thế mở
+        positions_factor = self._get_open_positions_adjustment(open_positions)
+        
+        # Điều chỉnh theo độ mạnh xu hướng
+        trend_factor = self._get_trend_strength_adjustment(trend_strength)
+        
+        # Điều chỉnh theo tương quan danh mục
+        correlation_factor = self._get_correlation_adjustment(portfolio_correlation)
+        
+        # Điều chỉnh theo tỷ lệ giá/MA
+        price_ma_factor = self._get_price_ma_adjustment(price_ratio_to_ma, market_regime)
+        
+        # Tính đòn bẩy cuối cùng
+        final_leverage = (base_leverage * 
+                        market_regime_factor * 
+                        volatility_factor * 
+                        balance_factor * 
+                        positions_factor * 
+                        trend_factor * 
+                        correlation_factor *
+                        price_ma_factor)
+        
+        # Đảm bảo đòn bẩy trong khoảng min-max
+        final_leverage = min(max(final_leverage, min_leverage), max_leverage)
+        
+        # Làm tròn đến 0.5
+        final_leverage = round(final_leverage * 2) / 2
+        
+        # Lưu quyết định
+        self._save_decision(
+            symbol=symbol,
+            timeframe=timeframe,
+            market_regime=market_regime,
+            volatility=volatility,
+            base_leverage=base_leverage,
+            final_leverage=final_leverage,
+            factors={
+                'market_regime': market_regime_factor,
+                'volatility': volatility_factor,
+                'balance': balance_factor,
+                'positions': positions_factor,
+                'trend': trend_factor,
+                'correlation': correlation_factor,
+                'price_ma': price_ma_factor
+            }
+        )
         
         return {
-            'symbol': symbol,
-            'days': days,
-            'data_points': len(decisions),
-            'average_leverage': avg_leverage,
-            'max_leverage': max_leverage,
-            'min_leverage': min_leverage,
-            'trend_slope': slope,
-            'trend_direction': 'increasing' if slope > 0.1 else ('decreasing' if slope < -0.1 else 'stable'),
-            'current_leverage': leverages[-1] if leverages else None,
-            'samples': decisions
+            'base_leverage': base_leverage,
+            'final_leverage': final_leverage,
+            'factors': {
+                'market_regime': market_regime_factor,
+                'volatility': volatility_factor,
+                'balance': balance_factor,
+                'positions': positions_factor,
+                'trend': trend_factor,
+                'correlation': correlation_factor,
+                'price_ma': price_ma_factor
+            },
+            'market_regime': market_regime,
+            'volatility': volatility,
+            'timestamp': int(time.time())
         }
     
-    def analyze_volatility_impact(self, symbol: str = None, days: int = 30) -> Dict:
+    def _get_volatility_adjustment(self, volatility: float, risk_profile: str = 'moderate') -> float:
+        """
+        Tính hệ số điều chỉnh theo biến động
+        
+        Args:
+            volatility (float): Tỷ lệ biến động
+            risk_profile (str): Hồ sơ rủi ro
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        # Lấy cấu hình cho hồ sơ rủi ro
+        profile_config = self.config.get('risk_profiles', {}).get(risk_profile, {})
+        volatility_adjustments = profile_config.get('volatility_adjustments', self.config.get('volatility_adjustments', {}))
+        volatility_thresholds = self.config.get('volatility_thresholds', {})
+        
+        if volatility < volatility_thresholds.get('low', 0.01):
+            return volatility_adjustments.get('low', 1.2)
+        elif volatility < volatility_thresholds.get('medium', 0.03):
+            return volatility_adjustments.get('medium', 1.0)
+        else:
+            return volatility_adjustments.get('high', 0.7)
+    
+    def _get_balance_adjustment(self, account_balance: float) -> float:
+        """
+        Tính hệ số điều chỉnh theo số dư tài khoản
+        
+        Args:
+            account_balance (float): Số dư tài khoản
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        balance_adjustments = self.config.get('balance_adjustments', {})
+        balance_thresholds = self.config.get('balance_thresholds', {})
+        
+        if account_balance < balance_thresholds.get('small', 1000):
+            return balance_adjustments.get('small', 0.8)
+        elif account_balance < balance_thresholds.get('medium', 10000):
+            return balance_adjustments.get('medium', 1.0)
+        else:
+            return balance_adjustments.get('large', 1.2)
+    
+    def _get_open_positions_adjustment(self, open_positions: int) -> float:
+        """
+        Tính hệ số điều chỉnh theo số vị thế mở
+        
+        Args:
+            open_positions (int): Số vị thế đang mở
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        positions_adjustments = self.config.get('open_positions_adjustments', {})
+        positions_thresholds = self.config.get('open_positions_thresholds', {})
+        
+        if open_positions == 0:
+            return positions_adjustments.get('none', 1.0)
+        elif open_positions < positions_thresholds.get('few', 3):
+            return positions_adjustments.get('few', 0.9)
+        else:
+            return positions_adjustments.get('many', 0.7)
+    
+    def _get_trend_strength_adjustment(self, trend_strength: float) -> float:
+        """
+        Tính hệ số điều chỉnh theo độ mạnh xu hướng
+        
+        Args:
+            trend_strength (float): Độ mạnh xu hướng (0-1)
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        trend_adjustments = self.config.get('trend_strength_adjustments', {})
+        
+        if trend_strength < 0.3:
+            return trend_adjustments.get('weak', 0.8)
+        elif trend_strength < 0.7:
+            return trend_adjustments.get('moderate', 1.0)
+        else:
+            return trend_adjustments.get('strong', 1.2)
+    
+    def _get_correlation_adjustment(self, correlation: float) -> float:
+        """
+        Tính hệ số điều chỉnh theo tương quan danh mục
+        
+        Args:
+            correlation (float): Mức độ tương quan (0-1)
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        correlation_adjustments = self.config.get('portfolio_correlation_adjustments', {})
+        correlation_thresholds = self.config.get('portfolio_correlation_thresholds', {})
+        
+        if correlation < correlation_thresholds.get('low', 0.3):
+            return correlation_adjustments.get('low', 1.1)
+        elif correlation < correlation_thresholds.get('medium', 0.7):
+            return correlation_adjustments.get('medium', 1.0)
+        else:
+            return correlation_adjustments.get('high', 0.8)
+    
+    def _get_price_ma_adjustment(self, price_ratio: float, market_regime: str) -> float:
+        """
+        Tính hệ số điều chỉnh theo tỷ lệ giá/MA
+        
+        Args:
+            price_ratio (float): Tỷ lệ giá hiện tại/MA
+            market_regime (str): Chế độ thị trường
+            
+        Returns:
+            float: Hệ số điều chỉnh
+        """
+        # Điều chỉnh đòn bẩy dựa trên vị trí của giá so với MA
+        # Trong xu hướng tăng: giá > MA là tốt, giá < MA là xấu
+        # Trong xu hướng giảm: giá < MA là tốt, giá > MA là xấu
+        # Trong thị trường sideway: giá càng gần MA càng tốt
+        
+        if market_regime == 'trending':
+            # Kiểm tra xem xu hướng là up hay down
+            if price_ratio > 1.05:  # Giá > MA (xu hướng tăng)
+                return min(price_ratio - 0.9, 1.2)  # Tăng đòn bẩy tối đa 20%
+            elif price_ratio < 0.95:  # Giá < MA (xu hướng giảm)
+                return min(1.9 - price_ratio, 1.2)  # Tăng đòn bẩy tối đa 20%
+            else:
+                return 1.0
+        elif market_regime == 'ranging':
+            # Trong thị trường sideway, giá càng gần MA càng tốt
+            distance = abs(price_ratio - 1.0)
+            if distance < 0.03:
+                return 1.1  # Gần MA, tăng nhẹ
+            elif distance < 0.07:
+                return 1.0  # Trung bình
+            else:
+                return 0.9  # Xa MA, giảm nhẹ
+        else:
+            return 1.0  # Mặc định không điều chỉnh
+    
+    def _save_decision(self, 
+                    symbol: str = None, 
+                    timeframe: str = None, 
+                    market_regime: str = None, 
+                    volatility: float = None, 
+                    base_leverage: float = None, 
+                    final_leverage: float = None, 
+                    factors: Dict = None) -> None:
+        """
+        Lưu quyết định đòn bẩy để phân tích sau này
+        
+        Args:
+            symbol (str, optional): Mã cặp tiền
+            timeframe (str, optional): Khung thời gian
+            market_regime (str, optional): Chế độ thị trường
+            volatility (float, optional): Tỷ lệ biến động
+            base_leverage (float, optional): Đòn bẩy cơ sở
+            final_leverage (float, optional): Đòn bẩy cuối cùng
+            factors (Dict, optional): Các hệ số điều chỉnh
+        """
+        if not symbol:
+            symbol = 'unknown'
+        
+        timestamp = int(time.time())
+        
+        decision = {
+            'timestamp': timestamp,
+            'timeframe': timeframe,
+            'market_regime': market_regime,
+            'volatility': volatility,
+            'base_leverage': base_leverage,
+            'final_leverage': final_leverage,
+            'factors': factors
+        }
+        
+        # Khởi tạo danh sách quyết định cho symbol nếu chưa có
+        if symbol not in self.history:
+            self.history[symbol] = []
+        
+        # Thêm quyết định mới
+        self.history[symbol].append(decision)
+        
+        # Giới hạn số lượng quyết định lưu trữ (giữ 100 quyết định gần nhất)
+        if len(self.history[symbol]) > 100:
+            self.history[symbol] = self.history[symbol][-100:]
+        
+        # Lưu lịch sử định kỳ
+        if len(self.history[symbol]) % 10 == 0:
+            self._save_decision_history()
+    
+    def _save_decision_history(self) -> None:
+        """Lưu lịch sử quyết định vào file"""
+        try:
+            with open('data/leverage_decisions.json', 'w') as f:
+                json.dump(self.history, f)
+            logger.info("Đã lưu lịch sử quyết định đòn bẩy")
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu lịch sử quyết định: {str(e)}")
+    
+    def _load_decision_history(self) -> None:
+        """Tải lịch sử quyết định từ file"""
+        try:
+            with open('data/leverage_decisions.json', 'r') as f:
+                self.history = json.load(f)
+            logger.info("Đã tải lịch sử quyết định đòn bẩy")
+        except (FileNotFoundError, json.JSONDecodeError):
+            logger.warning("Không tìm thấy hoặc không thể tải lịch sử quyết định")
+            self.history = {}
+    
+    def get_leverage_trend(self, symbol: str = None, lookback: int = 20) -> Dict:
+        """
+        Phân tích xu hướng đòn bẩy trong một khoảng thời gian
+        
+        Args:
+            symbol (str, optional): Mã cặp tiền
+            lookback (int): Số quyết định gần nhất để phân tích
+            
+        Returns:
+            Dict: Kết quả phân tích
+        """
+        if not symbol or symbol not in self.history:
+            symbols = list(self.history.keys())
+            if not symbols:
+                return {
+                    'trend_direction': 'unknown',
+                    'trend_strength': 0,
+                    'current_leverage': 0,
+                    'average_leverage': 0,
+                    'min_leverage': 0,
+                    'max_leverage': 0,
+                    'data_points': 0
+                }
+            symbol = symbols[0]
+        
+        # Lấy quyết định gần nhất
+        decisions = self.history[symbol][-lookback:]
+        
+        if not decisions:
+            return {
+                'trend_direction': 'unknown',
+                'trend_strength': 0,
+                'current_leverage': 0,
+                'average_leverage': 0,
+                'min_leverage': 0,
+                'max_leverage': 0,
+                'data_points': 0
+            }
+        
+        # Lấy các giá trị đòn bẩy
+        leverages = [d['final_leverage'] for d in decisions]
+        
+        # Tính các chỉ số
+        current_leverage = leverages[-1]
+        average_leverage = sum(leverages) / len(leverages)
+        min_leverage = min(leverages)
+        max_leverage = max(leverages)
+        
+        # Tính xu hướng
+        if len(leverages) < 3:
+            trend_direction = 'stable'
+            trend_strength = 0
+        else:
+            # Tính xu hướng đơn giản bằng cách so sánh nửa đầu và nửa sau
+            half = len(leverages) // 2
+            first_half_avg = sum(leverages[:half]) / half
+            second_half_avg = sum(leverages[half:]) / (len(leverages) - half)
+            
+            difference = second_half_avg - first_half_avg
+            
+            if abs(difference) < 0.2:
+                trend_direction = 'stable'
+            else:
+                trend_direction = 'increasing' if difference > 0 else 'decreasing'
+            
+            # Tính độ mạnh xu hướng (0-1)
+            max_diff = max_leverage - min_leverage
+            trend_strength = abs(difference) / max_diff if max_diff > 0 else 0
+        
+        return {
+            'trend_direction': trend_direction,
+            'trend_strength': trend_strength,
+            'current_leverage': current_leverage,
+            'average_leverage': average_leverage,
+            'min_leverage': min_leverage,
+            'max_leverage': max_leverage,
+            'data_points': len(leverages)
+        }
+    
+    def analyze_volatility_impact(self, symbol: str = None, lookback: int = 20) -> Dict:
         """
         Phân tích tác động của biến động đến đòn bẩy
         
         Args:
-            symbol: Cặp giao dịch
-            days: Số ngày cần phân tích
+            symbol (str, optional): Mã cặp tiền
+            lookback (int): Số quyết định gần nhất để phân tích
             
         Returns:
-            Dict: Thông tin phân tích
+            Dict: Kết quả phân tích
         """
-        # Lọc dữ liệu
-        now = int(time.time())
-        start_time = now - days * 24 * 3600
+        if not symbol or symbol not in self.history:
+            symbols = list(self.history.keys())
+            if not symbols:
+                return {
+                    'correlation': 0,
+                    'data_points': 0,
+                    'average_volatility': 0,
+                    'average_leverage': 0
+                }
+            symbol = symbols[0]
         
-        if symbol:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time and d.get('symbol') == symbol]
-        else:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time]
+        # Lấy quyết định gần nhất
+        decisions = self.history[symbol][-lookback:]
         
-        if not decisions:
-            return {'error': 'Không đủ dữ liệu'}
+        if len(decisions) < 3:
+            return {
+                'correlation': 0,
+                'data_points': len(decisions),
+                'average_volatility': 0,
+                'average_leverage': 0
+            }
         
-        # Tính tương quan giữa biến động và đòn bẩy
-        volatilities = [d.get('volatility', 0.01) for d in decisions]
-        leverages = [d.get('final_leverage', 1.0) for d in decisions]
+        # Lấy các giá trị
+        volatilities = [d.get('volatility', 0) for d in decisions]
+        leverages = [d.get('final_leverage', 0) for d in decisions]
         
-        # Tính hệ số tương quan
-        correlation = 0
-        if len(volatilities) >= 2 and len(leverages) >= 2:
-            n = len(volatilities)
-            sum_x = sum(volatilities)
-            sum_y = sum(leverages)
-            sum_xy = sum(x*y for x, y in zip(volatilities, leverages))
-            sum_xx = sum(x*x for x in volatilities)
-            sum_yy = sum(y*y for y in leverages)
-            
-            numerator = n * sum_xy - sum_x * sum_y
-            denominator = math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y))
-            
-            correlation = numerator / denominator if denominator != 0 else 0
+        # Tính tương quan
+        try:
+            correlation = np.corrcoef(volatilities, leverages)[0, 1]
+        except:
+            correlation = 0
         
-        # Phân loại biến động
-        volatility_ranges = {
-            'low': [],
-            'medium': [],
-            'high': []
-        }
-        
-        for d in decisions:
-            vol = d.get('volatility', 0.01)
-            lev = d.get('final_leverage', 1.0)
-            
-            if vol < 0.02:
-                volatility_ranges['low'].append(lev)
-            elif vol < 0.05:
-                volatility_ranges['medium'].append(lev)
-            else:
-                volatility_ranges['high'].append(lev)
-        
-        # Tính trung bình đòn bẩy cho mỗi khoảng biến động
-        avg_leverage_by_volatility = {}
-        for key, values in volatility_ranges.items():
-            avg_leverage_by_volatility[key] = sum(values) / len(values) if values else None
+        # Tính trung bình
+        avg_volatility = sum(volatilities) / len(volatilities)
+        avg_leverage = sum(leverages) / len(leverages)
         
         return {
-            'symbol': symbol,
-            'days': days,
             'correlation': correlation,
-            'relationship': 'strong_negative' if correlation < -0.7 else
-                           ('negative' if correlation < -0.3 else
-                           ('weak' if abs(correlation) <= 0.3 else
-                           ('positive' if correlation < 0.7 else 'strong_positive'))),
-            'avg_leverage_by_volatility': avg_leverage_by_volatility,
-            'data_points': len(decisions)
+            'data_points': len(decisions),
+            'average_volatility': avg_volatility,
+            'average_leverage': avg_leverage,
+            'interpretation': self._interpret_correlation(correlation, 'volatility', 'leverage')
         }
     
-    def analyze_market_regime_impact(self, symbol: str = None, days: int = 30) -> Dict:
+    def analyze_market_regime_impact(self, symbol: str = None, lookback: int = 50) -> Dict:
         """
         Phân tích tác động của chế độ thị trường đến đòn bẩy
         
         Args:
-            symbol: Cặp giao dịch
-            days: Số ngày cần phân tích
+            symbol (str, optional): Mã cặp tiền
+            lookback (int): Số quyết định gần nhất để phân tích
             
         Returns:
-            Dict: Thông tin phân tích
+            Dict: Kết quả phân tích
         """
-        # Lọc dữ liệu
-        now = int(time.time())
-        start_time = now - days * 24 * 3600
+        if not symbol or symbol not in self.history:
+            symbols = list(self.history.keys())
+            if not symbols:
+                return {
+                    'regime_leverages': {},
+                    'data_points': 0
+                }
+            symbol = symbols[0]
         
-        if symbol:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time and d.get('symbol') == symbol]
-        else:
-            decisions = [d for d in self.decision_history 
-                        if d.get('timestamp', 0) >= start_time]
+        # Lấy quyết định gần nhất
+        decisions = self.history[symbol][-lookback:]
         
         if not decisions:
-            return {'error': 'Không đủ dữ liệu'}
+            return {
+                'regime_leverages': {},
+                'data_points': 0
+            }
         
-        # Phân loại theo chế độ thị trường
-        regime_leverages = {}
+        # Nhóm theo chế độ thị trường
+        regime_groups = {}
+        
         for d in decisions:
-            regime = d.get('market_regime', 'neutral')
-            leverage = d.get('final_leverage', 1.0)
+            regime = d.get('market_regime', 'unknown')
+            leverage = d.get('final_leverage', 0)
             
-            if regime not in regime_leverages:
-                regime_leverages[regime] = []
-                
-            regime_leverages[regime].append(leverage)
+            if regime not in regime_groups:
+                regime_groups[regime] = []
+            
+            regime_groups[regime].append(leverage)
         
-        # Tính trung bình đòn bẩy cho mỗi chế độ
-        avg_leverage_by_regime = {}
-        for regime, leverages in regime_leverages.items():
-            avg_leverage_by_regime[regime] = sum(leverages) / len(leverages)
-        
-        # Tần suất của mỗi chế độ
-        regime_frequency = {}
-        total_decisions = len(decisions)
-        for regime, leverages in regime_leverages.items():
-            regime_frequency[regime] = len(leverages) / total_decisions if total_decisions > 0 else 0
+        # Tính trung bình cho mỗi chế độ
+        regime_leverages = {}
+        for regime, leverages in regime_groups.items():
+            regime_leverages[regime] = {
+                'average': sum(leverages) / len(leverages),
+                'min': min(leverages),
+                'max': max(leverages),
+                'count': len(leverages)
+            }
         
         return {
-            'symbol': symbol,
-            'days': days,
-            'avg_leverage_by_regime': avg_leverage_by_regime,
-            'regime_frequency': regime_frequency,
-            'recommended_leverage_by_regime': self.config.get('regime_multiplier', {}),
+            'regime_leverages': regime_leverages,
             'data_points': len(decisions)
         }
     
-    def get_recommendation(self, symbol: str, market_data: Dict) -> Dict:
+    def _interpret_correlation(self, correlation: float, var1: str, var2: str) -> str:
         """
-        Lấy đề xuất đòn bẩy cho một cặp giao dịch dựa trên dữ liệu thị trường
+        Diễn giải ý nghĩa của hệ số tương quan
         
         Args:
-            symbol: Cặp giao dịch
-            market_data: Dữ liệu thị trường
-                {
-                    'market_regime': str,
-                    'volatility': float,
-                    'account_balance': float,
-                    'max_open_positions': int,
-                    'portfolio_correlation': float,
-                    'price_ratio_to_ma': float,
-                    'risk_profile': str
-                }
-                
+            correlation (float): Hệ số tương quan
+            var1 (str): Tên biến thứ nhất
+            var2 (str): Tên biến thứ hai
+            
         Returns:
-            Dict: Đề xuất đòn bẩy
+            str: Diễn giải
         """
-        # Kiểm tra dữ liệu đầu vào
-        if not all(k in market_data for k in ['market_regime', 'volatility', 'account_balance']):
-            logger.error("Thiếu dữ liệu thị trường cần thiết")
-            return {'error': 'Thiếu dữ liệu thị trường cần thiết'}
+        abs_corr = abs(correlation)
         
-        # Tính toán đòn bẩy động
-        return self.calculate_dynamic_leverage(
-            market_regime=market_data['market_regime'],
-            volatility=market_data['volatility'],
-            account_balance=market_data['account_balance'],
-            risk_profile=market_data.get('risk_profile'),
-            max_open_positions=market_data.get('max_open_positions', 0),
-            portfolio_correlation=market_data.get('portfolio_correlation', 0),
-            price_ratio_to_ma=market_data.get('price_ratio_to_ma', 1.0),
-            symbol=symbol
-        )
+        if abs_corr < 0.3:
+            strength = "rất yếu"
+        elif abs_corr < 0.5:
+            strength = "yếu"
+        elif abs_corr < 0.7:
+            strength = "trung bình"
+        elif abs_corr < 0.9:
+            strength = "mạnh"
+        else:
+            strength = "rất mạnh"
+        
+        direction = "dương" if correlation > 0 else "âm"
+        
+        return f"Tương quan {direction} {strength} giữa {var1} và {var2}. " + \
+               (f"Khi {var1} tăng, {var2} có xu hướng tăng." if correlation > 0 else f"Khi {var1} tăng, {var2} có xu hướng giảm.")
+    
+    def get_recommended_leverage_profile(self, 
+                                       account_balance: float, 
+                                       trading_experience: str = 'intermediate',
+                                       risk_tolerance: str = 'moderate') -> str:
+        """
+        Gợi ý hồ sơ đòn bẩy phù hợp dựa trên số dư tài khoản và kinh nghiệm giao dịch
+        
+        Args:
+            account_balance (float): Số dư tài khoản
+            trading_experience (str): Kinh nghiệm giao dịch ('beginner', 'intermediate', 'expert')
+            risk_tolerance (str): Khả năng chịu đựng rủi ro ('low', 'moderate', 'high')
+            
+        Returns:
+            str: Hồ sơ đòn bẩy khuyên dùng ('conservative', 'moderate', 'aggressive')
+        """
+        # Xếp hạng dựa trên số dư
+        if account_balance < 1000:
+            balance_score = 1  # conservative
+        elif account_balance < 10000:
+            balance_score = 2  # moderate
+        else:
+            balance_score = 3  # aggressive
+        
+        # Xếp hạng dựa trên kinh nghiệm
+        experience_score = {
+            'beginner': 1,
+            'intermediate': 2,
+            'expert': 3
+        }.get(trading_experience.lower(), 2)
+        
+        # Xếp hạng dựa trên khả năng chịu đựng rủi ro
+        risk_score = {
+            'low': 1,
+            'moderate': 2,
+            'high': 3
+        }.get(risk_tolerance.lower(), 2)
+        
+        # Tính điểm tổng hợp
+        total_score = balance_score + experience_score + risk_score
+        
+        # Quyết định hồ sơ
+        if total_score <= 4:
+            return 'conservative'
+        elif total_score <= 7:
+            return 'moderate'
+        else:
+            return 'aggressive'
+    
+    def calculate_risk_adjusted_position_size(self, 
+                                           leverage: float, 
+                                           account_balance: float,
+                                           risk_per_trade: float = 2.0,
+                                           stop_loss_percent: float = 1.0) -> Dict:
+        """
+        Tính kích thước vị thế điều chỉnh theo rủi ro
+        
+        Args:
+            leverage (float): Đòn bẩy
+            account_balance (float): Số dư tài khoản
+            risk_per_trade (float): Phần trăm rủi ro trên mỗi giao dịch
+            stop_loss_percent (float): Phần trăm stop loss
+            
+        Returns:
+            Dict: Kết quả tính toán
+        """
+        # Tính số tiền rủi ro
+        risk_amount = account_balance * (risk_per_trade / 100)
+        
+        # Tính kích thước vị thế (position size = risk_amount / (stop_loss_percent * entry_price))
+        # Giả sử entry_price = 1 để có kích thước tương đối
+        position_size_usd = risk_amount / (stop_loss_percent / 100)
+        
+        # Điều chỉnh theo đòn bẩy
+        adjusted_position_size = position_size_usd / leverage
+        
+        # Tính margin sử dụng
+        margin_used = position_size_usd / leverage
+        
+        # Tính phần trăm margin sử dụng
+        margin_percent = (margin_used / account_balance) * 100
+        
+        return {
+            'account_balance': account_balance,
+            'leverage': leverage,
+            'risk_per_trade_percent': risk_per_trade,
+            'stop_loss_percent': stop_loss_percent,
+            'risk_amount': risk_amount,
+            'position_size_usd': position_size_usd,
+            'adjusted_position_size': adjusted_position_size,
+            'margin_used': margin_used,
+            'margin_percent': margin_percent
+        }
+    
+    def recommend_leverage_for_market_phase(self, 
+                                          market_phase: str, 
+                                          volatility_index: float,
+                                          risk_profile: str = 'moderate') -> Dict:
+        """
+        Gợi ý đòn bẩy phù hợp với giai đoạn thị trường
+        
+        Args:
+            market_phase (str): Giai đoạn thị trường 
+                                ('bull_run', 'bear_market', 'sideways', 'recovery', 'distribution', 'accumulation')
+            volatility_index (float): Chỉ số biến động (vd: ATR/Giá)
+            risk_profile (str): Hồ sơ rủi ro ('conservative', 'moderate', 'aggressive')
+            
+        Returns:
+            Dict: Gợi ý đòn bẩy
+        """
+        # Lấy cấu hình cho hồ sơ rủi ro
+        profile_config = self.config.get('risk_profiles', {}).get(risk_profile, {})
+        base_leverage = profile_config.get('default_leverage', self.config.get('default_leverage', 3))
+        
+        # Hệ số điều chỉnh theo giai đoạn thị trường
+        phase_adjustments = {
+            'bull_run': 1.3,      # Thị trường tăng mạnh, tận dụng xu hướng
+            'bear_market': 0.7,   # Thị trường giảm mạnh, thận trọng
+            'sideways': 0.8,      # Thị trường đi ngang, ít cơ hội
+            'recovery': 1.1,      # Thị trường phục hồi, cơ hội ổn định
+            'distribution': 0.7,  # Giai đoạn phân phối, rủi ro cao
+            'accumulation': 1.0   # Giai đoạn tích lũy, cơ hội đang hình thành
+        }
+        
+        phase_factor = phase_adjustments.get(market_phase, 1.0)
+        
+        # Điều chỉnh thêm theo biến động
+        volatility_factor = 1.0
+        if volatility_index < 0.01:
+            volatility_factor = 1.2  # Biến động thấp, tăng đòn bẩy
+        elif volatility_index > 0.05:
+            volatility_factor = 0.7  # Biến động cao, giảm đòn bẩy
+        
+        # Tính đòn bẩy gợi ý
+        recommended_leverage = base_leverage * phase_factor * volatility_factor
+        
+        # Làm tròn đến 0.5
+        recommended_leverage = round(recommended_leverage * 2) / 2
+        
+        # Giới hạn đòn bẩy
+        max_leverage = profile_config.get('max_leverage', self.config.get('max_leverage', 10))
+        min_leverage = profile_config.get('min_leverage', self.config.get('min_leverage', 1))
+        recommended_leverage = min(max(recommended_leverage, min_leverage), max_leverage)
+        
+        return {
+            'market_phase': market_phase,
+            'volatility_index': volatility_index,
+            'risk_profile': risk_profile,
+            'base_leverage': base_leverage,
+            'phase_adjustment': phase_factor,
+            'volatility_adjustment': volatility_factor,
+            'recommended_leverage': recommended_leverage
+        }
 
 
 def main():
-    """Hàm chính để test DynamicLeverageCalculator"""
-    # Khởi tạo DynamicLeverageCalculator
+    """Hàm chính để test"""
     calculator = DynamicLeverageCalculator()
     
-    # Ví dụ tính đòn bẩy động cho các chế độ thị trường khác nhau
-    regimes = ['trending', 'ranging', 'volatile', 'quiet', 'neutral']
+    # Test 1: Tính đòn bẩy trong điều kiện khác nhau
+    print("Test 1: Chế độ thị trường khác nhau")
+    for regime in ['trending', 'ranging', 'volatile', 'quiet', 'neutral']:
+        result = calculator.calculate_dynamic_leverage(market_regime=regime)
+        print(f"Chế độ {regime}: Đòn bẩy = {result['final_leverage']}x")
     
-    print("\n=== Ví dụ tính đòn bẩy động cho các chế độ thị trường ===")
-    for regime in regimes:
-        result = calculator.calculate_dynamic_leverage(
-            market_regime=regime,
-            volatility=0.02,  # 2% biến động
-            account_balance=10000,  # 10,000 USDT
-            symbol='BTCUSDT'
-        )
-        print(f"Chế độ thị trường: {regime}, Đòn bẩy: {result['final_leverage']}x")
+    # Test 2: Các mức biến động khác nhau
+    print("\nTest 2: Mức biến động khác nhau")
+    for vol in [0.01, 0.02, 0.05, 0.1]:
+        result = calculator.calculate_dynamic_leverage(volatility=vol)
+        print(f"Biến động {vol*100}%: Đòn bẩy = {result['final_leverage']}x")
     
-    # Ví dụ tính đòn bẩy động với các mức biến động khác nhau
-    volatilities = [0.01, 0.02, 0.05, 0.1]
+    # Test 3: Phân tích xu hướng đòn bẩy
+    print("\nTest 3: Phân tích xu hướng đòn bẩy")
+    trend = calculator.get_leverage_trend()
+    print(f"Xu hướng: {trend['trend_direction']}, Mạnh: {trend['trend_strength']:.2f}")
+    print(f"Đòn bẩy hiện tại: {trend['current_leverage']}x, Trung bình: {trend['average_leverage']:.2f}x")
     
-    print("\n=== Ví dụ tính đòn bẩy động với các mức biến động khác nhau ===")
-    for vol in volatilities:
-        result = calculator.calculate_dynamic_leverage(
-            market_regime='neutral',
-            volatility=vol,
-            account_balance=10000,
-            symbol='BTCUSDT'
-        )
-        print(f"Biến động: {vol*100:.1f}%, Đòn bẩy: {result['final_leverage']}x")
+    # Test 4: Gợi ý hồ sơ đòn bẩy
+    print("\nTest 4: Gợi ý hồ sơ đòn bẩy")
+    profile = calculator.get_recommended_leverage_profile(
+        account_balance=5000,
+        trading_experience='intermediate',
+        risk_tolerance='moderate'
+    )
+    print(f"Hồ sơ đòn bẩy khuyên dùng: {profile}")
     
-    # Ví dụ tính đòn bẩy động với các mức độ rủi ro khác nhau
-    risk_profiles = ['conservative', 'moderate', 'aggressive']
-    
-    print("\n=== Ví dụ tính đòn bẩy động với các mức độ rủi ro khác nhau ===")
-    for profile in risk_profiles:
-        result = calculator.calculate_dynamic_leverage(
-            market_regime='neutral',
-            volatility=0.02,
-            account_balance=10000,
-            risk_profile=profile,
-            symbol='BTCUSDT'
-        )
-        print(f"Mức độ rủi ro: {profile}, Đòn bẩy: {result['final_leverage']}x")
-    
-    # Phân tích tác động của biến động đến đòn bẩy
-    print("\n=== Phân tích tác động của biến động đến đòn bẩy ===")
-    # Mô phỏng dữ liệu lịch sử
-    for i in range(30):
-        vol = 0.01 + (i % 10) * 0.01  # 1% to 10%
-        calculator.calculate_dynamic_leverage(
-            market_regime='neutral',
-            volatility=vol,
-            account_balance=10000,
-            symbol='BTCUSDT'
-        )
-    
-    analysis = calculator.analyze_volatility_impact(symbol='BTCUSDT')
-    print(f"Tương quan biến động-đòn bẩy: {analysis['correlation']:.2f} ({analysis['relationship']})")
-    print(f"Đòn bẩy trung bình theo biến động: {analysis['avg_leverage_by_volatility']}")
-    
+    # Test 5: Tính kích thước vị thế điều chỉnh theo rủi ro
+    print("\nTest 5: Kích thước vị thế điều chỉnh theo rủi ro")
+    position = calculator.calculate_risk_adjusted_position_size(
+        leverage=5,
+        account_balance=10000,
+        risk_per_trade=2.0,
+        stop_loss_percent=1.0
+    )
+    print(f"Số tiền rủi ro: ${position['risk_amount']:.2f}")
+    print(f"Kích thước vị thế: ${position['position_size_usd']:.2f}")
+    print(f"Margin sử dụng: ${position['margin_used']:.2f} ({position['margin_percent']:.2f}%)")
+
 
 if __name__ == "__main__":
     main()

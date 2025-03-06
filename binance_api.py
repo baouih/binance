@@ -383,6 +383,42 @@ class BinanceAPI:
         """
         return self._request('GET', 'account', signed=True)
         
+    def futures_account_balance(self) -> List[Dict]:
+        """
+        Lấy số dư tài khoản futures
+        
+        Returns:
+            List[Dict]: Danh sách số dư theo từng đồng tiền
+        """
+        if self.account_type == 'futures':
+            # Sử dụng test account để thử nghiệm
+            logger.info("Gửi yêu cầu đến Binance Testnet Futures API")
+            try:
+                params = {'timestamp': int(time.time() * 1000)}
+                query_string = urllib.parse.urlencode(params)
+                signature = hmac.new(self.api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+                params['signature'] = signature
+                
+                base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+                url = f"{base_url}/fapi/v2/balance"
+                
+                headers = {'X-MBX-APIKEY': self.api_key}
+                
+                response = requests.get(url, params=params, headers=headers)
+                
+                if response.status_code == 200:
+                    logger.info("Đã lấy thành công dữ liệu từ Testnet Futures API")
+                    return response.json()
+                else:
+                    logger.error(f"Lỗi API: {response.status_code} - {response.text}")
+                    return []
+            except Exception as e:
+                logger.error(f"Lỗi khi gọi API: {str(e)}")
+                return []
+                
+        logger.warning("Phương thức futures_account_balance chỉ khả dụng với tài khoản futures")
+        return []
+        
     def get_account_status(self) -> Dict:
         """
         Lấy trạng thái tài khoản
