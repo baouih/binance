@@ -1,41 +1,41 @@
 {
     "current_sentiment": {
-        "level": "slightly_bearish",
-        "score": -0.2311997147619791,
+        "level": "bullish",
+        "score": 0.5067724432326579,
         "components": {
             "rsi": {
-                "score": 0.0103194023450639,
-                "description": "RSI = 50.4"
+                "score": 0.38461497293386093,
+                "description": "RSI = 65.4"
             },
             "macd": {
-                "score": -1.0,
-                "description": "MACD Hist = -27.6525"
+                "score": 1.0,
+                "description": "MACD Hist = 1257.4905"
             },
             "ema": {
                 "score": 0,
                 "description": "EMA kh\u00f4ng c\u1eaft nhau"
             },
             "bollinger": {
-                "score": -0.00961968001856972,
-                "description": "BB Position = 0.50"
+                "score": 1.2557823395529408,
+                "description": "BB Position = 1.13"
             },
             "adx": {
                 "score": 0,
                 "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
             },
             "volume": {
-                "score": -0.9492160913712768,
-                "description": "Volume change = -91.2%"
+                "score": -0.9365790642686641,
+                "description": "Volume change = -85.5%"
             },
             "price_change": {
-                "score": 0.3130999095399638,
-                "description": "24h change = 3.24%"
+                "score": 0.9896456055872903,
+                "description": "24h change = 26.29%"
             }
         },
-        "emoji": "\ud83d\ude1f",
-        "color": "#f1c40f",
-        "description": "H\u01a1i ti\u00eau c\u1ef1c",
-        "timestamp": "2025-03-06 01:19:02"
+        "emoji": "\ud83d\udc02",
+        "color": "#2ecc71",
+        "description": "T\u00edch c\u1ef1c",
+        "timestamp": "2025-03-06 05:10:44"
     },
     "historical_data": [
         {
@@ -1329,9 +1329,85 @@
             "color": "#f1c40f",
             "description": "H\u01a1i ti\u00eau c\u1ef1c",
             "timestamp": "2025-03-06 01:19:02"
+        },
+        {
+            "level": "slightly_bearish",
+            "score": -0.23778276991267117,
+            "components": {
+                "rsi": {
+                    "score": 0.0037792726790963015,
+                    "description": "RSI = 50.2"
+                },
+                "macd": {
+                    "score": -1.0,
+                    "description": "MACD Hist = -44.6791"
+                },
+                "ema": {
+                    "score": 0,
+                    "description": "EMA kh\u00f4ng c\u1eaft nhau"
+                },
+                "bollinger": {
+                    "score": -0.032889153406065574,
+                    "description": "BB Position = 0.48"
+                },
+                "adx": {
+                    "score": 0,
+                    "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
+                },
+                "volume": {
+                    "score": -0.9231080098567263,
+                    "description": "Volume change = -80.5%"
+                },
+                "price_change": {
+                    "score": 0.28530545938894397,
+                    "description": "24h change = 2.93%"
+                }
+            },
+            "emoji": "\ud83d\ude1f",
+            "color": "#f1c40f",
+            "description": "H\u01a1i ti\u00eau c\u1ef1c",
+            "timestamp": "2025-03-06 01:41:45"
+        },
+        {
+            "level": "bullish",
+            "score": 0.5067724432326579,
+            "components": {
+                "rsi": {
+                    "score": 0.38461497293386093,
+                    "description": "RSI = 65.4"
+                },
+                "macd": {
+                    "score": 1.0,
+                    "description": "MACD Hist = 1257.4905"
+                },
+                "ema": {
+                    "score": 0,
+                    "description": "EMA kh\u00f4ng c\u1eaft nhau"
+                },
+                "bollinger": {
+                    "score": 1.2557823395529408,
+                    "description": "BB Position = 1.13"
+                },
+                "adx": {
+                    "score": 0,
+                    "description": "ADX = nan (kh\u00f4ng xu h\u01b0\u1edbng r\u00f5 r\u00e0ng)"
+                },
+                "volume": {
+                    "score": -0.9365790642686641,
+                    "description": "Volume change = -85.5%"
+                },
+                "price_change": {
+                    "score": 0.9896456055872903,
+                    "description": "24h change = 26.29%"
+                }
+            },
+            "emoji": "\ud83d\udc02",
+            "color": "#2ecc71",
+            "description": "T\u00edch c\u1ef1c",
+            "timestamp": "2025-03-06 05:10:44"
         }
     ],
-    "last_updated": "2025-03-06 01:19:02",
+    "last_updated": "2025-03-06 05:10:44",
     "metadata": {
         "version": "1.0",
         "created_at": "2025-03-04 15:24:53"

@@ -149,15 +149,17 @@ class TargetProfitStrategy(ProfitStrategy):
     Chiến lược chốt lời khi đạt mức lãi mục tiêu
     """
     
-    def __init__(self, profit_target: float = 5.0):
+    def __init__(self, profit_target: float = 5.0, config: Dict = None):
         """
         Khởi tạo chiến lược
         
         Args:
             profit_target (float): Mức lãi mục tiêu (%)
+            config (Dict, optional): Cấu hình bổ sung
         """
         super().__init__("target_profit")
         self.profit_target = profit_target
+        self.config = config or {}
     
     def initialize(self, position: Dict) -> Dict:
         """
@@ -169,7 +171,34 @@ class TargetProfitStrategy(ProfitStrategy):
         Returns:
             Dict: Thông tin vị thế đã cập nhật
         """
-        position['profit_target'] = self.profit_target
+        # Kiểm tra và áp dụng cấu hình cho tài khoản nhỏ
+        symbol = position.get('symbol', '')
+        is_small_account = position.get('is_small_account', False)
+        leverage = position.get('leverage', 1)
+        
+        if is_small_account and self.config.get('small_account_settings', {}).get('enabled', False):
+            small_account_settings = self.config.get('small_account_settings', {})
+            
+            if small_account_settings.get('lower_profit_targets', True):
+                if symbol == 'BTCUSDT':
+                    position['profit_target'] = small_account_settings.get('btc_profit_target', 1.5)
+                elif symbol == 'ETHUSDT':
+                    position['profit_target'] = small_account_settings.get('eth_profit_target', 2.0)
+                else:
+                    position['profit_target'] = small_account_settings.get('altcoin_profit_target', 3.0)
+                    
+                logger.info(f"Tài khoản nhỏ: Đặt mục tiêu lợi nhuận cho {symbol} là {position['profit_target']}%")
+            else:
+                position['profit_target'] = self.profit_target
+        else:
+            position['profit_target'] = self.profit_target
+        
+        # Điều chỉnh mục tiêu lợi nhuận theo đòn bẩy
+        if leverage > 1:
+            effective_target = position['profit_target'] / leverage
+            logger.debug(f"Điều chỉnh mục tiêu lợi nhuận từ {position['profit_target']}% xuống {effective_target}% do đòn bẩy {leverage}x")
+            position['profit_target'] = effective_target
+        
         return position
     
     def should_close(self, position: Dict, current_price: float, 
@@ -192,6 +221,7 @@ class TargetProfitStrategy(ProfitStrategy):
         profit_target = position.get('profit_target', self.profit_target)
         entry_price = position.get('entry_price')
         side = position.get('side')
+        leverage = position.get('leverage', 1)
         
         if not entry_price or not side:
             return False, None
@@ -202,8 +232,11 @@ class TargetProfitStrategy(ProfitStrategy):
         else:  # SHORT
             current_profit_pct = (entry_price - current_price) / entry_price * 100
             
+        # Tính lợi nhuận thực tế với đòn bẩy
+        effective_profit = current_profit_pct * leverage
+            
         if current_profit_pct >= profit_target:
-            return True, f"Chốt lời khi đạt {profit_target:.2f}% lợi nhuận"
+            return True, f"Chốt lời khi đạt {profit_target:.2f}% lợi nhuận (thực tế: {effective_profit:.2f}%)"
         
         return False, None
 
@@ -453,6 +486,7 @@ class ProfitManager:
         """
         self.data_cache = data_cache
         self.strategies = {}
+        self.config = config or {}
         
         # Khởi tạo các chiến lược mặc định
         self._create_default_strategies()
@@ -465,7 +499,7 @@ class ProfitManager:
         """Tạo các chiến lược mặc định"""
         self.strategies = {
             'time_based': TimeBasedProfit(),
-            'target_profit': TargetProfitStrategy(),
+            'target_profit': TargetProfitStrategy(config=self.config),
             'indicator_based': IndicatorBasedProfit(),
             'price_reversal': PriceReversalProfit(),
             'dynamic_volatility': DynamicVolatilityProfit()

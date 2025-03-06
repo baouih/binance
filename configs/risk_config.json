@@ -47,6 +47,17 @@
             "min_risk_reward_ratio": 1.0
         }
     },
+    "small_account_settings": {
+        "enabled": true,
+        "account_size_threshold": 200.0,
+        "btc_leverage_adjustment": 20,
+        "eth_leverage_adjustment": 15,
+        "altcoin_leverage_adjustment": 10,
+        "risk_per_trade_adjustment": 0.7,
+        "min_position_value": 5.0,
+        "max_account_percent": 50.0,
+        "preferred_symbols": ["ADAUSDT", "DOGEUSDT", "MATICUSDT", "XRPUSDT", "ETHUSDT"]
+    },
     "adaptive_risk": {
         "enabled": true,
         "increase_pace": "slow",

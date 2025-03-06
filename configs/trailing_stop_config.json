@@ -1,0 +1,7 @@
+{
+    "strategy_type": "percentage",
+    "config": {
+        "activation_percent": 0.8,
+        "callback_percent": 0.3
+    }
+}

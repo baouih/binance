@@ -379,6 +379,83 @@ class DynamicRiskAllocator:
         
         return adjusted_risk
     
+    def _get_min_notional(self, symbol: str) -> float:
+        """
+        Lấy giá trị giao dịch tối thiểu cho một cặp tiền
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            
+        Returns:
+            float: Giá trị giao dịch tối thiểu
+        """
+        # Giá trị mặc định dựa trên Binance Futures
+        default_min_notional = {
+            'BTCUSDT': 100.0,
+            'ETHUSDT': 20.0,
+            'BNBUSDT': 10.0,
+            'SOLUSDT': 5.0,
+            'ADAUSDT': 5.0,
+            'XRPUSDT': 5.0,
+            'DOGEUSDT': 5.0,
+            'MATICUSDT': 5.0,
+            'LTCUSDT': 10.0,
+            'DOTUSDT': 5.0,
+            'LINKUSDT': 5.0,
+            'AVAXUSDT': 5.0,
+            'ATOMUSDT': 5.0,
+            'UNIUSDT': 5.0
+        }
+        
+        return default_min_notional.get(symbol, 5.0)
+    
+    def _get_step_size(self, symbol: str) -> float:
+        """
+        Lấy step size cho một cặp tiền
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            
+        Returns:
+            float: Step size
+        """
+        # Step size mặc định dựa trên Binance Futures
+        default_step_size = {
+            'BTCUSDT': 0.001,
+            'ETHUSDT': 0.001,
+            'BNBUSDT': 0.01,
+            'SOLUSDT': 0.01,
+            'ADAUSDT': 1.0,
+            'XRPUSDT': 1.0,
+            'DOGEUSDT': 1.0,
+            'MATICUSDT': 1.0,
+            'LTCUSDT': 0.01,
+            'DOTUSDT': 0.1,
+            'LINKUSDT': 0.1,
+            'AVAXUSDT': 0.1,
+            'ATOMUSDT': 0.01,
+            'UNIUSDT': 0.1
+        }
+        
+        return default_step_size.get(symbol, 0.001)
+    
+    def is_small_account(self, account_balance: float) -> bool:
+        """
+        Kiểm tra xem có phải là tài khoản nhỏ không
+        
+        Args:
+            account_balance (float): Số dư tài khoản
+            
+        Returns:
+            bool: True nếu là tài khoản nhỏ, False nếu không
+        """
+        small_account_settings = self.config.get('small_account_settings', {})
+        if not small_account_settings.get('enabled', False):
+            return False
+            
+        threshold = small_account_settings.get('account_size_threshold', 200.0)
+        return account_balance < threshold
+    
     def calculate_position_size(self, symbol: str, entry_price: float, stop_loss: float, 
                              account_balance: float, risk_percentage: float, 
                              max_position_percent: float = 20.0) -> Dict:
@@ -396,6 +473,12 @@ class DynamicRiskAllocator:
         Returns:
             Dict: Thông tin vị thế
         """
+        # Kiểm tra xem có phải tài khoản nhỏ không
+        if self.is_small_account(account_balance):
+            return self.calculate_position_size_for_small_account(
+                symbol, entry_price, stop_loss, account_balance, risk_percentage)
+        
+        # Xử lý cho tài khoản thông thường
         # Tính risk amount (số tiền rủi ro)
         risk_amount = account_balance * risk_percentage / 100
         
@@ -416,8 +499,10 @@ class DynamicRiskAllocator:
         # Tính số lượng (quantity)
         quantity = position_size_usd / entry_price if entry_price > 0 else 0
         
-        # Làm tròn số lượng (giả sử step size = 0.001)
-        quantity = math.floor(quantity * 1000) / 1000
+        # Làm tròn số lượng theo step size
+        step_size = self._get_step_size(symbol)
+        precision = len(str(step_size).split('.')[-1])
+        quantity = round(quantity, precision)
         
         return {
             'symbol': symbol,
@@ -429,6 +514,80 @@ class DynamicRiskAllocator:
             'quantity': quantity,
             'account_balance': account_balance,
             'max_position_percent': max_position_percent
+        }
+        
+    def calculate_position_size_for_small_account(self, symbol: str, entry_price: float, stop_loss: float, 
+                             account_balance: float, risk_percentage: float) -> Dict:
+        """
+        Tính toán kích thước vị thế đặc biệt cho tài khoản nhỏ
+        
+        Args:
+            symbol (str): Mã cặp tiền
+            entry_price (float): Giá vào lệnh
+            stop_loss (float): Giá stop loss
+            account_balance (float): Số dư tài khoản
+            risk_percentage (float): Phần trăm rủi ro
+            
+        Returns:
+            Dict: Thông tin vị thế
+        """
+        small_account_settings = self.config.get('small_account_settings', {})
+        
+        # Lấy giá trị giao dịch tối thiểu
+        min_notional = self._get_min_notional(symbol)
+        
+        # Điều chỉnh đòn bẩy dựa trên cặp tiền
+        leverage_adjustment = small_account_settings.get('altcoin_leverage_adjustment', 10)
+        if symbol == "BTCUSDT":
+            leverage_adjustment = small_account_settings.get('btc_leverage_adjustment', 20)
+        elif symbol == "ETHUSDT":
+            leverage_adjustment = small_account_settings.get('eth_leverage_adjustment', 15)
+        
+        # Điều chỉnh risk_percentage
+        adjusted_risk = risk_percentage * small_account_settings.get('risk_per_trade_adjustment', 0.7)
+        
+        # Tính toán risk amount
+        risk_amount = account_balance * adjusted_risk / 100
+        
+        # Tính khoảng cách SL
+        sl_distance_percent = abs(entry_price - stop_loss) / entry_price * 100
+        sl_distance_percent = max(sl_distance_percent, 1.0)  # Đảm bảo ít nhất 1%
+        
+        # Tính giá trị vị thế ban đầu dựa trên risk
+        if sl_distance_percent > 0:
+            position_size_usd = risk_amount / (sl_distance_percent / 100) * leverage_adjustment / 10
+        else:
+            position_size_usd = risk_amount * leverage_adjustment
+            
+        # Đảm bảo đạt giá trị tối thiểu
+        min_position_value = small_account_settings.get('min_position_value', 5.0)
+        position_size_usd = max(position_size_usd, min(min_position_value, min_notional))
+        
+        # Đảm bảo không vượt quá % tài khoản tối đa
+        max_account_percent = small_account_settings.get('max_account_percent', 50.0)
+        max_position_size = account_balance * max_account_percent / 100
+        position_size_usd = min(position_size_usd, max_position_size)
+        
+        # Tính số lượng
+        quantity = position_size_usd / entry_price if entry_price > 0 else 0
+        
+        # Làm tròn theo step size
+        step_size = self._get_step_size(symbol)
+        precision = len(str(step_size).split('.')[-1])
+        quantity = round(quantity, precision)
+        
+        return {
+            'symbol': symbol,
+            'entry_price': entry_price,
+            'stop_loss': stop_loss,
+            'risk_percentage': adjusted_risk,
+            'risk_amount': risk_amount,
+            'position_size_usd': position_size_usd,
+            'quantity': quantity,
+            'account_balance': account_balance,
+            'leverage': leverage_adjustment,
+            'is_small_account': True,
+            'min_notional': min_notional
         }
     
     def allocate_capital(self, symbols: List[str], account_balance: float, market_data: Dict = None,

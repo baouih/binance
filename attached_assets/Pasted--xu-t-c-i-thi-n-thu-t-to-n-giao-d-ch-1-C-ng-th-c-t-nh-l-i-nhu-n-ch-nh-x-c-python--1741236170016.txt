@@ -1,0 +1,119 @@
+# Đề xuất cải thiện thuật toán giao dịch
+
+## 1. Công thức tính lợi nhuận chính xác
+
+```python
+# Vị thế LONG
+PnL = (Vốn_ban_đầu * Đòn_bẩy * (Giá_thoát/Giá_vào - 1)) - (Phí_giao_dịch + Phí_funding)
+
+# Vị thế SHORT
+PnL = (Vốn_ban_đầu * Đòn_bẩy * (1 - Giá_thoát/Giá_vào)) - (Phí_giao_dịch + Phí_funding)
+
+# Trong đó:
+Vốn_ban_đầu = Giá_vào * Số_lượng / Đòn_bẩy
+Phí_giao_dịch = (Giá_vào * Số_lượng * Phí_mở) + (Giá_thoát * Số_lượng * Phí_đóng)
+Phí_funding = Vốn_ban_đầu * Đòn_bẩy * Funding_rate * Số_kỳ_funding
+```
+
+## 2. Thuật toán đòn bẩy động
+
+```python
+def calculate_dynamic_leverage(market_regime, volatility, account_balance):
+    base_leverage = 3.0  # Đòn bẩy cơ sở
+    
+    # Điều chỉnh theo chế độ thị trường
+    regime_multiplier = {
+        'trending': 1.2,
+        'ranging': 0.8,
+        'volatile': 0.6,
+        'quiet': 1.0,
+        'neutral': 1.0
+    }
+    
+    # Điều chỉnh theo biến động
+    volatility_factor = max(0.5, min(1.0, 0.05/volatility))
+    
+    # Điều chỉnh theo kích thước tài khoản
+    balance_factor = min(1.2, max(0.8, math.log10(account_balance/1000)))
+    
+    # Tính đòn bẩy tối ưu
+    optimal_leverage = base_leverage * regime_multiplier[market_regime] * volatility_factor * balance_factor
+    
+    # Giới hạn trong phạm vi an toàn (1-5x)
+    return max(1.0, min(5.0, round(optimal_leverage, 1)))
+```
+
+## 3. Cải tiến quản lý rủi ro
+
+```python
+def calculate_position_size(account_balance, risk_per_trade, entry_price, stop_loss_price, leverage):
+    # Rủi ro tuyệt đối
+    risk_amount = account_balance * (risk_per_trade/100)
+    
+    # Phần trăm thay đổi giá từ entry đến stop loss
+    price_change_percent = abs(stop_loss_price - entry_price) / entry_price
+    
+    # Tính số lượng tối đa có thể mua với mức rủi ro cho phép
+    max_position_value = risk_amount / (price_change_percent / leverage)
+    
+    # Tính số lượng coin
+    position_size = max_position_value / entry_price
+    
+    return position_size
+```
+
+## 4. Đánh giá chất lượng tín hiệu
+
+```python
+def signal_quality_score(adx, rsi, volume_ratio, price_action_score):
+    # Đánh giá sức mạnh xu hướng (0-100)
+    trend_strength = min(100, adx * 4)
+    
+    # Đánh giá momentum (0-100)
+    momentum_score = abs(rsi - 50) * 2
+    
+    # Đánh giá khối lượng bất thường (0-100)
+    volume_score = min(100, volume_ratio * 100)
+    
+    # Đánh giá mẫu hình giá (0-100)
+    pattern_score = price_action_score
+    
+    # Tính điểm tổng hợp
+    weights = {'trend': 0.35, 'momentum': 0.25, 'volume': 0.20, 'pattern': 0.20}
+    final_score = (trend_strength * weights['trend'] + 
+                  momentum_score * weights['momentum'] + 
+                  volume_score * weights['volume'] + 
+                  pattern_score * weights['pattern'])
+    
+    return final_score  # 0-100, >70 là tín hiệu mạnh
+```
+
+## 5. Trailing Stop thích ứng
+
+```python
+def adaptive_trailing_stop(position_type, entry_price, current_price, market_regime, highest_profit):
+    # Tham số cơ bản
+    base_callback = 0.02  # 2% callback cơ bản
+    
+    # Điều chỉnh theo chế độ thị trường
+    regime_multiplier = {
+        'trending': 0.7,  # Callback nhỏ hơn cho xu hướng
+        'ranging': 1.5,   # Callback lớn hơn cho thị trường sideway
+        'volatile': 1.2,  # Callback vừa phải cho thị trường biến động
+        'quiet': 1.0      # Callback tiêu chuẩn cho thị trường ít biến động
+    }
+    
+    # Điều chỉnh theo % lợi nhuận đã đạt được
+    profit_multiplier = 1.0 + (highest_profit * 2)  # Callback tăng theo lợi nhuận
+    
+    # Tính callback tối ưu
+    callback = base_callback * regime_multiplier.get(market_regime, 1.0) * profit_multiplier
+    
+    # Tính giá trailing stop
+    if position_type == 'LONG':
+        trailing_stop = current_price * (1 - callback)
+    else:  # SHORT
+        trailing_stop = current_price * (1 + callback)
+    
+    return trailing_stop
+```

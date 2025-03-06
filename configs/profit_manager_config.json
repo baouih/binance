@@ -1,11 +1,11 @@
 {
     "time_based": {
         "enabled": true,
-        "max_hold_time": 48
+        "max_hold_time": 24
     },
     "target_profit": {
         "enabled": true,
-        "profit_target": 5.0
+        "profit_target": 2.0
     },
     "indicator_based": {
         "enabled": true,
@@ -18,8 +18,16 @@
     },
     "dynamic_volatility": {
         "enabled": true,
-        "low_vol_target": 1.5,
-        "medium_vol_target": 3.0,
-        "high_vol_target": 5.0
+        "low_vol_target": 1.0,
+        "medium_vol_target": 2.0,
+        "high_vol_target": 3.0
+    },
+    "small_account_settings": {
+        "enabled": true,
+        "lower_profit_targets": true,
+        "btc_profit_target": 1.5,
+        "eth_profit_target": 2.0,
+        "altcoin_profit_target": 3.0,
+        "max_hold_time": 12
     }
 }
