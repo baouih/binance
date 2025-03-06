@@ -1,0 +1,7 @@
+{
+  "workflows": {
+    "direct-app": {
+      "commands": ["python direct_app.py"]
+    }
+  }
+}
