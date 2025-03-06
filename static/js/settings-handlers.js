@@ -13,7 +13,7 @@ const API_ENDPOINTS = {
     API_SETTINGS: '/api/account/settings',
     TEST_API_CONNECTION: '/api/test_connection', // Sửa lại cho đúng với route trong routes/bot_control.py
     TRADING_COINS: '/api/trading/coins',
-    RISK_SETTINGS: '/api/security/settings',
+    RISK_SETTINGS: '/api/settings/risk',
     TELEGRAM_SETTINGS: '/api/telegram/config', // Đã sửa để trỏ đến endpoint đúng
     TEST_TELEGRAM: '/api/telegram/test',
     NOTIFICATION_SETTINGS: '/api/notification/settings',
@@ -432,29 +432,176 @@ function setupApiSettingsHandlers() {
  * Thiết lập các handler cho phần Quản lý rủi ro
  */
 function setupRiskSettingsHandlers() {
+    // Risk level descriptions and values
+    const riskLevels = {
+        'very_low': {
+            name: 'Rất thấp',
+            color: 'success',
+            description: [
+                'Rủi ro mỗi giao dịch: <span class="fw-bold">0.3%</span> số dư',
+                'Số vị thế tối đa: <span class="fw-bold">3</span> vị thế',
+                'Tổng rủi ro tối đa: <span class="fw-bold">5%</span> số dư',
+                'Ngưỡng drawdown: <span class="fw-bold">5%</span>',
+                'Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:2.0</span>'
+            ],
+            values: {
+                riskPerTrade: 0.3,
+                maxPositions: 3,
+                maxRiskTotal: 5
+            }
+        },
+        'low': {
+            name: 'Thấp',
+            color: 'info',
+            description: [
+                'Rủi ro mỗi giao dịch: <span class="fw-bold">0.5%</span> số dư',
+                'Số vị thế tối đa: <span class="fw-bold">4</span> vị thế',
+                'Tổng rủi ro tối đa: <span class="fw-bold">10%</span> số dư',
+                'Ngưỡng drawdown: <span class="fw-bold">8%</span>',
+                'Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.8</span>'
+            ],
+            values: {
+                riskPerTrade: 0.5,
+                maxPositions: 4,
+                maxRiskTotal: 10
+            }
+        },
+        'medium': {
+            name: 'Trung bình',
+            color: 'primary',
+            description: [
+                'Rủi ro mỗi giao dịch: <span class="fw-bold">1.0%</span> số dư',
+                'Số vị thế tối đa: <span class="fw-bold">5</span> vị thế',
+                'Tổng rủi ro tối đa: <span class="fw-bold">20%</span> số dư',
+                'Ngưỡng drawdown: <span class="fw-bold">10%</span>',
+                'Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.5</span>'
+            ],
+            values: {
+                riskPerTrade: 1.0,
+                maxPositions: 5,
+                maxRiskTotal: 20
+            }
+        },
+        'high': {
+            name: 'Cao',
+            color: 'warning',
+            description: [
+                'Rủi ro mỗi giao dịch: <span class="fw-bold">2.0%</span> số dư',
+                'Số vị thế tối đa: <span class="fw-bold">7</span> vị thế',
+                'Tổng rủi ro tối đa: <span class="fw-bold">30%</span> số dư',
+                'Ngưỡng drawdown: <span class="fw-bold">15%</span>',
+                'Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.3</span>'
+            ],
+            values: {
+                riskPerTrade: 2.0,
+                maxPositions: 7,
+                maxRiskTotal: 30
+            }
+        },
+        'very_high': {
+            name: 'Rất cao',
+            color: 'danger',
+            description: [
+                'Rủi ro mỗi giao dịch: <span class="fw-bold">3.0%</span> số dư',
+                'Số vị thế tối đa: <span class="fw-bold">10</span> vị thế',
+                'Tổng rủi ro tối đa: <span class="fw-bold">50%</span> số dư',
+                'Ngưỡng drawdown: <span class="fw-bold">20%</span>',
+                'Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.0</span>'
+            ],
+            values: {
+                riskPerTrade: 3.0,
+                maxPositions: 10,
+                maxRiskTotal: 50
+            }
+        }
+    };
+    
+    // Risk level radio buttons
+    const riskLevelBtns = document.querySelectorAll('input[name="riskLevel"]');
+    const riskLevelInfo = document.getElementById('riskLevelInfo');
+    
     // Risk per trade slider
     const riskPerTradeSlider = document.getElementById('riskPerTrade');
     const riskPerTradeValue = document.getElementById('riskPerTradeValue');
     
+    // Max positions slider
+    const maxPositionsSlider = document.getElementById('maxPositions');
+    const maxPositionsValue = document.getElementById('maxPositionsValue');
+    
+    // Max risk total slider
+    const maxRiskTotalSlider = document.getElementById('maxRiskTotal');
+    const maxRiskTotalValue = document.getElementById('maxRiskTotalValue');
+    
+    // Update risk level info display
+    function updateRiskLevelInfo(level) {
+        const riskLevel = riskLevels[level];
+        
+        // Update header
+        let html = `<h6 class="mb-2">Mức độ rủi ro: <span class="fw-bold text-${riskLevel.color}">${riskLevel.name}</span></h6>`;
+        
+        // Update description list
+        html += '<ul class="mb-0">';
+        riskLevel.description.forEach(item => {
+            html += `<li>${item}</li>`;
+        });
+        html += '</ul>';
+        
+        // Update sliders with values from the risk level
+        if (riskPerTradeSlider && riskPerTradeValue) {
+            riskPerTradeSlider.value = riskLevel.values.riskPerTrade;
+            riskPerTradeValue.textContent = riskLevel.values.riskPerTrade + '%';
+        }
+        
+        if (maxPositionsSlider && maxPositionsValue) {
+            maxPositionsSlider.value = riskLevel.values.maxPositions;
+            maxPositionsValue.textContent = riskLevel.values.maxPositions;
+        }
+        
+        if (maxRiskTotalSlider && maxRiskTotalValue) {
+            maxRiskTotalSlider.value = riskLevel.values.maxRiskTotal;
+            maxRiskTotalValue.textContent = riskLevel.values.maxRiskTotal + '%';
+        }
+        
+        // Update info box
+        if (riskLevelInfo) {
+            riskLevelInfo.innerHTML = html;
+        }
+    }
+    
+    // Initial risk level display
+    if (riskLevelBtns.length > 0) {
+        let selectedRiskLevel = document.querySelector('input[name="riskLevel"]:checked');
+        if (selectedRiskLevel) {
+            updateRiskLevelInfo(selectedRiskLevel.value);
+        } else {
+            // Default to medium if none selected
+            const mediumRiskBtn = document.getElementById('riskMedium');
+            if (mediumRiskBtn) {
+                mediumRiskBtn.checked = true;
+                updateRiskLevelInfo('medium');
+            }
+        }
+        
+        // Risk level change handler
+        riskLevelBtns.forEach(btn => {
+            btn.addEventListener('change', function() {
+                updateRiskLevelInfo(this.value);
+            });
+        });
+    }
+    
+    // Slider event handlers
     if (riskPerTradeSlider && riskPerTradeValue) {
         riskPerTradeSlider.addEventListener('input', function () {
             riskPerTradeValue.textContent = this.value + '%';
         });
     }
     
-    // Max positions slider
-    const maxPositionsSlider = document.getElementById('maxPositions');
-    const maxPositionsValue = document.getElementById('maxPositionsValue');
-    
     if (maxPositionsSlider && maxPositionsValue) {
         maxPositionsSlider.addEventListener('input', function () {
             maxPositionsValue.textContent = this.value;
         });
     }
-    
-    // Max risk total slider
-    const maxRiskTotalSlider = document.getElementById('maxRiskTotal');
-    const maxRiskTotalValue = document.getElementById('maxRiskTotalValue');
     
     if (maxRiskTotalSlider && maxRiskTotalValue) {
         maxRiskTotalSlider.addEventListener('input', function () {
@@ -466,7 +613,8 @@ function setupRiskSettingsHandlers() {
     const saveRiskSettingsBtn = document.getElementById('saveRiskSettings');
     if (saveRiskSettingsBtn) {
         saveRiskSettingsBtn.addEventListener('click', function () {
-            // Lấy các giá trị
+            // Lấy các giá trị từ form
+            const riskLevel = document.querySelector('input[name="riskLevel"]:checked')?.value || 'medium';
             const riskPerTrade = riskPerTradeSlider?.value;
             const maxPositions = maxPositionsSlider?.value;
             const maxRiskTotal = maxRiskTotalSlider?.value;
@@ -474,10 +622,11 @@ function setupRiskSettingsHandlers() {
             // Hiển thị loading
             showLoading('Đang lưu cài đặt quản lý rủi ro...');
             
-            // Gửi API request
+            // Gửi API request đến endpoint
             fetchAPI(API_ENDPOINTS.RISK_SETTINGS, {
                 method: 'POST',
                 body: JSON.stringify({
+                    risk_level: riskLevel,
                     risk_per_trade: riskPerTrade,
                     max_positions: maxPositions,
                     max_risk_total: maxRiskTotal
@@ -485,7 +634,11 @@ function setupRiskSettingsHandlers() {
             }, false)
                 .then(data => {
                     hideLoading();
-                    showAlert('success', 'Cài đặt quản lý rủi ro đã được lưu thành công!');
+                    if (data.status === 'success') {
+                        showAlert('success', 'Cài đặt quản lý rủi ro đã được lưu thành công!');
+                    } else {
+                        showAlert('danger', data.message || 'Có lỗi xảy ra khi lưu cài đặt quản lý rủi ro.');
+                    }
                 })
                 .catch(() => {
                     hideLoading();

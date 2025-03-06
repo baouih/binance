@@ -1,38 +1,74 @@
 {
     "base_risk_percentage": 1.0,
-    "max_risk_percentage": 3.0,
-    "min_risk_percentage": 0.2,
-    "volatility_adjustment": {
-        "enabled": true,
-        "high_volatility_threshold": 0.03,
-        "low_volatility_threshold": 0.01,
-        "high_volatility_multiplier": 0.5,
-        "low_volatility_multiplier": 1.5
-    },
-    "drawdown_protection": {
-        "enabled": true,
-        "drawdown_levels": [5, 10, 15, 20],
-        "risk_reduction_percents": [20, 40, 60, 80]
-    },
     "position_limits": {
         "max_positions": 5,
-        "max_positions_per_direction": 3,
-        "position_correlation_threshold": 0.7
+        "max_leverage": 10,
+        "max_risk_total": 20
     },
-    "capital_allocation": {
-        "method": "equal",
-        "multi_timeframe_weight": {
-            "1m": 0.1,
-            "5m": 0.15,
-            "15m": 0.2,
-            "1h": 0.3,
-            "4h": 0.15,
-            "1d": 0.1
+    "risk_levels": {
+        "very_low": {
+            "risk_per_trade": 0.3,
+            "max_positions": 3,
+            "max_leverage": 2,
+            "max_risk_total": 5,
+            "drawdown_threshold": 5,
+            "min_risk_reward_ratio": 2.0
+        },
+        "low": {
+            "risk_per_trade": 0.5,
+            "max_positions": 4,
+            "max_leverage": 5,
+            "max_risk_total": 10,
+            "drawdown_threshold": 8,
+            "min_risk_reward_ratio": 1.8
+        },
+        "medium": {
+            "risk_per_trade": 1.0,
+            "max_positions": 5,
+            "max_leverage": 10,
+            "max_risk_total": 20,
+            "drawdown_threshold": 10,
+            "min_risk_reward_ratio": 1.5
+        },
+        "high": {
+            "risk_per_trade": 2.0,
+            "max_positions": 7,
+            "max_leverage": 20,
+            "max_risk_total": 30,
+            "drawdown_threshold": 15,
+            "min_risk_reward_ratio": 1.3
+        },
+        "very_high": {
+            "risk_per_trade": 3.0,
+            "max_positions": 10,
+            "max_leverage": 50,
+            "max_risk_total": 50,
+            "drawdown_threshold": 20,
+            "min_risk_reward_ratio": 1.0
         }
     },
-    "liquidity_requirements": {
-        "min_24h_volume": 10000000,
-        "min_orderbook_depth": 1000000,
-        "max_slippage_percent": 0.5
+    "adaptive_risk": {
+        "enabled": true,
+        "increase_pace": "slow",
+        "decrease_pace": "fast",
+        "equity_high_watermark": 0,
+        "drawdown_adjustment": {
+            "5": 0.8,
+            "10": 0.5,
+            "15": 0.3,
+            "20": 0.1
+        }
+    },
+    "profit_protection": {
+        "enabled": true,
+        "profit_target_percentage": 20,
+        "risk_reduction_percentage": 50
+    },
+    "advanced_settings": {
+        "check_correlation": true,
+        "check_market_condition": true,
+        "risk_adjustment_by_volatility": true,
+        "minimum_trade_spacing": 60,
+        "maximum_daily_trades": 20
     }
 }

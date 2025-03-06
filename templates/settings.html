@@ -325,12 +325,53 @@
                     <div class="info-card">
                         <h5 class="mb-3">Quản lý rủi ro</h5>
                         
+                        <!-- Mức độ rủi ro -->
+                        <div class="mb-4">
+                            <label class="form-label">Mức độ rủi ro</label>
+                            <div class="risk-levels d-flex justify-content-between mb-2">
+                                <div class="btn-group w-100" role="group" aria-label="Risk level options">
+                                    <input type="radio" class="btn-check" name="riskLevel" id="riskVeryLow" value="very_low">
+                                    <label class="btn btn-outline-success" for="riskVeryLow">Rất thấp</label>
+                                    
+                                    <input type="radio" class="btn-check" name="riskLevel" id="riskLow" value="low">
+                                    <label class="btn btn-outline-info" for="riskLow">Thấp</label>
+                                    
+                                    <input type="radio" class="btn-check" name="riskLevel" id="riskMedium" value="medium" checked>
+                                    <label class="btn btn-outline-primary" for="riskMedium">Trung bình</label>
+                                    
+                                    <input type="radio" class="btn-check" name="riskLevel" id="riskHigh" value="high">
+                                    <label class="btn btn-outline-warning" for="riskHigh">Cao</label>
+                                    
+                                    <input type="radio" class="btn-check" name="riskLevel" id="riskVeryHigh" value="very_high">
+                                    <label class="btn btn-outline-danger" for="riskVeryHigh">Rất cao</label>
+                                </div>
+                            </div>
+                            <div class="risk-level-info p-3 border rounded mb-2" id="riskLevelInfo">
+                                <!-- Thông tin chi tiết về mức độ rủi ro sẽ hiển thị ở đây -->
+                                <h6 class="mb-2">Mức độ rủi ro: <span class="fw-bold text-primary">Trung bình</span></h6>
+                                <ul class="mb-0">
+                                    <li>Rủi ro mỗi giao dịch: <span class="fw-bold">0.5-1.0%</span> số dư</li>
+                                    <li>Số vị thế tối đa: <span class="fw-bold">5</span> vị thế</li>
+                                    <li>Ngưỡng drawdown để giảm rủi ro: <span class="fw-bold">10%</span></li>
+                                    <li>Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.5</span></li>
+                                </ul>
+                            </div>
+                            <div class="form-text">
+                                Chọn mức độ rủi ro phù hợp với chiến lược giao dịch của bạn. Mức độ rủi ro sẽ ảnh hưởng đến tất cả các tham số quản lý rủi ro.
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Tùy chỉnh tham số -->
+                        <h6 class="mb-3">Tùy chỉnh tham số</h6>
+                        
                         <div class="mb-4">
                             <label for="riskPerTrade" class="form-label d-flex justify-content-between">
                                 <span>Rủi ro mỗi giao dịch</span>
-                                <span id="riskPerTradeValue">2.5%</span>
+                                <span id="riskPerTradeValue">1.0%</span>
                             </label>
-                            <input type="range" class="form-range" id="riskPerTrade" min="0.1" max="10" step="0.1" value="2.5">
+                            <input type="range" class="form-range" id="riskPerTrade" min="0.1" max="5" step="0.1" value="1.0">
                             <div class="form-text">
                                 Phần trăm số dư tài khoản có thể rủi ro trong mỗi giao dịch
                             </div>
@@ -395,11 +436,16 @@
                             </div>
                         </div>
                         
-                        <div class="d-grid">
+                        <div class="d-grid gap-2">
                             <button type="button" class="btn btn-primary" id="saveRiskSettings">
                                 <i class="bi bi-save me-2"></i>
                                 Lưu cài đặt
                             </button>
+                            <div class="alert alert-info" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Cấu hình quản lý rủi ro sẽ được áp dụng cho tất cả các giao dịch mới. 
+                                Mức độ rủi ro cao hơn có thể mang lại lợi nhuận lớn hơn nhưng cũng có thể dẫn đến tổn thất lớn hơn.
+                            </div>
                         </div>
                     </div>
                 </div>

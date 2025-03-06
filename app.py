@@ -7,6 +7,7 @@ import threading
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 import binance_api
 from account_type_selector import AccountTypeSelector
+from dynamic_risk_allocator import DynamicRiskAllocator
 
 # Jinja2 custom filter
 from datetime import datetime as dt
@@ -1679,6 +1680,15 @@ def position():
 def settings():
     """Trang cài đặt bot"""
     try:
+        # Tải cấu hình rủi ro để hiển thị trong form
+        risk_config = {}
+        try:
+            with open('configs/risk_config.json', 'r') as f:
+                risk_config = json.load(f)
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc cấu hình rủi ro: {str(e)}")
+            risk_config = {}
+            
         # Tạo dữ liệu cài đặt hiện tại
         current_settings = {
             'api_key': '••••••••••••••••',
@@ -1925,6 +1935,71 @@ def test_telegram():
 # Xóa phần POST để tránh xung đột với config_route.py
 # Các phần xung đột đã được xử lý trong file config_route.py
 
+
+@app.route('/api/settings/risk', methods=['GET', 'POST'])
+def risk_settings():
+    """Lấy hoặc cập nhật cài đặt rủi ro"""
+    if request.method == 'GET':
+        try:
+            # Đọc cấu hình rủi ro hiện tại từ file
+            with open('configs/risk_config.json', 'r') as f:
+                risk_config = json.load(f)
+            return jsonify({'status': 'success', 'data': risk_config})
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc cấu hình rủi ro: {str(e)}")
+            return jsonify({'status': 'error', 'message': f'Không thể đọc cấu hình rủi ro: {str(e)}'})
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            risk_level = data.get('risk_level')
+            risk_per_trade = data.get('risk_per_trade')
+            max_positions = data.get('max_positions')
+            max_risk_total = data.get('max_risk_total')
+            
+            # Đọc cấu hình rủi ro hiện tại
+            with open('configs/risk_config.json', 'r') as f:
+                risk_config = json.load(f)
+            
+            # Cập nhật các tham số cơ bản
+            risk_config['base_risk_percentage'] = float(risk_per_trade)
+            
+            # Cập nhật cấu hình vị thế
+            risk_config['position_limits']['max_positions'] = int(max_positions)
+            
+            # Nếu có mức độ rủi ro được chọn, cập nhật các tham số tương ứng
+            if risk_level and risk_level in risk_config.get('risk_levels', {}):
+                selected_risk = risk_config['risk_levels'][risk_level]
+                
+                # Áp dụng cài đặt từ mức độ rủi ro đã chọn
+                risk_config['base_risk_percentage'] = selected_risk['risk_per_trade']
+                risk_config['position_limits']['max_positions'] = selected_risk['max_positions']
+                
+                logger.info(f"Đã áp dụng mức độ rủi ro: {risk_level} với cài đặt: {selected_risk}")
+            
+            # Lưu cấu hình cập nhật
+            with open('configs/risk_config.json', 'w') as f:
+                json.dump(risk_config, f, indent=4)
+            
+            # Tạo instance của DynamicRiskAllocator để áp dụng cài đặt mới
+            try:
+                risk_allocator = DynamicRiskAllocator(config_path='configs/risk_config.json')
+                risk_allocator.reload_config()
+                logger.info("Đã tải lại cấu hình rủi ro trong DynamicRiskAllocator")
+            except Exception as e:
+                logger.warning(f"Không thể tải lại DynamicRiskAllocator: {str(e)}")
+            
+            return jsonify({
+                'status': 'success', 
+                'message': 'Đã cập nhật cài đặt rủi ro thành công'
+            })
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật cài đặt rủi ro: {str(e)}")
+            return jsonify({
+                'status': 'error', 
+                'message': f'Không thể cập nhật cài đặt rủi ro: {str(e)}'
+            })
 
 @app.route('/api/positions/close', methods=['POST'])
 def close_position():

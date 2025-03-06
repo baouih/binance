@@ -50,6 +50,17 @@ class DynamicRiskAllocator:
         self.active_positions = {}
         self.position_metrics = {}
     
+    def reload_config(self) -> Dict:
+        """
+        Tải lại cấu hình từ file
+        
+        Returns:
+            Dict: Cấu hình đã tải lại
+        """
+        self.config = self._load_config()
+        logger.info(f"Đã tải lại cấu hình từ {self.config_path}")
+        return self.config
+    
     def _load_config(self) -> Dict:
         """
         Tải cấu hình từ file
