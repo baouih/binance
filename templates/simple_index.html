@@ -184,139 +184,42 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Cập nhật trạng thái bot
-            function updateBotStatus() {
-                fetch('/api/bot-status')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Bot status update:', data);
-                        document.getElementById('bot-status').textContent = data.status;
-                        document.getElementById('bot-status').className = data.running ? 'badge bg-success status-badge' : 'badge bg-danger status-badge';
-                        document.getElementById('last-update').textContent = data.last_update;
-                        
-                        if (data.balance) {
-                            document.getElementById('account-balance').textContent = Number(data.balance).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching bot status:', error);
-                        addSystemMessage('Lỗi khi cập nhật trạng thái bot', 'danger');
+            // Kết nối tới Socket.IO server
+            const socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connected to server');
+                addSystemMessage('Connected to real-time updates server');
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Disconnected from server');
+                addSystemMessage('Disconnected from real-time updates server', 'danger');
+                document.getElementById('bot-status').className = 'badge bg-danger status-badge';
+                document.getElementById('bot-status').textContent = 'Disconnected';
+            });
+            
+            socket.on('server_status', function(data) {
+                console.log('Server status:', data);
+                addSystemMessage('Server status update: ' + data.status);
+            });
+            
+            socket.on('bot_status_update', function(data) {
+                console.log('Bot status update:', data);
+                document.getElementById('bot-status').textContent = data.status;
+                document.getElementById('bot-status').className = data.running ? 'badge bg-success status-badge' : 'badge bg-danger status-badge';
+                document.getElementById('last-update').textContent = data.last_update;
+                
+                if (data.balance) {
+                    document.getElementById('account-balance').textContent = Number(data.balance).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
                     });
-            }
-            
-            // Cập nhật dữ liệu thị trường
-            function updateMarketData() {
-                fetch('/api/market-data')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Market data update:', data);
-                        document.getElementById('btc-price').textContent = Number(data.btc_price).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
-                        document.getElementById('eth-price').textContent = Number(data.eth_price).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
-                        
-                        document.getElementById('btc-change').textContent = (data.btc_change_24h > 0 ? '+' : '') + data.btc_change_24h + '%';
-                        document.getElementById('btc-change').className = data.btc_change_24h >= 0 ? 'positive-change' : 'negative-change';
-                        
-                        document.getElementById('eth-change').textContent = (data.eth_change_24h > 0 ? '+' : '') + data.eth_change_24h + '%';
-                        document.getElementById('eth-change').className = data.eth_change_24h >= 0 ? 'positive-change' : 'negative-change';
-                        
-                        document.getElementById('market-mode').textContent = data.market_trend.charAt(0).toUpperCase() + data.market_trend.slice(1);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching market data:', error);
-                        addSystemMessage('Lỗi khi cập nhật dữ liệu thị trường', 'danger');
-                    });
-            }
-            
-            // Cập nhật dữ liệu thị trường từ API
-            function refreshMarketData() {
-                fetch('/api/update-market', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        console.log('Market data refreshed:', result.data);
-                        updateMarketData();
-                        addSystemMessage('Dữ liệu thị trường đã được cập nhật', 'info');
-                    } else {
-                        console.error('Error refreshing market data:', result.error);
-                        addSystemMessage('Lỗi khi làm mới dữ liệu thị trường: ' + result.error, 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error refreshing market data:', error);
-                    addSystemMessage('Lỗi khi làm mới dữ liệu thị trường', 'danger');
-                });
-            }
-            
-            // Khởi động bot
-            function startBot() {
-                fetch('/api/start-bot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        console.log('Bot started:', result.data);
-                        updateBotStatus();
-                        addSystemMessage('Bot đã được khởi động', 'success');
-                    } else {
-                        console.error('Error starting bot:', result.error);
-                        addSystemMessage('Lỗi khi khởi động bot: ' + result.error, 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error starting bot:', error);
-                    addSystemMessage('Lỗi khi khởi động bot', 'danger');
-                });
-            }
-            
-            // Dừng bot
-            function stopBot() {
-                fetch('/api/stop-bot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        console.log('Bot stopped:', result.data);
-                        updateBotStatus();
-                        addSystemMessage('Bot đã được dừng', 'warning');
-                    } else {
-                        console.error('Error stopping bot:', result.error);
-                        addSystemMessage('Lỗi khi dừng bot: ' + result.error, 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error stopping bot:', error);
-                    addSystemMessage('Lỗi khi dừng bot', 'danger');
-                });
-            }
-            
-            // Khởi tạo trang
-            updateBotStatus();
-            updateMarketData();
-            console.log('Initialized trading dashboard');
+                }
+            });
             
             // Function to add system message
             function addSystemMessage(message, type = 'info') {
