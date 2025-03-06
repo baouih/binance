@@ -1,26 +1,43 @@
 """
-Configuration file for Gunicorn to run with Flask-SocketIO
+Cấu hình Gunicorn cho Flask SocketIO với Eventlet
 """
-import os
 import multiprocessing
+import os
 
-# Worker settings
-worker_class = 'eventlet'
-workers = 1  # SocketIO needs exactly 1 worker when using eventlet
+# Cài đặt môi trường
+bind = "0.0.0.0:5000"
+workers = multiprocessing.cpu_count() * 2 + 1
+worker_class = "eventlet"
+timeout = 120
+keepalive = 5
 
-# Bind to port 5000
-bind = '0.0.0.0:5000'
+# File application
+wsgi_app = "app_wsgi:app"
 
-# Application module
-wsgi_app = 'main:app'
+# Debug và logging
+errorlog = "-"  # stdout
+accesslog = "-"  # stdout
+loglevel = "info"
 
-# Set reload to True for development
-reload = True
+# Eventlet worker settings
+worker_connections = 1000
+raw_env = [
+    "EVENTLET_NO_GREENDNS=yes",  # Tránh vấn đề DNS với greenlet
+]
 
-# Set reuse-port for better connection handling
-reuse_port = True
+# Tùy chỉnh cho Socket
+proxy_protocol = False
+forwarded_allow_ips = "*"
 
-# Log settings
-errorlog = '-'
-accesslog = '-'
-loglevel = 'info'
+# Options để tăng hiệu suất
+limit_request_line = 4096
+limit_request_fields = 100
+limit_request_field_size = 8190
+
+# Tắt sendfile
+enable_stdio_inheritance = True
+
+# Cài đặt ứng dụng
+preload = True
+
+print("Khởi động Gunicorn với cấu hình worker_class=eventlet")
