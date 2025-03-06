@@ -55,7 +55,9 @@ def load_account_config() -> Dict:
         logger.error(f"Lỗi khi tải account_config.json: {str(e)}")
         return {}
 
-def run_backtest_for_symbol(symbol: str, interval: str = '1h', risk: float = 1.0, adaptive_risk: bool = True) -> Dict:
+def run_backtest_for_symbol(symbol: str, interval: str = '1h', risk: float = 1.0, 
+                         adaptive_risk: bool = True, start_date: str = '2025-02-05', 
+                         end_date: str = '2025-03-01') -> Dict:
     """
     Chạy backtest cho một cặp tiền với mức rủi ro cụ thể
     
@@ -64,6 +66,8 @@ def run_backtest_for_symbol(symbol: str, interval: str = '1h', risk: float = 1.0
         interval (str): Khung thời gian
         risk (float): Mức rủi ro (% vốn)
         adaptive_risk (bool): Sử dụng rủi ro thích ứng hay không
+        start_date (str): Ngày bắt đầu backtest (định dạng YYYY-MM-DD)
+        end_date (str): Ngày kết thúc backtest (định dạng YYYY-MM-DD)
         
     Returns:
         Dict: Kết quả backtest
@@ -80,14 +84,20 @@ def run_backtest_for_symbol(symbol: str, interval: str = '1h', risk: float = 1.0
             "python", "enhanced_backtest.py", 
             "--symbol", symbol, 
             "--interval", interval,
-            "--risk", str(risk)
+            "--risk", str(risk),
+            "--start_date", start_date,
+            "--end_date", end_date
         ]
         
         if adaptive_risk:
             cmd.append("--adaptive_risk")
             
         # Chạy lệnh và lấy output
-        subprocess.run(cmd, check=True)
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Lỗi khi chạy backtest cho {symbol} {interval} rủi ro {risk}%: {e}")
+            return None
         
         # Đọc kết quả từ file
         if os.path.exists(result_file):
@@ -438,6 +448,8 @@ def main():
     parser.add_argument('--interval', default='1h', help='Khung thời gian (mặc định: 1h)')
     parser.add_argument('--symbols', nargs='+', help='Danh sách các cặp tiền (mặc định: tất cả)')
     parser.add_argument('--no-adaptive', action='store_true', help='Không sử dụng rủi ro thích ứng')
+    parser.add_argument('--start-date', default='2025-02-05', help='Ngày bắt đầu (định dạng YYYY-MM-DD, mặc định: 2025-02-05)')
+    parser.add_argument('--end-date', default='2025-03-01', help='Ngày kết thúc (định dạng YYYY-MM-DD, mặc định: 2025-03-01)')
     args = parser.parse_args()
     
     # Tải cấu hình
@@ -465,7 +477,9 @@ def main():
                 symbol=symbol,
                 interval=args.interval,
                 risk=risk,
-                adaptive_risk=not args.no_adaptive
+                adaptive_risk=not args.no_adaptive,
+                start_date=args.start_date,
+                end_date=args.end_date
             )
             
             if result:

@@ -402,12 +402,22 @@ def load_data(symbol, interval, data_dir='test_data', start_date=None, end_date=
         df.set_index('timestamp', inplace=True)
     
     # Lọc theo khoảng thời gian nếu được chỉ định
+    data_start = df.index.min() if not df.empty else None
+    data_end = df.index.max() if not df.empty else None
+    logger.info(f"Dữ liệu có sẵn từ {data_start} đến {data_end}")
+    
     if start_date:
         start_date = pd.to_datetime(start_date)
+        if not df.empty and df.index.min() > start_date:
+            logger.warning(f"Ngày bắt đầu yêu cầu ({start_date}) sớm hơn dữ liệu có sẵn ({df.index.min()})")
+            logger.info(f"Điều chỉnh ngày bắt đầu thành {df.index.min()}")
         df = df[df.index >= start_date]
         
     if end_date:
         end_date = pd.to_datetime(end_date)
+        if not df.empty and df.index.max() < end_date:
+            logger.warning(f"Ngày kết thúc yêu cầu ({end_date}) muộn hơn dữ liệu có sẵn ({df.index.max()})")
+            logger.info(f"Điều chỉnh ngày kết thúc thành {df.index.max()}")
         df = df[df.index <= end_date]
         
     # Log thông tin dữ liệu
@@ -415,6 +425,10 @@ def load_data(symbol, interval, data_dir='test_data', start_date=None, end_date=
         logger.info(f"Đã tải {len(df)} candles từ {df.index.min()} đến {df.index.max()}")
     else:
         logger.warning(f"Không có dữ liệu nào trong khoảng thời gian chỉ định")
+        # Nếu không có dữ liệu trong khoảng thời gian yêu cầu, sử dụng toàn bộ dữ liệu có sẵn
+        if data_start is not None and data_end is not None:
+            logger.info(f"Sử dụng toàn bộ dữ liệu có sẵn từ {data_start} đến {data_end}")
+            return df
         
     return df
 
