@@ -374,14 +374,16 @@ def generate_signal_for_regime(df: pd.DataFrame, regime: str, regime_detector: M
     
     return signals
 
-def load_data(symbol, interval, data_dir='test_data'):
+def load_data(symbol, interval, data_dir='test_data', start_date=None, end_date=None):
     """
-    Tải dữ liệu giá từ file CSV
+    Tải dữ liệu giá từ file CSV và lọc theo khoảng thời gian
     
     Args:
         symbol (str): Mã cặp giao dịch
         interval (str): Khung thời gian
         data_dir (str): Thư mục dữ liệu
+        start_date (str, optional): Ngày bắt đầu (YYYY-MM-DD)
+        end_date (str, optional): Ngày kết thúc (YYYY-MM-DD)
         
     Returns:
         pd.DataFrame: DataFrame với dữ liệu giá
@@ -399,6 +401,21 @@ def load_data(symbol, interval, data_dir='test_data'):
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df.set_index('timestamp', inplace=True)
     
+    # Lọc theo khoảng thời gian nếu được chỉ định
+    if start_date:
+        start_date = pd.to_datetime(start_date)
+        df = df[df.index >= start_date]
+        
+    if end_date:
+        end_date = pd.to_datetime(end_date)
+        df = df[df.index <= end_date]
+        
+    # Log thông tin dữ liệu
+    if not df.empty:
+        logger.info(f"Đã tải {len(df)} candles từ {df.index.min()} đến {df.index.max()}")
+    else:
+        logger.warning(f"Không có dữ liệu nào trong khoảng thời gian chỉ định")
+        
     return df
 
 def run_adaptive_backtest(
@@ -410,7 +427,9 @@ def run_adaptive_backtest(
     stop_loss_pct=7.0,
     take_profit_pct=15.0,
     use_adaptive_risk=True,
-    data_dir='test_data'):
+    data_dir='test_data',
+    start_date=None,
+    end_date=None):
     """
     Chạy backtest với chiến lược thích ứng
     
@@ -424,6 +443,8 @@ def run_adaptive_backtest(
         take_profit_pct (float): Phần trăm take profit
         use_adaptive_risk (bool): Sử dụng quản lý rủi ro thích ứng hay không
         data_dir (str): Thư mục dữ liệu
+        start_date (str, optional): Ngày bắt đầu phân tích (YYYY-MM-DD)
+        end_date (str, optional): Ngày kết thúc phân tích (YYYY-MM-DD)
     """
     # Thiết lập thông số backtest
     logger.info("=== CHẠY BACKTEST THÍCH ỨNG ===")
@@ -437,11 +458,16 @@ def run_adaptive_backtest(
     logger.info(f"Sử dụng rủi ro thích ứng: {use_adaptive_risk}")
     
     # Tải dữ liệu
-    df = load_data(symbol, interval, data_dir)
+    df = load_data(symbol, interval, data_dir, start_date, end_date)
     
     if df is None or len(df) < 100:
         logger.error("Không đủ dữ liệu để chạy backtest")
         return
+    
+    # Ghi log thông tin thời gian thử nghiệm
+    if start_date or end_date:
+        date_info = f"từ {start_date if start_date else 'đầu dữ liệu'} đến {end_date if end_date else 'cuối dữ liệu'}"
+        logger.info(f"Thực hiện backtest {date_info}")
     
     logger.info(f"Đã tải {len(df)} candles từ {df.index[0]} đến {df.index[-1]}")
     
@@ -755,6 +781,15 @@ def run_adaptive_backtest(
         logger.info(f"Đã lưu lịch sử giao dịch vào '{trades_csv_path}'")
         
         # Lưu kết quả backtest
+        # Thêm thông tin về khoảng thời gian nếu được chỉ định
+        date_info = {}
+        if start_date or end_date:
+            date_info = {
+                'start_date': str(start_date) if start_date else 'None',
+                'end_date': str(end_date) if end_date else 'None',
+                'analysis_period': f"{df.index[0].strftime('%Y-%m-%d')} to {df.index[-1].strftime('%Y-%m-%d')}"
+            }
+        
         results = {
             'symbol': symbol,
             'interval': interval,
@@ -775,7 +810,8 @@ def run_adaptive_backtest(
             'risk_percentage': risk_percentage,
             'use_adaptive_risk': use_adaptive_risk,
             'regime_performance': regime_performance,
-            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            **date_info  # Thêm thông tin về khoảng thời gian
         }
         
         results_json_path = f"backtest_results/{symbol}_{interval}_adaptive_results.json"
@@ -854,6 +890,8 @@ def main():
     parser.add_argument('--take_profit', type=float, default=15.0, help='Phần trăm take profit')
     parser.add_argument('--adaptive_risk', action='store_true', help='Sử dụng quản lý rủi ro thích ứng')
     parser.add_argument('--data_dir', type=str, default='test_data', help='Thư mục dữ liệu')
+    parser.add_argument('--start_date', type=str, help='Ngày bắt đầu (YYYY-MM-DD)')
+    parser.add_argument('--end_date', type=str, help='Ngày kết thúc (YYYY-MM-DD)')
     
     args = parser.parse_args()
     
@@ -866,7 +904,9 @@ def main():
         stop_loss_pct=args.stop_loss,
         take_profit_pct=args.take_profit,
         use_adaptive_risk=args.adaptive_risk,
-        data_dir=args.data_dir
+        data_dir=args.data_dir,
+        start_date=args.start_date,
+        end_date=args.end_date
     )
 
 if __name__ == "__main__":
