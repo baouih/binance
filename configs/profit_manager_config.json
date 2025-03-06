@@ -1,0 +1,25 @@
+{
+    "time_based": {
+        "enabled": true,
+        "max_hold_time": 48
+    },
+    "target_profit": {
+        "enabled": true,
+        "profit_target": 5.0
+    },
+    "indicator_based": {
+        "enabled": true,
+        "rsi_overbought": 70.0,
+        "rsi_oversold": 30.0
+    },
+    "price_reversal": {
+        "enabled": true,
+        "candle_count": 3
+    },
+    "dynamic_volatility": {
+        "enabled": true,
+        "low_vol_target": 1.5,
+        "medium_vol_target": 3.0,
+        "high_vol_target": 5.0
+    }
+}

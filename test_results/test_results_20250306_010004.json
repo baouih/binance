@@ -1,0 +1,621 @@
+{
+    "api_validator_tests": {
+        "success": true,
+        "details": {
+            "klines_validation": {
+                "valid_data_result": true,
+                "valid_data_errors": [],
+                "invalid_data_result": false,
+                "invalid_data_errors": [
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 0 c\u00f3 gi\u00e1 th\u1ea5p nh\u1ea5t (34500.0) > gi\u00e1 cao nh\u1ea5t (34000.0)",
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 0 c\u00f3 gi\u00e1 cao nh\u1ea5t (34000.0) < gi\u00e1 m\u1edf/\u0111\u00f3ng c\u1eeda",
+                    "Candlestick \u1edf v\u1ecb tr\u00ed 1 c\u00f3 volume \u00e2m (-1200.0)"
+                ],
+                "test_passed": true
+            },
+            "position_validation": {
+                "valid_data_result": true,
+                "valid_data_errors": [],
+                "invalid_data_result": false,
+                "invalid_data_errors": [
+                    "Thi\u1ebfu tr\u01b0\u1eddng b\u1eaft bu\u1ed9c 'leverage'",
+                    "Tr\u01b0\u1eddng 'positionAmt' kh\u00f4ng ph\u1ea3i l\u00e0 s\u1ed1 h\u1ee3p l\u1ec7"
+                ],
+                "test_passed": true
+            },
+            "data_transformation": {
+                "klines_transformed": true,
+                "position_transformed": true,
+                "test_passed": true
+            },
+            "retry_mechanism": {
+                "success_function": true,
+                "failure_function": true,
+                "test_passed": true
+            }
+        }
+    },
+    "strategy_selector_tests": {
+        "success": false,
+        "details": {
+            "regime_detection": {
+                "trending_detection": "trending",
+                "ranging_detection": "trending",
+                "volatile_detection": "trending",
+                "test_passed": false
+            },
+            "strategy_selection": {
+                "trending_priority": "trend_following",
+                "ranging_priority": "trend_following",
+                "volatile_priority": "trend_following",
+                "test_passed": false
+            },
+            "trading_decision": {
+                "trending_signal": "NEUTRAL",
+                "ranging_signal": "NEUTRAL",
+                "volatile_signal": "NEUTRAL",
+                "test_passed": true
+            }
+        }
+    },
+    "risk_allocator_tests": {
+        "success": false,
+        "details": {
+            "volatility_risk_adjustment": {
+                "low_volatility_risk": 1.7999999999999998,
+                "medium_volatility_risk": 1.1999999999999997,
+                "high_volatility_risk": 0.6,
+                "test_passed": true
+            },
+            "drawdown_risk_adjustment": {
+                "no_drawdown_risk": 1.1999999999999997,
+                "small_drawdown_risk": 0.9599999999999999,
+                "large_drawdown_risk": 0.4799999999999999,
+                "test_passed": true
+            },
+            "position_sizing": {
+                "position_size_usd": 2000.0,
+                "quantity": 0.04,
+                "expected_quantity": 0.1,
+                "test_passed": false
+            },
+            "capital_allocation": {
+                "allocation": {
+                    "BTCUSDT": 33.333333333333336,
+                    "ETHUSDT": 33.333333333333336,
+                    "BNBUSDT": 33.333333333333336
+                },
+                "total_allocation": 100.0,
+                "test_passed": true
+            }
+        }
+    },
+    "trailing_stop_tests": {
+        "success": true,
+        "details": {
+            "percentage_trailing_stop": {
+                "ts_updates": [
+                    {
+                        "price": 50000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 50400,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 50500,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50600,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50700,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50600,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50400,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50300,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    }
+                ],
+                "should_close": false,
+                "stop_price": 50247.5,
+                "close_reason": null,
+                "test_passed": true
+            },
+            "atr_trailing_stop": {
+                "ts_updates": [
+                    {
+                        "price": 50000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    }
+                ],
+                "should_close": false,
+                "stop_price": null,
+                "close_reason": null,
+                "test_passed": true
+            }
+        }
+    },
+    "comprehensive_tests": {
+        "success": false,
+        "details": {
+            "backtest": {
+                "initial_balance": null,
+                "final_balance": null,
+                "total_trades": null,
+                "win_rate": null,
+                "test_passed": false
+            },
+            "html_report": {
+                "report_path": "backtest_reports/backtest_report_20250306_010004.html",
+                "test_passed": true
+            }
+        }
+    },
+    "summary": {
+        "total_tests": 20,
+        "passed_tests": 15,
+        "failed_tests": 5,
+        "component_results": {
+            "api_validator_tests": {
+                "total": 4,
+                "passed": 4,
+                "failed": 0,
+                "success_rate": 100.0
+            },
+            "strategy_selector_tests": {
+                "total": 3,
+                "passed": 1,
+                "failed": 2,
+                "success_rate": 33.33333333333333
+            },
+            "risk_allocator_tests": {
+                "total": 4,
+                "passed": 3,
+                "failed": 1,
+                "success_rate": 75.0
+            },
+            "trailing_stop_tests": {
+                "total": 2,
+                "passed": 2,
+                "failed": 0,
+                "success_rate": 100.0
+            },
+            "comprehensive_tests": {
+                "total": 2,
+                "passed": 1,
+                "failed": 1,
+                "success_rate": 50.0
+            },
+            "trading_scenarios": {
+                "total": 5,
+                "passed": 4,
+                "failed": 1,
+                "success_rate": 80.0
+            }
+        },
+        "timestamp": "2025-03-06 01:00:04",
+        "duration": 2.067246,
+        "overall_success_rate": 75.0
+    },
+    "trading_scenarios": {
+        "success": false,
+        "details": {
+            "trending_scenario": {
+                "result": {
+                    "symbol": "BTCUSDT",
+                    "market_regime": "trending",
+                    "top_strategy": "trend_following",
+                    "strategy_weights": {
+                        "trend_following": 0.3,
+                        "momentum": 0.3,
+                        "mean_reversion": 0.2,
+                        "breakout": 0.2
+                    },
+                    "risk_percentage": 0.6,
+                    "entry_price": 69583.51665580607,
+                    "stop_loss": 77442.03459018588,
+                    "take_profit": 84627.37800577014,
+                    "quantity": 0.007,
+                    "position_size_usd": 531.2720584479846,
+                    "trading_signal": "BUY",
+                    "signal_strength": 0.21,
+                    "timestamp": "2025-03-06 01:00:04"
+                },
+                "test_passed": true
+            },
+            "volatile_scenario": {
+                "result": {
+                    "symbol": "BTCUSDT",
+                    "market_regime": "volatile",
+                    "top_strategy": "trend_following",
+                    "strategy_weights": {
+                        "trend_following": 0.3,
+                        "momentum": 0.3,
+                        "mean_reversion": 0.2,
+                        "breakout": 0.2
+                    },
+                    "risk_percentage": 0.3,
+                    "baseline_risk": 1.0,
+                    "risk_reduced": true,
+                    "entry_price": 68990.02256550008,
+                    "stop_loss": 39651.6095147962,
+                    "take_profit": 43781.9855059208,
+                    "quantity": 0.001,
+                    "position_size_usd": 70.54576106035654,
+                    "trading_signal": "BUY",
+                    "signal_strength": 0.29970398541734045,
+                    "atr_based_sl_tp": true,
+                    "timestamp": "2025-03-06 01:00:04"
+                },
+                "test_passed": true
+            },
+            "ranging_scenario": {
+                "result": {
+                    "symbol": "BTCUSDT",
+                    "market_regime": "ranging",
+                    "top_strategy": "trend_following",
+                    "strategy_weights": {
+                        "trend_following": 0.3,
+                        "momentum": 0.3,
+                        "mean_reversion": 0.2,
+                        "breakout": 0.2
+                    },
+                    "mean_reversion_priority": false,
+                    "risk_percentage": 0.4,
+                    "entry_price": 48144.08277546261,
+                    "stop_loss": 48707.58595171313,
+                    "take_profit": 51192.66686761686,
+                    "quantity": 0.041,
+                    "position_size_usd": 2000.0,
+                    "trading_signal": "BUY",
+                    "signal_strength": 0.2836854017746099,
+                    "timestamp": "2025-03-06 01:00:04"
+                },
+                "test_passed": true
+            },
+            "adverse_scenario": {
+                "result": {
+                    "position": {
+                        "id": "BTCUSDT_test_adverse",
+                        "symbol": "BTCUSDT",
+                        "side": "BUY",
+                        "entry_price": 50000,
+                        "quantity": 0.1,
+                        "stop_loss": 49000,
+                        "take_profit": 52000,
+                        "risk_percentage": 1.0,
+                        "entry_time": "2025-03-05 23:00:04",
+                        "market_regime": "trending",
+                        "strategy": "trend_following",
+                        "ts_activated": false,
+                        "ts_stop_price": null,
+                        "current_price": 49000,
+                        "current_pnl": -100.0,
+                        "current_pnl_percent": -2.0
+                    },
+                    "price_levels": [
+                        50000,
+                        49800,
+                        49500,
+                        49200,
+                        49100,
+                        49050,
+                        49000
+                    ],
+                    "tracking_results": [
+                        {
+                            "iteration": 0,
+                            "price": 50000,
+                            "current_pnl": 0.0,
+                            "current_pnl_percent": 0.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 1,
+                            "price": 49800,
+                            "current_pnl": -20.0,
+                            "current_pnl_percent": -0.4,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 2,
+                            "price": 49500,
+                            "current_pnl": -50.0,
+                            "current_pnl_percent": -1.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 3,
+                            "price": 49200,
+                            "current_pnl": -80.0,
+                            "current_pnl_percent": -1.6,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 4,
+                            "price": 49100,
+                            "current_pnl": -90.0,
+                            "current_pnl_percent": -1.7999999999999998,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 5,
+                            "price": 49050,
+                            "current_pnl": -95.0,
+                            "current_pnl_percent": -1.9,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": null
+                        },
+                        {
+                            "iteration": 6,
+                            "price": 49000,
+                            "current_pnl": -100.0,
+                            "current_pnl_percent": -2.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": true,
+                            "reason": "stop_loss"
+                        }
+                    ],
+                    "stop_loss_triggered": true,
+                    "stop_loss_reason": "stop_loss",
+                    "timestamp": "2025-03-06 01:00:04"
+                },
+                "test_passed": true
+            },
+            "favorable_scenario": {
+                "result": {
+                    "position": {
+                        "id": "BTCUSDT_test_favorable",
+                        "symbol": "BTCUSDT",
+                        "side": "BUY",
+                        "entry_price": 50000,
+                        "quantity": 0.1,
+                        "stop_loss": 49000,
+                        "take_profit": 52000,
+                        "risk_percentage": 1.0,
+                        "entry_time": "2025-03-05 23:00:04",
+                        "market_regime": "trending",
+                        "strategy": "trend_following",
+                        "ts_activated": false,
+                        "ts_stop_price": null,
+                        "current_price": 50600,
+                        "current_pnl": 60.0,
+                        "current_pnl_percent": 1.2,
+                        "trailing_type": "percentage",
+                        "trailing_activation_percent": 0.5,
+                        "trailing_callback_percent": 0.2,
+                        "trailing_activated": false,
+                        "trailing_stop": null,
+                        "highest_price": null,
+                        "lowest_price": 50000
+                    },
+                    "price_levels": [
+                        50000,
+                        50200,
+                        50500,
+                        50800,
+                        51000,
+                        51200,
+                        51000,
+                        50800,
+                        50600
+                    ],
+                    "tracking_results": [
+                        {
+                            "iteration": 0,
+                            "price": 50000,
+                            "highest_price": 50000,
+                            "current_pnl": 0.0,
+                            "current_pnl_percent": 0.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 1,
+                            "price": 50200,
+                            "highest_price": 50200,
+                            "current_pnl": 20.0,
+                            "current_pnl_percent": 0.4,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 2,
+                            "price": 50500,
+                            "highest_price": 50500,
+                            "current_pnl": 50.0,
+                            "current_pnl_percent": 1.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 3,
+                            "price": 50800,
+                            "highest_price": 50800,
+                            "current_pnl": 80.0,
+                            "current_pnl_percent": 1.6,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 4,
+                            "price": 51000,
+                            "highest_price": 51000,
+                            "current_pnl": 100.0,
+                            "current_pnl_percent": 2.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 5,
+                            "price": 51200,
+                            "highest_price": 51200,
+                            "current_pnl": 120.0,
+                            "current_pnl_percent": 2.4,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 6,
+                            "price": 51000,
+                            "highest_price": 51200,
+                            "current_pnl": 100.0,
+                            "current_pnl_percent": 2.0,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 7,
+                            "price": 50800,
+                            "highest_price": 51200,
+                            "current_pnl": 80.0,
+                            "current_pnl_percent": 1.6,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        },
+                        {
+                            "iteration": 8,
+                            "price": 50600,
+                            "highest_price": 51200,
+                            "current_pnl": 60.0,
+                            "current_pnl_percent": 1.2,
+                            "stop_loss": 49000,
+                            "take_profit": 52000,
+                            "ts_activated": false,
+                            "ts_stop_price": null,
+                            "should_close": false,
+                            "reason": "Trailing stop ch\u01b0a k\u00edch ho\u1ea1t"
+                        }
+                    ],
+                    "highest_price": 51200,
+                    "ts_activated": false,
+                    "ts_stop_price": null,
+                    "position_closed": false,
+                    "close_reason": null,
+                    "timestamp": "2025-03-06 01:00:04"
+                },
+                "test_passed": false
+            }
+        }
+    }
+}

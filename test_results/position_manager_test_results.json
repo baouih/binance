@@ -1,0 +1,81 @@
+{
+    "percentage_trailing_stop_with_profit_target": [
+        {
+            "price": 50200,
+            "profit_pct": 0.4,
+            "trailing_activated": false,
+            "trailing_stop_price": null,
+            "should_close": false,
+            "reason": null
+        },
+        {
+            "price": 50500,
+            "profit_pct": 1.0,
+            "trailing_activated": true,
+            "trailing_stop_price": 50247.5,
+            "should_close": false,
+            "reason": null
+        },
+        {
+            "price": 50800,
+            "profit_pct": 1.6,
+            "trailing_activated": true,
+            "trailing_stop_price": 50247.5,
+            "should_close": false,
+            "reason": null
+        },
+        {
+            "price": 51000,
+            "profit_pct": 2.0,
+            "trailing_activated": true,
+            "trailing_stop_price": 50247.5,
+            "should_close": true,
+            "reason": "Ch\u1ed1t l\u1eddi khi \u0111\u1ea1t 2.00% l\u1ee3i nhu\u1eadn"
+        }
+    ],
+    "price_reversal_exit": {
+        "price": 2150,
+        "profit_pct": 6.521739130434782,
+        "should_close": false,
+        "reason": null
+    },
+    "dynamic_volatility_profit": [
+        {
+            "price": 302,
+            "profit_pct": 0.6666666666666667,
+            "trailing_activated": false,
+            "trailing_stop_price": null,
+            "should_close": false,
+            "reason": null
+        },
+        {
+            "price": 304,
+            "profit_pct": 1.3333333333333335,
+            "trailing_activated": true,
+            "trailing_stop_price": 302.48,
+            "should_close": false,
+            "reason": null
+        },
+        {
+            "price": 304.5,
+            "profit_pct": 1.5,
+            "trailing_activated": true,
+            "trailing_stop_price": 302.48,
+            "should_close": true,
+            "reason": "Ch\u1ed1t l\u1eddi \u0111\u1ed9ng theo bi\u1ebfn \u0111\u1ed9ng th\u1ecb tr\u01b0\u1eddng (1.50%)"
+        }
+    ],
+    "indicator_based_profit": {
+        "price": 2200,
+        "profit_pct": 4.761904761904762,
+        "should_close": true,
+        "reason": "Ch\u1ed1t l\u1eddi khi RSI v\u01b0\u1ee3t ng\u01b0\u1ee1ng qu\u00e1 mua (RSI = 72.00)"
+    },
+    "time_based_profit": {
+        "price": 50500,
+        "profit_pct": 1.0,
+        "hold_duration": 25.00000001138889,
+        "should_close": true,
+        "reason": "Ch\u1ed1t l\u1eddi theo th\u1eddi gian sau 24 gi\u1edd"
+    }
+}

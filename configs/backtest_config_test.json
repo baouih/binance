@@ -1,0 +1,11 @@
+{
+    "symbols": [
+        "BTCUSDT"
+    ],
+    "timeframes": [
+        "1h"
+    ],
+    "start_date": "2023-01-01",
+    "end_date": "2023-01-10",
+    "initial_balance": 10000
+}

@@ -1,0 +1,147 @@
+{
+    "api_validator_tests": {},
+    "strategy_selector_tests": {},
+    "risk_allocator_tests": {},
+    "trailing_stop_tests": {
+        "success": true,
+        "details": {
+            "percentage_trailing_stop": {
+                "ts_updates": [
+                    {
+                        "price": 50000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 50400,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 50500,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50600,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50700,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50600,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50400,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    },
+                    {
+                        "price": 50300,
+                        "ts_activated": true,
+                        "ts_stop_price": 50247.5
+                    }
+                ],
+                "should_close": false,
+                "stop_price": 50247.5,
+                "close_reason": null,
+                "test_passed": true
+            },
+            "atr_trailing_stop": {
+                "ts_updates": [
+                    {
+                        "price": 50000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 48500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49000,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    },
+                    {
+                        "price": 49500,
+                        "ts_activated": false,
+                        "ts_stop_price": null
+                    }
+                ],
+                "should_close": false,
+                "stop_price": null,
+                "close_reason": null,
+                "test_passed": true
+            }
+        }
+    },
+    "comprehensive_tests": {},
+    "summary": {
+        "total_tests": 2,
+        "passed_tests": 2,
+        "failed_tests": 0,
+        "component_results": {
+            "api_validator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "strategy_selector_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "risk_allocator_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            },
+            "trailing_stop_tests": {
+                "total": 2,
+                "passed": 2,
+                "failed": 0,
+                "success_rate": 100.0
+            },
+            "comprehensive_tests": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "success_rate": 0
+            }
+        },
+        "timestamp": "2025-03-06 00:59:50",
+        "duration": 0,
+        "overall_success_rate": 100.0
+    }
+}

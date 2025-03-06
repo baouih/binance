@@ -1,0 +1,182 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Báo cáo Backtest</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        background-color: #f5f5f5;
+                    }
+                    .container {
+                        max-width: 1200px;
+                        margin: 0 auto;
+                        background-color: white;
+                        padding: 20px;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+                    h1, h2, h3 {
+                        color: #333;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                    }
+                    th, td {
+                        padding: 10px;
+                        text-align: left;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                    .positive {
+                        color: green;
+                    }
+                    .negative {
+                        color: red;
+                    }
+                    .chart-container {
+                        margin: 20px 0;
+                    }
+                    .summary-box {
+                        background-color: #f9f9f9;
+                        border-left: 4px solid #2196F3;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                    }
+                    .trades-table {
+                        font-size: 14px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Báo cáo Backtest</h1>
+                    
+                    <div class="summary-box">
+                        <h2>Tóm tắt</h2>
+                        <table>
+                            <tr>
+                                <th>Thông số</th>
+                                <th>Giá trị</th>
+                            </tr>
+                            <tr>
+                                <td>Số dư ban đầu</td>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Số dư cuối</td>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Lợi nhuận</td>
+                                <td class="positive">
+                                    $0.00 (0.00%)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Drawdown tối đa</td>
+                                <td class="negative">0.00%</td>
+                            </tr>
+                            <tr>
+                                <td>Tổng số giao dịch</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Tỷ lệ thắng</td>
+                                <td>0.00%</td>
+                            </tr>
+                            <tr>
+                                <td>Profit Factor</td>
+                                <td>0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Expectancy</td>
+                                <td>$0.00 (0.00%)</td>
+                            </tr>
+                            <tr>
+                                <td>Sharpe Ratio</td>
+                                <td>0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h2>Biểu đồ hiệu suất</h2>
+                        <p>Các biểu đồ được lưu trong thư mục 'backtest_charts'.</p>
+                        
+                        <h3>Phân tích theo chiến lược</h3>
+                        <table>
+                            <tr>
+                                <th>Chiến lược</th>
+                                <th>Số giao dịch</th>
+                                <th>Tỷ lệ thắng</th>
+                                <th>Lợi nhuận trung bình / giao dịch</th>
+                            </tr>
+            
+                        </table>
+                        
+                        <h3>Phân tích theo chế độ thị trường</h3>
+                        <table>
+                            <tr>
+                                <th>Chế độ thị trường</th>
+                                <th>Số giao dịch</th>
+                                <th>Tỷ lệ thắng</th>
+                                <th>Lợi nhuận trung bình / giao dịch</th>
+                            </tr>
+            
+                        </table>
+                        
+                        <h3>Phân tích theo lý do thoát</h3>
+                        <table>
+                            <tr>
+                                <th>Lý do thoát</th>
+                                <th>Số giao dịch</th>
+                                <th>Tỷ lệ thắng</th>
+                                <th>Lợi nhuận trung bình / giao dịch</th>
+                            </tr>
+            
+                        </table>
+                        
+                        <h3>Phân tích Trailing Stop</h3>
+                        <table>
+                            <tr>
+                                <th>Thông số</th>
+                                <th>Giá trị</th>
+                            </tr>
+                            <tr>
+                                <td>Số giao dịch sử dụng trailing stop</td>
+                                <td>0 (0.00%)</td>
+                            </tr>
+                            <tr>
+                                <td>Tỷ lệ thắng với trailing stop</td>
+                                <td>0.00%</td>
+                            </tr>
+                            <tr>
+                                <td>% lợi nhuận được bảo vệ bởi trailing stop</td>
+                                <td>0.00%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <h2>Giao dịch gần đây</h2>
+                    <table class="trades-table">
+                        <tr>
+                            <th>Thời gian vào</th>
+                            <th>Cặp tiền</th>
+                            <th>Hướng</th>
+                            <th>Giá vào</th>
+                            <th>Giá ra</th>
+                            <th>P/L (%)</th>
+                            <th>Lý do thoát</th>
+                            <th>Chiến lược</th>
+                        </tr>
+            
+                    </table>
+                </div>
+            </body>
+            </html>
+            
