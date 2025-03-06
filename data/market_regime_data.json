@@ -1,14 +1,14 @@
 {
-    "last_updated": "2025-03-06 09:13:02",
+    "last_updated": "2025-03-06 11:54:14",
     "btc_dominance": 0,
     "total_market_cap": 0,
-    "global_regime": "high_volatility",
+    "global_regime": "trending_down",
     "symbols_regime": {
         "BTCUSDT": {
-            "timeframe": "1h",
+            "timeframe": "4h",
             "regime": "high_volatility",
-            "volatility": 32.506021843790414,
-            "last_updated": "2025-03-06 09:13:07"
+            "volatility": 21.323215796196433,
+            "last_updated": "2025-03-06 11:54:22"
         },
         "ETHUSDT": {
             "timeframe": "1h",

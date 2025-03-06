@@ -29,7 +29,10 @@ def main():
         print(f"Phiên bản: {bot_config.get('version', 'Không xác định')}")
         
         if 'strategies' in bot_config:
-            active_strategies = [s.get('name') for s in bot_config['strategies'] if s.get('active', False)]
+            active_strategies = []
+            for strategy_name, strategy_data in bot_config['strategies'].items():
+                if strategy_data.get('enabled', False):
+                    active_strategies.append(strategy_name)
             print(f"Chiến lược đang hoạt động: {', '.join(active_strategies) if active_strategies else 'Không có'}")
         
         if 'risk_management' in bot_config:

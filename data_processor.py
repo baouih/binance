@@ -267,6 +267,102 @@ class DataProcessor:
         except Exception as e:
             logger.error(f"Lỗi khi lấy dữ liệu lịch sử: {str(e)}")
             return pd.DataFrame()
+            
+    def download_historical_data(self, symbol: str, interval: str, start_time: datetime = None, 
+                              end_time: datetime = None, save_to_file: bool = False) -> pd.DataFrame:
+        """
+        Tải xuống dữ liệu lịch sử đầy đủ cho một cặp tiền tệ
+        
+        Args:
+            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
+            interval (str): Khung thời gian (ví dụ: '1h', '4h', '1d')
+            start_time (datetime, optional): Thời gian bắt đầu, mặc định là 30 ngày trước
+            end_time (datetime, optional): Thời gian kết thúc, mặc định là hiện tại
+            save_to_file (bool): Có lưu dữ liệu vào file không
+            
+        Returns:
+            pd.DataFrame: DataFrame chứa dữ liệu lịch sử
+        """
+        try:
+            if start_time is None:
+                start_time = datetime.now() - timedelta(days=30)
+            if end_time is None:
+                end_time = datetime.now()
+            
+            start_timestamp = int(start_time.timestamp() * 1000)
+            end_timestamp = int(end_time.timestamp() * 1000)
+            
+            logger.info(f"Đang tải dữ liệu lịch sử cho {symbol} {interval} từ {start_time} đến {end_time}")
+            
+            # Khởi tạo DataFrame rỗng để chứa dữ liệu lịch sử
+            all_klines = []
+            
+            # Binance giới hạn 1000 candlestick mỗi request, nên chúng ta cần lặp
+            current_start = start_timestamp
+            while current_start < end_timestamp:
+                try:
+                    # Lấy dữ liệu từ API
+                    klines = self.binance_api.get_historical_klines(
+                        symbol=symbol,
+                        interval=interval,
+                        start_str=current_start,
+                        end_str=end_timestamp,
+                        limit=1000
+                    )
+                    
+                    if not klines or len(klines) == 0:
+                        break
+                    
+                    all_klines.extend(klines)
+                    
+                    # Cập nhật thời gian bắt đầu cho lần lấy tiếp theo
+                    current_start = int(klines[-1][0]) + 1
+                    
+                    logger.info(f"Đã tải {len(klines)} candlesticks. Tiến độ: {(current_start - start_timestamp) / (end_timestamp - start_timestamp) * 100:.2f}%")
+                    
+                    # Chờ một chút để tránh rate limit
+                    time.sleep(0.5)
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi tải dữ liệu lịch sử cho {symbol} {interval}: {str(e)}")
+                    # Chờ lâu hơn nếu có lỗi
+                    time.sleep(2)
+                    continue
+            
+            # Chuyển đổi thành DataFrame
+            if not all_klines:
+                logger.warning(f"Không có dữ liệu lịch sử cho {symbol} {interval}")
+                return pd.DataFrame()
+            
+            df = pd.DataFrame(all_klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 
+                                                  'close_time', 'quote_asset_volume', 'number_of_trades', 
+                                                  'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+            
+            # Chuyển đổi kiểu dữ liệu
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+            for col in ['open', 'high', 'low', 'close', 'volume']:
+                df[col] = df[col].astype(float)
+            
+            # Loại bỏ các cột không cần thiết
+            df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
+            
+            # Thêm các indicator cơ bản
+            df = self.add_basic_indicators(df)
+            
+            logger.info(f"Đã tải và xử lý {len(df)} candlesticks cho {symbol} {interval}")
+            
+            # Lưu vào file nếu cần
+            if save_to_file:
+                os.makedirs(f"{self.cache_dir}/historical", exist_ok=True)
+                file_path = f"{self.cache_dir}/historical/{symbol}_{interval}_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.csv"
+                df.to_csv(file_path, index=False)
+                logger.info(f"Đã lưu dữ liệu lịch sử vào file {file_path}")
+            
+            return df
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tải xuống dữ liệu lịch sử: {str(e)}")
+            return pd.DataFrame()
     
     def get_market_summary(self, symbol: str) -> Dict:
         """

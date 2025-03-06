@@ -75,8 +75,8 @@ def get_tradable_symbols(binance_api):
         list: Danh sách các cặp tiền
     """
     try:
-        # Lấy thông tin thị trường
-        exchange_info = binance_api.futures_exchange_info()
+        # Lấy thông tin thị trường (sử dụng phương thức phù hợp)
+        exchange_info = binance_api.get_exchange_info()
         
         # Lọc các cặp tiền kết thúc bằng USDT và đang hoạt động
         symbols = [

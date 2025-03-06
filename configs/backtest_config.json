@@ -1,0 +1,49 @@
+{
+    "symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+    ],
+    "timeframes": [
+        "1h"
+    ],
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "initial_balance": 10000,
+    "max_open_positions": 5,
+    "commission_rate": 0.04,
+    "slippage": 0.01,
+    "trailing_stop": {
+        "enabled": true,
+        "strategy_type": "percentage",
+        "activation_percent": 0.5,
+        "callback_percent": 0.2
+    },
+    "risk_management": {
+        "base_risk_percentage": 1.0,
+        "max_risk_per_trade": 2.0,
+        "dynamic_risk_adjustment": true,
+        "max_risk_per_day": 5.0
+    },
+    "position_sizing": {
+        "method": "risk_based",
+        "fixed_usd_amount": 100,
+        "fixed_pct_balance": 5.0
+    },
+    "strategy_weights": {
+        "trending": {
+            "trend_following": 0.7,
+            "breakout": 0.2,
+            "momentum": 0.1
+        },
+        "ranging": {
+            "mean_reversion": 0.6,
+            "support_resistance": 0.3,
+            "range_trading": 0.1
+        },
+        "volatile": {
+            "breakout": 0.4,
+            "volatility_based": 0.4,
+            "momentum": 0.2
+        }
+    }
+}

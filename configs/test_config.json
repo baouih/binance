@@ -1,0 +1,137 @@
+{
+  "test_suites": {
+    "data_collection": {
+      "name": "Data Collection",
+      "description": "Tests for data collection functionality",
+      "test_cases": [
+        {
+          "test_id": "TC_DC_001",
+          "name": "API Connection Stable",
+          "description": "Ki\u1ec3m tra k\u1ebft n\u1ed1i API trong \u0111i\u1ec1u ki\u1ec7n m\u1ea1ng \u1ed5n \u0111\u1ecbnh",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_DC_002",
+          "name": "API Connection Interrupted",
+          "description": "Ki\u1ec3m tra k\u1ebft n\u1ed1i API khi m\u1ea1ng b\u1ecb ng\u1eaft \u0111\u1ed9t ng\u1ed9t",
+          "setup": [],
+          "teardown": []
+        }
+      ]
+    },
+    "market_analysis": {
+      "name": "Market Analysis",
+      "description": "Tests for market analysis functionality",
+      "test_cases": []
+    },
+    "trading_decision": {
+      "name": "Trading Decision",
+      "description": "Tests for trading decision functionality",
+      "test_cases": []
+    },
+    "position_management": {
+      "name": "Position Management",
+      "description": "Tests for position management functionality",
+      "test_cases": [
+        {
+          "test_id": "TC_PE_001",
+          "name": "Position Exit with TP/SL",
+          "description": "Ki\u1ec3m tra tho\u00e1t v\u1ecb th\u1ebf theo TP/SL b\u00ecnh th\u01b0\u1eddng",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_PE_002",
+          "name": "Partial Position Exit",
+          "description": "Ki\u1ec3m tra tho\u00e1t v\u1ecb th\u1ebf theo ph\u00e2n \u0111o\u1ea1n",
+          "setup": [],
+          "teardown": []
+        }
+      ]
+    },
+    "trailing_stop": {
+      "name": "Trailing Stop",
+      "description": "Tests for trailing stop functionality",
+      "test_cases": [
+        {
+          "test_id": "TC_TS_001",
+          "name": "Trailing Stop in Trending Market",
+          "description": "Ki\u1ec3m tra \u0111i\u1ec1u ch\u1ec9nh trailing stop trong xu h\u01b0\u1edbng t\u0103ng \u1ed5n \u0111\u1ecbnh",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_TS_002",
+          "name": "Trailing Stop in Ranging Market",
+          "description": "Ki\u1ec3m tra \u0111i\u1ec1u ch\u1ec9nh trailing stop trong th\u1ecb tr\u01b0\u1eddng dao \u0111\u1ed9ng",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_TS_003",
+          "name": "Trailing Stop in Volatile Market",
+          "description": "Ki\u1ec3m tra \u0111i\u1ec1u ch\u1ec9nh trailing stop khi th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng m\u1ea1nh",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_TS_004",
+          "name": "Trailing Stop with Multiple Positions",
+          "description": "Ki\u1ec3m tra \u0111i\u1ec1u ch\u1ec9nh trailing stop khi c\u00f3 nhi\u1ec1u v\u1ecb th\u1ebf c\u00f9ng l\u00fac",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_TS_005",
+          "name": "Dynamic Callback Adjustment",
+          "description": "Ki\u1ec3m tra callback \u0111\u1ed9ng theo m\u1ee9c l\u1ee3i nhu\u1eadn",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_TS_006",
+          "name": "Minimum Profit Protection",
+          "description": "Ki\u1ec3m tra b\u1ea3o v\u1ec7 l\u1ee3i nhu\u1eadn t\u1ed1i thi\u1ec3u",
+          "setup": [],
+          "teardown": []
+        }
+      ]
+    },
+    "performance_analysis": {
+      "name": "Performance Analysis",
+      "description": "Tests for performance analysis functionality",
+      "test_cases": [
+        {
+          "test_id": "TC_PM_001",
+          "name": "Basic Performance Metrics",
+          "description": "Ki\u1ec3m tra t\u00ednh to\u00e1n ch\u1ec9 s\u1ed1 hi\u1ec7u su\u1ea5t c\u01a1 b\u1ea3n",
+          "setup": [],
+          "teardown": []
+        },
+        {
+          "test_id": "TC_PM_002",
+          "name": "Advanced Performance Metrics",
+          "description": "Ki\u1ec3m tra t\u00ednh to\u00e1n ch\u1ec9 s\u1ed1 hi\u1ec7u su\u1ea5t n\u00e2ng cao",
+          "setup": [],
+          "teardown": []
+        }
+      ]
+    },
+    "trading_bot": {
+      "name": "Trading Bot",
+      "description": "Tests for trading bot functionality",
+      "test_cases": []
+    }
+  },
+  "test_groups": [
+    "data_collection",
+    "market_analysis",
+    "trading_decision",
+    "position_management",
+    "trailing_stop",
+    "performance_analysis",
+    "trading_bot"
+  ],
+  "default_group": "trailing_stop"
+}

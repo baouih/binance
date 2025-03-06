@@ -1,0 +1,21 @@
+{
+    "account_type": "futures",
+    "use_testnet": true,
+    "custom_settings": null,
+    "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "BNBUSDT",
+        "XRPUSDT",
+        "ADAUSDT"
+    ],
+    "timeframes": [
+        "5m",
+        "15m",
+        "1h",
+        "4h"
+    ],
+    "leverage": 10,
+    "last_updated": null,
+    "creator": "system"
+}

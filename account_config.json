@@ -11,7 +11,7 @@
             "api_secret": ""
         }
     },
-    "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "DOGEUSDT"],
+    "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "DOGEUSDT", "XRPUSDT", "LINKUSDT", "AVAXUSDT", "DOTUSDT", "MATICUSDT", "LTCUSDT", "ATOMUSDT", "UNIUSDT"],
     "timeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
     "leverage": 5,
     "max_open_positions": 3,
@@ -26,5 +26,5 @@
     "auto_reduce_leverage": true,
     "enable_trailing_stop": true,
     "enable_dynamic_risk": true,
-    "last_updated": "2025-03-06T11:30:00"
+    "last_updated": "2025-03-06T12:07:30"
 }
