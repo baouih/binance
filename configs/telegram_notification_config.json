@@ -1,1 +1,13 @@
-{"cache_duration_seconds": 300, "enable_double_notification_prevention": true, "notification_types": ["trade", "position", "error", "warning", "info"]}
+{
+    "cache_duration_seconds": 300,
+    "enable_double_notification_prevention": true,
+    "notification_types": ["trade", "position", "error", "warning", "info"],
+    "min_interval_between_notifications": 60,
+    "max_notifications_per_hour": 20,
+    "priority_notifications": ["error", "position_closed"],
+    "notification_formatting": {
+        "use_emoji": true,
+        "include_timestamp": true,
+        "include_bot_name": true
+    }
+}

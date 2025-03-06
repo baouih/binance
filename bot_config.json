@@ -1,5 +1,78 @@
 {
-  "mode": "testnet",
-  "account_type": "futures",
-  "balance": 13063.06
+    "version": "1.0.0",
+    "bot_name": "Adaptive Crypto Trading Bot",
+    "description": "Advanced cryptocurrency trading bot with adaptive strategies",
+    "operation_mode": "testnet",
+    "strategies": {
+        "trend_following": {
+            "enabled": true,
+            "weight": 1.0,
+            "parameters": {
+                "ema_short": 9,
+                "ema_long": 21,
+                "rsi_period": 14,
+                "rsi_overbought": 70,
+                "rsi_oversold": 30
+            }
+        },
+        "mean_reversion": {
+            "enabled": true,
+            "weight": 0.7,
+            "parameters": {
+                "bb_period": 20,
+                "bb_std": 2.0,
+                "rsi_period": 14,
+                "rsi_high": 75,
+                "rsi_low": 25
+            }
+        },
+        "breakout": {
+            "enabled": true,
+            "weight": 0.8,
+            "parameters": {
+                "atr_period": 14,
+                "atr_multiplier": 2.0,
+                "volume_threshold": 1.5
+            }
+        }
+    },
+    "risk_management": {
+        "max_position_size_pct": 10,
+        "max_daily_drawdown_pct": 5,
+        "max_open_trades": 3,
+        "default_stop_loss_pct": 2.5,
+        "default_take_profit_pct": 5.0,
+        "use_trailing_stop": true,
+        "trailing_stop_activation_pct": 1.0,
+        "trailing_stop_callback_pct": 0.5
+    },
+    "timeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
+    "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "DOGEUSDT"],
+    "notifications": {
+        "telegram": {
+            "enabled": true,
+            "notify_trades": true,
+            "notify_balance": true,
+            "notify_errors": true
+        },
+        "email": {
+            "enabled": false
+        }
+    },
+    "logging": {
+        "level": "INFO",
+        "save_trades": true,
+        "save_performance": true
+    },
+    "market_analysis": {
+        "use_market_sentiment": true,
+        "use_volatility_adjustment": true,
+        "use_multi_timeframe": true
+    },
+    "advanced_features": {
+        "dynamic_position_sizing": true,
+        "adaptive_strategy_selection": true,
+        "ml_enhanced_signals": false,
+        "auto_parameter_optimization": true
+    }
 }

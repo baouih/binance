@@ -51,6 +51,32 @@ class TelegramNotifier:
         # Tải cấu hình thông báo từ file
         self._load_notification_config()
     
+    def _load_notification_config(self) -> bool:
+        """
+        Tải cấu hình thông báo từ file
+        
+        Returns:
+            bool: True nếu tải thành công, False nếu không
+        """
+        try:
+            if os.path.exists(NOTIFICATION_CONFIG_FILE):
+                with open(NOTIFICATION_CONFIG_FILE, 'r') as f:
+                    config = json.load(f)
+                    self.notification_config.update(config)
+                    logger.info(f"Đã tải cấu hình thông báo từ {NOTIFICATION_CONFIG_FILE}")
+                return True
+            else:
+                logger.warning(f"File cấu hình thông báo {NOTIFICATION_CONFIG_FILE} không tồn tại, sử dụng mặc định")
+                # Tạo thư mục configs nếu chưa tồn tại
+                os.makedirs(os.path.dirname(NOTIFICATION_CONFIG_FILE), exist_ok=True)
+                # Lưu cấu hình mặc định
+                with open(NOTIFICATION_CONFIG_FILE, 'w') as f:
+                    json.dump(self.notification_config, f, indent=4)
+                return True
+        except Exception as e:
+            logger.error(f"Lỗi khi tải cấu hình thông báo: {str(e)}")
+            return False
+    
     def load_config(self) -> bool:
         """
         Tải cấu hình từ file
