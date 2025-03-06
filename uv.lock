@@ -1634,7 +1634,7 @@ requires-dist = [
     { name = "eventlet", specifier = ">=0.39.0" },
     { name = "flask", specifier = "==2.3.3" },
     { name = "flask-login", specifier = ">=0.6.3" },
-    { name = "flask-socketio", specifier = ">=5.0.0" },
+    { name = "flask-socketio", specifier = ">=5.5.1" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "flask-wtf", specifier = ">=1.2.2" },
     { name = "gunicorn", specifier = ">=23.0.0" },

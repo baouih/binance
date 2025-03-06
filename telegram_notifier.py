@@ -85,39 +85,6 @@ class TelegramNotifier:
         except Exception as e:
             logger.error(f"Lỗi khi tải cấu hình Telegram: {str(e)}")
             return False
-            
-    def _load_notification_config(self) -> bool:
-        """
-        Tải cấu hình thông báo từ file
-        
-        Returns:
-            bool: True nếu tải thành công, False nếu không
-        """
-        try:
-            if os.path.exists(NOTIFICATION_CONFIG_FILE):
-                with open(NOTIFICATION_CONFIG_FILE, 'r') as f:
-                    config = json.load(f)
-                    
-                    # Cập nhật cấu hình thông báo
-                    if 'cache_duration_seconds' in config:
-                        self.notification_config['cache_duration_seconds'] = config['cache_duration_seconds']
-                    if 'enable_double_notification_prevention' in config:
-                        self.notification_config['enable_double_notification_prevention'] = config['enable_double_notification_prevention']
-                    if 'notification_types' in config:
-                        self.notification_config['notification_types'] = config['notification_types']
-                
-                logger.info(f"Đã tải cấu hình thông báo từ {NOTIFICATION_CONFIG_FILE}")
-                return True
-            else:
-                # Nếu file không tồn tại, tạo file với cấu hình mặc định
-                os.makedirs(os.path.dirname(NOTIFICATION_CONFIG_FILE), exist_ok=True)
-                with open(NOTIFICATION_CONFIG_FILE, 'w') as f:
-                    json.dump(self.notification_config, f, indent=4)
-                logger.info(f"Đã tạo file cấu hình thông báo mặc định tại {NOTIFICATION_CONFIG_FILE}")
-                return True
-        except Exception as e:
-            logger.error(f"Lỗi khi tải cấu hình thông báo: {str(e)}")
-            return False
     
     def save_config(self) -> bool:
         """
