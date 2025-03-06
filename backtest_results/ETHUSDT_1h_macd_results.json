@@ -1,0 +1,21 @@
+{
+  "symbol": "ETHUSDT",
+  "interval": "1h",
+  "strategy": "macd",
+  "initial_balance": 10000.0,
+  "final_balance": 10050.149577194847,
+  "profit": 50.14957719484664,
+  "profit_percent": 0.5014957719484664,
+  "num_trades": 40,
+  "winning_trades": 17,
+  "losing_trades": 23,
+  "win_rate": 42.5,
+  "profit_factor": 1.0127197355580417,
+  "max_drawdown": 9.596601550004982,
+  "take_profit_pct": 15.0,
+  "stop_loss_pct": 7.0,
+  "leverage": 5,
+  "risk_percentage": 1.0,
+  "overbought": 70,
+  "oversold": 30
+}
