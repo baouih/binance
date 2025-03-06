@@ -144,7 +144,51 @@ def check_api_connection():
 def index():
     """Trang chủ"""
     try:
-        return render_template('index.html')
+        # Truyền bot_status và market_data cho template
+        fake_prices = {
+            'BTCUSDT': market_data['btc_price'],
+            'ETHUSDT': market_data['eth_price'],
+            'BNBUSDT': market_data['bnb_price'],
+            'SOLUSDT': market_data['sol_price']
+        }
+        
+        account_data = {
+            'balance': bot_status['balance'],
+            'change_24h': 2.4,
+            'change_7d': 5.8,
+            'total_profit': 1250.5,
+            'total_profit_percent': 2.8,
+            'positions': [],
+            'unrealized_pnl': 0
+        }
+        
+        strategy_stats = {
+            'win_rate': 62.5
+        }
+        
+        signals = [
+            {'symbol': 'BTCUSDT', 'signal': 'buy', 'time': '14:25'},
+            {'symbol': 'ETHUSDT', 'signal': 'sell', 'time': '14:15'}
+        ]
+        
+        performance_stats = {
+            'total_trades': 125,
+            'win_rate': 62.5,
+            'avg_profit': 2.3,
+            'avg_loss': -1.5,
+            'best_trade': 8.7,
+            'worst_trade': -4.2,
+            'expectancy': 1.8
+        }
+        
+        return render_template('index.html', 
+                              bot_status=bot_status,
+                              market_data=market_data,
+                              fake_prices=fake_prices,
+                              account_data=account_data,
+                              strategy_stats=strategy_stats,
+                              signals=signals,
+                              performance_stats=performance_stats)
     except Exception as e:
         logger.error(f"Lỗi khi render index.html: {str(e)}")
         return render_template('simple_index.html')
