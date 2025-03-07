@@ -1,0 +1,24 @@
+{
+  "old_risk_levels": [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "new_risk_levels": [
+    2.0,
+    2.5,
+    3.0,
+    4.0,
+    5.0
+  ],
+  "updated_files": [
+    "run_quick_test.py",
+    "run_single_coin_risk_test.py",
+    "risk_config_manager.py",
+    "enhanced_backtest.py",
+    "run_multi_risk_test.py"
+  ],
+  "update_time": "2025-03-06 22:21:09"
+}

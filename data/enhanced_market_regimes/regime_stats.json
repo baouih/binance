@@ -1,0 +1,30 @@
+{
+  "ranging_wide": {
+    "count": 6,
+    "total_duration": 0,
+    "avg_duration": 0.0,
+    "avg_confidence": 0.8333333333333334,
+    "total_confidence": 5.0
+  },
+  "neutral": {
+    "count": 18,
+    "total_duration": 0,
+    "avg_duration": 0.0,
+    "avg_confidence": 0.714285714285714,
+    "total_confidence": 12.857142857142852
+  },
+  "ranging_narrow": {
+    "count": 5,
+    "total_duration": 0,
+    "avg_duration": 0.0,
+    "avg_confidence": 0.8333333333333334,
+    "total_confidence": 4.166666666666667
+  },
+  "quiet_accumulation": {
+    "count": 7,
+    "total_duration": 0,
+    "avg_duration": 0.0,
+    "avg_confidence": 0.8333333333333333,
+    "total_confidence": 5.833333333333333
+  }
+}

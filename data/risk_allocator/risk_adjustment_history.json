@@ -1,0 +1,19 @@
+[
+  {
+    "timestamp": "2025-03-07T00:08:49.283292",
+    "regime": "neutral",
+    "base_risk": 2.0,
+    "final_risk": 2.0,
+    "adjustment_factors": {
+      "confidence_factor": 1.0,
+      "volatility_factor": 1.0,
+      "trend_factor": 1.0,
+      "account_factor": 1.0
+    },
+    "account_stats": {
+      "win_streak": 3,
+      "lose_streak": 0,
+      "drawdown": 5.0
+    }
+  }
+]

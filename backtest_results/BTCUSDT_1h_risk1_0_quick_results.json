@@ -1,0 +1,13 @@
+{
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "risk_level": 1.0,
+    "period_days": 14,
+    "win_rate": 64.0,
+    "profit_percentage": 29.0,
+    "max_drawdown": 8.0,
+    "sharpe_ratio": 1.7333333333333334,
+    "total_trades": 40,
+    "test_period": "2025-02-20 \u0111\u1ebfn 2025-03-06",
+    "timestamp": "2025-03-06 17:51:41"
+}

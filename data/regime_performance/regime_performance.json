@@ -1,0 +1,65 @@
+{
+  "overall": {
+    "total_trades": 200,
+    "win_rate": 0.52,
+    "avg_profit": 0.08181368751696283,
+    "profit_factor": 1.169346778609219
+  },
+  "regime_performance": {
+    "neutral": {
+      "total_trades": 188,
+      "win_trades": 96,
+      "lose_trades": 92,
+      "win_rate": 0.5106382978723404,
+      "avg_profit": 0.03715001939130146,
+      "avg_win": 1.0297164595661004,
+      "avg_loss": -0.9985714833997932,
+      "profit_factor": 1.0760238583606871,
+      "max_drawdown": 12.63387760943927,
+      "sharpe_ratio": 0.03374558891247627,
+      "avg_hold_time": 15.02127659574468,
+      "direction_analysis": {
+        "long_trades": 100,
+        "short_trades": 88,
+        "long_win_rate": 0.49,
+        "short_win_rate": 0.5340909090909091,
+        "long_avg_profit": 0.005687464699976292,
+        "short_avg_profit": 0.0729029224496255
+      },
+      "regime_description": {
+        "en": "Neutral market - no clear directional bias or distinctive characteristics.",
+        "vi": "Th\u1ecb tr\u01b0\u1eddng trung t\u00ednh - kh\u00f4ng c\u00f3 xu h\u01b0\u1edbng r\u00f5 r\u00e0ng ho\u1eb7c \u0111\u1eb7c \u0111i\u1ec3m n\u1ed5i b\u1eadt."
+      }
+    },
+    "quiet_accumulation": {
+      "total_trades": 5,
+      "win_trades": 2,
+      "lose_trades": 3,
+      "win_rate": 0.4,
+      "avg_profit": -0.047621125485646766,
+      "avg_win": 1.5957876727618716,
+      "avg_loss": -1.1432269909839923,
+      "profit_factor": 0.9305749924538046,
+      "max_drawdown": 1.5259759526208172,
+      "sharpe_ratio": -0.03447209502061306,
+      "avg_hold_time": 36.8,
+      "direction_analysis": {
+        "long_trades": 3,
+        "short_trades": 2,
+        "long_win_rate": 0.3333333333333333,
+        "short_win_rate": 0.5,
+        "long_avg_profit": -0.47031361140264555,
+        "short_avg_profit": 0.5864176033898514
+      },
+      "regime_description": {
+        "en": "Quiet accumulation - low volatility and volume, potentially accumulating before a move.",
+        "vi": "T\u00edch l\u0169y y\u00ean l\u1eb7ng - bi\u1ebfn \u0111\u1ed9ng v\u00e0 kh\u1ed1i l\u01b0\u1ee3ng th\u1ea5p, c\u00f3 th\u1ec3 \u0111ang t\u00edch l\u0169y tr\u01b0\u1edbc m\u1ed9t b\u01b0\u1edbc di chuy\u1ec3n."
+      }
+    }
+  },
+  "best_regimes": [
+    "neutral",
+    "quiet_accumulation"
+  ],
+  "trades_count_by_regime": {
+    "neutral": 

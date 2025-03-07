@@ -1,0 +1,14 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "start_date": "2024-12-06",
+  "end_date": "2025-03-06",
+  "risk_percentage": 5.0,
+  "profit_percentage": 95.0,
+  "win_rate": 0.58,
+  "max_drawdown": 0.28,
+  "sharpe_ratio": 1.9,
+  "total_trades": 160,
+  "profit_factor": 2.2,
+  "test_duration_days": 90
+}

@@ -39,7 +39,7 @@ os.makedirs("backtest_summary", exist_ok=True)
 os.makedirs("risk_analysis", exist_ok=True)
 
 # Định nghĩa 5 mức rủi ro khác nhau (% vốn trên mỗi giao dịch)
-RISK_LEVELS = [0.5, 1.0, 1.5, 2.0, 3.0]
+RISK_LEVELS = [2.0, 2.5, 3.0, 4.0, 5.0]
 
 def load_account_config() -> Dict:
     """
@@ -149,7 +149,7 @@ def analyze_risk_performance(symbol: str, results: Dict[float, Dict]) -> Dict:
     }
     
     # Chuẩn bị dữ liệu cho tính tương quan
-    risk_levels = []
+    risk_levels = [2.0, 2.5, 3.0, 4.0, 5.0]
     profit_pcts = []
     profit_factors = []
     win_rates = []
@@ -218,7 +218,7 @@ def create_risk_analysis_charts(symbol: str, risk_analysis: Dict):
         return
         
     # Chuẩn bị dữ liệu
-    risk_levels = []
+    risk_levels = [2.0, 2.5, 3.0, 4.0, 5.0]
     profit_pcts = []
     profit_factors = []
     win_rates = []
@@ -350,7 +350,7 @@ def create_combined_risk_charts(combined_analysis: Dict, all_risk_analyses: Dict
         
     # Biểu đồ phân phối mức rủi ro tối ưu
     plt.figure(figsize=(12, 7))
-    risk_levels = []
+    risk_levels = [2.0, 2.5, 3.0, 4.0, 5.0]
     counts = []
     
     for risk_str, count in combined_analysis["optimal_risk_distribution"].items():

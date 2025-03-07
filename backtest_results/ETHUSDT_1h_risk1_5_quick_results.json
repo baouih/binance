@@ -1,0 +1,13 @@
+{
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "risk_level": 1.5,
+    "period_days": 14,
+    "win_rate": 66.5,
+    "profit_percentage": 34.0,
+    "max_drawdown": 9.5,
+    "sharpe_ratio": 1.9,
+    "total_trades": 45,
+    "test_period": "2025-02-20 \u0111\u1ebfn 2025-03-06",
+    "timestamp": "2025-03-06 17:57:51"
+}
