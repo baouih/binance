@@ -3,8 +3,8 @@
     "api_mode": "testnet",
     "api_keys": {
         "testnet": {
-            "api_key": "",
-            "api_secret": ""
+            "api_key": "${BINANCE_TESTNET_API_KEY}",
+            "api_secret": "${BINANCE_TESTNET_API_SECRET}"
         },
         "live": {
             "api_key": "",

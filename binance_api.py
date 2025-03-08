@@ -86,11 +86,13 @@ class BinanceAPI:
         if self.testnet:
             # URLs cho Testnet
             if self.account_type == 'futures':
-                self.base_url = 'https://testnet.binancefuture.com/fapi'
+                self.base_url = 'https://testnet.binancefuture.com'
+                self.api_path = '/fapi/v2'  # Đường dẫn API v2 cho futures
                 self.stream_url = 'wss://stream.binancefuture.com/ws'
                 logger.info("Sử dụng endpoints Binance Futures Testnet")
             else:  # Spot
-                self.base_url = 'https://testnet.binance.vision/api'
+                self.base_url = 'https://testnet.binance.vision'
+                self.api_path = '/api/v3'  # Đường dẫn API v3 cho spot
                 self.stream_url = 'wss://testnet.binance.vision/ws'
                 logger.info("Sử dụng endpoints Binance Spot Testnet")
         else:
@@ -146,11 +148,25 @@ class BinanceAPI:
         # Chọn phiên bản API phù hợp dựa trên loại tài khoản
         if version is None:
             if self.account_type == 'futures':
-                version = 'v1'  # Futures API sử dụng v1
+                version = 'v2'  # Futures API đã nâng cấp lên v2
             else:
                 version = 'v3'  # Spot API sử dụng v3
         
-        url = f"{self.base_url}/{version}/{endpoint}"
+        # Tạo URL chính xác từ base_url và api_path
+        if self.account_type == 'futures':
+            # Cho Futures API, sử dụng đường dẫn chính xác với phiên bản
+            if not version:
+                version = 'v2'  # Mặc định v2 cho futures
+            base = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+            url = f"{base}/fapi/{version}/{endpoint}"
+        else:
+            # Cho Spot API
+            if not version:
+                version = 'v3'  # Mặc định v3 cho spot
+            if hasattr(self, 'api_path'):
+                url = f"{self.base_url}{self.api_path}/{endpoint}"
+            else:
+                url = f"{self.base_url}/{version}/{endpoint}"
         
         # Chuẩn bị tham số
         params = params or {}
@@ -366,7 +382,8 @@ class BinanceAPI:
         if symbol:
             params['symbol'] = symbol
             
-        return self._request('GET', 'ticker/24hr', params)
+        # Đảm bảo sử dụng phiên bản API v1 cho endpoint ticker/24hr vì v2 không hỗ trợ
+        return self._request('GET', 'ticker/24hr', params, version='v1')
         
     def get_price_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
         """
@@ -402,7 +419,8 @@ class BinanceAPI:
         if symbol:
             params['symbol'] = symbol
             
-        return self._request('GET', 'ticker/bookTicker', params)
+        # Đảm bảo sử dụng phiên bản API v1 cho endpoint ticker/bookTicker vì v2 không hỗ trợ
+        return self._request('GET', 'ticker/bookTicker', params, version='v1')
         
     # Account Endpoints
     def get_account(self) -> Dict:
@@ -412,7 +430,13 @@ class BinanceAPI:
         Returns:
             Dict: Thông tin tài khoản
         """
-        return self._request('GET', 'account', signed=True)
+        # Cần sử dụng phiên bản API v2 cho Futures API
+        if self.account_type == 'futures':
+            logger.info("Gửi yêu cầu đến Binance Futures API v2")
+            return self._request('GET', 'account', signed=True, version='v2')
+        else:
+            # Spot API vẫn sử dụng v3
+            return self._request('GET', 'account', signed=True)
         
     def futures_account_trades(self, symbol: str, limit: int = 500, 
                               start_time: int = None, end_time: int = None) -> List[Dict]:
@@ -1026,8 +1050,8 @@ class BinanceAPI:
                 
                 # Thử với v1 endpoint
                 try:
-                    logger.info("Thử lại với Binance Testnet Futures API v1 (positionRisk)")
-                    positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v1') 
+                    logger.info("Thử lại với Binance Testnet Futures API v2 (positionRisk)")
+                    positions_data = self._request('GET', 'positionRisk', params, signed=True, version='v2') 
                     
                     # Kiểm tra dữ liệu trả về
                     if isinstance(positions_data, list):
