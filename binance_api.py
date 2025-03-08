@@ -727,6 +727,56 @@ class BinanceAPI:
             logger.error(f"Exception khi lấy thông tin giá Futures: {str(e)}")
             return []
         
+    def futures_klines(self, symbol: str, interval: str, limit: int = 500, 
+                  startTime: int = None, endTime: int = None) -> List[List]:
+        """
+        Lấy dữ liệu k-line từ Binance Futures API
+        
+        Args:
+            symbol (str): Mã cặp giao dịch
+            interval (str): Khoảng thời gian (1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M)
+            limit (int, optional): Số lượng nến tối đa cần lấy
+            startTime (int, optional): Thời gian bắt đầu (milliseconds)
+            endTime (int, optional): Thời gian kết thúc (milliseconds)
+            
+        Returns:
+            List[List]: Dữ liệu k-line
+        """
+        if self.account_type != 'futures':
+            logger.warning("Phương thức futures_klines chỉ khả dụng với tài khoản futures")
+            return []
+            
+        try:
+            # Tạo URL cho API endpoint
+            base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+            url = f"{base_url}/fapi/v1/klines"
+            
+            # Tham số
+            params = {
+                'symbol': symbol,
+                'interval': interval,
+                'limit': limit
+            }
+            
+            if startTime:
+                params['startTime'] = startTime
+            if endTime:
+                params['endTime'] = endTime
+            
+            logger.info(f"Gửi yêu cầu đến Binance {'Testnet ' if self.testnet else ''}Futures API")
+            response = requests.get(url, params=params)
+            
+            if response.status_code == 200:
+                logger.info(f"Đã lấy thành công dữ liệu từ {'Testnet ' if self.testnet else ''}Futures API")
+                return response.json()
+            else:
+                logger.error(f"Lỗi khi lấy dữ liệu k-line Futures: {response.status_code} - {response.text}")
+                return []
+                
+        except Exception as e:
+            logger.error(f"Exception khi lấy dữ liệu k-line Futures: {str(e)}")
+            return []
+    
     # Các phương thức hữu ích khác
     def convert_klines_to_dataframe(self, klines: List[List]) -> 'pd.DataFrame':
         """

@@ -1,0 +1,40 @@
+{
+    "base_settings": {
+        "min_stop_loss_percent": 1.5,
+        "max_stop_loss_percent": 5.0,
+        "default_risk_reward_ratio": 1.5,
+        "update_interval_seconds": 300,
+        "trailing_sensitivity": 0.5
+    },
+    "timeframe_weights": {
+        "5m": 0.2,
+        "1h": 0.5,
+        "4h": 0.3
+    },
+    "volatility_adjustment": {
+        "low_volatility_threshold": 1.0,
+        "high_volatility_threshold": 2.0,
+        "low_volatility_factor": 1.5,
+        "medium_volatility_factor": 1.2,
+        "high_volatility_factor": 1.0
+    },
+    "strategy_specific": {
+        "trend_following": {
+            "extra_buffer": 0.5
+        },
+        "breakout": {
+            "extra_buffer": 0.3
+        },
+        "bollinger_bounce": {
+            "extra_buffer": 0.2
+        }
+    },
+    "pair_specific": {
+        "BTCUSDT": {
+            "extra_buffer": 0.5
+        },
+        "ETHUSDT": {
+            "extra_buffer": 0.4
+        }
+    }
+}
