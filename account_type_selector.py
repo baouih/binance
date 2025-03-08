@@ -72,8 +72,50 @@ class AccountTypeSelector:
             selected_size = sizes[0]
             
         if selected_size:
-            config = self.small_account_configs.get(str(int(selected_size)), {})
-            logger.info(f"Đã chọn cấu hình cho tài khoản ${int(selected_size)}")
+            # Lấy cấu hình từ danh sách đã định nghĩa
+            config = self.small_account_configs.get(str(int(selected_size)), {}).copy()
+            
+            # Nếu số dư không khớp chính xác với một mức đã định nghĩa và lớn hơn mức nhỏ nhất
+            # Thực hiện nội suy tuyến tính để có cấu hình hợp lý hơn
+            if balance != selected_size and len(sizes) > 1 and balance > sizes[0]:
+                # Tìm mức tiếp theo lớn hơn (nếu có)
+                next_size = None
+                for size in sizes:
+                    if size > selected_size:
+                        next_size = size
+                        break
+                
+                # Nếu có mức tiếp theo và balance nhỏ hơn mức đó, nội suy giữa hai mức
+                if next_size and balance < next_size:
+                    next_config = self.small_account_configs.get(str(int(next_size)), {})
+                    
+                    # Tính hệ số nội suy (0-1)
+                    ratio = (balance - selected_size) / (next_size - selected_size)
+                    
+                    # Nội suy các tham số quan trọng
+                    leverage = config.get('leverage', 1)
+                    next_leverage = next_config.get('leverage', 1)
+                    interpolated_leverage = round(leverage + (next_leverage - leverage) * ratio)
+                    
+                    risk_pct = config.get('risk_percentage', 1)
+                    next_risk_pct = next_config.get('risk_percentage', 1)
+                    interpolated_risk = round(risk_pct + (next_risk_pct - risk_pct) * ratio, 1)
+                    
+                    positions = config.get('max_positions', 1)
+                    next_positions = next_config.get('max_positions', 1)
+                    interpolated_positions = round(positions + (next_positions - positions) * ratio)
+                    
+                    # Cập nhật cấu hình với giá trị nội suy
+                    config['leverage'] = interpolated_leverage
+                    config['risk_percentage'] = interpolated_risk
+                    config['max_positions'] = interpolated_positions
+                    
+                    # Ghi log thông tin về nội suy
+                    logger.info(f"Đã nội suy cấu hình cho tài khoản ${balance:.2f} giữa ${int(selected_size)} và ${int(next_size)}")
+                    logger.info(f"Đòn bẩy: {interpolated_leverage}x, Rủi ro: {interpolated_risk}%, Vị thế tối đa: {interpolated_positions}")
+            else:
+                logger.info(f"Đã chọn cấu hình cho tài khoản ${int(selected_size)}")
+            
             return config, selected_size
         else:
             logger.error("Không tìm thấy cấu hình phù hợp")
@@ -95,6 +137,7 @@ class AccountTypeSelector:
                 'Max Positions': config.get('max_positions'),
                 'Pairs Count': len(config.get('suitable_pairs', [])),
                 'Min Position': f"${config.get('min_position_size', 0)}",
+                'BTC Priority': "Yes" if config.get('btc_priority', False) else "No",
                 'Trailing Stop': "Yes" if config.get('enable_trailing_stop', False) else "No",
                 'Stop Loss': f"{config.get('default_stop_percentage', 0)}%",
                 'Take Profit': f"{config.get('default_take_profit_percentage', 0)}%"
@@ -125,6 +168,7 @@ class AccountTypeSelector:
         logger.info(f"Mức rủi ro: {config.get('risk_percentage')}%")
         logger.info(f"Số vị thế tối đa: {config.get('max_positions')}")
         logger.info(f"Vị thế tối thiểu: ${config.get('min_position_size', 0)}")
+        logger.info(f"Ưu tiên BTC: {'Có' if config.get('btc_priority', False) else 'Không'}")
         
         # Hiển thị thông tin chi tiết về lệnh
         logger.info("\nCác loại lệnh hỗ trợ:")

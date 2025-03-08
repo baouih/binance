@@ -38,7 +38,7 @@ Hệ thống giao dịch cho tài khoản nhỏ được thiết kế đặc bi�
 
 ## Cấu hình tài khoản
 
-Hệ thống hỗ trợ ba mức tài khoản chính với cấu hình được tối ưu hóa cho từng mức:
+Hệ thống hỗ trợ nhiều mức tài khoản khác nhau với cấu hình được tối ưu hóa cho từng mức. Ngoài ra, hệ thống còn có khả năng nội suy tự động để tạo cấu hình phù hợp nhất cho số dư tài khoản của bạn:
 
 ### Tài khoản $100
 - **Đòn bẩy**: 20x
@@ -63,6 +63,29 @@ Hệ thống hỗ trợ ba mức tài khoản chính với cấu hình được 
 - **Số cặp tiền phù hợp**: 25 cặp
 - **Stop Loss**: 2%
 - **Take Profit**: 4%
+
+### Tài khoản $500
+- **Đòn bẩy**: 7x
+- **Mức rủi ro**: 7% trên mỗi giao dịch
+- **Vị thế tối đa**: 5 vị thế cùng lúc
+- **Số cặp tiền phù hợp**: 30 cặp
+- **Stop Loss**: 1.5%
+- **Take Profit**: 3%
+
+### Tài khoản $1000
+- **Đòn bẩy**: 5x
+- **Mức rủi ro**: 5% trên mỗi giao dịch
+- **Vị thế tối đa**: 8 vị thế cùng lúc
+- **Số cặp tiền phù hợp**: 35 cặp
+- **Stop Loss**: 1.2%
+- **Take Profit**: 2.4%
+
+### Nội suy tự động
+Hệ thống có khả năng nội suy cấu hình cho các tài khoản có số dư ở giữa các mức đã cài đặt. Ví dụ, với tài khoản $730, hệ thống sẽ tự động tính toán:
+- **Đòn bẩy**: 6x (nội suy giữa 7x và 5x)
+- **Mức rủi ro**: 6.1% (nội suy giữa 7% và 5%)
+- **Vị thế tối đa**: 6 (nội suy giữa 5 và 8)
+- **Phù hợp với**: 30 cặp tiền từ cấu hình $500
 
 ## Chiến lược giao dịch
 

@@ -414,6 +414,64 @@ class BinanceAPI:
         """
         return self._request('GET', 'account', signed=True)
         
+    def futures_account_trades(self, symbol: str, limit: int = 500, 
+                              start_time: int = None, end_time: int = None) -> List[Dict]:
+        """
+        Lấy lịch sử giao dịch futures cho một symbol cụ thể
+        
+        Args:
+            symbol (str): Symbol cần lấy lịch sử
+            limit (int, optional): Số lượng kết quả trả về, mặc định 500, tối đa 1000
+            start_time (int, optional): Thời gian bắt đầu tính bằng milliseconds
+            end_time (int, optional): Thời gian kết thúc tính bằng milliseconds
+            
+        Returns:
+            List[Dict]: Danh sách các giao dịch
+        """
+        if self.account_type != 'futures':
+            logger.warning("Phương thức futures_account_trades chỉ khả dụng với tài khoản futures")
+            return []
+            
+        # Tạo params
+        params = {
+            'symbol': symbol, 
+            'timestamp': int(time.time() * 1000),
+            'limit': limit
+        }
+        
+        if start_time:
+            params['startTime'] = start_time
+        if end_time:
+            params['endTime'] = end_time
+            
+        # Ký params
+        query_string = urllib.parse.urlencode(params)
+        signature = hmac.new(
+            self.api_secret.encode('utf-8'),
+            query_string.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+        params['signature'] = signature
+        
+        # Gửi request
+        base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+        url = f"{base_url}/fapi/v1/userTrades"
+        headers = {'X-MBX-APIKEY': self.api_key}
+        
+        try:
+            logger.info(f"Lấy lịch sử giao dịch futures cho {symbol}...")
+            response = requests.get(url, params=params, headers=headers)
+            
+            if response.status_code == 200:
+                logger.info(f"Đã lấy {len(response.json())} giao dịch futures cho {symbol}")
+                return response.json()
+            else:
+                logger.error(f"Lỗi khi lấy lịch sử giao dịch cho {symbol}: {response.status_code} - {response.text}")
+                return []
+        except Exception as e:
+            logger.error(f"Exception khi lấy lịch sử giao dịch cho {symbol}: {str(e)}")
+            return []
+        
     def futures_account_balance(self) -> List[Dict]:
         """
         Lấy số dư tài khoản futures
@@ -627,12 +685,15 @@ class BinanceAPI:
         else:
             return self._request('GET', 'ticker/price', params)
             
-    def futures_ticker_price(self) -> List[Dict]:
+    def futures_ticker_price(self, symbol=None) -> List[Dict]:
         """
-        Lấy giá của tất cả các cặp giao dịch trên Binance Futures
+        Lấy giá của tất cả các cặp giao dịch trên Binance Futures hoặc một cặp cụ thể
         
+        Args:
+            symbol (str, optional): Mã cặp giao dịch cần lấy giá. Nếu None, trả về tất cả các cặp.
+            
         Returns:
-            List[Dict]: Danh sách giá của các cặp giao dịch
+            List[Dict] or Dict: Danh sách giá của các cặp giao dịch hoặc thông tin giá của một cặp cụ thể
         """
         if self.account_type != 'futures':
             logger.warning("Phương thức futures_ticker_price chỉ khả dụng với tài khoản futures")
@@ -643,10 +704,21 @@ class BinanceAPI:
             base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
             url = f"{base_url}/fapi/v1/ticker/price"
             
-            response = requests.get(url)
+            # Thêm tham số symbol nếu được chỉ định
+            params = {}
+            if symbol:
+                params['symbol'] = symbol
+                
+            response = requests.get(url, params=params)
             
             if response.status_code == 200:
-                return response.json()
+                data = response.json()
+                
+                # Nếu là một cặp cụ thể và kết quả không phải là list
+                if symbol and not isinstance(data, list):
+                    return [data]  # Bọc trong list để đảm bảo tính nhất quán
+                
+                return data
             else:
                 logger.error(f"Lỗi khi lấy thông tin giá Futures: {response.status_code} - {response.text}")
                 return []

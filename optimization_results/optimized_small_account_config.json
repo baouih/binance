@@ -1,0 +1,38 @@
+{
+    "leverage": 5,
+    "risk_percentage": 15,
+    "max_positions": 2,
+    "suitable_pairs": [
+        "ATOMUSDT",
+        "LTCUSDT",
+        "LINKUSDT",
+        "DOGEUSDT",
+        "XRPUSDT",
+        "DOTUSDT",
+        "ADAUSDT",
+        "ETHUSDT",
+        "NEARUSDT",
+        "BNBUSDT",
+        "UNIUSDT",
+        "AVAXUSDT",
+        "MATICUSDT",
+        "FILUSDT",
+        "EOSUSDT",
+        "ETCUSDT",
+        "VETUSDT",
+        "ICPUSDT",
+        "ALGOUSDT",
+        "TRXUSDT"
+    ],
+    "min_btc_value": 86220.0,
+    "max_trade_value": 450.0,
+    "min_position_size": 7.5,
+    "order_types": [
+        "MARKET",
+        "LIMIT",
+        "STOP_MARKET"
+    ],
+    "enable_trailing_stop": true,
+    "default_stop_percentage": 2.5,
+    "default_take_profit_percentage": 5.0
+}
