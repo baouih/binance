@@ -1,0 +1,350 @@
+{
+  "session": {
+    "symbol": "ETHUSDT",
+    "profile_type": "session",
+    "timestamp": "2025-03-07T06:24:04.973331",
+    "price_range": {
+      "min": 2144.15,
+      "max": 2281.14
+    },
+    "poc": 2231.13865,
+    "value_area": {
+      "high": 2257.16675,
+      "low": 2173.60285
+    },
+    "volume_nodes": [
+      {
+        "price_low": 2209.9052,
+        "price_high": 2211.2751,
+        "price_mid": 2210.59015,
+        "volume": 2703.090203758198
+      },
+      {
+        "price_low": 2211.2751,
+        "price_high": 2212.645,
+        "price_mid": 2211.9600499999997,
+        "volume": 2429.410589727855
+      },
+      {
+        "price_low": 2212.645,
+        "price_high": 2214.0149,
+        "price_mid": 2213.3299500000003,
+        "volume": 2526.3905224107816
+      },
+      {
+        "price_low": 2214.0149,
+        "price_high": 2215.3848,
+        "price_mid": 2214.69985,
+        "volume": 2793.4906384590267
+      },
+      {
+        "price_low": 2215.3848,
+        "price_high": 2216.7547,
+        "price_mid": 2216.0697499999997,
+        "volume": 2898.3172715044243
+      },
+      {
+        "price_low": 2216.7547,
+        "price_high": 2218.1246,
+        "price_mid": 2217.4396500000003,
+        "volume": 3207.301942885504
+      },
+      {
+        "price_low": 2218.1246,
+        "price_high": 2219.4945,
+        "price_mid": 2218.80955,
+        "volume": 3065.1946586567196
+      },
+      {
+        "price_low": 2219.4945,
+        "price_high": 2220.8644,
+        "price_mid": 2220.1794499999996,
+        "volume": 2895.5761323753277
+      },
+      {
+        "price_low": 2220.8644,
+        "price_high": 2222.2343,
+        "price_mid": 2221.5493500000002,
+        "volume": 3425.7292633166107
+      },
+      {
+        "price_low": 2222.2343,
+        "price_high": 2223.6041999999998,
+        "price_mid": 2222.91925,
+        "volume": 3530.2495345209572
+      },
+      {
+        "price_low": 2223.6041999999998,
+        "price_high": 2224.9741,
+        "price_mid": 2224.2891499999996,
+        "volume": 3530.2495345221287
+      },
+      {
+        "price_low": 2224.9741,
+        "price_high": 2226.344,
+        "price_mid": 2225.65905,
+        "volume": 3440.4355680861163
+      },
+      {
+        "price_low": 2226.344,
+        "price_high": 2227.7138999999997,
+        "price_mid": 2227.02895,
+        "volume": 3389.475904520237
+      },
+      {
+        "price_low": 2227.7138999999997,
+        "price_high": 2229.0838,
+        "price_mid": 2228.3988499999996,
+        "volume": 3761.8870202903213
+      },
+      {
+        "price_low": 2229.0838,
+        "price_high": 2230.4537,
+        "price_mid": 2229.76875,
+        "volume": 3953.9436932931308
+      },
+      {
+        "price_low": 2230.4537,
+        "price_high": 2231.8236,
+        "price_mid": 2231.13865,
+        "volume": 3953.9436932931308
+      },
+      {
+        "price_low": 2231.8236,
+        "price_high": 2233.1935,
+        "price_mid": 2232.50855,
+        "volume": 3953.943693291819
+      },
+      {
+        "price_low": 2233.1935,
+        "price_high": 2234.5634,
+        "price_mid": 2233.87845,
+        "volume": 3953.9436932931308
+      },
+      {
+        "price_low": 2234.5634,
+        "price_high": 2235.9333,
+        "price_mid": 2235.24835,
+        "volume": 3611.6815799756364
+      },
+      {
+        "price_low": 2235.9333,
+        "price_high": 2237.3032,
+        "price_mid": 2236.61825,
+        "volume": 3136.806386650574
+      },
+      {
+        "price_low": 2237.3032,
+        "price_high": 2238.6731,
+        "price_mid": 2237.98815,
+        "volume": 2516.022288832431
+      }
+    ],
+    "bin_width": 1.369899999999998,
+    "total_volume": 148640.72320000004
+  },
+  "daily": {
+    "symbol": "ETHUSDT",
+    "profile_type": "daily",
+    "timestamp": "2025-03-07T06:24:04.950845",
+    "price_range": {
+      "min": 2144.15,
+      "max": 2281.14
+    },
+    "poc": 2231.13865,
+    "value_area": {
+      "high": 2257.16675,
+      "low": 2177.71255
+    },
+    "volume_nodes": [
+      {
+        "price_low": 2209.9052,
+        "price_high": 2211.2751,
+        "price_mid": 2210.59015,
+        "volume": 2919.8792849998063
+      },
+      {
+        "price_low": 2211.2751,
+        "price_high": 2212.645,
+        "price_mid": 2211.9600499999997,
+        "volume": 2646.199670969535
+      },
+      {
+        "price_low": 2212.645,
+        "price_high": 2214.0149,
+        "price_mid": 2213.3299500000003,
+        "volume": 2743.179603652462
+      },
+      {
+        "price_low": 2214.0149,
+        "price_high": 2215.3848,
+        "price_mid": 2214.69985,
+        "volume": 3010.279719700635
+      },
+      {
+        "price_low": 2215.3848,
+        "price_high": 2216.7547,
+        "price_mid": 2216.0697499999997,
+        "volume": 3115.1063527461047
+      },
+      {
+        "price_low": 2216.7547,
+        "price_high": 2218.1246,
+        "price_mid": 2217.4396500000003,
+        "volume": 3424.091024127185
+      },
+      {
+        "price_low": 2218.1246,
+        "price_high": 2219.4945,
+        "price_mid": 2218.80955,
+        "volume": 3281.9837398983286
+      },
+      {
+        "price_low": 2219.4945,
+        "price_high": 2220.8644,
+        "price_mid": 2220.1794499999996,
+        "volume": 3112.3652136170085
+      },
+      {
+        "price_low": 2220.8644,
+        "price_high": 2222.2343,
+        "price_mid": 2221.5493500000002,
+        "volume": 3642.5183445582916
+      },
+      {
+        "price_low": 2222.2343,
+        "price_high": 2223.6041999999998,
+        "price_mid": 2222.91925,
+        "volume": 3747.0386157625653
+      },
+      {
+        "price_low": 2223.6041999999998,
+        "price_high": 2224.9741,
+        "price_mid": 2224.2891499999996,
+        "volume": 3747.0386157638086
+      },
+      {
+        "price_low": 2224.9741,
+        "price_high": 2226.344,
+        "price_mid": 2225.65905,
+        "volume": 3657.224649327796
+      },
+      {
+        "price_low": 2226.344,
+        "price_high": 2227.7138999999997,
+        "price_mid": 2227.02895,
+        "volume": 3606.264985761845
+      },
+      {
+        "price_low": 2227.7138999999997,
+        "price_high": 2229.0838,
+        "price_mid": 2228.3988499999996,
+        "volume": 3978.676101532001
+      },
+      {
+        "price_low": 2229.0838,
+        "price_high": 2230.4537,
+        "price_mid": 2229.76875,
+        "volume": 4170.732774534811
+      },
+      {
+        "price_low": 2230.4537,
+        "price_high": 2231.8236,
+        "price_mid": 2231.13865,
+        "volume": 4170.732774534811
+      },
+      {
+        "price_low": 2231.8236,
+        "price_high": 2233.1935,
+        "price_mid": 2232.50855,
+        "volume": 4170.732774533427
+      },
+      {
+        "price_low": 2233.1935,
+        "price_high": 2234.5634,
+        "price_mid": 2233.87845,
+        "volume": 4170.732774534811
+      },
+      {
+        "price_low": 2234.5634,
+        "price_high": 2235.9333,
+        "price_mid": 2235.24835,
+        "volume": 3828.470661217317
+      },
+      {
+        "price_low": 2235.9333,
+        "price_high": 2237.3032,
+        "price_mid": 2236.61825,
+        "volume": 3353.595467892182
+      },
+      {
+        "price_low": 2237.3032,
+        "price_high": 2238.6731,
+        "price_mid": 2237.98815,
+        "volume": 2732.8113700741114
+      }
+    ],
+    "bin_width": 1.369899999999998,
+    "total_volume": 157271.774
+  },
+  "weekly": {
+    "symbol": "ETHUSDT",
+    "profile_type": "weekly",
+    "timestamp": "2025-03-07T06:24:04.966166",
+    "price_range": {
+      "min": 550.0,
+      "max": 13733.32
+    },
+    "poc": 2329.7482,
+    "value_area": {
+      "high": 2725.2478,
+      "low": 2197.915
+    },
+    "volume_nodes": [
+      {
+        "price_low": 2000.1652000000001,
+        "price_high": 2131.9984,
+        "price_mid": 2066.0818,
+        "volume": 60079.0169990635
+      },
+      {
+        "price_low": 2131.9984,
+        "price_high": 2263.8316,
+        "price_mid": 2197.915,
+        "volume": 228326.3949914214
+      },
+      {
+        "price_low": 2263.8316,
+        "price_high": 2395.6648,
+        "price_mid": 2329.7482,
+        "volume": 256448.92018308653
+      },
+      {
+        "price_low": 2395.6648,
+        "price_high": 2527.498,
+        "price_mid": 2461.5814,
+        "volume": 219328.2871782706
+      },
+      {
+        "price_low": 2527.498,
+        "price_high": 2659.3312,
+        "price_mid": 2593.4146,
+        "volume": 39881.09730586644
+      },
+      {
+        "price_low": 2659.3312,
+        "price_high": 2791.1644,
+        "price_mid": 2725.2478,
+        "volume": 135662.90349741554
+      },
+      {
+        "price_low": 2791.1644,
+        "price_high": 2922.9976,
+        "price_mid": 2857.081,
+        "volume": 79328.85333220597
+      }
+    ],
+    "bin_width": 131.8332,
+    "total_volume": 1033265.6234000004
+  }
+}

@@ -35,4 +35,6 @@ dependencies = [
     "openai>=1.65.2",
     "flask-login>=0.6.3",
     "flask-wtf>=1.2.2",
+    "ccxt>=4.4.65",
+    "yfinance>=0.2.54",
 ]

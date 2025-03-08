@@ -75,8 +75,8 @@ class BinanceAPI:
             logger.info("Kết nối đến môi trường THỰC TẾ Binance")
             
         # Lấy API keys từ biến môi trường nếu không được cung cấp
-        self.api_key = api_key or os.environ.get('BINANCE_API_KEY', '')
-        self.api_secret = api_secret or os.environ.get('BINANCE_API_SECRET', '')
+        self.api_key = api_key or os.environ.get('BINANCE_TESTNET_API_KEY', '')
+        self.api_secret = api_secret or os.environ.get('BINANCE_TESTNET_API_SECRET', '')
         
         # Kiểm tra API keys
         if self.testnet and (not self.api_key or not self.api_secret):
@@ -181,6 +181,37 @@ class BinanceAPI:
             return self._request('GET', 'exchangeInfo', version='v1')
         else:
             return self._request('GET', 'exchangeInfo')
+            
+    def futures_exchange_info(self) -> Dict:
+        """
+        Lấy thông tin chi tiết về Binance Futures
+        
+        Returns:
+            Dict: Thông tin chi tiết về Binance Futures bao gồm quy tắc giao dịch, symbol info, v.v.
+        """
+        if self.account_type != 'futures':
+            logger.warning("Phương thức futures_exchange_info chỉ khả dụng với tài khoản futures")
+            return {}
+            
+        try:
+            logger.info("Lấy thông tin chi tiết về Binance Futures...")
+            
+            # Tạo URL cho API endpoint
+            base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+            url = f"{base_url}/fapi/v1/exchangeInfo"
+            
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                logger.info("Đã lấy thông tin chi tiết Binance Futures thành công")
+                return response.json()
+            else:
+                logger.error(f"Lỗi khi lấy thông tin Binance Futures: {response.status_code} - {response.text}")
+                return {}
+                
+        except Exception as e:
+            logger.error(f"Exception khi lấy thông tin Binance Futures: {str(e)}")
+            return {}
         
     def get_symbol_info(self, symbol: str) -> Dict:
         """
@@ -595,6 +626,34 @@ class BinanceAPI:
             return self._request('GET', 'ticker/price', params, version='v1')
         else:
             return self._request('GET', 'ticker/price', params)
+            
+    def futures_ticker_price(self) -> List[Dict]:
+        """
+        Lấy giá của tất cả các cặp giao dịch trên Binance Futures
+        
+        Returns:
+            List[Dict]: Danh sách giá của các cặp giao dịch
+        """
+        if self.account_type != 'futures':
+            logger.warning("Phương thức futures_ticker_price chỉ khả dụng với tài khoản futures")
+            return []
+            
+        try:
+            # Tạo URL cho API endpoint
+            base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+            url = f"{base_url}/fapi/v1/ticker/price"
+            
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"Lỗi khi lấy thông tin giá Futures: {response.status_code} - {response.text}")
+                return []
+                
+        except Exception as e:
+            logger.error(f"Exception khi lấy thông tin giá Futures: {str(e)}")
+            return []
         
     # Các phương thức hữu ích khác
     def convert_klines_to_dataframe(self, klines: List[List]) -> 'pd.DataFrame':
@@ -908,6 +967,7 @@ class BinanceAPI:
         
         return self._request('POST', 'leverage', params, signed=True, version='v1')
         
+
     def futures_create_order(self, symbol: str, side: str, type: str, **kwargs) -> Dict:
         """
         Tạo lệnh giao dịch mới trên Binance Futures

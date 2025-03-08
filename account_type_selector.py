@@ -1,423 +1,186 @@
 #!/usr/bin/env python3
-"""
-Module lựa chọn loại tài khoản giao dịch (Spot/Futures)
+# -*- coding: utf-8 -*-
 
-Module này cho phép người dùng lựa chọn và cấu hình loại tài khoản (spot hoặc futures)
-cho bot giao dịch, cùng với các tham số và giới hạn tương ứng.
-"""
-
-import os
-import logging
 import json
-from typing import Dict, Any, Optional, Tuple
+import logging
+import argparse
+from tabulate import tabulate
+from binance_api import BinanceAPI
 
 # Thiết lập logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger("account_type_selector")
-
-# Đường dẫn lưu cấu hình
-CONFIG_DIR = "configs"
-ACCOUNT_CONFIG_PATH = os.path.join(CONFIG_DIR, "account_config.json")
-
-# Tạo thư mục configs nếu chưa tồn tại
-os.makedirs(CONFIG_DIR, exist_ok=True)
-
-# Cấu hình mặc định cho các loại tài khoản
-DEFAULT_ACCOUNT_TYPES = {
-    "spot": {
-        "name": "Spot (Mua/Bán thông thường)",
-        "description": "Giao dịch mua/bán thông thường, không sử dụng đòn bẩy. An toàn hơn nhưng lợi nhuận thấp hơn.",
-        "leverage_available": False,
-        "max_leverage": 1,
-        "default_leverage": 1,
-        "margin_required": False,
-        "short_available": False,
-        "trading_fee": 0.1,  # 0.1%
-        "default_order_types": ["LIMIT", "MARKET", "STOP_LOSS", "TAKE_PROFIT"],
-        "min_order_size": 10.0,  # USD
-        "default_symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT"],
-        "default_timeframes": ["1h", "4h", "1d"]
-    },
-    "futures": {
-        "name": "Futures (Hợp đồng tương lai)",
-        "description": "Giao dịch hợp đồng tương lai với đòn bẩy, cho phép bán khống. Rủi ro cao hơn nhưng tiềm năng lợi nhuận lớn hơn.",
-        "leverage_available": True,
-        "max_leverage": 20,
-        "default_leverage": 10,
-        "margin_required": True,
-        "short_available": True,
-        "trading_fee": 0.04,  # 0.04%
-        "default_order_types": ["LIMIT", "MARKET", "STOP", "TAKE_PROFIT", "TRAILING_STOP"],
-        "min_order_size": 5.0,  # USD
-        "default_symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT"],
-        "default_timeframes": ["5m", "15m", "1h", "4h"]
-    }
-}
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("account_selector")
 
 class AccountTypeSelector:
-    """Lớp lựa chọn và cấu hình loại tài khoản giao dịch"""
+    """
+    Công cụ để lựa chọn cấu hình phù hợp nhất cho tài khoản dựa trên số dư và các tiêu chí đặt trước
+    """
     
-    def __init__(self, config_path: str = ACCOUNT_CONFIG_PATH):
-        """
-        Khởi tạo bộ chọn loại tài khoản
+    def __init__(self):
+        self.api = BinanceAPI(testnet=True)
+        self.account_config = self.load_config('account_config.json')
+        self.small_account_configs = self.account_config.get('small_account_configs', {})
         
-        Args:
-            config_path (str): Đường dẫn đến file cấu hình tài khoản
-        """
-        self.config_path = config_path
-        self.current_config = self._load_or_create_default()
-        
-        logger.info(f"Đã khởi tạo AccountTypeSelector, sử dụng file cấu hình: {config_path}")
-        
-        # Log loại tài khoản hiện tại
-        account_type = self.current_config.get("account_type", "futures")
-        account_settings = DEFAULT_ACCOUNT_TYPES[account_type]
-        env_type = "thực tế" if not self.current_config.get("use_testnet", True) else "testnet"
-        logger.info(f"Loại tài khoản hiện tại: {account_settings['name']} ({env_type})")
-    
-    def _load_or_create_default(self) -> Dict:
-        """
-        Tải cấu hình từ file hoặc tạo mới nếu không tồn tại
-        
-        Returns:
-            Dict: Cấu hình tài khoản
-        """
-        if os.path.exists(self.config_path):
-            try:
-                with open(self.config_path, 'r') as f:
-                    config = json.load(f)
-                logger.info(f"Đã tải cấu hình từ {self.config_path}")
-                return config
-            except Exception as e:
-                logger.error(f"Lỗi khi tải cấu hình: {e}")
-                
-        # Tạo cấu hình mặc định
-        default_config = {
-            "account_type": "futures",     # Mặc định là futures
-            "use_testnet": True,           # Mặc định sử dụng testnet (môi trường thử nghiệm)
-            "custom_settings": None,       # Cài đặt tùy chỉnh: None
-            "symbols": DEFAULT_ACCOUNT_TYPES["futures"]["default_symbols"],
-            "timeframes": DEFAULT_ACCOUNT_TYPES["futures"]["default_timeframes"],
-            "leverage": 10,                # Đòn bẩy mặc định: x10
-            "last_updated": None,          # Thời gian cập nhật cuối
-            "creator": "system"            # Người tạo: system
-        }
-        
-        # Lưu cấu hình mặc định
-        self._save_config(default_config)
-        logger.info(f"Đã tạo cấu hình mặc định và lưu vào {self.config_path}")
-        
-        return default_config
-    
-    def _save_config(self, config: Dict) -> bool:
-        """
-        Lưu cấu hình vào file
-        
-        Args:
-            config (Dict): Cấu hình cần lưu
-            
-        Returns:
-            bool: True nếu lưu thành công, False nếu thất bại
-        """
+    def load_config(self, filename):
+        """Tải cấu hình từ file"""
         try:
-            with open(self.config_path, 'w') as f:
-                json.dump(config, f, indent=4)
-            logger.info(f"Đã lưu cấu hình vào {self.config_path}")
-            return True
+            with open(filename, 'r') as f:
+                return json.load(f)
         except Exception as e:
-            logger.error(f"Lỗi khi lưu cấu hình: {e}")
-            return False
+            logger.error(f"Không thể tải cấu hình từ {filename}: {str(e)}")
+            return {}
     
-    def get_current_config(self) -> Dict:
-        """
-        Lấy cấu hình hiện tại
-        
-        Returns:
-            Dict: Cấu hình hiện tại
-        """
-        return self.current_config
+    def get_account_balance(self):
+        """Lấy số dư tài khoản"""
+        try:
+            account_balance = self.api.futures_account_balance()
+            available_balance = 0
+            
+            for balance in account_balance:
+                if balance.get('asset') == 'USDT':
+                    available_balance = float(balance.get('availableBalance', 0))
+                    break
+                    
+            logger.info(f"Số dư khả dụng: {available_balance} USDT")
+            return available_balance
+        except Exception as e:
+            logger.error(f"Không thể lấy số dư tài khoản: {str(e)}")
+            return 0
     
-    def get_account_types(self) -> Dict:
-        """
-        Lấy danh sách các loại tài khoản có sẵn
-        
-        Returns:
-            Dict: Danh sách các loại tài khoản
-        """
-        return DEFAULT_ACCOUNT_TYPES
-    
-    def set_account_type(self, account_type: str) -> bool:
-        """
-        Đặt loại tài khoản
-        
-        Args:
-            account_type (str): Loại tài khoản ('spot' hoặc 'futures')
+    def select_account_config(self, balance=None):
+        """Chọn cấu hình phù hợp dựa trên số dư"""
+        if balance is None:
+            balance = self.get_account_balance()
             
-        Returns:
-            bool: True nếu cập nhật thành công
-        """
-        if account_type not in DEFAULT_ACCOUNT_TYPES:
-            logger.error(f"Loại tài khoản không hợp lệ: {account_type}")
-            return False
+        if balance <= 0:
+            logger.error("Không thể xác định số dư tài khoản")
+            return None
             
-        self.current_config["account_type"] = account_type
+        # Chuyển đổi các key từ string thành float để so sánh
+        sizes = [float(size) for size in self.small_account_configs.keys()]
+        sizes.sort()
         
-        # Cập nhật các tham số liên quan
-        account_settings = DEFAULT_ACCOUNT_TYPES[account_type]
-        self.current_config["symbols"] = account_settings["default_symbols"]
-        self.current_config["timeframes"] = account_settings["default_timeframes"]
-        
-        if account_type == "futures" and "leverage" not in self.current_config:
-            self.current_config["leverage"] = account_settings["default_leverage"]
-        elif account_type == "spot":
-            self.current_config["leverage"] = 1  # Không có đòn bẩy cho spot
+        selected_size = None
+        for size in sizes:
+            if balance >= size:
+                selected_size = size
+            else:
+                break
+                
+        if selected_size is None and sizes:
+            # Nếu số dư nhỏ hơn tất cả các mức, chọn mức nhỏ nhất
+            selected_size = sizes[0]
             
-        self.current_config["last_updated"] = get_current_timestamp()
-        
-        return self._save_config(self.current_config)
-        
-    def set_api_mode(self, mode: str) -> bool:
-        """
-        Đặt chế độ API (demo, testnet, live)
-        
-        Args:
-            mode (str): Chế độ API ('demo', 'testnet', 'live')
-            
-        Returns:
-            bool: True nếu cập nhật thành công
-        """
-        valid_modes = ['demo', 'testnet', 'live']
-        if mode not in valid_modes:
-            logger.error(f"Chế độ API không hợp lệ: {mode}. Phải là một trong {valid_modes}")
-            return False
-            
-        # Nếu chế độ là demo, không cần API key
-        if mode == 'demo':
-            self.current_config['use_api'] = False
-            self.current_config['use_testnet'] = True
-            logger.info("Đặt chế độ DEMO (không cần API key)")
-        
-        # Nếu chế độ là testnet, cần API key và sử dụng testnet
-        elif mode == 'testnet':
-            self.current_config['use_api'] = True
-            self.current_config['use_testnet'] = True
-            logger.info("Đặt chế độ TESTNET API (cần testnet API key)")
-        
-        # Nếu chế độ là live, cần API key và sử dụng môi trường thực
-        elif mode == 'live':
-            self.current_config['use_api'] = True
-            self.current_config['use_testnet'] = False
-            logger.info("Đặt chế độ LIVE API - THỰC TẾ (cần API key thực)")
-            
-        self.current_config["last_updated"] = get_current_timestamp()
-        
-        return self._save_config(self.current_config)
-    
-    def set_symbols(self, symbols: list) -> bool:
-        """
-        Đặt danh sách các cặp giao dịch
-        
-        Args:
-            symbols (list): Danh sách các cặp giao dịch
-            
-        Returns:
-            bool: True nếu cập nhật thành công
-        """
-        if not symbols or not isinstance(symbols, list):
-            logger.error("Danh sách symbols không hợp lệ")
-            return False
-            
-        self.current_config["symbols"] = symbols
-        self.current_config["last_updated"] = get_current_timestamp()
-        
-        return self._save_config(self.current_config)
-    
-    def set_timeframes(self, timeframes: list) -> bool:
-        """
-        Đặt danh sách các khung thời gian
-        
-        Args:
-            timeframes (list): Danh sách các khung thời gian
-            
-        Returns:
-            bool: True nếu cập nhật thành công
-        """
-        if not timeframes or not isinstance(timeframes, list):
-            logger.error("Danh sách timeframes không hợp lệ")
-            return False
-            
-        self.current_config["timeframes"] = timeframes
-        self.current_config["last_updated"] = get_current_timestamp()
-        
-        return self._save_config(self.current_config)
-    
-    def set_leverage(self, leverage: int) -> bool:
-        """
-        Đặt đòn bẩy (chỉ cho futures)
-        
-        Args:
-            leverage (int): Đòn bẩy
-            
-        Returns:
-            bool: True nếu cập nhật thành công
-        """
-        account_type = self.current_config.get("account_type", "futures")
-        
-        if account_type == "spot":
-            logger.warning("Không thể đặt đòn bẩy cho tài khoản spot")
-            return False
-            
-        if leverage <= 0 or leverage > DEFAULT_ACCOUNT_TYPES["futures"]["max_leverage"]:
-            logger.error(f"Đòn bẩy không hợp lệ: {leverage}, phải trong khoảng [1, {DEFAULT_ACCOUNT_TYPES['futures']['max_leverage']}]")
-            return False
-            
-        self.current_config["leverage"] = leverage
-        self.current_config["last_updated"] = get_current_timestamp()
-        
-        return self._save_config(self.current_config)
-    
-    def get_effective_settings(self) -> Dict:
-        """
-        Lấy cài đặt tài khoản hiệu lực
-        
-        Returns:
-            Dict: Cài đặt tài khoản hiệu lực
-        """
-        effective_settings = {}
-        
-        # Bắt đầu với các cài đặt mặc định của loại tài khoản
-        account_type = self.current_config.get("account_type", "futures")
-        effective_settings.update(DEFAULT_ACCOUNT_TYPES[account_type])
-        
-        # Ghi đè với các cài đặt trong cấu hình
-        effective_settings["symbols"] = self.current_config.get("symbols", effective_settings["default_symbols"])
-        effective_settings["timeframes"] = self.current_config.get("timeframes", effective_settings["default_timeframes"])
-        
-        if account_type == "futures":
-            effective_settings["leverage"] = self.current_config.get("leverage", effective_settings["default_leverage"])
+        if selected_size:
+            config = self.small_account_configs.get(str(int(selected_size)), {})
+            logger.info(f"Đã chọn cấu hình cho tài khoản ${int(selected_size)}")
+            return config, selected_size
         else:
-            effective_settings["leverage"] = 1
+            logger.error("Không tìm thấy cấu hình phù hợp")
+            return None, 0
             
-        return effective_settings
-    
-    def get_account_summary(self) -> str:
-        """
-        Lấy tóm tắt cài đặt tài khoản hiện tại
+    def display_config_comparison(self):
+        """Hiển thị so sánh các cấu hình tài khoản"""
+        logger.info("\n" + "="*80)
+        logger.info("SO SÁNH CẤU HÌNH TÀI KHOẢN NHỎ")
+        logger.info("="*80)
         
-        Returns:
-            str: Tóm tắt cài đặt tài khoản
-        """
-        settings = self.get_effective_settings()
-        account_type = self.current_config.get("account_type", "futures")
+        configs = []
         
-        summary = f"""
-        === THÔNG TIN CẤU HÌNH TÀI KHOẢN ===
-        
-        Loại tài khoản: {settings['name']}
-        {settings['description']}
-        
-        Biểu tượng giao dịch: {', '.join(settings['symbols'])}
-        Khung thời gian: {', '.join(settings['timeframes'])}
-        
-        Phí giao dịch: {settings['trading_fee']}%
-        Loại lệnh hỗ trợ: {', '.join(settings['default_order_types'])}
-        Kích thước lệnh tối thiểu: {settings['min_order_size']} USD
-        """
-        
-        if account_type == "futures":
-            summary += f"""
-        Đòn bẩy: x{settings['leverage']}
-        Đòn bẩy tối đa: x{settings['max_leverage']}
-        """
+        for size, config in self.small_account_configs.items():
+            configs.append({
+                'Account Size': f"${size}",
+                'Leverage': f"{config.get('leverage')}x",
+                'Risk %': f"{config.get('risk_percentage')}%",
+                'Max Positions': config.get('max_positions'),
+                'Pairs Count': len(config.get('suitable_pairs', [])),
+                'Min Position': f"${config.get('min_position_size', 0)}",
+                'Trailing Stop': "Yes" if config.get('enable_trailing_stop', False) else "No",
+                'Stop Loss': f"{config.get('default_stop_percentage', 0)}%",
+                'Take Profit': f"{config.get('default_take_profit_percentage', 0)}%"
+            })
             
-        return summary
-    
-    def reset_to_default(self) -> bool:
-        """
-        Đặt lại cấu hình về mặc định
+        logger.info("\n" + tabulate(configs, headers='keys', tablefmt='grid'))
         
-        Returns:
-            bool: True nếu đặt lại thành công
-        """
-        default_config = {
-            "account_type": "futures",
-            "custom_settings": None,
-            "symbols": DEFAULT_ACCOUNT_TYPES["futures"]["default_symbols"],
-            "timeframes": DEFAULT_ACCOUNT_TYPES["futures"]["default_timeframes"],
-            "leverage": 10,
-            "last_updated": get_current_timestamp(),
-            "creator": "system"
-        }
+    def show_recommended_config(self, manual_balance=None):
+        """Hiển thị cấu hình được đề xuất dựa trên số dư"""
+        balance = manual_balance if manual_balance is not None else self.get_account_balance()
         
-        self.current_config = default_config
-        return self._save_config(self.current_config)
+        if balance <= 0:
+            logger.error("Không thể xác định số dư tài khoản")
+            return None, 0
+            
+        config, selected_size = self.select_account_config(balance)
         
-def get_current_timestamp() -> str:
-    """
-    Lấy thời gian hiện tại dạng chuỗi
-    
-    Returns:
-        str: Thời gian hiện tại dạng chuỗi
-    """
-    from datetime import datetime
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if not config or config is None:
+            return None, 0
+            
+        logger.info("\n" + "="*80)
+        logger.info(f"CẤU HÌNH ĐỀ XUẤT CHO TÀI KHOẢN (${balance:.2f})")
+        logger.info("="*80)
+        
+        # Hiển thị thông tin tổng quan
+        logger.info(f"Cấu hình được chọn: ${int(selected_size)}")
+        logger.info(f"Đòn bẩy: {config.get('leverage')}x")
+        logger.info(f"Mức rủi ro: {config.get('risk_percentage')}%")
+        logger.info(f"Số vị thế tối đa: {config.get('max_positions')}")
+        logger.info(f"Vị thế tối thiểu: ${config.get('min_position_size', 0)}")
+        
+        # Hiển thị thông tin chi tiết về lệnh
+        logger.info("\nCác loại lệnh hỗ trợ:")
+        for order_type in config.get('order_types', []):
+            logger.info(f"- {order_type}")
+            
+        # Hiển thị thông tin về stoploss và take profit
+        logger.info(f"\nStop Loss mặc định: {config.get('default_stop_percentage', 0)}%")
+        logger.info(f"Take Profit mặc định: {config.get('default_take_profit_percentage', 0)}%")
+        logger.info(f"Trailing Stop: {'Bật' if config.get('enable_trailing_stop', False) else 'Tắt'}")
+        
+        # Hiển thị danh sách các cặp tiền phù hợp
+        suitable_pairs = config.get('suitable_pairs', [])
+        
+        if suitable_pairs:
+            logger.info(f"\nCác cặp tiền phù hợp ({len(suitable_pairs)}):")
+            
+            # Chia thành các hàng để hiển thị đẹp hơn
+            pairs_rows = []
+            current_row = []
+            
+            for i, pair in enumerate(suitable_pairs):
+                current_row.append(pair)
+                
+                if len(current_row) == 5 or i == len(suitable_pairs) - 1:
+                    pairs_rows.append(current_row)
+                    current_row = []
+                    
+            for row in pairs_rows:
+                logger.info("  ".join(row))
+                
+        # Hiển thị giá trị giao dịch tối đa
+        max_trade_value = (balance * config.get('risk_percentage', 1) / 100) * config.get('leverage', 1)
+        logger.info(f"\nGiá trị giao dịch tối đa: ${max_trade_value:.2f}")
+        logger.info(f"BTC hiện tại: ${config.get('min_btc_value', 0)}")
+        
+        logger.info("\n" + "="*80)
+        
+    def run(self, manual_balance=None, compare=False):
+        """Chạy công cụ lựa chọn tài khoản"""
+        # Hiển thị so sánh nếu được yêu cầu
+        if compare:
+            self.display_config_comparison()
+            
+        # Hiển thị cấu hình đề xuất
+        self.show_recommended_config(manual_balance)
 
-def main():
-    """Hàm chính để test AccountTypeSelector"""
-    selector = AccountTypeSelector()
-    
-    print("===== CẤU HÌNH LOẠI TÀI KHOẢN GIAO DỊCH =====")
-    print()
-    
-    # Hiển thị cấu hình hiện tại
-    current_config = selector.get_current_config()
-    current_type = current_config.get("account_type", "futures")
-    print(f"Loại tài khoản hiện tại: {current_type}")
-    print()
-    
-    # Hiển thị menu
-    account_types = selector.get_account_types()
-    print("Các loại tài khoản có sẵn:")
-    for i, (type_name, type_info) in enumerate(account_types.items(), 1):
-        print(f"{i}. {type_info['name']}")
-        print(f"   {type_info['description']}")
-        print()
-    
-    # Chọn loại tài khoản
-    choice = input("Chọn loại tài khoản (1-2, Enter để giữ nguyên): ")
-    
-    types = {
-        "1": "spot",
-        "2": "futures"
-    }
-    
-    if choice and choice in types:
-        account_type = types[choice]
-        if selector.set_account_type(account_type):
-            print(f"Đã chọn loại tài khoản: {account_type}")
-        else:
-            print("Lỗi khi đặt loại tài khoản.")
-    
-    # Nếu là futures, chọn đòn bẩy
-    if current_type == "futures" or (choice and types.get(choice) == "futures"):
-        leverage = input(f"Nhập đòn bẩy (1-20, mặc định: {selector.current_config.get('leverage', 10)}): ")
-        
-        if leverage:
-            try:
-                leverage = int(leverage)
-                if selector.set_leverage(leverage):
-                    print(f"Đã đặt đòn bẩy: x{leverage}")
-                else:
-                    print("Lỗi khi đặt đòn bẩy.")
-            except ValueError:
-                print("Giá trị đòn bẩy không hợp lệ.")
-    
-    # Hiển thị tóm tắt
-    print("\nTóm tắt cấu hình tài khoản:")
-    print(selector.get_account_summary())
+def parse_arguments():
+    """Phân tích tham số dòng lệnh"""
+    parser = argparse.ArgumentParser(description='Công cụ lựa chọn cấu hình tài khoản')
+    parser.add_argument('--balance', type=float, help='Số dư tài khoản (nếu không cung cấp, sẽ lấy từ API)')
+    parser.add_argument('--compare', action='store_true', help='Hiển thị so sánh tất cả cấu hình')
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    
+    selector = AccountTypeSelector()
+    selector.run(manual_balance=args.balance, compare=args.compare)

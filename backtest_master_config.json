@@ -1,5 +1,5 @@
 {
-  "symbols": ["BTCUSDT", "ETHUSDT"],
+  "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "DOGEUSDT", "XRPUSDT", "LINKUSDT", "AVAXUSDT", "DOTUSDT", "LTCUSDT", "ATOMUSDT", "UNIUSDT"],
   "timeframes": ["1h", "4h"],
   "phases": [
     {

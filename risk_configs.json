@@ -1,0 +1,42 @@
+{
+  "100": {
+    "leverage": 10,
+    "risk_percentage": 30,
+    "max_positions": 1
+  },
+  "200": {
+    "leverage": 10,
+    "risk_percentage": 15,
+    "max_positions": 2
+  },
+  "300": {
+    "leverage": 10,
+    "risk_percentage": 10,
+    "max_positions": 2
+  },
+  "500": {
+    "leverage": 10,
+    "risk_percentage": 5,
+    "max_positions": 3
+  },
+  "1000": {
+    "leverage": 10,
+    "risk_percentage": 1,
+    "max_positions": 3
+  },
+  "3000": {
+    "leverage": 5,
+    "risk_percentage": 5,
+    "max_positions": 3
+  },
+  "5000": {
+    "leverage": 5,
+    "risk_percentage": 2,
+    "max_positions": 3
+  },
+  "10000": {
+    "leverage": 5,
+    "risk_percentage": 0.5,
+    "max_positions": 3
+  }
+}

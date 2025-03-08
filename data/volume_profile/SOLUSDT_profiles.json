@@ -1,0 +1,362 @@
+{
+  "session": {
+    "symbol": "SOLUSDT",
+    "profile_type": "session",
+    "timestamp": "2025-03-07T06:24:05.162986",
+    "price_range": {
+      "min": 135.04,
+      "max": 152.9
+    },
+    "poc": 149.0601,
+    "value_area": {
+      "high": 151.7391,
+      "low": 140.4873
+    },
+    "volume_nodes": [
+      {
+        "price_low": 143.2556,
+        "price_high": 143.4342,
+        "price_mid": 143.3449,
+        "volume": 104295.89090940161
+      },
+      {
+        "price_low": 143.4342,
+        "price_high": 143.6128,
+        "price_mid": 143.5235,
+        "volume": 115723.0048539985
+      },
+      {
+        "price_low": 143.6128,
+        "price_high": 143.7914,
+        "price_mid": 143.7021,
+        "volume": 108954.4054234197
+      },
+      {
+        "price_low": 143.7914,
+        "price_high": 143.97,
+        "price_mid": 143.8807,
+        "volume": 108670.07685922284
+      },
+      {
+        "price_low": 143.97,
+        "price_high": 144.1486,
+        "price_mid": 144.0593,
+        "volume": 108670.07685922284
+      },
+      {
+        "price_low": 144.1486,
+        "price_high": 144.3272,
+        "price_mid": 144.2379,
+        "volume": 108670.07685924013
+      },
+      {
+        "price_low": 144.3272,
+        "price_high": 144.5058,
+        "price_mid": 144.41649999999998,
+        "volume": 104005.1846196538
+      },
+      {
+        "price_low": 144.5058,
+        "price_high": 144.6844,
+        "price_mid": 144.5951,
+        "volume": 90633.95086534691
+      },
+      {
+        "price_low": 144.6844,
+        "price_high": 144.863,
+        "price_mid": 144.77370000000002,
+        "volume": 85718.87341326132
+      },
+      {
+        "price_low": 148.435,
+        "price_high": 148.6136,
+        "price_mid": 148.52429999999998,
+        "volume": 96204.27161806884
+      },
+      {
+        "price_low": 148.6136,
+        "price_high": 148.7922,
+        "price_mid": 148.7029,
+        "volume": 107742.60077215136
+      },
+      {
+        "price_low": 148.7922,
+        "price_high": 148.9708,
+        "price_mid": 148.88150000000002,
+        "volume": 123031.69905707717
+      },
+      {
+        "price_low": 148.9708,
+        "price_high": 149.1494,
+        "price_mid": 149.0601,
+        "volume": 123665.20426583498
+      },
+      {
+        "price_low": 149.1494,
+        "price_high": 149.328,
+        "price_mid": 149.2387,
+        "volume": 118280.77865173241
+      },
+      {
+        "price_low": 149.328,
+        "price_high": 149.5066,
+        "price_mid": 149.4173,
+        "volume": 86040.85114372445
+      }
+    ],
+    "bin_width": 0.17860000000000015,
+    "total_volume": 5327446.124999999
+  },
+  "daily": {
+    "symbol": "SOLUSDT",
+    "profile_type": "daily",
+    "timestamp": "2025-03-07T06:24:05.140546",
+    "price_range": {
+      "min": 135.04,
+      "max": 152.9
+    },
+    "poc": 149.0601,
+    "value_area": {
+      "high": 150.66750000000002,
+      "low": 140.4873
+    },
+    "volume_nodes": [
+      {
+        "price_low": 143.2556,
+        "price_high": 143.4342,
+        "price_mid": 143.3449,
+        "volume": 104295.89090940161
+      },
+      {
+        "price_low": 143.4342,
+        "price_high": 143.6128,
+        "price_mid": 143.5235,
+        "volume": 115723.0048539985
+      },
+      {
+        "price_low": 143.6128,
+        "price_high": 143.7914,
+        "price_mid": 143.7021,
+        "volume": 108954.4054234197
+      },
+      {
+        "price_low": 143.7914,
+        "price_high": 143.97,
+        "price_mid": 143.8807,
+        "volume": 108670.07685922284
+      },
+      {
+        "price_low": 143.97,
+        "price_high": 144.1486,
+        "price_mid": 144.0593,
+        "volume": 108670.07685922284
+      },
+      {
+        "price_low": 144.1486,
+        "price_high": 144.3272,
+        "price_mid": 144.2379,
+        "volume": 108670.07685924013
+      },
+      {
+        "price_low": 144.3272,
+        "price_high": 144.5058,
+        "price_mid": 144.41649999999998,
+        "volume": 104005.1846196538
+      },
+      {
+        "price_low": 144.5058,
+        "price_high": 144.6844,
+        "price_mid": 144.5951,
+        "volume": 90633.95086534691
+      },
+      {
+        "price_low": 144.6844,
+        "price_high": 144.863,
+        "price_mid": 144.77370000000002,
+        "volume": 85718.87341326132
+      },
+      {
+        "price_low": 148.435,
+        "price_high": 148.6136,
+        "price_mid": 148.52429999999998,
+        "volume": 109294.92118779807
+      },
+      {
+        "price_low": 148.6136,
+        "price_high": 148.7922,
+        "price_mid": 148.7029,
+        "volume": 121210.28517972025
+      },
+      {
+        "price_low": 148.7922,
+        "price_high": 148.9708,
+        "price_mid": 148.88150000000002,
+        "volume": 136499.38346464394
+      },
+      {
+        "price_low": 148.9708,
+        "price_high": 149.1494,
+        "price_mid": 149.0601,
+        "volume": 137132.88867340385
+      },
+      {
+        "price_low": 149.1494,
+        "price_high": 149.328,
+        "price_mid": 149.2387,
+        "volume": 131748.46305929916
+      },
+      {
+        "price_low": 149.328,
+        "price_high": 149.5066,
+        "price_mid": 149.4173,
+        "volume": 99508.53555129119
+      },
+      {
+        "price_low": 149.5066,
+        "price_high": 149.6852,
+        "price_mid": 149.5959,
+        "volume": 84628.82341161119
+      }
+    ],
+    "bin_width": 0.17860000000000015,
+    "total_volume": 5494849.5929999985
+  },
+  "weekly": {
+    "symbol": "SOLUSDT",
+    "profile_type": "weekly",
+    "timestamp": "2025-03-07T06:24:05.155965",
+    "price_range": {
+      "min": 125.89,
+      "max": 179.85
+    },
+    "poc": 143.9666,
+    "value_area": {
+      "high": 172.0258,
+      "low": 134.2538
+    },
+    "volume_nodes": [
+      {
+        "price_low": 135.6028,
+        "price_high": 136.1424,
+        "price_mid": 135.8726,
+        "volume": 971074.4240925562
+      },
+      {
+        "price_low": 136.1424,
+        "price_high": 136.682,
+        "price_mid": 136.41219999999998,
+        "volume": 1056029.4301551012
+      },
+      {
+        "price_low": 136.682,
+        "price_high": 137.2216,
+        "price_mid": 136.9518,
+        "volume": 1102561.5119774642
+      },
+      {
+        "price_low": 137.2216,
+        "price_high": 137.7612,
+        "price_mid": 137.4914,
+        "volume": 994872.3188143576
+      },
+      {
+        "price_low": 139.9196,
+        "price_high": 140.4592,
+        "price_mid": 140.1894,
+        "volume": 1107290.8919707304
+      },
+      {
+        "price_low": 140.4592,
+        "price_high": 140.9988,
+        "price_mid": 140.72899999999998,
+        "volume": 1291430.3977211148
+      },
+      {
+        "price_low": 140.9988,
+        "price_high": 141.5384,
+        "price_mid": 141.2686,
+        "volume": 1390895.9910377457
+      },
+      {
+        "price_low": 141.5384,
+        "price_high": 142.078,
+        "price_mid": 141.8082,
+        "volume": 1562157.4898181474
+      },
+      {
+        "price_low": 142.078,
+        "price_high": 142.6176,
+        "price_mid": 142.3478,
+        "volume": 1722418.7109827548
+      },
+      {
+        "price_low": 142.6176,
+        "price_high": 143.1572,
+        "price_mid": 142.8874,
+        "volume": 1900291.8772909609
+      },
+      {
+        "price_low": 143.1572,
+        "price_high": 143.6968,
+        "price_mid": 143.427,
+        "volume": 2135318.4453248205
+      },
+      {
+        "price_low": 143.6968,
+        "price_high": 144.2364,
+        "price_mid": 143.9666,
+        "volume": 2149990.6077140914
+      },
+      {
+        "price_low": 144.2364,
+        "price_high": 144.776,
+        "price_mid": 144.5062,
+        "volume": 1893682.9209127575
+      },
+      {
+        "price_low": 144.776,
+        "price_high": 145.3156,
+        "price_mid": 145.04579999999999,
+        "volume": 1491912.4356722562
+      },
+      {
+        "price_low": 145.3156,
+        "price_high": 145.8552,
+        "price_mid": 145.5854,
+        "volume": 1345742.8976889562
+      },
+      {
+        "price_low": 145.8552,
+        "price_high": 146.3948,
+        "price_mid": 146.125,
+        "volume": 1387309.5172143017
+      },
+      {
+        "price_low": 146.3948,
+        "price_high": 146.9344,
+        "price_mid": 146.6646,
+        "volume": 1381573.3508129276
+      },
+      {
+        "price_low": 146.9344,
+        "price_high": 147.474,
+        "price_mid": 147.20420000000001,
+        "volume": 1150555.9479485035
+      },
+      {
+        "price_low": 147.474,
+        "price_high": 148.0136,
+        "price_mid": 147.7438,
+        "volume": 932205.6503662345
+      },
+      {
+        "price_low": 148.5532,
+        "price_high": 149.0928,
+        "price_mid": 148.823,
+        "volume": 996898.9680543876
+      }
+    ],
+    "bin_width": 0.5396,
+    "total_volume": 57659585.99299999
+  }
+}

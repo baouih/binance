@@ -1,0 +1,195 @@
+Tôi sẽ giúp bạn tóm tắt và đề xuất các cải thiện cho chiến lược giao dịch của bạn, tập trung vào việc giảm overtrading và loại bỏ các tín hiệu mâu thuẫn.
+
+## Tóm tắt vấn đề hiện tại
+- Quá nhiều tín hiệu giao dịch (18% mua và 18.2% bán) dẫn đến overtrading
+- Tín hiệu mua và bán xuất hiện cùng lúc (lỗi logic)
+- FutureWarning trong code cần được khắc phục
+
+## Đề xuất cải thiện và công thức cụ thể
+
+### 1. Giảm số lượng tín hiệu không cần thiết
+
+**Bộ lọc xu hướng chính:**
+```python
+# Xác định xu hướng chính với SMA 200
+df['sma200'] = df['close'].rolling(window=200).mean()
+df['main_trend'] = np.where(df['close'] > df['sma200'], 'uptrend', 
+                    np.where(df['close'] < df['sma200'], 'downtrend', 'neutral'))
+
+# Chỉ giao dịch theo hướng xu hướng chính
+df['buy_signal_filtered'] = np.where((df['buy_signal'] == 1) & 
+                                     ((df['main_trend'] == 'uptrend') | 
+                                      (df['main_trend'] == 'neutral')), 1, 0)
+df['sell_signal_filtered'] = np.where((df['sell_signal'] == 1) & 
+                                      ((df['main_trend'] == 'downtrend') | 
+                                       (df['main_trend'] == 'neutral')), 1, 0)
+```
+
+**Bộ lọc biến động:**
+```python
+# Xác định ngưỡng biến động cao (VD: ATR > 2 lần giá trị trung bình)
+df['atr'] = ta.atr(df['high'], df['low'], df['close'], length=14)
+df['atr_mean'] = df['atr'].rolling(window=50).mean()
+df['high_volatility'] = df['atr'] > 2 * df['atr_mean']
+
+# Chỉ giao dịch trong biến động cao khi có xác nhận mạnh
+strong_confirmation = (df['rsi'] < 20) | (df['rsi'] > 80)  # Xác nhận mạnh
+
+df['buy_signal_vol_filtered'] = np.where(
+    (~df['high_volatility'] | strong_confirmation) & df['buy_signal_filtered'], 1, 0)
+df['sell_signal_vol_filtered'] = np.where(
+    (~df['high_volatility'] | strong_confirmation) & df['sell_signal_filtered'], 1, 0)
+```
+
+**Bộ lọc thời gian:**
+```python
+# Yêu cầu khoảng cách tối thiểu giữa các tín hiệu (ví dụ: 10 nến)
+min_candles_between_signals = 10
+
+# Khởi tạo biến đếm
+last_buy_signal_idx = -min_candles_between_signals
+last_sell_signal_idx = -min_candles_between_signals
+
+# Lọc tín hiệu dựa trên khoảng cách thời gian
+for i in range(len(df)):
+    if df['buy_signal_vol_filtered'].iloc[i] == 1:
+        if i - last_buy_signal_idx >= min_candles_between_signals:
+            last_buy_signal_idx = i
+        else:
+            df['buy_signal_vol_filtered'].iloc[i] = 0
+            
+    if df['sell_signal_vol_filtered'].iloc[i] == 1:
+        if i - last_sell_signal_idx >= min_candles_between_signals:
+            last_sell_signal_idx = i
+        else:
+            df['sell_signal_vol_filtered'].iloc[i] = 0
+```
+
+### 2. Sửa lỗi tín hiệu trùng lặp
+
+**Ưu tiên chiến lược:**
+```python
+# Xác định rõ ràng ưu tiên giữa tín hiệu sideway và trend following
+# Ví dụ: Ưu tiên sideway trong thị trường sideway, trend following trong thị trường trending
+
+# Xác định trạng thái thị trường
+df['market_condition'] = ''
+lookback = 50
+
+for i in range(lookback, len(df)):
+    price_range = df['high'].iloc[i-lookback:i].max() - df['low'].iloc[i-lookback:i].min()
+    last_price = df['close'].iloc[i]
+    first_price = df['close'].iloc[i-lookback]
+    trend_strength = abs(last_price - first_price) / price_range if price_range > 0 else 0
+    
+    if trend_strength < 0.3:
+        df.loc[df.index[i], 'market_condition'] = 'sideway'
+    else:
+        if last_price > first_price:
+            df.loc[df.index[i], 'market_condition'] = 'uptrend'
+        else:
+            df.loc[df.index[i], 'market_condition'] = 'downtrend'
+
+# Áp dụng ưu tiên dựa trên trạng thái thị trường
+df['final_buy_signal'] = 0
+df['final_sell_signal'] = 0
+
+for i in range(len(df)):
+    if df['market_condition'].iloc[i] == 'sideway':
+        # Ưu tiên tín hiệu mean-reversion trong thị trường sideway
+        if df['rsi'].iloc[i] < 30:
+            df['final_buy_signal'].iloc[i] = 1
+            df['final_sell_signal'].iloc[i] = 0
+        elif df['rsi'].iloc[i] > 70:
+            df['final_buy_signal'].iloc[i] = 0
+            df['final_sell_signal'].iloc[i] = 1
+    else:
+        # Ưu tiên tín hiệu trend following trong thị trường trending
+        df['final_buy_signal'].iloc[i] = df['buy_signal_vol_filtered'].iloc[i]
+        df['final_sell_signal'].iloc[i] = df['sell_signal_vol_filtered'].iloc[i]
+```
+
+### 3. Cải thiện chiến lược mean-reversion
+
+**Tăng điều kiện RSI với xu hướng:**
+```python
+# Thêm điều kiện về xu hướng RSI
+df['rsi'] = ta.rsi(df['close'], length=14)
+df['rsi_ma'] = df['rsi'].rolling(window=5).mean()
+
+# Mua khi RSI < 30 và RSI đang đi lên (RSI > RSI MA)
+df['rsi_buy'] = np.where((df['rsi'] < 30) & (df['rsi'] > df['rsi'].shift(1)), 1, 0)
+
+# Bán khi RSI > 70 và RSI đang đi xuống (RSI < RSI MA)
+df['rsi_sell'] = np.where((df['rsi'] > 70) & (df['rsi'] < df['rsi'].shift(1)), 1, 0)
+```
+
+**Sử dụng Stochastic để xác nhận:**
+```python
+# Thêm Stochastic để xác nhận tín hiệu RSI
+df['stoch_k'], df['stoch_d'] = ta.stoch(df['high'], df['low'], df['close'], 
+                                        k=14, d=3, smooth_k=3)
+
+# Mua khi RSI < 30 và Stochastic K < 20 và K cắt lên D
+df['mean_rev_buy'] = np.where((df['rsi'] < 30) & (df['stoch_k'] < 20) & 
+                             (df['stoch_k'] > df['stoch_d']) & 
+                             (df['stoch_k'].shift(1) < df['stoch_d'].shift(1)), 1, 0)
+
+# Bán khi RSI > 70 và Stochastic K > 80 và K cắt xuống D
+df['mean_rev_sell'] = np.where((df['rsi'] > 70) & (df['stoch_k'] > 80) & 
+                              (df['stoch_k'] < df['stoch_d']) & 
+                              (df['stoch_k'].shift(1) > df['stoch_d'].shift(1)), 1, 0)
+```
+
+### 4. Điều chỉnh kích thước vị thế và TP/SL
+
+```python
+# Điều chỉnh kích thước vị thế theo trạng thái thị trường
+def position_size(market_condition):
+    if market_condition == 'sideway':
+        return 0.5  # 50% kích thước vị thế trong thị trường sideway
+    elif market_condition == 'uptrend':
+        return 1.0  # 100% kích thước vị thế trong uptrend
+    elif market_condition == 'downtrend':
+        return 0.7  # 70% kích thước vị thế trong downtrend
+    else:
+        return 0.5  # Mặc định 50%
+
+# Điều chỉnh TP/SL theo trạng thái thị trường
+def adjust_tp_sl(market_condition, atr, is_buy):
+    atr_multiplier = {
+        'sideway': {'tp': 1.5, 'sl': 1.0},
+        'uptrend': {'tp': 3.0, 'sl': 1.5},
+        'downtrend': {'tp': 2.0, 'sl': 1.0}
+    }
+    
+    if is_buy:
+        tp_multiplier = atr_multiplier.get(market_condition, {'tp': 2.0, 'sl': 1.0})['tp']
+        sl_multiplier = atr_multiplier.get(market_condition, {'tp': 2.0, 'sl': 1.0})['sl']
+    else:
+        tp_multiplier = atr_multiplier.get(market_condition, {'tp': 2.0, 'sl': 1.0})['tp']
+        sl_multiplier = atr_multiplier.get(market_condition, {'tp': 2.0, 'sl': 1.0})['sl']
+    
+    return {'tp': atr * tp_multiplier, 'sl': atr * sl_multiplier}
+```
+
+## Tóm tắt cải thiện
+
+1. **Giảm tín hiệu giao dịch thừa**:
+   - Lọc theo xu hướng SMA 200
+   - Lọc theo biến động ATR
+   - Yêu cầu khoảng cách tối thiểu giữa các tín hiệu
+
+2. **Loại bỏ tín hiệu mâu thuẫn**:
+   - Sử dụng hệ thống ưu tiên rõ ràng: sideway vs trend following
+   - Áp dụng logic loại trừ dựa vào trạng thái thị trường
+
+3. **Tăng cường độ tin cậy của tín hiệu**:
+   - RSI kết hợp với xu hướng và Stochastic
+   - Tín hiệu xác nhận mạnh trong các thời điểm biến động cao
+
+4. **Điều chỉnh linh hoạt theo trạng thái thị trường**:
+   - Kích thước vị thế khác nhau: Sideway (50%), Uptrend (100%), Downtrend (70%)
+   - TP/SL động dựa trên ATR và trạng thái thị trường
+
+Bạn có cần thêm thông tin hoặc giải thích chi tiết về bất kỳ phần nào không?​​​​​​​​​​​​​​​​

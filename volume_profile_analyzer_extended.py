@@ -528,15 +528,17 @@ class VolumeProfileAnalyzer:
             logger.error(f"Lỗi khi tính VWAP: {str(e)}")
             return {'vwap': None, 'bands': {}}
             
-    def visualize_vwap_zones(self, df: pd.DataFrame, period: str = 'day', 
-                           save_path: str = None) -> str:
+    def visualize_vwap_zones(self, df: pd.DataFrame, symbol: str = 'TESTDATA', period: str = 'day', 
+                           save_path: str = None, custom_path: str = None) -> str:
         """
         Tạo biểu đồ VWAP và các bands.
         
         Args:
             df (pd.DataFrame): DataFrame chứa dữ liệu nến
+            symbol (str): Ký hiệu của cặp tiền tệ (e.g. 'BTCUSDT')
             period (str): Chu kỳ tính VWAP ('day', 'week', 'month')
-            save_path (str, optional): Đường dẫn lưu biểu đồ
+            save_path (str, optional): Đường dẫn đầy đủ lưu biểu đồ
+            custom_path (str, optional): Đường dẫn tùy chỉnh đến thư mục lưu biểu đồ
             
         Returns:
             str: Đường dẫn đến biểu đồ đã lưu
@@ -584,9 +586,12 @@ class VolumeProfileAnalyzer:
             
             # Lưu biểu đồ
             if save_path is None:
-                save_dir = 'charts/vwap'
+                if custom_path is not None:
+                    save_dir = custom_path
+                else:
+                    save_dir = 'charts/vwap'
                 os.makedirs(save_dir, exist_ok=True)
-                save_path = f"{save_dir}/vwap_{period}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                save_path = f"{save_dir}/vwap_{symbol}_{period}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
                 
             plt.savefig(save_path)
             plt.close()
@@ -598,14 +603,15 @@ class VolumeProfileAnalyzer:
             return ""
             
     def visualize_volume_profile(self, df: pd.DataFrame, lookback_periods: int = None, 
-                               save_path: str = None) -> str:
+                               save_path: str = None, custom_path: str = None) -> str:
         """
         Tạo biểu đồ volume profile.
         
         Args:
             df (pd.DataFrame): DataFrame chứa dữ liệu nến
             lookback_periods (int, optional): Số nến lấy để vẽ biểu đồ
-            save_path (str, optional): Đường dẫn lưu biểu đồ
+            save_path (str, optional): Đường dẫn đầy đủ lưu biểu đồ
+            custom_path (str, optional): Đường dẫn tùy chỉnh đến thư mục lưu biểu đồ
             
         Returns:
             str: Đường dẫn đến biểu đồ đã lưu
@@ -675,9 +681,12 @@ class VolumeProfileAnalyzer:
             
             # Lưu biểu đồ
             if save_path is None:
-                save_dir = 'charts/volume_profile'
+                if custom_path is not None:
+                    save_dir = custom_path
+                else:
+                    save_dir = 'charts/volume_profile'
                 os.makedirs(save_dir, exist_ok=True)
-                save_path = f"{save_dir}/volume_profile_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                save_path = f"{save_dir}/volume_profile_{symbol}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
                 
             plt.tight_layout()
             plt.savefig(save_path)

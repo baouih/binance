@@ -3,8 +3,8 @@
     "api_mode": "testnet",
     "api_keys": {
         "testnet": {
-            "api_key": "78dbe781ee91c6e1d348c3c19391bc4913eb6cc696a1a3bb344a88784bcd3099",
-            "api_secret": "f84481ba314c6eb3821d6b1673385944f97c150bb42379eb29bc6c77631c9842"
+            "api_key": "",
+            "api_secret": ""
         },
         "live": {
             "api_key": "",
@@ -26,5 +26,61 @@
     "auto_reduce_leverage": true,
     "enable_trailing_stop": true,
     "enable_dynamic_risk": true,
-    "last_updated": "2025-03-06T12:07:30"
+    "small_account_configs": {
+        "100": {
+            "leverage": 20,
+            "risk_percentage": 20,
+            "max_positions": 1,
+            "suitable_pairs": [
+                "ATOMUSDT", "LTCUSDT", "LINKUSDT", "DOGEUSDT", "XRPUSDT",
+                "DOTUSDT", "ADAUSDT", "UNIUSDT", "MATICUSDT", "NEARUSDT",
+                "FILUSDT", "EOSUSDT", "ETCUSDT", "VETUSDT"
+            ],
+            "min_btc_value": 86220.0,
+            "max_trade_value": 400.0,
+            "min_position_size": 5.0,
+            "order_types": ["MARKET", "STOP_MARKET"],
+            "enable_trailing_stop": true,
+            "default_stop_percentage": 3.0,
+            "default_take_profit_percentage": 6.0
+        },
+        "200": {
+            "leverage": 15,
+            "risk_percentage": 15,
+            "max_positions": 2,
+            "suitable_pairs": [
+                "ATOMUSDT", "LTCUSDT", "LINKUSDT", "DOGEUSDT", "XRPUSDT", 
+                "DOTUSDT", "ADAUSDT", "ETHUSDT", "NEARUSDT", "BNBUSDT", 
+                "UNIUSDT", "AVAXUSDT", "MATICUSDT", "FILUSDT", "EOSUSDT", 
+                "ETCUSDT", "VETUSDT", "ICPUSDT", "ALGOUSDT", "TRXUSDT"
+            ],
+            "min_btc_value": 86220.0,
+            "max_trade_value": 450.0,
+            "min_position_size": 7.5,
+            "order_types": ["MARKET", "LIMIT", "STOP_MARKET"],
+            "enable_trailing_stop": true,
+            "default_stop_percentage": 2.5,
+            "default_take_profit_percentage": 5.0
+        },
+        "300": {
+            "leverage": 10,
+            "risk_percentage": 10,
+            "max_positions": 3,
+            "suitable_pairs": [
+                "ATOMUSDT", "LTCUSDT", "LINKUSDT", "DOGEUSDT", "XRPUSDT", 
+                "DOTUSDT", "ADAUSDT", "ETHUSDT", "NEARUSDT", "BNBUSDT", 
+                "UNIUSDT", "AVAXUSDT", "BTCUSDT", "MATICUSDT", "FILUSDT", 
+                "EOSUSDT", "ETCUSDT", "VETUSDT", "ICPUSDT", "ALGOUSDT", 
+                "TRXUSDT", "AAVEUSDT", "SANDUSDT", "MANAUSDT", "AXSUSDT"
+            ],
+            "min_btc_value": 86220.0,
+            "max_trade_value": 300.0,
+            "min_position_size": 10.0,
+            "order_types": ["MARKET", "LIMIT", "STOP_MARKET", "TAKE_PROFIT_MARKET"],
+            "enable_trailing_stop": true,
+            "default_stop_percentage": 2.0,
+            "default_take_profit_percentage": 4.0
+        }
+    },
+    "last_updated": "2025-03-08T06:22:00"
 }

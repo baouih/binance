@@ -1,0 +1,678 @@
+{
+  "BTCUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 84753.7125,
+        "value_area": {
+          "high": 85796.0625,
+          "low": 83711.36249999999
+        },
+        "volume_nodes_count": 6,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 84753.7125,
+        "value_area": {
+          "high": 86317.23749999999,
+          "low": 83711.36249999999
+        },
+        "volume_nodes_count": 7,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 5,
+        "resistance_levels": 5,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 85254.27674999999,
+        "nearest_resistance": 86039.06466666666,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 80833.05523052438,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 24,
+        "weeks": 3,
+        "months": 0,
+        "total_candles": 582,
+        "start_date": "2025-02-05",
+        "end_date": "2025-03-01"
+      }
+    }
+  },
+  "ETHUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 2231.13865,
+        "value_area": {
+          "high": 2257.16675,
+          "low": 2173.60285
+        },
+        "volume_nodes_count": 21,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 2231.13865,
+        "value_area": {
+          "high": 2257.16675,
+          "low": 2177.71255
+        },
+        "volume_nodes_count": 21,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 4,
+        "resistance_levels": 5,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 2211.2751,
+        "nearest_resistance": 2225.6590499999998,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 2216.885988474502,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 24,
+        "weeks": 3,
+        "months": 0,
+        "total_candles": 582,
+        "start_date": "2025-02-05",
+        "end_date": "2025-03-01"
+      }
+    }
+  },
+  "BNBUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 600.2371499999999,
+        "value_area": {
+          "high": 605.5876499999999,
+          "low": 590.96295
+        },
+        "volume_nodes_count": 27,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 600.2371499999999,
+        "value_area": {
+          "high": 607.72785,
+          "low": 591.67635
+        },
+        "volume_nodes_count": 23,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 1,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 596.8319592105263,
+        "nearest_resistance": 605.7170363636365,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 596.969509786875,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "ADAUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 0.9079515,
+        "value_area": {
+          "high": 0.9525245,
+          "low": 0.8495455000000001
+        },
+        "volume_nodes_count": 10,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 0.9402284999999999,
+        "value_area": {
+          "high": 0.9525245,
+          "low": 0.8510825
+        },
+        "volume_nodes_count": 9,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 5,
+        "resistance_levels": 5,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 0.8684810000000001,
+        "nearest_resistance": 0.9048775000000001,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 0.8945161982757712,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "SOLUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 149.0601,
+        "value_area": {
+          "high": 151.7391,
+          "low": 140.4873
+        },
+        "volume_nodes_count": 15,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 149.0601,
+        "value_area": {
+          "high": 150.66750000000002,
+          "low": 140.4873
+        },
+        "volume_nodes_count": 16,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 5,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 141.38824285714284,
+        "nearest_resistance": 144.82235000000003,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 144.52890127418542,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "DOGEUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 0.201459,
+        "value_area": {
+          "high": 0.213969,
+          "low": 0.19645500000000002
+        },
+        "volume_nodes_count": 21,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 0.20137500000000003,
+        "value_area": {
+          "high": 0.21418900000000002,
+          "low": 0.196309
+        },
+        "volume_nodes_count": 19,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 3,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 0.197692,
+        "nearest_resistance": 0.2056633038461538,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 0.20383155551967003,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "XRPUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 2.579362,
+        "value_area": {
+          "high": 2.6229459999999998,
+          "low": 2.470402
+        },
+        "volume_nodes_count": 19,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 2.579362,
+        "value_area": {
+          "high": 2.6229459999999998,
+          "low": 2.4731259999999997
+        },
+        "volume_nodes_count": 19,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 4,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 2.4702053333333334,
+        "nearest_resistance": 2.51168,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 2.5378231386698764,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "LINKUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 16.91885,
+        "value_area": {
+          "high": 17.389450000000004,
+          "low": 16.556849999999997
+        },
+        "volume_nodes_count": 24,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 16.91885,
+        "value_area": {
+          "high": 17.389450000000004,
+          "low": 16.57495
+        },
+        "volume_nodes_count": 23,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 4,
+        "resistance_levels": 2,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 16.556849999999997,
+        "nearest_resistance": 17.060100000000002,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 16.836047313992385,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "AVAXUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 21.108,
+        "value_area": {
+          "high": 22.032799999999998,
+          "low": 20.2648
+        },
+        "volume_nodes_count": 13,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 21.16835,
+        "value_area": {
+          "high": 22.03535,
+          "low": 20.27245
+        },
+        "volume_nodes_count": 13,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 2,
+        "resistance_levels": 3,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 20.5042,
+        "nearest_resistance": 21.136087931034478,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 21.044939821086427,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "DOTUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 4.43239,
+        "value_area": {
+          "high": 4.56019,
+          "low": 4.36423
+        },
+        "volume_nodes_count": 25,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 4.431735,
+        "value_area": {
+          "high": 4.5715449999999995,
+          "low": 4.364085
+        },
+        "volume_nodes_count": 23,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 4,
+        "success": true
+      },
+      "trading_range": {
+        "position": "near_poc",
+        "nearest_support": 4.3970025,
+        "nearest_resistance": 4.4865464062500005,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 4.417118701570347,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "LTCUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 103.428,
+        "value_area": {
+          "high": 108.75999999999999,
+          "low": 100.7
+        },
+        "volume_nodes_count": 20,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 103.4187,
+        "value_area": {
+          "high": 108.82249999999999,
+          "low": 100.65090000000001
+        },
+        "volume_nodes_count": 20,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 1,
+        "resistance_levels": 4,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 100.99207142857142,
+        "nearest_resistance": 104.16664743589743,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 103.7097428871179,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "ATOMUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 4.27685,
+        "value_area": {
+          "high": 4.412890000000001,
+          "low": 4.21957
+        },
+        "volume_nodes_count": 26,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 4.27685,
+        "value_area": {
+          "high": 4.412890000000001,
+          "low": 4.21957
+        },
+        "volume_nodes_count": 28,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 2,
+        "resistance_levels": 5,
+        "success": true
+      },
+      "trading_range": {
+        "position": "inside_value_area",
+        "nearest_support": 4.181885454545455,
+        "nearest_resistance": 4.267005999999999,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 4.272352256032961,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  },
+  "UNIUSDT": {
+    "1h": {
+      "session_profile": {
+        "poc": 7.140965,
+        "value_area": {
+          "high": 7.526465,
+          "low": 7.056155
+        },
+        "volume_nodes_count": 19,
+        "success": true
+      },
+      "daily_profile": {
+        "poc": 7.14253,
+        "value_area": {
+          "high": 7.52511,
+          "low": 7.06113
+        },
+        "volume_nodes_count": 18,
+        "success": true
+      },
+      "support_resistance": {
+        "support_levels": 3,
+        "resistance_levels": 3,
+        "success": true
+      },
+      "trading_range": {
+        "position": "near_poc",
+        "nearest_support": 7.081423076923077,
+        "nearest_resistance": 7.161157031250001,
+        "breakout_potential_up": false,
+        "breakout_potential_down": false,
+        "success": true
+      },
+      "vwap_zones": {
+        "vwap": 7.217335938929991,
+        "upper_band": null,
+        "lower_band": null,
+        "success": true
+      },
+      "charts": {
+        "error": "VolumeProfileAnalyzer.visualize_volume_profile() got an unexpected keyword argument 'custom_path'"
+      },
+      "data_info": {
+        "days": 89,
+        "weeks": 12,
+        "months": 2,
+        "total_candles": 2160,
+        "start_date": "2024-12-07",
+        "end_date": "2025-03-07"
+      }
+    }
+  }
+}

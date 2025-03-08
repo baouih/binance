@@ -1,0 +1,73 @@
+{
+  "100": {
+    "leverage": 20,
+    "risk_percentage": 20,
+    "max_positions": 1,
+    "suitable_pairs": [
+      "ATOMUSDT",
+      "LTCUSDT",
+      "LINKUSDT",
+      "DOGEUSDT",
+      "XRPUSDT",
+      "DOTUSDT",
+      "ADAUSDT",
+      "ETHUSDT",
+      "BTCUSDT"
+    ],
+    "note": "C\u1ea5u h\u00ecnh cho t\u00e0i kho\u1ea3n $100, ch\u1ec9 n\u00ean giao d\u1ecbch c\u00e1c c\u1eb7p ti\u1ec1n c\u00f3 gi\u00e1 tr\u1ecb t\u1ed1i thi\u1ec3u th\u1ea5p",
+    "btc_min_value": 85.9792,
+    "max_trade_value": 400.0,
+    "btc_suitable": true,
+    "btc_positions": 4
+  },
+  "200": {
+    "leverage": 15,
+    "risk_percentage": 15,
+    "max_positions": 2,
+    "suitable_pairs": [
+      "ATOMUSDT",
+      "LTCUSDT",
+      "LINKUSDT",
+      "DOGEUSDT",
+      "XRPUSDT",
+      "DOTUSDT",
+      "ADAUSDT",
+      "ETHUSDT",
+      "NEARUSDT",
+      "BNBUSDT",
+      "UNIUSDT",
+      "AVAXUSDT",
+      "BTCUSDT"
+    ],
+    "note": "C\u1ea5u h\u00ecnh cho t\u00e0i kho\u1ea3n $200, c\u00f3 th\u1ec3 giao d\u1ecbch c\u00e1c c\u1eb7p ti\u1ec1n c\u00f3 gi\u00e1 tr\u1ecb t\u1ed1i thi\u1ec3u th\u1ea5p \u0111\u1ebfn trung b\u00ecnh",
+    "btc_min_value": 85.9792,
+    "max_trade_value": 450.0,
+    "btc_suitable": true,
+    "btc_positions": 5
+  },
+  "300": {
+    "leverage": 10,
+    "risk_percentage": 10,
+    "max_positions": 3,
+    "suitable_pairs": [
+      "ATOMUSDT",
+      "LTCUSDT",
+      "LINKUSDT",
+      "DOGEUSDT",
+      "XRPUSDT",
+      "DOTUSDT",
+      "ADAUSDT",
+      "ETHUSDT",
+      "NEARUSDT",
+      "BNBUSDT",
+      "UNIUSDT",
+      "AVAXUSDT",
+      "BTCUSDT"
+    ],
+    "note": "C\u1ea5u h\u00ecnh cho t\u00e0i kho\u1ea3n $300, c\u00f3 th\u1ec3 giao d\u1ecbch h\u1ea7u h\u1ebft c\u00e1c c\u1eb7p ti\u1ec1n tr\u1eeb nh\u1eefng c\u1eb7p c\u00f3 gi\u00e1 tr\u1ecb t\u1ed1i thi\u1ec3u cao",
+    "btc_min_value": 85.9792,
+    "max_trade_value": 300.0,
+    "btc_suitable": true,
+    "btc_positions": 3
+  }
+}
