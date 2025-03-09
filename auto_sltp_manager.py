@@ -134,9 +134,26 @@ class AutoSLTPManager:
         try:
             orders = self.api.get_open_orders(symbol)
             
-            # Phân loại lệnh
-            sl_orders = [o for o in orders if o.get('type') in ['STOP_MARKET', 'STOP']]
-            tp_orders = [o for o in orders if o.get('type') in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT']]
+            # Phân loại lệnh - sửa phần này để phân loại chính xác hơn
+            # Kiểm tra cả type và tên hiển thị đầy đủ
+            sl_orders = [o for o in orders if (
+                o.get('type') in ['STOP_MARKET', 'STOP'] and
+                # Cũng kiểm tra các thuộc tính khác để xác nhận đây là lệnh SL
+                o.get('origType', '') in ['STOP_MARKET', 'STOP'] and
+                # Thêm kiểm tra workingType nếu có
+                o.get('workingType', '') in ['MARK_PRICE', 'CONTRACT_PRICE']
+            )]
+            
+            tp_orders = [o for o in orders if (
+                o.get('type') in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT'] and
+                # Cũng kiểm tra các thuộc tính khác để xác nhận đây là lệnh TP
+                o.get('origType', '') in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT'] and
+                # Thêm kiểm tra workingType nếu có
+                o.get('workingType', '') in ['MARK_PRICE', 'CONTRACT_PRICE']
+            )]
+            
+            # Log chi tiết để debug
+            logger.info(f"Tìm thấy {len(sl_orders)} lệnh SL và {len(tp_orders)} lệnh TP cho {symbol}")
             
             return sl_orders, tp_orders
         except Exception as e:
@@ -162,15 +179,13 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Stop Loss với positionSide
-            # Lưu ý: Không thể dùng reduceOnly khi dùng positionSide
+            # Đặt lệnh Stop Loss với closePosition=True để hiển thị trên giao diện
             result = self.api.futures_create_order(
                 symbol=symbol,
                 side=close_side,
                 type='STOP_MARKET',
                 stopPrice=price,
-                quantity=quantity,
-                positionSide=position_side  # Chỉ dùng positionSide cho hedge mode
+                closePosition=True  # Sử dụng closePosition thay vì quantity và positionSide
             )
             
             logger.info(f"Đã đặt SL cho {symbol} {side} tại giá {price}, số lượng {quantity}")
@@ -198,15 +213,13 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Take Profit với positionSide
-            # Lưu ý: Không thể dùng reduceOnly khi dùng positionSide
+            # Đặt lệnh Take Profit với closePosition=True để hiển thị trên giao diện
             result = self.api.futures_create_order(
                 symbol=symbol,
                 side=close_side,
                 type='TAKE_PROFIT_MARKET',
                 stopPrice=price,
-                quantity=quantity,
-                positionSide=position_side  # Chỉ dùng positionSide cho hedge mode
+                closePosition=True  # Sử dụng closePosition thay vì quantity và positionSide
             )
             
             logger.info(f"Đã đặt TP cho {symbol} {side} tại giá {price}, số lượng {quantity}")
@@ -270,9 +283,16 @@ class AutoSLTPManager:
             # Kiểm tra lệnh đang mở
             sl_orders, tp_orders = self.get_open_orders(symbol)
             
-            # Nếu đã có lệnh và không force thì bỏ qua
+            # Nếu đã có lệnh và không force thì bỏ qua - nhưng chỉ khi thực sự xác định được đúng lệnh
             if not force and len(sl_orders) > 0 and len(tp_orders) > 0:
-                logger.info(f"{symbol} đã có cả SL và TP, bỏ qua")
+                # Tạo thêm log chi tiết
+                logger.info(f"{symbol} đã có cả SL ({len(sl_orders)} lệnh) và TP ({len(tp_orders)} lệnh), bỏ qua")
+                # Nếu chỉ có 1 lệnh SL và 1 lệnh TP, ghi log thêm chi tiết về các lệnh
+                if len(sl_orders) == 1 and len(tp_orders) == 1:
+                    sl_order = sl_orders[0]
+                    tp_order = tp_orders[0]
+                    logger.info(f"Chi tiết lệnh SL: ID={sl_order.get('orderId')}, stopPrice={sl_order.get('stopPrice')}")
+                    logger.info(f"Chi tiết lệnh TP: ID={tp_order.get('orderId')}, stopPrice={tp_order.get('stopPrice')}")
                 return True
             
             # Nếu force hoặc chưa có lệnh thì hủy lệnh cũ và đặt lại
