@@ -1,0 +1,24 @@
+{
+  "ETHUSDT": {
+    "entry_price": 2181.38,
+    "side": "LONG",
+    "qty": 0.124,
+    "sl_price": 2137.75,
+    "tp_price": 2246.82,
+    "highest_price": 2186.68,
+    "lowest_price": Infinity,
+    "trailing_active": false,
+    "last_updated": "2025-03-09T06:28:47.654938"
+  },
+  "BNBUSDT": {
+    "entry_price": 600.3683333333,
+    "side": "LONG",
+    "qty": 0.45,
+    "sl_price": 588.36,
+    "tp_price": 618.38,
+    "highest_price": 602.333,
+    "lowest_price": Infinity,
+    "trailing_active": false,
+    "last_updated": "2025-03-09T06:28:48.960244"
+  }
+}

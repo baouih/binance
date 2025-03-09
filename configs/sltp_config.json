@@ -1,0 +1,32 @@
+{
+    "sl_percent": 2.0,
+    "tp_percent": 3.0,
+    "trailing_stop_activation_percent": 1.0,
+    "trailing_stop_callback_percent": 0.5,
+    "min_position_value": 10.0,
+    "leverage_sl_adjustments": {
+        "1": 1.0,
+        "2": 0.8,
+        "3": 0.7,
+        "5": 0.5,
+        "10": 0.25,
+        "20": 0.15,
+        "50": 0.08,
+        "100": 0.05,
+        "125": 0.04
+    },
+    "symbol_overrides": {
+        "BTCUSDT": {
+            "sl_percent": 2.0,
+            "tp_percent": 3.0
+        },
+        "ETHUSDT": {
+            "sl_percent": 2.5,
+            "tp_percent": 3.5
+        },
+        "BNBUSDT": {
+            "sl_percent": 2.5,
+            "tp_percent": 3.5
+        }
+    }
+}

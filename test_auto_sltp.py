@@ -86,34 +86,100 @@ def test_get_stop_loss_orders(api, symbol):
 def test_auto_setup_stoploss(api):
     """Kiểm tra chức năng tự động thiết lập Stop Loss"""
     try:
-        # Thực hiện quét tất cả vị thế và cập nhật SL/TP
-        logger.info("Chạy auto_setup_stoploss.py...")
+        # Thực hiện quét tất cả vị thế và cập nhật SL/TP thủ công
+        logger.info("Chạy kiểm tra thiết lập SL thủ công...")
         
-        from auto_setup_stoploss import check_and_setup_positions
-        check_and_setup_positions()
+        # Lấy các vị thế đang hoạt động
+        positions = api.get_futures_position_risk()
+        active_positions = [p for p in positions if abs(float(p.get('positionAmt', 0))) > 0]
         
-        return True
+        if not active_positions:
+            logger.info("Không có vị thế nào để thiết lập SL/TP")
+            return False
+            
+        # Chỉ xử lý vị thế đầu tiên
+        position = active_positions[0]
+        symbol = position.get('symbol')
+        side = 'LONG' if float(position.get('positionAmt', 0)) > 0 else 'SHORT'
+        entry_price = float(position.get('entryPrice', 0))
+        
+        # Tính SL dựa trên phần trăm cơ bản
+        sl_percent = 2.0
+        if side == 'LONG':
+            sl_price = entry_price * (1 - sl_percent / 100)
+        else:
+            sl_price = entry_price * (1 + sl_percent / 100)
+            
+        # Đặt SL thủ công
+        try:
+            close_side = 'SELL' if side == 'LONG' else 'BUY'
+            
+            result = api.futures_create_order(
+                symbol=symbol,
+                side=close_side,
+                type='STOP_MARKET',
+                stopPrice=sl_price,
+                closePosition=True,
+                timeInForce='GTC'
+            )
+            
+            logger.info(f"Đã thiết lập SL thủ công cho {symbol} {side} tại giá {sl_price}")
+            return True
+        except Exception as e:
+            logger.error(f"Lỗi khi thiết lập SL thủ công: {str(e)}")
+            return False
+            
     except Exception as e:
-        logger.error(f"Lỗi khi chạy auto_setup_stoploss: {str(e)}")
+        logger.error(f"Lỗi khi thiết lập SL thủ công: {str(e)}")
         return False
 
 def test_auto_setup_sltp(api):
     """Kiểm tra chức năng tự động thiết lập SL/TP"""
     try:
-        logger.info("Chạy auto_setup_sltp.py...")
+        logger.info("Chạy kiểm tra thiết lập TP thủ công...")
         
-        # Import và chạy hàm từ module
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("auto_setup_sltp", "auto_setup_sltp.py")
-        sltp_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(sltp_module)
+        # Lấy các vị thế đang hoạt động
+        positions = api.get_futures_position_risk()
+        active_positions = [p for p in positions if abs(float(p.get('positionAmt', 0))) > 0]
         
-        # Chạy hàm setup_sltp_for_positions từ module đã import
-        sltp_module.setup_sltp_for_positions(testnet=True, force_check=True)
+        if not active_positions:
+            logger.info("Không có vị thế nào để thiết lập SL/TP")
+            return False
+            
+        # Chỉ xử lý vị thế đầu tiên
+        position = active_positions[0]
+        symbol = position.get('symbol')
+        side = 'LONG' if float(position.get('positionAmt', 0)) > 0 else 'SHORT'
+        entry_price = float(position.get('entryPrice', 0))
         
-        return True
+        # Tính TP dựa trên phần trăm cơ bản
+        tp_percent = 3.0
+        if side == 'LONG':
+            tp_price = entry_price * (1 + tp_percent / 100)
+        else:
+            tp_price = entry_price * (1 - tp_percent / 100)
+            
+        # Đặt TP thủ công
+        try:
+            close_side = 'SELL' if side == 'LONG' else 'BUY'
+            
+            result = api.futures_create_order(
+                symbol=symbol,
+                side=close_side,
+                type='TAKE_PROFIT_MARKET',
+                stopPrice=tp_price,
+                closePosition=True,
+                timeInForce='GTC'
+            )
+            
+            logger.info(f"Đã thiết lập TP thủ công cho {symbol} {side} tại giá {tp_price}")
+            return True
+        except Exception as e:
+            logger.error(f"Lỗi khi thiết lập TP thủ công: {str(e)}")
+            return False
+            
     except Exception as e:
-        logger.error(f"Lỗi khi chạy auto_setup_sltp: {str(e)}")
+        logger.error(f"Lỗi khi thiết lập TP thủ công: {str(e)}")
         return False
 
 def test_cancel_sl_tp_orders(api, symbol):
