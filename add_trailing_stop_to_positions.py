@@ -67,58 +67,36 @@ def futures_ticker_price(symbol):
 
 def get_active_positions():
     """Lấy thông tin các vị thế đang hoạt động"""
-    endpoint = "/fapi/v2/positionRisk"
-    url = f"{BASE_TESTNET_URL}{endpoint}"
-    
-    timestamp = get_server_time()
-    params = {
-        'timestamp': timestamp
-    }
-    
-    # Tạo query string và signature
-    query_string = '&'.join([f"{key}={params[key]}" for key in params])
-    signature = generate_signature(query_string)
-    
-    headers = {'X-MBX-APIKEY': API_KEY}
-    final_url = f"{url}?{query_string}&signature={signature}"
-    
-    logger.info(f"Gửi request đến: {url}")
-    
-    response = requests.get(final_url, headers=headers)
-    if response.status_code == 200:
-        positions = [p for p in response.json() if float(p['positionAmt']) != 0]
-        logger.info(f"Đã lấy {len(positions)} vị thế đang hoạt động")
-        return positions
-    else:
-        logger.error(f"Lỗi khi lấy thông tin vị thế: {response.status_code} - {response.text}")
+    try:
+        # Sử dụng binance_api để lấy vị thế
+        import binance_api
+        client = binance_api.BinanceAPI()
+        
+        logger.info("Đang lấy vị thế từ Binance API...")
+        positions = client.futures_get_position()
+        
+        # Lọc các vị thế có số lượng khác 0
+        active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
+        logger.info(f"Đã lấy {len(active_positions)} vị thế đang hoạt động")
+        return active_positions
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy thông tin vị thế: {str(e)}")
         return None
 
 def get_open_orders():
     """Lấy danh sách các lệnh đang mở"""
-    endpoint = "/fapi/v1/openOrders"
-    url = f"{BASE_TESTNET_URL}{endpoint}"
-    
-    timestamp = get_server_time()
-    params = {
-        'timestamp': timestamp
-    }
-    
-    # Tạo query string và signature
-    query_string = '&'.join([f"{key}={params[key]}" for key in params])
-    signature = generate_signature(query_string)
-    
-    headers = {'X-MBX-APIKEY': API_KEY}
-    final_url = f"{url}?{query_string}&signature={signature}"
-    
-    logger.info(f"Gửi request đến: {url}")
-    
-    response = requests.get(final_url, headers=headers)
-    if response.status_code == 200:
-        orders = response.json()
+    try:
+        # Sử dụng binance_api để lấy các lệnh đang mở
+        import binance_api
+        client = binance_api.BinanceAPI()
+        
+        logger.info("Đang lấy lệnh đang mở từ Binance API...")
+        orders = client.futures_get_open_orders()
+        
         logger.info(f"Đã lấy {len(orders)} lệnh đang mở")
         return orders
-    else:
-        logger.error(f"Lỗi khi lấy thông tin lệnh đang mở: {response.status_code} - {response.text}")
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy thông tin lệnh đang mở: {str(e)}")
         return None
 
 def futures_create_order(symbol, side, order_type, quantity=None, price=None, 
@@ -235,14 +213,18 @@ def add_trailing_stop_to_positions():
             logger.info(f"  - Giá kích hoạt: {activation_price} (+{activation_percent}% từ giá vào)")
             logger.info(f"  - Callback Rate: {callback_rate}%")
             
+            # Import module binance_api để dùng cho API
+            import binance_api
+            client = binance_api.BinanceAPI()
+            
             # Tạo trailing stop
-            trailing_stop_order = futures_create_order(
+            trailing_stop_order = client.futures_create_order(
                 symbol=symbol,
                 side="SELL",
-                order_type="TRAILING_STOP_MARKET",
+                type="TRAILING_STOP_MARKET",
                 quantity=str(position_amt),
-                activation_price=str(activation_price),
-                callback_rate=str(callback_rate)
+                activationPrice=str(activation_price),
+                callbackRate=str(callback_rate)
             )
             
             if trailing_stop_order:
@@ -322,13 +304,18 @@ def add_3pct_tp_for_positions():
         if not has_3pct_tp:
             logger.info(f"  - Thêm TP {tp_percent}% cho {symbol} tại giá {tp_price}")
             
+            # Import module binance_api nếu chưa import
+            if not 'binance_api' in locals():
+                import binance_api
+                client = binance_api.BinanceAPI()
+            
             # Tạo lệnh TP 3%
-            tp_order = futures_create_order(
+            tp_order = client.futures_create_order(
                 symbol=symbol,
                 side="SELL",
-                order_type="TAKE_PROFIT_MARKET",
+                type="TAKE_PROFIT_MARKET",
                 quantity=str(position_amt/2),  # Chỉ đặt TP cho 50% vị thế
-                stop_price=str(tp_price)
+                stopPrice=str(tp_price)
             )
             
             if tp_order:

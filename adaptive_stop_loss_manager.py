@@ -291,7 +291,10 @@ class AdaptiveStopLossManager:
         update_results = []
         
         for position in positions:
-            symbol = position.get("symbol")
+            symbol = position.get("symbol", "")
+            if not symbol:  # Bảo vệ nếu symbol là None hoặc chuỗi rỗng
+                continue
+                
             position_amt = float(position.get("positionAmt", "0"))
             entry_price = float(position.get("entryPrice", "0"))
             
@@ -325,8 +328,48 @@ class AdaptiveStopLossManager:
                            f"TP={optimal_sltp['take_profit']['percent']:.2f}% "
                            f"({take_profit_price:.2f})")
                 
-                # Cập nhật vị thế
-                # Trong ứng dụng thực, ở đây gọi API Binance để cập nhật stop loss và take profit
+                # Cập nhật vị thế thực tế trên Binance
+                try:
+                    # Sử dụng hàm từ module binance_api
+                    import binance_api
+                    
+                    # Khởi tạo client Binance API
+                    binance_client = binance_api.BinanceAPI()
+                    
+                    # Hủy các lệnh TP/SL hiện tại (nếu có)
+                    binance_client.futures_cancel_all_orders(symbol=symbol)
+                    logger.info(f"Đã hủy các lệnh cũ của {symbol} để cập nhật mới")
+                    
+                    # Chờ 1 giây để đảm bảo lệnh hủy được xử lý
+                    import time
+                    time.sleep(1)
+                    
+                    # Tạo lệnh Stop Loss mới
+                    sl_quantity = abs(position_amt)
+                    sl_side = "BUY" if side == "SELL" else "SELL"  # SL ngược hướng với vị thế
+                    
+                    sl_order = binance_client.futures_create_order(
+                        symbol=symbol,
+                        side=sl_side,
+                        type="STOP_MARKET",
+                        quantity=str(sl_quantity),
+                        stopPrice=str(stop_loss_price),
+                        closePosition="true"
+                    )
+                    
+                    # Tạo lệnh Take Profit mới
+                    tp_order = binance_client.futures_create_order(
+                        symbol=symbol,
+                        side=sl_side,
+                        type="TAKE_PROFIT_MARKET",
+                        quantity=str(sl_quantity),
+                        stopPrice=str(take_profit_price),
+                        closePosition="true"
+                    )
+                    
+                    logger.info(f"Đã cập nhật thành công SL/TP cho {symbol} trên Binance")
+                except Exception as e:
+                    logger.error(f"Lỗi khi cập nhật SL/TP cho {symbol} trên Binance: {str(e)}")
                 
                 # Lưu kết quả
                 update_results.append({
