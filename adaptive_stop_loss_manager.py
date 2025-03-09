@@ -132,7 +132,7 @@ class AdaptiveStopLossManager:
             logger.error(f"Lỗi khi lấy vị thế: {str(e)}")
             return []
     
-    def analyze_position_volatility(self, symbol: str, strategy_name: str = None) -> Dict:
+    def analyze_position_volatility(self, symbol: str, strategy_name: str = "") -> Dict:
         """
         Phân tích biến động cho một cặp tiền
         
@@ -211,7 +211,7 @@ class AdaptiveStopLossManager:
         return analysis_result
     
     def calculate_optimal_stop_loss(self, symbol: str, side: str, entry_price: float, 
-                                   strategy_name: str = None) -> Dict:
+                                   strategy_name: str = "") -> Dict:
         """
         Tính toán stop loss tối ưu
         
@@ -394,6 +394,7 @@ class AdaptiveStopLossManager:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Quản lý stop loss thích ứng")
     parser.add_argument("--monitor", action="store_true", help="Chạy vòng lặp theo dõi")
+    parser.add_argument("--one-time", action="store_true", help="Chỉ chạy một lần thay vì theo vòng lặp liên tục")
     parser.add_argument("--symbol", type=str, help="Mã cặp tiền cần phân tích")
     parser.add_argument("--side", type=str, choices=["BUY", "SELL"], help="Phía giao dịch")
     parser.add_argument("--price", type=float, help="Giá vào lệnh")
@@ -404,8 +405,19 @@ if __name__ == "__main__":
     manager = AdaptiveStopLossManager()
     
     if args.monitor:
-        # Chạy vòng lặp theo dõi
-        manager.run_monitoring_loop()
+        if args.one_time:
+            # Chỉ chạy một lần cập nhật cho tất cả vị thế
+            logger.info("Đang chạy cập nhật một lần cho tất cả vị thế...")
+            update_results = manager.update_active_positions_sltp()
+            if update_results:
+                logger.info(f"Đã cập nhật SL/TP cho {len(update_results)} vị thế")
+                for result in update_results:
+                    logger.info(f"Đã cập nhật {result['symbol']} ({result['side']}): SL={result['stop_loss_percent']:.2f}% ({result['updated_stop_loss']:.2f}), TP={result['take_profit_percent']:.2f}% ({result['updated_take_profit']:.2f})")
+            else:
+                logger.info("Không có vị thế nào cần cập nhật SL/TP")
+        else:
+            # Chạy vòng lặp theo dõi liên tục
+            manager.run_monitoring_loop()
     elif args.symbol and args.side and args.price:
         # Phân tích một cặp tiền cụ thể
         result = manager.calculate_optimal_stop_loss(

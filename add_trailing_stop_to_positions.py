@@ -357,7 +357,22 @@ def add_3pct_tp_for_positions():
     logger.info(f"Đã hoàn thành kiểm tra và thêm TP {tp_percent}% cho các vị thế.")
 
 if __name__ == "__main__":
-    logger.info("=== Thêm Trailing Stop cho các vị thế hiện có ===")
+    import argparse
+    
+    # Thiết lập command line arguments
+    parser = argparse.ArgumentParser(description='Thêm Trailing Stop và Take Profit cho các vị thế hiện có')
+    parser.add_argument('--force-update-all', action='store_true', help='Cập nhật cả những vị thế đã có Trailing Stop')
+    args = parser.parse_args()
+    
+    if args.force_update_all:
+        logger.info("=== Thêm/Cập nhật Trailing Stop cho TẤT CẢ vị thế hiện có (chế độ force) ===")
+        # Buộc xóa file theo dõi vị thế để đảm bảo mọi vị thế đều được cập nhật
+        if os.path.exists('active_positions.json'):
+            os.remove('active_positions.json')
+            logger.info("Đã xóa danh sách vị thế được theo dõi để buộc cập nhật lại toàn bộ")
+    else:
+        logger.info("=== Thêm Trailing Stop cho các vị thế hiện có ===")
+    
     add_trailing_stop_to_positions()
     
     logger.info("\n=== Thêm TP 3% cho các vị thế hiện có ===")

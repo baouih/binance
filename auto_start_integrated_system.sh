@@ -22,9 +22,15 @@ nohup ./monitor_trailing_stop.sh > logs/monitor.log 2>&1 &
 monitor_pid=$!
 echo "Monitor PID: $monitor_pid" >> $LOG_FILE
 
-# 3. Khởi động trailing stop cho các vị thế hiện có
-echo "$(date) - Thêm trailing stop cho vị thế hiện có" >> $LOG_FILE
-python add_trailing_stop_to_positions.py >> $LOG_FILE 2>&1
+# 3. Khởi động trailing stop và điều chỉnh TP/SL cho các vị thế hiện có
+echo "$(date) - Thêm trailing stop và điều chỉnh TP/SL cho vị thế hiện có" >> $LOG_FILE
+python add_trailing_stop_to_positions.py --force-update-all >> $LOG_FILE 2>&1
+
+# 3b. Khởi động dịch vụ giám sát TP/SL liên tục
+echo "$(date) - Khởi động dịch vụ giám sát TP/SL liên tục" >> $LOG_FILE
+nohup python adaptive_stop_loss_manager.py --monitor > logs/adaptive_sl_monitor.log 2>&1 &
+adaptive_sl_pid=$!
+echo "Adaptive SL Manager PID: $adaptive_sl_pid" >> $LOG_FILE
 
 # 4. Chờ 2 giây
 sleep 2
@@ -45,7 +51,7 @@ service_start_pid=$!
 echo "Service starter PID: $service_start_pid" >> $LOG_FILE
 
 # 8. Ghi PID vào file để có thể dễ dàng dừng sau này
-echo "$monitor_pid,$scheduler_pid,$service_start_pid" > integrated_system.pid
+echo "$monitor_pid,$scheduler_pid,$service_start_pid,$adaptive_sl_pid" > integrated_system.pid
 echo "$(date) - Đã lưu PID vào integrated_system.pid" >> $LOG_FILE
 
 # 9. Kiểm tra trạng thái hệ thống

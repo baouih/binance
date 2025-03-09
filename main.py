@@ -2408,8 +2408,21 @@ def start_trailing_stop_system():
             logger.info("Đã khởi động hệ thống trailing stop thành công")
         except Exception as e:
             logger.error(f"Lỗi khi khởi động hệ thống trailing stop: {str(e)}")
-    else:
-        logger.warning("Không tìm thấy script auto_start_integrated_system.sh")
+            
+def start_market_notifier_system():
+    """Khởi động hệ thống thông báo thị trường tự động sau khi server đã chạy"""
+    # Chờ 10 giây để cho phép server và các hệ thống khác khởi động
+    time.sleep(10)
+    
+    try:
+        logger.info("Đang khởi động hệ thống thông báo thị trường tự động...")
+        success = start_auto_notifier()
+        if success:
+            logger.info("Đã khởi động hệ thống thông báo thị trường tự động thành công")
+        else:
+            logger.warning("Hệ thống thông báo thị trường tự động đã được khởi động trước đó")
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động hệ thống thông báo thị trường tự động: {str(e)}")
 
 if __name__ == "__main__":
     # Khởi động thread để chạy hệ thống trailing stop
@@ -2417,6 +2430,12 @@ if __name__ == "__main__":
     trailing_thread.daemon = True  # Đảm bảo thread sẽ kết thúc khi chương trình chính kết thúc
     trailing_thread.start()
     logger.info("Đã khởi tạo thread chạy hệ thống trailing stop tự động")
+    
+    # Khởi động thread để chạy hệ thống thông báo thị trường tự động
+    notifier_thread = threading.Thread(target=start_market_notifier_system)
+    notifier_thread.daemon = True  # Đảm bảo thread sẽ kết thúc khi chương trình chính kết thúc
+    notifier_thread.start()
+    logger.info("Đã khởi tạo thread chạy hệ thống thông báo thị trường tự động")
     
     # Khởi động dịch vụ keep-alive để giữ bot chạy liên tục
     try:
