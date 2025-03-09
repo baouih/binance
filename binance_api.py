@@ -148,7 +148,7 @@ class BinanceAPI:
         # Chọn phiên bản API phù hợp dựa trên loại tài khoản
         if version is None:
             if self.account_type == 'futures':
-                version = 'v2'  # Futures API đã nâng cấp lên v2
+                version = 'v1'  # Mặc định sử dụng v1 cho hầu hết các lệnh futures
             else:
                 version = 'v3'  # Spot API sử dụng v3
         
@@ -156,7 +156,7 @@ class BinanceAPI:
         if self.account_type == 'futures':
             # Cho Futures API, sử dụng đường dẫn chính xác với phiên bản
             if not version:
-                version = 'v2'  # Mặc định v2 cho futures
+                version = 'v1'  # Mặc định v1 cho futures
             base = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
             url = f"{base}/fapi/{version}/{endpoint}"
         else:
@@ -1165,8 +1165,23 @@ class BinanceAPI:
             'side': side,
             'type': type,
         }
+        
+        # Loại bỏ closePosition khỏi kwargs nếu có
+        if 'closePosition' in kwargs:
+            kwargs.pop('closePosition')
+
+        # Đảm bảo có quantity trong params nếu không có
+        if 'quantity' not in kwargs and type in ['STOP_MARKET', 'TAKE_PROFIT_MARKET']:
+            logger.debug(f"Thêm tham số reduceOnly=true đối với lệnh {type}")
+            params['reduceOnly'] = 'true'
+            
+            # Thêm workingType cho lệnh stop và take-profit
+            params['workingType'] = 'MARK_PRICE'
+        
+        # Thêm các tham số khác
         params.update(kwargs)
         
+        logger.debug(f"Tạo lệnh futures với params: {params}")
         return self._request('POST', 'order', params, signed=True, version='v1')
         
     def futures_cancel_all_orders(self, symbol: str) -> Dict:

@@ -179,13 +179,16 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Stop Loss với closePosition=True để hiển thị trên giao diện
+            # Đặt lệnh Stop Loss với quantity và reduceOnly=True để hiển thị trên giao diện
             result = self.api.futures_create_order(
                 symbol=symbol,
                 side=close_side,
                 type='STOP_MARKET',
                 stopPrice=price,
-                closePosition=True  # Sử dụng closePosition thay vì quantity và positionSide
+                quantity=abs(quantity),
+                reduceOnly=True,
+                workingType="MARK_PRICE",
+                timeInForce="GTC"
             )
             
             logger.info(f"Đã đặt SL cho {symbol} {side} tại giá {price}, số lượng {quantity}")
@@ -213,13 +216,16 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Take Profit với closePosition=True để hiển thị trên giao diện
+            # Đặt lệnh Take Profit với quantity và reduceOnly=True để hiển thị trên giao diện
             result = self.api.futures_create_order(
                 symbol=symbol,
                 side=close_side,
                 type='TAKE_PROFIT_MARKET',
                 stopPrice=price,
-                closePosition=True  # Sử dụng closePosition thay vì quantity và positionSide
+                quantity=abs(quantity),
+                reduceOnly=True,
+                workingType="MARK_PRICE",
+                timeInForce="GTC"
             )
             
             logger.info(f"Đã đặt TP cho {symbol} {side} tại giá {price}, số lượng {quantity}")

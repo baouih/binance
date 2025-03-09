@@ -1,258 +1,244 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
-Script sửa lỗi SL/TP không hiển thị trên giao diện Binance
-
-Script này:
-1. Kiểm tra tất cả các vị thế đang mở
-2. Xác định xem lệnh SL/TP có sử dụng closePosition=True hay không
-3. Hủy các lệnh cũ và tạo lệnh mới với closePosition=True
+Script khắc phục các lệnh SL/TP không hiển thị trên giao diện Binance
 """
 
-import os
 import sys
-import json
-import time
 import logging
-from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+import json
+import argparse
+import time
+from binance_api import BinanceAPI
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler("fix_sltp_visibility.log")
+        logging.StreamHandler(sys.stdout)
     ]
 )
+logger = logging.getLogger("fix_visible_sltp")
 
-logger = logging.getLogger('fix_visible_sltp')
-
-# Thêm thư mục gốc vào sys.path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-
-# Import các module cần thiết
-from binance_api import BinanceAPI
-
-def get_positions(api):
-    """Lấy danh sách các vị thế đang mở"""
-    try:
-        positions = api.get_futures_position_risk()
-        # Lọc các vị thế có số lượng != 0
-        active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
-        return active_positions
-    except Exception as e:
-        logger.error(f"Lỗi khi lấy vị thế: {str(e)}")
-        return []
-
-def get_open_orders(api, symbol=None):
-    """Lấy danh sách các lệnh đang mở"""
-    try:
-        if symbol:
-            orders = api.get_open_orders(symbol)
-        else:
-            # Nếu không chỉ định symbol, lấy tất cả các lệnh
-            orders = api.get_open_orders()
-        
-        return orders
-    except Exception as e:
-        logger.error(f"Lỗi khi lấy danh sách lệnh: {str(e)}")
-        return []
-
-def classify_orders(orders):
-    """Phân loại các loại lệnh SL/TP"""
-    sl_orders = [o for o in orders if o.get('type') in ['STOP_MARKET', 'STOP']]
-    tp_orders = [o for o in orders if o.get('type') in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT']]
-    
-    return sl_orders, tp_orders
-
-def check_order_close_position(order):
-    """Kiểm tra xem lệnh có sử dụng tham số closePosition không"""
-    return 'closePosition' in order and order['closePosition'] == True
-
-def fix_symbol_orders(api, symbol, side, position_amt):
-    """Sửa các lệnh SL/TP cho một symbol
-    
-    Args:
-        api: Đối tượng BinanceAPI
-        symbol: Symbol cần sửa
-        side: Phía vị thế (LONG/SHORT)
-        position_amt: Lượng vị thế
-    
-    Returns:
-        bool: True nếu sửa thành công
+def load_account_config():
+    """
+    Tải cấu hình tài khoản từ file config
     """
     try:
-        # Lấy danh sách lệnh của symbol
-        orders = get_open_orders(api, symbol)
-        sl_orders, tp_orders = classify_orders(orders)
-        
-        # Kiểm tra xem có lệnh SL/TP không
-        if not sl_orders and not tp_orders:
-            logger.warning(f"{symbol} không có lệnh SL/TP nào, tạo mới!")
-            # Tính SL/TP dựa trên giá hiện tại thay vì hủy/tạo lại
-            try:
-                # Lấy thông tin vị thế để biết entry price
-                positions = get_positions(api)
-                position = next((p for p in positions if p['symbol'] == symbol), None)
-                if not position:
-                    logger.warning(f"Không tìm thấy thông tin vị thế {symbol}")
-                    return False
-                
-                entry_price = float(position['entryPrice'])
-                
-                # Tính toán mức SL/TP mặc định (2% SL, 3% TP)
-                sl_percent = 2.0
-                tp_percent = 3.0
-                
-                if side == 'LONG':
-                    sl_price = round(entry_price * (1 - sl_percent/100), 2)
-                    tp_price = round(entry_price * (1 + tp_percent/100), 2)
-                else:  # SHORT
-                    sl_price = round(entry_price * (1 + sl_percent/100), 2)
-                    tp_price = round(entry_price * (1 - tp_percent/100), 2)
-                
-                # Tạo lệnh mới
-                close_side = 'SELL' if side == 'LONG' else 'BUY'
-                
-                # Tạo lệnh SL
-                try:
-                    new_sl = api.futures_create_order(
-                        symbol=symbol,
-                        side=close_side,
-                        type='STOP_MARKET',
-                        stopPrice=sl_price,
-                        closePosition='true'  # Sử dụng chuỗi thay vì boolean
-                    )
-                    logger.info(f"Đã tạo lệnh SL mới cho {symbol} tại giá {sl_price} với closePosition=True")
-                    time.sleep(0.5)
-                except Exception as e:
-                    logger.error(f"Lỗi khi tạo lệnh SL mới cho {symbol}: {str(e)}")
-                
-                # Tạo lệnh TP
-                try:
-                    new_tp = api.futures_create_order(
-                        symbol=symbol,
-                        side=close_side,
-                        type='TAKE_PROFIT_MARKET',
-                        stopPrice=tp_price,
-                        closePosition='true'  # Sử dụng chuỗi thay vì boolean
-                    )
-                    logger.info(f"Đã tạo lệnh TP mới cho {symbol} tại giá {tp_price} với closePosition=True")
-                    time.sleep(0.5)
-                except Exception as e:
-                    logger.error(f"Lỗi khi tạo lệnh TP mới cho {symbol}: {str(e)}")
-                
-                return True
-            except Exception as e:
-                logger.error(f"Lỗi khi tạo SL/TP mới cho {symbol}: {str(e)}")
-                return False
-        
-        # Kiểm tra xem các lệnh có sử dụng closePosition không
-        all_use_close_position = True
-        for order in sl_orders + tp_orders:
-            if not check_order_close_position(order):
-                all_use_close_position = False
-                break
-        
-        # Nếu tất cả các lệnh đã sử dụng closePosition, không cần sửa
-        if all_use_close_position:
-            logger.info(f"{symbol} đã sử dụng closePosition cho tất cả các lệnh, không cần sửa")
-            return True
-        
-        # Lưu thông tin lệnh cũ
-        sl_prices = set()
-        tp_prices = set()
-        
-        for order in sl_orders:
-            sl_prices.add(float(order.get('stopPrice', 0)))
-        
-        for order in tp_orders:
-            tp_prices.add(float(order.get('stopPrice', 0)))
-        
-        # Hủy tất cả lệnh cũ qua API cancel_all_open_orders
-        try:
-            logger.info(f"Hủy tất cả lệnh đang mở cho {symbol}")
-            api.futures_cancel_all_orders(symbol=symbol)
-            logger.info(f"Đã hủy tất cả lệnh cho {symbol}")
-            time.sleep(1.0)  # Chờ lâu hơn để đảm bảo lệnh được hủy
-        except Exception as e:
-            logger.error(f"Lỗi khi hủy lệnh cho {symbol}: {str(e)}")
-        
-        # Tạo lệnh mới với closePosition=True
-        close_side = 'SELL' if side == 'LONG' else 'BUY'
-        
-        # Tạo lại các lệnh SL
-        for sl_price in sl_prices:
-            try:
-                new_sl = api.futures_create_order(
-                    symbol=symbol,
-                    side=close_side,
-                    type='STOP_MARKET',
-                    stopPrice=sl_price,
-                    closePosition='true'  # Sử dụng chuỗi thay vì boolean
-                )
-                logger.info(f"Đã tạo lại lệnh SL cho {symbol} tại giá {sl_price} với closePosition=True")
-                time.sleep(0.5)  # Chờ để đảm bảo lệnh được tạo
-            except Exception as e:
-                logger.error(f"Lỗi khi tạo lại lệnh SL cho {symbol}: {str(e)}")
-        
-        # Tạo lại các lệnh TP
-        for tp_price in tp_prices:
-            try:
-                new_tp = api.futures_create_order(
-                    symbol=symbol,
-                    side=close_side,
-                    type='TAKE_PROFIT_MARKET',
-                    stopPrice=tp_price,
-                    closePosition=True
-                )
-                logger.info(f"Đã tạo lại lệnh TP cho {symbol} tại giá {tp_price} với closePosition=True")
-                time.sleep(0.5)  # Chờ để đảm bảo lệnh được tạo
-            except Exception as e:
-                logger.error(f"Lỗi khi tạo lại lệnh TP cho {symbol}: {str(e)}")
-        
-        return True
+        with open('account_config.json', 'r') as f:
+            return json.load(f)
     except Exception as e:
-        logger.error(f"Lỗi khi sửa lệnh cho {symbol}: {str(e)}")
-        return False
+        logger.error(f"Lỗi khi tải file cấu hình: {str(e)}")
+        return {}
+
+def load_sltp_config():
+    """
+    Tải cấu hình SL/TP từ file
+    """
+    try:
+        with open('configs/sltp_config.json', 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Lỗi khi tải file cấu hình SL/TP: {str(e)}")
+        # Sử dụng giá trị mặc định nếu không tìm thấy file
+        return {"default_sl_percent": 2.0, "default_tp_percent": 3.0}
+
+def get_price_precision(symbol, api):
+    """
+    Lấy độ chính xác giá của một symbol
+    
+    Args:
+        symbol: Symbol cần lấy thông tin
+        api: Đối tượng BinanceAPI
+        
+    Returns:
+        int: Số chữ số sau dấu phẩy
+    """
+    try:
+        # Lấy thông tin symbol
+        exchange_info = api.futures_exchange_info()
+        
+        # Tìm symbol trong danh sách
+        for info in exchange_info.get('symbols', []):
+            if info.get('symbol') == symbol:
+                return len(info.get('pricePrecision', '1'))
+        
+        return 2  # Mặc định là 2
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy độ chính xác giá: {str(e)}")
+        return 2  # Mặc định là 2
+
+def fix_sltp_for_position(position, api, sl_percent, tp_percent, force=False):
+    """
+    Khắc phục SL/TP cho một vị thế
+    
+    Args:
+        position: Dict chứa thông tin vị thế
+        api: Đối tượng BinanceAPI
+        sl_percent: Phần trăm stop loss
+        tp_percent: Phần trăm take profit
+        force: Buộc thực hiện ngay cả khi đã có lệnh
+        
+    Returns:
+        bool: True nếu thành công
+    """
+    symbol = position.get('symbol')
+    pos_amount = float(position.get('positionAmt', 0))
+    entry_price = float(position.get('entryPrice', 0))
+    side = 'LONG' if pos_amount > 0 else 'SHORT'
+    quantity = abs(pos_amount)
+    
+    logger.info(f"Chuẩn bị khắc phục SL/TP cho {symbol} {side}: Entry={entry_price}, Quantity={quantity}")
+    
+    # Lấy các lệnh đang mở cho symbol
+    open_orders = api.get_open_orders(symbol)
+    
+    # Phân loại các lệnh SL và TP
+    sl_orders = [o for o in open_orders if o.get('type') in ['STOP_MARKET', 'STOP']]
+    tp_orders = [o for o in open_orders if o.get('type') in ['TAKE_PROFIT_MARKET', 'TAKE_PROFIT']]
+    
+    # Kiểm tra xem có cần khắc phục không
+    need_fix_sl = force or not sl_orders
+    need_fix_tp = force or not tp_orders
+    
+    # Nếu không cần khắc phục, kiểm tra các lệnh SL/TP có đúng không
+    if not need_fix_sl and sl_orders:
+        for order in sl_orders:
+            order_qty = float(order.get('origQty', 0))
+            reduce_only = order.get('reduceOnly', False)
+            
+            if not reduce_only or order_qty != quantity:
+                need_fix_sl = True
+                logger.info(f"Cần khắc phục lệnh SL: reduceOnly={reduce_only}, qty={order_qty} != {quantity}")
+                break
+    
+    if not need_fix_tp and tp_orders:
+        for order in tp_orders:
+            order_qty = float(order.get('origQty', 0))
+            reduce_only = order.get('reduceOnly', False)
+            
+            if not reduce_only or order_qty != quantity:
+                need_fix_tp = True
+                logger.info(f"Cần khắc phục lệnh TP: reduceOnly={reduce_only}, qty={order_qty} != {quantity}")
+                break
+    
+    # Nếu không cần khắc phục gì
+    if not need_fix_sl and not need_fix_tp:
+        logger.info(f"Không cần khắc phục SL/TP cho {symbol} {side}")
+        return True
+    
+    # Hủy tất cả lệnh SL/TP hiện có
+    for order in sl_orders + tp_orders:
+        order_id = order.get('orderId')
+        api.cancel_order(symbol=symbol, order_id=order_id)
+        logger.info(f"Đã hủy lệnh #{order_id} cho {symbol}")
+    
+    # Chờ một chút để đảm bảo lệnh đã được hủy
+    time.sleep(1)
+    
+    # Tính toán giá SL/TP
+    price_precision = get_price_precision(symbol, api)
+    
+    if side == 'LONG':
+        sl_price = round(entry_price * (1 - sl_percent / 100), price_precision)
+        tp_price = round(entry_price * (1 + tp_percent / 100), price_precision)
+        close_side = 'SELL'
+    else:  # SHORT
+        sl_price = round(entry_price * (1 + sl_percent / 100), price_precision)
+        tp_price = round(entry_price * (1 - tp_percent / 100), price_precision)
+        close_side = 'BUY'
+    
+    # Đặt lệnh mới
+    success = True
+    
+    if need_fix_sl:
+        try:
+            # Đặt lệnh SL với reduceOnly=True và quantity=pos_amount
+            result = api.futures_create_order(
+                symbol=symbol,
+                side=close_side,
+                type='STOP_MARKET',
+                stopPrice=sl_price,
+                quantity=quantity,
+                reduceOnly=True,
+                workingType="MARK_PRICE",
+                timeInForce="GTC"
+            )
+            
+            logger.info(f"Đã đặt SL cho {symbol} {side} tại giá {sl_price}, số lượng {quantity}")
+        except Exception as e:
+            logger.error(f"Lỗi khi đặt lệnh SL: {str(e)}")
+            success = False
+    
+    if need_fix_tp:
+        try:
+            # Đặt lệnh TP với reduceOnly=True và quantity=pos_amount
+            result = api.futures_create_order(
+                symbol=symbol,
+                side=close_side,
+                type='TAKE_PROFIT_MARKET',
+                stopPrice=tp_price,
+                quantity=quantity,
+                reduceOnly=True,
+                workingType="MARK_PRICE",
+                timeInForce="GTC"
+            )
+            
+            logger.info(f"Đã đặt TP cho {symbol} {side} tại giá {tp_price}, số lượng {quantity}")
+        except Exception as e:
+            logger.error(f"Lỗi khi đặt lệnh TP: {str(e)}")
+            success = False
+    
+    return success
+
+def fix_visible_sltp(symbol=None, force=False, api=None):
+    """
+    Khắc phục tất cả các lệnh SL/TP không hiển thị
+    
+    Args:
+        symbol: Symbol cần khắc phục, nếu None sẽ khắc phục tất cả
+        force: Buộc khắc phục ngay cả khi đã có lệnh
+        api: Đối tượng BinanceAPI đã khởi tạo
+    """
+    # Khởi tạo API nếu chưa được cung cấp
+    if api is None:
+        config = load_account_config()
+        api_key = config.get('api_key', '')
+        api_secret = config.get('api_secret', '')
+        testnet = config.get('testnet', True)
+        
+        api = BinanceAPI(api_key, api_secret, testnet=testnet)
+    
+    # Tải cấu hình SL/TP
+    sltp_config = load_sltp_config()
+    sl_percent = float(sltp_config.get('default_sl_percent', 2.0))
+    tp_percent = float(sltp_config.get('default_tp_percent', 3.0))
+    
+    # Lấy danh sách vị thế
+    positions = api.futures_get_position(symbol)
+    
+    # Lọc các vị thế đang mở
+    active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
+    
+    if not active_positions:
+        logger.info("Không có vị thế đang mở")
+        return
+    
+    logger.info(f"Tìm thấy {len(active_positions)} vị thế đang mở")
+    
+    # Khắc phục từng vị thế
+    for position in active_positions:
+        fix_sltp_for_position(position, api, sl_percent, tp_percent, force)
 
 def main():
     """Hàm chính"""
-    try:
-        logger.info("===== BẮT ĐẦU SỬA LỆNH SL/TP KHÔNG HIỂN THỊ =====")
-        
-        # Khởi tạo Binance API
-        api = BinanceAPI()
-        
-        # Lấy các vị thế đang mở
-        positions = get_positions(api)
-        logger.info(f"Đã tìm thấy {len(positions)} vị thế đang mở")
-        
-        if not positions:
-            logger.info("Không có vị thế nào đang mở.")
-            return
-        
-        # Sửa lệnh cho từng vị thế
-        fixed_count = 0
-        for position in positions:
-            symbol = position['symbol']
-            position_amt = float(position['positionAmt'])
-            side = 'LONG' if position_amt > 0 else 'SHORT'
-            
-            logger.info(f"\n==== Đang sửa lệnh cho vị thế {symbol} {side} ====")
-            
-            if fix_symbol_orders(api, symbol, side, abs(position_amt)):
-                fixed_count += 1
-        
-        logger.info(f"\n===== KẾT THÚC: Đã sửa {fixed_count}/{len(positions)} vị thế =====")
-        
-    except Exception as e:
-        logger.error(f"Lỗi: {str(e)}")
+    parser = argparse.ArgumentParser(description="Khắc phục các lệnh SL/TP không hiển thị")
+    parser.add_argument("--symbol", help="Symbol cần khắc phục")
+    parser.add_argument("--force", action="store_true", help="Buộc khắc phục tất cả các lệnh")
+    args = parser.parse_args()
+    
+    fix_visible_sltp(args.symbol, args.force)
 
 if __name__ == "__main__":
     main()
