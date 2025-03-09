@@ -470,67 +470,93 @@ class AutoSLTPManager:
             interval (int): Thời gian giữa các lần kiểm tra (giây)
             force_setup (bool): Buộc thiết lập lại SL/TP
         """
+        import traceback
         logger.info(f"Bắt đầu chạy Auto SL/TP Manager với interval={interval}s")
         
         # Theo dõi lỗi để có thể phục hồi
         consecutive_errors = 0
         max_consecutive_errors = 3
+        last_heartbeat = time.time()
+        heartbeat_interval = 300  # 5 phút
         
-        try:
-            while True:
-                try:
-                    # Chạy một chu kỳ cập nhật SL/TP
-                    success = self.run_once(force_setup=force_setup)
-                    
-                    # Reset biến force sau lần đầu tiên
-                    force_setup = False
-                    
-                    # Reset số lỗi liên tiếp nếu thành công
-                    if success:
-                        consecutive_errors = 0
-                    
-                    # Tạm nghỉ trước chu kỳ tiếp theo
-                    time.sleep(interval)
-                    
-                except Exception as inner_e:
-                    # Tăng số lỗi liên tiếp
-                    consecutive_errors += 1
-                    
-                    # Ghi log lỗi
-                    logger.error(f"Lỗi trong chu kỳ cập nhật SL/TP lần thứ {consecutive_errors}: {str(inner_e)}")
-                    
-                    # Kiểm tra số lỗi liên tiếp
-                    if consecutive_errors >= max_consecutive_errors:
-                        logger.critical(f"Đã xảy ra {consecutive_errors} lỗi liên tiếp, khởi động lại kết nối API")
-                        # Thử khởi động lại API
-                        try:
-                            del self.api
-                            self.api = BinanceAPI(self.api_key, self.api_secret, testnet=self.testnet)
-                            apply_fixes_to_api(self.api)
-                            # Khởi tạo lại các biến dữ liệu
-                            self.position_data = {}
-                            self.active_positions = {}
-                            # Thông báo khởi động lại thành công
-                            logger.info("Đã khởi động lại kết nối API thành công")
-                            # Reset số lỗi
+        # Lưu trữ thông tin API
+        api_testnet = self.testnet if hasattr(self, 'testnet') else False
+        
+        # Đảm bảo rằng chúng ta lặp mãi mãi với nhiều lớp xử lý lỗi
+        while True:
+            try:
+                # Vòng lặp chính
+                while True:
+                    try:
+                        # Chạy một chu kỳ cập nhật SL/TP
+                        success = self.run_once(force_setup=force_setup)
+                        
+                        # Reset biến force sau lần đầu tiên
+                        force_setup = False
+                        
+                        # Reset số lỗi liên tiếp nếu thành công
+                        if success:
                             consecutive_errors = 0
-                        except Exception as restart_e:
-                            logger.critical(f"Không thể khởi động lại API: {str(restart_e)}")
-                    
-                    # Tạm nghỉ ngắn sau lỗi trước khi thử lại
-                    recovery_interval = min(interval, 30)  # Tối đa 30 giây
-                    logger.info(f"Đợi {recovery_interval}s trước khi thử lại")
-                    time.sleep(recovery_interval)
-                    
-        except KeyboardInterrupt:
-            logger.info("Dừng Auto SL/TP Manager theo yêu cầu người dùng")
-        except Exception as e:
-            logger.critical(f"Lỗi nghiêm trọng trong vòng lặp chính: {str(e)}")
-            # Ghi chi tiết lỗi
-            import traceback
-            logger.critical(f"Chi tiết lỗi: {traceback.format_exc()}")
-            # Ném lại exception để caller xử lý
-            raise
+                        
+                        # Ghi log heartbeat định kỳ
+                        current_time = time.time()
+                        if current_time - last_heartbeat > heartbeat_interval:
+                            logger.info(f"Heartbeat: Auto SL/TP Manager đang chạy bình thường, đã xử lý {consecutive_errors} lỗi")
+                            last_heartbeat = current_time
+                        
+                        # Tạm nghỉ trước chu kỳ tiếp theo
+                        time.sleep(interval)
+                        
+                    except Exception as inner_e:
+                        # Tăng số lỗi liên tiếp
+                        consecutive_errors += 1
+                        
+                        # Ghi log lỗi chi tiết
+                        error_details = traceback.format_exc()
+                        logger.error(f"Lỗi trong chu kỳ cập nhật SL/TP lần thứ {consecutive_errors}: {str(inner_e)}")
+                        logger.error(f"Chi tiết lỗi: {error_details}")
+                        
+                        # Kiểm tra số lỗi liên tiếp
+                        if consecutive_errors >= max_consecutive_errors:
+                            logger.critical(f"Đã xảy ra {consecutive_errors} lỗi liên tiếp, khởi động lại kết nối API")
+                            # Thử khởi động lại API
+                            try:
+                                del self.api
+                                self.api = BinanceAPI("", "", testnet=api_testnet)
+                                apply_fixes_to_api(self.api)
+                                # Khởi tạo lại các biến dữ liệu
+                                self.position_data = {}
+                                self.active_positions = {}
+                                # Thông báo khởi động lại thành công
+                                logger.info("Đã khởi động lại kết nối API thành công")
+                                # Reset số lỗi
+                                consecutive_errors = 0
+                            except Exception as restart_e:
+                                logger.critical(f"Không thể khởi động lại API: {str(restart_e)}")
+                        
+                        # Tạm nghỉ ngắn sau lỗi trước khi thử lại
+                        recovery_interval = min(interval, 30)  # Tối đa 30 giây
+                        logger.info(f"Đợi {recovery_interval}s trước khi thử lại")
+                        time.sleep(recovery_interval)
+                        
+            except KeyboardInterrupt:
+                logger.info("Dừng Auto SL/TP Manager theo yêu cầu người dùng")
+                break  # Thoát khỏi vòng lặp ngoài cùng
+            except Exception as e:
+                # Xử lý lỗi nghiêm trọng
+                import traceback
+                logger.critical(f"Lỗi nghiêm trọng trong vòng lặp chính: {str(e)}")
+                logger.critical(f"Chi tiết lỗi: {traceback.format_exc()}")
+                
+                # Đợi một thời gian trước khi khởi động lại toàn bộ
+                logger.info("Đợi 60 giây trước khi khởi động lại toàn bộ quy trình")
+                time.sleep(60)
+                
+                # Reset trạng thái
+                consecutive_errors = 0
+                
+                # Tiếp tục vòng lặp ngoài để thử lại từ đầu
+                logger.info("Khởi động lại toàn bộ quy trình sau lỗi nghiêm trọng")
 
 def main():
     parser = argparse.ArgumentParser(description='Auto SL/TP Manager')

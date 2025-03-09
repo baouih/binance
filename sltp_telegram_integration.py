@@ -387,24 +387,73 @@ def main():
     #     setproctitle.setproctitle("sltp_telegram_integration")
     # except ImportError:
     #     pass
-    pass  # Không cần thiết
-    
+    # Cập nhật trạng thái
     try:
-        # Chạy
-        if args.once:
-            logger.info("Chạy một lần chế độ đơn lẻ")
-            manager.run_once(force_setup=args.force)
-        else:
-            logger.info(f"Chạy liên tục với interval={args.interval}s")
-            manager.run(interval=args.interval, force_setup=args.force)
-    except KeyboardInterrupt:
-        logger.info("Đã nhận tín hiệu dừng từ bàn phím")
+        # Thử import setproctitle nếu có
+        try:
+            import setproctitle
+            setproctitle.setproctitle("sltp_telegram_integration")
+            logger.info("Đã cập nhật tên tiến trình thành 'sltp_telegram_integration'")
+        except ImportError:
+            logger.info("Không thể cập nhật tên tiến trình, bỏ qua")
     except Exception as e:
-        logger.critical(f"Lỗi nghiêm trọng trong tiến trình SL/TP Telegram: {str(e)}")
-        import traceback
-        logger.critical(f"Chi tiết lỗi: {traceback.format_exc()}")
-    finally:
-        logger.info("Tiến trình SL/TP Telegram kết thúc")
+        logger.warning(f"Lỗi khi thiết lập tên tiến trình: {str(e)}")
+    
+    # Khởi tạo quản lý
+    try:
+        # Khởi tạo manager
+        manager = EnhancedAutoSLTPManager(testnet=args.testnet)
+        logger.info(f"Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet={args.testnet}")
+    except Exception as e:
+        logger.critical(f"Không thể khởi tạo EnhancedAutoSLTPManager: {str(e)}")
+        logger.critical(f"Chi tiết: {traceback.format_exc()}")
+        sys.exit(1)
+    
+    # Không thoát ra dù gặp lỗi
+    retry_count = 0
+    max_retry_count = 10
+    wait_time = 60
+    
+    while True:
+        try:
+            # Chạy
+            if args.once:
+                logger.info("Chạy một lần chế độ đơn lẻ")
+                manager.run_once(force_setup=args.force)
+                break  # Thoát vòng lặp nếu chế độ once
+            else:
+                logger.info(f"Chạy liên tục với interval={args.interval}s")
+                manager.run(interval=args.interval, force_setup=args.force)
+                # Không nên chạy tới đây vì hàm run() có vòng lặp vô hạn
+                logger.warning("Hàm run() đã trả về dù có vòng lặp vô hạn, đây là bất thường. Khởi động lại...")
+                
+        except KeyboardInterrupt:
+            logger.info("Đã nhận tín hiệu dừng từ bàn phím")
+            break
+            
+        except Exception as e:
+            retry_count += 1
+            logger.critical(f"Lỗi nghiêm trọng trong tiến trình SL/TP Telegram lần thứ {retry_count}: {str(e)}")
+            logger.critical(f"Chi tiết lỗi: {traceback.format_exc()}")
+            
+            if retry_count >= max_retry_count:
+                logger.critical(f"Đã thử khởi động lại {retry_count} lần không thành công, đợi thời gian dài hơn")
+                wait_time = 300  # Tăng thời gian chờ lên 5 phút
+                retry_count = 0  # Reset lại đếm
+            
+            logger.info(f"Đợi {wait_time} giây trước khi thử khởi động lại...")
+            time.sleep(wait_time)
+            
+            # Khởi tạo lại manager để tránh lỗi trạng thái
+            try:
+                del manager
+                manager = EnhancedAutoSLTPManager(testnet=args.testnet)
+                logger.info("Đã khởi tạo lại EnhancedAutoSLTPManager thành công")
+            except Exception as init_error:
+                logger.error(f"Không thể khởi tạo lại manager: {str(init_error)}")
+    
+    # Chỉ tới đây nếu đã nhận KeyboardInterrupt hoặc chế độ run_once
+    logger.info("Tiến trình SL/TP Telegram kết thúc")
 
 if __name__ == "__main__":
     main()
