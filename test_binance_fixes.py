@@ -91,7 +91,7 @@ def test_tp_sl_orders():
     usd_value = 100  # 100 USD
     
     # Lấy vị thế hiện tại
-    positions = api.get_position_risk()
+    positions = api.get_futures_position_risk()
     active_pos = None
     
     for pos in positions:

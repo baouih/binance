@@ -1,0 +1,72 @@
+{
+  "timestamp": 1741499470145,
+  "available_symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "price": 86133.1,
+      "status": "available"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "price": 2169.41,
+      "status": "available"
+    },
+    {
+      "symbol": "BNBUSDT",
+      "price": 596.128,
+      "status": "available"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "price": 175.0,
+      "status": "available"
+    },
+    {
+      "symbol": "ADAUSDT",
+      "price": 0.9,
+      "status": "available"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "price": 0.191,
+      "status": "available"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "price": 104.0,
+      "status": "available"
+    },
+    {
+      "symbol": "DOTUSDT",
+      "price": 5.0,
+      "status": "available"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "price": 2.5044,
+      "status": "available"
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "price": 22.0,
+      "status": "available"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "price": 15.286,
+      "status": "available"
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "price": 3.501,
+      "status": "available"
+    }
+  ],
+  "unavailable_symbols": [
+    {
+      "symbol": "MATICUSDT",
+      "status": "unavailable",
+      "reason": "Not found or not trading"
+    }
+  ]
+}
