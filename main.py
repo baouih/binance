@@ -3,6 +3,7 @@
 """
 import os
 import logging
+import subprocess
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_socketio import SocketIO
@@ -2290,7 +2291,34 @@ def run_app():
     # Khởi chạy ứng dụng
     socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False, log_output=True)
 
+def start_trailing_stop_system():
+    """Khởi động hệ thống trailing stop sau khi server đã chạy"""
+    # Chờ 5 giây để cho phép server khởi động
+    time.sleep(5)
+    
+    # Kiểm tra xem script tự động khởi động đã tồn tại chưa
+    if os.path.exists('auto_start_integrated_system.sh'):
+        # Log thông báo
+        logger.info("Đang khởi động hệ thống trailing stop tích hợp...")
+        
+        # Thực thi script tự động khởi động
+        try:
+            subprocess.run(['./auto_start_integrated_system.sh'], 
+                          stdout=subprocess.PIPE, 
+                          stderr=subprocess.PIPE)
+            logger.info("Đã khởi động hệ thống trailing stop thành công")
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi động hệ thống trailing stop: {str(e)}")
+    else:
+        logger.warning("Không tìm thấy script auto_start_integrated_system.sh")
+
 if __name__ == "__main__":
+    # Khởi động thread để chạy hệ thống trailing stop
+    trailing_thread = threading.Thread(target=start_trailing_stop_system)
+    trailing_thread.daemon = True  # Đảm bảo thread sẽ kết thúc khi chương trình chính kết thúc
+    trailing_thread.start()
+    logger.info("Đã khởi tạo thread chạy hệ thống trailing stop tự động")
+    
     # Khởi động dịch vụ keep-alive để giữ bot chạy liên tục
     try:
         from keep_alive import keep_alive

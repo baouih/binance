@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import logging
 import ccxt
-import talib
 import requests
-from binance.client import Client
 import json
 import time
 

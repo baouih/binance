@@ -1,0 +1,32 @@
+{
+    "activation_percent": 2.0,
+    "callback_percent": 1.0,
+    "check_interval": 60,
+    "default_tp_levels": [3.0, 7.5],
+    "default_sl_percent": 5.0,
+    "use_dynamic_activation": true,
+    "dynamic_parameters": {
+        "high_volatility": {
+            "activation_percent": 2.5,
+            "callback_percent": 1.2
+        },
+        "medium_volatility": {
+            "activation_percent": 2.0,
+            "callback_percent": 1.0
+        },
+        "low_volatility": {
+            "activation_percent": 1.5,
+            "callback_percent": 0.8
+        }
+    },
+    "hedging_mode": true,
+    "telegram_notifications": true,
+    "auto_add_trailing_stop": true,
+    "parallel_trailing_stop": true,
+    "service_monitoring": {
+        "auto_restart": true,
+        "check_interval": 300,
+        "max_restarts": 5,
+        "restart_delay": 10
+    }
+}

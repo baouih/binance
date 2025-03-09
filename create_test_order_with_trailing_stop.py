@@ -9,7 +9,6 @@ import hmac
 import hashlib
 import requests
 from datetime import datetime
-from math import floor
 import logging
 
 # Thiết lập logging
@@ -21,14 +20,14 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger('trailing_stop_test')
+logger = logging.getLogger('test_order_creator')
 
 # API Testnet endpoints
 BASE_TESTNET_URL = "https://testnet.binancefuture.com"
 
 # Lấy API key và secret từ biến môi trường
-API_KEY = os.environ.get('BINANCE_TESTNET_API_KEY')
-API_SECRET = os.environ.get('BINANCE_TESTNET_API_SECRET')
+API_KEY = os.environ.get('BINANCE_TESTNET_API_KEY', '')
+API_SECRET = os.environ.get('BINANCE_TESTNET_API_SECRET', '')
 
 def get_server_time():
     """Lấy thời gian từ server Binance"""
@@ -61,73 +60,9 @@ def futures_ticker_price(symbol):
     
     response = requests.get(url, params=params)
     if response.status_code == 200:
-        return response.json()
+        return float(response.json()['price'])
     else:
         logger.error(f"Lỗi khi lấy giá ticker: {response.status_code} - {response.text}")
-        return None
-
-def futures_account_balance():
-    """Lấy số dư tài khoản futures"""
-    endpoint = "/fapi/v2/balance"
-    url = f"{BASE_TESTNET_URL}{endpoint}"
-    
-    timestamp = get_server_time()
-    params = {
-        'timestamp': timestamp
-    }
-    
-    # Tạo query string và signature
-    query_string = '&'.join([f"{key}={params[key]}" for key in params])
-    signature = generate_signature(query_string)
-    
-    headers = {'X-MBX-APIKEY': API_KEY}
-    final_url = f"{url}?{query_string}&signature={signature}"
-    
-    response = requests.get(final_url, headers=headers)
-    if response.status_code == 200:
-        logger.info("Đã lấy số dư tài khoản thành công")
-        return response.json()
-    else:
-        logger.error(f"Lỗi khi lấy số dư tài khoản: {response.status_code} - {response.text}")
-        return None
-
-def futures_exchange_info():
-    """Lấy thông tin exchange"""
-    url = f"{BASE_TESTNET_URL}/fapi/v1/exchangeInfo"
-    
-    response = requests.get(url)
-    if response.status_code == 200:
-        logger.info("Đã lấy thông tin exchange thành công")
-        return response.json()
-    else:
-        logger.error(f"Lỗi khi lấy thông tin exchange: {response.status_code} - {response.text}")
-        return None
-
-def futures_change_leverage(symbol, leverage):
-    """Thay đổi đòn bẩy"""
-    endpoint = "/fapi/v1/leverage"
-    url = f"{BASE_TESTNET_URL}{endpoint}"
-    
-    timestamp = get_server_time()
-    params = {
-        'symbol': symbol,
-        'leverage': leverage,
-        'timestamp': timestamp
-    }
-    
-    # Tạo query string và signature
-    query_string = '&'.join([f"{key}={params[key]}" for key in params])
-    signature = generate_signature(query_string)
-    
-    headers = {'X-MBX-APIKEY': API_KEY}
-    final_url = f"{url}?{query_string}&signature={signature}"
-    
-    response = requests.post(final_url, headers=headers)
-    if response.status_code == 200:
-        logger.info(f"Đã thay đổi đòn bẩy cho {symbol} thành {leverage}x")
-        return response.json()
-    else:
-        logger.error(f"Lỗi khi thay đổi đòn bẩy: {response.status_code} - {response.text}")
         return None
 
 def futures_create_order(symbol, side, order_type, quantity=None, price=None, 
@@ -144,7 +79,7 @@ def futures_create_order(symbol, side, order_type, quantity=None, price=None,
         'side': side,
         'type': order_type,
         'timestamp': timestamp,
-        'positionSide': 'LONG'  # Sử dụng LONG mode
+        'positionSide': 'LONG'  # Tài khoản đang sử dụng LONG positions
     }
     
     # Thêm các tham số tùy chọn
@@ -156,7 +91,7 @@ def futures_create_order(symbol, side, order_type, quantity=None, price=None,
         params['stopPrice'] = stop_price
     if close_position is not None:
         params['closePosition'] = close_position
-    if reduce_only is not None:
+    if reduce_only is not None and order_type != 'TRAILING_STOP_MARKET':
         params['reduceOnly'] = reduce_only
     if time_in_force is not None:
         params['timeInForce'] = time_in_force
@@ -185,176 +120,80 @@ def futures_create_order(symbol, side, order_type, quantity=None, price=None,
         logger.error(f"Lỗi khi đặt lệnh: {response.status_code} - {response.text}")
         return None
 
-def main():
-    # Lấy balance tài khoản
-    balances = futures_account_balance()
-    usdt_balance = None
+def create_test_order_with_trailing_stop(symbol='BTCUSDT', quantity='0.001'):
+    """Tạo lệnh test với TP và Trailing Stop"""
+    # 1. Lấy giá hiện tại
+    current_price = futures_ticker_price(symbol)
+    if not current_price:
+        logger.error(f"Không thể lấy giá hiện tại cho {symbol}, không thể tạo lệnh")
+        return False
     
-    # Tìm balance của USDT
-    if balances:
-        for asset in balances:
-            if asset['asset'] == 'USDT':
-                usdt_balance = float(asset['balance'])
-                break
+    logger.info(f"Giá hiện tại của {symbol}: {current_price}")
     
-    if usdt_balance is None:
-        logger.error("Không tìm thấy balance USDT trong tài khoản!")
-        usdt_balance = 13000.0  # Giá trị mặc định từ log thực tế
+    # 2. Đặt lệnh MARKET
+    market_order = futures_create_order(
+        symbol=symbol,
+        side="BUY",
+        order_type="MARKET",
+        quantity=quantity
+    )
     
-    logger.info(f"Số dư tài khoản hiện tại: {usdt_balance} USDT")
+    if not market_order:
+        logger.error(f"Không thể tạo lệnh MARKET, dừng quá trình")
+        return False
     
-    # Cấu hình giao dịch
-    symbol = "BNBUSDT"  # Thử với BNB
-    leverage = 5  # 5x leverage
-    risk_percent = 2.0  # % số dư để giao dịch
-    stop_loss_percent = 5.0  # % giảm giá để dừng lỗ
-    take_profit_percent = 7.5  # % tăng giá để chốt lời
+    logger.info(f"Đã tạo lệnh MARKET thành công: {market_order}")
+    logger.info("Chờ 3 giây để lệnh được thực hiện...")
+    time.sleep(3)
     
-    # Tham số cho trailing stop
-    trailing_percent = 1.0  # % callback rate cho trailing stop
-    activation_percent = 2.0  # % tăng giá để kích hoạt trailing stop
+    # 3. Tính giá kích hoạt cho trailing stop (+2%)
+    activation_price = round(current_price * 1.02, 2)
+    logger.info(f"Giá kích hoạt cho Trailing Stop: {activation_price} (+2% từ giá hiện tại)")
     
-    # Lấy giá hiện tại
-    ticker = futures_ticker_price(symbol)
-    if ticker:
-        current_price = float(ticker['price'])
-        logger.info(f"Giá hiện tại của {symbol}: {current_price} USDT")
+    # 4. Đặt Trailing Stop với callback 1%
+    trailing_stop = futures_create_order(
+        symbol=symbol,
+        side="SELL",
+        order_type="TRAILING_STOP_MARKET",
+        quantity=quantity,
+        activation_price=str(activation_price),
+        callback_rate="1.0"
+    )
+    
+    if trailing_stop:
+        logger.info(f"Đã đặt Trailing Stop thành công: {trailing_stop}")
     else:
-        logger.error(f"Không thể lấy giá hiện tại cho {symbol}")
-        current_price = 600.0  # Giả định giá mặc định khi không lấy được giá hiện tại
+        logger.error(f"Không thể đặt Trailing Stop")
     
-    # Thiết lập đòn bẩy
-    try:
-        leverage_response = futures_change_leverage(symbol, leverage)
-        if leverage_response:
-            logger.info(f"Đã thiết lập đòn bẩy {leverage}x cho {symbol}")
-        else:
-            logger.warning(f"Không thể thiết lập đòn bẩy, sử dụng giá trị mặc định")
-    except Exception as e:
-        logger.error(f"Lỗi khi thiết lập đòn bẩy: {str(e)}")
+    # 5. Tính giá TP 3%
+    tp_price = round(current_price * 1.03, 2)
+    logger.info(f"Giá Take Profit: {tp_price} (+3% từ giá hiện tại)")
     
-    # Tính toán kích thước vị thế dựa trên risk_percent
-    position_value = usdt_balance * (risk_percent / 100)
-    position_size = position_value / current_price
+    # 6. Đặt lệnh Take Profit
+    take_profit = futures_create_order(
+        symbol=symbol,
+        side="SELL",
+        order_type="TAKE_PROFIT_MARKET",
+        quantity=quantity,
+        stop_price=str(tp_price)
+    )
     
-    # Tính toán stop loss, take profit và trailing stop
-    stop_loss_price = round(current_price * (1 - stop_loss_percent / 100), 2)
-    take_profit_price = round(current_price * (1 + take_profit_percent / 100), 2)
-    activation_price = round(current_price * (1 + activation_percent / 100), 2)
-    
-    # Làm tròn số lượng theo precision
-    exchange_info = futures_exchange_info()
-    if exchange_info:
-        symbol_info = next((s for s in exchange_info['symbols'] if s['symbol'] == symbol), None)
-        if symbol_info:
-            qty_precision = int(symbol_info.get('quantityPrecision', 3))
-            # Làm tròn chính xác theo precision
-            position_size = floor(position_size * 10**qty_precision) / 10**qty_precision
+    if take_profit:
+        logger.info(f"Đã đặt Take Profit thành công: {take_profit}")
     else:
-        # Mặc định làm tròn xuống 3 chữ số thập phân
-        position_size = floor(position_size * 1000) / 1000
+        logger.error(f"Không thể đặt Take Profit")
     
-    # Chuyển đổi sang chuỗi với định dạng chính xác
-    position_size_str = f"{position_size}"
-    
-    # Hiển thị thông tin giao dịch
-    logger.info("Thông số giao dịch:")
-    logger.info(f"- Symbol: {symbol}")
-    logger.info(f"- Đòn bẩy: {leverage}x")
-    logger.info(f"- Kích thước vị thế: {position_size} {symbol.replace('USDT', '')} (≈ {position_value:.3f} USDT)")
-    logger.info(f"- Giá hiện tại: {current_price} USDT")
-    logger.info(f"- Stop Loss: {stop_loss_price} USDT ({stop_loss_percent}%)")
-    logger.info(f"- Activation Price: {activation_price} USDT (+{activation_percent}%)")
-    logger.info(f"- Trailing Stop Callback Rate: {trailing_percent}%")
-    
-    logger.info("Bot đang chạy ở chế độ tự động, tiến hành đặt lệnh...")
-    
-    # Đặt lệnh MARKET
-    try:
-        # Thử test order trước
-        test_result = futures_create_order(
-            symbol=symbol,
-            side="BUY",
-            order_type="MARKET",
-            quantity=position_size_str,
-            test=True
-        )
-        
-        if test_result is not None:
-            logger.info(f"Test order thành công: {test_result}")
-            
-            # Đặt lệnh thực tế
-            order = futures_create_order(
-                symbol=symbol,
-                side="BUY",
-                order_type="MARKET",
-                quantity=position_size_str
-            )
-            
-            if order:
-                logger.info(f"Đã đặt lệnh MARKET BUY thành công: {json.dumps(order, indent=2)}")
-                
-                # Đặt Stop Loss
-                stop_order = futures_create_order(
-                    symbol=symbol,
-                    side="SELL",
-                    order_type="STOP_MARKET",
-                    stop_price=str(stop_loss_price),
-                    close_position="true"
-                )
-                
-                if stop_order:
-                    logger.info(f"Đã đặt lệnh Stop Loss thành công: {json.dumps(stop_order, indent=2)}")
-                
-                # Đặt Trailing Stop
-                trailing_stop_order = futures_create_order(
-                    symbol=symbol,
-                    side="SELL",
-                    order_type="TRAILING_STOP_MARKET",
-                    quantity=position_size_str,
-                    activation_price=str(activation_price),
-                    callback_rate=str(trailing_percent),
-                    reduce_only="true"
-                )
-                
-                if trailing_stop_order:
-                    logger.info(f"Đã đặt lệnh Trailing Stop thành công: {json.dumps(trailing_stop_order, indent=2)}")
-                
-                # Cập nhật file active_positions.json
-                try:
-                    with open('active_positions.json', 'r') as f:
-                        active_positions = json.load(f)
-                except (FileNotFoundError, json.JSONDecodeError):
-                    active_positions = {}
-                
-                # Thêm vị thế mới
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                active_positions[symbol] = {
-                    "entry_price": current_price,
-                    "position_size": position_size,
-                    "stop_loss": stop_loss_price,
-                    "trailing_activation": activation_price,
-                    "trailing_callback": trailing_percent,
-                    "entry_time": timestamp,
-                    "order_id": order.get("orderId", "Unknown"),
-                    "sl_order_id": stop_order.get("orderId", "Unknown") if stop_order else "Unknown",
-                    "trailing_order_id": trailing_stop_order.get("orderId", "Unknown") if trailing_stop_order else "Unknown",
-                    "status": "ACTIVE"
-                }
-                
-                # Lưu lại thông tin
-                with open('active_positions.json', 'w') as f:
-                    json.dump(active_positions, f, indent=4)
-                
-                logger.info(f"Đã cập nhật vị thế vào active_positions.json: {symbol}")
-        else:
-            logger.error("Test order không thành công, không đặt lệnh thực tế")
-            
-    except Exception as e:
-        logger.error(f"Lỗi khi đặt lệnh: {str(e)}")
-        # In ra traceback đầy đủ để debug
-        import traceback
-        logger.error(traceback.format_exc())
+    logger.info("Quá trình tạo lệnh test đã hoàn tất")
+    return True
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Tạo lệnh test với TP và Trailing Stop")
+    parser.add_argument("--symbol", type=str, default="BTCUSDT", help="Symbol để tạo lệnh (mặc định: BTCUSDT)")
+    parser.add_argument("--quantity", type=str, default="0.001", help="Số lượng BTC (mặc định: 0.001)")
+    
+    args = parser.parse_args()
+    
+    logger.info(f"=== Tạo lệnh test cho {args.symbol} với số lượng {args.quantity} ===")
+    create_test_order_with_trailing_stop(args.symbol, args.quantity)

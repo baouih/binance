@@ -19,7 +19,10 @@
         "order_id": 4108666467,
         "sl_order_id": 4108666481,
         "tp_order_id": 4108666507,
-        "status": "ACTIVE"
+        "status": "ACTIVE",
+        "trailing_activation": 87822.31,
+        "trailing_callback": 1.0,
+        "trailing_order_id": 4109838104
     },
     "ETHUSDT": {
         "entry_price": 2181.34,
@@ -30,18 +33,29 @@
         "order_id": 1512487503,
         "sl_order_id": 1512487508,
         "tp_order_id": 1512487517,
-        "status": "ACTIVE"
+        "status": "ACTIVE",
+        "trailing_activation": 2225.01,
+        "trailing_callback": 1.0,
+        "trailing_order_id": 1513099477,
+        "partial_tp": [
+            {
+                "percent": 3.0,
+                "price": 2246.82,
+                "quantity": "0.062",
+                "order_id": 1513099517
+            }
+        ]
     },
     "BNBUSDT": {
         "entry_price": 600.895,
         "position_size": 0.45,
         "stop_loss": 570.85,
-        "trailing_activation": 612.91,
+        "trailing_activation": 612.38,
         "trailing_callback": 1.0,
         "entry_time": "2025-03-08 16:57:26",
         "order_id": 481742995,
         "sl_order_id": 481742996,
-        "trailing_order_id": "Unknown",
+        "trailing_order_id": 481744632,
         "status": "ACTIVE"
     }
 }
