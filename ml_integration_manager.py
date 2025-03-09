@@ -42,21 +42,23 @@ class MLIntegrationManager:
     Lớp quản lý tích hợp ML vào hệ thống giao dịch
     """
     
-    def __init__(self, config_path: str = "ml_pipeline_results/ml_deployment_config.json"):
+    def __init__(self, config_path: str = "ml_pipeline_results/ml_deployment_config.json", data_dir: str = "real_data"):
         """
         Khởi tạo MLIntegrationManager
         
         Args:
             config_path: Đường dẫn đến file cấu hình triển khai
+            data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
         """
         self.config_path = config_path
+        self.data_dir = data_dir
         
         # Tải cấu hình
         self.config = self._load_config()
         
         # Khởi tạo API và bộ xử lý dữ liệu
-        self.api = BinanceAPI(simulation_mode=False)
-        self.data_processor = DataProcessor(self.api, simulation_mode=False)
+        self.api = BinanceAPI(testnet=False)
+        self.data_processor = DataProcessor(self.api, data_dir=self.data_dir)
         
         # Khởi tạo Market Regime Detector
         self.regime_detector = MarketRegimeDetector()
@@ -69,7 +71,7 @@ class MLIntegrationManager:
         # Từ điển lưu trữ mô hình đã tải
         self.loaded_models = {}
         
-        logger.info(f"Khởi tạo MLIntegrationManager với cấu hình từ {config_path}")
+        logger.info(f"Khởi tạo MLIntegrationManager với cấu hình từ {config_path}, thư mục dữ liệu: {data_dir}")
         
         # Tải các mô hình
         self._load_all_models()
@@ -647,12 +649,14 @@ def main():
                       help='Khung thời gian (chỉ tạo tín hiệu cho một khung thời gian)')
     parser.add_argument('--mode', type=str, choices=['once', 'continuous'], default='once', 
                       help='Chế độ chạy (mặc định: once)')
+    parser.add_argument('--data-dir', type=str, default='real_data',
+                      help='Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)')
     
     args = parser.parse_args()
     
     # Khởi tạo manager
     config_path = args.config if args.config else "ml_pipeline_results/ml_deployment_config.json"
-    manager = MLIntegrationManager(config_path=config_path)
+    manager = MLIntegrationManager(config_path=config_path, data_dir=args.data_dir)
     
     # Chọn chế độ chạy
     if args.symbol and args.timeframe:

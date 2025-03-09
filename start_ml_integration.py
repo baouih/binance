@@ -61,13 +61,14 @@ def check_configuration():
         logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
         return None
 
-def start_integration_service(interval_minutes=60, daemon=True):
+def start_integration_service(interval_minutes=60, daemon=True, data_dir='real_data'):
     """
     Khởi động dịch vụ tích hợp ML
     
     Args:
         interval_minutes: Khoảng thời gian cập nhật (phút)
         daemon: Chạy như daemon hay không
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         Đường dẫn đến file log hoặc None nếu thất bại
@@ -83,7 +84,7 @@ def start_integration_service(interval_minutes=60, daemon=True):
         return None
     
     # Tạo lệnh khởi động
-    command = f"python ml_integration_manager.py --interval {interval_minutes} --mode continuous"
+    command = f"python ml_integration_manager.py --interval {interval_minutes} --mode continuous --data-dir {data_dir}"
     
     if daemon:
         # Tạo file log riêng
@@ -179,9 +180,12 @@ def stop_integration_service():
         logger.error(f"Lỗi khi dừng dịch vụ tích hợp ML: {str(e)}")
         return False
 
-def run_once():
+def run_once(data_dir='real_data'):
     """
     Chạy tích hợp ML một lần
+    
+    Args:
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         True nếu thành công
@@ -199,7 +203,7 @@ def run_once():
     try:
         logger.info("Chạy tích hợp ML một lần")
         
-        command = "python ml_integration_manager.py"
+        command = f"python ml_integration_manager.py --data-dir {data_dir}"
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         
         if result.returncode != 0:
@@ -262,19 +266,22 @@ def main():
                       help='Chạy tích hợp ML một lần (mặc định: False)')
     parser.add_argument('--install', action='store_true', 
                       help='Cài đặt dịch vụ tích hợp ML vào cron (mặc định: False)')
+    parser.add_argument('--data-dir', type=str, default='real_data',
+                      help='Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)')
     
     args = parser.parse_args()
     
     if args.stop:
         stop_integration_service()
     elif args.run_once:
-        run_once()
+        run_once(data_dir=args.data_dir)
     elif args.install:
         run_install()
     else:
         start_integration_service(
             interval_minutes=args.interval,
-            daemon=not args.no_daemon
+            daemon=not args.no_daemon,
+            data_dir=args.data_dir
         )
 
 if __name__ == "__main__":

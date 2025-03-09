@@ -13,6 +13,7 @@ import json
 import logging
 import numpy as np
 import pandas as pd
+import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Optional, Any, Union
 
@@ -25,17 +26,22 @@ logger = logging.getLogger(__name__)
 class DataProcessor:
     """Lớp xử lý dữ liệu thị trường"""
     
-    def __init__(self, binance_api: BinanceAPI = None, cache_dir: str = 'data/cache'):
+    def __init__(self, binance_api: BinanceAPI = None, simulation_mode: bool = False, 
+               cache_dir: str = 'data/cache', data_dir: str = None):
         """
         Khởi tạo bộ xử lý dữ liệu
         
         Args:
             binance_api (BinanceAPI, optional): Đối tượng BinanceAPI để kết nối với Binance
+            simulation_mode (bool): Có sử dụng chế độ mô phỏng không
             cache_dir (str): Thư mục lưu cache dữ liệu
+            data_dir (str, optional): Thư mục chứa dữ liệu lịch sử, nếu None sẽ lấy qua API
         """
         self.cache_dir = cache_dir
-        self.binance_api = binance_api if binance_api else BinanceAPI()
+        self.binance_api = binance_api if binance_api else BinanceAPI(testnet=simulation_mode)
         self.data_cache = {}
+        self.data_dir = data_dir
+        self.simulation_mode = simulation_mode
         
         # Đảm bảo thư mục cache tồn tại
         os.makedirs(self.cache_dir, exist_ok=True)
@@ -121,7 +127,8 @@ class DataProcessor:
         if len(df) == 0:
             return df
         
-        # Tính RSI
+        # Tính toán tất cả các chỉ báo cần thiết cho mô hình ML
+        df = self.calculate_indicators(df, indicators=["ALL"])
         df['rsi'] = self._calculate_rsi(df['close'], 14)
         
         # Tính MACD
@@ -230,6 +237,29 @@ class DataProcessor:
             pd.DataFrame: DataFrame chứa dữ liệu lịch sử
         """
         try:
+            # Nếu có thư mục dữ liệu, ưu tiên đọc từ file
+            if self.data_dir:
+                file_pattern = f"{symbol}_{interval}_historical_data.csv"
+                file_path = os.path.join(self.data_dir, file_pattern)
+                
+                if os.path.exists(file_path):
+                    logger.info(f"Đọc dữ liệu lịch sử từ file {file_path}")
+                    df = pd.read_csv(file_path)
+                    if 'timestamp' in df.columns:
+                        df['timestamp'] = pd.to_datetime(df['timestamp'])
+                        
+                    # Lấy dữ liệu theo số ngày yêu cầu nếu có nhiều hơn
+                    if lookback_days > 0 and 'timestamp' in df.columns:
+                        now = datetime.now()
+                        start_date = now - timedelta(days=lookback_days)
+                        df = df[df['timestamp'] >= start_date]
+                    
+                    # Nếu đã tải thành công từ file, trả về luôn
+                    if not df.empty:
+                        logger.info(f"Đã tải {len(df)} nến từ file dữ liệu cho {symbol} {interval}")
+                        return df
+        
+            # Nếu không đọc được từ file hoặc không có thư mục dữ liệu, lấy từ API
             # Tính số lượng candlestick cần lấy
             intervals_per_day = {
                 '1m': 24 * 60,

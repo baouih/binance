@@ -1,0 +1,242 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "lookback_days": 30,
+  "risk_pct": 5,
+  "leverage": 1,
+  "ranking": [
+    {
+      "rank": 1,
+      "model": "BTCUSDT_1h_1m_target1d",
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "trades": 0,
+      "sharpe_ratio": 0
+    },
+    {
+      "rank": 2,
+      "model": "BTCUSDT_1h_1m_target3d",
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "trades": 0,
+      "sharpe_ratio": 0
+    },
+    {
+      "rank": 3,
+      "model": "BTCUSDT_1h_3m_target1d",
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "trades": 0,
+      "sharpe_ratio": 0
+    },
+    {
+      "rank": 4,
+      "model": "BTCUSDT_1h_3m_target3d",
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "trades": 0,
+      "sharpe_ratio": 0
+    },
+    {
+      "rank": 5,
+      "model": "high_risk",
+      "profit_pct": -1.8134959017335084,
+      "max_drawdown": 1.8134959017335133,
+      "win_rate": 20.0,
+      "profit_factor": 0.1988561537292916,
+      "trades": 5,
+      "sharpe_ratio": -0.7837059254148828
+    }
+  ],
+  "detailed_results": {
+    "BTCUSDT_1h_1m_target1d": {
+      "initial_balance": 10000,
+      "final_balance": 10000.0,
+      "profit_loss": 0.0,
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "trades": [],
+      "stats": {
+        "total_trades": 0,
+        "win_trades": 0,
+        "lose_trades": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "avg_win": 0,
+        "avg_loss": 0,
+        "avg_win_pct": 0,
+        "avg_loss_pct": 0,
+        "largest_win": 0,
+        "largest_loss": 0,
+        "largest_win_pct": 0,
+        "largest_loss_pct": 0,
+        "sharpe_ratio": 0
+      },
+      "execution_time": 1.445319652557373
+    },
+    "BTCUSDT_1h_1m_target3d": {
+      "initial_balance": 10000,
+      "final_balance": 10000.0,
+      "profit_loss": 0.0,
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "trades": [],
+      "stats": {
+        "total_trades": 0,
+        "win_trades": 0,
+        "lose_trades": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "avg_win": 0,
+        "avg_loss": 0,
+        "avg_win_pct": 0,
+        "avg_loss_pct": 0,
+        "largest_win": 0,
+        "largest_loss": 0,
+        "largest_win_pct": 0,
+        "largest_loss_pct": 0,
+        "sharpe_ratio": 0
+      },
+      "execution_time": 1.3026728630065918
+    },
+    "BTCUSDT_1h_3m_target1d": {
+      "initial_balance": 10000,
+      "final_balance": 10000.0,
+      "profit_loss": 0.0,
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "trades": [],
+      "stats": {
+        "total_trades": 0,
+        "win_trades": 0,
+        "lose_trades": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "avg_win": 0,
+        "avg_loss": 0,
+        "avg_win_pct": 0,
+        "avg_loss_pct": 0,
+        "largest_win": 0,
+        "largest_loss": 0,
+        "largest_win_pct": 0,
+        "largest_loss_pct": 0,
+        "sharpe_ratio": 0
+      },
+      "execution_time": 1.2668676376342773
+    },
+    "BTCUSDT_1h_3m_target3d": {
+      "initial_balance": 10000,
+      "final_balance": 10000.0,
+      "profit_loss": 0.0,
+      "profit_pct": 0.0,
+      "max_drawdown": 0,
+      "trades": [],
+      "stats": {
+        "total_trades": 0,
+        "win_trades": 0,
+        "lose_trades": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "avg_win": 0,
+        "avg_loss": 0,
+        "avg_win_pct": 0,
+        "avg_loss_pct": 0,
+        "largest_win": 0,
+        "largest_loss": 0,
+        "largest_win_pct": 0,
+        "largest_loss_pct": 0,
+        "sharpe_ratio": 0
+      },
+      "execution_time": 1.411452054977417
+    },
+    "high_risk": {
+      "initial_balance": 10000,
+      "final_balance": 9818.650409826649,
+      "profit_loss": -181.34959017335132,
+      "profit_pct": -1.8134959017335084,
+      "max_drawdown": 1.8134959017335133,
+      "trades": [
+        {
+          "type": "short",
+          "entry_idx": 43,
+          "exit_idx": 403,
+          "entry_price": 100387.4,
+          "exit_price": 90192.7,
+          "pnl": -50.776790712778684,
+          "pnl_pct": 11.303242945382497,
+          "exit_reason": "take_profit",
+          "balance": 9949.223209287222
+        },
+        {
+          "type": "long",
+          "entry_idx": 468,
+          "exit_idx": 474,
+          "entry_price": 84000.0,
+          "exit_price": 79763.3,
+          "pnl": -25.090401173087585,
+          "pnl_pct": -5.043690476190477,
+          "exit_reason": "stop_loss",
+          "balance": 9924.132808114135
+        },
+        {
+          "type": "short",
+          "entry_idx": 546,
+          "exit_idx": 547,
+          "entry_price": 84951.1,
+          "exit_price": 92657.5,
+          "pnl": 45.01374147742096,
+          "pnl_pct": -8.317081725710274,
+          "exit_reason": "stop_loss",
+          "balance": 9969.146549591556
+        },
+        {
+          "type": "short",
+          "entry_idx": 548,
+          "exit_idx": 561,
+          "entry_price": 92639.5,
+          "exit_price": 82985.7,
+          "pnl": -51.943364850008365,
+          "pnl_pct": 11.633088592371932,
+          "exit_reason": "take_profit",
+          "balance": 9917.203184741547
+        },
+        {
+          "type": "short",
+          "entry_idx": 605,
+          "exit_idx": 606,
+          "entry_price": 112999.6,
+          "exit_price": 90540.8,
+          "pnl": -98.55277491489947,
+          "pnl_pct": 24.80517070757051,
+          "exit_reason": "take_profit",
+          "balance": 9818.650409826649
+        }
+      ],
+      "stats": {
+        "total_trades": 5,
+        "win_trades": 1,
+        "lose_trades": 4,
+        "win_rate": 20.0,
+        "profit_factor": 0.1988561537292916,
+        "avg_win": 45.01374147742096,
+        "avg_loss": 56.59083291269353,
+        "avg_win_pct": -8.317081725710274,
+        "avg_loss_pct": 13.196298180378854,
+        "largest_win": 45.01374147742096,
+        "largest_loss": -98.55277491489947,
+        "largest_win_pct": -8.317081725710274,
+        "largest_loss_pct": -5.043690476190477,
+        "sharpe_ratio": -0.7837059254148828
+      },
+      "execution_time": 1.7228069305419922
+    }
+  }
+}

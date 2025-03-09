@@ -1,18 +1,330 @@
 {
-  "tasks_total": 2,
+  "tasks_total": 80,
   "tasks_completed": 0,
-  "tasks_failed": 2,
-  "started_at": "2025-03-09T17:44:52.329577",
+  "tasks_failed": 80,
+  "started_at": "2025-03-09T23:13:24.885214",
   "results": {
+    "BTCUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
     "BTCUSDT_1h_1m_target3d": {
       "success": false,
-      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u sau khi x\u1eed l\u00fd"
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BTCUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
     },
     "ETHUSDT_1h_1m_target3d": {
       "success": false,
-      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u sau khi x\u1eed l\u00fd"
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ETHUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "BNBUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "SOLUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "ADAUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "XRPUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOGEUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "DOTUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "AVAXUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_1h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_1h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_1h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_4h_1m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_4h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_4h_3m_target1d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
+    },
+    "MATICUSDT_4h_3m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u"
     }
   },
-  "completed_at": "2025-03-09T17:44:55.614049",
-  "total_time": 3.284479
+  "completed_at": "2025-03-09T23:13:24.928378",
+  "total_time": 0.043176
 }

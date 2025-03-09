@@ -79,7 +79,7 @@ def run_command(command, description=None):
         logger.error(f"Command failed with exit code {e.returncode}: {e.stderr}")
         raise
 
-def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=False):
+def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=False, data_dir='real_data'):
     """
     Huấn luyện mô hình ML cho các coin và khung thời gian
     
@@ -89,6 +89,7 @@ def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=F
         lookback_periods: Danh sách khoảng thời gian lịch sử
         target_days: Danh sách khoảng thời gian mục tiêu
         optimize: Tối ưu siêu tham số hay không
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         True nếu thành công
@@ -111,7 +112,7 @@ def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=F
         f"--lookback {lookback_str} "
         f"--target {target_str} "
         f"{optimize_flag} "
-        f"--data-dir real_data"
+        f"--data-dir {data_dir}"
     )
     
     # Run training
@@ -119,7 +120,7 @@ def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=F
         run_command(command, "Huấn luyện mô hình ML")
         
         # Generate summary
-        report_command = "python enhanced_ml_trainer.py --report-only --data-dir real_data"
+        report_command = f"python enhanced_ml_trainer.py --report-only --data-dir {data_dir}"
         run_command(report_command, "Tạo báo cáo tổng hợp")
         
         logger.info("=== Hoàn thành huấn luyện mô hình ML ===")
@@ -128,7 +129,7 @@ def train_ml_models(coins, timeframes, lookback_periods, target_days, optimize=F
         logger.error(f"Lỗi khi huấn luyện mô hình ML: {str(e)}")
         return False
 
-def test_ml_models(coins, timeframes, risk_pct=10, leverage=20):
+def test_ml_models(coins, timeframes, risk_pct=10, leverage=20, data_dir='real_data'):
     """
     Kiểm thử mô hình ML và so sánh với chiến lược rủi ro cao
     
@@ -137,6 +138,7 @@ def test_ml_models(coins, timeframes, risk_pct=10, leverage=20):
         timeframes: Danh sách khung thời gian
         risk_pct: Phần trăm rủi ro
         leverage: Đòn bẩy
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         Dict của các cặp tiền và mô hình tốt nhất
@@ -155,7 +157,7 @@ def test_ml_models(coins, timeframes, risk_pct=10, leverage=20):
                 f"--risk {risk_pct} "
                 f"--leverage {leverage} "
                 f"--mode ml-compare "
-                f"--data-dir real_data"
+                f"--data-dir {data_dir}"
             )
             
             try:
@@ -187,7 +189,7 @@ def test_ml_models(coins, timeframes, risk_pct=10, leverage=20):
     
     return best_models
 
-def integrate_ml_models(best_models, risk_pct=10, leverage=20):
+def integrate_ml_models(best_models, risk_pct=10, leverage=20, data_dir='real_data'):
     """
     Tích hợp mô hình ML tốt nhất với chiến lược rủi ro cao
     
@@ -195,6 +197,7 @@ def integrate_ml_models(best_models, risk_pct=10, leverage=20):
         best_models: Dict của các cặp tiền và mô hình tốt nhất
         risk_pct: Phần trăm rủi ro
         leverage: Đòn bẩy
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         Dict chứa kết quả tích hợp
@@ -215,7 +218,7 @@ def integrate_ml_models(best_models, risk_pct=10, leverage=20):
             f"--risk {risk_pct} "
             f"--leverage {leverage} "
             f"--mode integrate "
-            f"--data-dir real_data"
+            f"--data-dir {data_dir}"
         )
         
         try:
@@ -340,7 +343,7 @@ def create_deployment_config(best_models, integration_results, threshold_profit=
 
 def run_complete_pipeline(coins=None, timeframes=None, optimize=False, 
                        risk_pct=10, leverage=20, threshold_profit=20.0, 
-                       threshold_win_rate=60.0):
+                       threshold_win_rate=60.0, data_dir='real_data'):
     """
     Chạy toàn bộ pipeline ML
     
@@ -352,6 +355,7 @@ def run_complete_pipeline(coins=None, timeframes=None, optimize=False,
         leverage: Đòn bẩy
         threshold_profit: Ngưỡng lợi nhuận tối thiểu
         threshold_win_rate: Ngưỡng tỷ lệ thắng tối thiểu
+        data_dir: Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)
     
     Returns:
         Dict chứa kết quả pipeline
@@ -371,7 +375,8 @@ def run_complete_pipeline(coins=None, timeframes=None, optimize=False,
         timeframes=timeframes,
         lookback_periods=LOOKBACK_PERIODS,
         target_days=TARGET_DAYS,
-        optimize=optimize
+        optimize=optimize,
+        data_dir=data_dir
     )
     
     if not success:
@@ -383,7 +388,8 @@ def run_complete_pipeline(coins=None, timeframes=None, optimize=False,
         coins=coins,
         timeframes=timeframes,
         risk_pct=risk_pct,
-        leverage=leverage
+        leverage=leverage,
+        data_dir=data_dir
     )
     
     if not best_models:
@@ -394,7 +400,8 @@ def run_complete_pipeline(coins=None, timeframes=None, optimize=False,
     integration_results = integrate_ml_models(
         best_models=best_models,
         risk_pct=risk_pct,
-        leverage=leverage
+        leverage=leverage,
+        data_dir=data_dir
     )
     
     # Step 4: Tạo cấu hình triển khai
@@ -430,6 +437,8 @@ def main():
                       help='Tối ưu siêu tham số (mặc định: False)')
     parser.add_argument('--risk', type=float, default=10, 
                       help='Phần trăm rủi ro (mặc định: 10)')
+    parser.add_argument('--data-dir', type=str, default='real_data',
+                      help='Thư mục chứa dữ liệu thị trường thực (mặc định: real_data)')
     parser.add_argument('--leverage', type=float, default=20, 
                       help='Đòn bẩy (mặc định: 20)')
     parser.add_argument('--profit-threshold', type=float, default=20.0, 
@@ -446,7 +455,8 @@ def main():
         risk_pct=args.risk,
         leverage=args.leverage,
         threshold_profit=args.profit_threshold,
-        threshold_win_rate=args.winrate_threshold
+        threshold_win_rate=args.winrate_threshold,
+        data_dir=args.data_dir
     )
 
 if __name__ == "__main__":

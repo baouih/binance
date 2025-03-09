@@ -10,14 +10,16 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger('data_processor')
 
 class DataProcessor:
-    def __init__(self, binance_api, simulation_mode=False):
+    def __init__(self, binance_api, simulation_mode=False, data_dir=None):
         """
         Initialize the DataProcessor.
         
         Args:
             binance_api: BinanceAPI instance
             simulation_mode (bool): Whether to use simulation mode
+            data_dir (str, optional): Directory containing historical data files
         """
+        self.data_dir = data_dir
         self.binance_api = binance_api
         self.simulation_mode = simulation_mode
         self.feature_engineering = SimpleFeatureEngineering()  # Sử dụng phiên bản đơn giản không cần talib

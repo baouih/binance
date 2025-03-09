@@ -47,9 +47,16 @@ class MLStrategyTester:
     Lớp kiểm thử chiến lược ML và so sánh với các chiến lược khác
     """
     
-    def __init__(self, simulation_mode=True):
-        """Khởi tạo tester"""
+    def __init__(self, simulation_mode=True, data_dir=None):
+        """
+        Khởi tạo tester
+        
+        Args:
+            simulation_mode: Sử dụng chế độ mô phỏng hay không
+            data_dir: Thư mục chứa dữ liệu lịch sử, nếu None sẽ lấy qua API
+        """
         self.simulation_mode = simulation_mode
+        self.data_dir = data_dir
         
         # Khởi tạo API và bộ xử lý dữ liệu
         self.api = BinanceAPI(simulation_mode=simulation_mode)
@@ -145,8 +152,47 @@ class MLStrategyTester:
         try:
             logger.info(f"Chuẩn bị dữ liệu cho backtesting {symbol} {interval}")
             
-            # Tải dữ liệu lịch sử
-            df = self.data_processor.get_historical_data(symbol, interval, lookback_days=lookback_days)
+            # Nếu data_dir được cung cấp, đọc từ file
+            if self.data_dir:
+                # Thử các định dạng file khác nhau
+                file_patterns = [
+                    f"{symbol}_{interval}.csv",
+                    f"{symbol}_{interval}_historical_data.csv",
+                    f"{symbol}_{interval}_sample.csv"
+                ]
+                
+                found_file = False
+                for pattern in file_patterns:
+                    file_path = os.path.join(self.data_dir, pattern)
+                    if os.path.exists(file_path):
+                        logger.info(f"Đọc dữ liệu từ file {file_path}")
+                        df = pd.read_csv(file_path)
+                        found_file = True
+                        break
+                        
+                if not found_file:
+                    logger.warning(f"Không tìm thấy file dữ liệu {self.data_dir}/{symbol}_{interval}*.csv")
+                    return None
+                
+                # Đảm bảo định dạng cột thời gian đúng
+                if 'datetime' in df.columns:
+                    df['datetime'] = pd.to_datetime(df['datetime'])
+                    df.set_index('datetime', inplace=True)
+                elif 'timestamp' in df.columns:
+                    df['datetime'] = pd.to_datetime(df['timestamp'])
+                    df.set_index('datetime', inplace=True)
+                elif 'open_time' in df.columns:
+                    df['datetime'] = pd.to_datetime(df['open_time'], unit='ms')
+                    df.set_index('datetime', inplace=True)
+                    
+                # Chỉ lấy số ngày dữ liệu cần thiết nếu có quá nhiều
+                if lookback_days > 0 and isinstance(df.index, pd.DatetimeIndex):
+                    end_date = df.index.max()
+                    start_date = end_date - pd.Timedelta(days=lookback_days)
+                    df = df[df.index >= start_date]
+            else:
+                # Tải dữ liệu lịch sử qua API
+                df = self.data_processor.get_historical_data(symbol, interval, lookback_days=lookback_days)
             
             if df is None or len(df) < 30:
                 logger.error(f"Không đủ dữ liệu cho {symbol} {interval}")
@@ -369,17 +415,80 @@ class MLStrategyTester:
             # Khởi tạo cột tín hiệu
             df_strategy['signal'] = 0
             
-            # Lọc các đặc trưng cần thiết
-            available_features = [f for f in features if f in df.columns]
+            # Trích xuất danh sách tính năng từ đối tượng features
+            if isinstance(features, dict) and 'features' in features:
+                feature_list = features['features']
+            else:
+                feature_list = features
+
+            # Thêm các tính năng còn thiếu trong DataFrame
+            required_features = set(feature_list)
+            existing_features = set(df.columns)
             
-            if len(available_features) < len(features):
-                missing = set(features) - set(available_features)
-                logger.warning(f"Thiếu {len(missing)} đặc trưng: {missing}")
+            # Lọc các đặc trưng có sẵn
+            available_features = [f for f in feature_list if f in df.columns]
             
+            if len(available_features) < len(feature_list):
+                missing_features = required_features - existing_features
+                logger.warning(f"Thiếu {len(missing_features)} đặc trưng: {missing_features}")
+                
+                # Thêm một số tính năng cơ bản nếu thiếu
+                for feature in missing_features:
+                    if feature == 'sma5':
+                        df['sma5'] = df['close'].rolling(window=5).mean()
+                    elif feature == 'sma10':
+                        df['sma10'] = df['close'].rolling(window=10).mean()
+                    elif feature == 'sma20':
+                        df['sma20'] = df['close'].rolling(window=20).mean()
+                    elif feature == 'sma50':
+                        df['sma50'] = df['close'].rolling(window=50).mean()
+                    elif feature == 'sma100':
+                        df['sma100'] = df['close'].rolling(window=100).mean()
+                    elif feature == 'ema5':
+                        df['ema5'] = df['close'].ewm(span=5, adjust=False).mean()
+                    elif feature == 'ema10':
+                        df['ema10'] = df['close'].ewm(span=10, adjust=False).mean()
+                    elif feature == 'ema20':
+                        df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
+                    elif feature == 'ema50':
+                        df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
+                    elif feature == 'price_sma20_ratio' and 'sma20' in df.columns:
+                        df['price_sma20_ratio'] = df['close'] / df['sma20']
+                    elif feature == 'price_sma50_ratio' and 'sma50' in df.columns:
+                        df['price_sma50_ratio'] = df['close'] / df['sma50']
+                    elif feature == 'volume_sma5':
+                        df['volume_sma5'] = df['volume'].rolling(window=5).mean()
+                    elif feature == 'volume_ratio' and 'volume_sma5' in df.columns:
+                        df['volume_ratio'] = df['volume'] / df['volume_sma5']
+                    elif feature == 'volatility':
+                        df['volatility'] = df['close'].pct_change().rolling(window=20).std()
+                    elif feature == 'daily_return':
+                        df['daily_return'] = df['close'].pct_change(24)
+                    elif feature == 'weekly_return':
+                        df['weekly_return'] = df['close'].pct_change(24*7)
+                    
+            # Cập nhật lại danh sách tính năng có sẵn
+            available_features = [f for f in feature_list if f in df.columns]
+            
+            if len(available_features) == 0:
+                logger.error("Không có tính năng nào khớp, không thể tiếp tục")
+                return df_strategy
+            
+            # Đọc dữ liệu chỉ với các tính năng có sẵn
             X = df[available_features]
             
+            # Loại bỏ các dòng NaN
+            X = X.dropna()
+            if len(X) == 0:
+                logger.error("Sau khi loại bỏ NaN, không còn dữ liệu nào")
+                return df_strategy
+                
             # Chuẩn hóa đặc trưng
-            X_scaled = scaler.transform(X)
+            try:
+                X_scaled = scaler.transform(X)
+            except Exception as e:
+                logger.error(f"Lỗi khi chuẩn hóa dữ liệu: {e}")
+                return df_strategy
             
             # Dự đoán
             predictions = model.predict(X_scaled)
@@ -1699,11 +1808,12 @@ def main():
     parser.add_argument('--mode', type=str, choices=['compare', 'ml-compare', 'integrate'], default='compare',
                       help='Chế độ kiểm thử (mặc định: compare)')
     parser.add_argument('--simulation', action='store_true', help='Chế độ mô phỏng (mặc định: False)')
+    parser.add_argument('--data-dir', type=str, help='Thư mục chứa dữ liệu lịch sử (mặc định: None)')
     
     args = parser.parse_args()
     
     # Khởi tạo tester
-    tester = MLStrategyTester(simulation_mode=args.simulation)
+    tester = MLStrategyTester(simulation_mode=args.simulation, data_dir=args.data_dir)
     
     # Chọn chế độ kiểm thử
     if args.mode == 'compare':
