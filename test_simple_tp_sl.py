@@ -55,17 +55,19 @@ def test_take_profit_and_stop_loss():
         # Sử dụng 50% vị thế cho TP
         tp_quantity = round(position_amt / 2, 3)
         
-        # Binance Futures yêu cầu thêm tham số working_type và price cho TAKE_PROFIT orders
+        # Binance Futures yêu cầu thêm một số tham số cho TAKE_PROFIT orders
+        # Chú ý: workingType -> working_type, timeInForce -> time_in_force, 
+        # và các tham số khác phải tuân theo đúng định dạng từ API
         tp_order = client.create_order(
             symbol=symbol,
-            side="SELL",
-            type="TAKE_PROFIT", # Sử dụng TAKE_PROFIT thay vì TAKE_PROFIT_MARKET
+            side="SELL", 
+            type="TAKE_PROFIT",
             quantity=tp_quantity,
-            stop_price=tp_price,
-            price=tp_price*0.99, # Cần thêm giá limit thấp hơn stop price
-            time_in_force="GTC",
-            working_type="MARK_PRICE",
-            reduce_only=True
+            stopPrice=tp_price,     # Chú ý: stopPrice không phải stop_price
+            price=tp_price*0.99,
+            timeInForce="GTC",      # Chú ý: timeInForce không phải time_in_force
+            workingType="MARK_PRICE", # Chú ý: workingType không phải working_type
+            reduceOnly="true"       # Chú ý: reduceOnly="true" là chuỗi, không phải boolean
         )
         
         # Kiểm tra kết quả TP
@@ -82,17 +84,17 @@ def test_take_profit_and_stop_loss():
         # Sử dụng toàn bộ vị thế còn lại cho SL
         sl_quantity = position_amt - tp_quantity if success_tp else position_amt
         
-        # Binance Futures yêu cầu thêm tham số working_type cho STOP orders
+        # Binance Futures yêu cầu các tham số có đúng định dạng cho STOP orders
         sl_order = client.create_order(
             symbol=symbol,
             side="SELL",
             type="STOP",
             quantity=sl_quantity,
-            stop_price=sl_price,
-            price=sl_price*1.01, # Cần thêm giá limit cao hơn stop price
-            time_in_force="GTC",
-            working_type="MARK_PRICE",
-            reduce_only=True
+            stopPrice=sl_price,       # Chú ý: stopPrice không phải stop_price
+            price=sl_price*1.01,      # Cần thêm giá limit cao hơn stop price
+            timeInForce="GTC",        # Chú ý: timeInForce không phải time_in_force
+            workingType="MARK_PRICE", # Chú ý: workingType không phải working_type
+            reduceOnly="true"         # Chú ý: reduceOnly="true" là chuỗi, không phải boolean
         )
         
         # Kiểm tra kết quả SL
