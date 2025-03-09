@@ -55,7 +55,7 @@ def get_open_orders(api, symbol=None):
 def get_positions(api):
     """Lấy danh sách các vị thế đang mở"""
     try:
-        positions = api.get_position_information()
+        positions = api.get_futures_position_risk()
         # Lọc các vị thế có số lượng != 0
         active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
         return active_positions
