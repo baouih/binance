@@ -187,8 +187,7 @@ class AutoSLTPManager:
                 stopPrice=price,
                 quantity=abs(quantity),
                 reduceOnly=True,
-                workingType="MARK_PRICE",
-                timeInForce="GTC"
+                workingType="MARK_PRICE"
             )
             
             logger.info(f"Đã đặt SL cho {symbol} {side} tại giá {price}, số lượng {quantity}")
@@ -224,8 +223,7 @@ class AutoSLTPManager:
                 stopPrice=price,
                 quantity=abs(quantity),
                 reduceOnly=True,
-                workingType="MARK_PRICE",
-                timeInForce="GTC"
+                workingType="MARK_PRICE"
             )
             
             logger.info(f"Đã đặt TP cho {symbol} {side} tại giá {price}, số lượng {quantity}")
