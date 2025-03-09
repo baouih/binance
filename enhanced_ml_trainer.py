@@ -1596,11 +1596,12 @@ def main():
     parser.add_argument('--optimize', action='store_true', help='Tối ưu siêu tham số (mặc định: False)')
     parser.add_argument('--simulation', action='store_true', help='Chế độ mô phỏng (mặc định: False)')
     parser.add_argument('--report-only', action='store_true', help='Chỉ tạo báo cáo tổng hợp (mặc định: False)')
+    parser.add_argument('--data-dir', type=str, help='Thư mục chứa dữ liệu lịch sử (nếu không cung cấp, sẽ lấy qua API)')
     
     args = parser.parse_args()
     
     # Khởi tạo trainer
-    trainer = EnhancedMLTrainer(simulation_mode=args.simulation)
+    trainer = EnhancedMLTrainer(simulation_mode=args.simulation, data_dir=args.data_dir)
     
     # Chỉ tạo báo cáo tổng hợp
     if args.report_only:
