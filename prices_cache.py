@@ -201,7 +201,12 @@ def get_price(symbol: str, fallback_to_default: bool = True) -> Optional[float]:
     Returns:
         Optional[float]: Giá của symbol hoặc None
     """
-    return price_cache.get_price(symbol, fallback_to_default)
+    price = price_cache.get_price(symbol, fallback_to_default)
+    if price:
+        logger.info(f"Lấy giá {symbol} từ cache: {price}")
+    else:
+        logger.warning(f"Không tìm thấy giá cho {symbol} trong cache")
+    return price
 
 def update_prices(price_data: Dict[str, float]) -> None:
     """

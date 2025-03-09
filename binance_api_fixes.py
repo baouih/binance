@@ -399,23 +399,14 @@ if __name__ == "__main__":
                 price = float(ticker_data['price'])
                 logger.info(f"Đã lấy được giá {symbol} từ API: {price}")
             else:
-                # Sử dụng cached prices trong trường hợp không lấy được từ API
-                # Đặc biệt cần thiết cho môi trường testnet không ổn định
-                cached_prices = {
-                    "BTCUSDT": 86133.1, "ETHUSDT": 2169.41, "BNBUSDT": 596.128, 
-                    "SOLUSDT": 175.0, "ADAUSDT": 0.9, "DOGEUSDT": 0.191,
-                    "LTCUSDT": 104.0, "DOTUSDT": 5.0, "XRPUSDT": 2.5044,
-                    "AVAXUSDT": 22.0, "LINKUSDT": 15.286, "ATOMUSDT": 3.501
-                }
-                
-                price = cached_prices.get(symbol)
-                logger.warning(f"Không lấy được giá {symbol} từ API, sử dụng giá dự phòng: {price}")
+                # Sử dụng giá từ cache trong trường hợp không lấy được từ API
+                from prices_cache import get_price as get_cached_price
+                price = get_cached_price(symbol)
+                logger.warning(f"Không lấy được giá {symbol} từ API, sử dụng giá cache: {price}")
         except Exception as e:
-            # Trong trường hợp lỗi API, sử dụng giá dự phòng
-            cached_prices = {
-                "BTCUSDT": 86133.1, "ETHUSDT": 2169.41, "BNBUSDT": 596.128
-            }
-            price = cached_prices.get(symbol)
+            # Trong trường hợp lỗi API, sử dụng giá dự phòng từ module prices_cache
+            from prices_cache import get_price as get_cached_price
+            price = get_cached_price(symbol)
             logger.error(f"Lỗi khi lấy giá {symbol}: {str(e)}, sử dụng giá dự phòng: {price}")
         
         if price:

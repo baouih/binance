@@ -1,0 +1,20 @@
+{
+  "last_update": "2025-03-09 06:12:04",
+  "reliable_symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "SOLUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "LTCUSDT",
+    "DOTUSDT",
+    "XRPUSDT",
+    "AVAXUSDT",
+    "LINKUSDT",
+    "ATOMUSDT"
+  ],
+  "unreliable_symbols": [],
+  "price_errors": {},
+  "trading_enabled": true
+}
