@@ -260,13 +260,13 @@ class TelegramNotifier:
 
 
 # Hàm để sử dụng module này độc lập
-def send_notification(message, telegram_config_path='configs/telegram/telegram_notification_config.json'):
+def send_notification(message, telegram_config_path='telegram_config.json'):
     """
     Gửi thông báo qua Telegram
     
     Args:
         message (str): Nội dung thông báo
-        telegram_config_path (str, optional): Đường dẫn đến file cấu hình. Mặc định là 'configs/telegram/telegram_notification_config.json'.
+        telegram_config_path (str, optional): Đường dẫn đến file cấu hình. Mặc định là 'telegram_config.json'.
         
     Returns:
         bool: True nếu gửi thành công, False nếu có lỗi

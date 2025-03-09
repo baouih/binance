@@ -1,0 +1,49 @@
+{
+  "account": {
+    "balance": 450.0,
+    "type": "medium",
+    "created_at": "2025-03-09 14:51:39"
+  },
+  "risk_management": {
+    "risk_level": 18.0,
+    "max_position_size": 0.35,
+    "max_positions": 5,
+    "stop_loss_pct": 7.0,
+    "take_profit_pct": 21.0,
+    "reward_risk_ratio": 3.0
+  },
+  "timeframe_allocation": {
+    "1d": 0.4,
+    "4h": 0.4,
+    "1h": 0.2,
+    "15m": 0.0,
+    "5m": 0.0
+  },
+  "recommended_coins": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "LINKUSDT"
+  ],
+  "trading_sizes": {
+    "BTCUSDT": 74.51999999999998,
+    "ETHUSDT": 70.19999999999999,
+    "SOLUSDT": 63.72000000000001,
+    "BNBUSDT": 61.56,
+    "LINKUSDT": 61.56
+  },
+  "trading_rules": {
+    "max_daily_trades": 10,
+    "minimum_win_rate_threshold": 52.0,
+    "maximum_concurrent_trades": 5,
+    "maximum_correlated_trades": 2
+  },
+  "optimization_notes": [
+    "T\u1ed1i \u01b0u h\u00f3a cho t\u00e0i kho\u1ea3n $300-$600",
+    "T\u1eadp trung v\u00e0o khung th\u1eddi gian c\u00f3 win rate cao (1d, 4h)",
+    "\u01afu ti\u00ean coin c\u00f3 t\u1ef7 l\u1ec7 th\u1eafng cao",
+    "S\u1eed d\u1ee5ng c\u00f4ng th\u1ee9c Kelly \u0111\u1ec3 t\u00ednh k\u00edch th\u01b0\u1edbc giao d\u1ecbch t\u1ed1i \u01b0u",
+    "Ph\u00e2n b\u1ed5 v\u1ed1n theo t\u1ef7 l\u1ec7 th\u1eafng c\u1ee7a t\u1eebng khung th\u1eddi gian"
+  ]
+}

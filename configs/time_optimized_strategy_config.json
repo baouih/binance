@@ -1,0 +1,144 @@
+{
+  "enabled": true,
+  "timezone_offset": 7,
+  "entry_windows": [
+    {
+      "start_hour": 8,
+      "start_minute": 0,
+      "end_hour": 10,
+      "end_minute": 0,
+      "win_rate": 95.0,
+      "direction": "short",
+      "name": "London Open"
+    },
+    {
+      "start_hour": 13,
+      "start_minute": 30,
+      "end_hour": 15,
+      "end_minute": 30,
+      "win_rate": 90.0,
+      "direction": "short",
+      "name": "New York Open"
+    },
+    {
+      "start_hour": 23,
+      "start_minute": 30,
+      "end_hour": 0,
+      "end_minute": 30,
+      "win_rate": 75.0,
+      "direction": "long",
+      "name": "Daily Candle Close"
+    },
+    {
+      "start_hour": 14,
+      "start_minute": 30,
+      "end_hour": 15,
+      "end_minute": 0,
+      "win_rate": 80.0,
+      "direction": "short",
+      "name": "Major News Events"
+    },
+    {
+      "start_hour": 20,
+      "start_minute": 0,
+      "end_hour": 22,
+      "end_minute": 0,
+      "win_rate": 70.0,
+      "direction": "both",
+      "name": "London/NY Close"
+    },
+    {
+      "start_hour": 7,
+      "start_minute": 0,
+      "end_hour": 8,
+      "end_minute": 30,
+      "win_rate": 60.0,
+      "direction": "both",
+      "name": "Asian-European Transition"
+    }
+  ],
+  "weekday_win_rates": {
+    "0": 51.8,
+    "1": 52.3,
+    "2": 54.5,
+    "3": 56.2,
+    "4": 55.1,
+    "5": 49.5,
+    "6": 48.3
+  },
+  "max_trades_by_weekday": {
+    "0": 3,
+    "1": 3,
+    "2": 4,
+    "3": 5,
+    "4": 5,
+    "5": 2,
+    "6": 2
+  },
+  "optimal_coins": {
+    "London Open": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "New York Open": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "Daily Candle Close": [
+      "SOLUSDT",
+      "LINKUSDT",
+      "ETHUSDT"
+    ],
+    "Major News Events": [
+      "BTCUSDT",
+      "BNBUSDT"
+    ],
+    "London/NY Close": [
+      "BNBUSDT",
+      "BTCUSDT"
+    ],
+    "Asian-European Transition": [
+      "SOLUSDT",
+      "BTCUSDT"
+    ]
+  },
+  "entry_conditions": {
+    "short": {
+      "london_open": {
+        "rsi_max": 70,
+        "macd_crossover": true,
+        "volume_min": 1.5,
+        "price_action": "resistance_rejection",
+        "min_pct_from_ema": 0.5
+      },
+      "new_york_open": {
+        "rsi_max": 65,
+        "macd_crossover": true,
+        "volume_min": 1.5,
+        "price_action": "resistance_rejection",
+        "min_pct_from_ema": 0.5
+      }
+    },
+    "long": {
+      "daily_candle_close": {
+        "rsi_min": 40,
+        "macd_crossover": true,
+        "volume_min": 2.0,
+        "price_action": "support_bounce",
+        "min_pct_from_ema": 0.3
+      }
+    }
+  },
+  "minimum_win_rate": 70.0,
+  "high_win_rate_threshold": 85.0,
+  "max_trades_per_day": 5,
+  "max_trades_per_session": 2,
+  "default_risk_reward_ratio": 3.0,
+  "weekday_multiplier": true,
+  "position_sizing": {
+    "default": 0.02,
+    "high_confidence": 0.03,
+    "max_risk_per_day": 0.1
+  },
+  "created_at": "2025-03-09 15:36:27"
+}

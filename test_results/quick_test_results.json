@@ -1,0 +1,461 @@
+{
+  "BTCUSDT": {
+    "symbol": "BTCUSDT",
+    "trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 51206.66187849602,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 52535.13763234381,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.57110620023946
+      },
+      {
+        "entry_time": "2024-01-22 16:00:00",
+        "entry_price": 49562.11537592403,
+        "exit_time": "2024-01-23 02:00:00",
+        "exit_price": 46674.72485794215,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "loss",
+        "profit_pct": -3.462403506391922
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 44999.54117581392,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 43539.54337483848,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 4.721265712169563
+      },
+      {
+        "entry_time": "2024-01-11 10:00:00",
+        "entry_price": 49001.952731609286,
+        "exit_time": "2024-01-11 20:00:00",
+        "exit_price": 50309.54921050334,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 6.331976554212002
+      },
+      {
+        "entry_time": "2024-01-19 18:00:00",
+        "entry_price": 52332.896383950465,
+        "exit_time": "2024-01-20 04:00:00",
+        "exit_price": 50219.02843611146,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 3.605830489601658
+      },
+      {
+        "entry_time": "2024-01-28 02:00:00",
+        "entry_price": 45447.70397642589,
+        "exit_time": "2024-01-28 12:00:00",
+        "exit_price": 47478.84389062909,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 4.450332850378708
+      },
+      {
+        "entry_time": "2024-02-05 10:00:00",
+        "entry_price": 47776.02736430008,
+        "exit_time": "2024-02-05 20:00:00",
+        "exit_price": 47858.57969343296,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 5.427306254354331
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 49178.451228455684,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 49443.79974390479,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 3.9839989612271807
+      },
+      {
+        "entry_time": "2024-01-23 22:00:00",
+        "entry_price": 44414.05436899547,
+        "exit_time": "2024-01-24 08:00:00",
+        "exit_price": 44391.92032927984,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -2.623531164258947
+      },
+      {
+        "entry_time": "2024-02-01 06:00:00",
+        "entry_price": 42122.92476069827,
+        "exit_time": "2024-02-01 16:00:00",
+        "exit_price": 42219.38691437973,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -4.214452264525069
+      }
+    ],
+    "optimized_trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 51206.66187849602,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 52535.13763234381,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.941925046674365
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 44999.54117581392,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 43539.54337483848,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 6.170288875087495
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 49178.451228455684,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 49443.79974390479,
+        "direction": "long",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 9.802842681617175
+      }
+    ],
+    "summary": {
+      "base_strategy": {
+        "total_trades": 10,
+        "win_count": 7,
+        "loss_count": 3,
+        "win_rate": 70.0,
+        "avg_profit": 2.3791430087006966
+      },
+      "optimized_strategy": {
+        "total_trades": 3,
+        "win_count": 3,
+        "loss_count": 0,
+        "win_rate": 100.0,
+        "avg_profit": 7.305018867793012
+      }
+    }
+  },
+  "ETHUSDT": {
+    "symbol": "ETHUSDT",
+    "trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 2048.2664751398406,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 2101.4055052937524,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.57110620023946
+      },
+      {
+        "entry_time": "2024-01-22 16:00:00",
+        "entry_price": 1982.4846150369608,
+        "exit_time": "2024-01-23 02:00:00",
+        "exit_price": 1866.9889943176854,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "loss",
+        "profit_pct": -3.462403506391922
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 1799.9816470325568,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 1741.58173499354,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 4.721265712169563
+      },
+      {
+        "entry_time": "2024-01-11 10:00:00",
+        "entry_price": 1960.0781092643715,
+        "exit_time": "2024-01-11 20:00:00",
+        "exit_price": 2012.381968420133,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 6.331976554212002
+      },
+      {
+        "entry_time": "2024-01-19 18:00:00",
+        "entry_price": 2093.315855358019,
+        "exit_time": "2024-01-20 04:00:00",
+        "exit_price": 2008.7611374444589,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 3.605830489601658
+      },
+      {
+        "entry_time": "2024-01-28 02:00:00",
+        "entry_price": 1817.9081590570356,
+        "exit_time": "2024-01-28 12:00:00",
+        "exit_price": 1899.1537556251637,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 4.450332850378708
+      },
+      {
+        "entry_time": "2024-02-05 10:00:00",
+        "entry_price": 1911.0410945720018,
+        "exit_time": "2024-02-05 20:00:00",
+        "exit_price": 1914.343187737317,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 5.427306254354331
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 1967.138049138227,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 1977.751989756191,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 3.9839989612271807
+      },
+      {
+        "entry_time": "2024-01-23 22:00:00",
+        "entry_price": 1776.5621747598184,
+        "exit_time": "2024-01-24 08:00:00",
+        "exit_price": 1775.6768131711929,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -2.623531164258947
+      },
+      {
+        "entry_time": "2024-02-01 06:00:00",
+        "entry_price": 1684.916990427931,
+        "exit_time": "2024-02-01 16:00:00",
+        "exit_price": 1688.7754765751893,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -4.214452264525069
+      }
+    ],
+    "optimized_trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 2048.2664751398406,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 2101.4055052937524,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.941925046674365
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 1799.9816470325568,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 1741.58173499354,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 6.170288875087495
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 1967.138049138227,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 1977.751989756191,
+        "direction": "long",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 9.802842681617175
+      }
+    ],
+    "summary": {
+      "base_strategy": {
+        "total_trades": 10,
+        "win_count": 7,
+        "loss_count": 3,
+        "win_rate": 70.0,
+        "avg_profit": 2.3791430087006966
+      },
+      "optimized_strategy": {
+        "total_trades": 3,
+        "win_count": 3,
+        "loss_count": 0,
+        "win_rate": 100.0,
+        "avg_profit": 7.305018867793012
+      }
+    }
+  },
+  "SOLUSDT": {
+    "symbol": "SOLUSDT",
+    "trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 153.61998563548798,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 157.60541289703133,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.57110620023946
+      },
+      {
+        "entry_time": "2024-01-22 16:00:00",
+        "entry_price": 148.68634612777223,
+        "exit_time": "2024-01-23 02:00:00",
+        "exit_price": 140.02417457382657,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "loss",
+        "profit_pct": -3.462403506391922
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 134.99862352744194,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 130.61863012451568,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 4.721265712169563
+      },
+      {
+        "entry_time": "2024-01-11 10:00:00",
+        "entry_price": 147.00585819482768,
+        "exit_time": "2024-01-11 20:00:00",
+        "exit_price": 150.92864763150982,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 6.331976554212002
+      },
+      {
+        "entry_time": "2024-01-19 18:00:00",
+        "entry_price": 156.99868915185152,
+        "exit_time": "2024-01-20 04:00:00",
+        "exit_price": 150.6570853083345,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 3.605830489601658
+      },
+      {
+        "entry_time": "2024-01-28 02:00:00",
+        "entry_price": 136.34311192927774,
+        "exit_time": "2024-01-28 12:00:00",
+        "exit_price": 142.43653167188737,
+        "direction": "short",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 4.450332850378708
+      },
+      {
+        "entry_time": "2024-02-05 10:00:00",
+        "entry_price": 143.3280820929003,
+        "exit_time": "2024-02-05 20:00:00",
+        "exit_price": 143.57573908029892,
+        "direction": "short",
+        "pattern": "Golden Cross",
+        "status": "win",
+        "profit_pct": 5.427306254354331
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 147.53535368536697,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 148.3313992317143,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 3.9839989612271807
+      },
+      {
+        "entry_time": "2024-01-23 22:00:00",
+        "entry_price": 133.24216310698657,
+        "exit_time": "2024-01-24 08:00:00",
+        "exit_price": 133.17576098783965,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -2.623531164258947
+      },
+      {
+        "entry_time": "2024-02-01 06:00:00",
+        "entry_price": 126.36877428209499,
+        "exit_time": "2024-02-01 16:00:00",
+        "exit_price": 126.65816074313938,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "loss",
+        "profit_pct": -4.214452264525069
+      }
+    ],
+    "optimized_trades": [
+      {
+        "entry_time": "2024-01-14 08:00:00",
+        "entry_price": 153.61998563548798,
+        "exit_time": "2024-01-14 18:00:00",
+        "exit_price": 157.60541289703133,
+        "direction": "short",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 5.941925046674365
+      },
+      {
+        "entry_time": "2024-01-31 00:00:00",
+        "entry_price": 134.99862352744194,
+        "exit_time": "2024-01-31 10:00:00",
+        "exit_price": 130.61863012451568,
+        "direction": "long",
+        "pattern": "Breakout",
+        "status": "win",
+        "profit_pct": 6.170288875087495
+      },
+      {
+        "entry_time": "2024-01-15 14:00:00",
+        "entry_price": 147.53535368536697,
+        "exit_time": "2024-01-16 00:00:00",
+        "exit_price": 148.3313992317143,
+        "direction": "long",
+        "pattern": "Support Bounce",
+        "status": "win",
+        "profit_pct": 9.802842681617175
+      }
+    ],
+    "summary": {
+      "base_strategy": {
+        "total_trades": 10,
+        "win_count": 7,
+        "loss_count": 3,
+        "win_rate": 70.0,
+        "avg_profit": 2.3791430087006966
+      },
+      "optimized_strategy": {
+        "total_trades": 3,
+        "win_count": 3,
+        "loss_count": 0,
+        "win_rate": 100.0,
+        "avg_profit": 7.305018867793012
+      }
+    }
+  }
+}

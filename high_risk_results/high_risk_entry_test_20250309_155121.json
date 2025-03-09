@@ -1,0 +1,313 @@
+{
+  "summary": {
+    "overall": {
+      "total_trades": 5,
+      "win_count": 0,
+      "loss_count": 5,
+      "win_rate": 0.0,
+      "total_pnl_percent": -35.00000000000008,
+      "avg_pnl_percent": -7.000000000000016,
+      "total_pnl_r": -5.000000000000011,
+      "avg_pnl_r": -1.0000000000000022
+    },
+    "by_timeframe": {
+      "London Open": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      },
+      "New York Open": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "total_trades": 5,
+        "win_count": 0,
+        "loss_count": 5,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "Major News Events": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      }
+    },
+    "by_symbol": {
+      "BTCUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "ETHUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "BNBUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "SOLUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "LINKUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      }
+    },
+    "by_direction": {
+      "long": {
+        "total_trades": 5,
+        "win_count": 0,
+        "loss_count": 5,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -7.000000000000016,
+        "avg_pnl_r": -1.0000000000000022
+      },
+      "short": {
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      }
+    },
+    "best_timeframe": null,
+    "best_symbol": null,
+    "best_direction": null
+  },
+  "detailed_results": {
+    "BTCUSDT": {
+      "London Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "New York Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "entries_count": 1,
+        "results": [
+          {
+            "entry_index": 471,
+            "entry_timestamp": "2025-02-27 06:51:18.268251",
+            "entry_price": 1169.9957374576381,
+            "direction": "long",
+            "stop_loss": 1088.0960358356033,
+            "take_profit": 1415.694842323742,
+            "exit_price": 1088.0960358356033,
+            "exit_timestamp": "2025-02-27 07:51:18.268251",
+            "exit_reason": "stop_loss",
+            "pnl_percent": -7.000000000000016,
+            "pnl_r": -1.0000000000000022,
+            "duration_bars": "0 days 01:00:00"
+          }
+        ]
+      },
+      "Major News Events": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      }
+    },
+    "ETHUSDT": {
+      "London Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "New York Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "entries_count": 1,
+        "results": [
+          {
+            "entry_index": 471,
+            "entry_timestamp": "2025-02-27 06:51:19.013870",
+            "entry_price": 1169.9957374576381,
+            "direction": "long",
+            "stop_loss": 1088.0960358356033,
+            "take_profit": 1415.694842323742,
+            "exit_price": 1088.0960358356033,
+            "exit_timestamp": "2025-02-27 07:51:19.013870",
+            "exit_reason": "stop_loss",
+            "pnl_percent": -7.000000000000016,
+            "pnl_r": -1.0000000000000022,
+            "duration_bars": "0 days 01:00:00"
+          }
+        ]
+      },
+      "Major News Events": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      }
+    },
+    "BNBUSDT": {
+      "London Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "New York Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "entries_count": 1,
+        "results": [
+          {
+            "entry_index": 471,
+            "entry_timestamp": "2025-02-27 06:51:19.772386",
+            "entry_price": 1169.9957374576381,
+            "direction": "long",
+            "stop_loss": 1088.0960358356033,
+            "take_profit": 1415.694842323742,
+            "exit_price": 1088.0960358356033,
+            "exit_timestamp": "2025-02-27 07:51:19.772386",
+            "exit_reason": "stop_loss",
+            "pnl_percent": -7.000000000000016,
+            "pnl_r": -1.0000000000000022,
+            "duration_bars": "0 days 01:00:00"
+          }
+        ]
+      },
+      "Major News Events": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      }
+    },
+    "SOLUSDT": {
+      "London Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "New York Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "entries_count": 1,
+        "results": [
+          {
+            "entry_index": 471,
+            "entry_timestamp": "2025-02-27 06:51:20.494502",
+            "entry_price": 1169.9957374576381,
+            "direction": "long",
+            "stop_loss": 1088.0960358356033,
+            "take_profit": 1415.694842323742,
+            "exit_price": 1088.0960358356033,
+            "exit_timestamp": "2025-02-27 07:51:20.494502",
+            "exit_reason": "stop_loss",
+            "pnl_percent": -7.000000000000016,
+            "pnl_r": -1.0000000000000022,
+            "duration_bars": "0 days 01:00:00"
+          }
+        ]
+      },
+      "Major News Events": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      }
+    },
+    "LINKUSDT": {
+      "London Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "New York Open": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "entries_count": 1,
+        "results": [
+          {
+            "entry_index": 471,
+            "entry_timestamp": "2025-02-27 06:51:21.146185",
+            "entry_price": 1169.9957374576381,
+            "direction": "long",
+            "stop_loss": 1088.0960358356033,
+            "take_profit": 1415.694842323742,
+            "exit_price": 1088.0960358356033,
+            "exit_timestamp": "2025-02-27 07:51:21.146185",
+            "exit_reason": "stop_loss",
+            "pnl_percent": -7.000000000000016,
+            "pnl_r": -1.0000000000000022,
+            "duration_bars": "0 days 01:00:00"
+          }
+        ]
+      },
+      "Major News Events": {
+        "direction": "short",
+        "entries_count": 0,
+        "results": []
+      }
+    }
+  },
+  "test_settings": {
+    "days_to_test": 30,
+    "risk_reward_ratio": 3.0,
+    "stop_loss_percent": 7.0,
+    "take_profit_percent": 21.0,
+    "entry_timeout_minutes": 15,
+    "use_trailing_stop": true,
+    "trailing_stop_activation": 10.0,
+    "trailing_stop_callback": 3.0
+  },
+  "test_time": "2025-03-09 15:51:21"
+}

@@ -1,13 +1,5 @@
 {
   "enabled": true,
-  "bot_token": "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM",
-  "chat_id": "1834332146",
-  "notify_new_trades": true,
-  "notify_position_closed": true,
-  "notify_error_status": true,
-  "notify_daily_summary": true,
-  "notify_market_analysis": true,
-  "periodic_reports": true,
-  "report_interval_hours": 3,
-  "debug_mode": false
+  "bot_token": "",
+  "chat_id": ""
 }

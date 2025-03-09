@@ -1,0 +1,48 @@
+{
+  "account": {
+    "balance": 13542.82,
+    "type": "xlarge",
+    "created_at": "2025-03-09 14:36:16"
+  },
+  "risk_management": {
+    "original_optimal_risk": 20.0,
+    "safety_factor": 0.7,
+    "risk_level": 14.0,
+    "max_position_size": 0.3,
+    "max_open_positions": 8,
+    "max_daily_trades": 16,
+    "stop_loss_pct": 5.6000000000000005,
+    "take_profit_pct": 45.0,
+    "risk_per_trade": 1895.9948000000002
+  },
+  "trading_preferences": {
+    "timeframe": "1d",
+    "preferred_coins": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "SOLUSDT",
+      "ADAUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "AVAXUSDT",
+      "DOTUSDT",
+      "LTCUSDT"
+    ],
+    "preferred_timeframes": [
+      "1h",
+      "15m",
+      "5m"
+    ],
+    "leverage": 5
+  },
+  "position_sizing": {
+    "max_position_amount": 4062.8459999999995,
+    "min_position_amount": 677.1410000000001
+  },
+  "performance_metrics": {
+    "expected_win_rate": 60.55,
+    "expected_profit_factor": 7.53,
+    "expected_risk_adjusted_return": 8.21
+  }
+}

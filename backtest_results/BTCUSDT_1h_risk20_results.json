@@ -1,0 +1,16 @@
+{
+    "symbol": "BTCUSDT",
+    "timeframe": "1h",
+    "risk_level": 20.0,
+    "start_date": "2024-09-10",
+    "end_date": "2025-03-09",
+    "total_trades": 144,
+    "winning_trades": 79,
+    "losing_trades": 65,
+    "win_rate": 55.30212476559714,
+    "profit_pct": 177.00134147149186,
+    "max_drawdown_pct": 35.86609452841974,
+    "profit_factor": 4.847873344897077,
+    "risk_adjusted_return": 4.935060362684283,
+    "sharpe_ratio": 6.528471212377418
+}

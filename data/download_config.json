@@ -1,0 +1,28 @@
+{
+  "symbols": [
+    "BTC/USDT",
+    "ETH/USDT",
+    "BNB/USDT",
+    "SOL/USDT",
+    "LINK/USDT",
+    "DOGE/USDT",
+    "ADA/USDT",
+    "MATIC/USDT",
+    "LTC/USDT",
+    "DOT/USDT",
+    "AVAX/USDT",
+    "ATOM/USDT",
+    "UNI/USDT"
+  ],
+  "timeframes": [
+    "1d",
+    "4h",
+    "1h"
+  ],
+  "start_date": "2024-01-01",
+  "end_date": "2024-03-08",
+  "testnet": false,
+  "output_dir": "data",
+  "synthetic": true,
+  "download_time": "2025-03-09 15:05:07"
+}

@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+    "update_date": "2025-03-09",
+    "description": "Phiên bản đầu tiên của Hệ thống Giao dịch Tiền điện tử Tự động",
+    "changes": [
+        "Tính năng phân tích thị trường đa cặp tiền",
+        "Quản lý rủi ro động dựa trên quy mô tài khoản",
+        "Trailing Stop song song cho nhiều vị thế",
+        "Thông báo Telegram chi tiết và tùy chỉnh",
+        "Giao diện quản lý trực quan và dễ sử dụng"
+    ],
+    "author": "Your Name",
+    "minimum_requirements": {
+        "os": "Windows 10/11, macOS 10.14+, Ubuntu 18.04+",
+        "ram": "4GB",
+        "disk": "500MB",
+        "python": "3.8+"
+    }
+}

@@ -1,0 +1,38 @@
+{
+  "account": {
+    "balance": 13542.82,
+    "type": "xlarge",
+    "created_at": "2025-03-09 14:34:54"
+  },
+  "risk_management": {
+    "risk_level": 30.0,
+    "max_position_size": 0.3,
+    "max_open_positions": 8,
+    "max_daily_trades": 15,
+    "stop_loss_pct": 10.0,
+    "take_profit_pct": 30.0,
+    "risk_per_trade": 4062.8459999999995
+  },
+  "trading_preferences": {
+    "preferred_coins": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "SOLUSDT",
+      "ADAUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "AVAXUSDT"
+    ],
+    "preferred_timeframes": [
+      "1h",
+      "15m",
+      "5m"
+    ],
+    "leverage": 5
+  },
+  "position_sizing": {
+    "max_position_amount": 4062.8459999999995,
+    "min_position_amount": 677.1410000000001
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "test_timeframes": [
+    {
+      "name": "London Open",
+      "start_hour": 15,
+      "start_minute": 0,
+      "end_hour": 17,
+      "end_minute": 0,
+      "direction": "short"
+    },
+    {
+      "name": "New York Open",
+      "start_hour": 20,
+      "start_minute": 30,
+      "end_hour": 22,
+      "end_minute": 30,
+      "direction": "short"
+    },
+    {
+      "name": "Daily Candle Close",
+      "start_hour": 6,
+      "start_minute": 30,
+      "end_hour": 7,
+      "end_minute": 30,
+      "direction": "long"
+    },
+    {
+      "name": "Major News Events",
+      "start_hour": 21,
+      "start_minute": 30,
+      "end_hour": 22,
+      "end_minute": 0,
+      "direction": "short"
+    }
+  ],
+  "test_symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "DOGEUSDT"
+  ],
+  "test_indicators": [
+    {
+      "name": "RSI",
+      "condition": "> 70",
+      "timeframe": "1h",
+      "for_direction": "short"
+    },
+    {
+      "name": "RSI",
+      "condition": "< 30",
+      "timeframe": "1h",
+      "for_direction": "long"
+    },
+    {
+      "name": "MACD",
+      "condition": "signal_cross_down",
+      "timeframe": "1h",
+      "for_direction": "short"
+    },
+    {
+      "name": "MACD",
+      "condition": "signal_cross_up",
+      "timeframe": "1h",
+      "for_direction": "long"
+    },
+    {
+      "name": "Price vs EMA",
+      "condition": "> 1%",
+      "timeframe": "1h",
+      "for_direction": "short"
+    },
+    {
+      "name": "Price vs EMA",
+      "condition": "< -1%",
+      "timeframe": "1h",
+      "for_direction": "long"
+    }
+  ],
+  "test_settings": {
+    "days_to_test": 30,
+    "risk_reward_ratio": 3.0,
+    "stop_loss_percent": 7.0,
+    "take_profit_percent": 21.0,
+    "entry_timeout_minutes": 15,
+    "use_trailing_stop": true,
+    "trailing_stop_activation": 10.0,
+    "trailing_stop_callback": 3.0
+  },
+  "created_at": "2025-03-09 15:51:18"
+}

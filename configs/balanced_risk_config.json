@@ -1,0 +1,12 @@
+{
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "start_date": "2024-12-09",
+    "end_date": "2025-03-09",
+    "initial_balance": 100.0,
+    "risk_percentage": 15.0,
+    "max_positions": 3,
+    "use_trailing_stop": true,
+    "use_stop_loss": true,
+    "use_take_profit": true
+}

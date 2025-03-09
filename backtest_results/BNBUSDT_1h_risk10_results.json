@@ -1,0 +1,16 @@
+{
+    "symbol": "BNBUSDT",
+    "timeframe": "1h",
+    "risk_level": 10.0,
+    "start_date": "2024-09-10",
+    "end_date": "2025-03-09",
+    "total_trades": 144,
+    "winning_trades": 70,
+    "losing_trades": 74,
+    "win_rate": 48.984325886322125,
+    "profit_pct": 95.10640869500233,
+    "max_drawdown_pct": 13.489877483762436,
+    "profit_factor": 6.94567713410709,
+    "risk_adjusted_return": 7.0502055196187285,
+    "sharpe_ratio": 9.326545248403033
+}

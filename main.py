@@ -1207,16 +1207,17 @@ def background_tasks():
     startup_file = "bot_start_time.txt"
     current_time = time.time()
     
-    # Kiểm tra nếu đã khởi động trong 5 phút qua thì không gửi lại
+    # Kiểm tra nếu đã khởi động trong 5 phút qua thì không gửi lại thông báo khởi động
+    # Nhưng vẫn gửi các thông báo quan trọng khác
     send_startup_notification = True
     if os.path.exists(startup_file):
         try:
             with open(startup_file, 'r') as f:
                 last_startup_time = float(f.read().strip())
-                # Nếu khởi động trong vòng 5 phút (300 giây), không gửi thông báo mới
+                # Nếu khởi động trong vòng 5 phút (300 giây), không gửi thông báo khởi động mới
                 if current_time - last_startup_time < 300:
                     send_startup_notification = False
-                    logger.info("Bot đã khởi động trong 5 phút qua, bỏ qua thông báo Telegram")
+                    logger.info("Bot đã khởi động trong 5 phút qua, bỏ qua thông báo khởi động")
         except Exception:
             # Nếu có lỗi đọc file, gửi lại thông báo
             pass
@@ -1421,7 +1422,8 @@ def close_position_by_price(position_id, current_price, reason="Manual Close"):
                             f"{profit_emoji} P/L: `{pnl:.2f} USDT ({pnl_percent:.2f}%)`\n"
                             f"⏱️ Thời gian giữ: `{timedelta(seconds=trade['duration'])}`\n"
                             f"📝 Lý do đóng: `{reason}`\n\n"
-                            f"💵 Số dư mới: `{bot_status['balance']:.2f} USDT`"
+                            f"💵 Số dư mới: `{bot_status['balance']:.2f} USDT`\n\n"
+                            f"⏰ Thời gian: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
                         )
                         
                         telegram_notifier.send_message(message)

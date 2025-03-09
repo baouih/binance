@@ -1,0 +1,598 @@
+{
+  "account_balance": 450.0,
+  "created_at": "2025-03-09 14:56:55",
+  "timezone_offset": 7,
+  "total_weekly_entries": 24,
+  "weekly_schedule": {
+    "Thursday": {
+      "win_rate": 56.2,
+      "num_entries": 5,
+      "entries": [
+        {
+          "start_hour": 3,
+          "start_minute": 0,
+          "end_hour": 5,
+          "end_minute": 0,
+          "win_rate_bonus": 2.8,
+          "name": "London/NY Close",
+          "local_start_str": "03:00",
+          "local_end_str": "05:00",
+          "coins": [
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 15,
+          "start_minute": 0,
+          "end_hour": 17,
+          "end_minute": 0,
+          "win_rate_bonus": 3.0,
+          "name": "London Open",
+          "local_start_str": "15:00",
+          "local_end_str": "17:00",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 21,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 0,
+          "win_rate_bonus": 3.2,
+          "name": "Major News Events",
+          "local_start_str": "21:30",
+          "local_end_str": "22:00",
+          "coins": []
+        }
+      ]
+    },
+    "Friday": {
+      "win_rate": 55.1,
+      "num_entries": 5,
+      "entries": [
+        {
+          "start_hour": 3,
+          "start_minute": 0,
+          "end_hour": 5,
+          "end_minute": 0,
+          "win_rate_bonus": 2.8,
+          "name": "London/NY Close",
+          "local_start_str": "03:00",
+          "local_end_str": "05:00",
+          "coins": [
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 15,
+          "start_minute": 0,
+          "end_hour": 17,
+          "end_minute": 0,
+          "win_rate_bonus": 3.0,
+          "name": "London Open",
+          "local_start_str": "15:00",
+          "local_end_str": "17:00",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 21,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 0,
+          "win_rate_bonus": 3.2,
+          "name": "Major News Events",
+          "local_start_str": "21:30",
+          "local_end_str": "22:00",
+          "coins": []
+        }
+      ]
+    },
+    "Wednesday": {
+      "win_rate": 54.5,
+      "num_entries": 4,
+      "entries": [
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 15,
+          "start_minute": 0,
+          "end_hour": 17,
+          "end_minute": 0,
+          "win_rate_bonus": 3.0,
+          "name": "London Open",
+          "local_start_str": "15:00",
+          "local_end_str": "17:00",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 21,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 0,
+          "win_rate_bonus": 3.2,
+          "name": "Major News Events",
+          "local_start_str": "21:30",
+          "local_end_str": "22:00",
+          "coins": [
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            }
+          ]
+        }
+      ]
+    },
+    "Tuesday": {
+      "win_rate": 52.3,
+      "num_entries": 3,
+      "entries": [
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            },
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 21,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 0,
+          "win_rate_bonus": 3.2,
+          "name": "Major News Events",
+          "local_start_str": "21:30",
+          "local_end_str": "22:00",
+          "coins": [
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            }
+          ]
+        }
+      ]
+    },
+    "Monday": {
+      "win_rate": 51.8,
+      "num_entries": 3,
+      "entries": [
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            },
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            }
+          ]
+        },
+        {
+          "start_hour": 21,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 0,
+          "win_rate_bonus": 3.2,
+          "name": "Major News Events",
+          "local_start_str": "21:30",
+          "local_end_str": "22:00",
+          "coins": [
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            }
+          ]
+        }
+      ]
+    },
+    "Saturday": {
+      "win_rate": 49.5,
+      "num_entries": 2,
+      "entries": [
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            },
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            },
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            }
+          ]
+        }
+      ]
+    },
+    "Sunday": {
+      "win_rate": 48.3,
+      "num_entries": 2,
+      "entries": [
+        {
+          "start_hour": 6,
+          "start_minute": 30,
+          "end_hour": 7,
+          "end_minute": 30,
+          "win_rate_bonus": 4.0,
+          "name": "Daily Candle Close",
+          "local_start_str": "06:30",
+          "local_end_str": "07:30",
+          "coins": [
+            {
+              "symbol": "ETHUSDT",
+              "win_rate": 57.5,
+              "best_timeframe": "1d",
+              "best_session": "London Open"
+            },
+            {
+              "symbol": "BNBUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "4h",
+              "best_session": "London/NY Close"
+            },
+            {
+              "symbol": "LINKUSDT",
+              "win_rate": 53.5,
+              "best_timeframe": "1d",
+              "best_session": "Daily Candle Close"
+            }
+          ]
+        },
+        {
+          "start_hour": 20,
+          "start_minute": 30,
+          "end_hour": 22,
+          "end_minute": 30,
+          "win_rate_bonus": 3.5,
+          "name": "New York Open",
+          "local_start_str": "20:30",
+          "local_end_str": "22:30",
+          "coins": [
+            {
+              "symbol": "BTCUSDT",
+              "win_rate": 59.5,
+              "best_timeframe": "1d",
+              "best_session": "New York Open"
+            },
+            {
+              "symbol": "SOLUSDT",
+              "win_rate": 54.5,
+              "best_timeframe": "1d",
+              "best_session": "Asian-European Transition"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "position_sizes": {
+    "BTCUSDT": 19.228007181328543,
+    "ETHUSDT": 18.581687612208256,
+    "BNBUSDT": 17.289048473967686,
+    "SOLUSDT": 17.61220825852783,
+    "LINKUSDT": 17.289048473967686
+  },
+  "successful_patterns": [
+    {
+      "name": "Breakout after Consolidation",
+      "description": "Gi\u00e1 \u0111i ngang trong \u00edt nh\u1ea5t 12h r\u1ed3i b\u1eadt t\u0103ng/gi\u1ea3m m\u1ea1nh v\u1edbi volume l\u1edbn",
+      "win_rate": 67.5,
+      "optimal_timeframe": "4h",
+      "example": "BTC ph\u00e1 v\u1ee1 kho\u1ea3ng gi\u00e1 ngang $55k-$58k sau 2 tu\u1ea7n t\u00edch l\u0169y"
+    },
+    {
+      "name": "Double Bottom/Top",
+      "description": "Gi\u00e1 t\u1ea1o 2 \u0111\u00e1y/\u0111\u1ec9nh g\u1ea7n nhau v\u1edbi volume gi\u1ea3m d\u1ea7n",
+      "win_rate": 64.2,
+      "optimal_timeframe": "1d",
+      "example": "ETH t\u1ea1o 2 \u0111\u00e1y \u1edf $1500 v\u00e0 $1550 v\u1edbi volume gi\u1ea3m d\u1ea7n"
+    },
+    {
+      "name": "Golden Cross",
+      "description": "MA ng\u1eafn c\u1eaft l\u00ean MA d\u00e0i (50 v\u00e0 200)",
+      "win_rate": 62.8,
+      "optimal_timeframe": "1d",
+      "example": "MA50 c\u1eaft l\u00ean MA200 tr\u00ean BTC v\u00e0o th\u00e1ng 4"
+    },
+    {
+      "name": "Support/Resistance Bounce",
+      "description": "Gi\u00e1 ch\u1ea1m v\u00e0 n\u1ea3y t\u1eeb v\u00f9ng h\u1ed7 tr\u1ee3/kh\u00e1ng c\u1ef1 m\u1ea1nh",
+      "win_rate": 60.5,
+      "optimal_timeframe": "4h",
+      "example": "BTC n\u1ea3y t\u1eeb v\u00f9ng $50k (h\u1ed7 tr\u1ee3 t\u00e2m l\u00fd quan tr\u1ecdng)"
+    },
+    {
+      "name": "Oversold/Overbought Reversal",
+      "description": "RSI d\u01b0\u1edbi 30 ho\u1eb7c tr\u00ean 70 v\u00e0 b\u1eaft \u0111\u1ea7u \u0111\u1ea3o chi\u1ec1u",
+      "win_rate": 58.3,
+      "optimal_timeframe": "4h",
+      "example": "RSI BTC xu\u1ed1ng d\u01b0\u1edbi 30 v\u00e0 b\u1eaft \u0111\u1ea7u t\u0103ng tr\u1edf l\u1ea1i"
+    }
+  ],
+  "recommendations": [
+    "Ch\u1ec9 v\u00e0o l\u1ec7nh v\u00e0o th\u1eddi \u0111i\u1ec3m \u0111\u00e3 \u0111\u01b0\u1ee3c x\u00e1c \u0111\u1ecbnh tr\u01b0\u1edbc trong l\u1ecbch tr\u00ecnh",
+    "\u01afu ti\u00ean c\u00e1c m\u1eabu giao d\u1ecbch c\u00f3 t\u1ef7 l\u1ec7 th\u1eafng cao (>60%)",
+    "T\u1eadp trung v\u00e0o khung th\u1eddi gian 1d v\u00e0 4h \u0111\u1ec3 c\u00f3 t\u1ef7 l\u1ec7 th\u1eafng cao nh\u1ea5t",
+    "Tr\u00e1nh giao d\u1ecbch v\u00e0o cu\u1ed1i tu\u1ea7n (th\u1ee9 7, ch\u1ee7 nh\u1eadt) khi th\u1ecb tr\u01b0\u1eddng \u00edt thanh kho\u1ea3n",
+    "N\u1ebfu g\u1eb7p m\u1eabu giao d\u1ecbch c\u00f3 t\u1ef7 l\u1ec7 th\u1eafng th\u1ea5p, gi\u1ea3m k\u00edch th\u01b0\u1edbc l\u1ec7nh xu\u1ed1ng 50%",
+    "\u0110\u1eb7t c\u1ea3nh b\u00e1o gi\u00e1 \u0111\u1ec3 theo d\u00f5i hi\u1ec7u qu\u1ea3 th\u1eddi \u0111i\u1ec3m v\u00e0o l\u1ec7nh \u0111\u00e3 l\u00ean l\u1ecbch"
+  ]
+}
