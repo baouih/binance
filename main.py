@@ -26,6 +26,9 @@ from data_processor import DataProcessor
 # Thêm chiến thuật giao dịch nâng cao
 from strategy_integration import StrategyIntegration
 
+# Thêm hệ thống thông báo tự động
+from auto_market_notifier import get_auto_notifier, start_auto_notifier
+
 # Thêm các route
 from routes import sentiment_route, update_route
 
