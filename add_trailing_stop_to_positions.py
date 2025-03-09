@@ -222,13 +222,14 @@ def add_trailing_stop_to_positions():
             client = binance_api.BinanceAPI()
             
             # Tạo trailing stop
-            trailing_stop_order = client.futures_create_order(
+            trailing_stop_order = client.create_order(
                 symbol=symbol,
                 side="SELL",
                 type="TRAILING_STOP_MARKET",
-                quantity=str(position_amt),
-                activationPrice=str(activation_price),
-                callbackRate=str(callback_rate)
+                quantity=position_amt,
+                activation_price=activation_price,
+                callback_rate=callback_rate,
+                reduce_only=True
             )
             
             if trailing_stop_order:
@@ -319,12 +320,13 @@ def add_3pct_tp_for_positions():
             client = binance_api.BinanceAPI()
             
             # Tạo lệnh TP 3%
-            tp_order = client.futures_create_order(
+            tp_order = client.create_order(
                 symbol=symbol,
                 side="SELL",
                 type="TAKE_PROFIT_MARKET",
-                quantity=str(position_amt/2),  # Chỉ đặt TP cho 50% vị thế
-                stopPrice=str(tp_price)
+                quantity=position_amt/2,  # Chỉ đặt TP cho 50% vị thế
+                stop_price=tp_price,
+                reduce_only=True
             )
             
             if tp_order:

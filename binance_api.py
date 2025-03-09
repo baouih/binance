@@ -576,9 +576,28 @@ class BinanceAPI:
             'side': side,
             'type': type,
         }
-        params.update(kwargs)
         
-        return self._request('POST', 'order', params, signed=True)
+        # Chuyển đổi các tham số từ snake_case sang camelCase cho API Binance
+        param_conversions = {
+            'quantity': 'quantity',
+            'price': 'price',
+            'time_in_force': 'timeInForce',
+            'reduce_only': 'reduceOnly',
+            'stop_price': 'stopPrice',
+            'activation_price': 'activationPrice',
+            'callback_rate': 'callbackRate',
+            'working_type': 'workingType',
+            'close_position': 'closePosition',
+        }
+        
+        for key, value in kwargs.items():
+            if key in param_conversions:
+                params[param_conversions[key]] = value
+            else:
+                params[key] = value
+        
+        logger.info(f"Tạo lệnh {type} cho {symbol} với tham số: {params}")
+        return self._request('POST', 'order', params, signed=True, version='v1')
         
     def test_order(self, symbol: str, side: str, type: str, **kwargs) -> Dict:
         """
@@ -659,8 +678,17 @@ class BinanceAPI:
         params = {}
         if symbol:
             params['symbol'] = symbol
-            
-        return self._request('GET', 'openOrders', params, signed=True)
+        
+        try:
+            # Sử dụng endpoint v1 cho openOrders
+            result = self._request('GET', 'openOrders', params, signed=True, version='v1')
+            if isinstance(result, dict) and result.get('error'):
+                logger.error(f"Lỗi khi lấy open orders với version=v1: {result.get('error')}")
+                return []
+            return result
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy danh sách lệnh đang mở: {str(e)}")
+            return []
         
     def get_all_orders(self, symbol: str, limit: int = 500, 
                      order_id: int = None, start_time: int = None, end_time: int = None) -> List[Dict]:
