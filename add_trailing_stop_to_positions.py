@@ -73,7 +73,7 @@ def get_active_positions():
         client = binance_api.BinanceAPI()
         
         logger.info("Đang lấy vị thế từ Binance API...")
-        positions = client.futures_get_position()
+        positions = client.get_futures_position_risk()
         
         # Lọc các vị thế có số lượng khác 0
         active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
@@ -91,7 +91,7 @@ def get_open_orders():
         client = binance_api.BinanceAPI()
         
         logger.info("Đang lấy lệnh đang mở từ Binance API...")
-        orders = client.futures_get_open_orders()
+        orders = client.get_open_orders()
         
         logger.info(f"Đã lấy {len(orders)} lệnh đang mở")
         return orders
@@ -202,11 +202,15 @@ def add_trailing_stop_to_positions():
         
         # Kiểm tra xem đã có trailing stop chưa
         has_trailing_stop = False
-        for order in open_orders:
-            if order['symbol'] == symbol and order['type'] == 'TRAILING_STOP_MARKET':
-                has_trailing_stop = True
-                logger.info(f"  - Đã có lệnh Trailing Stop cho {symbol}, không cần tạo thêm")
-                break
+        # Đảm bảo open_orders là danh sách và có dữ liệu
+        if isinstance(open_orders, list):
+            for order in open_orders:
+                if isinstance(order, dict) and order.get('symbol') == symbol and order.get('type') == 'TRAILING_STOP_MARKET':
+                    has_trailing_stop = True
+                    logger.info(f"  - Đã có lệnh Trailing Stop cho {symbol}, không cần tạo thêm")
+                    break
+        else:
+            logger.warning(f"  - Không lấy được danh sách lệnh đang mở, tiếp tục tạo Trailing Stop mới cho {symbol}")
         
         if not has_trailing_stop:
             logger.info(f"  - Chưa có Trailing Stop cho {symbol}, tạo mới")
@@ -293,21 +297,26 @@ def add_3pct_tp_for_positions():
         
         # Kiểm tra xem đã có TP 3% chưa
         has_3pct_tp = False
-        for order in open_orders:
-            if (order['symbol'] == symbol and 
-                order['type'] == 'TAKE_PROFIT_MARKET' and 
-                abs(float(order['stopPrice']) - tp_price) < 0.1):
-                has_3pct_tp = True
-                logger.info(f"  - Đã có lệnh TP {tp_percent}% cho {symbol}, không cần tạo thêm")
-                break
+        # Đảm bảo open_orders là danh sách và có dữ liệu
+        if isinstance(open_orders, list):
+            for order in open_orders:
+                if (isinstance(order, dict) and 
+                    order.get('symbol') == symbol and 
+                    order.get('type') == 'TAKE_PROFIT_MARKET' and 
+                    order.get('stopPrice') is not None and 
+                    abs(float(order.get('stopPrice', 0)) - tp_price) < 0.1):
+                    has_3pct_tp = True
+                    logger.info(f"  - Đã có lệnh TP {tp_percent}% cho {symbol}, không cần tạo thêm")
+                    break
+        else:
+            logger.warning(f"  - Không lấy được danh sách lệnh đang mở, tiếp tục tạo TP {tp_percent}% mới cho {symbol}")
         
         if not has_3pct_tp:
             logger.info(f"  - Thêm TP {tp_percent}% cho {symbol} tại giá {tp_price}")
             
-            # Import module binance_api nếu chưa import
-            if not 'binance_api' in locals():
-                import binance_api
-                client = binance_api.BinanceAPI()
+            # Import module binance_api để dùng cho API
+            import binance_api
+            client = binance_api.BinanceAPI()
             
             # Tạo lệnh TP 3%
             tp_order = client.futures_create_order(

@@ -1,75 +1,96 @@
 {
-  "trailing_stop": {
-    "enabled": true,
-    "type": "percentage",
-    "auto_adjust_to_market": true,
-    "config": {
-      "percentage": {
-        "activation_percent": 1.0,
-        "callback_percent": 0.5
-      },
-      "absolute": {
-        "activation_amount": 50.0,
-        "callback_amount": 20.0
-      },
-      "atr": {
-        "atr_multiplier": 2.0,
-        "atr_period": 14
-      },
-      "psar": {
-        "acceleration_factor": 0.02,
-        "acceleration_max": 0.2
-      },
-      "step": {
-        "profit_steps": [1.0, 2.0, 3.0, 5.0, 8.0],
-        "callback_steps": [0.5, 0.8, 1.0, 1.5, 2.0]
-      }
+    "trailing_stop": {
+        "enabled": true,
+        "type": "percentage",
+        "auto_adjust_to_market": true,
+        "config": {
+            "percentage": {
+                "activation_percent": 1.0,
+                "callback_percent": 0.5
+            },
+            "absolute": {
+                "activation_amount": 50.0,
+                "callback_amount": 20.0
+            },
+            "atr": {
+                "atr_multiplier": 2.0,
+                "atr_period": 14
+            },
+            "psar": {
+                "acceleration_factor": 0.02,
+                "acceleration_max": 0.2
+            },
+            "step": {
+                "profit_steps": [
+                    1.0,
+                    2.0,
+                    3.0,
+                    5.0,
+                    8.0
+                ],
+                "callback_steps": [
+                    0.5,
+                    0.8,
+                    1.0,
+                    1.5,
+                    2.0
+                ]
+            }
+        },
+        "market_regime_settings": {
+            "trending": {
+                "type": "percentage",
+                "config": {
+                    "activation_percent": 0.8,
+                    "callback_percent": 0.4
+                }
+            },
+            "ranging": {
+                "type": "psar",
+                "config": {
+                    "acceleration_factor": 0.01,
+                    "acceleration_max": 0.15
+                }
+            },
+            "volatile": {
+                "type": "atr",
+                "config": {
+                    "atr_multiplier": 3.0,
+                    "atr_period": 14
+                }
+            },
+            "quiet": {
+                "type": "percentage",
+                "config": {
+                    "activation_percent": 0.5,
+                    "callback_percent": 0.2
+                }
+            }
+        }
     },
-    "market_regime_settings": {
-      "trending": {
-        "type": "percentage",
-        "config": {
-          "activation_percent": 0.8,
-          "callback_percent": 0.4
-        }
-      },
-      "ranging": {
-        "type": "psar",
-        "config": {
-          "acceleration_factor": 0.01,
-          "acceleration_max": 0.15
-        }
-      },
-      "volatile": {
-        "type": "atr",
-        "config": {
-          "atr_multiplier": 3.0,
-          "atr_period": 14
-        }
-      },
-      "quiet": {
-        "type": "percentage",
-        "config": {
-          "activation_percent": 0.5,
-          "callback_percent": 0.2
-        }
-      }
+    "risk_management": {
+        "max_open_positions": 5,
+        "max_position_size_percent": 20.0,
+        "max_daily_drawdown_percent": 5.0,
+        "position_sizing": "dynamic",
+        "use_dynamic_stop_loss": true
+    },
+    "notification": {
+        "position_open": true,
+        "position_close": true,
+        "trailing_stop_activation": true,
+        "trailing_stop_update": true,
+        "stop_loss_hit": true,
+        "take_profit_hit": true,
+        "channels": [
+            "telegram",
+            "email"
+        ]
+    },
+    "integration": {
+        "sync_stop_loss": true,
+        "override_strategy": "most_protective",
+        "notify_conflicts": true,
+        "auto_resolve_conflicts": true
     }
-  },
-  "risk_management": {
-    "max_open_positions": 5,
-    "max_position_size_percent": 20.0,
-    "max_daily_drawdown_percent": 5.0,
-    "position_sizing": "dynamic",
-    "use_dynamic_stop_loss": true
-  },
-  "notification": {
-    "position_open": true,
-    "position_close": true,
-    "trailing_stop_activation": true,
-    "trailing_stop_update": true,
-    "stop_loss_hit": true,
-    "take_profit_hit": true,
-    "channels": ["telegram", "email"]
-  }
 }
