@@ -1,0 +1,15 @@
+{
+    "symbol": "SOLUSDT",
+    "initial_balance": 10000.0,
+    "final_balance": 18304.09356725146,
+    "profit_loss": 8304.09356725146,
+    "profit_pct": 83.0409356725146,
+    "max_drawdown": 0.0,
+    "trades_count": 1,
+    "win_rate": 100.0,
+    "avg_profit": 71.00000000000001,
+    "avg_loss": 0.0,
+    "profit_factor": Infinity,
+    "risk_per_trade": 10.0,
+    "leverage": 20.0
+}

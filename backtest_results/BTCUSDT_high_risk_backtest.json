@@ -1,0 +1,15 @@
+{
+    "symbol": "BTCUSDT",
+    "initial_balance": 10000.0,
+    "final_balance": 13541.878761677262,
+    "profit_loss": 3541.8787616772624,
+    "profit_pct": 35.41878761677262,
+    "max_drawdown": 0.0,
+    "trades_count": 1,
+    "win_rate": 100.0,
+    "avg_profit": 21.520553351071435,
+    "avg_loss": 0.0,
+    "profit_factor": Infinity,
+    "risk_per_trade": 10.0,
+    "leverage": 20.0
+}

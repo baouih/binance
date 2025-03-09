@@ -1,0 +1,7 @@
+{
+  "algorithm": "composite_trading_strategy",
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "risk_level": 7.0,
+  "error": "Any cannot be instantiated"
+}

@@ -1,128 +1,65 @@
 {
-  "use_testnet": true,
-  "timezone_offset": 7,
-  "coins_to_test": [
-    "BTCUSDT",
-    "ETHUSDT"
-  ],
-  "test_period_days": 14,
-  "entry_windows": [
-    {
-      "start_hour": 23,
-      "start_minute": 30,
-      "end_hour": 0,
-      "end_minute": 30,
-      "win_rate_bonus": 4.0,
-      "name": "Daily Candle Close"
+  "symbols": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "LINKUSDT"],
+  "timeframes": ["1h", "4h", "1d"],
+  "risk_levels": [3.0, 5.0, 7.0, 10.0],
+  "test_days": 14,
+  "algorithm_configs": {
+    "market_regime_performance_analyzer": {
+      "weight": 1.2,
+      "preferred_regime": "trending",
+      "use_dynamic_threshold": true
     },
-    {
-      "start_hour": 13,
-      "start_minute": 30,
-      "end_hour": 15,
-      "end_minute": 30,
-      "win_rate_bonus": 3.5,
-      "name": "New York Open"
+    "adaptive_strategy_selector": {
+      "adaptation_speed": 2.0,
+      "learning_rate": 0.05,
+      "use_reinforcement": true
     },
-    {
-      "start_hour": 14,
-      "start_minute": 30,
-      "end_hour": 15,
-      "end_minute": 0,
-      "win_rate_bonus": 3.2,
-      "name": "Major News Events"
+    "adaptive_exit_strategy": {
+      "trailing_activation": 3.0,
+      "partial_tp": [0.3, 0.5, 0.2],
+      "quick_exit_volatility": 1.5
     },
-    {
-      "start_hour": 8,
-      "start_minute": 0,
-      "end_hour": 10,
-      "end_minute": 0,
-      "win_rate_bonus": 3.0,
-      "name": "London Open"
+    "multi_timeframe_analyzer": {
+      "weight_1h": 0.3,
+      "weight_4h": 0.5,
+      "weight_1d": 0.2,
+      "confirmation_threshold": 0.7
     },
-    {
-      "start_hour": 20,
-      "start_minute": 0,
-      "end_hour": 22,
-      "end_minute": 0,
-      "win_rate_bonus": 2.8,
-      "name": "London/NY Close"
+    "time_optimized_strategy": {
+      "entry_windows": [
+        {"name": "London Open", "start_hour": 8, "start_minute": 0, "end_hour": 10, "end_minute": 0, "direction": "short"},
+        {"name": "New York Open", "start_hour": 13, "start_minute": 30, "end_hour": 15, "end_minute": 30, "direction": "short"},
+        {"name": "Daily Close", "start_hour": 23, "start_minute": 30, "end_hour": 0, "end_minute": 30, "direction": "long"}
+      ],
+      "weight": 1.5
     },
-    {
-      "start_hour": 7,
-      "start_minute": 0,
-      "end_hour": 8,
-      "end_minute": 30,
-      "win_rate_bonus": 2.5,
-      "name": "Asian-European Transition"
-    }
-  ],
-  "weekday_win_rates": {
-    "0": 51.8,
-    "1": 52.3,
-    "2": 54.5,
-    "3": 56.2,
-    "4": 55.1,
-    "5": 49.5,
-    "6": 48.3
-  },
-  "max_trades_by_weekday": {
-    "0": 3,
-    "1": 3,
-    "2": 4,
-    "3": 5,
-    "4": 5,
-    "5": 2,
-    "6": 2
-  },
-  "optimal_coins": {
-    "Daily Candle Close": [
-      "SOLUSDT",
-      "LINKUSDT",
-      "ETHUSDT"
-    ],
-    "New York Open": [
-      "BTCUSDT",
-      "ETHUSDT"
-    ],
-    "Major News Events": [
-      "BTCUSDT",
-      "BNBUSDT"
-    ],
-    "London Open": [
-      "ETHUSDT",
-      "LINKUSDT"
-    ],
-    "London/NY Close": [
-      "BNBUSDT",
-      "BTCUSDT"
-    ],
-    "Asian-European Transition": [
-      "SOLUSDT",
-      "BTCUSDT"
-    ]
-  },
-  "risk_levels": {
-    "low": {
-      "leverage": 1,
-      "stop_loss_percent": 3,
-      "take_profit_percent": 9,
-      "position_size_percent": 10,
-      "max_active_positions": 2
+    "liquidity_analyzer": {
+      "min_liquidity": 500000,
+      "volume_threshold": 1.2,
+      "weight": 1.0
     },
-    "medium": {
-      "leverage": 3,
-      "stop_loss_percent": 5,
-      "take_profit_percent": 15,
-      "position_size_percent": 15,
-      "max_active_positions": 3
+    "improved_rsi_strategy": {
+      "overbought": 75,
+      "oversold": 25,
+      "weight": 1.1
     },
-    "high": {
-      "leverage": 5,
-      "stop_loss_percent": 7,
-      "take_profit_percent": 21,
-      "position_size_percent": 20,
-      "max_active_positions": 5
+    "composite_trading_strategy": {
+      "weights": {
+        "rsi": 0.2,
+        "macd": 0.2,
+        "ema_cross": 0.2,
+        "bbands": 0.2,
+        "volume_trend": 0.1,
+        "adx": 0.1
+      }
     }
   },
-  "created_at": "2025-03-09 15:26:30"
+  "backtest_settings": {
+    "initial_balance": 10000.0,
+    "max_positions": 5,
+    "use_trailing_stop": true,
+    "use_dynamic_stop_loss": true,
+    "use_adaptive_position_sizing": true
+  },
+  "created_at": "2025-03-09 16:08:00"
 }

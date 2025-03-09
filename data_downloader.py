@@ -2,339 +2,472 @@
 # -*- coding: utf-8 -*-
 
 """
-Script tải dữ liệu lịch sử từ Binance API
-
-Script này tải dữ liệu lịch sử giá của các coin từ Binance API
-và lưu vào file CSV để sử dụng cho backtest.
+Module tải và lưu trữ dữ liệu lịch sử từ Binance cho ML
 """
 
 import os
 import sys
-import json
 import logging
 import argparse
-import time
-from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
-import ccxt
+from datetime import datetime, timedelta
+import time
+import json
+from typing import Dict, List, Optional, Union, Tuple
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('data_download.log')
+        logging.FileHandler("data_downloader.log"),
+        logging.StreamHandler()
     ]
 )
-
 logger = logging.getLogger('data_downloader')
 
-# Danh sách coin mặc định để tải dữ liệu
-DEFAULT_SYMBOLS = [
-    "BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "LINK/USDT", 
-    "DOGE/USDT", "ADA/USDT", "MATIC/USDT", "LTC/USDT", "DOT/USDT", 
-    "AVAX/USDT", "ATOM/USDT", "UNI/USDT"
-]
-
-# Danh sách khung thời gian để tải dữ liệu
-DEFAULT_TIMEFRAMES = ["1d", "4h", "1h"]
-
-def create_exchange(testnet: bool = False):
-    """
-    Tạo đối tượng exchange
-
-    Args:
-        testnet (bool): Sử dụng testnet hay không
-
-    Returns:
-        ccxt.Exchange: Đối tượng exchange
-    """
-    if testnet:
-        exchange = ccxt.binance({
-            'options': {
-                'defaultType': 'future',
-                'adjustForTimeDifference': True,
-                'test': True
-            }
-        })
-        exchange.urls['api'] = exchange.urls['test']
-    else:
-        exchange = ccxt.binance({
-            'options': {
-                'defaultType': 'future',
-                'adjustForTimeDifference': True
-            }
-        })
-
-    return exchange
-
-def download_historical_data(symbol: str, timeframe: str, start_date: str, end_date: str, 
-                            testnet: bool = False, save_dir: str = "data") -> pd.DataFrame:
-    """
-    Tải dữ liệu lịch sử từ Binance API
-
-    Args:
-        symbol (str): Tên cặp tiền (dạng BTC/USDT)
-        timeframe (str): Khung thời gian (1d, 4h, 1h, ...)
-        start_date (str): Ngày bắt đầu (YYYY-MM-DD)
-        end_date (str): Ngày kết thúc (YYYY-MM-DD)
-        testnet (bool): Sử dụng testnet hay không
-        save_dir (str): Thư mục lưu dữ liệu
-
-    Returns:
-        pd.DataFrame: Dữ liệu lịch sử
-    """
-    # Tạo đối tượng exchange
-    exchange = create_exchange(testnet)
+# Thêm thư mục gốc vào sys.path để import các module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from app.binance_api import BinanceAPI
+except ImportError as e:
+    logger.error(f"Lỗi khi import modules: {str(e)}")
+    # Sử dụng một bản sao của BinanceAPI nếu cần thiết
+    from binance.client import Client
+    import pandas as pd
+    import numpy as np
+    from datetime import datetime, timedelta
+    import time
+    import json
+    import os
     
-    # Chuyển đổi ngày thành timestamp (milliseconds)
-    start_timestamp = int(datetime.strptime(start_date, '%Y-%m-%d').timestamp() * 1000)
-    end_timestamp = int(datetime.strptime(end_date, '%Y-%m-%d').timestamp() * 1000)
+    class BinanceAPI:
+        """
+        Phiên bản đơn giản của BinanceAPI để tải dữ liệu
+        """
+        
+        def __init__(self, simulation_mode=False):
+            """
+            Khởi tạo API với các tham số mặc định
+            """
+            try:
+                # Tìm các biến môi trường
+                api_key = os.environ.get('BINANCE_API_KEY', '')
+                api_secret = os.environ.get('BINANCE_API_SECRET', '')
+                testnet = os.environ.get('BINANCE_TESTNET', 'True').lower() == 'true'
+                
+                # Khởi tạo client
+                self.client = Client(api_key, api_secret, testnet=testnet)
+                logger.info(f"Đã khởi tạo Binance API client, testnet={testnet}")
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi khởi tạo BinanceAPI: {str(e)}")
+        
+        def get_historical_klines(self, symbol, interval, start_str, end_str=None):
+            """
+            Lấy dữ liệu lịch sử từ Binance API
+            """
+            try:
+                klines = self.client.get_historical_klines(
+                    symbol, interval, start_str, end_str
+                )
+                
+                return klines
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy dữ liệu lịch sử: {str(e)}")
+                return []
+        
+        def process_historical_klines(self, klines):
+            """
+            Xử lý dữ liệu nến lịch sử
+            """
+            processed_data = []
+            
+            for kline in klines:
+                processed_kline = {
+                    'open_time': kline[0],
+                    'open': float(kline[1]),
+                    'high': float(kline[2]),
+                    'low': float(kline[3]),
+                    'close': float(kline[4]),
+                    'volume': float(kline[5]),
+                    'close_time': kline[6],
+                    'quote_asset_volume': float(kline[7]),
+                    'number_of_trades': int(kline[8]),
+                    'taker_buy_base_asset_volume': float(kline[9]),
+                    'taker_buy_quote_asset_volume': float(kline[10])
+                }
+                processed_data.append(processed_kline)
+            
+            # Chuyển đổi thành DataFrame
+            if processed_data:
+                df = pd.DataFrame(processed_data)
+                df['datetime'] = pd.to_datetime(df['open_time'], unit='ms')
+                df.set_index('datetime', inplace=True)
+                return df
+            else:
+                return pd.DataFrame()
+
+class DataDownloader:
+    """
+    Lớp tải và lưu trữ dữ liệu lịch sử từ Binance
+    """
     
-    logger.info(f"Đang tải dữ liệu cho {symbol} - {timeframe} từ {start_date} đến {end_date}")
-    
-    # Binance có giới hạn 1000 candles mỗi lần, nên phải chia nhỏ
-    all_candles = []
-    current_timestamp = start_timestamp
-    
-    while current_timestamp < end_timestamp:
+    def __init__(self, use_testnet=True):
+        """
+        Khởi tạo downloader
+        
+        Args:
+            use_testnet: Sử dụng testnet hay không
+        """
         try:
-            # Tải dữ liệu
-            candles = exchange.fetch_ohlcv(
+            # Thử sử dụng BinanceAPI nếu có
+            from app.binance_api import BinanceAPI
+            self.api = BinanceAPI(simulation_mode=False)
+            logger.info("Sử dụng BinanceAPI từ app")
+            
+            # Khởi tạo client Binance trực tiếp
+            import os
+            from binance.client import Client
+            
+            # Tìm các biến môi trường
+            api_key = os.environ.get('BINANCE_API_KEY', '')
+            api_secret = os.environ.get('BINANCE_API_SECRET', '')
+            
+            if use_testnet:
+                api_key = os.environ.get('BINANCE_TESTNET_API_KEY', '')
+                api_secret = os.environ.get('BINANCE_TESTNET_API_SECRET', '')
+            
+            self.client = Client(api_key, api_secret, testnet=use_testnet)
+            logger.info(f"Đã khởi tạo Binance Client, testnet={use_testnet}")
+            
+        except ImportError:
+            # Khởi tạo client Binance trực tiếp
+            import os
+            from binance.client import Client
+            
+            # Tìm các biến môi trường
+            api_key = os.environ.get('BINANCE_API_KEY', '')
+            api_secret = os.environ.get('BINANCE_API_SECRET', '')
+            
+            if use_testnet:
+                api_key = os.environ.get('BINANCE_TESTNET_API_KEY', '')
+                api_secret = os.environ.get('BINANCE_TESTNET_API_SECRET', '')
+            
+            self.client = Client(api_key, api_secret, testnet=use_testnet)
+            logger.info(f"Đã khởi tạo Binance Client, testnet={use_testnet}")
+            
+        self.data_dir = "real_data"
+        
+        # Tạo thư mục lưu trữ nếu chưa tồn tại
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Danh sách khung thời gian được hỗ trợ
+        self.supported_intervals = {
+            "1m": {"binance": "1m", "minutes": 1},
+            "5m": {"binance": "5m", "minutes": 5},
+            "15m": {"binance": "15m", "minutes": 15},
+            "30m": {"binance": "30m", "minutes": 30},
+            "1h": {"binance": "1h", "minutes": 60},
+            "2h": {"binance": "2h", "minutes": 120},
+            "4h": {"binance": "4h", "minutes": 240},
+            "6h": {"binance": "6h", "minutes": 360},
+            "8h": {"binance": "8h", "minutes": 480},
+            "12h": {"binance": "12h", "minutes": 720},
+            "1d": {"binance": "1d", "minutes": 1440},
+            "3d": {"binance": "3d", "minutes": 4320},
+            "1w": {"binance": "1w", "minutes": 10080},
+            "1M": {"binance": "1M", "minutes": 43200}
+        }
+        
+        logger.info(f"Khởi tạo DataDownloader, testnet={use_testnet}")
+    
+    def download_historical_data(self, symbol: str, interval: str, 
+                               lookback_days: int = 90,
+                               end_date: Optional[datetime] = None) -> Optional[pd.DataFrame]:
+        """
+        Tải dữ liệu lịch sử từ Binance
+        
+        Args:
+            symbol: Mã tiền
+            interval: Khung thời gian
+            lookback_days: Số ngày lịch sử
+            end_date: Ngày kết thúc (mặc định: hiện tại)
+            
+        Returns:
+            DataFrame chứa dữ liệu lịch sử hoặc None nếu thất bại
+        """
+        try:
+            # Kiểm tra khung thời gian
+            if interval not in self.supported_intervals:
+                logger.error(f"Khung thời gian không hợp lệ: {interval}")
+                return None
+            
+            # Chuẩn bị tham số
+            if end_date is None:
+                end_date = datetime.now()
+                
+            start_date = end_date - timedelta(days=lookback_days)
+            
+            # Chuyển đổi định dạng timestamp cho Binance
+            start_timestamp = int(start_date.timestamp() * 1000)
+            end_timestamp = int(end_date.timestamp() * 1000)
+            
+            # Chuyển đổi định dạng ngày (cho log)
+            start_str = start_date.strftime("%d %b, %Y")
+            end_str = end_date.strftime("%d %b, %Y")
+            
+            logger.info(f"Tải dữ liệu lịch sử cho {symbol} {interval} từ {start_str} đến {end_str}")
+            
+            # Tải dữ liệu sử dụng Binance Client
+            binance_interval = self.supported_intervals[interval]["binance"]
+            
+            # Sử dụng client binance để tải dữ liệu
+            klines = self.client.futures_klines(
                 symbol=symbol,
-                timeframe=timeframe,
-                since=current_timestamp,
+                interval=binance_interval,
+                startTime=start_timestamp,
+                endTime=end_timestamp,
                 limit=1000
             )
             
-            if not candles:
-                logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe} từ {datetime.fromtimestamp(current_timestamp/1000)}")
-                break
+            if not klines:
+                logger.error(f"Không thể tải dữ liệu cho {symbol} {interval}")
+                return None
             
-            all_candles.extend(candles)
+            # Xử lý dữ liệu sang DataFrame
+            df = pd.DataFrame(klines, columns=[
+                'timestamp', 'open', 'high', 'low', 'close', 'volume',
+                'close_time', 'quote_asset_volume', 'number_of_trades',
+                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+            ])
             
-            # Cập nhật timestamp cho lần lấy dữ liệu tiếp theo
-            current_timestamp = candles[-1][0] + 1
+            # Chuyển đổi kiểu dữ liệu
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+            df['open'] = pd.to_numeric(df['open'])
+            df['high'] = pd.to_numeric(df['high'])
+            df['low'] = pd.to_numeric(df['low'])
+            df['close'] = pd.to_numeric(df['close'])
+            df['volume'] = pd.to_numeric(df['volume'])
             
-            # Thêm khoảng dừng để tránh rate limit
-            time.sleep(0.5)
+            # Đặt timestamp làm index
+            df.set_index('timestamp', inplace=True)
             
-            logger.info(f"Đã tải {len(candles)} nến, tổng cộng {len(all_candles)} nến")
+            # Sắp xếp dữ liệu theo thời gian tăng dần
+            df.sort_index(inplace=True)
             
-            # Nếu đã đến ngày kết thúc, dừng lại
-            if current_timestamp >= end_timestamp:
-                break
-        
+            if df.empty:
+                logger.error(f"Dữ liệu trống cho {symbol} {interval}")
+                return None
+            
+            logger.info(f"Đã tải {len(df)} nến cho {symbol} {interval}")
+            
+            return df
+            
         except Exception as e:
-            logger.error(f"Lỗi khi tải dữ liệu cho {symbol} - {timeframe}: {e}")
-            # Thử lại sau 3 giây
-            time.sleep(3)
+            logger.error(f"Lỗi khi tải dữ liệu lịch sử: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
     
-    if not all_candles:
-        logger.error(f"Không tải được dữ liệu cho {symbol} - {timeframe}")
-        return None
-    
-    # Chuyển đổi sang DataFrame
-    df = pd.DataFrame(all_candles, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-    
-    # Chuyển đổi timestamp thành datetime
-    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-    
-    # Loại bỏ các hàng trùng lặp
-    df = df.drop_duplicates(subset=['timestamp'])
-    
-    # Sắp xếp theo timestamp
-    df = df.sort_values('timestamp')
-    
-    # Loại bỏ dữ liệu ngoài phạm vi
-    df = df[(df['timestamp'] >= pd.to_datetime(start_date)) & 
-            (df['timestamp'] <= pd.to_datetime(end_date))]
-    
-    # Tạo thư mục lưu dữ liệu
-    tf_dir = f"{save_dir}/{timeframe}"
-    os.makedirs(tf_dir, exist_ok=True)
-    
-    # Lưu vào file CSV
-    symbol_name = symbol.replace("/", "")
-    file_path = f"{tf_dir}/{symbol_name}_{timeframe}.csv"
-    df.to_csv(file_path, index=False)
-    
-    logger.info(f"Đã lưu dữ liệu vào {file_path}, tổng cộng {len(df)} nến")
-    
-    return df
-
-def download_multiple_symbols(symbols: list, timeframes: list, start_date: str, end_date: str,
-                            testnet: bool = False, save_dir: str = "data"):
-    """
-    Tải dữ liệu lịch sử cho nhiều coin và khung thời gian
-
-    Args:
-        symbols (list): Danh sách cặp tiền
-        timeframes (list): Danh sách khung thời gian
-        start_date (str): Ngày bắt đầu (YYYY-MM-DD)
-        end_date (str): Ngày kết thúc (YYYY-MM-DD)
-        testnet (bool): Sử dụng testnet hay không
-        save_dir (str): Thư mục lưu dữ liệu
-    """
-    for symbol in symbols:
-        for timeframe in timeframes:
-            try:
-                download_historical_data(
-                    symbol=symbol,
-                    timeframe=timeframe,
-                    start_date=start_date,
-                    end_date=end_date,
-                    testnet=testnet,
-                    save_dir=save_dir
-                )
-                
-                # Tạm dừng để tránh rate limit
-                time.sleep(1)
-            
-            except Exception as e:
-                logger.error(f"Lỗi khi tải dữ liệu cho {symbol} - {timeframe}: {e}")
-
-def generate_synthetic_data(symbols: list, timeframes: list, start_date: str, end_date: str,
-                         save_dir: str = "data"):
-    """
-    Tạo dữ liệu giả cho các coin và khung thời gian.
-    Hàm này được sử dụng khi không thể kết nối tới API Binance.
-
-    Args:
-        symbols (list): Danh sách cặp tiền
-        timeframes (list): Danh sách khung thời gian
-        start_date (str): Ngày bắt đầu (YYYY-MM-DD)
-        end_date (str): Ngày kết thúc (YYYY-MM-DD)
-        save_dir (str): Thư mục lưu dữ liệu
-    """
-    # Tạo các thư mục cần thiết
-    for timeframe in timeframes:
-        tf_dir = f"{save_dir}/{timeframe}"
-        os.makedirs(tf_dir, exist_ok=True)
-    
-    # Tạo dữ liệu giả cho mỗi coin và khung thời gian
-    for symbol in symbols:
-        symbol_name = symbol.replace("/", "")
+    def save_historical_data(self, df: pd.DataFrame, symbol: str, interval: str) -> str:
+        """
+        Lưu dữ liệu lịch sử vào file
         
-        # Tạo giá ban đầu khác nhau cho mỗi coin
-        if "BTC" in symbol:
-            base_price = 50000.0
-        elif "ETH" in symbol:
-            base_price = 2000.0
-        elif "BNB" in symbol:
-            base_price = 500.0
-        elif "SOL" in symbol:
-            base_price = 150.0
-        else:
-            base_price = np.random.uniform(10.0, 100.0)
-        
-        for timeframe in timeframes:
-            # Tạo các mốc thời gian dựa vào khung thời gian
-            start_dt = datetime.strptime(start_date, '%Y-%m-%d')
-            end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+        Args:
+            df: DataFrame chứa dữ liệu
+            symbol: Mã tiền
+            interval: Khung thời gian
             
-            if timeframe == '1d':
-                dates = pd.date_range(start=start_dt, end=end_dt, freq='D')
-            elif timeframe == '4h':
-                dates = pd.date_range(start=start_dt, end=end_dt, freq='4H')
-            elif timeframe == '1h':
-                dates = pd.date_range(start=start_dt, end=end_dt, freq='H')
+        Returns:
+            Đường dẫn đến file đã lưu hoặc chuỗi rỗng nếu thất bại
+        """
+        try:
+            if df is None or df.empty:
+                logger.error(f"Không có dữ liệu để lưu cho {symbol} {interval}")
+                return ""
+            
+            # Chuẩn bị tên file
+            filename = f"{symbol}_{interval}_historical_data.csv"
+            filepath = os.path.join(self.data_dir, filename)
+            
+            # Lưu dữ liệu
+            df.to_csv(filepath)
+            
+            logger.info(f"Đã lưu dữ liệu lịch sử {symbol} {interval} vào {filepath}")
+            
+            return filepath
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu dữ liệu lịch sử: {str(e)}")
+            return ""
+    
+    def load_historical_data(self, symbol: str, interval: str) -> Optional[pd.DataFrame]:
+        """
+        Tải dữ liệu lịch sử từ file
+        
+        Args:
+            symbol: Mã tiền
+            interval: Khung thời gian
+            
+        Returns:
+            DataFrame chứa dữ liệu lịch sử hoặc None nếu thất bại
+        """
+        try:
+            # Chuẩn bị tên file
+            filename = f"{symbol}_{interval}_historical_data.csv"
+            filepath = os.path.join(self.data_dir, filename)
+            
+            # Kiểm tra file tồn tại
+            if not os.path.exists(filepath):
+                logger.error(f"Không tìm thấy file dữ liệu {filepath}")
+                return None
+            
+            # Tải dữ liệu
+            df = pd.read_csv(filepath, index_col=0, parse_dates=True)
+            
+            if df.empty:
+                logger.error(f"Dữ liệu trống trong file {filepath}")
+                return None
+            
+            logger.info(f"Đã tải {len(df)} nến từ {filepath}")
+            
+            return df
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi tải dữ liệu lịch sử từ file: {str(e)}")
+            return None
+    
+    def get_historical_data(self, symbol: str, interval: str, 
+                         lookback_days: int = 90,
+                         force_download: bool = False) -> Optional[pd.DataFrame]:
+        """
+        Lấy dữ liệu lịch sử (từ file nếu có, nếu không thì tải mới)
+        
+        Args:
+            symbol: Mã tiền
+            interval: Khung thời gian
+            lookback_days: Số ngày lịch sử
+            force_download: Bắt buộc tải lại dữ liệu
+            
+        Returns:
+            DataFrame chứa dữ liệu lịch sử hoặc None nếu thất bại
+        """
+        # Chuẩn bị tên file
+        filename = f"{symbol}_{interval}_historical_data.csv"
+        filepath = os.path.join(self.data_dir, filename)
+        
+        # Kiểm tra xem có nên tải lại dữ liệu không
+        should_download = force_download or not os.path.exists(filepath)
+        
+        if not should_download:
+            # Kiểm tra thời gian cập nhật của file
+            file_time = datetime.fromtimestamp(os.path.getmtime(filepath))
+            now = datetime.now()
+            
+            # Nếu file quá cũ, tải lại
+            if (now - file_time).total_seconds() > 86400:  # 24 giờ
+                should_download = True
+        
+        if should_download:
+            # Tải và lưu dữ liệu mới
+            df = self.download_historical_data(symbol, interval, lookback_days)
+            if df is not None:
+                self.save_historical_data(df, symbol, interval)
+                return df
             else:
-                continue
+                # Nếu tải thất bại nhưng file tồn tại, sử dụng file
+                if os.path.exists(filepath):
+                    logger.warning(f"Tải dữ liệu thất bại, sử dụng dữ liệu từ file {filepath}")
+                    return self.load_historical_data(symbol, interval)
+                else:
+                    return None
+        else:
+            # Sử dụng dữ liệu từ file
+            return self.load_historical_data(symbol, interval)
+    
+    def download_all_data(self, symbols: List[str], intervals: List[str], 
+                       lookback_days: int = 90) -> Dict[str, Dict[str, str]]:
+        """
+        Tải dữ liệu cho nhiều coin và khung thời gian
+        
+        Args:
+            symbols: Danh sách coin
+            intervals: Danh sách khung thời gian
+            lookback_days: Số ngày lịch sử
             
-            # Tạo DataFrame
-            df = pd.DataFrame(index=dates, columns=['open', 'high', 'low', 'close', 'volume'])
+        Returns:
+            Dict chứa kết quả tải dữ liệu
+        """
+        results = {}
+        
+        for symbol in symbols:
+            symbol_results = {}
             
-            # Tạo dữ liệu giá giả
-            price = base_price
-            for i in range(len(df)):
-                # Tạo biến động giá theo mô hình random walk
-                daily_return = np.random.normal(0, 0.02)  # 2% độ lệch chuẩn
-                price *= (1 + daily_return)
-                
-                # Tạo giá open, high, low, close
-                daily_open = price * (1 + np.random.uniform(-0.005, 0.005))
-                daily_high = max(daily_open, price) * (1 + np.random.uniform(0, 0.01))
-                daily_low = min(daily_open, price) * (1 - np.random.uniform(0, 0.01))
-                daily_close = price * (1 + np.random.uniform(-0.005, 0.005))
-                
-                # Tạo volume
-                daily_volume = np.random.randint(10000, 100000)
-                
-                # Cập nhật DataFrame
-                df.iloc[i, 0] = daily_open
-                df.iloc[i, 1] = daily_high
-                df.iloc[i, 2] = daily_low
-                df.iloc[i, 3] = daily_close
-                df.iloc[i, 4] = daily_volume
+            for interval in intervals:
+                try:
+                    logger.info(f"Tải dữ liệu cho {symbol} {interval}")
+                    
+                    df = self.download_historical_data(symbol, interval, lookback_days)
+                    
+                    if df is not None:
+                        filepath = self.save_historical_data(df, symbol, interval)
+                        symbol_results[interval] = filepath
+                    else:
+                        symbol_results[interval] = ""
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi tải dữ liệu cho {symbol} {interval}: {str(e)}")
+                    symbol_results[interval] = "error"
             
-            # Reset index để timestamp thành cột
-            df.reset_index(inplace=True)
-            df.rename(columns={'index': 'timestamp'}, inplace=True)
-            
-            # Lưu vào file CSV
-            file_path = f"{save_dir}/{timeframe}/{symbol_name}_{timeframe}.csv"
-            df.to_csv(file_path, index=False)
-            
-            logger.info(f"Đã tạo dữ liệu giả cho {symbol} - {timeframe}, tổng cộng {len(df)} nến")
+            results[symbol] = symbol_results
+        
+        return results
 
 def main():
     """Hàm chính"""
-    parser = argparse.ArgumentParser(description='Tải dữ liệu lịch sử từ Binance API')
-    parser.add_argument('--symbols', type=str, nargs='+', default=DEFAULT_SYMBOLS, help='Danh sách cặp tiền')
-    parser.add_argument('--timeframes', type=str, nargs='+', default=DEFAULT_TIMEFRAMES, help='Danh sách khung thời gian')
-    parser.add_argument('--start', type=str, default='2023-01-01', help='Ngày bắt đầu (YYYY-MM-DD)')
-    parser.add_argument('--end', type=str, default='2023-12-31', help='Ngày kết thúc (YYYY-MM-DD)')
-    parser.add_argument('--testnet', action='store_true', help='Sử dụng testnet')
-    parser.add_argument('--output', type=str, default='data', help='Thư mục lưu dữ liệu')
-    parser.add_argument('--synthetic', action='store_true', help='Tạo dữ liệu giả (không kết nối API)')
+    parser = argparse.ArgumentParser(description='Tải dữ liệu lịch sử từ Binance')
+    parser.add_argument('--symbols', type=str, nargs='+', 
+                      default=["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT"],
+                      help='Danh sách coin (mặc định: BTC, ETH, BNB, SOL, ADA)')
+    parser.add_argument('--intervals', type=str, nargs='+', 
+                      default=["1h", "4h"],
+                      help='Danh sách khung thời gian (mặc định: 1h, 4h)')
+    parser.add_argument('--lookback', type=int, default=90, 
+                      help='Số ngày lịch sử (mặc định: 90)')
+    parser.add_argument('--force', action='store_true', 
+                      help='Bắt buộc tải lại dữ liệu (mặc định: False)')
+    
     args = parser.parse_args()
     
-    # Tạo thư mục lưu dữ liệu
-    os.makedirs(args.output, exist_ok=True)
+    downloader = DataDownloader()
     
-    # Lưu cấu hình
-    config = {
-        "symbols": args.symbols,
-        "timeframes": args.timeframes,
-        "start_date": args.start,
-        "end_date": args.end,
-        "testnet": args.testnet,
-        "output_dir": args.output,
-        "synthetic": args.synthetic,
-        "download_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    
-    with open(f"{args.output}/download_config.json", 'w') as f:
-        json.dump(config, f, indent=2)
-    
-    if args.synthetic:
-        logger.info("Đang tạo dữ liệu giả (không kết nối API Binance)")
-        generate_synthetic_data(
-            symbols=args.symbols,
-            timeframes=args.timeframes,
-            start_date=args.start,
-            end_date=args.end,
-            save_dir=args.output
-        )
+    if args.force:
+        results = downloader.download_all_data(args.symbols, args.intervals, args.lookback)
     else:
-        logger.info("Đang tải dữ liệu từ Binance API")
-        download_multiple_symbols(
-            symbols=args.symbols,
-            timeframes=args.timeframes,
-            start_date=args.start,
-            end_date=args.end,
-            testnet=args.testnet,
-            save_dir=args.output
-        )
+        results = {}
+        for symbol in args.symbols:
+            symbol_results = {}
+            
+            for interval in args.intervals:
+                df = downloader.get_historical_data(
+                    symbol, interval, args.lookback, args.force
+                )
+                
+                if df is not None:
+                    filepath = os.path.join(
+                        downloader.data_dir, 
+                        f"{symbol}_{interval}_historical_data.csv"
+                    )
+                    symbol_results[interval] = filepath
+                else:
+                    symbol_results[interval] = ""
+            
+            results[symbol] = symbol_results
     
-    logger.info(f"Hoàn tất quá trình tải dữ liệu. Dữ liệu được lưu trong thư mục: {args.output}")
-    print(f"\nHoàn tất quá trình tải dữ liệu!")
-    print(f"Dữ liệu được lưu trong thư mục: {args.output}")
-    print(f"Đã tải dữ liệu cho {len(args.symbols)} coin và {len(args.timeframes)} khung thời gian")
-    print(f"Giai đoạn: {args.start} đến {args.end}")
+    # In kết quả
+    print(json.dumps(results, indent=2))
 
 if __name__ == "__main__":
     main()

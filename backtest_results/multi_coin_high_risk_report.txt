@@ -1,0 +1,17 @@
+===== BÁO CÁO TỔNG HỢP BACKTEST CHIẾN LƯỢC RỦI RO CAO =====
+
+Ngày thực hiện: 2025-03-09 17:00:51
+Số ngày backtest: 30
+Khung thời gian: 1h
+Rủi ro mỗi lệnh: 10.0%
+Đòn bẩy: 20x
+
+XẾP HẠNG HIỆU SUẤT COINS:
+1. ETHUSDT: 64.89%, DD: 0.00%, Số lệnh: 1, Win rate: 100.00%, PF: inf
+2. BTCUSDT: 35.42%, DD: 0.00%, Số lệnh: 1, Win rate: 100.00%, PF: inf
+
+HIỆU SUẤT TRUNG BÌNH:
+Lợi nhuận: 50.16%
+Drawdown: 0.00%
+Win rate: 100.00%
+Profit Factor: inf

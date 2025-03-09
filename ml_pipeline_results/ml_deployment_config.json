@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-03-09T17:40:00.000000",
+  "qualified_models": {
+    "BTCUSDT_1h": {
+      "model_name": "BTCUSDT_1h_3m_target3d_random_forest",
+      "profit_pct": 35.42,
+      "win_rate": 100.0,
+      "profit_factor": 999.99
+    },
+    "ETHUSDT_1h": {
+      "model_name": "ETHUSDT_1h_3m_target3d_random_forest",
+      "profit_pct": 64.89,
+      "win_rate": 100.0,
+      "profit_factor": 999.99
+    }
+  },
+  "trading_configs": {
+    "BTCUSDT_1h": {
+      "symbol": "BTCUSDT",
+      "interval": "1h",
+      "model_name": "BTCUSDT_1h_3m_target3d_random_forest",
+      "use_integration": true,
+      "risk_pct": 10,
+      "leverage": 20
+    },
+    "ETHUSDT_1h": {
+      "symbol": "ETHUSDT",
+      "interval": "1h",
+      "model_name": "ETHUSDT_1h_3m_target3d_random_forest",
+      "use_integration": true,
+      "risk_pct": 10,
+      "leverage": 20
+    }
+  },
+  "ml_integration_enabled": true,
+  "thresholds": {
+    "profit_pct": 20.0,
+    "win_rate": 60.0
+  }
+}

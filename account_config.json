@@ -17,15 +17,15 @@
         "LTCUSDT", "UNIUSDT", "ATOMUSDT"
     ],
     "timeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
-    "leverage": 5,
-    "max_open_positions": 3,
-    "position_size_limit": 500,
+    "leverage": 20,
+    "max_open_positions": 10,
+    "position_size_limit": 800,
     "order_types": ["MARKET", "LIMIT", "STOP", "TAKE_PROFIT"],
-    "risk_per_trade": 1.0,
+    "risk_per_trade": 10.0,
     "capital_allocation": {
-        "BTC": 0.4,
-        "ETH": 0.3,
-        "others": 0.3
+        "BTC": 0.3,
+        "ETH": 0.2,
+        "others": 0.5
     },
     "auto_reduce_leverage": true,
     "enable_trailing_stop": true,

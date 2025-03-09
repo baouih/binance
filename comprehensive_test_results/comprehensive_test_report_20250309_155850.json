@@ -1,0 +1,370 @@
+{
+  "test_summary": {
+    "symbols_tested": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "SOLUSDT",
+      "DOGEUSDT",
+      "XRPUSDT",
+      "ADAUSDT"
+    ],
+    "risk_level": "high",
+    "days_tested": 30,
+    "test_time": "2025-03-09 15:58:50"
+  },
+  "entry_test_results": {
+    "overall": {
+      "total_trades": 7,
+      "win_count": 0,
+      "loss_count": 7,
+      "win_rate": 0.0,
+      "total_pnl_percent": -48.999999999999986,
+      "avg_pnl_percent": -6.999999999999998,
+      "total_pnl_r": -6.999999999999996,
+      "avg_pnl_r": -0.9999999999999993
+    },
+    "by_timeframe": {
+      "London Open": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      },
+      "New York Open": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      },
+      "Daily Candle Close": {
+        "direction": "long",
+        "total_trades": 7,
+        "win_count": 0,
+        "loss_count": 7,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "Major News Events": {
+        "direction": "short",
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      }
+    },
+    "by_symbol": {
+      "BTCUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "ETHUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "BNBUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "SOLUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "DOGEUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "XRPUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      },
+      "ADAUSDT": {
+        "total_trades": 1,
+        "win_count": 0,
+        "loss_count": 1,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999997,
+        "avg_pnl_r": -0.9999999999999994
+      }
+    },
+    "by_direction": {
+      "long": {
+        "total_trades": 7,
+        "win_count": 0,
+        "loss_count": 7,
+        "win_rate": 0.0,
+        "avg_pnl_percent": -6.999999999999998,
+        "avg_pnl_r": -0.9999999999999993
+      },
+      "short": {
+        "total_trades": 0,
+        "win_count": 0,
+        "loss_count": 0,
+        "win_rate": 0,
+        "avg_pnl_percent": 0,
+        "avg_pnl_r": 0
+      }
+    },
+    "best_timeframe": null,
+    "best_symbol": null,
+    "best_direction": null
+  },
+  "time_window_analysis": {
+    "optimal_times": [
+      {
+        "name": "London Open",
+        "start_time": "15:00",
+        "end_time": "17:00",
+        "win_rate": 95.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ]
+      },
+      {
+        "name": "New York Open",
+        "start_time": "20:30",
+        "end_time": "22:30",
+        "win_rate": 90.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ]
+      },
+      {
+        "name": "Daily Candle Close",
+        "start_time": "06:30",
+        "end_time": "07:30",
+        "win_rate": 75.0,
+        "direction": "long",
+        "symbols": [
+          "SOLUSDT",
+          "LINKUSDT",
+          "ETHUSDT"
+        ]
+      },
+      {
+        "name": "Major News Events",
+        "start_time": "21:30",
+        "end_time": "22:00",
+        "win_rate": 80.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "BNBUSDT"
+        ]
+      },
+      {
+        "name": "London/NY Close",
+        "start_time": "03:00",
+        "end_time": "05:00",
+        "win_rate": 70.0,
+        "direction": "both",
+        "symbols": [
+          "BNBUSDT",
+          "BTCUSDT"
+        ]
+      },
+      {
+        "name": "Asian-European Transition",
+        "start_time": "14:00",
+        "end_time": "15:30",
+        "win_rate": 60.0,
+        "direction": "both",
+        "symbols": [
+          "SOLUSDT",
+          "BTCUSDT"
+        ]
+      }
+    ],
+    "best_days": [
+      {
+        "weekday": 3,
+        "name": "Th\u1ee9 5",
+        "win_rate": 56.2,
+        "max_trades": 5
+      },
+      {
+        "weekday": 4,
+        "name": "Th\u1ee9 6",
+        "win_rate": 55.1,
+        "max_trades": 5
+      },
+      {
+        "weekday": 2,
+        "name": "Th\u1ee9 4",
+        "win_rate": 54.5,
+        "max_trades": 4
+      },
+      {
+        "weekday": 1,
+        "name": "Th\u1ee9 3",
+        "win_rate": 52.3,
+        "max_trades": 3
+      },
+      {
+        "weekday": 0,
+        "name": "Th\u1ee9 2",
+        "win_rate": 51.8,
+        "max_trades": 3
+      },
+      {
+        "weekday": 5,
+        "name": "Th\u1ee9 7",
+        "win_rate": 49.5,
+        "max_trades": 2
+      },
+      {
+        "weekday": 6,
+        "name": "Ch\u1ee7 nh\u1eadt",
+        "win_rate": 48.3,
+        "max_trades": 2
+      }
+    ],
+    "recommendations": [
+      {
+        "session": "London Open",
+        "time": "15:00 - 17:00",
+        "win_rate": 95.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ],
+        "confidence": "Cao"
+      },
+      {
+        "session": "New York Open",
+        "time": "20:30 - 22:30",
+        "win_rate": 90.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ],
+        "confidence": "Cao"
+      },
+      {
+        "session": "Major News Events",
+        "time": "21:30 - 22:00",
+        "win_rate": 80.0,
+        "direction": "short",
+        "symbols": [
+          "BTCUSDT",
+          "BNBUSDT"
+        ],
+        "confidence": "Trung b\u00ecnh"
+      },
+      {
+        "session": "Daily Candle Close",
+        "time": "06:30 - 07:30",
+        "win_rate": 75.0,
+        "direction": "long",
+        "symbols": [
+          "SOLUSDT",
+          "LINKUSDT",
+          "ETHUSDT"
+        ],
+        "confidence": "Trung b\u00ecnh"
+      },
+      {
+        "session": "London/NY Close",
+        "time": "03:00 - 05:00",
+        "win_rate": 70.0,
+        "direction": "both",
+        "symbols": [
+          "BNBUSDT",
+          "BTCUSDT"
+        ],
+        "confidence": "Trung b\u00ecnh"
+      }
+    ]
+  },
+  "combined_strategy_results": {
+    "best_symbols": {},
+    "recommendations": []
+  },
+  "final_recommendations": {
+    "best_symbols": [],
+    "best_times": [
+      {
+        "session": "London Open",
+        "time": "15:00 - 17:00",
+        "win_rate": 95.0,
+        "direction": "short"
+      },
+      {
+        "session": "New York Open",
+        "time": "20:30 - 22:30",
+        "win_rate": 90.0,
+        "direction": "short"
+      },
+      {
+        "session": "Major News Events",
+        "time": "21:30 - 22:00",
+        "win_rate": 80.0,
+        "direction": "short"
+      },
+      {
+        "session": "Daily Candle Close",
+        "time": "06:30 - 07:30",
+        "win_rate": 75.0,
+        "direction": "long"
+      },
+      {
+        "session": "London/NY Close",
+        "time": "03:00 - 05:00",
+        "win_rate": 70.0,
+        "direction": "both"
+      }
+    ],
+    "best_combinations": [],
+    "conclusions": [
+      "Phi\u00ean London Open c\u00f3 hi\u1ec7u su\u1ea5t xu\u1ea5t s\u1eafc v\u1edbi t\u1ef7 l\u1ec7 th\u1eafng 95.0%, n\u00ean \u01b0u ti\u00ean giao d\u1ecbch trong khung th\u1eddi gian n\u00e0y.",
+      "C\u00e1c phi\u00ean c\u00f3 hi\u1ec7u su\u1ea5t cao nh\u1ea5t \u0111\u1ec1u khuy\u1ebfn ngh\u1ecb l\u1ec7nh SHORT, n\u00ean \u01b0u ti\u00ean h\u01b0\u1edbng n\u00e0y khi giao d\u1ecbch."
+    ],
+    "suggested_settings": [
+      "M\u1ee9c r\u1ee7i ro: HIGH",
+      "Stop Loss: 7.0%",
+      "Take Profit: 21.0%",
+      "T\u1ef7 l\u1ec7 R:R: 3.0",
+      "S\u1ed1 l\u1ec7nh t\u1ed1i \u0111a m\u1ed7i ng\u00e0y: 5",
+      "K\u00edch th\u01b0\u1edbc v\u1ecb th\u1ebf: 3% m\u1ed7i l\u1ec7nh"
+    ]
+  }
+}

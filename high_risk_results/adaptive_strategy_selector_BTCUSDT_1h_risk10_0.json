@@ -1,0 +1,19 @@
+{
+  "algorithm": "adaptive_strategy_selector",
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "risk_level": 10.0,
+  "initial_balance": 10000.0,
+  "final_balance": 10000.0,
+  "profit": 0.0,
+  "profit_percentage": 0.0,
+  "total_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "win_rate": 0,
+  "avg_win": 0,
+  "avg_loss": 0,
+  "profit_factor": 0,
+  "max_drawdown": 0,
+  "trades": []
+}

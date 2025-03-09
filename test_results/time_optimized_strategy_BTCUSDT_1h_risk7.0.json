@@ -1,0 +1,205 @@
+{
+  "initial_balance": 10000,
+  "final_balance": 10535.37057429185,
+  "total_profit": 535.3705742918501,
+  "profit_percentage": 5.353705742918501,
+  "total_trades": 9,
+  "winning_trades": 6,
+  "losing_trades": 3,
+  "win_rate": 66.66666666666666,
+  "avg_win": 107.3489720843523,
+  "avg_loss": -36.24108607142126,
+  "profit_factor": 5.924158667474638,
+  "max_drawdown": 0.3500000000000085,
+  "trades": [
+    {
+      "entry_time": "2025-02-10 00:51:18.268251",
+      "exit_time": "2025-02-10 05:51:18.268251",
+      "direction": "long",
+      "entry_price": 964.1659847978776,
+      "exit_price": 1108.790882517559,
+      "size": 0.7260160709224193,
+      "profit": 104.9999999999999,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 0h - RSI: 43.06"
+    },
+    {
+      "entry_time": "2025-02-10 23:51:18.268251",
+      "exit_time": "2025-02-11 00:51:18.268251",
+      "direction": "long",
+      "entry_price": 843.5758388288948,
+      "exit_price": 970.112214653229,
+      "size": 0.8385138210951939,
+      "profit": 106.10249999999998,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 44.20"
+    },
+    {
+      "entry_time": "2025-02-14 23:51:18.268251",
+      "exit_time": "2025-02-15 04:51:18.268251",
+      "direction": "long",
+      "entry_price": 933.9678860526552,
+      "exit_price": 887.2694917500224,
+      "size": 0.7653123685236672,
+      "profit": -35.73885875000002,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 43.65"
+    },
+    {
+      "entry_time": "2025-02-15 22:51:18.268251",
+      "exit_time": "2025-02-15 23:51:18.268251",
+      "direction": "long",
+      "entry_price": 847.7640813782109,
+      "exit_price": 974.9286935849425,
+      "size": 0.840181213775362,
+      "profit": 106.84131823312497,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 22h - RSI: 42.99"
+    },
+    {
+      "entry_time": "2025-02-16 23:51:18.268251",
+      "exit_time": "2025-02-17 00:51:18.268251",
+      "direction": "long",
+      "entry_price": 907.5766855731696,
+      "exit_price": 1043.713188409145,
+      "size": 0.7930507235421834,
+      "profit": 107.96315207457282,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 43.10"
+    },
+    {
+      "entry_time": "2025-02-18 23:51:18.268251",
+      "exit_time": "2025-02-19 03:51:18.268251",
+      "direction": "long",
+      "entry_price": 963.047307116664,
+      "exit_price": 914.8949417608308,
+      "size": 0.7552191490847833,
+      "profit": -36.365588390451975,
+      "profit_percentage": -5.000000000000004,
+      "exit_reason": "stop_loss",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 44.12"
+    },
+    {
+      "entry_time": "2025-02-22 01:51:18.268251",
+      "exit_time": "2025-02-22 02:51:18.268251",
+      "direction": "long",
+      "entry_price": 867.754204325643,
+      "exit_price": 997.9173349744893,
+      "size": 0.8352205878218062,
+      "profit": 108.71492649325604,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 1h - RSI: 42.18"
+    },
+    {
+      "entry_time": "2025-02-26 00:51:18.268251",
+      "exit_time": "2025-02-26 03:51:18.268251",
+      "direction": "long",
+      "entry_price": 937.5654610286776,
+      "exit_price": 890.6871879772438,
+      "size": 0.7811467592595476,
+      "profit": -36.61881107381177,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 0h - RSI: 44.68"
+    },
+    {
+      "entry_time": "2025-03-05 01:51:18.268251",
+      "exit_time": "2025-03-05 04:51:18.268251",
+      "direction": "long",
+      "entry_price": 845.1381701136254,
+      "exit_price": 971.9088956306691,
+      "size": 0.863542708765536,
+      "profit": 109.47193570516019,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 1h - RSI: 40.34"
+    }
+  ],
+  "equity_curve": [
+    10000,
+    10105.0,
+    10211.1025,
+    10175.36364125,
+    10282.204959483124,
+    10390.168111557698,
+    10353.802523167245,
+    10462.517449660501,
+    10425.89863858669,
+    10535.37057429185
+  ],
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "strategy": "time_optimized_strategy",
+  "risk_level": 7.0,
+  "signals": [
+    {
+      "timestamp": "2025-02-10 00:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 964.1659847978776,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 0h - RSI: 43.06"
+    },
+    {
+      "timestamp": "2025-02-10 23:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 843.5758388288948,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 44.20"
+    },
+    {
+      "timestamp": "2025-02-14 23:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 933.9678860526552,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 43.65"
+    },
+    {
+      "timestamp": "2025-02-15 22:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 847.7640813782109,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 22h - RSI: 42.99"
+    },
+    {
+      "timestamp": "2025-02-16 23:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 907.5766855731696,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 43.10"
+    },
+    {
+      "timestamp": "2025-02-18 23:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 963.047307116664,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 23h - RSI: 44.12"
+    },
+    {
+      "timestamp": "2025-02-22 01:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 867.754204325643,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 1h - RSI: 42.18"
+    },
+    {
+      "timestamp": "2025-02-26 00:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 937.5654610286776,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 0h - RSI: 44.68"
+    },
+    {
+      "timestamp": "2025-03-05 01:51:18.268251",
+      "type": "entry",
+      "direction": "long",
+      "price": 845.1381701136254,
+      "reason": "T\u00edn hi\u1ec7u LONG t\u1ed1i \u01b0u gi\u1edd: 1h - RSI: 40.34"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "tasks_total": 2,
+  "tasks_completed": 0,
+  "tasks_failed": 2,
+  "started_at": "2025-03-09T17:44:52.329577",
+  "results": {
+    "BTCUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u sau khi x\u1eed l\u00fd"
+    },
+    "ETHUSDT_1h_1m_target3d": {
+      "success": false,
+      "message": "Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u sau khi x\u1eed l\u00fd"
+    }
+  },
+  "completed_at": "2025-03-09T17:44:55.614049",
+  "total_time": 3.284479
+}

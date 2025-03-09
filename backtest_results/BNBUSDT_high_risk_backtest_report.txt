@@ -1,0 +1,21 @@
+===== BÁO CÁO BACKTEST BNBUSDT - CHIẾN LƯỢC RỦI RO CAO =====
+
+Ngày thực hiện: 2025-03-09 16:59:25
+Symbol: BNBUSDT
+Số ngày backtest: 30
+Khung thời gian: 1h
+Rủi ro mỗi lệnh: 10.0%
+Đòn bẩy: 20x
+
+Số dư ban đầu: 10000.0 USDT
+Số dư cuối: 12207.61 USDT
+Lợi nhuận: 2207.61 USDT (22.08%)
+Drawdown tối đa: 0.00%
+Số lệnh: 1
+Tỷ lệ thắng: 100.00%
+Trung bình lãi mỗi lệnh thắng: 12.41%
+Trung bình lỗ mỗi lệnh thua: 0.00%
+Profit Factor: inf
+
+DANH SÁCH GIAO DỊCH:
+1. SHORT 2025-02-09 22:00:00 -> 2025-03-09 16:00:00, Giá vào: 670.09, Giá ra: 596.13, P/L: 12.41%, Kết quả: THUA

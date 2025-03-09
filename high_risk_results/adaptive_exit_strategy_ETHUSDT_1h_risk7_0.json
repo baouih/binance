@@ -1,0 +1,7 @@
+{
+  "algorithm": "adaptive_exit_strategy",
+  "symbol": "ETHUSDT",
+  "timeframe": "1h",
+  "risk_level": 7.0,
+  "error": "[Errno 17] File exists: 'configs/adaptive_exit_strategy_test_config.json'"
+}

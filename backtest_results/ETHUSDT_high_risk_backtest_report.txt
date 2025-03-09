@@ -1,0 +1,21 @@
+===== BÁO CÁO BACKTEST ETHUSDT - CHIẾN LƯỢC RỦI RO CAO =====
+
+Ngày thực hiện: 2025-03-09 17:00:51
+Symbol: ETHUSDT
+Số ngày backtest: 30
+Khung thời gian: 1h
+Rủi ro mỗi lệnh: 10.0%
+Đòn bẩy: 20x
+
+Số dư ban đầu: 10000.0 USDT
+Số dư cuối: 16489.45 USDT
+Lợi nhuận: 6489.45 USDT (64.89%)
+Drawdown tối đa: 0.00%
+Số lệnh: 1
+Tỷ lệ thắng: 100.00%
+Trung bình lãi mỗi lệnh thắng: 48.03%
+Trung bình lỗ mỗi lệnh thua: 0.00%
+Profit Factor: inf
+
+DANH SÁCH GIAO DỊCH:
+1. SHORT 2025-02-17 23:00:00 -> 2025-03-09 17:00:00, Giá vào: 3039.92, Giá ra: 2053.55, P/L: 48.03%, Kết quả: THUA

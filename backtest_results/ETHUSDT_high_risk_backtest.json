@@ -1,0 +1,15 @@
+{
+    "symbol": "ETHUSDT",
+    "initial_balance": 10000.0,
+    "final_balance": 16489.447090712914,
+    "profit_loss": 6489.447090712914,
+    "profit_pct": 64.89447090712915,
+    "max_drawdown": 0.0,
+    "trades_count": 1,
+    "win_rate": 100.0,
+    "avg_profit": 48.03243164276496,
+    "avg_loss": 0.0,
+    "profit_factor": Infinity,
+    "risk_per_trade": 10.0,
+    "leverage": 20.0
+}

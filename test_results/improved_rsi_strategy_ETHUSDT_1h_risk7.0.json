@@ -1,0 +1,3305 @@
+{
+  "initial_balance": 10000,
+  "final_balance": 29963.29249979282,
+  "total_profit": 19963.292499792828,
+  "profit_percentage": 199.63292499792828,
+  "total_trades": 164,
+  "winning_trades": 120,
+  "losing_trades": 44,
+  "win_rate": 73.17073170731707,
+  "avg_win": 191.7097339753744,
+  "avg_loss": -69.13353584663855,
+  "profit_factor": 7.562823492546279,
+  "max_drawdown": 1.0463292874999954,
+  "trades": [
+    {
+      "entry_time": "2025-02-09 18:51:19.013870",
+      "exit_time": "2025-02-09 22:51:19.013870",
+      "direction": "long",
+      "entry_price": 952.99578522405,
+      "exit_price": 1095.9451530076574,
+      "size": 0.7345258088790284,
+      "profit": 104.99999999999994,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "entry_time": "2025-02-09 21:51:19.013870",
+      "exit_time": "2025-02-09 22:51:19.013870",
+      "direction": "short",
+      "entry_price": 993.3867385374176,
+      "exit_price": 1043.0560754642886,
+      "size": 0.704660101493426,
+      "profit": -35.00000000000008,
+      "profit_percentage": -5.000000000000011,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.37"
+    },
+    {
+      "entry_time": "2025-02-09 22:51:19.013870",
+      "exit_time": "2025-02-09 23:51:19.013870",
+      "direction": "short",
+      "entry_price": 1209.9721789166515,
+      "exit_price": 1028.4763520791537,
+      "size": 0.5825753784117021,
+      "profit": 105.73500000000006,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 61.52"
+    },
+    {
+      "entry_time": "2025-02-10 00:51:19.013870",
+      "exit_time": "2025-02-10 05:51:19.013870",
+      "direction": "long",
+      "entry_price": 964.1659847978776,
+      "exit_price": 1108.790882517559,
+      "size": 0.7387747143447744,
+      "profit": 106.8452174999999,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.06"
+    },
+    {
+      "entry_time": "2025-02-10 12:51:19.013870",
+      "exit_time": "2025-02-10 13:51:19.013870",
+      "direction": "long",
+      "entry_price": 802.9896182288164,
+      "exit_price": 923.4380609631388,
+      "size": 0.8963759915260755,
+      "profit": 107.96709228374995,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.67"
+    },
+    {
+      "entry_time": "2025-02-10 22:51:19.013870",
+      "exit_time": "2025-02-10 23:51:19.013870",
+      "direction": "short",
+      "entry_price": 1197.6440584515483,
+      "exit_price": 1017.9974496838161,
+      "size": 0.6073075773658905,
+      "profit": 109.1007467527294,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.94"
+    },
+    {
+      "entry_time": "2025-02-10 23:51:19.013870",
+      "exit_time": "2025-02-11 00:51:19.013870",
+      "direction": "long",
+      "entry_price": 843.5758388288948,
+      "exit_price": 970.112214653229,
+      "size": 0.8712617527997161,
+      "profit": 110.24630459363303,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "entry_time": "2025-02-11 03:51:19.013870",
+      "exit_time": "2025-02-11 05:51:19.013870",
+      "direction": "long",
+      "entry_price": 866.968637426101,
+      "exit_price": 997.0139330400161,
+      "size": 0.8566545238407356,
+      "profit": 111.40389079186612,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.30"
+    },
+    {
+      "entry_time": "2025-02-11 07:51:19.013870",
+      "exit_time": "2025-02-11 08:51:19.013870",
+      "direction": "short",
+      "entry_price": 1151.1154930247349,
+      "exit_price": 978.4481690710246,
+      "size": 0.6519683578078749,
+      "profit": 112.57363164518081,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.59"
+    },
+    {
+      "entry_time": "2025-02-11 14:51:19.013870",
+      "exit_time": "2025-02-11 15:51:19.013870",
+      "direction": "long",
+      "entry_price": 739.5786143372866,
+      "exit_price": 850.5154064878795,
+      "size": 1.025409628061317,
+      "profit": 113.75565477745516,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 38.98"
+    },
+    {
+      "entry_time": "2025-02-12 04:51:19.013870",
+      "exit_time": "2025-02-12 05:51:19.013870",
+      "direction": "short",
+      "entry_price": 932.4291920838388,
+      "exit_price": 979.0506516880307,
+      "size": 0.821868227839888,
+      "profit": -38.31669638420617,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.94"
+    },
+    {
+      "entry_time": "2025-02-12 06:51:19.013870",
+      "exit_time": "2025-02-12 08:51:19.013870",
+      "direction": "long",
+      "entry_price": 891.2754061137198,
+      "exit_price": 1024.9667170307778,
+      "size": 0.8568078437921046,
+      "profit": 114.54776384058431,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.93"
+    },
+    {
+      "entry_time": "2025-02-12 14:51:19.013870",
+      "exit_time": "2025-02-12 15:51:19.013870",
+      "direction": "short",
+      "entry_price": 1119.410940304737,
+      "exit_price": 951.4992992590265,
+      "size": 0.6893537258051076,
+      "profit": 115.7505153609104,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.89"
+    },
+    {
+      "entry_time": "2025-02-12 21:51:19.013870",
+      "exit_time": "2025-02-13 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1142.2369861698508,
+      "exit_price": 970.9014382443731,
+      "size": 0.6826715015559661,
+      "profit": 116.9658957722,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.94"
+    },
+    {
+      "entry_time": "2025-02-12 23:51:19.013870",
+      "exit_time": "2025-02-13 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1097.8858050781796,
+      "exit_price": 933.2029343164527,
+      "size": 0.710249312701339,
+      "profit": 116.96589577219997,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.84"
+    },
+    {
+      "entry_time": "2025-02-13 05:51:19.013870",
+      "exit_time": "2025-02-13 07:51:19.013870",
+      "direction": "short",
+      "entry_price": 1140.159859294643,
+      "exit_price": 969.1358804004465,
+      "size": 0.6982774015408473,
+      "profit": 119.42217958341624,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 61.36"
+    },
+    {
+      "entry_time": "2025-02-13 06:51:19.013870",
+      "exit_time": "2025-02-13 07:51:19.013870",
+      "direction": "short",
+      "entry_price": 1065.045009253614,
+      "exit_price": 905.2882578655718,
+      "size": 0.7475250876461865,
+      "profit": 119.42217958341617,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.20"
+    },
+    {
+      "entry_time": "2025-02-13 07:51:19.013870",
+      "exit_time": "2025-02-13 08:51:19.013870",
+      "direction": "long",
+      "entry_price": 849.6919698240182,
+      "exit_price": 977.1457652976209,
+      "size": 0.9566607640171937,
+      "profit": 121.93004535466787,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.78"
+    },
+    {
+      "entry_time": "2025-02-13 13:51:19.013870",
+      "exit_time": "2025-02-13 14:51:19.013870",
+      "direction": "short",
+      "entry_price": 1310.9918556005362,
+      "exit_price": 1114.3430772604556,
+      "size": 0.6265500954082437,
+      "profit": 123.21031083089201,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.72"
+    },
+    {
+      "entry_time": "2025-02-13 21:51:19.013870",
+      "exit_time": "2025-02-14 03:51:19.013870",
+      "direction": "short",
+      "entry_price": 1049.774308909139,
+      "exit_price": 892.3081625727682,
+      "size": 0.7906716585840451,
+      "profit": 124.50401909461634,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.49"
+    },
+    {
+      "entry_time": "2025-02-14 02:51:19.013870",
+      "exit_time": "2025-02-14 03:51:19.013870",
+      "direction": "long",
+      "entry_price": 944.1698246053968,
+      "exit_price": 896.961333375127,
+      "size": 0.8791075210553434,
+      "profit": -41.50133969820543,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.16"
+    },
+    {
+      "entry_time": "2025-02-14 03:51:19.013870",
+      "exit_time": "2025-02-14 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 889.9845767028305,
+      "exit_price": 1023.4822632082551,
+      "size": 0.9391589510667969,
+      "profit": 125.37554722827862,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 33.03"
+    },
+    {
+      "entry_time": "2025-02-13 23:51:19.013870",
+      "exit_time": "2025-02-14 07:51:19.013870",
+      "direction": "short",
+      "entry_price": 1042.1586610614456,
+      "exit_price": 1094.266594114518,
+      "size": 0.7964495474410017,
+      "profit": -41.50133969820555,
+      "profit_percentage": -5.000000000000013,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.06"
+    },
+    {
+      "entry_time": "2025-02-14 09:51:19.013870",
+      "exit_time": "2025-02-14 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 1066.8741655592512,
+      "exit_price": 1013.5304572812886,
+      "size": 0.7889479408358742,
+      "profit": -42.08540880244817,
+      "profit_percentage": -5.0000000000000036,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.63"
+    },
+    {
+      "entry_time": "2025-02-14 10:51:19.013870",
+      "exit_time": "2025-02-14 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 890.8299123860686,
+      "exit_price": 1024.4543992439787,
+      "size": 0.9415514519333831,
+      "profit": 125.81432961491856,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.82"
+    },
+    {
+      "entry_time": "2025-02-14 21:51:19.013870",
+      "exit_time": "2025-02-14 23:51:19.013870",
+      "direction": "long",
+      "entry_price": 1004.977368718096,
+      "exit_price": 954.7285002821912,
+      "size": 0.8433714299327525,
+      "profit": -42.37846002529178,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.30"
+    },
+    {
+      "entry_time": "2025-02-14 23:51:19.013870",
+      "exit_time": "2025-02-15 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 933.9678860526552,
+      "exit_price": 887.2694917500224,
+      "size": 0.9043166482669066,
+      "profit": -42.23013541520328,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.65"
+    },
+    {
+      "entry_time": "2025-02-15 00:51:19.013870",
+      "exit_time": "2025-02-15 04:51:19.013870",
+      "direction": "short",
+      "entry_price": 1069.8828420202535,
+      "exit_price": 909.4004157172154,
+      "size": 0.789434763444946,
+      "profit": 126.69040624560986,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.89"
+    },
+    {
+      "entry_time": "2025-02-15 03:51:19.013870",
+      "exit_time": "2025-02-15 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 947.396515733242,
+      "exit_price": 900.02668994658,
+      "size": 0.8914986431530003,
+      "profit": -42.23013541520326,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.76"
+    },
+    {
+      "entry_time": "2025-02-15 04:51:19.013870",
+      "exit_time": "2025-02-15 05:51:19.013870",
+      "direction": "long",
+      "entry_price": 784.6657080128756,
+      "exit_price": 902.3655642148069,
+      "size": 1.0801527441915708,
+      "profit": 127.13382266746937,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.69"
+    },
+    {
+      "entry_time": "2025-02-15 22:51:19.013870",
+      "exit_time": "2025-02-15 23:51:19.013870",
+      "direction": "long",
+      "entry_price": 847.7640813782109,
+      "exit_price": 974.9286935849425,
+      "size": 1.0102553342169291,
+      "profit": 128.4687278054778,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.99"
+    },
+    {
+      "entry_time": "2025-02-16 04:51:19.013870",
+      "exit_time": "2025-02-16 05:51:19.013870",
+      "direction": "long",
+      "entry_price": 888.347556005134,
+      "exit_price": 1021.5996894059041,
+      "size": 0.9742256737983686,
+      "profit": 129.8176494474353,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.71"
+    },
+    {
+      "entry_time": "2025-02-16 08:51:19.013870",
+      "exit_time": "2025-02-16 10:51:19.013870",
+      "direction": "short",
+      "entry_price": 1016.0018225852788,
+      "exit_price": 1066.8019137145427,
+      "size": 0.8607644320482026,
+      "profit": -43.726911588877805,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.01"
+    },
+    {
+      "entry_time": "2025-02-16 11:51:19.013870",
+      "exit_time": "2025-02-16 12:51:19.013870",
+      "direction": "short",
+      "entry_price": 1144.8499229892927,
+      "exit_price": 973.1224345408988,
+      "size": 0.7612153614779823,
+      "profit": 130.72160219495024,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.40"
+    },
+    {
+      "entry_time": "2025-02-16 10:51:19.013870",
+      "exit_time": "2025-02-16 13:51:19.013870",
+      "direction": "short",
+      "entry_price": 1111.739881590246,
+      "exit_price": 944.978899351709,
+      "size": 0.7838860172217292,
+      "profit": 130.72160219495026,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.44"
+    },
+    {
+      "entry_time": "2025-02-16 13:51:19.013870",
+      "exit_time": "2025-02-16 15:51:19.013870",
+      "direction": "long",
+      "entry_price": 867.3952313917962,
+      "exit_price": 997.5045161005655,
+      "size": 1.0258050079960852,
+      "profit": 133.46675584104406,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.67"
+    },
+    {
+      "entry_time": "2025-02-16 19:51:19.013870",
+      "exit_time": "2025-02-16 21:51:19.013870",
+      "direction": "long",
+      "entry_price": 995.1347648429548,
+      "exit_price": 945.3780266008071,
+      "size": 0.9035168672098334,
+      "profit": -44.95605225912507,
+      "profit_percentage": -5.0000000000000036,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "entry_time": "2025-02-16 18:51:19.013870",
+      "exit_time": "2025-02-17 00:51:19.013870",
+      "direction": "short",
+      "entry_price": 1034.3787881549886,
+      "exit_price": 1086.097727562738,
+      "size": 0.8692377062239011,
+      "profit": -44.95605225912512,
+      "profit_percentage": -5.000000000000009,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.61"
+    },
+    {
+      "entry_time": "2025-02-16 23:51:19.013870",
+      "exit_time": "2025-02-17 00:51:19.013870",
+      "direction": "long",
+      "entry_price": 907.5766855731696,
+      "exit_price": 1043.713188409145,
+      "size": 0.9872158857391977,
+      "profit": 134.39611822865427,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.10"
+    },
+    {
+      "entry_time": "2025-02-17 02:51:19.013870",
+      "exit_time": "2025-02-17 06:51:19.013870",
+      "direction": "long",
+      "entry_price": 815.3812137761906,
+      "exit_price": 937.6883958426191,
+      "size": 1.1065191482200107,
+      "profit": 135.33523892133422,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "entry_time": "2025-02-17 08:51:19.013870",
+      "exit_time": "2025-02-17 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 907.8140186874688,
+      "exit_price": 1043.986121490589,
+      "size": 1.004289837014066,
+      "profit": 136.75625893000833,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.78"
+    },
+    {
+      "entry_time": "2025-02-17 14:51:19.013870",
+      "exit_time": "2025-02-17 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 945.3319915412736,
+      "exit_price": 1087.1317902724645,
+      "size": 0.9644319678426082,
+      "profit": 136.75625893000822,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.84"
+    },
+    {
+      "entry_time": "2025-02-17 15:51:19.013870",
+      "exit_time": "2025-02-17 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 972.8344889673948,
+      "exit_price": 1118.759662312504,
+      "size": 0.9371670137172521,
+      "profit": 136.75625893000824,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.46"
+    },
+    {
+      "entry_time": "2025-02-17 16:51:19.013870",
+      "exit_time": "2025-02-17 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1167.3452090298538,
+      "exit_price": 992.2434276753756,
+      "size": 0.8056119132262389,
+      "profit": 141.0640810863037,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 66.21"
+    },
+    {
+      "entry_time": "2025-02-17 17:51:19.013870",
+      "exit_time": "2025-02-17 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1134.0461051790348,
+      "exit_price": 963.9391894021796,
+      "size": 0.8292671726019081,
+      "profit": 141.06408108630362,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 61.05"
+    },
+    {
+      "entry_time": "2025-02-17 19:51:19.013870",
+      "exit_time": "2025-02-17 21:51:19.013870",
+      "direction": "short",
+      "entry_price": 1082.9732417879177,
+      "exit_price": 920.52725551973,
+      "size": 0.8866111751837183,
+      "profit": 144.02642678911602,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.43"
+    },
+    {
+      "entry_time": "2025-02-17 22:51:19.013870",
+      "exit_time": "2025-02-17 23:51:19.013870",
+      "direction": "short",
+      "entry_price": 1081.877764375486,
+      "exit_price": 1135.9716525942604,
+      "size": 0.8968277752056643,
+      "profit": -48.512901423467234,
+      "profit_percentage": -4.999999999999998,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.76"
+    },
+    {
+      "entry_time": "2025-02-17 23:51:19.013870",
+      "exit_time": "2025-02-18 00:51:19.013870",
+      "direction": "short",
+      "entry_price": 1153.7931918412553,
+      "exit_price": 980.7242130650669,
+      "size": 0.8379856391999997,
+      "profit": 145.0293188054554,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.07"
+    },
+    {
+      "entry_time": "2025-02-18 07:51:19.013870",
+      "exit_time": "2025-02-18 08:51:19.013870",
+      "direction": "long",
+      "entry_price": 867.3527871688917,
+      "exit_price": 997.4557052442254,
+      "size": 1.1264322800819442,
+      "profit": 146.55212665291256,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.26"
+    },
+    {
+      "entry_time": "2025-02-18 08:51:19.013870",
+      "exit_time": "2025-02-18 12:51:19.013870",
+      "direction": "short",
+      "entry_price": 1104.7317706621448,
+      "exit_price": 939.022005062823,
+      "size": 0.893676503899263,
+      "profit": 148.0909239827682,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.91"
+    },
+    {
+      "entry_time": "2025-02-18 12:51:19.013870",
+      "exit_time": "2025-02-18 13:51:19.013870",
+      "direction": "long",
+      "entry_price": 846.8892497444278,
+      "exit_price": 973.922637206092,
+      "size": 1.1780043158319071,
+      "profit": 149.64587868458722,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.66"
+    },
+    {
+      "entry_time": "2025-02-18 14:51:19.013870",
+      "exit_time": "2025-02-18 16:51:19.013870",
+      "direction": "short",
+      "entry_price": 1057.2057441714144,
+      "exit_price": 1110.0660313799851,
+      "size": 0.9535650069028078,
+      "profit": -50.40572013692517,
+      "profit_percentage": -5.000000000000003,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 56.61"
+    },
+    {
+      "entry_time": "2025-02-18 23:51:19.013870",
+      "exit_time": "2025-02-19 03:51:19.013870",
+      "direction": "long",
+      "entry_price": 963.047307116664,
+      "exit_price": 914.8949417608308,
+      "size": 1.0431325594343022,
+      "profit": -50.22930011644595,
+      "profit_percentage": -5.0000000000000036,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.12"
+    },
+    {
+      "entry_time": "2025-02-19 03:51:19.013870",
+      "exit_time": "2025-02-19 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 839.342289926132,
+      "exit_price": 965.2436334150517,
+      "size": 1.1926837993697041,
+      "profit": 150.1604926981149,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.85"
+    },
+    {
+      "entry_time": "2025-02-19 06:51:19.013870",
+      "exit_time": "2025-02-19 07:51:19.013870",
+      "direction": "long",
+      "entry_price": 870.7737304894381,
+      "exit_price": 1001.3897900628538,
+      "size": 1.1617038392293402,
+      "profit": 151.7371778714452,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.50"
+    },
+    {
+      "entry_time": "2025-02-19 15:51:19.013870",
+      "exit_time": "2025-02-19 18:51:19.013870",
+      "direction": "long",
+      "entry_price": 916.8177791769556,
+      "exit_price": 1054.340446053499,
+      "size": 1.1149465155205505,
+      "profit": 153.3304182390954,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "entry_time": "2025-02-19 22:51:19.013870",
+      "exit_time": "2025-02-20 03:51:19.013870",
+      "direction": "short",
+      "entry_price": 1049.9685110302937,
+      "exit_price": 892.4732343757496,
+      "size": 0.983777995897984,
+      "profit": 154.94038763060595,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.54"
+    },
+    {
+      "entry_time": "2025-02-20 01:51:19.013870",
+      "exit_time": "2025-02-20 03:51:19.013870",
+      "direction": "short",
+      "entry_price": 1074.2682418359725,
+      "exit_price": 913.1280055605766,
+      "size": 0.9615251361913473,
+      "profit": 154.9403876306059,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.55"
+    },
+    {
+      "entry_time": "2025-02-20 02:51:19.013870",
+      "exit_time": "2025-02-20 03:51:19.013870",
+      "direction": "short",
+      "entry_price": 1048.2248952680657,
+      "exit_price": 890.9911609778558,
+      "size": 0.9854144107817787,
+      "profit": 154.94038763060593,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.43"
+    },
+    {
+      "entry_time": "2025-02-20 04:51:19.013870",
+      "exit_time": "2025-02-20 06:51:19.013870",
+      "direction": "short",
+      "entry_price": 1086.9156064389274,
+      "exit_price": 923.8782654730883,
+      "size": 0.9802724265139787,
+      "profit": 159.82100984097002,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.42"
+    },
+    {
+      "entry_time": "2025-02-20 05:51:19.013870",
+      "exit_time": "2025-02-20 06:51:19.013870",
+      "direction": "short",
+      "entry_price": 1088.7290837266742,
+      "exit_price": 925.4197211676731,
+      "size": 0.9786396036126169,
+      "profit": 159.82100984097,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.19"
+    },
+    {
+      "entry_time": "2025-02-20 09:51:19.013870",
+      "exit_time": "2025-02-20 11:51:19.013870",
+      "direction": "long",
+      "entry_price": 979.0686180420638,
+      "exit_price": 1125.9289107483733,
+      "size": 1.11110530995571,
+      "profit": 163.17725104763025,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.12"
+    },
+    {
+      "entry_time": "2025-02-20 10:51:19.013870",
+      "exit_time": "2025-02-20 11:51:19.013870",
+      "direction": "short",
+      "entry_price": 1107.2978047766012,
+      "exit_price": 1162.6626950154314,
+      "size": 0.9824352000201164,
+      "profit": -54.39241701587692,
+      "profit_percentage": -5.0000000000000115,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 57.16"
+    },
+    {
+      "entry_time": "2025-02-20 11:51:19.013870",
+      "exit_time": "2025-02-20 12:51:19.013870",
+      "direction": "short",
+      "entry_price": 1236.387249461936,
+      "exit_price": 1050.9291620426457,
+      "size": 0.8860195534825304,
+      "profit": 164.3194918049638,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.84"
+    },
+    {
+      "entry_time": "2025-02-20 13:51:19.013870",
+      "exit_time": "2025-02-20 14:51:19.013870",
+      "direction": "long",
+      "entry_price": 861.8955396846225,
+      "exit_price": 991.1798706373157,
+      "size": 1.2843385215001315,
+      "profit": 166.04484646891575,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "entry_time": "2025-02-20 17:51:19.013870",
+      "exit_time": "2025-02-20 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1145.3260663321034,
+      "exit_price": 973.5271563822879,
+      "size": 0.9766553082662309,
+      "profit": 167.78831735683954,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.84"
+    },
+    {
+      "entry_time": "2025-02-20 18:51:19.013870",
+      "exit_time": "2025-02-20 19:51:19.013870",
+      "direction": "long",
+      "entry_price": 866.1394200276751,
+      "exit_price": 996.0603330318263,
+      "size": 1.3050254248418713,
+      "profit": 169.55009468908622,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.82"
+    },
+    {
+      "entry_time": "2025-02-21 05:51:19.013870",
+      "exit_time": "2025-02-21 06:51:19.013870",
+      "direction": "long",
+      "entry_price": 808.0326843802344,
+      "exit_price": 929.2375870372695,
+      "size": 1.4135597399729203,
+      "profit": 171.3303706833216,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.17"
+    },
+    {
+      "entry_time": "2025-02-21 07:51:19.013870",
+      "exit_time": "2025-02-21 09:51:19.013870",
+      "direction": "long",
+      "entry_price": 931.0272225935826,
+      "exit_price": 1070.68130598262,
+      "size": 1.239701234465207,
+      "profit": 173.1293395754966,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.45"
+    },
+    {
+      "entry_time": "2025-02-21 12:51:19.013870",
+      "exit_time": "2025-02-21 20:51:19.013870",
+      "direction": "long",
+      "entry_price": 972.1037069668192,
+      "exit_price": 923.4985216184782,
+      "size": 1.1997841820595712,
+      "profit": -58.31573254701319,
+      "profit_percentage": -5.000000000000006,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.88"
+    },
+    {
+      "entry_time": "2025-02-21 22:51:19.013870",
+      "exit_time": "2025-02-22 00:51:19.013870",
+      "direction": "short",
+      "entry_price": 1294.9094425308726,
+      "exit_price": 1100.6730261512416,
+      "size": 0.8975396359689933,
+      "profit": 174.33488244929583,
+      "profit_percentage": 15.00000000000001,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 60.73"
+    },
+    {
+      "entry_time": "2025-02-22 01:51:19.013870",
+      "exit_time": "2025-02-22 02:51:19.013870",
+      "direction": "long",
+      "entry_price": 867.754204325643,
+      "exit_price": 997.9173349744893,
+      "size": 1.3534201108781843,
+      "profit": 176.16539871501325,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "entry_time": "2025-02-22 09:51:19.013870",
+      "exit_time": "2025-02-22 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 778.0699627252465,
+      "exit_price": 894.7804571340333,
+      "size": 1.5252710247118828,
+      "profit": 178.0151354015208,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.51"
+    },
+    {
+      "entry_time": "2025-02-22 12:51:19.013870",
+      "exit_time": "2025-02-22 13:51:19.013870",
+      "direction": "long",
+      "entry_price": 1017.5211418908513,
+      "exit_price": 1170.149313174479,
+      "size": 1.178578586183539,
+      "profit": 179.88429432323696,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.93"
+    },
+    {
+      "entry_time": "2025-02-22 13:51:19.013870",
+      "exit_time": "2025-02-22 14:51:19.013870",
+      "direction": "short",
+      "entry_price": 1298.5259002603411,
+      "exit_price": 1103.74701522129,
+      "size": 0.9332278464228158,
+      "profit": 181.7730794136309,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.85"
+    },
+    {
+      "entry_time": "2025-02-22 14:51:19.013870",
+      "exit_time": "2025-02-22 16:51:19.013870",
+      "direction": "short",
+      "entry_price": 1036.7481665474304,
+      "exit_price": 1088.585574874802,
+      "size": 1.1811399185408042,
+      "profit": -61.22723224915807,
+      "profit_percentage": -5.000000000000005,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.77"
+    },
+    {
+      "entry_time": "2025-02-22 20:51:19.013870",
+      "exit_time": "2025-02-22 21:51:19.013870",
+      "direction": "short",
+      "entry_price": 1205.6543564829542,
+      "exit_price": 1024.8062030105111,
+      "size": 1.0121132413815248,
+      "profit": 183.03881080885782,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.77"
+    },
+    {
+      "entry_time": "2025-02-23 03:51:19.013870",
+      "exit_time": "2025-02-23 06:51:19.013870",
+      "direction": "long",
+      "entry_price": 970.4910085762094,
+      "exit_price": 921.966458147399,
+      "size": 1.2705645334018676,
+      "profit": -61.653572774116974,
+      "profit_percentage": -5.0,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.03"
+    },
+    {
+      "entry_time": "2025-02-23 06:51:19.013870",
+      "exit_time": "2025-02-23 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 875.4282623553615,
+      "exit_price": 1006.7425017086657,
+      "size": 1.4036052503972778,
+      "profit": 184.31335580822258,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.96"
+    },
+    {
+      "entry_time": "2025-02-23 09:51:19.013870",
+      "exit_time": "2025-02-23 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 874.1495089324666,
+      "exit_price": 1005.2719352723365,
+      "size": 1.4056585204614922,
+      "profit": 184.3133558082225,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.62"
+    },
+    {
+      "entry_time": "2025-02-23 10:51:19.013870",
+      "exit_time": "2025-02-23 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 978.2982949575628,
+      "exit_price": 1125.0430392011972,
+      "size": 1.2560133363428305,
+      "profit": 184.3133558082226,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.28"
+    },
+    {
+      "entry_time": "2025-02-23 12:51:19.013870",
+      "exit_time": "2025-02-23 13:51:19.013870",
+      "direction": "short",
+      "entry_price": 1242.6716486345522,
+      "exit_price": 1056.2709013393694,
+      "size": 1.0199488428826429,
+      "profit": 190.1192265161816,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.53"
+    },
+    {
+      "entry_time": "2025-02-23 14:51:19.013870",
+      "exit_time": "2025-02-23 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 862.2382499245763,
+      "exit_price": 991.5739874132627,
+      "size": 1.4854013447861365,
+      "profit": 192.1154783946015,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.91"
+    },
+    {
+      "entry_time": "2025-02-23 17:51:19.013870",
+      "exit_time": "2025-02-23 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1208.8442772869926,
+      "exit_price": 1027.5176356939437,
+      "size": 1.0706242017840741,
+      "profit": 194.13269091774484,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.91"
+    },
+    {
+      "entry_time": "2025-02-23 18:51:19.013870",
+      "exit_time": "2025-02-23 20:51:19.013870",
+      "direction": "long",
+      "entry_price": 841.4016687762041,
+      "exit_price": 967.6119190926347,
+      "size": 1.5543197456668285,
+      "profit": 196.17108417238114,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.48"
+    },
+    {
+      "entry_time": "2025-02-23 19:51:19.013870",
+      "exit_time": "2025-02-23 20:51:19.013870",
+      "direction": "long",
+      "entry_price": 812.0075614860955,
+      "exit_price": 933.8086957090097,
+      "size": 1.6105850362063028,
+      "profit": 196.1710841723811,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.96"
+    },
+    {
+      "entry_time": "2025-02-23 20:51:19.013870",
+      "exit_time": "2025-02-23 22:51:19.013870",
+      "direction": "short",
+      "entry_price": 1187.0965175371782,
+      "exit_price": 1009.0320399066014,
+      "size": 1.1248210738333575,
+      "profit": 200.29067694000125,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.26"
+    },
+    {
+      "entry_time": "2025-02-24 10:51:19.013870",
+      "exit_time": "2025-02-24 11:51:19.013870",
+      "direction": "long",
+      "entry_price": 900.4184605209771,
+      "exit_price": 1035.4812295991235,
+      "size": 1.498516063525747,
+      "profit": 202.39372904787095,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "entry_time": "2025-02-24 15:51:19.013870",
+      "exit_time": "2025-02-24 17:51:19.013870",
+      "direction": "long",
+      "entry_price": 855.1408585366456,
+      "exit_price": 983.4119873171423,
+      "size": 1.5944263151597848,
+      "profit": 204.5188632028736,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.45"
+    },
+    {
+      "entry_time": "2025-02-24 14:51:19.013870",
+      "exit_time": "2025-02-24 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1003.8237994960028,
+      "exit_price": 1054.0149894708031,
+      "size": 1.358265353644455,
+      "profit": -68.17295440095815,
+      "profit_percentage": -5.000000000000016,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 59.39"
+    },
+    {
+      "entry_time": "2025-02-24 18:51:19.013870",
+      "exit_time": "2025-02-24 19:51:19.013870",
+      "direction": "short",
+      "entry_price": 1262.0793091029975,
+      "exit_price": 1072.7674127375478,
+      "size": 1.0878898748535326,
+      "profit": 205.95049524529398,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 62.71"
+    },
+    {
+      "entry_time": "2025-02-24 23:51:19.013870",
+      "exit_time": "2025-02-25 02:51:19.013870",
+      "direction": "short",
+      "entry_price": 1175.8620484195133,
+      "exit_price": 999.4827411565863,
+      "size": 1.179917183454732,
+      "profit": 208.11297544536959,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.91"
+    },
+    {
+      "entry_time": "2025-02-24 20:51:19.013870",
+      "exit_time": "2025-02-25 05:51:19.013870",
+      "direction": "short",
+      "entry_price": 1146.4177238752438,
+      "exit_price": 974.4550652939572,
+      "size": 1.2102219002795584,
+      "profit": 208.1129754453696,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.46"
+    },
+    {
+      "entry_time": "2025-02-25 08:51:19.013870",
+      "exit_time": "2025-02-25 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 919.9961435602354,
+      "exit_price": 1057.9955650942707,
+      "size": 1.5397408595464055,
+      "profit": 212.48334792972219,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.54"
+    },
+    {
+      "entry_time": "2025-02-25 11:51:19.013870",
+      "exit_time": "2025-02-25 15:51:19.013870",
+      "direction": "long",
+      "entry_price": 954.269834491321,
+      "exit_price": 906.5563427667549,
+      "size": 1.5000259208475633,
+      "profit": -71.57147436099486,
+      "profit_percentage": -5.000000000000005,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.54"
+    },
+    {
+      "entry_time": "2025-02-25 13:51:19.013870",
+      "exit_time": "2025-02-25 15:51:19.013870",
+      "direction": "long",
+      "entry_price": 1005.8022734808396,
+      "exit_price": 955.5121598067976,
+      "size": 1.4231718549074885,
+      "profit": -71.57147436099481,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.69"
+    },
+    {
+      "entry_time": "2025-02-25 15:51:19.013870",
+      "exit_time": "2025-02-25 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 775.3110666015394,
+      "exit_price": 891.6077265917703,
+      "size": 1.8333408899216328,
+      "profit": 213.2114221214034,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.66"
+    },
+    {
+      "entry_time": "2025-02-26 00:51:19.013870",
+      "exit_time": "2025-02-26 03:51:19.013870",
+      "direction": "long",
+      "entry_price": 937.5654610286776,
+      "exit_price": 890.6871879772438,
+      "size": 1.531982928191423,
+      "profit": -71.81671401789278,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.68"
+    },
+    {
+      "entry_time": "2025-02-26 03:51:19.013870",
+      "exit_time": "2025-02-26 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 779.4433942900931,
+      "exit_price": 896.359903433607,
+      "size": 1.8363195080769377,
+      "profit": 214.69606655649014,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.62"
+    },
+    {
+      "entry_time": "2025-02-26 05:51:19.013870",
+      "exit_time": "2025-02-26 07:51:19.013870",
+      "direction": "short",
+      "entry_price": 1127.4875041278722,
+      "exit_price": 958.3643785086913,
+      "size": 1.2827954453954844,
+      "profit": 216.9503752553336,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 60.16"
+    },
+    {
+      "entry_time": "2025-02-26 10:51:19.013870",
+      "exit_time": "2025-02-26 15:51:19.013870",
+      "direction": "short",
+      "entry_price": 1059.879438956191,
+      "exit_price": 1112.8734109040006,
+      "size": 1.3789515180545366,
+      "profit": -73.0761180651715,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 58.27"
+    },
+    {
+      "entry_time": "2025-02-26 17:51:19.013870",
+      "exit_time": "2025-02-26 19:51:19.013870",
+      "direction": "short",
+      "entry_price": 1078.905668737552,
+      "exit_price": 1132.8509521744297,
+      "size": 1.3498928360836564,
+      "profit": -72.82035165194343,
+      "profit_percentage": -5.000000000000002,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 62.35"
+    },
+    {
+      "entry_time": "2025-02-26 15:51:19.013870",
+      "exit_time": "2025-02-26 21:51:19.013870",
+      "direction": "short",
+      "entry_price": 1145.5822322146769,
+      "exit_price": 973.7448973824753,
+      "size": 1.271324739580933,
+      "profit": 218.46105495583026,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.16"
+    },
+    {
+      "entry_time": "2025-02-26 22:51:19.013870",
+      "exit_time": "2025-02-27 00:51:19.013870",
+      "direction": "short",
+      "entry_price": 1140.336997012519,
+      "exit_price": 969.2864474606412,
+      "size": 1.2861126895929689,
+      "profit": 219.9902823405211,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.76"
+    },
+    {
+      "entry_time": "2025-02-27 05:51:19.013870",
+      "exit_time": "2025-02-27 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 1031.1308673442884,
+      "exit_price": 979.574323977074,
+      "size": 1.4372581104578122,
+      "profit": -74.10006010169886,
+      "profit_percentage": -5.000000000000001,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.61"
+    },
+    {
+      "entry_time": "2025-02-27 10:51:19.013870",
+      "exit_time": "2025-02-27 11:51:19.013870",
+      "direction": "long",
+      "entry_price": 896.747609647246,
+      "exit_price": 1031.2597510943328,
+      "size": 1.6468560182812115,
+      "profit": 221.52212967402855,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.17"
+    },
+    {
+      "entry_time": "2025-02-27 11:51:19.013870",
+      "exit_time": "2025-02-27 12:51:19.013870",
+      "direction": "short",
+      "entry_price": 1039.792704994681,
+      "exit_price": 1091.782340244415,
+      "size": 1.4352098641735265,
+      "profit": -74.61603734520219,
+      "profit_percentage": -5.000000000000013,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.03"
+    },
+    {
+      "entry_time": "2025-02-27 17:51:19.013870",
+      "exit_time": "2025-02-27 19:51:19.013870",
+      "direction": "long",
+      "entry_price": 921.5238091872296,
+      "exit_price": 875.4476187278681,
+      "size": 1.613737604459155,
+      "profit": -74.35488121449389,
+      "profit_percentage": -5.000000000000008,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.98"
+    },
+    {
+      "entry_time": "2025-02-27 19:51:19.013870",
+      "exit_time": "2025-02-27 20:51:19.013870",
+      "direction": "long",
+      "entry_price": 859.4432980821358,
+      "exit_price": 988.3597927944561,
+      "size": 1.7242472957922097,
+      "profit": 222.28391739072896,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.65"
+    },
+    {
+      "entry_time": "2025-02-27 16:51:19.013870",
+      "exit_time": "2025-02-27 21:51:19.013870",
+      "direction": "long",
+      "entry_price": 891.0366962657612,
+      "exit_price": 1024.6922007056253,
+      "size": 1.668952166080411,
+      "profit": 223.0646436434812,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.37"
+    },
+    {
+      "entry_time": "2025-02-27 20:51:19.013870",
+      "exit_time": "2025-02-27 22:51:19.013870",
+      "direction": "long",
+      "entry_price": 1001.5618333949604,
+      "exit_price": 951.4837417252123,
+      "size": 1.4951175323308266,
+      "profit": -74.87263284111073,
+      "profit_percentage": -5.000000000000009,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.78"
+    },
+    {
+      "entry_time": "2025-02-28 02:51:19.013870",
+      "exit_time": "2025-02-28 03:51:19.013870",
+      "direction": "long",
+      "entry_price": 934.2165446147862,
+      "exit_price": 1074.3490263070041,
+      "size": 1.6140006364371475,
+      "profit": 226.1739146367566,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.67"
+    },
+    {
+      "entry_time": "2025-02-28 13:51:19.013870",
+      "exit_time": "2025-02-28 14:51:19.013870",
+      "direction": "long",
+      "entry_price": 863.2862193539754,
+      "exit_price": 992.7791522570717,
+      "size": 1.7649514580959638,
+      "profit": 228.5487407404426,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.00"
+    },
+    {
+      "entry_time": "2025-02-28 15:51:19.013870",
+      "exit_time": "2025-02-28 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 876.7476685231491,
+      "exit_price": 1008.2598188016213,
+      "size": 1.7561001172073603,
+      "profit": 230.94850251821717,
+      "profit_percentage": 14.999999999999995,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.56"
+    },
+    {
+      "entry_time": "2025-03-01 12:51:19.013870",
+      "exit_time": "2025-03-01 14:51:19.013870",
+      "direction": "short",
+      "entry_price": 1075.6788679986985,
+      "exit_price": 914.3270377988937,
+      "size": 1.4463638962487637,
+      "profit": 233.3734617946586,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.85"
+    },
+    {
+      "entry_time": "2025-03-01 13:51:19.013870",
+      "exit_time": "2025-03-01 14:51:19.013870",
+      "direction": "short",
+      "entry_price": 1061.2468794013605,
+      "exit_price": 902.0598474911563,
+      "size": 1.4660331246473794,
+      "profit": 233.3734617946587,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 59.02"
+    },
+    {
+      "entry_time": "2025-03-01 14:51:19.013870",
+      "exit_time": "2025-03-01 18:51:19.013870",
+      "direction": "long",
+      "entry_price": 898.3316871423502,
+      "exit_price": 1033.0814402137028,
+      "size": 1.7682726614435846,
+      "profit": 238.27430449234637,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.97"
+    },
+    {
+      "entry_time": "2025-03-01 15:51:19.013870",
+      "exit_time": "2025-03-01 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 975.5919526325798,
+      "exit_price": 1024.371550264209,
+      "size": 1.6282374603396883,
+      "profit": -79.42476816411572,
+      "profit_percentage": -5.000000000000016,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.31"
+    },
+    {
+      "entry_time": "2025-03-01 19:51:19.013870",
+      "exit_time": "2025-03-01 21:51:19.013870",
+      "direction": "short",
+      "entry_price": 1143.1366781831184,
+      "exit_price": 971.6661764556507,
+      "size": 1.3993207123470883,
+      "profit": 239.94222462379284,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 58.36"
+    },
+    {
+      "entry_time": "2025-03-01 20:51:19.013870",
+      "exit_time": "2025-03-01 21:51:19.013870",
+      "direction": "short",
+      "entry_price": 1108.176672767283,
+      "exit_price": 941.9501718521905,
+      "size": 1.4434655322881034,
+      "profit": 239.94222462379292,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.60"
+    },
+    {
+      "entry_time": "2025-03-01 21:51:19.013870",
+      "exit_time": "2025-03-01 22:51:19.013870",
+      "direction": "long",
+      "entry_price": 868.7780806568594,
+      "exit_price": 999.0947927553882,
+      "size": 1.8798894431565232,
+      "profit": 244.98101134089225,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.50"
+    },
+    {
+      "entry_time": "2025-03-02 01:51:19.013870",
+      "exit_time": "2025-03-02 02:51:19.013870",
+      "direction": "short",
+      "entry_price": 1109.098042518597,
+      "exit_price": 1164.5529446445269,
+      "size": 1.4880158018481098,
+      "profit": -82.51777065332409,
+      "profit_percentage": -5.000000000000009,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 59.56"
+    },
+    {
+      "entry_time": "2025-03-02 04:51:19.013870",
+      "exit_time": "2025-03-02 05:51:19.013870",
+      "direction": "short",
+      "entry_price": 1024.9308595641728,
+      "exit_price": 1076.1774025423815,
+      "size": 1.6045757172538093,
+      "profit": -82.2289584560374,
+      "profit_percentage": -5.000000000000006,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.12"
+    },
+    {
+      "entry_time": "2025-03-02 02:51:19.013870",
+      "exit_time": "2025-03-02 06:51:19.013870",
+      "direction": "short",
+      "entry_price": 1201.2270445700765,
+      "exit_price": 1021.042987884565,
+      "size": 1.3690827030200163,
+      "profit": 246.68687536811186,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.08"
+    },
+    {
+      "entry_time": "2025-03-02 05:51:19.013870",
+      "exit_time": "2025-03-02 10:51:19.013870",
+      "direction": "short",
+      "entry_price": 1104.5088474084753,
+      "exit_price": 938.8325202972039,
+      "size": 1.4837573695077384,
+      "profit": 245.8234713043236,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.21"
+    },
+    {
+      "entry_time": "2025-03-02 10:51:19.013870",
+      "exit_time": "2025-03-02 11:51:19.013870",
+      "direction": "long",
+      "entry_price": 918.1571334058,
+      "exit_price": 1055.8807034166698,
+      "size": 1.822453701458465,
+      "profit": 250.99482994438375,
+      "profit_percentage": 14.999999999999982,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "entry_time": "2025-03-02 11:51:19.013870",
+      "exit_time": "2025-03-02 13:51:19.013870",
+      "direction": "short",
+      "entry_price": 1153.2367724678115,
+      "exit_price": 980.2512565976398,
+      "size": 1.4661937121322544,
+      "profit": 253.63027565880012,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 59.00"
+    },
+    {
+      "entry_time": "2025-03-02 13:51:19.013870",
+      "exit_time": "2025-03-02 14:51:19.013870",
+      "direction": "long",
+      "entry_price": 860.0693825198059,
+      "exit_price": 989.0797898977768,
+      "size": 1.9866102182154706,
+      "profit": 256.29339355321747,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.53"
+    },
+    {
+      "entry_time": "2025-03-02 15:51:19.013870",
+      "exit_time": "2025-03-02 16:51:19.013870",
+      "direction": "long",
+      "entry_price": 789.9973492348377,
+      "exit_price": 908.4969516200632,
+      "size": 2.1855303222335207,
+      "profit": 258.9844741855261,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.46"
+    },
+    {
+      "entry_time": "2025-03-03 00:51:19.013870",
+      "exit_time": "2025-03-03 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1196.2587190530794,
+      "exit_price": 1016.8199111951175,
+      "size": 1.4584571436276526,
+      "profit": 261.70381116447436,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.16"
+    },
+    {
+      "entry_time": "2025-03-03 03:51:19.013870",
+      "exit_time": "2025-03-03 04:51:19.013870",
+      "direction": "short",
+      "entry_price": 1134.1475915530882,
+      "exit_price": 964.025452820125,
+      "size": 1.5544814046618882,
+      "profit": 264.45170118170125,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.66"
+    },
+    {
+      "entry_time": "2025-03-03 20:51:19.013870",
+      "exit_time": "2025-03-03 21:51:19.013870",
+      "direction": "long",
+      "entry_price": 747.0439922305698,
+      "exit_price": 859.1005910651552,
+      "size": 2.3847631181326827,
+      "profit": 267.2284440441091,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 38.02"
+    },
+    {
+      "entry_time": "2025-03-03 21:51:19.013870",
+      "exit_time": "2025-03-03 23:51:19.013870",
+      "direction": "long",
+      "entry_price": 970.33925409302,
+      "exit_price": 921.822291388369,
+      "size": 1.855257265727985,
+      "profit": -90.01144756885756,
+      "profit_percentage": -5.000000000000006,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.33"
+    },
+    {
+      "entry_time": "2025-03-04 00:51:19.013870",
+      "exit_time": "2025-03-04 01:51:19.013870",
+      "direction": "long",
+      "entry_price": 1038.632331781156,
+      "exit_price": 986.7007151920981,
+      "size": 1.7272022978245942,
+      "profit": -89.69640750236654,
+      "profit_percentage": -5.000000000000005,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.84"
+    },
+    {
+      "entry_time": "2025-03-04 02:51:19.013870",
+      "exit_time": "2025-03-04 04:51:19.013870",
+      "direction": "short",
+      "entry_price": 1175.547569831549,
+      "exit_price": 999.2154343568167,
+      "size": 1.5206950764045437,
+      "profit": 268.1474102283245,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.81"
+    },
+    {
+      "entry_time": "2025-03-04 04:51:19.013870",
+      "exit_time": "2025-03-04 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 953.4194430881836,
+      "exit_price": 905.7484709337743,
+      "size": 1.8946747240511925,
+      "profit": -90.32098601190741,
+      "profit_percentage": -5.000000000000006,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.56"
+    },
+    {
+      "entry_time": "2025-03-04 10:51:19.013870",
+      "exit_time": "2025-03-04 11:51:19.013870",
+      "direction": "short",
+      "entry_price": 886.9384665062473,
+      "exit_price": 931.2853898315598,
+      "size": 2.0295627252565813,
+      "profit": -90.00486256086577,
+      "profit_percentage": -5.000000000000009,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.29"
+    },
+    {
+      "entry_time": "2025-03-04 16:51:19.013870",
+      "exit_time": "2025-03-04 20:51:19.013870",
+      "direction": "long",
+      "entry_price": 1025.3165238037982,
+      "exit_price": 974.0506976136082,
+      "size": 1.7495055128764394,
+      "profit": -89.68984554190267,
+      "profit_percentage": -5.000000000000004,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.88"
+    },
+    {
+      "entry_time": "2025-03-05 01:51:19.013870",
+      "exit_time": "2025-03-05 04:51:19.013870",
+      "direction": "long",
+      "entry_price": 845.1381701136254,
+      "exit_price": 971.9088956306691,
+      "size": 2.1150608088258442,
+      "profit": 268.1277932475176,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.34"
+    },
+    {
+      "entry_time": "2025-03-05 04:51:19.013870",
+      "exit_time": "2025-03-05 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 974.382024750462,
+      "exit_price": 925.662923512939,
+      "size": 1.8537775957433458,
+      "profit": -90.31437835887222,
+      "profit_percentage": -4.999999999999999,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.87"
+    },
+    {
+      "entry_time": "2025-03-05 08:51:19.013870",
+      "exit_time": "2025-03-05 10:51:19.013870",
+      "direction": "short",
+      "entry_price": 1087.4517074132525,
+      "exit_price": 924.3339513012646,
+      "size": 1.6610278459850916,
+      "profit": 270.9431350766167,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.78"
+    },
+    {
+      "entry_time": "2025-03-05 09:51:19.013870",
+      "exit_time": "2025-03-05 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 935.0234773151732,
+      "exit_price": 888.2723034494145,
+      "size": 1.931809853977164,
+      "profit": -90.31437835887229,
+      "profit_percentage": -5.000000000000003,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.86"
+    },
+    {
+      "entry_time": "2025-03-05 11:51:19.013870",
+      "exit_time": "2025-03-05 18:51:19.013870",
+      "direction": "long",
+      "entry_price": 895.7955587756896,
+      "exit_price": 1030.164892592043,
+      "size": 2.023463452017906,
+      "profit": 271.8914360493849,
+      "profit_percentage": 15.000000000000002,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.09"
+    },
+    {
+      "entry_time": "2025-03-05 22:51:19.013870",
+      "exit_time": "2025-03-05 23:51:19.013870",
+      "direction": "long",
+      "entry_price": 996.8560829625224,
+      "exit_price": 947.0132788143962,
+      "size": 1.8374186660351504,
+      "profit": -91.58209870930114,
+      "profit_percentage": -5.0,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.65"
+    },
+    {
+      "entry_time": "2025-03-05 21:51:19.013870",
+      "exit_time": "2025-03-06 00:51:19.013870",
+      "direction": "long",
+      "entry_price": 907.330169115269,
+      "exit_price": 1043.4296944825592,
+      "size": 2.018716049056369,
+      "profit": 274.7462961279032,
+      "profit_percentage": 14.999999999999986,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.18"
+    },
+    {
+      "entry_time": "2025-03-05 18:51:19.013870",
+      "exit_time": "2025-03-06 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1059.5029465835564,
+      "exit_price": 900.5775045960229,
+      "size": 1.7287747807519407,
+      "profit": 274.7462961279036,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.17"
+    },
+    {
+      "entry_time": "2025-03-06 00:51:19.013870",
+      "exit_time": "2025-03-06 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1057.31278132412,
+      "exit_price": 898.7158641255019,
+      "size": 1.7444823335015596,
+      "profit": 276.6695202007988,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 60.29"
+    },
+    {
+      "entry_time": "2025-03-06 05:51:19.013870",
+      "exit_time": "2025-03-06 06:51:19.013870",
+      "direction": "short",
+      "entry_price": 1269.3033663980495,
+      "exit_price": 1078.907861438342,
+      "size": 1.4835402040191323,
+      "profit": 282.45938627225024,
+      "profit_percentage": 15.000000000000007,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 64.34"
+    },
+    {
+      "entry_time": "2025-03-06 16:51:19.013870",
+      "exit_time": "2025-03-06 17:51:19.013870",
+      "direction": "short",
+      "entry_price": 1173.8851351853332,
+      "exit_price": 997.8023649075332,
+      "size": 1.6209718269300444,
+      "profit": 285.42520982810885,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.65"
+    },
+    {
+      "entry_time": "2025-03-07 05:51:19.013870",
+      "exit_time": "2025-03-07 07:51:19.013870",
+      "direction": "short",
+      "entry_price": 1170.410551625549,
+      "exit_price": 994.8489688817167,
+      "size": 1.6428547181199096,
+      "profit": 288.4221745313038,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 56.31"
+    },
+    {
+      "entry_time": "2025-03-07 10:51:19.013870",
+      "exit_time": "2025-03-07 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 829.612841317328,
+      "exit_price": 954.0547675149272,
+      "size": 2.342061202918807,
+      "profit": 291.4506073638825,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.18"
+    },
+    {
+      "entry_time": "2025-03-07 17:51:19.013870",
+      "exit_time": "2025-03-07 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1162.5958915362064,
+      "exit_price": 1220.7256861130168,
+      "size": 1.6888117409512422,
+      "profit": -98.17027958040117,
+      "profit_percentage": -5.000000000000003,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 59.35"
+    },
+    {
+      "entry_time": "2025-03-07 16:51:19.013870",
+      "exit_time": "2025-03-07 19:51:19.013870",
+      "direction": "short",
+      "entry_price": 1190.4136589573006,
+      "exit_price": 1011.8516101137055,
+      "size": 1.6493473313535363,
+      "profit": 294.5108387412034,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.65"
+    },
+    {
+      "entry_time": "2025-03-07 18:51:19.013870",
+      "exit_time": "2025-03-07 19:51:19.013870",
+      "direction": "short",
+      "entry_price": 1221.8780233448133,
+      "exit_price": 1038.5963198430914,
+      "size": 1.6012512171071773,
+      "profit": 293.4800508056091,
+      "profit_percentage": 14.999999999999996,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.35"
+    },
+    {
+      "entry_time": "2025-03-07 19:51:19.013870",
+      "exit_time": "2025-03-07 21:51:19.013870",
+      "direction": "long",
+      "entry_price": 984.0954789599948,
+      "exit_price": 934.890705011995,
+      "size": 2.029978876050584,
+      "profit": -99.88465171528368,
+      "profit_percentage": -5.000000000000006,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.21"
+    },
+    {
+      "entry_time": "2025-03-08 02:51:19.013870",
+      "exit_time": "2025-03-08 07:51:19.013870",
+      "direction": "long",
+      "entry_price": 941.1133173261304,
+      "exit_price": 1082.2803149250499,
+      "size": 2.115261862770719,
+      "profit": 298.60516630284,
+      "profit_percentage": 14.999999999999988,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.18"
+    },
+    {
+      "entry_time": "2025-03-08 06:51:19.013870",
+      "exit_time": "2025-03-08 08:51:19.013870",
+      "direction": "long",
+      "entry_price": 945.1731205074924,
+      "exit_price": 897.9144644821178,
+      "size": 2.1061761760816187,
+      "profit": -99.53505543428012,
+      "profit_percentage": -5.000000000000003,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.78"
+    },
+    {
+      "entry_time": "2025-03-08 08:51:19.013870",
+      "exit_time": "2025-03-08 10:51:19.013870",
+      "direction": "long",
+      "entry_price": 889.5137206937479,
+      "exit_price": 1022.94077879781,
+      "size": 2.2536313603830065,
+      "profit": 300.69540246695993,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.43"
+    },
+    {
+      "entry_time": "2025-03-08 12:51:19.013870",
+      "exit_time": "2025-03-08 14:51:19.013870",
+      "direction": "long",
+      "entry_price": 928.2081109252398,
+      "exit_price": 1067.4393275640257,
+      "size": 2.1823604758203214,
+      "profit": 303.85270419286303,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.15"
+    },
+    {
+      "entry_time": "2025-03-08 17:51:19.013870",
+      "exit_time": "2025-03-08 18:51:19.013870",
+      "direction": "short",
+      "entry_price": 1048.387665118804,
+      "exit_price": 891.1295153509834,
+      "size": 1.9524785077289382,
+      "profit": 307.04315758688836,
+      "profit_percentage": 15.000000000000005,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 55.28"
+    },
+    {
+      "entry_time": "2025-03-08 15:51:19.013870",
+      "exit_time": "2025-03-09 01:51:19.013870",
+      "direction": "short",
+      "entry_price": 1019.4107630953358,
+      "exit_price": 1070.3813012501028,
+      "size": 2.0079779986795727,
+      "profit": -102.3477191956297,
+      "profit_percentage": -5.000000000000013,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 mua: 55.60"
+    },
+    {
+      "entry_time": "2025-03-09 01:51:19.013870",
+      "exit_time": "2025-03-09 02:51:19.013870",
+      "direction": "short",
+      "entry_price": 1122.8980502489062,
+      "exit_price": 954.4633427115702,
+      "size": 1.8356813996988097,
+      "profit": 309.1924596899965,
+      "profit_percentage": 15.0,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 mua: 57.33"
+    },
+    {
+      "entry_time": "2025-03-09 04:51:19.013870",
+      "exit_time": "2025-03-09 05:51:19.013870",
+      "direction": "long",
+      "entry_price": 791.2972981397932,
+      "exit_price": 909.991892860762,
+      "size": 2.632293250179024,
+      "profit": 312.43898051674125,
+      "profit_percentage": 14.999999999999991,
+      "exit_reason": "take_profit",
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.32"
+    },
+    {
+      "entry_time": "2025-03-09 09:51:19.013870",
+      "exit_time": "2025-03-09 12:51:19.013870",
+      "direction": "long",
+      "entry_price": 933.2220443531114,
+      "exit_price": 886.5609421354558,
+      "size": 2.255408858106697,
+      "profit": -105.23986327072257,
+      "profit_percentage": -5.000000000000007,
+      "exit_reason": "stop_loss",
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.57"
+    }
+  ],
+  "equity_curve": [
+    10000,
+    10105.0,
+    10070.0,
+    10175.735,
+    10282.5802175,
+    10390.547309783751,
+    10499.64805653648,
+    10609.894361130113,
+    10721.298251921979,
+    10833.871883567159,
+    10947.627538344614,
+    10909.310841960407,
+    11023.858605800991,
+    11139.609121161902,
+    11256.575016934103,
+    11373.540912706303,
+    11492.96309228972,
+    11612.385271873136,
+    11734.315317227803,
+    11857.525628058695,
+    11982.029647153311,
+    11940.528307455106,
+    12065.903854683385,
+    12024.40251498518,
+    11982.317106182732,
+    12108.131435797652,
+    12065.75297577236,
+    12023.522840357156,
+    12150.213246602767,
+    12107.983111187563,
+    12235.116933855032,
+    12363.585661660509,
+    12493.403311107944,
+    12449.676399519067,
+    12580.398001714017,
+    12711.119603908966,
+    12844.58635975001,
+    12799.630307490885,
+    12754.67425523176,
+    12889.070373460414,
+    13024.405612381748,
+    13161.161871311757,
+    13297.918130241766,
+    13434.674389171774,
+    13575.738470258078,
+    13716.802551344383,
+    13860.828978133499,
+    13812.31607671003,
+    13957.345395515486,
+    14103.897522168398,
+    14251.988446151166,
+    14401.634324835753,
+    14351.228604698828,
+    14300.999304582383,
+    14451.159797280498,
+    14602.896975151943,
+    14756.227393391038,
+    14911.167781021644,
+    15066.10816865225,
+    15221.048556282856,
+    15380.869566123827,
+    15540.690575964798,
+    15703.867827012427,
+    15649.47540999655,
+    15813.794901801513,
+    15979.83974827043,
+    16147.628065627268,
+    16317.178160316354,
+    16488.508530999676,
+    16661.637870575174,
+    16603.32213802816,
+    16777.657020477458,
+    16953.82241919247,
+    17131.837554593993,
+    17311.72184891723,
+    17493.49492833086,
+    17432.2676960817,
+    17615.30650689056,
+    17553.652934116442,
+    17737.966289924665,
+    17922.279645732888,
+    18106.59300154111,
+    18296.71222805729,
+    18488.82770645189,
+    18682.960397369636,
+    18879.131481542016,
+    19075.302565714395,
+    19275.593242654395,
+    19477.986971702267,
+    19682.50583490514,
+    19614.332880504182,
+    19820.283375749477,
+    20028.396351194846,
+    20236.509326640215,
+    20448.992674569938,
+    20377.421200208944,
+    20305.84972584795,
+    20519.061147969354,
+    20447.244433951462,
+    20661.940500507953,
+    20878.890875763285,
+    20805.814757698114,
+    20732.99440604617,
+    20951.455461002002,
+    21171.445743342523,
+    21097.345683240823,
+    21318.86781291485,
+    21244.251775569646,
+    21169.89689435515,
+    21392.180811745882,
+    21615.245455389362,
+    21540.372822548252,
+    21766.54673718501,
+    21995.095477925453,
+    22226.043980443672,
+    22459.41744223833,
+    22692.790904032987,
+    22931.065208525335,
+    22851.640440361218,
+    23091.58266498501,
+    23331.5248896088,
+    23576.505900949694,
+    23493.98813029637,
+    23411.75917184033,
+    23658.446047208443,
+    23904.269518512767,
+    24155.26434845715,
+    24408.89462411595,
+    24665.188017669167,
+    24924.172491854693,
+    25185.87630301917,
+    25450.32800420087,
+    25717.55644824498,
+    25627.545000676124,
+    25537.848593173756,
+    25805.99600340208,
+    25715.675017390175,
+    25625.67015482931,
+    25535.980309287406,
+    25804.108102534923,
+    25713.793724176052,
+    25984.73685925267,
+    25894.422480893798,
+    26166.31391694318,
+    26074.73181823388,
+    26349.47811436178,
+    26624.224410489685,
+    26900.893930690483,
+    27183.353316962734,
+    27468.778526790844,
+    27757.20070132215,
+    28048.651308686032,
+    27950.48102910563,
+    28244.991867846835,
+    28538.471918652445,
+    28438.58726693716,
+    28737.19243324,
+    28637.65737780572,
+    28938.352780272682,
+    29242.205484465547,
+    29549.248642052436,
+    29446.900922856807,
+    29756.093382546802,
+    30068.532363063543,
+    29963.29249979282
+  ],
+  "symbol": "ETHUSDT",
+  "timeframe": "1h",
+  "strategy": "improved_rsi_strategy",
+  "risk_level": 7.0,
+  "signals": [
+    {
+      "timestamp": "2025-02-09 18:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 952.99578522405,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "timestamp": "2025-02-09 21:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 993.3867385374176,
+      "reason": "RSI qu\u00e1 mua: 55.37"
+    },
+    {
+      "timestamp": "2025-02-09 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1209.9721789166515,
+      "reason": "RSI qu\u00e1 mua: 61.52"
+    },
+    {
+      "timestamp": "2025-02-10 00:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 964.1659847978776,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.06"
+    },
+    {
+      "timestamp": "2025-02-10 12:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 802.9896182288164,
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.67"
+    },
+    {
+      "timestamp": "2025-02-10 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1197.6440584515483,
+      "reason": "RSI qu\u00e1 mua: 58.94"
+    },
+    {
+      "timestamp": "2025-02-10 23:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 843.5758388288948,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "timestamp": "2025-02-11 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 866.968637426101,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.30"
+    },
+    {
+      "timestamp": "2025-02-11 07:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1151.1154930247349,
+      "reason": "RSI qu\u00e1 mua: 56.59"
+    },
+    {
+      "timestamp": "2025-02-11 14:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 739.5786143372866,
+      "reason": "RSI qu\u00e1 b\u00e1n: 38.98"
+    },
+    {
+      "timestamp": "2025-02-12 04:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 932.4291920838388,
+      "reason": "RSI qu\u00e1 mua: 55.94"
+    },
+    {
+      "timestamp": "2025-02-12 06:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 891.2754061137198,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.93"
+    },
+    {
+      "timestamp": "2025-02-12 14:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1119.410940304737,
+      "reason": "RSI qu\u00e1 mua: 55.89"
+    },
+    {
+      "timestamp": "2025-02-12 21:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1142.2369861698508,
+      "reason": "RSI qu\u00e1 mua: 56.94"
+    },
+    {
+      "timestamp": "2025-02-12 23:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1097.8858050781796,
+      "reason": "RSI qu\u00e1 mua: 56.84"
+    },
+    {
+      "timestamp": "2025-02-13 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1140.159859294643,
+      "reason": "RSI qu\u00e1 mua: 61.36"
+    },
+    {
+      "timestamp": "2025-02-13 06:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1065.045009253614,
+      "reason": "RSI qu\u00e1 mua: 55.20"
+    },
+    {
+      "timestamp": "2025-02-13 07:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 849.6919698240182,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.78"
+    },
+    {
+      "timestamp": "2025-02-13 13:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1310.9918556005362,
+      "reason": "RSI qu\u00e1 mua: 56.72"
+    },
+    {
+      "timestamp": "2025-02-13 21:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1049.774308909139,
+      "reason": "RSI qu\u00e1 mua: 55.49"
+    },
+    {
+      "timestamp": "2025-02-13 23:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1042.1586610614456,
+      "reason": "RSI qu\u00e1 mua: 55.06"
+    },
+    {
+      "timestamp": "2025-02-14 02:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 944.1698246053968,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.16"
+    },
+    {
+      "timestamp": "2025-02-14 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 889.9845767028305,
+      "reason": "RSI qu\u00e1 b\u00e1n: 33.03"
+    },
+    {
+      "timestamp": "2025-02-14 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1066.8741655592512,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.63"
+    },
+    {
+      "timestamp": "2025-02-14 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 890.8299123860686,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.82"
+    },
+    {
+      "timestamp": "2025-02-14 21:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1004.977368718096,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.30"
+    },
+    {
+      "timestamp": "2025-02-14 23:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 933.9678860526552,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.65"
+    },
+    {
+      "timestamp": "2025-02-15 00:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1069.8828420202535,
+      "reason": "RSI qu\u00e1 mua: 58.89"
+    },
+    {
+      "timestamp": "2025-02-15 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 947.396515733242,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.76"
+    },
+    {
+      "timestamp": "2025-02-15 04:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 784.6657080128756,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.69"
+    },
+    {
+      "timestamp": "2025-02-15 22:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 847.7640813782109,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.99"
+    },
+    {
+      "timestamp": "2025-02-16 04:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 888.347556005134,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.71"
+    },
+    {
+      "timestamp": "2025-02-16 08:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1016.0018225852788,
+      "reason": "RSI qu\u00e1 mua: 55.01"
+    },
+    {
+      "timestamp": "2025-02-16 10:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1111.739881590246,
+      "reason": "RSI qu\u00e1 mua: 56.44"
+    },
+    {
+      "timestamp": "2025-02-16 11:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1144.8499229892927,
+      "reason": "RSI qu\u00e1 mua: 58.40"
+    },
+    {
+      "timestamp": "2025-02-16 13:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 867.3952313917962,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.67"
+    },
+    {
+      "timestamp": "2025-02-16 18:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1034.3787881549886,
+      "reason": "RSI qu\u00e1 mua: 55.61"
+    },
+    {
+      "timestamp": "2025-02-16 19:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 995.1347648429548,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "timestamp": "2025-02-16 23:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 907.5766855731696,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.10"
+    },
+    {
+      "timestamp": "2025-02-17 02:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 815.3812137761906,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "timestamp": "2025-02-17 08:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 907.8140186874688,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.78"
+    },
+    {
+      "timestamp": "2025-02-17 14:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 945.3319915412736,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.84"
+    },
+    {
+      "timestamp": "2025-02-17 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 972.8344889673948,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.46"
+    },
+    {
+      "timestamp": "2025-02-17 16:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1167.3452090298538,
+      "reason": "RSI qu\u00e1 mua: 66.21"
+    },
+    {
+      "timestamp": "2025-02-17 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1134.0461051790348,
+      "reason": "RSI qu\u00e1 mua: 61.05"
+    },
+    {
+      "timestamp": "2025-02-17 19:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1082.9732417879177,
+      "reason": "RSI qu\u00e1 mua: 55.43"
+    },
+    {
+      "timestamp": "2025-02-17 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1081.877764375486,
+      "reason": "RSI qu\u00e1 mua: 55.76"
+    },
+    {
+      "timestamp": "2025-02-17 23:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1153.7931918412553,
+      "reason": "RSI qu\u00e1 mua: 58.07"
+    },
+    {
+      "timestamp": "2025-02-18 07:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 867.3527871688917,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.26"
+    },
+    {
+      "timestamp": "2025-02-18 08:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1104.7317706621448,
+      "reason": "RSI qu\u00e1 mua: 56.91"
+    },
+    {
+      "timestamp": "2025-02-18 12:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 846.8892497444278,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.66"
+    },
+    {
+      "timestamp": "2025-02-18 14:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1057.2057441714144,
+      "reason": "RSI qu\u00e1 mua: 56.61"
+    },
+    {
+      "timestamp": "2025-02-18 23:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 963.047307116664,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.12"
+    },
+    {
+      "timestamp": "2025-02-19 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 839.342289926132,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.85"
+    },
+    {
+      "timestamp": "2025-02-19 06:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 870.7737304894381,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.50"
+    },
+    {
+      "timestamp": "2025-02-19 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 916.8177791769556,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.20"
+    },
+    {
+      "timestamp": "2025-02-19 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1049.9685110302937,
+      "reason": "RSI qu\u00e1 mua: 55.54"
+    },
+    {
+      "timestamp": "2025-02-20 01:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1074.2682418359725,
+      "reason": "RSI qu\u00e1 mua: 55.55"
+    },
+    {
+      "timestamp": "2025-02-20 02:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1048.2248952680657,
+      "reason": "RSI qu\u00e1 mua: 57.43"
+    },
+    {
+      "timestamp": "2025-02-20 04:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1086.9156064389274,
+      "reason": "RSI qu\u00e1 mua: 57.42"
+    },
+    {
+      "timestamp": "2025-02-20 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1088.7290837266742,
+      "reason": "RSI qu\u00e1 mua: 57.19"
+    },
+    {
+      "timestamp": "2025-02-20 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 979.0686180420638,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.12"
+    },
+    {
+      "timestamp": "2025-02-20 10:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1107.2978047766012,
+      "reason": "RSI qu\u00e1 mua: 57.16"
+    },
+    {
+      "timestamp": "2025-02-20 11:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1236.387249461936,
+      "reason": "RSI qu\u00e1 mua: 58.84"
+    },
+    {
+      "timestamp": "2025-02-20 13:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 861.8955396846225,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "timestamp": "2025-02-20 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1145.3260663321034,
+      "reason": "RSI qu\u00e1 mua: 57.84"
+    },
+    {
+      "timestamp": "2025-02-20 18:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 866.1394200276751,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.82"
+    },
+    {
+      "timestamp": "2025-02-21 05:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 808.0326843802344,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.17"
+    },
+    {
+      "timestamp": "2025-02-21 07:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 931.0272225935826,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.45"
+    },
+    {
+      "timestamp": "2025-02-21 12:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 972.1037069668192,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.88"
+    },
+    {
+      "timestamp": "2025-02-21 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1294.9094425308726,
+      "reason": "RSI qu\u00e1 mua: 60.73"
+    },
+    {
+      "timestamp": "2025-02-22 01:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 867.754204325643,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "timestamp": "2025-02-22 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 778.0699627252465,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.51"
+    },
+    {
+      "timestamp": "2025-02-22 12:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1017.5211418908513,
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.93"
+    },
+    {
+      "timestamp": "2025-02-22 13:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1298.5259002603411,
+      "reason": "RSI qu\u00e1 mua: 55.85"
+    },
+    {
+      "timestamp": "2025-02-22 14:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1036.7481665474304,
+      "reason": "RSI qu\u00e1 mua: 55.77"
+    },
+    {
+      "timestamp": "2025-02-22 20:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1205.6543564829542,
+      "reason": "RSI qu\u00e1 mua: 56.77"
+    },
+    {
+      "timestamp": "2025-02-23 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 970.4910085762094,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.03"
+    },
+    {
+      "timestamp": "2025-02-23 06:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 875.4282623553615,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.96"
+    },
+    {
+      "timestamp": "2025-02-23 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 874.1495089324666,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.62"
+    },
+    {
+      "timestamp": "2025-02-23 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 978.2982949575628,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.28"
+    },
+    {
+      "timestamp": "2025-02-23 12:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1242.6716486345522,
+      "reason": "RSI qu\u00e1 mua: 56.53"
+    },
+    {
+      "timestamp": "2025-02-23 14:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 862.2382499245763,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.91"
+    },
+    {
+      "timestamp": "2025-02-23 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1208.8442772869926,
+      "reason": "RSI qu\u00e1 mua: 56.91"
+    },
+    {
+      "timestamp": "2025-02-23 18:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 841.4016687762041,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.48"
+    },
+    {
+      "timestamp": "2025-02-23 19:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 812.0075614860955,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.96"
+    },
+    {
+      "timestamp": "2025-02-23 20:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1187.0965175371782,
+      "reason": "RSI qu\u00e1 mua: 57.26"
+    },
+    {
+      "timestamp": "2025-02-24 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 900.4184605209771,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.18"
+    },
+    {
+      "timestamp": "2025-02-24 14:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1003.8237994960028,
+      "reason": "RSI qu\u00e1 mua: 59.39"
+    },
+    {
+      "timestamp": "2025-02-24 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 855.1408585366456,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.45"
+    },
+    {
+      "timestamp": "2025-02-24 18:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1262.0793091029975,
+      "reason": "RSI qu\u00e1 mua: 62.71"
+    },
+    {
+      "timestamp": "2025-02-24 20:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1146.4177238752438,
+      "reason": "RSI qu\u00e1 mua: 56.46"
+    },
+    {
+      "timestamp": "2025-02-24 23:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1175.8620484195133,
+      "reason": "RSI qu\u00e1 mua: 55.91"
+    },
+    {
+      "timestamp": "2025-02-25 08:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 919.9961435602354,
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.54"
+    },
+    {
+      "timestamp": "2025-02-25 11:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 954.269834491321,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.54"
+    },
+    {
+      "timestamp": "2025-02-25 13:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1005.8022734808396,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.69"
+    },
+    {
+      "timestamp": "2025-02-25 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 775.3110666015394,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.66"
+    },
+    {
+      "timestamp": "2025-02-26 00:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 937.5654610286776,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.68"
+    },
+    {
+      "timestamp": "2025-02-26 03:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 779.4433942900931,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.62"
+    },
+    {
+      "timestamp": "2025-02-26 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1127.4875041278722,
+      "reason": "RSI qu\u00e1 mua: 60.16"
+    },
+    {
+      "timestamp": "2025-02-26 10:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1059.879438956191,
+      "reason": "RSI qu\u00e1 mua: 58.27"
+    },
+    {
+      "timestamp": "2025-02-26 15:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1145.5822322146769,
+      "reason": "RSI qu\u00e1 mua: 56.16"
+    },
+    {
+      "timestamp": "2025-02-26 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1078.905668737552,
+      "reason": "RSI qu\u00e1 mua: 62.35"
+    },
+    {
+      "timestamp": "2025-02-26 22:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1140.336997012519,
+      "reason": "RSI qu\u00e1 mua: 56.76"
+    },
+    {
+      "timestamp": "2025-02-27 05:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1031.1308673442884,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.61"
+    },
+    {
+      "timestamp": "2025-02-27 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 896.747609647246,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.17"
+    },
+    {
+      "timestamp": "2025-02-27 11:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1039.792704994681,
+      "reason": "RSI qu\u00e1 mua: 55.03"
+    },
+    {
+      "timestamp": "2025-02-27 16:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 891.0366962657612,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.37"
+    },
+    {
+      "timestamp": "2025-02-27 17:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 921.5238091872296,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.98"
+    },
+    {
+      "timestamp": "2025-02-27 19:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 859.4432980821358,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.65"
+    },
+    {
+      "timestamp": "2025-02-27 20:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1001.5618333949604,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.78"
+    },
+    {
+      "timestamp": "2025-02-28 02:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 934.2165446147862,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.67"
+    },
+    {
+      "timestamp": "2025-02-28 13:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 863.2862193539754,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.00"
+    },
+    {
+      "timestamp": "2025-02-28 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 876.7476685231491,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.56"
+    },
+    {
+      "timestamp": "2025-03-01 12:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1075.6788679986985,
+      "reason": "RSI qu\u00e1 mua: 55.85"
+    },
+    {
+      "timestamp": "2025-03-01 13:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1061.2468794013605,
+      "reason": "RSI qu\u00e1 mua: 59.02"
+    },
+    {
+      "timestamp": "2025-03-01 14:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 898.3316871423502,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.97"
+    },
+    {
+      "timestamp": "2025-03-01 15:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 975.5919526325798,
+      "reason": "RSI qu\u00e1 mua: 55.31"
+    },
+    {
+      "timestamp": "2025-03-01 19:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1143.1366781831184,
+      "reason": "RSI qu\u00e1 mua: 58.36"
+    },
+    {
+      "timestamp": "2025-03-01 20:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1108.176672767283,
+      "reason": "RSI qu\u00e1 mua: 56.60"
+    },
+    {
+      "timestamp": "2025-03-01 21:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 868.7780806568594,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.50"
+    },
+    {
+      "timestamp": "2025-03-02 01:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1109.098042518597,
+      "reason": "RSI qu\u00e1 mua: 59.56"
+    },
+    {
+      "timestamp": "2025-03-02 02:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1201.2270445700765,
+      "reason": "RSI qu\u00e1 mua: 55.08"
+    },
+    {
+      "timestamp": "2025-03-02 04:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1024.9308595641728,
+      "reason": "RSI qu\u00e1 mua: 55.12"
+    },
+    {
+      "timestamp": "2025-03-02 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1104.5088474084753,
+      "reason": "RSI qu\u00e1 mua: 55.21"
+    },
+    {
+      "timestamp": "2025-03-02 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 918.1571334058,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.01"
+    },
+    {
+      "timestamp": "2025-03-02 11:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1153.2367724678115,
+      "reason": "RSI qu\u00e1 mua: 59.00"
+    },
+    {
+      "timestamp": "2025-03-02 13:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 860.0693825198059,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.53"
+    },
+    {
+      "timestamp": "2025-03-02 15:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 789.9973492348377,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.46"
+    },
+    {
+      "timestamp": "2025-03-03 00:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1196.2587190530794,
+      "reason": "RSI qu\u00e1 mua: 56.16"
+    },
+    {
+      "timestamp": "2025-03-03 03:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1134.1475915530882,
+      "reason": "RSI qu\u00e1 mua: 56.66"
+    },
+    {
+      "timestamp": "2025-03-03 20:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 747.0439922305698,
+      "reason": "RSI qu\u00e1 b\u00e1n: 38.02"
+    },
+    {
+      "timestamp": "2025-03-03 21:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 970.33925409302,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.33"
+    },
+    {
+      "timestamp": "2025-03-04 00:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1038.632331781156,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.84"
+    },
+    {
+      "timestamp": "2025-03-04 02:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1175.547569831549,
+      "reason": "RSI qu\u00e1 mua: 56.81"
+    },
+    {
+      "timestamp": "2025-03-04 04:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 953.4194430881836,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.56"
+    },
+    {
+      "timestamp": "2025-03-04 10:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 886.9384665062473,
+      "reason": "RSI qu\u00e1 mua: 55.29"
+    },
+    {
+      "timestamp": "2025-03-04 16:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 1025.3165238037982,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.88"
+    },
+    {
+      "timestamp": "2025-03-05 01:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 845.1381701136254,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.34"
+    },
+    {
+      "timestamp": "2025-03-05 04:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 974.382024750462,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.87"
+    },
+    {
+      "timestamp": "2025-03-05 08:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1087.4517074132525,
+      "reason": "RSI qu\u00e1 mua: 56.78"
+    },
+    {
+      "timestamp": "2025-03-05 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 935.0234773151732,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.86"
+    },
+    {
+      "timestamp": "2025-03-05 11:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 895.7955587756896,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.09"
+    },
+    {
+      "timestamp": "2025-03-05 18:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1059.5029465835564,
+      "reason": "RSI qu\u00e1 mua: 56.17"
+    },
+    {
+      "timestamp": "2025-03-05 21:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 907.330169115269,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.18"
+    },
+    {
+      "timestamp": "2025-03-05 22:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 996.8560829625224,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.65"
+    },
+    {
+      "timestamp": "2025-03-06 00:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1057.31278132412,
+      "reason": "RSI qu\u00e1 mua: 60.29"
+    },
+    {
+      "timestamp": "2025-03-06 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1269.3033663980495,
+      "reason": "RSI qu\u00e1 mua: 64.34"
+    },
+    {
+      "timestamp": "2025-03-06 16:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1173.8851351853332,
+      "reason": "RSI qu\u00e1 mua: 55.65"
+    },
+    {
+      "timestamp": "2025-03-07 05:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1170.410551625549,
+      "reason": "RSI qu\u00e1 mua: 56.31"
+    },
+    {
+      "timestamp": "2025-03-07 10:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 829.612841317328,
+      "reason": "RSI qu\u00e1 b\u00e1n: 43.18"
+    },
+    {
+      "timestamp": "2025-03-07 16:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1190.4136589573006,
+      "reason": "RSI qu\u00e1 mua: 55.65"
+    },
+    {
+      "timestamp": "2025-03-07 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1162.5958915362064,
+      "reason": "RSI qu\u00e1 mua: 59.35"
+    },
+    {
+      "timestamp": "2025-03-07 18:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1221.8780233448133,
+      "reason": "RSI qu\u00e1 mua: 57.35"
+    },
+    {
+      "timestamp": "2025-03-07 19:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 984.0954789599948,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.21"
+    },
+    {
+      "timestamp": "2025-03-08 02:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 941.1133173261304,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.18"
+    },
+    {
+      "timestamp": "2025-03-08 06:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 945.1731205074924,
+      "reason": "RSI qu\u00e1 b\u00e1n: 41.78"
+    },
+    {
+      "timestamp": "2025-03-08 08:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 889.5137206937479,
+      "reason": "RSI qu\u00e1 b\u00e1n: 40.43"
+    },
+    {
+      "timestamp": "2025-03-08 12:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 928.2081109252398,
+      "reason": "RSI qu\u00e1 b\u00e1n: 42.15"
+    },
+    {
+      "timestamp": "2025-03-08 15:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1019.4107630953358,
+      "reason": "RSI qu\u00e1 mua: 55.60"
+    },
+    {
+      "timestamp": "2025-03-08 17:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1048.387665118804,
+      "reason": "RSI qu\u00e1 mua: 55.28"
+    },
+    {
+      "timestamp": "2025-03-09 01:51:19.013870",
+      "type": "entry",
+      "direction": "short",
+      "price": 1122.8980502489062,
+      "reason": "RSI qu\u00e1 mua: 57.33"
+    },
+    {
+      "timestamp": "2025-03-09 04:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 791.2972981397932,
+      "reason": "RSI qu\u00e1 b\u00e1n: 39.32"
+    },
+    {
+      "timestamp": "2025-03-09 09:51:19.013870",
+      "type": "entry",
+      "direction": "long",
+      "price": 933.2220443531114,
+      "reason": "RSI qu\u00e1 b\u00e1n: 44.57"
+    }
+  ]
+}

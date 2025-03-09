@@ -1,0 +1,15 @@
+{
+    "symbol": "BNBUSDT",
+    "initial_balance": 10000.0,
+    "final_balance": 12207.610608111438,
+    "profit_loss": 2207.6106081114376,
+    "profit_pct": 22.076106081114368,
+    "max_drawdown": 0.0,
+    "trades_count": 1,
+    "win_rate": 100.0,
+    "avg_profit": 12.407611813609876,
+    "avg_loss": 0.0,
+    "profit_factor": Infinity,
+    "risk_per_trade": 10.0,
+    "leverage": 20.0
+}

@@ -1,0 +1,7 @@
+{
+  "algorithm": "time_optimized_strategy",
+  "symbol": "ETHUSDT",
+  "timeframe": "1h",
+  "risk_level": 7.0,
+  "error": "Any cannot be instantiated"
+}

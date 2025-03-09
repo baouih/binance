@@ -1,0 +1,10 @@
+{
+  "symbol": "ETHUSDT",
+  "timeframe": "1h",
+  "risk_percentage": 15.0,
+  "initial_balance": 10000.0,
+  "max_positions": 5,
+  "use_stop_loss": true,
+  "use_take_profit": true,
+  "use_trailing_stop": true
+}

@@ -1,0 +1,7 @@
+{
+  "algorithm": "adaptive_exit_strategy",
+  "symbol": "BTCUSDT",
+  "timeframe": "1h",
+  "risk_level": 10.0,
+  "error": "[Errno 17] File exists: 'configs/adaptive_exit_strategy_test_config.json'"
+}

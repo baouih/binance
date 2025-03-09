@@ -1,0 +1,15 @@
+{
+  "symbol": "BNBUSDT",
+  "interval": "1h",
+  "start_date": "2025-02-22",
+  "end_date": "2025-03-09",
+  "risk_percentage": 20.0,
+  "profit_percentage": 360.0,
+  "win_rate": 0.5,
+  "max_drawdown": 0.30000000000000004,
+  "sharpe_ratio": 1.8333333333333335,
+  "total_trades": 40,
+  "profit_factor": 1.9,
+  "avg_win_percentage": 38.0,
+  "avg_loss_percentage": 20.0
+}
