@@ -1,6 +1,7 @@
 {
-    "bot_token": "ENVIRONMENT",
-    "chat_id": "ENVIRONMENT",
+    "bot_token": "",
+    "chat_id": "",
+    "use_env_variables": true,
     "enabled": true,
     "notification_settings": {
         "enable_trade_signals": true,

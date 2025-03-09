@@ -59,15 +59,16 @@ class AdvancedTelegramNotifier:
         # Lấy token và chat_id từ config hoặc env
         token_from_config = self.config.get("bot_token")
         chat_id_from_config = self.config.get("chat_id")
+        use_env_variables = self.config.get("use_env_variables", False)
         
         # Kiểm tra xem có phải dùng biến môi trường không
-        if token_from_config == "ENVIRONMENT" or not token_from_config:
+        if use_env_variables or token_from_config == "ENVIRONMENT" or not token_from_config:
             self.bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
             logger.info("Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường")
         else:
             self.bot_token = token_from_config
             
-        if chat_id_from_config == "ENVIRONMENT" or not chat_id_from_config:
+        if use_env_variables or chat_id_from_config == "ENVIRONMENT" or not chat_id_from_config:
             self.chat_id = os.environ.get("TELEGRAM_CHAT_ID")
             logger.info("Sử dụng TELEGRAM_CHAT_ID từ biến môi trường")
         else:
@@ -120,6 +121,7 @@ class AdvancedTelegramNotifier:
         config = {
             "bot_token": "",
             "chat_id": "",
+            "use_env_variables": True,
             "enabled": True,
             "notification_settings": {
                 "enable_trade_signals": True,
