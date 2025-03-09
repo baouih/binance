@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "bot_token": "${TELEGRAM_BOT_TOKEN}",
+  "chat_id": "${TELEGRAM_CHAT_ID}",
+  "notify_trades": true,
+  "notify_market_analysis": true,
+  "notify_errors": true,
+  "notify_daily_summary": true,
+  "detailed_notifications": true,
+  "send_charts": true,
+  "report_interval_hours": 4
+}

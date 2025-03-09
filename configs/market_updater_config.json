@@ -1,0 +1,26 @@
+{
+  "symbols": [
+    "BTCUSDT", 
+    "ETHUSDT", 
+    "BNBUSDT", 
+    "SOLUSDT", 
+    "ADAUSDT", 
+    "DOGEUSDT", 
+    "XRPUSDT", 
+    "DOTUSDT", 
+    "AVAXUSDT", 
+    "MATICUSDT",
+    "LINKUSDT", 
+    "UNIUSDT", 
+    "ATOMUSDT", 
+    "LTCUSDT"
+  ],
+  "timeframes": ["1h", "4h", "1d"],
+  "update_interval": 60,
+  "report_interval": 3600,
+  "notification": {
+    "threshold_change": 3.0,
+    "threshold_volume": 50.0,
+    "threshold_signal": 80.0
+  }
+}

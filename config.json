@@ -59,9 +59,9 @@
   },
   "additional_timeframes": ["15m", "4h", "1d"],
   "notifications": {
-    "enable_telegram": false,
-    "telegram_bot_token": "",
-    "telegram_chat_id": "",
+    "enable_telegram": true,
+    "telegram_bot_token": "${TELEGRAM_BOT_TOKEN}",
+    "telegram_chat_id": "${TELEGRAM_CHAT_ID}",
     "notify_on_trade": true,
     "notify_on_signal": false,
     "notify_on_error": true

@@ -102,6 +102,15 @@ telegram_notifier = TelegramNotifier(
     chat_id=telegram_config.get('chat_id', DEFAULT_CHAT_ID)
 )
 
+# Tải các module thông báo chi tiết nếu có
+try:
+    from detailed_trade_notifications import DetailedTradeNotifications
+    detailed_notifier = DetailedTradeNotifications()
+    logger.info("Đã tải module thông báo chi tiết")
+except ImportError:
+    detailed_notifier = None
+    logger.warning("Không tìm thấy module thông báo chi tiết, bỏ qua")
+
 # Danh sách các đồng coin được hỗ trợ
 # Tải danh sách cặp tiền từ account_config.json
 try:
@@ -358,6 +367,23 @@ def update_market_data():
                     'bb_upper': price * (1 + random.uniform(1, 3) / 100),
                     'bb_lower': price * (1 - random.uniform(1, 3) / 100)
                 }
+        
+        # Cập nhật dữ liệu thị trường cho module thông báo chi tiết
+        if detailed_notifier:
+            try:
+                detailed_notifier.update_market_data(market_prices)
+                logger.info("Đã cập nhật dữ liệu thị trường cho module thông báo chi tiết")
+                
+                # Cập nhật vị thế nếu có
+                if 'account_positions' in api_data and api_data['account_positions']:
+                    try:
+                        positions_dict = {pos['symbol']: pos for pos in api_data['account_positions']}
+                        detailed_notifier.update_positions(positions_dict)
+                        logger.info(f"Đã cập nhật {len(positions_dict)} vị thế cho module thông báo chi tiết")
+                    except Exception as e:
+                        logger.error(f"Lỗi khi cập nhật vị thế cho module thông báo chi tiết: {str(e)}")
+            except Exception as e:
+                logger.error(f"Lỗi khi cập nhật dữ liệu thị trường cho module thông báo chi tiết: {str(e)}")
     
     # Cập nhật thời gian chạy của bot nếu đang hoạt động
     if bot_status['running']:
@@ -567,6 +593,47 @@ def open_position(signal):
                     f"🪙 *Cặp giao dịch:* `{signal['symbol']}`\n"
                     f"⚙️ *Loại lệnh:* `{position_type}`\n"
                     f"💰 *Giá vào:* `{entry_price:.2f} USDT`\n"
+                )
+                
+                # Sử dụng thông báo chi tiết nếu có
+                if detailed_notifier:
+                    try:
+                        # Biến đổi thông tin vị thế để phù hợp với định dạng của DetailedTradeNotifications
+                        entry_data = {
+                            'symbol': signal['symbol'],
+                            'side': 'LONG' if signal['type'] == 'BUY' else 'SHORT',
+                            'entry_price': entry_price,
+                            'quantity': quantity,
+                            'leverage': position.get('leverage', 1),
+                            'take_profit': take_profit,
+                            'stop_loss': stop_loss,
+                            'margin_amount': risk_amount,
+                            'entry_time': datetime.now().isoformat(),
+                            'entry_reason': signal.get('strategy', 'Tín hiệu kỹ thuật hợp lệ'),
+                            'indicator_values': {
+                                'confidence': signal.get('confidence', 0),
+                                'timeframe': signal.get('timeframe', '1h'),
+                                'strength': signal.get('strength', 0)
+                            },
+                            'risk_reward_ratio': take_profit_percent / stop_loss_percent
+                        }
+                        
+                        # Gửi thông báo vào lệnh chi tiết
+                        if hasattr(detailed_notifier, 'notify_entry') and callable(getattr(detailed_notifier, 'notify_entry')):
+                            detailed_notifier.notify_entry(entry_data)
+                            logger.info(f"Đã gửi thông báo chi tiết vào lệnh cho {signal['symbol']}")
+                        else:
+                            # Sử dụng phương thức thay thế nếu notify_entry không tồn tại
+                            detailed_notifier.send_new_position_notification(signal['symbol'], entry_data)
+                            logger.info(f"Đã gửi thông báo vị thế mới cho {signal['symbol']}")
+                    except Exception as e:
+                        logger.error(f"Lỗi khi gửi thông báo chi tiết: {str(e)}")
+                
+                position_message = (
+                    f"{position_emoji} *VỊ THẾ MỚI ĐÃ ĐƯỢC MỞ*\n\n"
+                    f"🪙 *Cặp giao dịch:* `{signal['symbol']}`\n"
+                    f"⚙️ *Loại lệnh:* `{position_type}`\n"
+                    f"💰 *Giá vào:* `{entry_price:.2f} USDT`\n"
                     f"📊 *Số lượng:* `{quantity:.4f}`\n"
                     f"🛑 *Stop Loss:* `{stop_loss:.2f} USDT`\n"
                     f"🎯 *Take Profit:* `{take_profit:.2f} USDT`\n"
@@ -688,6 +755,35 @@ def close_position(position_id, exit_price=None, reason='Manual Close'):
                 telegram_notifier.send_message(position_message)
                 logger.info(f"Đã gửi thông báo đóng vị thế {trade['symbol']} {trade['side']} qua Telegram")
                 telegram_config['last_notification'] = now
+                
+                # Sử dụng thông báo chi tiết nếu có
+                if detailed_notifier:
+                    try:
+                        # Biến đổi thông tin giao dịch để phù hợp với định dạng của DetailedTradeNotifications
+                        exit_data = {
+                            'symbol': trade['symbol'],
+                            'side': 'LONG' if trade['side'] == 'BUY' else 'SHORT',
+                            'entry_price': trade['entry_price'],
+                            'exit_price': trade['exit_price'],
+                            'quantity': trade['quantity'],
+                            'exit_time': datetime.now().isoformat(),
+                            'exit_reason': reason,
+                            'profit_loss': pnl,
+                            'profit_loss_percent': pnl_percent,
+                            'holding_time': f"{int(trade['duration'] / 3600)}h {int((trade['duration'] % 3600) / 60)}m",
+                            'trade_id': trade['id']
+                        }
+                        
+                        # Gửi thông báo thoát lệnh chi tiết
+                        if hasattr(detailed_notifier, 'notify_exit') and callable(getattr(detailed_notifier, 'notify_exit')):
+                            detailed_notifier.notify_exit(exit_data)
+                            logger.info(f"Đã gửi thông báo chi tiết thoát lệnh cho {trade['symbol']}")
+                        else:
+                            # Sử dụng phương thức thay thế nếu notify_exit không tồn tại
+                            detailed_notifier.send_position_closed_notification(trade['symbol'], exit_data)
+                            logger.info(f"Đã gửi thông báo đóng vị thế cho {trade['symbol']}")
+                    except Exception as e:
+                        logger.error(f"Lỗi khi gửi thông báo chi tiết thoát lệnh: {str(e)}")
             except Exception as e:
                 logger.error(f"Lỗi khi gửi thông báo đóng vị thế qua Telegram: {str(e)}")
     
