@@ -1,67 +1,61 @@
-#!/usr/bin/env python3
-"""
-Script kiểm tra kết nối Telegram
-"""
-
 import os
+import json
 import logging
 import requests
-import json
-from dotenv import load_dotenv
+from datetime import datetime
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('telegram_test')
 
-def send_test_message():
-    # Tải biến môi trường
-    load_dotenv()
-    
-    # Lấy thông tin cấu hình từ biến môi trường
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-    
-    if not token or not chat_id:
-        logger.error("Thiếu thông tin cấu hình Telegram (token hoặc chat_id)")
-        print("Lỗi: Thiếu thông tin cấu hình Telegram (token hoặc chat_id)")
-        return False
-    
-    logger.info(f"Bot Token: {token[:5]}...{token[-5:]}")
-    logger.info(f"Chat ID: {chat_id}")
-    
-    # Gửi tin nhắn test
-    base_url = "https://api.telegram.org/bot"
-    url = f"{base_url}{token}/sendMessage"
-    message = "🔄 Đây là tin nhắn test từ Bot Giao Dịch Crypto.\n\n⏱️ Thời gian: " + \
-              f"{__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n" + \
-              "✅ Nếu bạn nhận được tin nhắn này, kết nối Telegram đang hoạt động bình thường."
-    
-    try:
-        params = {
-            "chat_id": chat_id,
-            "text": message,
-            "parse_mode": "HTML"
-        }
-        
-        response = requests.post(url, params=params)
-        
-        # Kiểm tra kết quả
-        if response.status_code == 200:
-            logger.info("Đã gửi tin nhắn test thành công!")
-            print("Thành công: Đã gửi tin nhắn test tới Telegram!")
-            print(f"Thông tin phản hồi: {response.json()}")
-            return True
-        else:
-            logger.error(f"Lỗi khi gửi tin nhắn: {response.status_code} - {response.text}")
-            print(f"Lỗi: Không thể gửi tin nhắn. Mã lỗi: {response.status_code}")
-            print(f"Chi tiết lỗi: {response.text}")
-            return False
-            
-    except Exception as e:
-        logger.error(f"Lỗi khi gửi tin nhắn qua Telegram: {e}")
-        print(f"Lỗi: {str(e)}")
-        return False
+# Lấy token và chat_id từ biến môi trường
+bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+chat_id = os.environ.get('TELEGRAM_CHAT_ID')
 
-if __name__ == "__main__":
-    print("Đang kiểm tra kết nối Telegram...")
-    send_test_message()
+if not bot_token or not chat_id:
+    logger.error("Không tìm thấy TELEGRAM_BOT_TOKEN hoặc TELEGRAM_CHAT_ID trong biến môi trường")
+    exit(1)
+
+logger.info(f"Bot token: {bot_token[:5]}...{bot_token[-5:]}")
+logger.info(f"Chat ID: {chat_id}")
+
+# Khởi tạo API URL
+api_url = f"https://api.telegram.org/bot{bot_token}"
+
+# Kiểm tra kết nối
+try:
+    response = requests.get(f"{api_url}/getMe")
+    response_data = response.json()
+    
+    if response.status_code == 200 and response_data.get('ok'):
+        bot_info = response_data.get('result', {})
+        logger.info(f"Kết nối thành công! Bot: @{bot_info.get('username')} - {bot_info.get('first_name')}")
+    else:
+        logger.error(f"Lỗi khi kết nối đến Bot API: {response.text}")
+        exit(1)
+except Exception as e:
+    logger.error(f"Lỗi khi kết nối đến Bot API: {str(e)}")
+    exit(1)
+
+# Gửi tin nhắn kiểm tra
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+test_message = f"🧪 Tin nhắn kiểm tra hệ thống giao dịch\n⏰ Thời gian: {current_time}\n\n✅ Hệ thống đang hoạt động bình thường\n🔄 Đang theo dõi thị trường, chờ cơ hội giao dịch"
+
+try:
+    params = {
+        'chat_id': chat_id,
+        'text': test_message
+    }
+    
+    logger.info("Đang gửi tin nhắn kiểm tra...")
+    response = requests.post(f"{api_url}/sendMessage", json=params)
+    
+    if response.status_code == 200 and response.json().get('ok'):
+        logger.info("✅ Đã gửi tin nhắn kiểm tra thành công!")
+        print("\n✅ ĐÃ GỬI TIN NHẮN KIỂM TRA TELEGRAM THÀNH CÔNG!")
+    else:
+        logger.error(f"❌ Lỗi khi gửi tin nhắn: {response.text}")
+        print(f"\n❌ LỖI KHI GỬI TIN NHẮN: {response.text}")
+except Exception as e:
+    logger.error(f"❌ Lỗi khi gửi tin nhắn: {str(e)}")
+    print(f"\n❌ LỖI KHI GỬI TIN NHẮN: {str(e)}")

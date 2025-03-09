@@ -1,0 +1,7 @@
+{
+    "main_trading_bot": "failed",
+    "auto_sltp_manager": "running",
+    "trailing_stop": "stopped",
+    "market_analyzer": "stopped",
+    "telegram_notifier": "stopped"
+}

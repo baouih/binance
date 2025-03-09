@@ -206,23 +206,44 @@ class APIFixer:
         if stop_price and order_type in ['STOP', 'STOP_MARKET', 'TAKE_PROFIT', 'TAKE_PROFIT_MARKET']:
             params['stopPrice'] = stop_price
         
-        # Xử lý đặc biệt cho hedge mode
-        if api.hedge_mode and position_side:
-            # Trong hedge mode với position side được chỉ định
+        # Xử lý đặc biệt cho hedge mode và one-way mode
+        # Quan trọng: Không kết hợp closePosition=true với positionSide
+        if 'closePosition' in kwargs and kwargs['closePosition'] == 'true':
+            # Nếu đã chỉ định closePosition, xóa position_side để tránh lỗi
+            logger.warning("Không thể kết hợp closePosition với positionSide, sẽ ưu tiên closePosition")
+            position_side = None
+            
+        if api.hedge_mode:
+            # Trong chế độ hedge mode
             if position_side in ['LONG', 'SHORT']:
+                # Thêm positionSide nhưng KHÔNG thêm reduceOnly - đây là vấn đề quan trọng
                 params['positionSide'] = position_side
-                # Không thêm reduceOnly khi đã chỉ định positionSide
-            elif position_side == 'BOTH':
+                if 'reduceOnly' in params:
+                    logger.warning("Đã xóa tham số reduceOnly khi sử dụng positionSide")
+                    del params['reduceOnly']
+            elif position_side == 'BOTH' and reduce_only:
+                # Trường hợp BOTH chỉ dùng trong one-way mode
                 params['positionSide'] = 'BOTH'
-                if reduce_only:
-                    params['reduceOnly'] = 'true'
+                params['reduceOnly'] = 'true'
+            elif reduce_only:
+                # Trong hedge mode nhưng không chỉ định position_side
+                logger.warning("Trong hedge mode nhưng không chỉ định position_side cho reduceOnly")
+                # Mặc định dùng LONG cho SL/TP nếu không chỉ định
+                params['positionSide'] = 'LONG'  
         else:
-            # Chế độ one-way hoặc không chỉ định position side
+            # Chế độ one-way (không có positionSide)
             if reduce_only:
                 params['reduceOnly'] = 'true'
+                # Xác nhận không sử dụng positionSide trong one-way mode
+                if position_side:
+                    logger.warning(f"Bỏ qua tham số position_side={position_side} trong chế độ one-way")
         
         # Thêm các tham số bổ sung
         for key, value in kwargs.items():
+            # Bỏ qua closePosition khi đã chỉ định positionSide
+            if key == 'closePosition' and 'positionSide' in params:
+                logger.warning(f"Bỏ qua tham số {key}={value} khi đã sử dụng positionSide")
+                continue
             params[key] = value
             
         logger.info(f"Tạo lệnh {order_type} cho {symbol}: {json.dumps(params, indent=2)}")
@@ -230,11 +251,21 @@ class APIFixer:
         # Thử gọi API
         result = api._request('POST', 'order', params, signed=True, version='v1')
         
-        # Nếu gặp lỗi position side, tự động thử lại với LONG
-        if isinstance(result, dict) and result.get('code') == -4061:
-            logger.warning("Lỗi position side không khớp, thử lại với LONG")
-            params['positionSide'] = 'LONG'
-            result = api._request('POST', 'order', params, signed=True, version='v1')
+        # Xử lý các lỗi thường gặp
+        if isinstance(result, dict) and 'code' in result:
+            error_code = result.get('code')
+            
+            # Lỗi position side không khớp
+            if error_code == -4061:
+                logger.warning("Lỗi position side không khớp, thử lại với LONG")
+                params['positionSide'] = 'LONG'
+                result = api._request('POST', 'order', params, signed=True, version='v1')
+            # Lỗi về reduceOnly và positionSide
+            elif error_code == -4013 and 'positionSide' in params and 'reduceOnly' in params:
+                logger.warning("Lỗi kết hợp reduceOnly với positionSide, thử lại sau khi xóa reduceOnly")
+                del params['reduceOnly']
+                result = api._request('POST', 'order', params, signed=True, version='v1')
+            # Thêm các xử lý lỗi khác nếu cần
             
         return result
     
@@ -262,72 +293,137 @@ class APIFixer:
         if not hasattr(api, 'hedge_mode'):
             api.hedge_mode = APIFixer.check_hedge_mode(api)
         
+        # Ghi log chế độ tài khoản
+        logger.info(f"Đang đặt SL/TP cho tài khoản {'' if api.hedge_mode else 'không '}ở chế độ hedge mode")
+        
         # Xác định phương hướng của vị thế
         if not position_side and api.hedge_mode:
             position_side = 'LONG'  # Mặc định LONG nếu không chỉ định trong hedge mode
+            logger.info(f"Không chỉ định position_side, sử dụng mặc định: {position_side}")
         
         # Xác định số lượng lệnh TP/SL
         if not order_quantity and usd_value:
             order_quantity = APIFixer.calculate_min_quantity(api, symbol, usd_value)
+            logger.info(f"Tính toán số lượng từ giá trị USD {usd_value}: {order_quantity}")
             
         if not order_quantity:
             # Thử lấy từ vị thế hiện tại
-            positions = api.get_futures_position_risk()
-            for pos in positions:
-                if pos['symbol'] == symbol:
-                    if (not position_side) or (position_side == 'BOTH') or (pos['positionSide'] == position_side):
-                        order_quantity = abs(float(pos['positionAmt']))
-                        break
+            try:
+                positions = api.get_futures_position_risk()
+                found_position = False
+                
+                for pos in positions:
+                    if pos['symbol'] == symbol:
+                        # Kiểm tra position_side nếu ở chế độ hedge
+                        if api.hedge_mode:
+                            if position_side and pos['positionSide'] == position_side:
+                                order_quantity = abs(float(pos['positionAmt']))
+                                logger.info(f"Đã xác định số lượng từ vị thế {symbol} ({position_side}): {order_quantity}")
+                                found_position = True
+                                break
+                        else:
+                            # Trong chế độ one-way, không cần kiểm tra positionSide
+                            order_quantity = abs(float(pos['positionAmt']))
+                            logger.info(f"Đã xác định số lượng từ vị thế {symbol} (one-way): {order_quantity}")
+                            found_position = True
+                            break
+                
+                if not found_position:
+                    logger.warning(f"Không tìm thấy vị thế {symbol} phù hợp")
+            except Exception as e:
+                logger.error(f"Lỗi khi truy vấn vị thế: {str(e)}")
         
         if not order_quantity:
             return {'error': "Không thể xác định số lượng cho TP/SL"}
             
-        # Xác định side dựa vào position_side
-        if position_side == 'LONG':
-            side = 'SELL'
-        elif position_side == 'SHORT':
-            side = 'BUY'
-        else:
-            # Với BOTH, cần xác định dựa trên vị thế hiện tại
-            positions = api.get_futures_position_risk()
-            for pos in positions:
-                if pos['symbol'] == symbol:
-                    pos_amt = float(pos['positionAmt'])
-                    side = 'SELL' if pos_amt > 0 else 'BUY'
-                    break
+        # Xác định side dựa vào position_side và loại vị thế
+        side = None
+        
+        if api.hedge_mode:
+            # Trong chế độ hedge mode, side phụ thuộc vào position_side
+            if position_side == 'LONG':
+                side = 'SELL'  # Đóng vị thế LONG bằng SELL
+            elif position_side == 'SHORT':
+                side = 'BUY'   # Đóng vị thế SHORT bằng BUY
             else:
-                return {'error': "Không thể xác định side cho TP/SL"}
+                logger.error(f"Position side không hợp lệ trong hedge mode: {position_side}")
+                return {'error': f"Position side không hợp lệ: {position_side}"}
+        else:
+            # Trong chế độ one-way, cần xác định side dựa trên giá trị vị thế
+            try:
+                positions = api.get_futures_position_risk()
+                for pos in positions:
+                    if pos['symbol'] == symbol:
+                        pos_amt = float(pos['positionAmt'])
+                        side = 'SELL' if pos_amt > 0 else 'BUY'
+                        logger.info(f"Đã xác định side cho one-way mode: {side} (positionAmt={pos_amt})")
+                        break
+                else:
+                    return {'error': "Không tìm thấy vị thế để đặt SL/TP"}
+            except Exception as e:
+                logger.error(f"Lỗi khi xác định side cho SL/TP: {str(e)}")
+                return {'error': f"Lỗi khi xác định side: {str(e)}"}
+        
+        if not side:
+            return {'error': "Không thể xác định side cho TP/SL"}
+        
+        # Chuẩn bị các tham số cho SL/TP dựa vào loại tài khoản
+        tp_params = {
+            'api': api,
+            'symbol': symbol,
+            'side': side,
+            'order_type': 'TAKE_PROFIT_MARKET',
+            'quantity': order_quantity,
+            'stop_price': take_profit_price,
+            'working_type': 'MARK_PRICE'
+        }
+        
+        sl_params = {
+            'api': api,
+            'symbol': symbol,
+            'side': side,
+            'order_type': 'STOP_MARKET',
+            'quantity': order_quantity,
+            'stop_price': stop_loss_price,
+            'working_type': 'MARK_PRICE'
+        }
+        
+        # Thêm tham số đặc biệt dựa vào chế độ tài khoản
+        if api.hedge_mode:
+            # Trong hedge mode, thêm position_side
+            tp_params['position_side'] = position_side
+            sl_params['position_side'] = position_side
+            logger.info(f"Thêm position_side={position_side} cho lệnh SL/TP trong hedge mode")
+        else:
+            # Trong one-way mode, thêm reduceOnly=True
+            tp_params['reduce_only'] = True
+            sl_params['reduce_only'] = True
+            logger.info("Thêm reduceOnly=True cho lệnh SL/TP trong one-way mode")
         
         # Tạo lệnh
         results = {}
         
         # Take Profit
         if take_profit_price:
-            tp_result = APIFixer.create_order_with_position_side(
-                api=api,
-                symbol=symbol,
-                side=side,
-                order_type='TAKE_PROFIT_MARKET',
-                quantity=order_quantity,
-                stop_price=take_profit_price,
-                position_side=position_side,
-                working_type='MARK_PRICE'
-            )
+            logger.info(f"Đặt Take Profit cho {symbol} tại giá {take_profit_price}")
+            tp_result = APIFixer.create_order_with_position_side(**tp_params)
             results['take_profit'] = tp_result
+            
+            if 'orderId' in tp_result:
+                logger.info(f"Đặt TP thành công, orderId: {tp_result['orderId']}")
+            else:
+                logger.error(f"Lỗi khi đặt TP: {tp_result}")
             
         # Stop Loss
         if stop_loss_price:
-            sl_result = APIFixer.create_order_with_position_side(
-                api=api,
-                symbol=symbol,
-                side=side,
-                order_type='STOP_MARKET',
-                quantity=order_quantity,
-                stop_price=stop_loss_price,
-                position_side=position_side,
-                working_type='MARK_PRICE'
-            )
+            logger.info(f"Đặt Stop Loss cho {symbol} tại giá {stop_loss_price}")
+            sl_result = APIFixer.create_order_with_position_side(**sl_params)
             results['stop_loss'] = sl_result
+            
+            if 'orderId' in sl_result:
+                logger.info(f"Đặt SL thành công, orderId: {sl_result['orderId']}")
+            else:
+                logger.error(f"Lỗi khi đặt SL: {sl_result}")
             
         return results
 

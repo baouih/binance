@@ -5,10 +5,10 @@
     "qty": 0.124,
     "sl_price": 2137.75,
     "tp_price": 2246.82,
-    "highest_price": 2183.36,
+    "highest_price": 2181.38,
     "lowest_price": Infinity,
     "trailing_active": false,
-    "last_updated": "2025-03-09T08:38:20.752912"
+    "last_updated": "2025-03-09T09:03:22.816163"
   },
   "BNBUSDT": {
     "entry_price": 600.3683333333,
@@ -19,7 +19,7 @@
     "highest_price": 600.3683333333,
     "lowest_price": Infinity,
     "trailing_active": false,
-    "last_updated": "2025-03-09T08:38:22.093807"
+    "last_updated": "2025-03-09T09:03:23.706108"
   },
   "BTCUSDT": {
     "entry_price": 86077.32222222,
@@ -30,6 +30,6 @@
     "highest_price": 86077.32222222,
     "lowest_price": Infinity,
     "trailing_active": false,
-    "last_updated": "2025-03-09T08:38:23.147639"
+    "last_updated": "2025-03-09T12:37:17.135373"
   }
 }

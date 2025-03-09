@@ -27,7 +27,7 @@ class TelegramNotifier:
     Lớp xử lý gửi thông báo qua Telegram
     """
     
-    def __init__(self, token=None, chat_id=None, config_path='configs/telegram/telegram_notification_config.json'):
+    def __init__(self, token=None, chat_id=None, config_path='telegram_config.json'):
         """
         Khởi tạo Telegram notifier
         

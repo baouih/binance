@@ -49,6 +49,9 @@ class AutoSLTPManager:
             api_secret (str, optional): API secret Binance
             testnet (bool): Sử dụng testnet hay không
         """
+        # Lưu trữ cài đặt
+        self.testnet = testnet
+        
         # Khởi tạo API
         self.api = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=testnet)
         self.api = apply_fixes_to_api(self.api)
@@ -179,18 +182,29 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Stop Loss với quantity và reduceOnly=True để hiển thị trên giao diện
-            result = self.api.futures_create_order(
-                symbol=symbol,
-                side=close_side,
-                type='STOP_MARKET',
-                stopPrice=price,
-                quantity=abs(quantity),
-                reduceOnly=True,
-                workingType="MARK_PRICE"
-            )
+            # Tạo các tham số cơ bản
+            params = {
+                'symbol': symbol,
+                'side': close_side,
+                'type': 'STOP_MARKET',
+                'stopPrice': price,
+                'quantity': abs(quantity),
+                'workingType': 'MARK_PRICE'
+            }
+            
+            # Thiết lập các tham số dựa trên chế độ tài khoản (hedge mode hoặc không)
+            if hasattr(self.api, 'hedge_mode') and self.api.hedge_mode:
+                # Sử dụng positionSide cho tài khoản hedge mode
+                params['positionSide'] = position_side
+            else:
+                # Sử dụng reduceOnly cho tài khoản one-way mode
+                params['reduceOnly'] = True
+                
+            # Đặt lệnh Stop Loss
+            result = self.api._request('POST', 'order', params, signed=True, version='v1')
             
             logger.info(f"Đã đặt SL cho {symbol} {side} tại giá {price}, số lượng {quantity}")
+            logger.debug(f"Chi tiết lệnh SL: {result}")
             return True
         except Exception as e:
             logger.error(f"Lỗi khi đặt SL cho {symbol}: {str(e)}")
@@ -215,18 +229,29 @@ class AutoSLTPManager:
             # Xác định positionSide cho hedge mode
             position_side = 'LONG' if side == 'LONG' else 'SHORT'
             
-            # Đặt lệnh Take Profit với quantity và reduceOnly=True để hiển thị trên giao diện
-            result = self.api.futures_create_order(
-                symbol=symbol,
-                side=close_side,
-                type='TAKE_PROFIT_MARKET',
-                stopPrice=price,
-                quantity=abs(quantity),
-                reduceOnly=True,
-                workingType="MARK_PRICE"
-            )
+            # Tạo các tham số cơ bản
+            params = {
+                'symbol': symbol,
+                'side': close_side,
+                'type': 'TAKE_PROFIT_MARKET',
+                'stopPrice': price,
+                'quantity': abs(quantity),
+                'workingType': 'MARK_PRICE'
+            }
+            
+            # Thiết lập các tham số dựa trên chế độ tài khoản (hedge mode hoặc không)
+            if hasattr(self.api, 'hedge_mode') and self.api.hedge_mode:
+                # Sử dụng positionSide cho tài khoản hedge mode
+                params['positionSide'] = position_side
+            else:
+                # Sử dụng reduceOnly cho tài khoản one-way mode
+                params['reduceOnly'] = True
+                
+            # Đặt lệnh Take Profit
+            result = self.api._request('POST', 'order', params, signed=True, version='v1')
             
             logger.info(f"Đã đặt TP cho {symbol} {side} tại giá {price}, số lượng {quantity}")
+            logger.debug(f"Chi tiết lệnh TP: {result}")
             return True
         except Exception as e:
             logger.error(f"Lỗi khi đặt TP cho {symbol}: {str(e)}")
