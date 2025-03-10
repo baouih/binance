@@ -1,324 +1,518 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
-Module quản lý vị thế giao dịch (Position Manager)
-
-Module này kết hợp AdvancedTrailingStop và ProfitManager để quản lý toàn diện
-vị thế giao dịch, bao gồm trailing stop, chốt lời, và quản lý rủi ro.
+Module quản lý vị thế giao dịch cho hệ thống giao dịch
+Tương tác với Binance API để quản lý vị thế, đặt lệnh, và theo dõi
 """
 
-import time
+import os
 import logging
-from typing import Dict, Tuple, List, Optional, Any
+import time
+import json
+import traceback
 from datetime import datetime
+from binance.client import Client
+from binance.exceptions import BinanceAPIException
+from binance.enums import *
 
-from advanced_trailing_stop import AdvancedTrailingStop
-from profit_manager import ProfitManager
-
-# Thiết lập logging
-logger = logging.getLogger(__name__)
+# Cấu hình logging
+logger = logging.getLogger("position_manager")
 
 class PositionManager:
     """
-    Lớp quản lý vị thế giao dịch tổng hợp
+    Lớp quản lý vị thế, tương tác với Binance API
+    để mở, đóng và quản lý vị thế giao dịch
     """
     
-    def __init__(self, 
-                 trailing_stop_config: Dict = None, 
-                 profit_manager_config: Dict = None,
-                 data_cache = None):
+    def __init__(self, api_key=None, api_secret=None, testnet=True, risk_config=None):
         """
-        Khởi tạo quản lý vị thế
+        Khởi tạo với thông tin API
         
-        Args:
-            trailing_stop_config (Dict, optional): Cấu hình cho trailing stop
-            profit_manager_config (Dict, optional): Cấu hình cho profit manager
-            data_cache (DataCache, optional): Cache dữ liệu
+        :param api_key: Binance API key
+        :param api_secret: Binance API secret
+        :param testnet: Sử dụng testnet (True) hoặc mainnet (False)
+        :param risk_config: Cấu hình quản lý rủi ro
         """
-        self.data_cache = data_cache
-        
-        # Khởi tạo các thành phần
-        self.trailing_stop = AdvancedTrailingStop(
-            strategy_type=trailing_stop_config.get('strategy_type', 'percentage') if trailing_stop_config else 'percentage',
-            config=trailing_stop_config.get('config', {}) if trailing_stop_config else {},
-            data_cache=data_cache
-        )
-        
-        self.profit_manager = ProfitManager(
-            config=profit_manager_config,
-            data_cache=data_cache
-        )
+        self.api_key = api_key or os.environ.get("BINANCE_TESTNET_API_KEY")
+        self.api_secret = api_secret or os.environ.get("BINANCE_TESTNET_API_SECRET")
+        self.testnet = testnet
+        self.client = None
+        self.risk_config = risk_config or {}
+        self.connect()
     
-    def initialize_position(self, position: Dict) -> Dict:
-        """
-        Khởi tạo vị thế với tất cả các tham số quản lý
+    def connect(self):
+        """Kết nối tới Binance API"""
+        try:
+            self.client = Client(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                testnet=self.testnet
+            )
+            # Kiểm tra kết nối
+            self.client.ping()
+            logger.info("✅ Kết nối Binance API thành công")
+            return True
+        except BinanceAPIException as e:
+            logger.error(f"❌ Lỗi kết nối Binance API: {str(e)}")
+            return False
+        except Exception as e:
+            logger.error(f"❌ Lỗi không xác định khi kết nối Binance API: {str(e)}")
+            logger.error(traceback.format_exc())
+            return False
+    
+    def is_connected(self):
+        """Kiểm tra xem API có kết nối không"""
+        if not self.client:
+            return False
         
-        Args:
-            position (Dict): Thông tin vị thế
+        try:
+            self.client.ping()
+            return True
+        except:
+            return False
+    
+    def reconnect(self):
+        """Kết nối lại nếu mất kết nối"""
+        logger.info("Đang kết nối lại với Binance API...")
+        return self.connect()
+    
+    def get_all_positions(self):
+        """
+        Lấy tất cả vị thế đang mở
+        
+        :return: List các vị thế đang mở
+        """
+        if not self.is_connected() and not self.reconnect():
+            logger.error("Không thể kết nối tới Binance API")
+            return []
+        
+        try:
+            # Lấy thông tin tài khoản futures
+            account = self.client.futures_account()
             
-        Returns:
-            Dict: Thông tin vị thế đã cập nhật
-        """
-        # Khởi tạo trailing stop
-        position = self.trailing_stop.initialize_position(position)
-        
-        # Khởi tạo profit manager
-        position = self.profit_manager.initialize_position(position)
-        
-        # Đảm bảo có entry_time
-        if 'entry_time' not in position:
-            position['entry_time'] = datetime.now()
-        
-        return position
-    
-    def update_position(self, position: Dict, current_price: float, current_time: datetime = None) -> Dict:
-        """
-        Cập nhật trạng thái vị thế
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            current_time (datetime, optional): Thời gian hiện tại
+            # Lọc các vị thế có số lượng khác 0
+            positions = []
+            for position in account['positions']:
+                position_amt = float(position['positionAmt'])
+                if position_amt != 0:
+                    symbol = position['symbol']
+                    entry_price = float(position['entryPrice'])
+                    mark_price = float(position['markPrice'])
+                    unrealized_pnl = float(position['unrealizedProfit'])
+                    leverage = int(position['leverage'])
+                    
+                    # Xác định hướng vị thế
+                    side = "LONG" if position_amt > 0 else "SHORT"
+                    
+                    # Tính % lợi nhuận
+                    if entry_price == 0:
+                        profit_percent = 0
+                    else:
+                        if side == "LONG":
+                            profit_percent = ((mark_price - entry_price) / entry_price) * 100 * leverage
+                        else:
+                            profit_percent = ((entry_price - mark_price) / entry_price) * 100 * leverage
+                    
+                    # Lấy thông tin SL/TP nếu có
+                    open_orders = self.client.futures_get_open_orders(symbol=symbol)
+                    stop_loss = None
+                    take_profit = None
+                    
+                    for order in open_orders:
+                        order_type = order['type']
+                        order_side = order['side']
+                        
+                        # SL cho vị thế LONG là SELL STOP, cho SHORT là BUY STOP
+                        is_sl = (side == "LONG" and order_side == "SELL" and order_type == "STOP_MARKET") or \
+                                (side == "SHORT" and order_side == "BUY" and order_type == "STOP_MARKET")
+                        
+                        # TP cho vị thế LONG là SELL LIMIT, cho SHORT là BUY LIMIT
+                        is_tp = (side == "LONG" and order_side == "SELL" and order_type == "LIMIT") or \
+                                (side == "SHORT" and order_side == "BUY" and order_type == "LIMIT")
+                        
+                        if is_sl:
+                            stop_loss = float(order['stopPrice'])
+                        elif is_tp:
+                            take_profit = float(order['price'])
+                    
+                    position_info = {
+                        "symbol": symbol,
+                        "side": side,
+                        "entry_price": entry_price,
+                        "mark_price": mark_price,
+                        "amount": abs(position_amt),
+                        "leverage": leverage,
+                        "unrealized_pnl": unrealized_pnl,
+                        "profit_percent": profit_percent,
+                        "stop_loss": stop_loss,
+                        "take_profit": take_profit
+                    }
+                    
+                    positions.append(position_info)
             
-        Returns:
-            Dict: Thông tin vị thế đã cập nhật
-        """
-        # Cập nhật trailing stop
-        position = self.trailing_stop.update_trailing_stop(position, current_price)
-        
-        return position
-    
-    def check_exit_conditions(self, position: Dict, current_price: float, 
-                             current_time: datetime = None) -> Tuple[bool, str]:
-        """
-        Kiểm tra các điều kiện đóng vị thế
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            current_time (datetime, optional): Thời gian hiện tại
+            return positions
             
-        Returns:
-            Tuple[bool, str]: (Có nên đóng hay không, Lý do)
-        """
-        if not current_time:
-            current_time = datetime.now()
-        
-        # Kiểm tra trailing stop
-        should_close, reason = self.trailing_stop.check_stop_condition(position, current_price)
-        
-        if should_close:
-            return True, reason
-        
-        # Kiểm tra profit manager
-        should_close, reason = self.profit_manager.check_profit_conditions(
-            position, current_price, current_time
-        )
-        
-        if should_close:
-            return True, reason
-        
-        return False, None
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi Binance API khi lấy vị thế: {str(e)}")
+            return []
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi lấy vị thế: {str(e)}")
+            logger.error(traceback.format_exc())
+            return []
     
-    def get_trailing_stop_status(self, position: Dict) -> Dict:
+    def open_position(self, symbol, side, amount, leverage=None, stop_loss=None, take_profit=None):
         """
-        Lấy trạng thái trailing stop
+        Mở vị thế mới
         
-        Args:
-            position (Dict): Thông tin vị thế
+        :param symbol: Cặp tiền, ví dụ BTCUSDT
+        :param side: Hướng vị thế ("LONG" hoặc "SHORT")
+        :param amount: Số lượng (đơn vị là USDT nếu dùng QUANTITY_TYPE="USDT")
+        :param leverage: Đòn bẩy (nếu None, sẽ dùng leverage từ risk_config)
+        :param stop_loss: Mức stop loss (giá)
+        :param take_profit: Mức take profit (giá)
+        :return: Dict thông tin vị thế hoặc lỗi
+        """
+        if not self.is_connected() and not self.reconnect():
+            logger.error("Không thể kết nối tới Binance API")
+            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
+        
+        try:
+            # Kiểm tra số lượng vị thế đang mở
+            current_positions = self.get_all_positions()
+            max_positions = self.risk_config.get("max_open_positions", 5)
             
-        Returns:
-            Dict: Trạng thái trailing stop
-        """
-        return {
-            'strategy': self.trailing_stop.get_strategy_name(),
-            'activated': position.get('trailing_activated', False),
-            'stop_price': position.get('trailing_stop')
-        }
-    
-    def get_profit_strategies(self) -> List[str]:
-        """
-        Lấy danh sách chiến lược chốt lời đang hoạt động
-        
-        Returns:
-            List[str]: Danh sách tên chiến lược
-        """
-        return self.profit_manager.get_active_strategies()
-    
-    def change_trailing_strategy(self, new_strategy_type: str, config: Dict = None) -> bool:
-        """
-        Thay đổi chiến lược trailing stop
-        
-        Args:
-            new_strategy_type (str): Loại chiến lược mới
-            config (Dict, optional): Cấu hình mới
+            if len(current_positions) >= max_positions:
+                logger.warning(f"Đã đạt giới hạn vị thế tối đa ({max_positions})")
+                return {"status": "error", "message": f"Đã đạt giới hạn vị thế tối đa ({max_positions})"}
             
-        Returns:
-            bool: True nếu thành công, False nếu không
-        """
-        return self.trailing_stop.change_strategy(new_strategy_type, config)
-    
-    def toggle_profit_strategy(self, strategy_name: str, enabled: bool) -> bool:
-        """
-        Bật/tắt một chiến lược chốt lời
-        
-        Args:
-            strategy_name (str): Tên chiến lược
-            enabled (bool): Trạng thái
+            # Đặt leverage
+            lev = leverage or self.risk_config.get("leverage", 1)
+            self.client.futures_change_leverage(symbol=symbol, leverage=lev)
             
-        Returns:
-            bool: True nếu thành công, False nếu không
-        """
-        return self.profit_manager.toggle_strategy(strategy_name, enabled)
-    
-    def update_profit_strategy(self, strategy_name: str, params: Dict) -> bool:
-        """
-        Cập nhật tham số cho một chiến lược chốt lời
-        
-        Args:
-            strategy_name (str): Tên chiến lược
-            params (Dict): Tham số mới
+            # Lấy thông tin giá hiện tại
+            ticker = self.client.futures_symbol_ticker(symbol=symbol)
+            current_price = float(ticker['price'])
             
-        Returns:
-            bool: True nếu thành công, False nếu không
-        """
-        return self.profit_manager.update_strategy_params(strategy_name, params)
-    
-    def generate_position_summary(self, position: Dict, current_price: float) -> Dict:
-        """
-        Tạo tóm tắt vị thế
-        
-        Args:
-            position (Dict): Thông tin vị thế
-            current_price (float): Giá hiện tại
-            
-        Returns:
-            Dict: Tóm tắt vị thế
-        """
-        entry_price = position.get('entry_price')
-        side = position.get('side')
-        quantity = position.get('quantity')
-        entry_time = position.get('entry_time')
-        
-        # Tính lợi nhuận hiện tại
-        current_profit = 0
-        current_profit_pct = 0
-        
-        if entry_price and side and current_price:
-            if side == 'LONG':
-                current_profit = (current_price - entry_price) * quantity
-                current_profit_pct = (current_price - entry_price) / entry_price * 100
+            # Tính số lượng dựa trên USDT amount
+            # Trong thực tế, cần kiểm tra precision và quantity_step_size từ exchange info
+            precision = 3  # Tạm thời cứng, trong thực tế cần lấy từ exchange info
+            if side == "LONG":
+                binance_side = "BUY"
             else:  # SHORT
-                current_profit = (entry_price - current_price) * quantity
-                current_profit_pct = (entry_price - current_price) / entry_price * 100
-        
-        # Thời gian giữ vị thế
-        hold_duration = None
-        if entry_time:
-            if isinstance(entry_time, str):
-                try:
-                    entry_time = datetime.strptime(entry_time, "%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    try:
-                        entry_time = datetime.fromisoformat(entry_time)
-                    except ValueError:
-                        entry_time = None
+                binance_side = "SELL"
             
-            if entry_time:
-                hold_duration = (datetime.now() - entry_time).total_seconds() / 3600  # giờ
+            # Tính toán số lượng base coin dựa trên số tiền USDT
+            quantity = amount / current_price
+            quantity = round(quantity, precision)
+            
+            # Đặt lệnh thị trường để mở vị thế
+            order = self.client.futures_create_order(
+                symbol=symbol,
+                side=binance_side,
+                type="MARKET",
+                quantity=quantity
+            )
+            
+            logger.info(f"Đã mở vị thế {side} trên {symbol} với số lượng {quantity} ({amount} USDT)")
+            
+            # Nếu có SL, đặt lệnh SL
+            if stop_loss:
+                sl_side = "SELL" if side == "LONG" else "BUY"
+                sl_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=sl_side,
+                    type="STOP_MARKET",
+                    quantity=quantity,
+                    stopPrice=stop_loss,
+                    reduceOnly=True
+                )
+                logger.info(f"Đã đặt Stop Loss tại {stop_loss} cho vị thế {side} trên {symbol}")
+            
+            # Nếu có TP, đặt lệnh TP
+            if take_profit:
+                tp_side = "SELL" if side == "LONG" else "BUY"
+                tp_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=tp_side,
+                    type="LIMIT",
+                    timeInForce="GTC",
+                    quantity=quantity,
+                    price=take_profit,
+                    reduceOnly=True
+                )
+                logger.info(f"Đã đặt Take Profit tại {take_profit} cho vị thế {side} trên {symbol}")
+            
+            return {
+                "status": "success",
+                "order": order,
+                "position": {
+                    "symbol": symbol,
+                    "side": side,
+                    "amount": amount,
+                    "quantity": quantity,
+                    "leverage": lev,
+                    "entry_price": current_price,
+                    "stop_loss": stop_loss,
+                    "take_profit": take_profit
+                }
+            }
+            
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi Binance API khi mở vị thế: {str(e)}")
+            return {"status": "error", "message": f"Lỗi Binance API: {str(e)}"}
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi mở vị thế: {str(e)}")
+            logger.error(traceback.format_exc())
+            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
+    
+    def close_position(self, symbol, side):
+        """
+        Đóng vị thế
         
-        # Tóm tắt
-        summary = {
-            'id': position.get('id'),
-            'symbol': position.get('symbol'),
-            'side': side,
-            'entry_price': entry_price,
-            'current_price': current_price,
-            'quantity': quantity,
-            'current_profit': current_profit,
-            'current_profit_pct': current_profit_pct,
-            'entry_time': entry_time,
-            'hold_duration_hours': hold_duration,
-            'trailing_stop': self.get_trailing_stop_status(position),
-            'profit_strategies': position.get('profit_strategies', [])
+        :param symbol: Cặp tiền, ví dụ BTCUSDT
+        :param side: Hướng vị thế ("LONG" hoặc "SHORT")
+        :return: Dict kết quả đóng vị thế
+        """
+        if not self.is_connected() and not self.reconnect():
+            logger.error("Không thể kết nối tới Binance API")
+            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
+        
+        try:
+            # Lấy thông tin vị thế
+            positions = self.get_all_positions()
+            position = None
+            
+            for pos in positions:
+                if pos["symbol"] == symbol and pos["side"] == side:
+                    position = pos
+                    break
+            
+            if not position:
+                logger.warning(f"Không tìm thấy vị thế {side} trên {symbol}")
+                return {"status": "error", "message": f"Không tìm thấy vị thế {side} trên {symbol}"}
+            
+            # Đặt lệnh market để đóng vị thế
+            close_side = "SELL" if side == "LONG" else "BUY"
+            
+            order = self.client.futures_create_order(
+                symbol=symbol,
+                side=close_side,
+                type="MARKET",
+                quantity=position["amount"],
+                reduceOnly=True
+            )
+            
+            # Hủy tất cả các lệnh SL/TP đang chờ
+            self.client.futures_cancel_all_open_orders(symbol=symbol)
+            
+            logger.info(f"Đã đóng vị thế {side} trên {symbol}")
+            
+            return {
+                "status": "success",
+                "order": order,
+                "message": f"Đã đóng vị thế {side} trên {symbol}"
+            }
+            
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi Binance API khi đóng vị thế: {str(e)}")
+            return {"status": "error", "message": f"Lỗi Binance API: {str(e)}"}
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi đóng vị thế: {str(e)}")
+            logger.error(traceback.format_exc())
+            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
+    
+    def close_all_positions(self):
+        """
+        Đóng tất cả vị thế đang mở
+        
+        :return: Dict kết quả đóng vị thế
+        """
+        if not self.is_connected() and not self.reconnect():
+            logger.error("Không thể kết nối tới Binance API")
+            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
+        
+        try:
+            # Lấy tất cả vị thế đang mở
+            positions = self.get_all_positions()
+            
+            if not positions:
+                logger.info("Không có vị thế nào đang mở")
+                return {"status": "success", "message": "Không có vị thế nào đang mở"}
+            
+            results = []
+            
+            # Đóng từng vị thế
+            for position in positions:
+                symbol = position["symbol"]
+                side = position["side"]
+                
+                # Đóng vị thế
+                result = self.close_position(symbol, side)
+                results.append(result)
+            
+            return {
+                "status": "success",
+                "results": results,
+                "message": f"Đã đóng {len(results)} vị thế"
+            }
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi đóng tất cả vị thế: {str(e)}")
+            logger.error(traceback.format_exc())
+            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
+    
+    def update_sl_tp(self, symbol, side, stop_loss=None, take_profit=None):
+        """
+        Cập nhật Stop Loss và Take Profit cho vị thế
+        
+        :param symbol: Cặp tiền, ví dụ BTCUSDT
+        :param side: Hướng vị thế ("LONG" hoặc "SHORT")
+        :param stop_loss: Mức stop loss mới (giá)
+        :param take_profit: Mức take profit mới (giá)
+        :return: Dict kết quả cập nhật
+        """
+        if not self.is_connected() and not self.reconnect():
+            logger.error("Không thể kết nối tới Binance API")
+            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
+        
+        try:
+            # Lấy thông tin vị thế
+            positions = self.get_all_positions()
+            position = None
+            
+            for pos in positions:
+                if pos["symbol"] == symbol and pos["side"] == side:
+                    position = pos
+                    break
+            
+            if not position:
+                logger.warning(f"Không tìm thấy vị thế {side} trên {symbol}")
+                return {"status": "error", "message": f"Không tìm thấy vị thế {side} trên {symbol}"}
+            
+            # Hủy các lệnh SL/TP hiện tại
+            open_orders = self.client.futures_get_open_orders(symbol=symbol)
+            
+            for order in open_orders:
+                order_type = order['type']
+                if order_type in ["STOP_MARKET", "LIMIT"]:
+                    self.client.futures_cancel_order(
+                        symbol=symbol,
+                        orderId=order['orderId']
+                    )
+            
+            results = {"status": "success", "message": "Đã cập nhật SL/TP"}
+            
+            # Đặt SL mới nếu có
+            if stop_loss is not None:
+                sl_side = "SELL" if side == "LONG" else "BUY"
+                sl_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=sl_side,
+                    type="STOP_MARKET",
+                    quantity=position["amount"],
+                    stopPrice=stop_loss,
+                    reduceOnly=True
+                )
+                results["stop_loss"] = stop_loss
+                logger.info(f"Đã cập nhật Stop Loss tại {stop_loss} cho vị thế {side} trên {symbol}")
+            
+            # Đặt TP mới nếu có
+            if take_profit is not None:
+                tp_side = "SELL" if side == "LONG" else "BUY"
+                tp_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=tp_side,
+                    type="LIMIT",
+                    timeInForce="GTC",
+                    quantity=position["amount"],
+                    price=take_profit,
+                    reduceOnly=True
+                )
+                results["take_profit"] = take_profit
+                logger.info(f"Đã cập nhật Take Profit tại {take_profit} cho vị thế {side} trên {symbol}")
+            
+            return results
+            
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi Binance API khi cập nhật SL/TP: {str(e)}")
+            return {"status": "error", "message": f"Lỗi Binance API: {str(e)}"}
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi cập nhật SL/TP: {str(e)}")
+            logger.error(traceback.format_exc())
+            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
+
+# Hàm để thử nghiệm module
+def test_position_manager():
+    """Hàm kiểm tra chức năng của PositionManager"""
+    # Cấu hình logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Load risk config
+    try:
+        with open("risk_configs/risk_level_10.json", "r") as f:
+            risk_config = json.load(f)
+    except:
+        risk_config = {
+            "position_size_percent": 1,
+            "stop_loss_percent": 1,
+            "take_profit_percent": 2,
+            "leverage": 1,
+            "max_open_positions": 2
         }
-        
-        return summary
-
-
-def main():
-    """Hàm chính để test PositionManager"""
-    # Thiết lập logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    print("Đang kiểm tra PositionManager...")
+    position_manager = PositionManager(testnet=True, risk_config=risk_config)
+    
+    if not position_manager.is_connected():
+        print("❌ Không thể kết nối tới Binance API")
+        return
+    
+    print("✅ Đã kết nối tới Binance API")
+    
+    # Kiểm tra vị thế hiện tại
+    positions = position_manager.get_all_positions()
+    print(f"Số vị thế đang mở: {len(positions)}")
+    for pos in positions:
+        print(f"  - {pos['symbol']} {pos['side']}: Entry: {pos['entry_price']}, Mark: {pos['mark_price']}, P/L: {pos['profit_percent']:.2f}%")
+    
+    # Test mở vị thế (có thể bỏ comment để test)
+    """
+    symbol = "BTCUSDT"
+    side = "LONG"
+    amount = 10  # USDT
+    
+    # Tính SL/TP
+    ticker = position_manager.client.futures_symbol_ticker(symbol=symbol)
+    current_price = float(ticker['price'])
+    
+    sl_percent = risk_config["stop_loss_percent"] / 100
+    tp_percent = risk_config["take_profit_percent"] / 100
+    
+    if side == "LONG":
+        stop_loss = current_price * (1 - sl_percent)
+        take_profit = current_price * (1 + tp_percent)
+    else:
+        stop_loss = current_price * (1 + sl_percent)
+        take_profit = current_price * (1 - tp_percent)
+    
+    # Mở vị thế
+    result = position_manager.open_position(
+        symbol=symbol,
+        side=side,
+        amount=amount,
+        stop_loss=stop_loss,
+        take_profit=take_profit
     )
     
-    # Tạo cấu hình
-    trailing_config = {
-        'strategy_type': 'percentage',
-        'config': {
-            'activation_percent': 1.0,
-            'callback_percent': 0.5
-        }
-    }
-    
-    profit_config = {
-        'time_based': {
-            'enabled': True,
-            'max_hold_time': 48
-        },
-        'target_profit': {
-            'enabled': True,
-            'profit_target': 5.0
-        }
-    }
-    
-    # Tạo position manager
-    position_manager = PositionManager(trailing_config, profit_config)
-    
-    # Tạo vị thế
-    position = {
-        'id': 'test_position',
-        'symbol': 'BTCUSDT',
-        'side': 'LONG',
-        'entry_price': 50000,
-        'quantity': 0.1,
-        'entry_time': datetime.now()
-    }
-    
-    # Khởi tạo vị thế
-    position = position_manager.initialize_position(position)
-    
-    # Mô phỏng cập nhật giá
-    prices = [
-        50100,  # +0.2%
-        50300,  # +0.6%
-        50500,  # +1.0% (kích hoạt trailing stop)
-        50700,  # +1.4%
-        50900,  # +1.8%
-        50700,  # +1.4%
-        50500,  # +1.0%
-        50300   # +0.6%
-    ]
-    
-    for price in prices:
-        # Cập nhật vị thế
-        position = position_manager.update_position(position, price)
-        
-        # Kiểm tra điều kiện đóng
-        should_close, reason = position_manager.check_exit_conditions(position, price)
-        
-        # Hiển thị trạng thái
-        summary = position_manager.generate_position_summary(position, price)
-        logger.info(f"Giá: {price}, Lợi nhuận: {summary['current_profit_pct']:.2f}%, "
-                   f"Trailing: {summary['trailing_stop']['stop_price']}")
-        
-        if should_close:
-            logger.info(f"Đóng vị thế: {reason}")
-            break
-
+    if result["status"] == "success":
+        print(f"✅ Đã mở vị thế {side} trên {symbol}")
+        print(f"  - Entry: {result['position']['entry_price']}")
+        print(f"  - SL: {result['position']['stop_loss']}")
+        print(f"  - TP: {result['position']['take_profit']}")
+    else:
+        print(f"❌ Lỗi khi mở vị thế: {result.get('message', 'Unknown error')}")
+    """
 
 if __name__ == "__main__":
-    main()
+    test_position_manager()

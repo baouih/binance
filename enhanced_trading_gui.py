@@ -766,56 +766,81 @@ class EnhancedTradingGUI(QMainWindow):
             self.account_balance_label.setText(f"Số dư tài khoản: {balance:.2f} USDT")
     
     def refresh_market_analysis(self):
-        """Làm mới phân tích thị trường"""
+        """Làm mới phân tích thị trường sử dụng dữ liệu thực từ Binance API"""
         selected_coin = self.coin_combo.currentText()
         selected_timeframe = self.timeframe_combo.currentText()
         
         self.update_log(f"Đang phân tích {selected_coin} trên khung thời gian {selected_timeframe}...")
         
         try:
-            # Trong thực tế, sẽ gọi tới market analyzer
-            # Giả lập dữ liệu cho giao diện
-            self.price_label.setText(f"Giá hiện tại: 50000")
-            self.change_label.setText(f"Thay đổi 24h: +2.5%")
-            self.volume_label.setText(f"Khối lượng 24h: 15000 BTC")
-            self.high_label.setText(f"Cao nhất 24h: 51000")
-            self.low_label.setText(f"Thấp nhất 24h: 49000")
+            # Khởi tạo market analyzer nếu chưa có
+            if not hasattr(self, 'market_analyzer'):
+                from market_analyzer import MarketAnalyzer
+                self.market_analyzer = MarketAnalyzer(
+                    api_key=os.environ.get("BINANCE_TESTNET_API_KEY"),
+                    api_secret=os.environ.get("BINANCE_TESTNET_API_SECRET"),
+                    testnet=True
+                )
+            
+            # Kiểm tra kết nối
+            if not self.market_analyzer.is_connected() and not self.market_analyzer.reconnect():
+                self.update_log("Không thể kết nối tới Binance API. Vui lòng kiểm tra API key và secret.")
+                return
+            
+            # Lấy dữ liệu thị trường tổng quan
+            market_overview = self.market_analyzer.get_market_overview()
+            if market_overview["status"] != "success":
+                self.update_log(f"Lỗi khi lấy dữ liệu thị trường: {market_overview.get('message', 'Unknown error')}")
+                return
+            
+            # Tìm thông tin coin được chọn
+            selected_data = None
+            for data in market_overview["market_data"]:
+                if data["symbol"] == selected_coin:
+                    selected_data = data
+                    break
+            
+            if selected_data:
+                # Cập nhật thông tin thị trường
+                self.price_label.setText(f"Giá hiện tại: {selected_data['price']:.2f}")
+                self.change_label.setText(f"Thay đổi 24h: {selected_data['change_24h']:.2f}%")
+                self.volume_label.setText(f"Khối lượng 24h: {selected_data['volume']:.2f}")
+                self.high_label.setText(f"Cao nhất 24h: {selected_data['high_24h']:.2f}")
+                self.low_label.setText(f"Thấp nhất 24h: {selected_data['low_24h']:.2f}")
+            
+            # Phân tích kỹ thuật
+            analysis = self.market_analyzer.analyze_technical(selected_coin, selected_timeframe)
+            if analysis["status"] != "success":
+                self.update_log(f"Lỗi khi phân tích kỹ thuật: {analysis.get('message', 'Unknown error')}")
+                return
             
             # Cập nhật bảng phân tích kỹ thuật
             self.ta_table.setRowCount(0)
             
-            # Thêm các chỉ báo giả lập
-            indicators = [
-                ("RSI(14)", "65", "Trung tính"),
-                ("MACD", "Dương", "Mua"),
-                ("MA(50) vs MA(200)", "Phía trên", "Tín hiệu mua"),
-                ("Bollinger Bands", "Cận trên", "Quá mua"),
-                ("Stochastic", "80", "Quá mua")
-            ]
-            
-            for indicator in indicators:
+            for indicator in analysis["indicators"]:
                 row_position = self.ta_table.rowCount()
                 self.ta_table.insertRow(row_position)
                 
-                self.ta_table.setItem(row_position, 0, QTableWidgetItem(indicator[0]))
-                self.ta_table.setItem(row_position, 1, QTableWidgetItem(indicator[1]))
+                self.ta_table.setItem(row_position, 0, QTableWidgetItem(indicator["name"]))
+                self.ta_table.setItem(row_position, 1, QTableWidgetItem(indicator["value"]))
                 
-                signal_item = QTableWidgetItem(indicator[2])
-                if "mua" in indicator[2].lower():
+                signal_item = QTableWidgetItem(indicator["signal"])
+                if "mua" in indicator["signal"].lower():
                     signal_item.setForeground(QColor("green"))
-                elif "bán" in indicator[2].lower():
+                elif "bán" in indicator["signal"].lower():
                     signal_item.setForeground(QColor("red"))
                 
                 self.ta_table.setItem(row_position, 2, signal_item)
             
             # Cập nhật tín hiệu
             self.signals_text.setText(f"Phân tích {selected_coin} trên khung thời gian {selected_timeframe}:\n\n")
-            self.signals_text.append("• RSI(14) đang ở mức 65, cho thấy thị trường đang trung tính\n")
-            self.signals_text.append("• MACD hiện đang dương, cho tín hiệu mua\n")
-            self.signals_text.append("• MA(50) đang nằm trên MA(200), xác nhận xu hướng tăng\n")
-            self.signals_text.append("• Bollinger Bands cho thấy giá đang tiếp cận cận trên, có thể quá mua\n")
-            self.signals_text.append("• Stochastic ở mức 80, cũng cho thấy thị trường đang quá mua\n\n")
-            self.signals_text.append("Kết luận: Xu hướng tăng trong trung hạn, nhưng ngắn hạn có thể điều chỉnh.")
+            
+            for indicator in analysis["indicators"]:
+                self.signals_text.append(f"• {indicator['name']}: {indicator['value']}, {indicator['signal']}\n")
+            
+            self.signals_text.append(f"\nKết luận: Tín hiệu tổng thể là {analysis['overall_signal']} ({analysis['strength']})")
+            
+            self.update_log(f"Đã hoàn thành phân tích {selected_coin} trên khung thời gian {selected_timeframe}")
             
         except Exception as e:
             self.update_log(f"Lỗi khi phân tích thị trường: {str(e)}")
