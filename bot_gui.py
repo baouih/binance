@@ -131,12 +131,18 @@ class BotThread(QThread):
             while self.is_running and self.process.poll() is None:
                 output = self.process.stdout.readline()
                 if output:
-                    self.update_signal.emit(output.strip())
+                    try:
+                        self.update_signal.emit(output.strip().decode('utf-8'))
+                    except UnicodeDecodeError:
+                        self.update_signal.emit(output.strip().decode('latin-1'))
             
             # Đọc lỗi nếu có
             for error in self.process.stderr.readlines():
                 if error:
-                    self.error_signal.emit(error.strip())
+                    try:
+                        self.error_signal.emit(error.strip().decode('utf-8'))
+                    except UnicodeDecodeError:
+                        self.error_signal.emit(error.strip().decode('latin-1'))
             
             # Kiểm tra trạng thái kết thúc
             if self.process.poll() is not None and self.process.returncode != 0:
@@ -231,7 +237,7 @@ class LogMonitorThread(QThread):
         if not os.path.exists(self.log_file):
             try:
                 os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
-                with open(self.log_file, 'w') as f:
+                with open(self.log_file, 'w', encoding="utf-8") as f:
                     f.write(f"# Log file created at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             except Exception as e:
                 logger.error(f"Không thể tạo file log: {str(e)}")
@@ -240,7 +246,7 @@ class LogMonitorThread(QThread):
         
         # Theo dõi file log
         try:
-            with open(self.log_file, 'r') as f:
+            with open(self.log_file, 'r', encoding="utf-8") as f:
                 # Di chuyển đến cuối file
                 f.seek(0, 2)
                 
