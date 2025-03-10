@@ -39,6 +39,8 @@ try:
     from app.simple_feature_engineering import SimpleFeatureEngineering
     from app.market_regime_detector import MarketRegimeDetector
     from app.advanced_ml_optimizer import AdvancedMLOptimizer
+    from fibonacci_helper import FibonacciAnalyzer, add_fibonacci_signals
+    from adaptive_risk_manager import AdaptiveRiskManager, add_atr_to_dataframe
 except ImportError as e:
     logger.error(f"Lỗi khi import modules: {str(e)}")
 
@@ -109,10 +111,13 @@ class MLStrategyTester:
             source_dir = self.models_dir
             
         try:
+            # Xử lý tên file - cắt bỏ "_random_forest" nếu có
+            base_name = model_name.replace("_random_forest", "")
+            
             # Đường dẫn đến các file
-            model_path = os.path.join(source_dir, f"{model_name}_model.joblib")
-            scaler_path = os.path.join(source_dir, f"{model_name}_scaler.joblib")
-            features_path = os.path.join(source_dir, f"{model_name}_features.json")
+            model_path = os.path.join(source_dir, f"{base_name}_model.joblib")
+            scaler_path = os.path.join(source_dir, f"{base_name}_scaler.joblib")
+            features_path = os.path.join(source_dir, f"{base_name}_features.json")
             
             # Kiểm tra tất cả các file tồn tại
             if not all(os.path.exists(p) for p in [model_path, scaler_path, features_path]):
@@ -521,16 +526,50 @@ class MLStrategyTester:
                         col_name = f'prob_{class_label}'
                         df_strategy[col_name] = probas[:, i]
                     
+                    # Ngưỡng tin cậy để quyết định giao dịch
+                    confidence_threshold = 0.40  # Giảm ngưỡng tin cậy xuống 40%
+                    
                     # Chỉ đặt tín hiệu khi xác suất vượt ngưỡng
-                    confidence_threshold = 0.40  # Giảm ngưỡng tin cậy xuống mức thấp hơn (xác suất phải > 40%)
+                    # Đã đặt ngưỡng tin cậy ở trên (confidence_threshold = 0.40)
                     
                     # Đặt tín hiệu mua khi dự đoán là 1 và xác suất cao
                     if 'prob_1' in df_strategy.columns:
                         # Kết hợp xác suất với các chỉ báo kỹ thuật
                         if 'rsi' in df_strategy.columns:
-                            # Nếu RSI quá bán (< 40), giảm ngưỡng tin cậy xuống thấp hơn
-                            rsi_oversold = df_strategy['rsi'] < 40
-                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI quá bán
+                            # RSI boost - 3 mức dựa trên mức độ quá bán
+                            # Mức 1: < 40 - giảm 20%
+                            # Mức 2: < 30 - giảm 30%
+                            # Mức 3: < 20 - giảm 40%
+                            rsi_confidence_boost = 0.0
+                            rsi_oversold_level3 = df_strategy['rsi'] < 20
+                            rsi_oversold_level2 = df_strategy['rsi'] < 30 
+                            rsi_oversold_level1 = df_strategy['rsi'] < 40
+                            
+                            # Mặc định RSI boost là 0, áp dụng mức cao nhất nếu thỏa mãn
+                            rsi_boost_mask = rsi_oversold_level1.copy()  # Mặc định mức 1
+                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI < 40
+                            
+                            # Mức 2: giảm 30% nếu RSI < 30
+                            mask_level2 = rsi_oversold_level2
+                            if mask_level2.any():
+                                rsi_boost_mask = mask_level2
+                                rsi_confidence_boost = 0.30
+                            
+                            # Mức 3: giảm 40% nếu RSI < 20
+                            mask_level3 = rsi_oversold_level3
+                            if mask_level3.any():
+                                rsi_boost_mask = mask_level3
+                                rsi_confidence_boost = 0.40
+                            
+                            # Ghi log các trường hợp RSI boost
+                            rsi_values = df_strategy.loc[rsi_boost_mask, 'rsi']
+                            if not rsi_values.empty:
+                                min_rsi = rsi_values.min()
+                                max_rsi = rsi_values.max()
+                                logger.info(f"Áp dụng RSI boost cho long: {rsi_confidence_boost:.2f}, RSI min={min_rsi:.2f}, max={max_rsi:.2f}")
+                            
+                            # Sử dụng mask để xác định điều kiện quá bán
+                            rsi_oversold = rsi_boost_mask
                             
                             # Mua khi dự đoán = 1 và (xác suất > ngưỡng hoặc RSI quá bán và xác suất > ngưỡng thấp hơn)
                             buy_signals = (predictions == 1) & (
@@ -547,9 +586,40 @@ class MLStrategyTester:
                     if 'prob_0' in df_strategy.columns:
                         # Kết hợp xác suất với các chỉ báo kỹ thuật
                         if 'rsi' in df_strategy.columns:
-                            # Nếu RSI quá mua (> 60), giảm ngưỡng tin cậy xuống thấp hơn
-                            rsi_overbought = df_strategy['rsi'] > 60
-                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI quá mua
+                            # RSI boost - 3 mức dựa trên mức độ quá mua
+                            # Mức 1: > 60 - giảm 20%
+                            # Mức 2: > 70 - giảm 30%
+                            # Mức 3: > 80 - giảm 40%
+                            rsi_confidence_boost = 0.0
+                            rsi_overbought_level3 = df_strategy['rsi'] > 80
+                            rsi_overbought_level2 = df_strategy['rsi'] > 70 
+                            rsi_overbought_level1 = df_strategy['rsi'] > 60
+                            
+                            # Mặc định RSI boost là 0, áp dụng mức cao nhất nếu thỏa mãn
+                            rsi_boost_mask = rsi_overbought_level1.copy()  # Mặc định mức 1
+                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI > 60
+                            
+                            # Mức 2: giảm 30% nếu RSI > 70
+                            mask_level2 = rsi_overbought_level2
+                            if mask_level2.any():
+                                rsi_boost_mask = mask_level2
+                                rsi_confidence_boost = 0.30
+                            
+                            # Mức 3: giảm 40% nếu RSI > 80
+                            mask_level3 = rsi_overbought_level3
+                            if mask_level3.any():
+                                rsi_boost_mask = mask_level3
+                                rsi_confidence_boost = 0.40
+                            
+                            # Ghi log các trường hợp RSI boost
+                            rsi_values = df_strategy.loc[rsi_boost_mask, 'rsi']
+                            if not rsi_values.empty:
+                                min_rsi = rsi_values.min()
+                                max_rsi = rsi_values.max()
+                                logger.info(f"Áp dụng RSI boost cho short: {rsi_confidence_boost:.2f}, RSI min={min_rsi:.2f}, max={max_rsi:.2f}")
+                            
+                            # Sử dụng mask để xác định điều kiện quá mua
+                            rsi_overbought = rsi_boost_mask
                             
                             # Bán khi dự đoán = 0 và (xác suất > ngưỡng hoặc RSI quá mua và xác suất > ngưỡng thấp hơn)
                             sell_signals = (predictions == 0) & (
@@ -663,9 +733,14 @@ class MLStrategyTester:
             risk_factor = risk_pct / 100.0
             position_size_pct = risk_factor * leverage
             
-            # Thiết lập stop loss và take profit
-            stop_loss_pct = 0.05  # 5%
-            take_profit_pct = 0.1  # 10%
+            # Khởi tạo helper cho quản lý risk nếu dùng trong chiến lược tích hợp mới
+            risk_manager = None
+            if 'atr' in df_strategy.columns:
+                risk_manager = AdaptiveRiskManager()
+            
+            # Thiết lập stop loss và take profit mặc định
+            default_stop_loss_pct = 0.05  # 5%
+            default_take_profit_pct = 0.1  # 10%
             
             # Vòng lặp qua từng nến
             for i in range(1, len(df_strategy)):
@@ -688,8 +763,22 @@ class MLStrategyTester:
                     # Tính toán P/L hiện tại
                     if position_type == 'long':
                         pnl_pct = (current_price / entry_price - 1) * 100
-                        stop_loss_price = entry_price * (1 - stop_loss_pct)
-                        take_profit_price = entry_price * (1 + take_profit_pct)
+                        
+                        # Sử dụng ATR nếu có, ngược lại dùng % cố định
+                        if risk_manager is not None and 'atr' in df_strategy.columns and 'market_regime' in df_strategy.columns:
+                            # Lấy chế độ thị trường hiện tại
+                            market_regime = df_strategy['market_regime'].iloc[i]
+                            
+                            # Tính SL/TP thích ứng dựa trên ATR
+                            stop_loss_price = risk_manager.calculate_adaptive_stoploss(
+                                df_strategy.iloc[i-5:i+1], 'long', entry_price, market_regime, 2.0)
+                            
+                            take_profit_price = risk_manager.calculate_adaptive_takeprofit(
+                                df_strategy.iloc[i-5:i+1], 'long', entry_price, market_regime, 2.5)
+                        else:
+                            # Dùng % cố định khi không có ATR
+                            stop_loss_price = entry_price * (1 - default_stop_loss_pct)
+                            take_profit_price = entry_price * (1 + default_take_profit_pct)
                         
                         # Kiểm tra stop loss
                         if current_price <= stop_loss_price:
@@ -761,8 +850,22 @@ class MLStrategyTester:
                     
                     elif position_type == 'short':
                         pnl_pct = (entry_price / current_price - 1) * 100
-                        stop_loss_price = entry_price * (1 + stop_loss_pct)
-                        take_profit_price = entry_price * (1 - take_profit_pct)
+                        
+                        # Sử dụng ATR nếu có, ngược lại dùng % cố định
+                        if risk_manager is not None and 'atr' in df_strategy.columns and 'market_regime' in df_strategy.columns:
+                            # Lấy chế độ thị trường hiện tại
+                            market_regime = df_strategy['market_regime'].iloc[i]
+                            
+                            # Tính SL/TP thích ứng dựa trên ATR
+                            stop_loss_price = risk_manager.calculate_adaptive_stoploss(
+                                df_strategy.iloc[i-5:i+1], 'short', entry_price, market_regime, 2.0)
+                            
+                            take_profit_price = risk_manager.calculate_adaptive_takeprofit(
+                                df_strategy.iloc[i-5:i+1], 'short', entry_price, market_regime, 2.5)
+                        else:
+                            # Dùng % cố định khi không có ATR
+                            stop_loss_price = entry_price * (1 + default_stop_loss_pct)
+                            take_profit_price = entry_price * (1 - default_take_profit_pct)
                         
                         # Kiểm tra stop loss
                         if current_price >= stop_loss_price:
@@ -1660,7 +1763,11 @@ class MLStrategyTester:
             ml_strategy_func = lambda df: self._apply_ml_strategy(df, model, scaler, features)
             high_risk_func = self._apply_high_risk_strategy
             
-            # Tích hợp ML với chiến lược rủi ro cao
+            # Khởi tạo các công cụ mới
+            fib_analyzer = FibonacciAnalyzer(window_size=20, lookback=100)
+            risk_manager = AdaptiveRiskManager(default_sl_pct=0.02, default_tp_pct=0.05, atr_periods=14)
+            
+            # Tích hợp ML với chiến lược rủi ro cao, RSI Boost, Fibonacci và ATR
             def integrated_strategy(df):
                 # Áp dụng cả hai chiến lược
                 df_ml = ml_strategy_func(df)
@@ -1670,11 +1777,127 @@ class MLStrategyTester:
                 df_integrated = df.copy()
                 df_integrated['signal'] = 0
                 
-                # Chỉ mua khi cả hai đều đồng ý
-                buy_condition = (df_ml['signal'] == 1) & (df_high_risk['signal'] == 1)
+                # Thêm các chỉ báo mới
+                # 1. Thêm ATR và các mức stop loss/take profit thích ứng
+                df_integrated = add_atr_to_dataframe(df_integrated, atr_periods=14)
                 
-                # Chỉ bán khi cả hai đều đồng ý
-                sell_condition = (df_ml['signal'] == -1) & (df_high_risk['signal'] == -1)
+                # 2. Thêm phân tích Fibonacci
+                df_integrated = add_fibonacci_signals(df_integrated, window_size=20, lookback=100)
+                
+                # Cải tiến 1: Tạo thêm tín hiệu mua/bán từ RSI với 3 mức độ
+                strong_rsi_buy = (df['rsi'] < 20)  # RSI dưới 20: tín hiệu mua mạnh
+                medium_rsi_buy = (df['rsi'] >= 20) & (df['rsi'] < 30)  # RSI 20-30: tín hiệu mua trung bình
+                weak_rsi_buy = (df['rsi'] >= 30) & (df['rsi'] < 40)  # RSI 30-40: tín hiệu mua yếu
+                
+                strong_rsi_sell = (df['rsi'] > 80)  # RSI trên 80: tín hiệu bán mạnh
+                medium_rsi_sell = (df['rsi'] <= 80) & (df['rsi'] > 70)  # RSI 70-80: tín hiệu bán trung bình
+                weak_rsi_sell = (df['rsi'] <= 70) & (df['rsi'] > 60)  # RSI 60-70: tín hiệu bán yếu
+                
+                # Cải tiến 2: Phân loại chi tiết cho các chế độ thị trường
+                market_regime = df['market_regime']
+                trending_up = (market_regime == 'trending_up')
+                trending_down = (market_regime == 'trending_down')
+                ranging = (market_regime == 'ranging')
+                volatile = (market_regime == 'volatile')
+                neutral = (market_regime == 'neutral')
+                
+                # Cải tiến 3: Điều chỉnh tín hiệu ML dựa trên chế độ thị trường
+                # Trong chế độ trending_up: Ưu tiên tín hiệu mua, bỏ qua một số tín hiệu bán
+                # Trong chế độ trending_down: Ưu tiên tín hiệu bán, bỏ qua một số tín hiệu mua
+                # Trong chế độ ranging: Ưu tiên tín hiệu đảo chiều khi giá đến vùng hỗ trợ/kháng cự
+                # Trong chế độ volatile: Tăng ngưỡng xác nhận, tìm điểm đột phá
+                
+                # Cải tiến 4: Tích hợp Fibonacci vào quá trình ra quyết định
+                # Lấy tín hiệu Fibonacci và các mức hỗ trợ/kháng cự
+                fib_signals = df_integrated['fib_signal'].copy()
+                fib_supports = df_integrated['fib_support'].fillna(0).copy()
+                fib_resistances = df_integrated['fib_resistance'].fillna(0).copy()
+                
+                # Thêm tín hiệu giao dịch dựa trên tín hiệu Fibonacci
+                fib_strong_buy_signal = (fib_signals == 1) & (df_integrated['trend'] > 0)
+                
+                fib_medium_buy_signal = (fib_supports > 0) & (df_integrated['close'] <= fib_supports * 1.01) & (df_integrated['trend'] > 0)
+                
+                fib_strong_sell_signal = (fib_signals == -1) & (df_integrated['trend'] < 0) 
+                
+                fib_medium_sell_signal = (fib_resistances > 0) & (df_integrated['close'] >= fib_resistances * 0.99) & (df_integrated['trend'] < 0)
+                
+                # Cải tiến 5: Tích hợp ATR cho quản lý rủi ro thích ứng
+                # Lưu trữ các tham số ATR cho điều chỉnh stop loss/take profit sau này
+                atr_values = df_integrated['atr'].copy()
+                
+                # Lấy tham số thích ứng theo chế độ thị trường
+                risk_params = {}
+                for i in range(len(df_integrated)):
+                    regime = df_integrated['market_regime'].iloc[i]
+                    # Lấy bội số ATR dựa trên chế độ thị trường
+                    sl_multiplier, tp_multiplier = risk_manager.get_market_based_multipliers(regime)
+                    risk_params[i] = {'sl_multiplier': sl_multiplier, 'tp_multiplier': tp_multiplier}
+                
+                # Điều kiện mua cho từng chế độ thị trường - tích hợp thêm Fibonacci
+                trending_up_buy = trending_up & (
+                    ((df_ml['signal'] == 1) & (fib_strong_buy_signal | fib_medium_buy_signal)) |  # ML tín hiệu mua + Fib hỗ trợ
+                    ((df_high_risk['signal'] == 1) & fib_strong_buy_signal) |  # High Risk tín hiệu mua + Fib hỗ trợ mạnh
+                    ((medium_rsi_buy | strong_rsi_buy) & fib_strong_buy_signal)  # RSI quá bán + Fib hỗ trợ mạnh
+                )
+                
+                trending_down_buy = trending_down & (
+                    ((df_ml['signal'] == 1) & strong_rsi_buy & fib_strong_buy_signal) |  # ML tín hiệu mua + RSI cực thấp + Fib hỗ trợ mạnh
+                    ((df_high_risk['signal'] == 1) & strong_rsi_buy & fib_strong_buy_signal)  # High Risk tín hiệu mua + RSI cực thấp + Fib hỗ trợ mạnh
+                )
+                
+                ranging_buy = ranging & (
+                    ((df_ml['signal'] == 1) & (medium_rsi_buy | strong_rsi_buy) & fib_medium_buy_signal) |  # ML tín hiệu mua + RSI thấp + Fib hỗ trợ trung bình
+                    ((df_high_risk['signal'] == 1) & (medium_rsi_buy | strong_rsi_buy) & fib_medium_buy_signal) |  # High Risk tín hiệu mua + RSI thấp + Fib hỗ trợ
+                    (strong_rsi_buy & fib_strong_buy_signal)  # RSI cực thấp + Fib hỗ trợ mạnh
+                )
+                
+                volatile_buy = volatile & (
+                    ((df_ml['signal'] == 1) & (df_high_risk['signal'] == 1) & strong_rsi_buy & fib_strong_buy_signal) |  # Cả ML và High Risk đều có tín hiệu + RSI cực thấp + Fib hỗ trợ mạnh
+                    ((df_ml['signal'] == 1) & strong_rsi_buy & fib_strong_buy_signal)  # ML tín hiệu mua + RSI cực thấp + Fib hỗ trợ mạnh
+                )
+                
+                neutral_buy = neutral & (
+                    ((df_ml['signal'] == 1) & medium_rsi_buy & (fib_strong_buy_signal | fib_medium_buy_signal)) |  # ML tín hiệu mua + RSI trung bình + Fib hỗ trợ
+                    ((df_high_risk['signal'] == 1) & strong_rsi_buy & fib_strong_buy_signal)  # High Risk tín hiệu mua + RSI cực thấp + Fib hỗ trợ mạnh
+                )
+                
+                # Điều kiện bán cho từng chế độ thị trường - tích hợp thêm Fibonacci
+                trending_up_sell = trending_up & (
+                    ((df_ml['signal'] == -1) & strong_rsi_sell & fib_strong_sell_signal) |  # ML tín hiệu bán + RSI cực cao + Fib kháng cự mạnh
+                    ((df_high_risk['signal'] == -1) & strong_rsi_sell & fib_medium_sell_signal)  # High Risk tín hiệu bán + RSI cực cao + Fib kháng cự
+                )
+                
+                trending_down_sell = trending_down & (
+                    ((df_ml['signal'] == -1) & (fib_strong_sell_signal | fib_medium_sell_signal)) |  # ML tín hiệu bán + Fib kháng cự
+                    ((df_high_risk['signal'] == -1) & fib_strong_sell_signal) |  # High Risk tín hiệu bán + Fib kháng cự mạnh
+                    ((medium_rsi_sell | strong_rsi_sell) & fib_strong_sell_signal)  # RSI quá mua + Fib kháng cự mạnh
+                )
+                
+                ranging_sell = ranging & (
+                    ((df_ml['signal'] == -1) & (medium_rsi_sell | strong_rsi_sell) & fib_medium_sell_signal) |  # ML tín hiệu bán + RSI cao + Fib kháng cự trung bình
+                    ((df_high_risk['signal'] == -1) & (medium_rsi_sell | strong_rsi_sell) & fib_medium_sell_signal) |  # High Risk tín hiệu bán + RSI cao + Fib kháng cự
+                    (strong_rsi_sell & fib_strong_sell_signal)  # RSI cực cao + Fib kháng cự mạnh
+                )
+                
+                volatile_sell = volatile & (
+                    ((df_ml['signal'] == -1) & (df_high_risk['signal'] == -1) & strong_rsi_sell & fib_strong_sell_signal) |  # Cả ML và High Risk đều có tín hiệu + RSI cực cao + Fib kháng cự mạnh
+                    ((df_ml['signal'] == -1) & strong_rsi_sell & fib_strong_sell_signal)  # ML tín hiệu bán + RSI cực cao + Fib kháng cự mạnh
+                )
+                
+                neutral_sell = neutral & (
+                    ((df_ml['signal'] == -1) & medium_rsi_sell & (fib_strong_sell_signal | fib_medium_sell_signal)) |  # ML tín hiệu bán + RSI cao-trung bình + Fib kháng cự
+                    ((df_high_risk['signal'] == -1) & strong_rsi_sell & fib_strong_sell_signal)  # High Risk tín hiệu bán + RSI cực cao + Fib kháng cự mạnh
+                )
+                
+                # Kết hợp tất cả các điều kiện mua/bán
+                buy_condition = (
+                    trending_up_buy | trending_down_buy | ranging_buy | volatile_buy | neutral_buy
+                )
+                
+                sell_condition = (
+                    trending_up_sell | trending_down_sell | ranging_sell | volatile_sell | neutral_sell
+                )
                 
                 # Đặt tín hiệu
                 df_integrated.loc[buy_condition, 'signal'] = 1

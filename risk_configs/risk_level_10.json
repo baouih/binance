@@ -1,0 +1,17 @@
+{
+    "max_position_size_percent": 1.0,
+    "max_open_positions": 3,
+    "stop_loss_percent": 0.5,
+    "take_profit_percent": 1.5,
+    "leverage": 3,
+    "max_daily_loss_percent": 2.0,
+    "enable_trailing_stop": true,
+    "trailing_stop_callback": 0.15,
+    "use_smart_entry": true,
+    "smart_entry_threshold": 0.9,
+    "use_market_regime_filter": true,
+    "use_volatility_filter": true,
+    "session_start_hour": 2,
+    "session_end_hour": 22,
+    "auto_compounding": false
+}

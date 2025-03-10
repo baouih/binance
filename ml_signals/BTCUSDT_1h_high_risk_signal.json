@@ -1,0 +1,13 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "timestamp": "2025-03-10T00:17:45.367418",
+  "price": 80579.7,
+  "high_risk_signal": 0,
+  "signal_strength": 0,
+  "rsi": 20.15945009437428,
+  "bb_position": 0.1085219211602618,
+  "volume_ratio": 0.6568752677125753,
+  "market_regime": "neutral",
+  "high_risk_enabled": true
+}

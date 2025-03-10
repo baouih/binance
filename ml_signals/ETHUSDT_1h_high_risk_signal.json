@@ -1,0 +1,13 @@
+{
+  "symbol": "ETHUSDT",
+  "interval": "1h",
+  "timestamp": "2025-03-10T00:17:49.023271",
+  "price": 2016.45,
+  "high_risk_signal": 0,
+  "signal_strength": 0,
+  "rsi": 25.759153580205847,
+  "bb_position": 0.21021130583225722,
+  "volume_ratio": 0.410856884380205,
+  "market_regime": "volatile",
+  "high_risk_enabled": true
+}

@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module xử lý dữ liệu thị trường (Data Processor)
-
-Module này cung cấp các công cụ để lấy, xử lý và chuẩn bị dữ liệu thị trường
-từ các nguồn khác nhau (Binance API, dữ liệu lịch sử, v.v.).
+Data Processor - Xử lý và chuẩn bị dữ liệu cho ML trong giao dịch tiền điện tử
 """
 
 import os
@@ -13,520 +10,461 @@ import json
 import logging
 import numpy as np
 import pandas as pd
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional, Any, Union
-
-from binance_api import BinanceAPI
+from typing import Dict, List, Tuple, Union, Optional, Any
 
 # Cấu hình logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('data_processor')
 
 class DataProcessor:
-    """Lớp xử lý dữ liệu thị trường"""
+    """
+    Lớp xử lý dữ liệu cho ML trong giao dịch tiền điện tử
+    """
     
-    def __init__(self, binance_api: BinanceAPI = None, simulation_mode: bool = False, 
-               cache_dir: str = 'data/cache', data_dir: str = None):
+    def __init__(
+        self,
+        api: Any = None,
+        data_dir: str = 'data',
+        cache_dir: str = 'data/cache',
+        use_cache: bool = True,
+        cache_expiry: int = 3600
+    ):
         """
-        Khởi tạo bộ xử lý dữ liệu
+        Khởi tạo DataProcessor
         
         Args:
-            binance_api (BinanceAPI, optional): Đối tượng BinanceAPI để kết nối với Binance
-            simulation_mode (bool): Có sử dụng chế độ mô phỏng không
-            cache_dir (str): Thư mục lưu cache dữ liệu
-            data_dir (str, optional): Thư mục chứa dữ liệu lịch sử, nếu None sẽ lấy qua API
+            api: API client (như Binance API)
+            data_dir: Thư mục dữ liệu
+            cache_dir: Thư mục cache
+            use_cache: Sử dụng cache hay không
+            cache_expiry: Thời gian hết hạn cache (giây)
         """
-        self.cache_dir = cache_dir
-        self.binance_api = binance_api if binance_api else BinanceAPI(testnet=simulation_mode)
-        self.data_cache = {}
+        self.api = api
         self.data_dir = data_dir
-        self.simulation_mode = simulation_mode
+        self.cache_dir = cache_dir
+        self.use_cache = use_cache
+        self.cache_expiry = cache_expiry
         
-        # Đảm bảo thư mục cache tồn tại
-        os.makedirs(self.cache_dir, exist_ok=True)
+        # Tạo thư mục dữ liệu nếu chưa tồn tại
+        os.makedirs(data_dir, exist_ok=True)
+        os.makedirs(cache_dir, exist_ok=True)
         
-        logger.info(f"Đã khởi tạo DataProcessor, sử dụng cache dir: {self.cache_dir}")
+        logger.info(f"Đã khởi tạo DataProcessor, sử dụng cache dir: {cache_dir}")
     
-    def get_market_data(self, symbol: str, interval: str, limit: int = 100, 
-                      use_cache: bool = True, cache_ttl: int = 300) -> pd.DataFrame:
+    def get_historical_data(
+        self,
+        symbol: str,
+        interval: str,
+        limit: int = 1000,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        use_cache: Optional[bool] = None
+    ) -> pd.DataFrame:
         """
-        Lấy dữ liệu thị trường cho một cặp tiền tệ và khung thời gian
+        Lấy dữ liệu lịch sử
         
         Args:
-            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
-            interval (str): Khung thời gian (ví dụ: '1h', '4h', '1d')
-            limit (int): Số lượng candlestick cần lấy
-            use_cache (bool): Có sử dụng cache không
-            cache_ttl (int): Thời gian cache hợp lệ (giây)
-            
+            symbol: Mã tiền
+            interval: Khung thời gian
+            limit: Số lượng nến tối đa
+            start_time: Thời gian bắt đầu
+            end_time: Thời gian kết thúc
+            use_cache: Sử dụng cache hay không, None sẽ sử dụng giá trị mặc định
+        
         Returns:
-            pd.DataFrame: DataFrame chứa dữ liệu thị trường và các indicator
+            DataFrame chứa dữ liệu lịch sử
         """
-        # Tạo cache key
-        cache_key = f"{symbol}_{interval}_{limit}"
+        if use_cache is None:
+            use_cache = self.use_cache
+        
+        # Tạo tên file cache
+        cache_filename = f"{symbol}_{interval}_{limit}"
+        if start_time:
+            cache_filename += f"_{start_time.strftime('%Y%m%d')}"
+        if end_time:
+            cache_filename += f"_{end_time.strftime('%Y%m%d')}"
+        cache_filename += ".csv"
+        
+        cache_path = os.path.join(self.cache_dir, cache_filename)
         
         # Kiểm tra cache
-        if use_cache and cache_key in self.data_cache:
-            cache_data = self.data_cache[cache_key]
-            cache_time = cache_data.get('timestamp', 0)
-            current_time = datetime.now().timestamp()
-            
-            # Nếu cache còn hợp lệ
-            if current_time - cache_time < cache_ttl:
-                logger.info(f"Lấy dữ liệu {symbol} {interval} từ cache")
-                return cache_data.get('data', pd.DataFrame())
-        
-        try:
-            # Lấy dữ liệu mới từ API
-            klines = self.binance_api.get_klines(symbol, interval, limit=limit)
-            
-            if not klines or len(klines) == 0:
-                logger.warning(f"Không thể lấy dữ liệu cho {symbol} {interval}")
-                return pd.DataFrame()
-            
-            # Chuyển đổi thành DataFrame
-            df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 
-                                              'close_time', 'quote_asset_volume', 'number_of_trades', 
-                                              'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
-            
-            # Chuyển đổi kiểu dữ liệu
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
-            
-            # Loại bỏ các cột không cần thiết
-            df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
-            
-            # Thêm các indicator cơ bản
-            df = self.add_basic_indicators(df)
-            
-            # Lưu vào cache
-            self.data_cache[cache_key] = {
-                'data': df,
-                'timestamp': datetime.now().timestamp()
-            }
-            
-            logger.info(f"Đã lấy và xử lý {len(df)} candlesticks cho {symbol} {interval}")
-            return df
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy dữ liệu thị trường: {str(e)}")
-            return pd.DataFrame()
-    
-    def add_basic_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Thêm các chỉ báo kỹ thuật cơ bản vào DataFrame
-        
-        Args:
-            df (pd.DataFrame): DataFrame chứa dữ liệu giá
-            
-        Returns:
-            pd.DataFrame: DataFrame với các chỉ báo đã thêm
-        """
-        if len(df) == 0:
-            return df
-        
-        # Tính toán tất cả các chỉ báo cần thiết cho mô hình ML
-        df = self.calculate_indicators(df, indicators=["ALL"])
-        df['rsi'] = self._calculate_rsi(df['close'], 14)
-        
-        # Tính MACD
-        df['ema_12'] = df['close'].ewm(span=12, adjust=False).mean()
-        df['ema_26'] = df['close'].ewm(span=26, adjust=False).mean()
-        df['macd'] = df['ema_12'] - df['ema_26']
-        df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
-        
-        # Tính Bollinger Bands
-        period = 20
-        df['sma'] = df['close'].rolling(window=period).mean()
-        df['std'] = df['close'].rolling(window=period).std()
-        df['bb_upper'] = df['sma'] + (df['std'] * 2)
-        df['bb_lower'] = df['sma'] - (df['std'] * 2)
-        
-        # Tính EMA ngắn và dài
-        df['ema_short'] = df['close'].ewm(span=10, adjust=False).mean()
-        df['ema_long'] = df['close'].ewm(span=50, adjust=False).mean()
-        
-        # Tính ATR
-        df['tr1'] = abs(df['high'] - df['low'])
-        df['tr2'] = abs(df['high'] - df['close'].shift())
-        df['tr3'] = abs(df['low'] - df['close'].shift())
-        df['tr'] = df[['tr1', 'tr2', 'tr3']].max(axis=1)
-        df['atr'] = df['tr'].rolling(window=14).mean()
-        
-        # Tính ADX
-        df = self._calculate_adx(df, 14)
-        
-        return df
-    
-    def _calculate_rsi(self, prices: pd.Series, period: int = 14) -> pd.Series:
-        """
-        Tính RSI (Relative Strength Index)
-        
-        Args:
-            prices (pd.Series): Chuỗi giá
-            period (int): Chu kỳ RSI
-            
-        Returns:
-            pd.Series: Chuỗi RSI
-        """
-        # Tính biến động giá
-        deltas = prices.diff()
-        
-        # Tạo chuỗi gain và loss
-        gain = deltas.copy()
-        loss = deltas.copy()
-        gain[gain < 0] = 0
-        loss[loss > 0] = 0
-        loss = -loss  # Chuyển đổi thành giá trị dương
-        
-        # Tính giá trị trung bình
-        avg_gain = gain.rolling(window=period).mean()
-        avg_loss = loss.rolling(window=period).mean()
-        
-        # Tính RS và RSI
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-        
-        return rsi
-    
-    def _calculate_adx(self, df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
-        """
-        Tính ADX (Average Directional Index)
-        
-        Args:
-            df (pd.DataFrame): DataFrame chứa dữ liệu giá
-            period (int): Chu kỳ ADX
-            
-        Returns:
-            pd.DataFrame: DataFrame với ADX đã tính
-        """
-        # Tính +DM và -DM
-        df['prev_high'] = df['high'].shift(1)
-        df['prev_low'] = df['low'].shift(1)
-        df['dm_plus'] = np.where((df['high'] - df['prev_high']) > (df['prev_low'] - df['low']),
-                                np.maximum(df['high'] - df['prev_high'], 0),
-                                0)
-        df['dm_minus'] = np.where((df['prev_low'] - df['low']) > (df['high'] - df['prev_high']),
-                                np.maximum(df['prev_low'] - df['low'], 0),
-                                0)
-        
-        # Tính +DI và -DI
-        df['di_plus'] = 100 * (df['dm_plus'].rolling(window=period).mean() / df['atr'])
-        df['di_minus'] = 100 * (df['dm_minus'].rolling(window=period).mean() / df['atr'])
-        
-        # Tính DX
-        df['dx'] = 100 * abs(df['di_plus'] - df['di_minus']) / (df['di_plus'] + df['di_minus'])
-        
-        # Tính ADX
-        df['adx'] = df['dx'].rolling(window=period).mean()
-        
-        return df
-    
-    def get_historical_data(self, symbol: str, interval: str, lookback_days: int = 30) -> pd.DataFrame:
-        """
-        Lấy dữ liệu lịch sử cho một cặp tiền tệ trong khoảng thời gian xác định
-        
-        Args:
-            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
-            interval (str): Khung thời gian (ví dụ: '1h', '4h', '1d')
-            lookback_days (int): Số ngày lấy dữ liệu lịch sử
-            
-        Returns:
-            pd.DataFrame: DataFrame chứa dữ liệu lịch sử
-        """
-        try:
-            # Nếu có thư mục dữ liệu, ưu tiên đọc từ file
-            if self.data_dir:
-                file_pattern = f"{symbol}_{interval}_historical_data.csv"
-                file_path = os.path.join(self.data_dir, file_pattern)
-                
-                if os.path.exists(file_path):
-                    logger.info(f"Đọc dữ liệu lịch sử từ file {file_path}")
-                    df = pd.read_csv(file_path)
-                    if 'timestamp' in df.columns:
-                        df['timestamp'] = pd.to_datetime(df['timestamp'])
-                        
-                    # Lấy dữ liệu theo số ngày yêu cầu nếu có nhiều hơn
-                    if lookback_days > 0 and 'timestamp' in df.columns:
-                        now = datetime.now()
-                        start_date = now - timedelta(days=lookback_days)
-                        df = df[df['timestamp'] >= start_date]
-                    
-                    # Nếu đã tải thành công từ file, trả về luôn
-                    if not df.empty:
-                        logger.info(f"Đã tải {len(df)} nến từ file dữ liệu cho {symbol} {interval}")
-                        return df
-        
-            # Nếu không đọc được từ file hoặc không có thư mục dữ liệu, lấy từ API
-            # Tính số lượng candlestick cần lấy
-            intervals_per_day = {
-                '1m': 24 * 60,
-                '3m': 24 * 20,
-                '5m': 24 * 12,
-                '15m': 24 * 4,
-                '30m': 24 * 2,
-                '1h': 24,
-                '2h': 12,
-                '4h': 6,
-                '6h': 4,
-                '8h': 3,
-                '12h': 2,
-                '1d': 1,
-                '3d': 1/3,
-                '1w': 1/7,
-                '1M': 1/30
-            }
-            
-            if interval not in intervals_per_day:
-                interval = '1h'  # Mặc định nếu interval không hợp lệ
-            
-            # Số candlestick cần lấy
-            limit = min(1000, int(lookback_days * intervals_per_day.get(interval, 24)))
-            
-            # Lấy dữ liệu từ API
-            df = self.get_market_data(symbol, interval, limit=limit, use_cache=True)
-            
-            if df is None or (hasattr(df, 'empty') and df.empty):
-                logger.warning(f"Không có dữ liệu lịch sử cho {symbol} với khung thời gian {interval}")
-                return pd.DataFrame()
-            
-            return df
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy dữ liệu lịch sử: {str(e)}")
-            return pd.DataFrame()
-            
-    def download_historical_data(self, symbol: str, interval: str, start_time: datetime = None, 
-                              end_time: datetime = None, save_to_file: bool = False) -> pd.DataFrame:
-        """
-        Tải xuống dữ liệu lịch sử đầy đủ cho một cặp tiền tệ
-        
-        Args:
-            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
-            interval (str): Khung thời gian (ví dụ: '1h', '4h', '1d')
-            start_time (datetime, optional): Thời gian bắt đầu, mặc định là 30 ngày trước
-            end_time (datetime, optional): Thời gian kết thúc, mặc định là hiện tại
-            save_to_file (bool): Có lưu dữ liệu vào file không
-            
-        Returns:
-            pd.DataFrame: DataFrame chứa dữ liệu lịch sử
-        """
-        try:
-            if start_time is None:
-                start_time = datetime.now() - timedelta(days=30)
-            if end_time is None:
-                end_time = datetime.now()
-            
-            start_timestamp = int(start_time.timestamp() * 1000)
-            end_timestamp = int(end_time.timestamp() * 1000)
-            
-            logger.info(f"Đang tải dữ liệu lịch sử cho {symbol} {interval} từ {start_time} đến {end_time}")
-            
-            # Khởi tạo DataFrame rỗng để chứa dữ liệu lịch sử
-            all_klines = []
-            
-            # Binance giới hạn 1000 candlestick mỗi request, nên chúng ta cần lặp
-            current_start = start_timestamp
-            while current_start < end_timestamp:
+        if use_cache and os.path.exists(cache_path):
+            cache_time = os.path.getmtime(cache_path)
+            if datetime.now().timestamp() - cache_time < self.cache_expiry:
                 try:
-                    # Lấy dữ liệu từ API
-                    klines = self.binance_api.get_historical_klines(
-                        symbol=symbol,
-                        interval=interval,
-                        start_time=current_start,
-                        end_time=end_timestamp,
-                        limit=1000
-                    )
-                    
-                    if not klines or len(klines) == 0:
-                        break
-                    
-                    all_klines.extend(klines)
-                    
-                    # Cập nhật thời gian bắt đầu cho lần lấy tiếp theo
-                    current_start = int(klines[-1][0]) + 1
-                    
-                    logger.info(f"Đã tải {len(klines)} candlesticks. Tiến độ: {(current_start - start_timestamp) / (end_timestamp - start_timestamp) * 100:.2f}%")
-                    
-                    # Chờ một chút để tránh rate limit
-                    time.sleep(0.5)
-                    
+                    df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+                    logger.info(f"Đã tải dữ liệu từ cache: {cache_path}")
+                    return df
                 except Exception as e:
-                    logger.error(f"Lỗi khi tải dữ liệu lịch sử cho {symbol} {interval}: {str(e)}")
-                    # Chờ lâu hơn nếu có lỗi
-                    time.sleep(2)
-                    continue
+                    logger.error(f"Lỗi khi tải dữ liệu từ cache: {str(e)}")
+        
+        # Lấy dữ liệu mới
+        if self.api is None:
+            # Nếu không có API, tạo dữ liệu mẫu
+            logger.warning("Không có API, tạo dữ liệu mẫu")
+            df = self._generate_sample_data(symbol, interval, limit)
+        else:
+            try:
+                # Lấy dữ liệu từ API
+                klines = self.api.get_historical_klines(
+                    symbol=symbol,
+                    interval=interval,
+                    limit=limit,
+                    start_time=start_time,
+                    end_time=end_time
+                )
+                
+                # Chuyển đổi thành DataFrame
+                df = pd.DataFrame(
+                    klines,
+                    columns=['timestamp', 'open', 'high', 'low', 'close', 'volume',
+                             'close_time', 'quote_asset_volume', 'trades_count',
+                             'taker_buy_base', 'taker_buy_quote', 'ignore']
+                )
+                
+                # Xử lý dữ liệu
+                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                df.set_index('timestamp', inplace=True)
+                
+                # Chuyển đổi kiểu dữ liệu
+                for col in ['open', 'high', 'low', 'close', 'volume']:
+                    df[col] = pd.to_numeric(df[col])
+                
+                logger.info(f"Đã lấy {len(df)} dòng dữ liệu cho {symbol} {interval}")
+                
+                # Lưu vào cache
+                if use_cache:
+                    df.to_csv(cache_path)
+                    logger.info(f"Đã lưu dữ liệu vào cache: {cache_path}")
             
-            # Chuyển đổi thành DataFrame
-            if not all_klines:
-                logger.warning(f"Không có dữ liệu lịch sử cho {symbol} {interval}")
-                return pd.DataFrame()
-            
-            df = pd.DataFrame(all_klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 
-                                                  'close_time', 'quote_asset_volume', 'number_of_trades', 
-                                                  'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
-            
-            # Chuyển đổi kiểu dữ liệu
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
-            
-            # Loại bỏ các cột không cần thiết
-            df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
-            
-            # Thêm các indicator cơ bản
-            df = self.add_basic_indicators(df)
-            
-            logger.info(f"Đã tải và xử lý {len(df)} candlesticks cho {symbol} {interval}")
-            
-            # Lưu vào file nếu cần
-            if save_to_file:
-                os.makedirs(f"{self.cache_dir}/historical", exist_ok=True)
-                file_path = f"{self.cache_dir}/historical/{symbol}_{interval}_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.csv"
-                df.to_csv(file_path, index=False)
-                logger.info(f"Đã lưu dữ liệu lịch sử vào file {file_path}")
-            
-            return df
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi tải xuống dữ liệu lịch sử: {str(e)}")
-            return pd.DataFrame()
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy dữ liệu từ API: {str(e)}")
+                # Tạo dữ liệu mẫu trong trường hợp lỗi
+                df = self._generate_sample_data(symbol, interval, limit)
+        
+        return df
     
-    def get_market_summary(self, symbol: str) -> Dict:
+    def _generate_sample_data(
+        self,
+        symbol: str,
+        interval: str,
+        limit: int = 1000
+    ) -> pd.DataFrame:
         """
-        Lấy tóm tắt thị trường cho một cặp tiền tệ
+        Tạo dữ liệu mẫu cho kiểm thử
         
         Args:
-            symbol (str): Mã cặp giao dịch (ví dụ: 'BTCUSDT')
-            
+            symbol: Mã tiền
+            interval: Khung thời gian
+            limit: Số lượng nến
+        
         Returns:
-            Dict: Tóm tắt thị trường
+            DataFrame chứa dữ liệu mẫu
         """
+        # Tạo index thời gian
+        end_time = datetime.now()
+        
+        if interval == '1m':
+            delta = timedelta(minutes=1)
+        elif interval == '5m':
+            delta = timedelta(minutes=5)
+        elif interval == '15m':
+            delta = timedelta(minutes=15)
+        elif interval == '30m':
+            delta = timedelta(minutes=30)
+        elif interval == '1h':
+            delta = timedelta(hours=1)
+        elif interval == '4h':
+            delta = timedelta(hours=4)
+        elif interval == '1d':
+            delta = timedelta(days=1)
+        else:
+            delta = timedelta(hours=1)  # Default
+        
+        # Tạo timestamps
+        timestamps = [end_time - i * delta for i in range(limit)]
+        timestamps.reverse()
+        
+        # Tạo giá
+        if symbol.startswith('BTC'):
+            base_price = 60000
+            volatility = 2000
+        elif symbol.startswith('ETH'):
+            base_price = 3000
+            volatility = 100
+        else:
+            base_price = 100
+            volatility = 5
+        
+        # Tạo dữ liệu giả với xu hướng
+        trend = np.linspace(-0.1, 0.1, limit)  # -10% to +10%
+        noise = np.random.normal(0, 0.01, limit)  # 1% noise
+        
+        returns = trend + noise
+        cum_returns = np.cumprod(1 + returns)
+        
+        close_prices = base_price * cum_returns
+        
+        # Tính các giá khác
+        daily_volatility = volatility * 0.01  # 1% của volatility
+        
+        open_prices = close_prices * (1 + np.random.normal(0, daily_volatility, limit))
+        high_prices = np.maximum(open_prices, close_prices) * (1 + abs(np.random.normal(0, daily_volatility, limit)))
+        low_prices = np.minimum(open_prices, close_prices) * (1 - abs(np.random.normal(0, daily_volatility, limit)))
+        
+        # Tạo volume
+        base_volume = 1000
+        volume = base_volume * (1 + np.random.lognormal(0, 1, limit))
+        
+        # Tạo DataFrame
+        df = pd.DataFrame({
+            'open': open_prices,
+            'high': high_prices,
+            'low': low_prices,
+            'close': close_prices,
+            'volume': volume
+        }, index=timestamps)
+        
+        logger.warning(f"Đã tạo dữ liệu mẫu cho {symbol} {interval} ({limit} nến)")
+        
+        return df
+    
+    def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Thêm các chỉ báo kỹ thuật vào DataFrame
+        
+        Args:
+            df: DataFrame chứa dữ liệu giá
+        
+        Returns:
+            DataFrame đã thêm chỉ báo kỹ thuật
+        """
+        # Tạo bản sao để tránh thay đổi DataFrame gốc
+        df_copy = df.copy()
+        
         try:
-            # Lấy giá hiện tại
-            ticker = self.binance_api.get_symbol_ticker(symbol)
-            price = float(ticker['price']) if isinstance(ticker, dict) and 'price' in ticker else 0.0
+            # SMA - Simple Moving Average
+            for period in [9, 20, 50, 200]:
+                df_copy[f'sma_{period}'] = df_copy['close'].rolling(period).mean()
             
-            # Lấy thông tin biến động 24h
-            ticker_24h = self.binance_api.get_24h_ticker(symbol)
+            # EMA - Exponential Moving Average
+            for period in [9, 12, 26, 50, 200]:
+                df_copy[f'ema_{period}'] = df_copy['close'].ewm(span=period, adjust=False).mean()
             
-            # Lấy dữ liệu 1h gần nhất
-            df_1h = self.get_market_data(symbol, '1h', limit=24)
+            # Bollinger Bands
+            df_copy['bb_middle'] = df_copy['close'].rolling(20).mean()
+            df_copy['bb_std'] = df_copy['close'].rolling(20).std()
+            df_copy['bb_upper'] = df_copy['bb_middle'] + 2 * df_copy['bb_std']
+            df_copy['bb_lower'] = df_copy['bb_middle'] - 2 * df_copy['bb_std']
+            df_copy['bb_width'] = (df_copy['bb_upper'] - df_copy['bb_lower']) / df_copy['bb_middle']
             
-            # Lấy dữ liệu 4h gần nhất
-            df_4h = self.get_market_data(symbol, '4h', limit=24)
+            # RSI - Relative Strength Index
+            delta = df_copy['close'].diff()
+            gain = delta.where(delta > 0, 0)
+            loss = -delta.where(delta < 0, 0)
             
-            # Lấy dữ liệu 1d gần nhất
-            df_1d = self.get_market_data(symbol, '1d', limit=30)
+            avg_gain = gain.rolling(14).mean()
+            avg_loss = loss.rolling(14).mean()
             
-            # Tính toán các chỉ số biến động
-            volatility_24h = float(ticker_24h.get('priceChangePercent', 0)) if isinstance(ticker_24h, dict) else 0.0
+            rs = avg_gain / avg_loss.replace(0, 0.001)  # Tránh chia cho 0
+            df_copy['rsi_14'] = 100 - (100 / (1 + rs))
             
-            # Tính toán volume trung bình
-            volume_1h = df_1h['volume'].mean() if not df_1h.empty else 0
-            volume_4h = df_4h['volume'].mean() if not df_4h.empty else 0
-            volume_1d = df_1d['volume'].mean() if not df_1d.empty else 0
+            # MACD - Moving Average Convergence Divergence
+            df_copy['ema_12'] = df_copy['close'].ewm(span=12, adjust=False).mean()
+            df_copy['ema_26'] = df_copy['close'].ewm(span=26, adjust=False).mean()
+            df_copy['macd'] = df_copy['ema_12'] - df_copy['ema_26']
+            df_copy['macd_signal'] = df_copy['macd'].ewm(span=9, adjust=False).mean()
+            df_copy['macd_hist'] = df_copy['macd'] - df_copy['macd_signal']
             
-            # Tổng hợp các chỉ báo kỹ thuật
-            indicators = {}
+            # Stochastic Oscillator
+            n = 14
+            df_copy['stoch_k'] = 100 * (df_copy['close'] - df_copy['low'].rolling(n).min()) / \
+                            (df_copy['high'].rolling(n).max() - df_copy['low'].rolling(n).min())
+            df_copy['stoch_d'] = df_copy['stoch_k'].rolling(3).mean()
             
-            # Lấy các chỉ báo từ khung 1h
-            if not df_1h.empty and len(df_1h) > 0:
-                latest = df_1h.iloc[-1]
-                indicators['1h'] = {
-                    'rsi': float(latest['rsi']) if 'rsi' in latest else 0,
-                    'macd': float(latest['macd']) if 'macd' in latest else 0,
-                    'macd_signal': float(latest['macd_signal']) if 'macd_signal' in latest else 0,
-                    'bb_upper': float(latest['bb_upper']) if 'bb_upper' in latest else 0,
-                    'bb_lower': float(latest['bb_lower']) if 'bb_lower' in latest else 0,
-                    'ema_short': float(latest['ema_short']) if 'ema_short' in latest else 0,
-                    'ema_long': float(latest['ema_long']) if 'ema_long' in latest else 0,
-                    'adx': float(latest['adx']) if 'adx' in latest else 0
-                }
+            # ADX - Average Directional Index
+            tr1 = df_copy['high'] - df_copy['low']
+            tr2 = abs(df_copy['high'] - df_copy['close'].shift())
+            tr3 = abs(df_copy['low'] - df_copy['close'].shift())
             
-            # Lấy các chỉ báo từ khung 4h
-            if not df_4h.empty and len(df_4h) > 0:
-                latest = df_4h.iloc[-1]
-                indicators['4h'] = {
-                    'rsi': float(latest['rsi']) if 'rsi' in latest else 0,
-                    'macd': float(latest['macd']) if 'macd' in latest else 0,
-                    'macd_signal': float(latest['macd_signal']) if 'macd_signal' in latest else 0,
-                    'bb_upper': float(latest['bb_upper']) if 'bb_upper' in latest else 0,
-                    'bb_lower': float(latest['bb_lower']) if 'bb_lower' in latest else 0,
-                    'ema_short': float(latest['ema_short']) if 'ema_short' in latest else 0,
-                    'ema_long': float(latest['ema_long']) if 'ema_long' in latest else 0,
-                    'adx': float(latest['adx']) if 'adx' in latest else 0
-                }
+            tr = pd.DataFrame({'tr1': tr1, 'tr2': tr2, 'tr3': tr3}).max(axis=1)
+            atr = tr.rolling(14).mean()
             
-            # Lấy các chỉ báo từ khung 1d
-            if not df_1d.empty and len(df_1d) > 0:
-                latest = df_1d.iloc[-1]
-                indicators['1d'] = {
-                    'rsi': float(latest['rsi']) if 'rsi' in latest else 0,
-                    'macd': float(latest['macd']) if 'macd' in latest else 0,
-                    'macd_signal': float(latest['macd_signal']) if 'macd_signal' in latest else 0,
-                    'bb_upper': float(latest['bb_upper']) if 'bb_upper' in latest else 0,
-                    'bb_lower': float(latest['bb_lower']) if 'bb_lower' in latest else 0,
-                    'ema_short': float(latest['ema_short']) if 'ema_short' in latest else 0,
-                    'ema_long': float(latest['ema_long']) if 'ema_long' in latest else 0,
-                    'adx': float(latest['adx']) if 'adx' in latest else 0
-                }
+            plus_dm = df_copy['high'].diff()
+            minus_dm = df_copy['low'].diff()
+            plus_dm = plus_dm.where((plus_dm > 0) & (plus_dm > minus_dm), 0)
+            minus_dm = minus_dm.where((minus_dm > 0) & (minus_dm > plus_dm), 0)
             
-            # Tạo tóm tắt thị trường
-            market_summary = {
-                'symbol': symbol,
-                'price': price,
-                'change_24h': volatility_24h,
-                'volume': {
-                    '1h': volume_1h,
-                    '4h': volume_4h,
-                    '1d': volume_1d
-                },
-                'indicators': indicators,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
+            plus_di = 100 * plus_dm.rolling(14).mean() / atr
+            minus_di = 100 * minus_dm.rolling(14).mean() / atr
             
-            return market_summary
+            dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+            df_copy['adx'] = dx.rolling(14).mean()
             
+            # Đặc trưng giá và khối lượng
+            df_copy['returns'] = df_copy['close'].pct_change()
+            df_copy['log_returns'] = np.log(df_copy['close'] / df_copy['close'].shift(1))
+            df_copy['volatility'] = df_copy['returns'].rolling(20).std()
+            
+            df_copy['volume_delta'] = df_copy['volume'].diff()
+            df_copy['volume_sma'] = df_copy['volume'].rolling(20).mean()
+            df_copy['volume_ratio'] = df_copy['volume'] / df_copy['volume_sma']
+            
+            logger.info(f"Đã thêm {len(df_copy.columns) - len(df.columns)} chỉ báo kỹ thuật")
+        
         except Exception as e:
-            logger.error(f"Lỗi khi lấy tóm tắt thị trường: {str(e)}")
-            return {
-                'symbol': symbol,
-                'error': str(e),
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
-
-def main():
-    """Hàm chính để test DataProcessor"""
-    data_processor = DataProcessor()
+            logger.error(f"Lỗi khi thêm chỉ báo kỹ thuật: {str(e)}")
+        
+        return df_copy
     
-    # Lấy dữ liệu BTC 1h
-    df = data_processor.get_market_data('BTCUSDT', '1h', limit=24)
+    def split_train_test(
+        self, 
+        df: pd.DataFrame, 
+        test_size: float = 0.2
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Chia dữ liệu thành tập huấn luyện và kiểm thử
+        
+        Args:
+            df: DataFrame chứa dữ liệu
+            test_size: Tỷ lệ dữ liệu kiểm thử
+        
+        Returns:
+            Tuple (train_df, test_df)
+        """
+        train_size = int(len(df) * (1 - test_size))
+        train_df = df.iloc[:train_size]
+        test_df = df.iloc[train_size:]
+        
+        logger.info(f"Đã chia dữ liệu: train={len(train_df)}, test={len(test_df)}")
+        
+        return train_df, test_df
     
-    # In thông tin
-    print(f"Đã lấy {len(df)} candlesticks")
-    print("\nThông tin DataFrame:")
-    print(df.info())
+    def normalize_data(
+        self, 
+        df: pd.DataFrame, 
+        columns: List[str] = None,
+        method: str = 'minmax'
+    ) -> pd.DataFrame:
+        """
+        Chuẩn hóa dữ liệu
+        
+        Args:
+            df: DataFrame chứa dữ liệu
+            columns: Danh sách cột cần chuẩn hóa, None sẽ chuẩn hóa tất cả các cột số
+            method: Phương pháp chuẩn hóa ('minmax', 'zscore', 'robust')
+        
+        Returns:
+            DataFrame đã chuẩn hóa
+        """
+        # Tạo bản sao để tránh thay đổi DataFrame gốc
+        df_copy = df.copy()
+        
+        # Nếu không chỉ định cột, lấy tất cả các cột số
+        if columns is None:
+            columns = df.select_dtypes(include=['number']).columns.tolist()
+        
+        # Chuẩn hóa từng cột
+        for col in columns:
+            if col not in df.columns:
+                continue
+            
+            if method == 'minmax':
+                # Min-Max Scaling
+                min_val = df[col].min()
+                max_val = df[col].max()
+                
+                if max_val > min_val:
+                    df_copy[col] = (df[col] - min_val) / (max_val - min_val)
+                else:
+                    df_copy[col] = 0.5  # Giá trị mặc định nếu min = max
+            
+            elif method == 'zscore':
+                # Z-score Normalization
+                mean = df[col].mean()
+                std = df[col].std()
+                
+                if std > 0:
+                    df_copy[col] = (df[col] - mean) / std
+                else:
+                    df_copy[col] = 0  # Giá trị mặc định nếu std = 0
+            
+            elif method == 'robust':
+                # Robust Scaling
+                q1 = df[col].quantile(0.25)
+                q3 = df[col].quantile(0.75)
+                iqr = q3 - q1
+                
+                if iqr > 0:
+                    df_copy[col] = (df[col] - q1) / iqr
+                else:
+                    df_copy[col] = 0.5  # Giá trị mặc định nếu iqr = 0
+        
+        logger.info(f"Đã chuẩn hóa {len(columns)} cột bằng phương pháp {method}")
+        
+        return df_copy
     
-    print("\nSample data:")
-    print(df.head())
-    
-    # Lấy tóm tắt thị trường
-    summary = data_processor.get_market_summary('BTCUSDT')
-    
-    print("\nMarket Summary:")
-    print(f"Symbol: {summary['symbol']}")
-    print(f"Price: {summary['price']}")
-    print(f"24h Change: {summary['change_24h']}%")
-    
-    print("\nIndicators (1h):")
-    if '1h' in summary['indicators']:
-        indicators = summary['indicators']['1h']
-        print(f"RSI: {indicators['rsi']:.2f}")
-        print(f"MACD: {indicators['macd']:.4f}")
-        print(f"ADX: {indicators['adx']:.2f}")
+    def export_data(
+        self, 
+        df: pd.DataFrame, 
+        filename: str, 
+        format: str = 'csv'
+    ) -> str:
+        """
+        Xuất dữ liệu ra file
+        
+        Args:
+            df: DataFrame chứa dữ liệu
+            filename: Tên file
+            format: Định dạng file ('csv', 'json', 'xlsx')
+        
+        Returns:
+            Đường dẫn file đã lưu
+        """
+        # Tạo đường dẫn đầy đủ
+        filepath = os.path.join(self.data_dir, filename)
+        
+        # Tạo thư mục nếu chưa tồn tại
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        try:
+            if format == 'csv':
+                df.to_csv(filepath)
+            elif format == 'json':
+                df.to_json(filepath)
+            elif format == 'xlsx':
+                df.to_excel(filepath)
+            else:
+                raise ValueError(f"Định dạng không hỗ trợ: {format}")
+            
+            logger.info(f"Đã xuất dữ liệu ra file: {filepath}")
+            return filepath
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi xuất dữ liệu: {str(e)}")
+            return ""
 
 if __name__ == "__main__":
-    main()
+    # Demo
+    processor = DataProcessor()
+    
+    # Tạo dữ liệu mẫu
+    df = processor._generate_sample_data("BTCUSDT", "1h", 100)
+    print(f"Dữ liệu gốc: {df.shape}")
+    
+    # Thêm chỉ báo kỹ thuật
+    df_with_indicators = processor.add_technical_indicators(df)
+    print(f"Dữ liệu với chỉ báo: {df_with_indicators.shape}")
+    
+    # Chia dữ liệu
+    train_df, test_df = processor.split_train_test(df_with_indicators)
+    print(f"Tập huấn luyện: {train_df.shape}")
+    print(f"Tập kiểm thử: {test_df.shape}")
+    
+    # Chuẩn hóa dữ liệu
+    normalized_df = processor.normalize_data(train_df)
+    print(f"Dữ liệu chuẩn hóa: {normalized_df.shape}")

@@ -1,0 +1,24 @@
+{
+  "multi_task": {
+    "price_movement": {
+      "direction": 1,
+      "probability": 95966.67782340798,
+      "strength": 191933.35564681597
+    },
+    "volatility": {
+      "expected_volatility": 0.14047025338302757,
+      "high_volatility_prob": 1.0,
+      "percentile": 28
+    },
+    "regime": {
+      "regime": "volatile",
+      "probabilities": {
+        "trending_up": 0.21276595744680846,
+        "trending_down": 0.14893617021276595,
+        "ranging": 0.21276595744680846,
+        "volatile": 0.34042553191489355,
+        "neutral": 0.08510638297872339
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-03-10T00:17:49.024346",
+  "signals": {
+    "BTCUSDT": {
+      "ml_signal": 0,
+      "probability": 0,
+      "confidence_score": 0,
+      "signal_strength": 0,
+      "market_regime": "unknown",
+      "risk_pct": 10,
+      "leverage": 20,
+      "timestamp": "2025-03-10T00:17:45.368307"
+    },
+    "ETHUSDT": {
+      "ml_signal": 0,
+      "probability": 0,
+      "confidence_score": 0,
+      "signal_strength": 0,
+      "market_regime": "unknown",
+      "risk_pct": 10,
+      "leverage": 20,
+      "timestamp": "2025-03-10T00:17:49.023865"
+    }
+  },
+  "ml_integration_enabled": true
+}
