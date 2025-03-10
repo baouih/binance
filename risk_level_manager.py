@@ -391,6 +391,29 @@ class RiskLevelManager:
                     print("  Take profit từng phần:")
                     for i, tp in enumerate(config["exit_strategy"]["partial_take_profits"]):
                         print(f"    - {tp['percent']}% tại mục tiêu {tp['price_target']}%")
+                        
+    def apply_risk_config(self, risk_level=None):
+        """
+        Áp dụng cấu hình rủi ro cho bot
+        
+        Args:
+            risk_level (str): Mức độ rủi ro, nếu None sẽ dùng mức đang hoạt động
+            
+        Returns:
+            dict: Cấu hình rủi ro được áp dụng
+        """
+        # Lấy mức rủi ro hiện tại nếu không được chỉ định
+        if risk_level is None:
+            risk_level = self.get_active_risk_level()
+        
+        # Lấy cấu hình rủi ro
+        config = self.get_risk_config(risk_level)
+        
+        # Thiết lập mức rủi ro hiện tại
+        self.set_active_risk_level(risk_level)
+        
+        # Trả về cấu hình đã áp dụng
+        return config
 
 def main():
     """Hàm main"""

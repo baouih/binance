@@ -1,0 +1,180 @@
+===== CHAY BOT CHE DO 24/7 =====
+
+Chon muc do rui ro:
+[1] 10 (Thap)
+[2] 15 (Trung binh thap)
+[3] 20 (Trung binh)
+[4] 30 (Cao)
+Nhap lua chon (1-4): 2
+
+Da chon muc rui ro: 15
+
+Khoi dong bot voi Guardian...
+
+Bot se tu dong khoi dong lai khi gap loi.
+
+De dung bot, dong cua so nay hoac nhan Ctrl+C.
+
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ede' in position 52: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 143, in start
+    logger.info("===== KHỞI ĐỘNG GUARDIAN =====")
+Message: '===== KHỞI ĐỘNG GUARDIAN ====='
+Arguments: ()
+2025-03-10 12:37:41,475 - guardian - INFO - ===== KHỞI ĐỘNG GUARDIAN =====
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ee9' in position 45: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 144, in start
+    logger.info(f"Mức độ rủi ro: {self.risk_level if self.risk_level else 'Mặc định'}")
+Message: 'Mức độ rủi ro: 15'
+Arguments: ()
+2025-03-10 12:37:41,475 - guardian - INFO - Mức độ rủi ro: 15
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ea3' in position 47: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 145, in start
+    logger.info(f"Khoảng thời gian kiểm tra: {self.check_interval} giây")
+Message: 'Khoảng thời gian kiểm tra: 60 giây'
+Arguments: ()
+2025-03-10 12:37:41,475 - guardian - INFO - Khoảng thời gian kiểm tra: 60 giây
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ed1' in position 45: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 146, in start
+    logger.info(f"Số lần khởi động lại tối đa trong 1 giờ: {self.max_restarts_per_hour}")
+Message: 'Số lần khởi động lại tối đa trong 1 giờ: 5'
+Arguments: ()
+2025-03-10 12:37:41,491 - guardian - INFO - Số lần khởi động lại tối đa trong 1 giờ: 5
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1edf' in position 46: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 152, in start
+    self._start_bot()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 159, in _start_bot
+    logger.info("Khởi động bot...")
+Message: 'Khởi động bot...'
+Arguments: ()
+2025-03-10 12:37:41,491 - guardian - INFO - Khởi động bot...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1ec7' in position 45: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 152, in start
+    self._start_bot()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 178, in _start_bot
+    logger.info(f"Lệnh khởi động: {' '.join(cmd)}")
+Message: 'Lệnh khởi động: C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python310\\python.exe bot_startup.py --risk-level 15'
+Arguments: ()
+2025-03-10 12:37:41,491 - guardian - INFO - Lệnh khởi động: C:\Users\Administrator\AppData\Local\Programs\Python\Python310\python.exe bot_startup.py --risk-level 15
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\xe3' in position 49: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 152, in start
+    self._start_bot()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 192, in _start_bot
+    logger.info(f"Bot đã được khởi động (PID: {self.bot_process.pid})")
+Message: 'Bot đã được khởi động (PID: 19696)'
+Arguments: ()
+2025-03-10 12:37:41,491 - guardian - INFO - Bot đã được khởi động (PID: 19696)
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\xe3' in position 49: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 152, in start
+    self._start_bot()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 223, in _start_bot
+    logger.info("Bot đã khởi động thành công")
+Message: 'Bot đã khởi động thành công'
+Arguments: ()
+2025-03-10 12:37:46,512 - guardian - INFO - Bot đã khởi động thành công
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+    stream.write(msg + self.terminator)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u1eaf' in position 45: character maps to <undefined>
+Call stack:
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 487, in <module>
+    sys.exit(main())
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 473, in main
+    guardian.start()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 155, in start
+    self._monitor_loop()
+  File "E:\BinanceTradeMaster\auto_restart_guardian.py", line 233, in _monitor_loop
+    logger.info("Bắt đầu vòng lặp giám sát...")
+Message: 'Bắt đầu vòng lặp giám sát...'
+Arguments: ()
+2025-03-10 12:37:46,512 - guardian - INFO - Bắt đầu vòng lặp giám sát...

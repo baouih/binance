@@ -1,0 +1,142 @@
+[2025-03-10 12:46:48] Đã gửi tín hiệu dừng cho bot.
+[2025-03-10 12:46:48] LỖI: --- Logging error ---
+[2025-03-10 12:46:48] LỖI: Traceback (most recent call last):
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:46:48] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:46:48] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:46:48] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\u1edf' in position 49: character maps to <undefined>
+[2025-03-10 12:46:48] LỖI: Call stack:
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:46:48] LỖI: sys.exit(main())
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:46:48] LỖI: success = manager.start()
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 260, in start
+[2025-03-10 12:46:48] LỖI: logger.info("Kh\u1edfi đ\u1ed9ng bot...")
+[2025-03-10 12:46:48] LỖI: Message: 'Kh\u1edfi đ\u1ed9ng bot...'
+[2025-03-10 12:46:48] LỖI: Arguments: ()
+[2025-03-10 12:46:48] LỖI: 2025-03-10 12:44:25,514 - bot_startup - INFO - Kh\u1edfi đ\u1ed9ng bot...
+[2025-03-10 12:46:48] LỖI: --- Logging error ---
+[2025-03-10 12:46:48] LỖI: Traceback (most recent call last):
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:46:48] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:46:48] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:46:48] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\u1edf' in position 49: character maps to <undefined>
+[2025-03-10 12:46:48] LỖI: Call stack:
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:46:48] LỖI: sys.exit(main())
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:46:48] LỖI: success = manager.start()
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 275, in start
+[2025-03-10 12:46:48] LỖI: self._start_bot_process(bot_module)
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 410, in _start_bot_process
+[2025-03-10 12:46:48] LỖI: logger.info("Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...")
+[2025-03-10 12:46:48] LỖI: Message: 'Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...'
+[2025-03-10 12:46:48] LỖI: Arguments: ()
+[2025-03-10 12:46:48] LỖI: 2025-03-10 12:44:26,331 - bot_startup - INFO - Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...
+[2025-03-10 12:46:48] LỖI: Exception in thread Thread-1 (main):
+[2025-03-10 12:46:48] LỖI: --- Logging error ---
+[2025-03-10 12:46:48] LỖI: Traceback (most recent call last):
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\threading.py", line 1016, in _bootstrap_inner
+[2025-03-10 12:46:48] LỖI: Traceback (most recent call last):
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:46:48] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:46:48] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:46:48] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\xe3' in position 52: character maps to <undefined>
+[2025-03-10 12:46:48] LỖI: Call stack:
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:46:48] LỖI: sys.exit(main())
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:46:48] LỖI: success = manager.start()
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 275, in start
+[2025-03-10 12:46:48] LỖI: self._start_bot_process(bot_module)
+[2025-03-10 12:46:48] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 443, in _start_bot_process
+[2025-03-10 12:46:48] LỖI: logger.info("Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng")
+[2025-03-10 12:46:48] LỖI: Message: 'Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng'
+[2025-03-10 12:46:48] LỖI: Arguments: ()
+[2025-03-10 12:46:48] LỖI: 2025-03-10 12:44:26,331 - bot_startup - INFO - Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng
+[2025-03-10 12:46:48] LỖI: self.run()
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\threading.py", line 953, in run
+[2025-03-10 12:46:48] LỖI: self._target(*self._args, **self._kwargs)
+[2025-03-10 12:46:48] LỖI: TypeError: main() takes 0 positional arguments but 1 was given
+[2025-03-10 12:46:48] LỖI: --- Logging error ---
+[2025-03-10 12:46:48] LỖI: Traceback (most recent call last):
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:46:48] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:46:48] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:46:48] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:46:48] Bot đã dừng thành công.
+[2025-03-10 12:46:50] Khởi động bot giao dịch...
+[2025-03-10 12:47:55] Đã gửi tín hiệu dừng cho bot.
+[2025-03-10 12:47:55] LỖI: --- Logging error ---
+[2025-03-10 12:47:55] LỖI: Traceback (most recent call last):
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:47:55] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:47:55] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:47:55] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\u1edf' in position 49: character maps to <undefined>
+[2025-03-10 12:47:55] LỖI: Call stack:
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:47:55] LỖI: sys.exit(main())
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:47:55] LỖI: success = manager.start()
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 260, in start
+[2025-03-10 12:47:55] LỖI: logger.info("Kh\u1edfi đ\u1ed9ng bot...")
+[2025-03-10 12:47:55] LỖI: Message: 'Kh\u1edfi đ\u1ed9ng bot...'
+[2025-03-10 12:47:55] LỖI: Arguments: ()
+[2025-03-10 12:47:55] LỖI: 2025-03-10 12:46:50,401 - bot_startup - INFO - Kh\u1edfi đ\u1ed9ng bot...
+[2025-03-10 12:47:55] LỖI: --- Logging error ---
+[2025-03-10 12:47:55] LỖI: Traceback (most recent call last):
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:47:55] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:47:55] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:47:55] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\u1edf' in position 49: character maps to <undefined>
+[2025-03-10 12:47:55] LỖI: Call stack:
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:47:55] LỖI: sys.exit(main())
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:47:55] LỖI: success = manager.start()
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 275, in start
+[2025-03-10 12:47:55] LỖI: self._start_bot_process(bot_module)
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 410, in _start_bot_process
+[2025-03-10 12:47:55] LỖI: logger.info("Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...")
+[2025-03-10 12:47:55] LỖI: Message: 'Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...'
+[2025-03-10 12:47:55] LỖI: Arguments: ()
+[2025-03-10 12:47:55] LỖI: 2025-03-10 12:46:50,891 - bot_startup - INFO - Kh\u1edfi đ\u1ed9ng bot v\u1edbi hàm main()...
+[2025-03-10 12:47:55] LỖI: Exception in thread Thread-1 (main):
+[2025-03-10 12:47:55] LỖI: Traceback (most recent call last):
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\threading.py", line 1016, in _bootstrap_inner
+[2025-03-10 12:47:55] LỖI: --- Logging error ---
+[2025-03-10 12:47:55] LỖI: Traceback (most recent call last):
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:47:55] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:47:55] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:47:55] LỖI: UnicodeEncodeError: 'charmap' codec can't encode character '\xe3' in position 52: character maps to <undefined>
+[2025-03-10 12:47:55] LỖI: Call stack:
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 627, in <module>
+[2025-03-10 12:47:55] LỖI: sys.exit(main())
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 606, in main
+[2025-03-10 12:47:55] LỖI: success = manager.start()
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 275, in start
+[2025-03-10 12:47:55] LỖI: self._start_bot_process(bot_module)
+[2025-03-10 12:47:55] LỖI: File "E:\BinanceTradeMaster\bot_startup.py", line 443, in _start_bot_process
+[2025-03-10 12:47:55] LỖI: logger.info("Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng")
+[2025-03-10 12:47:55] LỖI: Message: 'Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng'
+[2025-03-10 12:47:55] LỖI: Arguments: ()
+[2025-03-10 12:47:55] LỖI: 2025-03-10 12:46:50,891 - bot_startup - INFO - Bot đ\xe3 đư\u1ee3c kh\u1edfi đ\u1ed9ng
+[2025-03-10 12:47:55] LỖI: self.run()
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\threading.py", line 953, in run
+[2025-03-10 12:47:55] LỖI: self._target(*self._args, **self._kwargs)
+[2025-03-10 12:47:55] LỖI: TypeError: main() takes 0 positional arguments but 1 was given
+[2025-03-10 12:47:55] LỖI: --- Logging error ---
+[2025-03-10 12:47:55] LỖI: Traceback (most recent call last):
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\logging\__init__.py", line 1103, in emit
+[2025-03-10 12:47:55] LỖI: stream.write(msg + self.terminator)
+[2025-03-10 12:47:55] LỖI: File "C:\Users\Administrator\AppData\Local\Programs\Python\Python310\lib\encodings\cp1258.py", line 19, in encode
+[2025-03-10 12:47:55] LỖI: return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+[2025-03-10 12:47:55] Bot đã dừng thành công.
+[2025-03-10 12:47:58] Khởi động bot giao dịch...
