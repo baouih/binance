@@ -1,275 +1,501 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
-Module gửi thông báo qua Telegram
-Cung cấp các chức năng để gửi tin nhắn và hình ảnh đến Telegram
+Module xử lý thông báo Telegram cho ứng dụng desktop
 """
 
-import logging
-import json
 import os
+import json
+import logging
+import datetime
+import traceback
 import requests
-from datetime import datetime
+from typing import Dict, List, Any, Optional, Union
 
 # Thiết lập logging
-logger = logging.getLogger('telegram_notifier')
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
-# Ensure logs directory exists
-os.makedirs('logs', exist_ok=True)
-
-# File handler
-file_handler = logging.FileHandler('logs/telegram_notifier.log')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+logger = logging.getLogger("telegram_notifier")
 
 class TelegramNotifier:
     """
-    Lớp xử lý gửi thông báo qua Telegram
+    Lớp xử lý gửi thông báo đến Telegram
     """
     
-    def __init__(self, token=None, chat_id=None, config_path='telegram_config.json'):
+    def __init__(self, token: Optional[str] = None, chat_id: Optional[str] = None):
         """
-        Khởi tạo Telegram notifier
+        Khởi tạo TelegramNotifier
         
-        Args:
-            token (str, optional): Token của bot Telegram. Mặc định là None.
-            chat_id (str, optional): ID của chat. Mặc định là None.
-            config_path (str, optional): Đường dẫn đến file cấu hình. Mặc định là 'configs/telegram/telegram_notification_config.json'.
+        :param token: Telegram Bot Token
+        :param chat_id: Telegram Chat ID
         """
-        self.config_path = config_path
+        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN")
+        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+        self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
+        self.enabled = bool(self.token and self.chat_id)
         
-        # Tải cấu hình nếu token hoặc chat_id không được cung cấp
-        if token is None or chat_id is None:
-            self.config = self._load_config()
-            
-            # Thay thế biến môi trường nếu có
-            bot_token = self.config.get('bot_token', '')
-            if isinstance(bot_token, str) and bot_token.startswith('${') and bot_token.endswith('}'):
-                env_var = bot_token[2:-1]
-                bot_token = os.environ.get(env_var, '')
-                
-            chat_id = self.config.get('chat_id', '')
-            if isinstance(chat_id, str) and chat_id.startswith('${') and chat_id.endswith('}'):
-                env_var = chat_id[2:-1]
-                chat_id = os.environ.get(env_var, '')
-            
-            self.token = token or bot_token
-            self.chat_id = chat_id or self.config.get('chat_id', '')
-            self.enabled = self.config.get('enabled', False)
-        else:
-            self.token = token
-            self.chat_id = chat_id
-            self.enabled = True
-            self.config = {
-                'enabled': True,
-                'bot_token': token,
-                'chat_id': chat_id
+        # Kiểm tra cài đặt
+        if not self.token:
+            logger.warning("Thiếu Telegram Bot Token")
+        
+        if not self.chat_id:
+            logger.warning("Thiếu Telegram Chat ID")
+    
+    def set_credentials(self, token: str, chat_id: str) -> Dict[str, Any]:
+        """
+        Thiết lập token và chat_id mới
+        
+        :param token: Telegram Bot Token mới
+        :param chat_id: Telegram Chat ID mới
+        :return: Kết quả kiểm tra kết nối
+        """
+        self.token = token
+        self.chat_id = chat_id
+        self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
+        self.enabled = bool(self.token and self.chat_id)
+        
+        # Kiểm tra kết nối
+        return self.test_connection()
+    
+    def test_connection(self) -> Dict[str, Any]:
+        """
+        Kiểm tra kết nối Telegram
+        
+        :return: Kết quả kiểm tra kết nối
+        """
+        if not self.enabled:
+            return {
+                "status": "error",
+                "message": "Thiếu cấu hình Telegram (Bot Token hoặc Chat ID)"
             }
         
-        # Kiểm tra token và chat_id
-        if not self.token or not self.chat_id:
-            logger.warning("Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt")
-            self.enabled = False
-        else:
-            logger.info("Telegram notifications đã được kích hoạt")
-        
-        # API endpoint
-        self.api_url = f"https://api.telegram.org/bot{self.token}"
-        
-        logger.info(f"Đã tải cấu hình thông báo từ {config_path}")
-    
-    def _load_config(self):
-        """
-        Tải cấu hình từ file
-        
-        Returns:
-            dict: Cấu hình Telegram
-        """
         try:
-            if os.path.exists(self.config_path):
-                with open(self.config_path, 'r') as f:
-                    config = json.load(f)
-                return config
+            # Gửi tin nhắn test
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            message = f"🔄 Kiểm tra kết nối Telegram thành công!\n⏱️ Thời gian: {current_time}"
+            
+            response = requests.get(
+                f"{self.base_url}/sendMessage",
+                params={
+                    "chat_id": self.chat_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                }
+            )
+            
+            if response.status_code == 200:
+                return {
+                    "status": "success",
+                    "message": "Kết nối Telegram thành công"
+                }
             else:
-                logger.warning(f"Không tìm thấy file cấu hình: {self.config_path}")
-                return {'enabled': False}
+                return {
+                    "status": "error",
+                    "message": f"Lỗi kết nối Telegram: {response.json().get('description', 'Lỗi không xác định')}"
+                }
+        
         except Exception as e:
-            logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
-            return {'enabled': False}
+            logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}"
+            }
     
-    def send_message(self, message, parse_mode=None):
+    def send_message(self, message: str, parse_mode: str = "HTML") -> Dict[str, Any]:
         """
         Gửi tin nhắn đến Telegram
         
-        Args:
-            message (str): Nội dung tin nhắn
-            parse_mode (str, optional): Chế độ phân tích cú pháp (Markdown hoặc HTML). Mặc định là None.
-            
-        Returns:
-            bool: True nếu gửi thành công, False nếu có lỗi
+        :param message: Nội dung tin nhắn
+        :param parse_mode: Chế độ định dạng (HTML, Markdown, MarkdownV2)
+        :return: Kết quả gửi tin nhắn
         """
         if not self.enabled:
-            logger.info("Bỏ qua tin nhắn vì thông báo Telegram bị tắt")
-            return False
-        
-        if not message:
-            logger.warning("Bỏ qua tin nhắn vì nội dung trống")
-            return False
+            logger.warning("Không thể gửi tin nhắn: Thiếu cấu hình Telegram")
+            return {
+                "status": "error",
+                "message": "Thiếu cấu hình Telegram (Bot Token hoặc Chat ID)"
+            }
         
         try:
-            params = {
-                'chat_id': self.chat_id,
-                'text': message
+            response = requests.get(
+                f"{self.base_url}/sendMessage",
+                params={
+                    "chat_id": self.chat_id,
+                    "text": message,
+                    "parse_mode": parse_mode
+                }
+            )
+            
+            if response.status_code == 200:
+                return {
+                    "status": "success",
+                    "message": "Đã gửi tin nhắn thành công"
+                }
+            else:
+                error_msg = response.json().get('description', 'Lỗi không xác định')
+                logger.error(f"Lỗi khi gửi tin nhắn Telegram: {error_msg}")
+                return {
+                    "status": "error",
+                    "message": f"Lỗi khi gửi tin nhắn Telegram: {error_msg}"
+                }
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi tin nhắn Telegram: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi tin nhắn Telegram: {str(e)}"
+            }
+    
+    def notify_position_opened(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Thông báo mở vị thế mới
+        
+        :param position_data: Dữ liệu vị thế
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Lấy thông tin vị thế
+            symbol = position_data.get("symbol", "Unknown")
+            side = position_data.get("side", "Unknown")
+            entry_price = position_data.get("entry_price", 0)
+            amount = position_data.get("amount", 0)
+            leverage = position_data.get("leverage", 1)
+            stop_loss = position_data.get("stop_loss", 0)
+            take_profit = position_data.get("take_profit", 0)
+            
+            # Định dạng tin nhắn
+            message = (
+                f"🚀 <b>ĐÃ MỞ VỊ THẾ MỚI</b>\n\n"
+                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
+                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
+                f"💰 <b>Giá vào lệnh:</b> {entry_price}\n"
+                f"📏 <b>Kích thước:</b> {amount} ({leverage}x)\n"
+                f"🛑 <b>Stop Loss:</b> {stop_loss}\n"
+                f"🎯 <b>Take Profit:</b> {take_profit}\n\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo mở vị thế: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo mở vị thế: {str(e)}"
+            }
+    
+    def notify_position_closed(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Thông báo đóng vị thế
+        
+        :param position_data: Dữ liệu vị thế
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Lấy thông tin vị thế
+            symbol = position_data.get("symbol", "Unknown")
+            side = position_data.get("side", "Unknown")
+            entry_price = position_data.get("entry_price", 0)
+            exit_price = position_data.get("exit_price", 0)
+            amount = position_data.get("amount", 0)
+            profit_loss = position_data.get("profit_loss", 0)
+            profit_percentage = position_data.get("profit_percentage", 0)
+            duration = position_data.get("duration", "Unknown")
+            close_reason = position_data.get("close_reason", "Manual")
+            
+            # Xác định emoji dựa trên kết quả
+            result_emoji = "🟢" if profit_loss > 0 else "🔴"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"{result_emoji} <b>ĐÃ ĐÓNG VỊ THẾ</b>\n\n"
+                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
+                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
+                f"💰 <b>Giá vào lệnh:</b> {entry_price}\n"
+                f"💰 <b>Giá ra lệnh:</b> {exit_price}\n"
+                f"📏 <b>Kích thước:</b> {amount}\n"
+                f"💵 <b>Lợi nhuận:</b> {profit_loss:.2f} USDT ({profit_percentage:.2f}%)\n"
+                f"⏱️ <b>Thời gian nắm giữ:</b> {duration}\n"
+                f"📝 <b>Lý do đóng:</b> {close_reason}\n\n"
+                f"🕒 <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo đóng vị thế: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo đóng vị thế: {str(e)}"
+            }
+    
+    def notify_sl_tp_update(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Thông báo cập nhật SL/TP
+        
+        :param position_data: Dữ liệu vị thế
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Lấy thông tin vị thế
+            symbol = position_data.get("symbol", "Unknown")
+            side = position_data.get("side", "Unknown")
+            current_price = position_data.get("current_price", 0)
+            old_sl = position_data.get("old_sl", 0)
+            old_tp = position_data.get("old_tp", 0)
+            new_sl = position_data.get("new_sl", 0)
+            new_tp = position_data.get("new_tp", 0)
+            
+            # Định dạng tin nhắn
+            message = (
+                f"🔄 <b>CẬP NHẬT SL/TP</b>\n\n"
+                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
+                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
+                f"💰 <b>Giá hiện tại:</b> {current_price}\n"
+                f"🛑 <b>Stop Loss cũ:</b> {old_sl} ➡️ <b>Stop Loss mới:</b> {new_sl}\n"
+                f"🎯 <b>Take Profit cũ:</b> {old_tp} ➡️ <b>Take Profit mới:</b> {new_tp}\n\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo cập nhật SL/TP: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo cập nhật SL/TP: {str(e)}"
+            }
+    
+    def notify_trading_opportunity(self, opportunity_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Thông báo cơ hội giao dịch
+        
+        :param opportunity_data: Dữ liệu cơ hội giao dịch
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Lấy thông tin cơ hội
+            symbol = opportunity_data.get("symbol", "Unknown")
+            signal = opportunity_data.get("signal", "Unknown")
+            price = opportunity_data.get("price", 0)
+            strength = opportunity_data.get("strength", "Unknown")
+            timeframe = opportunity_data.get("timeframe", "Unknown")
+            indicators = opportunity_data.get("indicators", [])
+            reason = opportunity_data.get("reason", "Unknown")
+            
+            # Xác định emoji dựa trên tín hiệu
+            signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
+            
+            # Định dạng thông tin chỉ báo
+            indicators_str = ""
+            for indicator in indicators:
+                indicators_str += f"  • {indicator.get('name')}: {indicator.get('value')} - {indicator.get('signal')}\n"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"🔍 <b>CƠ HỘI GIAO DỊCH MỚI</b> {signal_emoji}\n\n"
+                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
+                f"📈 <b>Tín hiệu:</b> {signal.upper()}\n"
+                f"💰 <b>Giá hiện tại:</b> {price}\n"
+                f"⏲️ <b>Khung thời gian:</b> {timeframe}\n"
+                f"💪 <b>Độ mạnh:</b> {strength}\n"
+                f"📝 <b>Lý do:</b> {reason}\n\n"
+                f"📊 <b>Chỉ báo:</b>\n{indicators_str}\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo cơ hội giao dịch: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo cơ hội giao dịch: {str(e)}"
+            }
+    
+    def notify_bot_status(self, status: str, details: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Thông báo trạng thái bot
+        
+        :param status: Trạng thái bot ("started", "stopped", "error")
+        :param details: Chi tiết bổ sung
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Xác định emoji và tiêu đề dựa trên trạng thái
+            if status.lower() == "started":
+                emoji = "✅"
+                title = "BOT ĐÃ KHỞI ĐỘNG"
+            elif status.lower() == "stopped":
+                emoji = "⛔"
+                title = "BOT ĐÃ DỪNG"
+            elif status.lower() == "error":
+                emoji = "❗"
+                title = "LỖI BOT"
+            else:
+                emoji = "ℹ️"
+                title = "TRẠNG THÁI BOT"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"{emoji} <b>{title}</b>\n\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Thêm chi tiết nếu có
+            if details:
+                message += f"\n\n📝 <b>Chi tiết:</b> {details}"
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo trạng thái bot: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo trạng thái bot: {str(e)}"
+            }
+    
+    def notify_error(self, error_type: str, message: str, details: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Thông báo lỗi
+        
+        :param error_type: Loại lỗi
+        :param message: Thông báo lỗi
+        :param details: Chi tiết bổ sung
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Định dạng tin nhắn
+            error_message = (
+                f"❌ <b>LỖI: {error_type}</b>\n\n"
+                f"📝 <b>Thông báo:</b> {message}\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Thêm chi tiết nếu có
+            if details:
+                error_message += f"\n\n📋 <b>Chi tiết:</b>\n<pre>{details}</pre>"
+            
+            # Gửi tin nhắn
+            return self.send_message(error_message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo lỗi: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo lỗi: {str(e)}"
+            }
+    
+    def notify_system_update(self, version: str, changes: List[str]) -> Dict[str, Any]:
+        """
+        Thông báo cập nhật hệ thống
+        
+        :param version: Phiên bản mới
+        :param changes: Danh sách thay đổi
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Định dạng danh sách thay đổi
+            changes_str = ""
+            for i, change in enumerate(changes, 1):
+                changes_str += f"  {i}. {change}\n"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"🆕 <b>CẬP NHẬT HỆ THỐNG</b>\n\n"
+                f"📦 <b>Phiên bản mới:</b> {version}\n\n"
+                f"📋 <b>Thay đổi:</b>\n{changes_str}\n"
+                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}"
+            }
+    
+    def notify_daily_summary(self, summary_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Gửi báo cáo tổng kết hàng ngày
+        
+        :param summary_data: Dữ liệu tổng kết
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Lấy thông tin tổng kết
+            date = summary_data.get("date", datetime.datetime.now().strftime("%Y-%m-%d"))
+            total_trades = summary_data.get("total_trades", 0)
+            win_trades = summary_data.get("win_trades", 0)
+            loss_trades = summary_data.get("loss_trades", 0)
+            win_rate = summary_data.get("win_rate", 0)
+            total_profit_loss = summary_data.get("total_profit_loss", 0)
+            best_trade = summary_data.get("best_trade", {})
+            worst_trade = summary_data.get("worst_trade", {})
+            
+            # Định dạng tin nhắn
+            message = (
+                f"📊 <b>TỔNG KẾT GIAO DỊCH NGÀY {date}</b>\n\n"
+                f"🔢 <b>Tổng số giao dịch:</b> {total_trades}\n"
+                f"✅ <b>Thắng:</b> {win_trades}\n"
+                f"❌ <b>Thua:</b> {loss_trades}\n"
+                f"📈 <b>Tỷ lệ thắng:</b> {win_rate:.2f}%\n"
+                f"💰 <b>Tổng lợi nhuận:</b> {total_profit_loss:.2f} USDT\n\n"
+            )
+            
+            # Thêm thông tin về giao dịch tốt nhất
+            if best_trade:
+                message += (
+                    f"🏆 <b>Giao dịch tốt nhất:</b>\n"
+                    f"  • Cặp giao dịch: {best_trade.get('symbol', 'N/A')}\n"
+                    f"  • Hướng: {best_trade.get('side', 'N/A')}\n"
+                    f"  • Lợi nhuận: {best_trade.get('profit', 0):.2f} USDT ({best_trade.get('profit_percentage', 0):.2f}%)\n\n"
+                )
+            
+            # Thêm thông tin về giao dịch tệ nhất
+            if worst_trade:
+                message += (
+                    f"📉 <b>Giao dịch tệ nhất:</b>\n"
+                    f"  • Cặp giao dịch: {worst_trade.get('symbol', 'N/A')}\n"
+                    f"  • Hướng: {worst_trade.get('side', 'N/A')}\n"
+                    f"  • Lỗ: {worst_trade.get('loss', 0):.2f} USDT ({worst_trade.get('loss_percentage', 0):.2f}%)\n\n"
+                )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi báo cáo tổng kết hàng ngày: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi báo cáo tổng kết hàng ngày: {str(e)}"
             }
             
-            if parse_mode:
-                params['parse_mode'] = parse_mode
-            
-            response = requests.post(f"{self.api_url}/sendMessage", json=params)
-            
-            if response.status_code == 200:
-                logger.info("Đã gửi thông báo Telegram thành công")
-                return True
-            else:
-                logger.error(f"Lỗi khi gửi thông báo Telegram: {response.text}")
-                return False
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
-            return False
-    
-    def send_photo(self, photo_path, caption=None, parse_mode=None):
-        """
-        Gửi hình ảnh đến Telegram
-        
-        Args:
-            photo_path (str): Đường dẫn đến file hình ảnh
-            caption (str, optional): Chú thích cho hình ảnh. Mặc định là None.
-            parse_mode (str, optional): Chế độ phân tích cú pháp (Markdown hoặc HTML). Mặc định là None.
-            
-        Returns:
-            bool: True nếu gửi thành công, False nếu có lỗi
-        """
-        if not self.enabled:
-            logger.info("Bỏ qua hình ảnh vì thông báo Telegram bị tắt")
-            return False
-        
-        if not os.path.exists(photo_path):
-            logger.warning(f"Bỏ qua hình ảnh vì file không tồn tại: {photo_path}")
-            return False
-        
-        try:
-            params = {
-                'chat_id': self.chat_id
-            }
-            
-            if caption:
-                params['caption'] = caption
-            
-            if parse_mode:
-                params['parse_mode'] = parse_mode
-            
-            with open(photo_path, 'rb') as photo:
-                files = {'photo': photo}
-                response = requests.post(f"{self.api_url}/sendPhoto", params=params, files=files)
-            
-            if response.status_code == 200:
-                logger.info(f"Đã gửi hình ảnh {photo_path} qua Telegram thành công")
-                return True
-            else:
-                logger.error(f"Lỗi khi gửi hình ảnh qua Telegram: {response.text}")
-                return False
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi hình ảnh qua Telegram: {str(e)}")
-            return False
-    
-    def send_document(self, document_path, caption=None, parse_mode=None):
-        """
-        Gửi tài liệu đến Telegram
-        
-        Args:
-            document_path (str): Đường dẫn đến file tài liệu
-            caption (str, optional): Chú thích cho tài liệu. Mặc định là None.
-            parse_mode (str, optional): Chế độ phân tích cú pháp (Markdown hoặc HTML). Mặc định là None.
-            
-        Returns:
-            bool: True nếu gửi thành công, False nếu có lỗi
-        """
-        if not self.enabled:
-            logger.info("Bỏ qua tài liệu vì thông báo Telegram bị tắt")
-            return False
-        
-        if not os.path.exists(document_path):
-            logger.warning(f"Bỏ qua tài liệu vì file không tồn tại: {document_path}")
-            return False
-        
-        try:
-            params = {
-                'chat_id': self.chat_id
-            }
-            
-            if caption:
-                params['caption'] = caption
-            
-            if parse_mode:
-                params['parse_mode'] = parse_mode
-            
-            with open(document_path, 'rb') as document:
-                files = {'document': document}
-                response = requests.post(f"{self.api_url}/sendDocument", params=params, files=files)
-            
-            if response.status_code == 200:
-                logger.info(f"Đã gửi tài liệu {document_path} qua Telegram thành công")
-                return True
-            else:
-                logger.error(f"Lỗi khi gửi tài liệu qua Telegram: {response.text}")
-                return False
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi tài liệu qua Telegram: {str(e)}")
-            return False
-    
-    def test_connection(self):
-        """
-        Kiểm tra kết nối đến Telegram API
-        
-        Returns:
-            bool: True nếu kết nối thành công, False nếu có lỗi
-        """
-        if not self.enabled:
-            logger.info("Bỏ qua kiểm tra kết nối vì thông báo Telegram bị tắt")
-            return False
-        
-        try:
-            response = requests.get(f"{self.api_url}/getMe")
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('ok', False):
-                    bot_info = data.get('result', {})
-                    bot_name = bot_info.get('first_name', 'Unknown')
-                    logger.info(f"Kết nối thành công đến bot Telegram: {bot_name}")
-                    return True
-                else:
-                    logger.error(f"Lỗi khi kết nối đến Telegram API: {data.get('description', 'Unknown error')}")
-                    return False
-            else:
-                logger.error(f"Lỗi khi kết nối đến Telegram API: {response.status_code} - {response.text}")
-                return False
-        except Exception as e:
-            logger.error(f"Lỗi khi kiểm tra kết nối đến Telegram API: {str(e)}")
-            return False
+# Singleton instance
+_instance = None
 
-
-# Hàm để sử dụng module này độc lập
-def send_notification(message, telegram_config_path='telegram_config.json'):
+def get_notifier() -> TelegramNotifier:
     """
-    Gửi thông báo qua Telegram
+    Lấy instance của TelegramNotifier
     
-    Args:
-        message (str): Nội dung thông báo
-        telegram_config_path (str, optional): Đường dẫn đến file cấu hình. Mặc định là 'telegram_config.json'.
-        
-    Returns:
-        bool: True nếu gửi thành công, False nếu có lỗi
+    :return: TelegramNotifier instance
     """
-    notifier = TelegramNotifier(config_path=telegram_config_path)
-    return notifier.send_message(message)
+    global _instance
+    if _instance is None:
+        _instance = TelegramNotifier()
+    return _instance
