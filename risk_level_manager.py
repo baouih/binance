@@ -245,7 +245,7 @@ class RiskLevelManager:
         # Cập nhật file account_config.json nếu có
         if os.path.exists("account_config.json"):
             try:
-                with open("account_config.json", "r") as f:
+                with open("account_config.json", "r", encoding="utf-8") as f:
                     account_config = json.load(f)
                 
                 # Cập nhật risk_level
@@ -261,7 +261,7 @@ class RiskLevelManager:
                 logger.error(f"Lỗi khi cập nhật account_config.json: {str(e)}")
         
         # Tạo file active_risk_level.txt
-        with open("active_risk_level.txt", "w") as f:
+        with open("active_risk_level.txt", "w", encoding="utf-8") as f:
             f.write(risk_level)
         
         logger.info(f"Đã thiết lập mức rủi ro hiện tại: {risk_level}")
@@ -276,7 +276,7 @@ class RiskLevelManager:
         # Kiểm tra file active_risk_level.txt
         if os.path.exists("active_risk_level.txt"):
             try:
-                with open("active_risk_level.txt", "r") as f:
+                with open("active_risk_level.txt", "r", encoding="utf-8") as f:
                     risk_level = f.read().strip()
                 
                 if risk_level in self.SUPPORTED_RISK_LEVELS:
@@ -288,7 +288,7 @@ class RiskLevelManager:
         # Kiểm tra trong account_config.json
         if os.path.exists("account_config.json"):
             try:
-                with open("account_config.json", "r") as f:
+                with open("account_config.json", "r", encoding="utf-8") as f:
                     account_config = json.load(f)
                 
                 risk_level = str(account_config.get("risk_level", 10))
@@ -349,7 +349,7 @@ class RiskLevelManager:
                 
                 # Tải lại cấu hình
                 try:
-                    with open(dst_file, "r") as f:
+                    with open(dst_file, "r", encoding="utf-8") as f:
                         config = json.load(f)
                     
                     self.risk_configs[risk_level] = config
