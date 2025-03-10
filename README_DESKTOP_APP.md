@@ -18,20 +18,25 @@
 
 ## Cài đặt
 
-1. Clone repository:
+1. Tải file từ Replit:
+   - Nhấn vào nút "Download as ZIP" trên Replit để tải toàn bộ project 
+   - Hoặc sử dụng công cụ "package_desktop_app.py" để tạo file thực thi
+
+2. Giải nén file (nếu tải dưới dạng ZIP):
    ```
-   git clone https://github.com/your-username/trading-bot.git
+   unzip trading-bot.zip
    cd trading-bot
    ```
 
-2. Cài đặt các thư viện cần thiết:
+3. Cài đặt các thư viện cần thiết (nếu chạy từ source code):
    ```
    pip install -r system_requirements.txt
    ```
 
-3. Cấu hình tài khoản API:
+4. Cấu hình tài khoản API:
    - Tạo file `.env` từ file `.env.example`
    - Nhập API Key và Secret của Binance Testnet vào file `.env`
+   - Nhập Telegram Bot Token và Chat ID (nếu muốn nhận thông báo)
 
 ## Sử dụng
 
