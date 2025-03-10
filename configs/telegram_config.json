@@ -1,8 +1,4 @@
 {
-    "bot_token": "",
-    "chat_id": "",
-    "use_env_variables": true,
-    "enabled": true,
     "notification_settings": {
         "enable_trade_signals": true,
         "enable_price_alerts": true,
@@ -15,12 +11,23 @@
         "quiet_hours_start": 0,
         "quiet_hours_end": 0
     },
-    "message_templates": {
-        "startup": "🚀 HỆ THỐNG GIAO DỊCH TỰ ĐỘNG ĐÃ KHỞI ĐỘNG\n\nSố dư: {account_balance:.2f} USDT\nVị thế đang mở: {positions_count}\n\nThời gian: {date_time}",
-        "trade_signal": "🚨 TÍN HIỆU GIAO DỊCH MỚI 🚨\n\nCặp: {symbol}\nHướng: {side_emoji} {side}\nGiá vào lệnh: {entry_price:.2f}\nStop Loss: {stop_loss:.2f}\nTake Profit: {take_profit:.2f}\nRisk/Reward: 1:{risk_reward:.2f}\nKhung thời gian: {timeframe}\nChiến lược: {strategy}\nĐộ tin cậy: {confidence_stars} ({confidence:.1f}%)\n\n💡 Đặt SL/TP theo mức được gợi ý để đảm bảo quản lý vốn!",
-        "price_alert": "📈 CẢNH BÁO GIÁ {symbol} 📈\n\nGiá hiện tại: {current_price}\nThay đổi: {price_change:.2f}%\nKhung thời gian: {timeframe}\nLý do: {reason}\n\nCảnh báo này dựa trên các thay đổi đáng kể về giá.",
-        "position_update": "📊 CẬP NHẬT VỊ THẾ\n\nVị thế đang mở: {positions_count}\n\n{positions_detail}\n\nSố dư tài khoản: {account_balance:.2f} USDT\nTổng vị thế: {total_position_size:.2f} USDT\nTỷ lệ margin: {margin_ratio:.2f}%\nUnrealized P/L: {unrealized_pnl:.2f} USDT\nP/L ngày: {daily_pnl:.2f} USDT ({daily_pnl_percent:.2f}%)",
-        "sltp_update": "🔄 CẬP NHẬT SL/TP 🔄\n\nCặp: {symbol}\nHướng: {side_emoji} {side}\n{sl_update}{tp_update}\nLý do: {reason}\n\nHệ thống đã tự động điều chỉnh mức SL/TP.",
-        "error": "⚠️ LỖI HỆ THỐNG ⚠️\n\nThời gian: {date_time}\nMô-đun: {module}\nMức độ: {severity}\nMô tả: {description}\n\nVui lòng kiểm tra log để biết thêm chi tiết."
+    "templates": {
+        "trade_signal": "🚨 TÍN HIỆU GIAO DỊCH MỚI 🚨\n\nCặp: {symbol}\nHướng: {side_emoji} {side}\nGiá vào lệnh: {entry_price:.2f}\nStop Loss: {stop_loss:.2f}\nTake Profit: {take_profit:.2f}\nRisk/Reward: 1:{risk_reward:.2f}\nKhung thời gian: {timeframe}\nChiến lược: {strategy}\n{confidence_info}\n\n💡 Đặt SL/TP theo mức được gợi ý để đảm bảo quản lý vốn!",
+        "price_alert": "{emoji} CẢNH BÁO GIÁ {symbol} {emoji}\n\nGiá hiện tại: {price}\nThay đổi: {change_prefix}{change_percent:.2f}%\nKhung thời gian: {timeframe}\n{reason}\n\nCảnh báo này dựa trên các thay đổi đáng kể về giá.",
+        "position_update": "📊 CẬP NHẬT VỊ THẾ\n\nVị thế đang mở: {num_positions}\n\n{positions_info}\n\nSố dư tài khoản: {account_balance:.2f} USDT\nTổng vị thế: {total_position_value:.2f} USDT\nTỷ lệ margin: {margin_percent:.2f}%\n{pnl_info}",
+        "sltp_update": "🔄 CẬP NHẬT SL/TP 🔄\n\nCặp: {symbol}\nHướng: {side_emoji} {side}\n{sl_info}\n{tp_info}\n{reason}\n\nHệ thống đã tự động điều chỉnh mức SL/TP.",
+        "system_status": "🤖 BÁO CÁO TRẠNG THÁI HỆ THỐNG\n\n⏱️ Thời gian hoạt động: {uptime_str}\n💰 Số dư tài khoản: {account_balance:.2f} USDT\n📊 Vị thế đang mở: {open_positions}\n🔄 Giao dịch hôm nay: {daily_trades}\n{pnl_info}\n{system_load_info}\n\n🕒 Thời gian báo cáo: {timestamp}"
+    },
+    "emoji": {
+        "long": "🟢",
+        "short": "🔴",
+        "price_up": "📈",
+        "price_down": "📉",
+        "profit": "📈",
+        "loss": "📉",
+        "success": "✅",
+        "error": "❌",
+        "warning": "⚠️",
+        "info": "ℹ️"
     }
 }
