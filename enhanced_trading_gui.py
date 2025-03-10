@@ -697,11 +697,84 @@ class EnhancedTradingGUI(QMainWindow):
         self.testnet_checkbox.setChecked(True)
         api_layout.addRow("", self.testnet_checkbox)
         
-        self.save_api_button = QPushButton("Lưu cài đặt API")
-        self.save_api_button.clicked.connect(self.save_api_settings)
-        api_layout.addRow("", self.save_api_button)
+        api_button_layout = QHBoxLayout()
+        save_api_button = QPushButton("Lưu cài đặt API")
+        save_api_button.clicked.connect(self.save_api_settings)
+        test_api_button = QPushButton("Kiểm tra kết nối")
+        test_api_button.clicked.connect(self.test_api_connection)
+        api_button_layout.addWidget(save_api_button)
+        api_button_layout.addWidget(test_api_button)
+        api_layout.addRow("", api_button_layout)
         
         layout.addWidget(api_group)
+        
+        # Tạo phần cài đặt Telegram
+        telegram_group = QGroupBox("Cài đặt thông báo Telegram")
+        telegram_layout = QFormLayout(telegram_group)
+        
+        self.telegram_token_edit = QLineEdit()
+        self.telegram_token_edit.setEchoMode(QLineEdit.Password)
+        self.telegram_token_edit.setPlaceholderText("Nhập Bot Token")
+        telegram_layout.addRow("Bot Token:", self.telegram_token_edit)
+        
+        self.telegram_chat_id_edit = QLineEdit()
+        self.telegram_chat_id_edit.setPlaceholderText("Nhập Chat ID")
+        telegram_layout.addRow("Chat ID:", self.telegram_chat_id_edit)
+        
+        telegram_button_layout = QHBoxLayout()
+        save_telegram_button = QPushButton("Lưu cài đặt Telegram")
+        save_telegram_button.clicked.connect(self.save_telegram_settings)
+        test_telegram_button = QPushButton("Kiểm tra kết nối")
+        test_telegram_button.clicked.connect(self.test_telegram_connection)
+        telegram_button_layout.addWidget(save_telegram_button)
+        telegram_button_layout.addWidget(test_telegram_button)
+        telegram_layout.addRow("", telegram_button_layout)
+        
+        telegram_help_text = QLabel("Hướng dẫn thiết lập Telegram Bot:")
+        telegram_help_text.setTextFormat(Qt.RichText)
+        telegram_help_text.setWordWrap(True)
+        telegram_layout.addRow(telegram_help_text)
+        
+        telegram_steps = QLabel(
+            "1. Tìm @BotFather trên Telegram<br>"
+            "2. Gửi lệnh /newbot và làm theo hướng dẫn<br>"
+            "3. Sao chép Bot Token được cung cấp<br>"
+            "4. Chat với bot của bạn hoặc thêm vào group<br>"
+            "5. Truy cập api.telegram.org/botXXX:YYY/getUpdates<br>"
+            "   (thay XXX:YYY bằng token của bạn)<br>"
+            "6. Sao chép chat_id từ phản hồi JSON"
+        )
+        telegram_steps.setTextFormat(Qt.RichText)
+        telegram_steps.setWordWrap(True)
+        telegram_layout.addRow(telegram_steps)
+        
+        notification_options_box = QGroupBox("Tùy chọn thông báo")
+        notification_options_layout = QVBoxLayout()
+        
+        self.notify_position_checkbox = QCheckBox("Thông báo khi mở/đóng vị thế")
+        self.notify_position_checkbox.setChecked(True)
+        notification_options_layout.addWidget(self.notify_position_checkbox)
+        
+        self.notify_sltp_checkbox = QCheckBox("Thông báo khi cập nhật SL/TP")
+        self.notify_sltp_checkbox.setChecked(True)
+        notification_options_layout.addWidget(self.notify_sltp_checkbox)
+        
+        self.notify_opportunity_checkbox = QCheckBox("Thông báo cơ hội giao dịch")
+        self.notify_opportunity_checkbox.setChecked(True)
+        notification_options_layout.addWidget(self.notify_opportunity_checkbox)
+        
+        self.notify_error_checkbox = QCheckBox("Thông báo lỗi hệ thống")
+        self.notify_error_checkbox.setChecked(True)
+        notification_options_layout.addWidget(self.notify_error_checkbox)
+        
+        self.notify_summary_checkbox = QCheckBox("Gửi báo cáo tổng kết hàng ngày")
+        self.notify_summary_checkbox.setChecked(True)
+        notification_options_layout.addWidget(self.notify_summary_checkbox)
+        
+        notification_options_box.setLayout(notification_options_layout)
+        telegram_layout.addRow(notification_options_box)
+        
+        layout.addWidget(telegram_group)
         
         # Tạo phần cài đặt rủi ro
         risk_group = QGroupBox("Cài đặt rủi ro")
@@ -843,6 +916,28 @@ class EnhancedTradingGUI(QMainWindow):
             
             self.api_key_edit.setText(api_key)
             self.api_secret_edit.setText(api_secret)
+            
+            # Tải cấu hình Telegram
+            telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+            telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
+            
+            self.telegram_token_edit.setText(telegram_token)
+            self.telegram_chat_id_edit.setText(telegram_chat_id)
+            
+            # Tải cấu hình thông báo Telegram
+            try:
+                telegram_config_file = "configs/telegram_config.json"
+                if os.path.exists(telegram_config_file):
+                    with open(telegram_config_file, "r") as f:
+                        telegram_config = json.load(f)
+                    
+                    self.notify_position_checkbox.setChecked(telegram_config.get("notify_position", True))
+                    self.notify_sltp_checkbox.setChecked(telegram_config.get("notify_sltp", True))
+                    self.notify_opportunity_checkbox.setChecked(telegram_config.get("notify_opportunity", True))
+                    self.notify_error_checkbox.setChecked(telegram_config.get("notify_error", True))
+                    self.notify_summary_checkbox.setChecked(telegram_config.get("notify_summary", True))
+            except Exception as e:
+                logger.warning(f"Không tải được cấu hình Telegram: {str(e)}")
             
             # Tải cấu hình rủi ro nếu có Risk Manager
             if self.risk_manager:
@@ -1660,6 +1755,87 @@ class EnhancedTradingGUI(QMainWindow):
         except Exception as e:
             logger.error(f"Lỗi khi lưu cài đặt API: {str(e)}", exc_info=True)
             self.show_error("Lỗi khi lưu cài đặt API", str(e))
+            
+    def save_telegram_settings(self):
+        """Lưu cài đặt Telegram"""
+        try:
+            # Lấy thông tin Telegram
+            telegram_token = self.telegram_token_edit.text()
+            telegram_chat_id = self.telegram_chat_id_edit.text()
+            
+            # Kiểm tra thông tin Telegram
+            if not telegram_token or not telegram_chat_id:
+                self.show_error("Thông tin Telegram không hợp lệ", "Bot Token và Chat ID không được để trống")
+                return
+            
+            # Lưu thông tin Telegram vào biến môi trường
+            os.environ["TELEGRAM_BOT_TOKEN"] = telegram_token
+            os.environ["TELEGRAM_CHAT_ID"] = telegram_chat_id
+            
+            # Lưu cài đặt thông báo
+            telegram_notify_config = {
+                "notify_position": self.notify_position_checkbox.isChecked(),
+                "notify_sltp": self.notify_sltp_checkbox.isChecked(),
+                "notify_opportunity": self.notify_opportunity_checkbox.isChecked(),
+                "notify_error": self.notify_error_checkbox.isChecked(),
+                "notify_summary": self.notify_summary_checkbox.isChecked()
+            }
+            
+            # Lưu cấu hình vào file
+            config_file = "configs/telegram_config.json"
+            os.makedirs(os.path.dirname(config_file), exist_ok=True)
+            
+            with open(config_file, "w") as f:
+                json.dump(telegram_notify_config, f, indent=4)
+            
+            # Khởi tạo và kiểm tra kết nối Telegram
+            self.test_telegram_connection()
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cài đặt Telegram: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi lưu cài đặt Telegram", str(e))
+            
+    def test_telegram_connection(self):
+        """Kiểm tra kết nối Telegram"""
+        try:
+            # Lấy thông tin Telegram
+            telegram_token = self.telegram_token_edit.text()
+            telegram_chat_id = self.telegram_chat_id_edit.text()
+            
+            # Kiểm tra thông tin Telegram
+            if not telegram_token or not telegram_chat_id:
+                self.show_error("Thông tin Telegram không hợp lệ", "Bot Token và Chat ID không được để trống")
+                return
+            
+            # Gửi tin nhắn test
+            import requests
+            
+            # Thời gian hiện tại
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Tạo nội dung tin nhắn
+            message = f"🔄 Kiểm tra kết nối Telegram từ ứng dụng Desktop\n⏱️ Thời gian: {current_time}"
+            
+            # Gửi tin nhắn
+            response = requests.get(
+                f"https://api.telegram.org/bot{telegram_token}/sendMessage",
+                params={"chat_id": telegram_chat_id, "text": message}
+            )
+            
+            # Kiểm tra kết quả
+            if response.status_code == 200:
+                self.show_info("Kết nối Telegram thành công", "Đã gửi tin nhắn kiểm tra đến Telegram")
+                self.status_label.setText("Đã kết nối Telegram thành công")
+                
+                # Lưu cài đặt nếu chưa lưu
+                if not os.environ.get("TELEGRAM_BOT_TOKEN") or not os.environ.get("TELEGRAM_CHAT_ID"):
+                    self.save_telegram_settings()
+            else:
+                error_message = response.json().get("description", "Lỗi không xác định")
+                self.show_error("Lỗi kết nối Telegram", f"Không thể gửi tin nhắn: {error_message}")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi kiểm tra kết nối Telegram", str(e))
     
     def save_risk_settings(self):
         """Lưu cài đặt rủi ro"""
