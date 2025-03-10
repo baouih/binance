@@ -1,549 +1,187 @@
-{% extends 'common_layout.html' %}
-
+{% extends "common_layout.html" %}
 {% set active_page = 'dashboard' %}
-
-{% block title %}Trang chủ - Bot Giao Dịch Crypto{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="mb-3">Bảng điều khiển</h2>
-            
-            <!-- Status Cards -->
-            <div class="status-cards d-flex flex-wrap gap-4 mb-3">
-                <div class="status-card">
-                    {% if bot_status.running %}
-                    <div class="status-badge running">
-                        <i class="bi bi-play-circle-fill me-1"></i>
-                        Đang chạy
-                    </div>
-                    {% else %}
-                    <div class="status-badge stopped">
-                        <i class="bi bi-stop-circle-fill me-1"></i>
-                        Đã dừng
-                    </div>
-                    {% endif %}
+            <h2 class="mb-4">Tổng Quan Hệ Thống</h2>
+        </div>
+    </div>
+
+    <!-- System Status and Controls -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas {{ 'fa-circle-play running' if status.running else 'fa-circle-stop stopped' }}"></i>
                 </div>
+                <div class="status-label">Trạng Thái Hệ Thống</div>
+                <div class="status-value mb-3">{{ 'Đang Chạy' if status.running else 'Đã Dừng' }}</div>
                 
-                {% if bot_status.mode == 'demo' %}
-                <div class="status-badge bg-secondary">
-                    <i class="bi bi-life-preserver me-1"></i> Demo Mode
-                </div>
-                {% elif bot_status.mode == 'testnet' %}
-                <div class="status-badge testnet">
-                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Testnet Mode
-                </div>
-                {% else %}
-                <div class="status-badge live">
-                    <i class="bi bi-check-circle-fill me-1"></i> Live Mode
-                </div>
-                {% endif %}
-                
-                <div class="status-badge {{ 'connected' if bot_status.api_connected else 'disconnected' }}">
-                    <i class="bi {{ 'bi-plug-fill' if bot_status.api_connected else 'bi-plug' }} me-1"></i>
-                    {{ 'API đã kết nối' if bot_status.api_connected else 'API chưa kết nối' }}
-                </div>
-                
-                <div class="status-badge info">
-                    <i class="bi bi-info-circle-fill me-1"></i>
-                    Cập nhật lần cuối: {{ bot_status.last_update|default('2025-03-03 14:30:45') }}
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="startSystem()" {{ 'disabled' if status.running else '' }}>
+                        <i class="fas fa-play"></i> Khởi Động
+                    </button>
+                    <button class="btn btn-danger" onclick="stopSystem()" {{ 'disabled' if not status.running else '' }}>
+                        <i class="fas fa-stop"></i> Dừng
+                    </button>
                 </div>
             </div>
-            
-            <!-- Bot Controls -->
-            <div class="bot-controls mb-4">
-                {% if bot_status.running %}
-                <button class="btn btn-danger" id="stopBotBtn">
-                    <i class="bi bi-stop-circle me-2"></i>
-                    Dừng Bot
-                </button>
-                <button class="btn btn-secondary" id="restartBotBtn">
-                    <i class="bi bi-arrow-clockwise me-2"></i>
-                    Khởi động lại
-                </button>
-                {% else %}
-                <button class="btn btn-success" id="startBotBtn">
-                    <i class="bi bi-play-circle me-2"></i>
-                    Khởi động Bot
-                </button>
-                {% endif %}
-                <button class="btn btn-outline-primary" id="refreshStatusBtn">
-                    <i class="bi bi-arrow-repeat me-2"></i>
-                    Làm mới trạng thái
-                </button>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-wallet running"></i>
+                </div>
+                <div class="status-label">Số Dư Tài Khoản</div>
+                <div class="status-value mb-3">{{ status.account_balance|round(2) }} USDT</div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="location.href='/positions'">
+                        <i class="fas fa-list"></i> Xem Vị Thế
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-vial running"></i>
+                </div>
+                <div class="status-label">Kiểm Tra Hệ Thống</div>
+                <div class="status-value mb-3">Chạy kiểm tra chức năng</div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="location.href='/test'">
+                        <i class="fas fa-check-circle"></i> Kiểm Tra
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Account Summary -->
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="info-card h-100">
-                <h5 class="mb-3">Tài khoản</h5>
-                
-                <div class="mb-3">
-                    <div class="info-label">Số dư</div>
-                    <h3 class="info-value">
-                        ${{ account_data.balance|default(bot_status.balance)|round(2) }}
-                        {% if bot_status.mode == 'testnet' or bot_status.mode == 'demo' %}
-                        <span class="badge {{ 'bg-secondary' if bot_status.mode == 'demo' else 'testnet-badge' }}">{{ bot_status.mode }}</span>
-                        {% endif %}
-                    </h3>
-                    
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <div>
-                            <span class="info-label">Thay đổi 24h:</span>
-                            <span class="{{ 'text-success' if account_data.change_24h|default(0) >= 0 else 'text-danger' }}">
-                                {{ '+' if account_data.change_24h|default(0) >= 0 else '' }}{{ account_data.change_24h|default(0)|round(2) }}%
-                            </span>
-                        </div>
-                        <div class="text-end">
-                            <span class="info-label">Thay đổi 7d:</span>
-                            <span class="{{ 'text-success' if account_data.change_7d|default(0) >= 0 else 'text-danger' }}">
-                                {{ '+' if account_data.change_7d|default(0) >= 0 else '' }}{{ account_data.change_7d|default(0)|round(2) }}%
-                            </span>
-                        </div>
-                    </div>
+    <!-- Market Overview and Recent Logs -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Tổng Quan Thị Trường</h5>
                 </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between mb-1">
-                        <div class="info-label">Lợi nhuận tích lũy</div>
-                        <span class="{{ 'text-success' if account_data.total_profit|default(0) >= 0 else 'text-danger' }}">
-                            ${{ account_data.total_profit|default(0)|round(2) }}
-                        </span>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cặp Tiền</th>
+                                    <th>Giá</th>
+                                    <th>Thay Đổi 24h</th>
+                                    <th>Tín Hiệu</th>
+                                    <th>Xu Hướng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marketOverviewTable">
+                                {% for item in status.market_data[:5] %}
+                                <tr>
+                                    <td>{{ item.symbol }}</td>
+                                    <td>{{ item.price }}</td>
+                                    <td class="{{ 'text-success' if '+' in item.change_24h else 'text-danger' }}">{{ item.change_24h }}</td>
+                                    <td class="
+                                        {% if 'Mua' in item.signal %}signal-buy
+                                        {% elif 'Bán' in item.signal %}signal-sell
+                                        {% else %}signal-neutral{% endif %}
+                                    ">{{ item.signal }}</td>
+                                    <td class="
+                                        {% if 'Tăng' in item.trend %}trend-up
+                                        {% elif 'Giảm' in item.trend %}trend-down
+                                        {% else %}trend-sideways{% endif %}
+                                    ">{{ item.trend }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                        {% set profit_percent = account_data.total_profit_percent|default(2.8) %}
-                        {% set progress_class = "bg-success" if profit_percent >= 0 else "bg-danger" %}
-                        {% set progress_width = (profit_percent|abs)|string + '%' %}
-                        
-                        <div class="progress-bar {{ progress_class }}" role="progressbar" 
-                             style="width: {{ progress_width }}" 
-                             aria-valuenow="{{ profit_percent|abs }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-6">
-                        <div class="info-label">Vị thế đang mở</div>
-                        <div>{{ account_data.positions|default([])|length }}</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="info-label">P/L chưa chốt</div>
-                        <div class="{{ 'text-success' if account_data.unrealized_pnl|default(0) >= 0 else 'text-danger' }}">
-                            ${{ account_data.unrealized_pnl|default(0)|round(2) }}
-                        </div>
+                    <div class="text-center mt-3">
+                        <a href="/market" class="btn btn-sm btn-outline-primary">Xem Tất Cả</a>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Market Overview -->
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="info-card h-100">
-                <h5 class="mb-3">Tổng quan thị trường</h5>
-                
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="info-label mb-1">BTC/USDT</div>
-                            <div class="info-value">${{ market_data.btc_price|default(fake_prices.BTCUSDT)|round(2) }}</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="price-change {{ 'positive' if market_data.btc_change_24h|default(0) > 0 else 'negative' if market_data.btc_change_24h|default(0) < 0 else '' }}">
-                                {{ market_data.btc_change_24h|default(0)|round(2) }}%
-                            </div>
-                            <div class="small text-muted">24h</div>
-                        </div>
-                    </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Nhật Ký Gần Đây</h5>
                 </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="info-label mb-1">ETH/USDT</div>
-                            <div class="info-value">${{ market_data.eth_price|default(fake_prices.ETHUSDT)|round(2) }}</div>
+                <div class="card-body">
+                    <div class="log-container">
+                        {% for log in status.logs[:10] %}
+                        <div class="log-entry {{ log.type }}">
+                            <small>{{ log.timestamp }}</small><br>
+                            {{ log.message }}
                         </div>
-                        <div class="text-end">
-                            <div class="price-change {{ 'positive' if market_data.eth_change_24h|default(0) > 0 else 'negative' if market_data.eth_change_24h|default(0) < 0 else '' }}">
-                                {{ market_data.eth_change_24h|default(0)|round(2) }}%
-                            </div>
-                            <div class="small text-muted">24h</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="info-label">Chế độ thị trường</div>
-                    <div class="d-flex align-items-center">
-                        <div class="market-mode {{ market_data.market_mode|default('uptrend')|lower }}">
-                            <i class="bi {{ 'bi-graph-up-arrow' if market_data.market_mode|default('uptrend') == 'uptrend' else 'bi-graph-down-arrow' if market_data.market_mode|default('uptrend') == 'downtrend' else 'bi-arrow-left-right' }}"></i>
-                            {{ market_data.market_mode|default('Uptrend') }}
-                        </div>
-                        <div class="ms-2 small">
-                            ({{ market_data.market_strength|default(72) }}%)
-                        </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="info-label">Biến động</div>
-                    <div class="d-flex align-items-center">
-                        <div class="volatility-meter {{ market_data.volatility_level|default('medium')|lower }}">
-                            <i class="bi bi-activity"></i>
-                            {{ market_data.volatility_level|default('Medium') }}
-                        </div>
-                        <div class="progress ms-2 flex-grow-1" style="height: 6px;">
-                            {% set volatility = market_data.volatility_value|default(45) %}
-                            <div class="progress-bar 
-                                {% if volatility < 30 %}bg-success
-                                {% elif volatility < 70 %}bg-warning
-                                {% else %}bg-danger{% endif %}" 
-                                 role="progressbar" 
-                                 style="width: {{ volatility }}%;" 
-                                 aria-valuenow="{{ volatility }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Current Strategy -->
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="info-card h-100">
-                <h5 class="mb-3">Chiến lược hiện tại</h5>
-                
-                <div class="mb-3">
-                    <div class="info-label">Chiến lược đang dùng</div>
-                    <div class="d-flex align-items-center">
-                        <h5 class="mb-0 me-2">{{ bot_status.active_strategy|default('RSI Strategy') }}</h5>
-                        {% if bot_status.strategy_mode == 'auto' %}
-                        <span class="badge bg-info">Tự động</span>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="info-label">Hiệu suất gần đây</div>
-                    <div class="d-flex align-items-center">
-                        <span class="me-2">Win rate:</span>
-                        <div class="progress flex-grow-1" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                 style="width: {{ strategy_stats.win_rate|default(62.5) }}%;" 
-                                 aria-valuenow="{{ strategy_stats.win_rate|default(62.5) }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
-                            </div>
-                        </div>
-                        <span class="ms-2">{{ strategy_stats.win_rate|default(62.5) }}%</span>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="info-label">Tín hiệu gần nhất</div>
-                    <table class="table table-sm signals-table">
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Tín hiệu</th>
-                                <th>Thời gian</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for signal in signals|default([
-                                {'symbol': 'BTCUSDT', 'signal': 'buy', 'time': '14:25'},
-                                {'symbol': 'ETHUSDT', 'signal': 'sell', 'time': '14:15'},
-                                {'symbol': 'SOLUSDT', 'signal': 'neutral', 'time': '14:10'}
-                            ]) %}
-                            <tr>
-                                <td>{{ signal.symbol }}</td>
-                                <td>
-                                    <span class="badge {{ 'bg-success' if signal.signal == 'buy' else 'bg-danger' if signal.signal == 'sell' else 'bg-secondary' }}">
-                                        {{ signal.signal|upper }}
-                                    </span>
-                                </td>
-                                <td>{{ signal.time }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="d-grid">
-                    <a href="/strategies" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-gear me-1"></i>
-                        Cấu hình chiến lược
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Recent Activity -->
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="info-card h-100">
-                <h5 class="mb-3">Hoạt động gần đây</h5>
-                
-                <div class="activity-list">
-                    {# DEBUG #}
-                    <!-- Debug thông tin: {{ account_data.activities|length if account_data.activities else 0 }} activities -->
-                    
-                    {# Hiển thị hoạt động từ vị thế thực #}
-                    {% for position in account_data.positions %}
-                            <div class="activity-item">
-                                <div class="activity-icon {% if position.type == 'LONG' %}text-success{% else %}text-danger{% endif %}">
-                                    <i class="bi {% if position.type == 'LONG' %}bi-arrow-up-circle-fill{% else %}bi-arrow-down-circle-fill{% endif %}"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-time">
-                                        {% if position.entry_time and ' ' in position.entry_time %}
-                                            {{ position.entry_time.split(' ')[1] }}
-                                        {% else %}
-                                            12:00
-                                        {% endif %}
-                                    </div>
-                                    <div class="activity-description">
-                                        {% if position.type == 'LONG' %}
-                                            Mở vị thế BUY {{ position.symbol }} tại ${{ '{:,.2f}'.format(position.entry_price) }}
-                                        {% else %}
-                                            Mở vị thế SELL {{ position.symbol }} tại ${{ '{:,.2f}'.format(position.entry_price) }}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
                         {% endfor %}
-                    
-                    {# Hiển thị thông báo mặc định nếu không có vị thế #}
-                    {% if not account_data.positions or account_data.positions|length == 0 %}
-                    <div class="activity-item">
-                        <div class="activity-icon text-info">
-                            <i class="bi bi-play-circle"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-time">12:00</div>
-                            <div class="activity-description">Bot đã bắt đầu hoạt động</div>
-                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/logs" class="btn btn-sm btn-outline-primary">Xem Tất Cả</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Positions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Vị Thế Đang Mở</h5>
+                </div>
+                <div class="card-body">
+                    {% if status.positions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cặp Tiền</th>
+                                    <th>Loại</th>
+                                    <th>Giá Vào</th>
+                                    <th>Giá Hiện Tại</th>
+                                    <th>Kích Thước</th>
+                                    <th>Lợi Nhuận</th>
+                                    <th>Thời Gian Mở</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for position in status.positions %}
+                                <tr>
+                                    <td>{{ position.symbol }}</td>
+                                    <td class="{{ 'position-long' if position.type == 'LONG' else 'position-short' }}">
+                                        {{ position.type }}
+                                    </td>
+                                    <td>{{ position.entry_price }}</td>
+                                    <td>{{ position.current_price }}</td>
+                                    <td>{{ position.size }}</td>
+                                    <td class="{{ 'profit' if '+' in position.pnl else 'loss' }}">
+                                        {{ position.pnl }}
+                                    </td>
+                                    <td>{{ position.time }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-info-circle fa-2x mb-3 text-muted"></i>
+                        <p>Hiện không có vị thế nào được mở.</p>
+                        <button class="btn btn-primary" onclick="location.href='/positions'">
+                            Quản Lý Vị Thế
+                        </button>
                     </div>
                     {% endif %}
-                </div>
-                
-                <div class="d-grid mt-3">
-                    <a href="/trades" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-clock-history me-1"></i>
-                        Xem tất cả
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Portfolio Performance -->
-        <div class="col-md-8 mb-4">
-            <div class="info-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Hiệu suất danh mục</h5>
-                    
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary period-btn active" data-period="1w">1 Tuần</button>
-                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="1m">1 Tháng</button>
-                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="3m">3 Tháng</button>
-                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="1y">1 Năm</button>
-                        <button type="button" class="btn btn-outline-secondary period-btn" data-period="all">Tất cả</button>
-                    </div>
-                </div>
-                
-                <div class="chart-container" style="height: 300px;">
-                    <canvas id="performanceChart"></canvas>
-                </div>
-                
-                <div class="row mt-3 stats-row">
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">Tổng giao dịch</div>
-                        <div class="info-value">{{ performance_stats.total_trades|default(24) }}</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">Win rate</div>
-                        <div class="info-value">{{ performance_stats.win_rate|default(62.5) }}%</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">Profit factor</div>
-                        <div class="info-value">{{ performance_stats.profit_factor|default(1.85) }}</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">Drawdown tối đa</div>
-                        <div class="info-value">{{ performance_stats.max_drawdown|default(12.3) }}%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Open Positions -->
-        <div class="col-md-4 mb-4">
-            <div class="info-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Vị thế đang mở</h5>
-                    
-                    <a href="/position" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-wallet2 me-1"></i>
-                        Quản lý vị thế
-                    </a>
-                </div>
-                
-                {% if account_data.positions and account_data.positions|length > 0 %}
-                    {% for position in account_data.positions %}
-                    <div class="position-summary mb-3 p-3 rounded 
-                        {% if position.unrealized_pnl > 0 %}bg-success bg-opacity-10 border-success{% 
-                        elif position.unrealized_pnl < 0 %}bg-danger bg-opacity-10 border-danger{% 
-                        else %}bg-secondary bg-opacity-10 border-secondary{% endif %} border-opacity-25 border-start border-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <h6 class="mb-0">{{ position.symbol }}</h6>
-                                <span class="badge bg-{{ 'success' if position.side == 'BUY' else 'danger' }}">
-                                    {{ 'LONG' if position.side == 'BUY' else 'SHORT' }}
-                                </span>
-                                <span class="badge bg-secondary">
-                                    x{{ position.leverage|default(1) }}
-                                </span>
-                            </div>
-                            <div class="text-end">
-                                <div class="{{ 'text-success' if position.unrealized_pnl > 0 else 'text-danger' if position.unrealized_pnl < 0 else '' }}">
-                                    ${{ position.unrealized_pnl|round(2) }} ({{ position.unrealized_pnl_percent|round(2) }}%)
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="small">
-                                <div>Giá vào: ${{ position.entry_price|round(2) }}</div>
-                                <div>Giá hiện tại: ${{ position.current_price|round(2) }}</div>
-                            </div>
-                            <div>
-                                <button class="btn btn-sm btn-danger close-position-btn" data-position-id="{{ position.id }}">
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                <div class="text-center py-4">
-                    <i class="bi bi-wallet2 fs-1 text-muted"></i>
-                    <p class="mt-3 text-muted">Không có vị thế nào đang mở</p>
-                </div>
-                {% endif %}
-                
-                {% if account_data.positions and account_data.positions|length > 3 %}
-                <div class="d-grid mt-3">
-                    <a href="/position" class="btn btn-outline-secondary btn-sm">
-                        Xem tất cả vị thế ({{ account_data.positions|length }})
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Market Watchlist -->
-        <div class="col-md-6 mb-4">
-            <div class="info-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Watchlist</h5>
-                    
-                    <button class="btn btn-sm btn-outline-secondary add-watchlist-btn">
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Thêm
-                    </button>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="table table-sm watchlist-table">
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Giá</th>
-                                <th>24h %</th>
-                                <th>Tín hiệu</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for symbol, data in watchlist.items() %}
-                            <tr>
-                                <td>{{ symbol }}</td>
-                                <td>${{ data.price|round(2) }}</td>
-                                <td class="{{ 'text-success' if data.change_24h > 0 else 'text-danger' if data.change_24h < 0 else '' }}">
-                                    {{ '+' if data.change_24h > 0 else '' }}{{ data.change_24h|round(2) }}%
-                                </td>
-                                <td>
-                                    <span class="badge {{ 'bg-success' if data.signal == 'BUY' else 'bg-danger' if data.signal == 'SELL' else 'bg-secondary' }}">
-                                        {{ data.signal }}
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-primary create-position-btn" data-symbol="{{ symbol }}">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="d-grid mt-3">
-                    <a href="/market" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-graph-up me-1"></i>
-                        Phân tích thị trường
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Trade Statistics -->
-        <div class="col-md-6 mb-4">
-            <div class="info-card">
-                <h5 class="mb-3">Thống kê giao dịch</h5>
-                
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="info-label">Phân bố giao dịch</div>
-                        <div class="chart-container" style="height: 180px;">
-                            <canvas id="tradeDistributionChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-label">Lý do đóng vị thế</div>
-                        <div class="chart-container" style="height: 180px;">
-                            <canvas id="exitReasonChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-label">Thời gian giao dịch trung bình</div>
-                        <div class="info-value">{{ trade_stats.avg_trade_time|default('5h 23m') }}</div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-label">Lợi nhuận / Lệnh</div>
-                        <div class="info-value">${{ trade_stats.avg_profit_per_trade|default(28.75)|round(2) }}</div>
-                    </div>
-                </div>
-                
-                <div class="d-grid mt-3">
-                    <a href="/trades" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-bar-chart me-1"></i>
-                        Xem báo cáo chi tiết
-                    </a>
                 </div>
             </div>
         </div>
@@ -553,319 +191,54 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Bot Control Buttons
-        const startBotBtn = document.getElementById('startBotBtn');
-        const stopBotBtn = document.getElementById('stopBotBtn');
-        const restartBotBtn = document.getElementById('restartBotBtn');
-        const refreshStatusBtn = document.getElementById('refreshStatusBtn');
-        
-        if (startBotBtn) {
-            startBotBtn.addEventListener('click', function() {
-                showLoading();
+    // Cập nhật bảng thị trường
+    function updateMarketOverview() {
+        $.ajax({
+            url: '/api/market_data',
+            type: 'GET',
+            success: function(response) {
+                const marketData = response.market_data.slice(0, 5);
+                let tableHtml = '';
                 
-                // In a real app, this would send an API request to start the bot
-                setTimeout(() => {
-                    hideLoading();
-                    showToast('Thành công', 'Bot đã được khởi động', 'success');
-                    
-                    // Reload page to reflect new bot status
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }, 1000);
-            });
-        }
-        
-        if (stopBotBtn) {
-            stopBotBtn.addEventListener('click', function() {
-                showLoading();
-                
-                // In a real app, this would send an API request to stop the bot
-                setTimeout(() => {
-                    hideLoading();
-                    showToast('Thông báo', 'Bot đã được dừng lại', 'info');
-                    
-                    // Reload page to reflect new bot status
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }, 1000);
-            });
-        }
-        
-        if (restartBotBtn) {
-            restartBotBtn.addEventListener('click', function() {
-                showLoading();
-                
-                // In a real app, this would send an API request to restart the bot
-                setTimeout(() => {
-                    hideLoading();
-                    showToast('Thành công', 'Bot đã được khởi động lại', 'success');
-                    
-                    // Reload page to reflect new bot status
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }, 1000);
-            });
-        }
-        
-        if (refreshStatusBtn) {
-            refreshStatusBtn.addEventListener('click', function() {
-                showLoading();
-                
-                // In a real app, this would fetch the current bot status
-                setTimeout(() => {
-                    hideLoading();
-                    showToast('Thành công', 'Trạng thái đã được cập nhật', 'success');
-                    
-                    // Reload page to reflect updated status
-                    window.location.reload();
-                }, 1000);
-            });
-        }
-        
-        // Performance Chart
-        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-        const performanceChart = new Chart(performanceCtx, {
-            type: 'line',
-            data: {
-                labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', '11/01', '12/01', '13/01', '14/01', '15/01', '16/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01', '23/01', '24/01', '25/01', '26/01', '27/01', '28/01'],
-                datasets: [{
-                    label: 'Bot Performance',
-                    data: [0, 0.5, 1.2, 1.8, 2.5, 2.1, 2.8, 3.5, 4.2, 3.8, 4.5, 5.2, 6.1, 5.8, 6.5, 7.2, 8.0, 8.8, 9.5, 9.0, 9.8, 10.5, 11.2, 11.8, 12.5, 13.2, 14.0, 14.5],
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'BTC Performance',
-                    data: [0, 0.2, 0.5, 0.9, 1.5, 2.0, 2.2, 1.8, 2.5, 3.2, 3.8, 4.0, 4.2, 3.8, 4.3, 4.9, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.2, 10.8, 11.2],
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.0)',
-                    tension: 0.4,
-                    fill: false,
-                    borderDash: [5, 5]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'top',
+                marketData.forEach(item => {
+                    let signalClass = '';
+                    if (item.signal.includes('Mua')) {
+                        signalClass = 'signal-buy';
+                    } else if (item.signal.includes('Bán')) {
+                        signalClass = 'signal-sell';
+                    } else {
+                        signalClass = 'signal-neutral';
                     }
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
+                    
+                    let trendClass = '';
+                    if (item.trend.includes('Tăng')) {
+                        trendClass = 'trend-up';
+                    } else if (item.trend.includes('Giảm')) {
+                        trendClass = 'trend-down';
+                    } else {
+                        trendClass = 'trend-sideways';
                     }
-                }
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${item.symbol}</td>
+                            <td>${item.price}</td>
+                            <td class="${item.change_24h.includes('+') ? 'text-success' : 'text-danger'}">${item.change_24h}</td>
+                            <td class="${signalClass}">${item.signal}</td>
+                            <td class="${trendClass}">${item.trend}</td>
+                        </tr>
+                    `;
+                });
+                
+                $('#marketOverviewTable').html(tableHtml);
             }
         });
-        
-        // Trade Distribution Chart
-        const tradeDistCtx = document.getElementById('tradeDistributionChart').getContext('2d');
-        const tradeDistributionChart = new Chart(tradeDistCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'AVAXUSDT', 'Other'],
-                datasets: [{
-                    data: [42, 28, 15, 10, 5],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            boxWidth: 15,
-                            padding: 10
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Exit Reason Chart
-        const exitReasonCtx = document.getElementById('exitReasonChart').getContext('2d');
-        const exitReasonChart = new Chart(exitReasonCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Take Profit', 'Stop Loss', 'Trailing Stop', 'Manual'],
-                datasets: [{
-                    data: [45, 30, 15, 10],
-                    backgroundColor: [
-                        'rgba(40, 167, 69, 0.7)',
-                        'rgba(220, 53, 69, 0.7)',
-                        'rgba(255, 193, 7, 0.7)',
-                        'rgba(108, 117, 125, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(40, 167, 69, 1)',
-                        'rgba(220, 53, 69, 1)',
-                        'rgba(255, 193, 7, 1)',
-                        'rgba(108, 117, 125, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            boxWidth: 15,
-                            padding: 10
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Period buttons for performance chart
-        const periodBtns = document.querySelectorAll('.period-btn');
-        
-        periodBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all buttons
-                periodBtns.forEach(btn => btn.classList.remove('active'));
-                
-                // Add active class to clicked button
-                this.classList.add('active');
-                
-                // Get selected period
-                const period = this.getAttribute('data-period');
-                
-                // Update chart data based on period
-                updatePerformanceChart(period);
-            });
-        });
-        
-        // Function to update performance chart based on selected period
-        function updatePerformanceChart(period) {
-            // In a real app, this would fetch data for the selected period
-            // For demo, we'll just show different data for each period
-            
-            let labels = [];
-            let botData = [];
-            let btcData = [];
-            
-            switch(period) {
-                case '1w':
-                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                    botData = [0, 0.8, 1.5, 2.2, 3.0, 3.5, 4.2];
-                    btcData = [0, 0.5, 1.0, 1.8, 2.3, 2.8, 3.0];
-                    break;
-                case '1m':
-                    labels = Array.from({length: 30}, (_, i) => `${i+1}`);
-                    botData = Array.from({length: 30}, (_, i) => i * 0.5);
-                    btcData = Array.from({length: 30}, (_, i) => i * 0.4);
-                    break;
-                case '3m':
-                    labels = ['Jan', 'Feb', 'Mar'];
-                    botData = [5, 12, 18];
-                    btcData = [4, 10, 14];
-                    break;
-                case '1y':
-                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    botData = [2, 5, 9, 12, 15, 18, 22, 26, 30, 35, 42, 48];
-                    btcData = [1, 3, 6, 9, 13, 16, 19, 22, 25, 28, 32, 38];
-                    break;
-                case 'all':
-                    labels = ['2020', '2021', '2022', '2023', '2024', '2025'];
-                    botData = [15, 48, 35, 68, 92, 125];
-                    btcData = [12, 40, 28, 55, 75, 100];
-                    break;
-            }
-            
-            // Update chart data
-            performanceChart.data.labels = labels;
-            performanceChart.data.datasets[0].data = botData;
-            performanceChart.data.datasets[1].data = btcData;
-            
-            // Update chart
-            performanceChart.update();
-        }
-        
-        // Close position buttons
-        const closePositionBtns = document.querySelectorAll('.close-position-btn');
-        
-        closePositionBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const positionId = this.getAttribute('data-position-id');
-                
-                if (confirm('Bạn có chắc chắn muốn đóng vị thế này?')) {
-                    showLoading();
-                    
-                    // In a real app, this would send an API request to close the position
-                    setTimeout(() => {
-                        hideLoading();
-                        showToast('Thành công', 'Vị thế đã được đóng', 'success');
-                        
-                        // Remove the position from the UI or reload the page
-                        // For demo, we'll reload the page
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    }, 1000);
-                }
-            });
-        });
-        
-        // Create position buttons
-        const createPositionBtns = document.querySelectorAll('.create-position-btn');
-        
-        createPositionBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const symbol = this.getAttribute('data-symbol');
-                
-                // In a real app, this would redirect to the position page with the symbol pre-selected
-                // or open a modal to create a new position
-                window.location.href = `/position?symbol=${symbol}`;
-            });
-        });
+    }
+
+    // Cập nhật dữ liệu định kỳ
+    $(document).ready(function() {
+        // Cập nhật thị trường mỗi 10 giây
+        setInterval(updateMarketOverview, 10000);
     });
 </script>
 {% endblock %}

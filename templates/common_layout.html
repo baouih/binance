@@ -1,769 +1,437 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bot Giao Dịch Crypto{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Hệ Thống Giao Dịch Tiền Điện Tử - Kiểm Tra</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        /* Card styles */
-        .info-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .info-label {
-            color: #8b949e;
-            font-size: 0.9rem;
-        }
-
-        .info-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* Status badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-right: 10px;
-        }
-
-        .status-badge i {
-            margin-right: 5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
         }
         
-        .status-badge.testnet {
-            background-color: #ff8800;
-            color: #000;
-        }
-
-        .status-badge.connected {
-            background-color: #238636;
-            color: white;
-        }
-
-        .status-badge.disconnected {
-            background-color: #f85149;
-            color: white;
-        }
-
-        .status-badge.testnet {
-            background-color: #fd7e14;
-            color: white;
-        }
-
-        .status-badge.live {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        /* Messages container */
-        .messages-container {
-            height: 300px;
-            overflow-y: auto;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-        }
-
-        .message {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 6px;
-            background-color: rgba(30, 37, 46, 0.8);
-            transition: background-color 0.3s ease;
-        }
-        
-        .message:hover {
-            background-color: rgba(36, 44, 54, 0.8);
-        }
-        
-        .message-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            font-size: 0.7rem;
-            margin-right: 10px;
-        }
-        
-        .message-badge.info {
-            background-color: #0d6efd;
-        }
-        
-        .message-badge.success {
-            background-color: #198754;
-        }
-        
-        .message-badge.warning {
-            background-color: #ffc107;
-            color: #000;
-        }
-        
-        .message-badge.error {
-            background-color: #dc3545;
-        }
-
-        /* Bot status */
-        .bot-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-right: 10px;
-        }
-        
-        .bot-status.running {
-            background-color: #238636;
-            color: white;
-        }
-        
-        .bot-status.stopped {
-            background-color: #f85149;
-            color: white;
-        }
-
-        /* Button with processing state */
-        .btn .spinner-border {
-            margin-left: 5px;
-        }
-
-        /* Charts container */
-        .chart-container {
-            width: 100%;
-            height: 250px;
-        }
-
-        /* Symbol selector */
-        .symbol-selection {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 10px;
-        }
-        
-        .symbol-item {
-            display: inline-block;
-            padding: 5px 10px;
-            margin-right: 8px;
-            border-radius: 12px;
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .symbol-item:hover, .symbol-item.active {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-
-        /* Alert styles */
-        .alert-testnet {
-            background-color: rgba(253, 126, 20, 0.1);
-            color: #fd7e14;
-            border: 1px solid rgba(253, 126, 20, 0.2);
-            border-radius: 6px;
-            padding: 8px 12px;
-        }
-        
-        /* Custom table styles */
-        .custom-table {
-            background-color: #161b22;
-            color: #c9d1d9;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .custom-table th {
-            background-color: #1f2937;
-            color: #8b949e;
-            font-weight: 500;
-            border: none;
-        }
-        
-        .custom-table td {
-            border-color: #30363d;
-        }
-        
-        .custom-table tbody tr:hover {
-            background-color: rgba(56, 139, 253, 0.1);
-        }
-
-        /* Status indicators */
-        .indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-        }
-        
-        .indicator.green {
-            background-color: #238636;
-        }
-        
-        .indicator.red {
-            background-color: #f85149;
-        }
-        
-        .indicator.yellow {
-            background-color: #f0883e;
-        }
-
-        /* Position card */
-        .position-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .position-card:hover {
-            border-color: #388bfd;
-        }
-        
-        .position-card.profit {
-            border-left: 4px solid #238636;
-        }
-        
-        .position-card.loss {
-            border-left: 4px solid #f85149;
-        }
-
-        /* Price badge */
-        .price-change {
-            display: inline-block;
-            font-size: 0.85rem;
-            border-radius: 12px;
-            padding: 2px 8px;
-        }
-        
-        .price-change.positive {
-            background-color: rgba(25, 135, 84, 0.1);
-            color: #198754;
-        }
-        
-        .price-change.negative {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-        /* Sidebar menu */
         .sidebar {
-            background-color: #161b22;
-            border-right: 1px solid #30363d;
+            background-color: var(--dark-color);
+            color: white;
             height: 100vh;
             position: fixed;
-            top: 0;
-            left: 0;
-            padding: 20px 0;
-            width: 250px;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        
-        .sidebar-header {
-            padding: 10px 20px;
-            border-bottom: 1px solid #30363d;
-            margin-bottom: 20px;
+            padding-top: 20px;
         }
         
         .sidebar .nav-link {
-            color: #c9d1d9;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            border-left: 3px solid transparent;
+            color: #ecf0f1;
+            padding: 12px 20px;
+            margin-bottom: 5px;
+            border-radius: 5px;
             transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, 
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
         }
         
         .sidebar .nav-link i {
             margin-right: 10px;
-            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
         }
         
-        .sidebar .nav-link:hover {
-            background-color: rgba(56, 139, 253, 0.1);
-            color: #58a6ff;
-        }
-        
-        .sidebar .nav-link.active {
-            background-color: rgba(56, 139, 253, 0.1);
-            color: #58a6ff;
-            border-left-color: #58a6ff;
-        }
-        
-        .content-wrapper {
+        .content {
             margin-left: 250px;
-            transition: all 0.3s;
             padding: 20px;
         }
         
-        /* Responsive sidebar */
-        @media (max-width: 991.98px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .content-wrapper {
-                margin-left: 0;
-            }
-            
-            .content-wrapper.sidebar-open {
-                margin-left: 250px;
-            }
+        .status-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
         }
         
-        /* Mobile navbar */
-        .mobile-navbar {
-            display: none;
-            background-color: #161b22;
-            border-bottom: 1px solid #30363d;
-            padding: 10px 15px;
-            position: sticky;
-            top: 0;
-            z-index: 999;
+        .status-card:hover {
+            transform: translateY(-5px);
         }
         
-        @media (max-width: 991.98px) {
-            .mobile-navbar {
-                display: flex;
-            }
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
         }
         
-        /* Mobile Bottom Navigation */
-        .mobile-nav {
-            display: none;
+        .status-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .running {
+            color: var(--secondary-color);
+        }
+        
+        .stopped {
+            color: var(--danger-color);
+        }
+        
+        .warning {
+            color: var(--warning-color);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+        }
+        
+        .log-container {
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .log-entry {
+            padding: 5px 10px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        
+        .log-entry.INFO {
+            color: #2c3e50;
+        }
+        
+        .log-entry.ERROR {
+            color: var(--danger-color);
+        }
+        
+        .log-entry.WARNING {
+            color: var(--warning-color);
+        }
+        
+        .position-long {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .position-short {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .profit {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .loss {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .signal-buy {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .signal-sell {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .signal-neutral {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .trend-up {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .trend-down {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .trend-sideways {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .test-card {
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-card .card-header {
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+        }
+        
+        .test-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .status-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .status-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .status-not-tested {
+            background-color: rgba(189, 195, 199, 0.2);
+            color: #7f8c8d;
+        }
+        
+        /* Thanh trạng thái bot */
+        .bot-status-bar {
             position: fixed;
             bottom: 0;
-            left: 0;
+            left: 250px;
             right: 0;
-            background-color: #161b22;
-            border-top: 1px solid #30363d;
-            z-index: 999;
-            padding: 10px 0;
+            padding: 10px 20px;
+            background-color: var(--dark-color);
+            color: white;
             display: flex;
-            justify-content: space-around;
-        }
-        
-        .mobile-nav a.nav-link {
-            flex: 1;
-            text-align: center;
-            padding: 8px 0;
-            color: #8b949e;
-            display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            font-size: 0.75rem;
-            text-decoration: none;
+            z-index: 1000;
         }
         
-        .mobile-nav a.nav-link i {
-            font-size: 1.25rem;
-            margin-bottom: 4px;
+        .bot-status {
+            display: flex;
+            align-items: center;
         }
         
-        .mobile-nav a.nav-link.active {
-            color: #58a6ff;
+        .bot-status.running i {
+            color: var(--secondary-color);
         }
         
-        @media (max-width: 767.98px) {
-            .mobile-nav {
-                display: flex;
-            }
-            
-            body {
-                padding-bottom: 70px;
-            }
+        .bot-status.stopped i {
+            color: var(--danger-color);
         }
-
-        /* Toast notification */
+        
+        .bot-status i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .bot-balance {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        
+        .bot-positions {
+            margin-left: 20px;
+        }
+        
+        /* Loader */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast notifications */
         .toast-container {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 9999;
+            z-index: 2000;
         }
         
-        .toast {
-            background-color: #161b22;
-            color: #c9d1d9;
-            border: 1px solid #30363d;
+        .custom-toast {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            overflow: hidden;
+            width: 350px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s;
+        }
+        
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(0);
         }
         
         .toast-header {
-            background-color: #1f2937;
-            color: #c9d1d9;
-            border-bottom: 1px solid #30363d;
-        }
-
-        /* Loading spinner */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(13, 17, 23, 0.7);
+            padding: 12px 15px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            z-index: 9999;
+            border-bottom: 1px solid #eee;
         }
         
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            padding: 0.25rem 0.5rem;
-            border-radius: 50%;
-            background: #dc3545;
+        .toast-body {
+            padding: 12px 15px;
+        }
+        
+        .toast-success .toast-header {
+            background-color: var(--secondary-color);
             color: white;
-            font-size: 0.75rem;
         }
         
-        .api-guide {
-            background: rgba(13, 110, 253, 0.1);
-            border: 1px solid #0d6efd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
+        .toast-error .toast-header {
+            background-color: var(--danger-color);
+            color: white;
         }
         
-        .api-guide ol {
-            margin-bottom: 0;
-            padding-left: 20px;
+        .toast-warning .toast-header {
+            background-color: var(--warning-color);
+            color: white;
         }
         
-        .info-card.highlight {
-            border-color: #198754;
-            box-shadow: 0 0 0 1px #198754;
-        }
-        
-        .testnet-balance {
-            font-size: 0.9rem;
-            color: #fd7e14;
-            margin-top: 5px;
-        }
-        
-        .btn {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:active {
-            transform: scale(0.95);
+        .toast-info .toast-header {
+            background-color: var(--primary-color);
+            color: white;
         }
     </style>
-    {% block additional_css %}{% endblock %}
 </head>
 <body>
-    <!-- Mobile Navbar -->
-    <div class="mobile-navbar d-flex justify-content-between align-items-center">
-        <button type="button" class="btn btn-outline-secondary" id="sidebarToggleBtn">
-            <i class="bi bi-list"></i>
-        </button>
-        <div class="d-flex align-items-center">
-            <i class="bi bi-currency-bitcoin me-2"></i>
-            <span>Bot Giao Dịch Crypto</span>
-        </div>
-        <div class="bot-status {{ 'running' if bot_status.running else 'stopped' }}">
-            <i class="bi {{ 'bi-play-circle-fill' if bot_status.running else 'bi-stop-circle-fill' }} me-1"></i>
-            {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
-        </div>
-    </div>
-    
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header d-flex align-items-center">
-            <i class="bi bi-currency-bitcoin fs-4 me-2"></i>
-            <span class="fs-5">Bot Giao Dịch Crypto</span>
-        </div>
-        <div class="px-3 mb-3">
-            <div class="bot-status {{ 'running' if bot_status.running else 'stopped' }} w-100 text-center">
-                <i class="bi {{ 'bi-play-circle-fill' if bot_status.running else 'bi-stop-circle-fill' }} me-2"></i>
-                {{ 'Đang chạy' if bot_status.running else 'Đã dừng' }}
-            </div>
-        </div>
-        <div class="px-3 mb-3">
-            <button id="controlButton" type="button"
-                    class="btn {{ 'btn-danger' if bot_status.running else 'btn-success' }} btn-sm w-100"
-                    onclick="handleControlButton(this)">
-                <i class="bi {{ 'bi-stop-fill' if bot_status.running else 'bi-play-fill' }} me-1"></i>
-                <span class="button-text">{{ 'Dừng Bot' if bot_status.running else 'Khởi động Bot' }}</span>
-                <div class="spinner-border spinner-border-sm d-none" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </button>
+    <div class="sidebar col-md-2 col-lg-2 d-md-block">
+        <div class="text-center mb-4">
+            <h4>Hệ Thống Giao Dịch</h4>
+            <small>v1.0.0</small>
         </div>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="/">
-                    <i class="bi bi-speedometer2"></i> Trang chủ
+                    <i class="fas fa-tachometer-alt"></i> Tổng Quan
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if active_page == 'market' %}active{% endif %}" href="/market">
-                    <i class="bi bi-graph-up"></i> Phân tích thị trường
+                    <i class="fas fa-chart-line"></i> Thị Trường
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if active_page == 'position' %}active{% endif %}" href="/position">
-                    <i class="bi bi-wallet2"></i> Quản lý vị thế
+                <a class="nav-link {% if active_page == 'positions' %}active{% endif %}" href="/positions">
+                    <i class="fas fa-wallet"></i> Vị Thế
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if active_page == 'strategies' %}active{% endif %}" href="/strategies">
-                    <i class="bi bi-gear"></i> Chiến lược giao dịch
+                <a class="nav-link {% if active_page == 'test' %}active{% endif %}" href="/test">
+                    <i class="fas fa-vial"></i> Kiểm Tra
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if active_page == 'backtest' %}active{% endif %}" href="/backtest">
-                    <i class="bi bi-bar-chart"></i> Backtest
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if active_page == 'trades' %}active{% endif %}" href="/trades">
-                    <i class="bi bi-clipboard-data"></i> Lịch sử giao dịch
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if active_page == 'trading-report' %}active{% endif %}" href="/trading-report">
-                    <i class="bi bi-file-earmark-text"></i> Báo cáo giao dịch
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if active_page == 'sentiment' %}active{% endif %}" href="/sentiment/mood">
-                    <i class="bi bi-emoji-smile"></i> Mood Meter
+                <a class="nav-link {% if active_page == 'logs' %}active{% endif %}" href="/logs">
+                    <i class="fas fa-list"></i> Nhật Ký
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if active_page == 'settings' %}active{% endif %}" href="/settings">
-                    <i class="bi bi-sliders"></i> Cài đặt
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if active_page == 'cli' %}active{% endif %}" href="/cli">
-                    <i class="bi bi-terminal"></i> CLI
+                    <i class="fas fa-cog"></i> Cài Đặt
                 </a>
             </li>
         </ul>
-        <div class="mt-auto p-3">
-            {% if bot_status.mode == 'testnet' %}
-            <div class="status-badge testnet w-100 text-center mb-2">
-                <i class="bi bi-exclamation-triangle-fill"></i> Chế độ Testnet
-            </div>
-            {% elif bot_status.mode == 'live' %}
-            <div class="status-badge live w-100 text-center mb-2">
-                <i class="bi bi-check-circle-fill"></i> Chế độ Live
-            </div>
-            {% else %}
-            <div class="status-badge w-100 text-center mb-2" style="background-color: #6c757d;">
-                <i class="bi bi-life-preserver"></i> Chế độ Demo
-            </div>
-            {% endif %}
-            <div class="text-center">
-                <small class="text-muted">Version 1.0.0</small>
-            </div>
-        </div>
     </div>
-    
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-nav">
-        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="/">
-            <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-link {% if active_page == 'market' %}active{% endif %}" href="/market">
-            <i class="bi bi-graph-up"></i>
-            <span>Thị trường</span>
-        </a>
-        <a class="nav-link {% if active_page == 'position' %}active{% endif %}" href="/position">
-            <i class="bi bi-wallet2"></i>
-            <span>Vị thế</span>
-        </a>
-        <a class="nav-link {% if active_page == 'trades' %}active{% endif %}" href="/trades">
-            <i class="bi bi-clipboard-data"></i>
-            <span>Giao dịch</span>
-        </a>
-        <a class="nav-link {% if active_page == 'sentiment' %}active{% endif %}" href="/sentiment/mood">
-            <i class="bi bi-emoji-smile"></i>
-            <span>Mood Meter</span>
-        </a>
-        <a class="nav-link {% if active_page == 'settings' %}active{% endif %}" href="/settings">
-            <i class="bi bi-sliders"></i>
-            <span>Cài đặt</span>
-        </a>
-    </div>
-    
-    <!-- Content Wrapper -->
-    <div class="content-wrapper" id="content">
+
+    <!-- Main Content -->
+    <div class="content">
         {% block content %}{% endblock %}
     </div>
-    
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-    
-    <!-- Loading Overlay -->
-    <div class="loading-overlay d-none" id="loadingOverlay">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+
+    <!-- Bot Status Bar -->
+    <div class="bot-status-bar">
+        <div class="bot-status {{ 'running' if status.running else 'stopped' }}">
+            <i class="fas {{ 'fa-circle-play' if status.running else 'fa-circle-stop' }}"></i>
+            <span>{{ 'Đang Chạy' if status.running else 'Đã Dừng' }}</span>
+        </div>
+        <div class="bot-balance">
+            <strong>Số Dư:</strong> {{ status.account_balance|round(2) }} USDT
+        </div>
+        <div class="bot-positions">
+            <strong>Vị Thế Mở:</strong> {{ status.positions|length }}
+        </div>
+        <div class="bot-latest-log">
+            <strong>Log Mới Nhất:</strong>
+            {% if status.logs %}
+                {{ status.logs[0].message }}
+            {% else %}
+                Không có log
+            {% endif %}
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/static/js/tab-manager.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar Toggle
-        const sidebar = document.getElementById('sidebar');
-        const content = document.getElementById('content');
-        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-        
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                content.classList.toggle('sidebar-open');
-            });
-        }
-        
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 991.98 && 
-                !sidebar.contains(event.target) && 
-                event.target !== sidebarToggleBtn) {
-                sidebar.classList.remove('show');
-                content.classList.remove('sidebar-open');
-            }
-        });
-        
-        // Bot control button handler
-        function handleControlButton(button) {
-            const isRunning = button.classList.contains('btn-danger');
-            const spinner = button.querySelector('.spinner-border');
-            const buttonText = button.querySelector('.button-text');
-            
-            // Disable button and show spinner
-            button.disabled = true;
-            spinner.classList.remove('d-none');
-            
-            // Send request to server
-            fetch(isRunning ? '/stop-bot' : '/start-bot', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update button appearance
-                    if (isRunning) {
-                        button.classList.remove('btn-danger');
-                        button.classList.add('btn-success');
-                        buttonText.textContent = 'Khởi động Bot';
-                        button.querySelector('i').classList.remove('bi-stop-fill');
-                        button.querySelector('i').classList.add('bi-play-fill');
-                        
-                        // Update status indicators
-                        document.querySelectorAll('.bot-status').forEach(el => {
-                            el.classList.remove('running');
-                            el.classList.add('stopped');
-                            el.innerHTML = '<i class="bi bi-stop-circle-fill me-1"></i> Đã dừng';
-                        });
-                        
-                        showToast('Thông báo', 'Bot đã được dừng thành công', 'success');
-                    } else {
-                        button.classList.remove('btn-success');
-                        button.classList.add('btn-danger');
-                        buttonText.textContent = 'Dừng Bot';
-                        button.querySelector('i').classList.remove('bi-play-fill');
-                        button.querySelector('i').classList.add('bi-stop-fill');
-                        
-                        // Update status indicators
-                        document.querySelectorAll('.bot-status').forEach(el => {
-                            el.classList.remove('stopped');
-                            el.classList.add('running');
-                            el.innerHTML = '<i class="bi bi-play-circle-fill me-1"></i> Đang chạy';
-                        });
-                        
-                        showToast('Thông báo', 'Bot đã được khởi động thành công', 'success');
-                    }
-                } else {
-                    showToast('Lỗi', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Lỗi', 'Không thể kết nối với máy chủ', 'error');
-            })
-            .finally(() => {
-                // Re-enable button and hide spinner
-                button.disabled = false;
-                spinner.classList.add('d-none');
-            });
-        }
-        
-        // Toast notification
-        function showToast(title, message, type = 'info') {
-            const toastContainer = document.getElementById('toastContainer');
-            
+        // Toast Notification Function
+        function showToast(message, type = 'info', duration = 3000) {
+            const toastContainer = document.querySelector('.toast-container');
             const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.role = 'alert';
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-            
-            let iconClass = 'bi-info-circle-fill';
-            let bgColor = 'primary';
-            
-            switch (type) {
-                case 'success':
-                    iconClass = 'bi-check-circle-fill';
-                    bgColor = 'success';
-                    break;
-                case 'warning':
-                    iconClass = 'bi-exclamation-triangle-fill';
-                    bgColor = 'warning';
-                    break;
-                case 'error':
-                    iconClass = 'bi-x-circle-fill';
-                    bgColor = 'danger';
-                    break;
-            }
+            toast.className = `custom-toast toast-${type}`;
             
             toast.innerHTML = `
                 <div class="toast-header">
-                    <i class="bi ${iconClass} me-2 text-${bgColor}"></i>
-                    <strong class="me-auto">${title}</strong>
-                    <small>Bây giờ</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                    <button type="button" class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
                 </div>
                 <div class="toast-body">
                     ${message}
@@ -772,49 +440,100 @@
             
             toastContainer.appendChild(toast);
             
-            const bsToast = new bootstrap.Toast(toast, {
-                autohide: true,
-                delay: 5000
-            });
+            // Trigger reflow to enable the transition
+            toast.offsetHeight;
             
-            bsToast.show();
+            // Show the toast
+            toast.classList.add('show');
             
-            // Remove toast from DOM after hidden
-            toast.addEventListener('hidden.bs.toast', function () {
-                toast.remove();
-            });
+            // Auto-close after duration
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, duration);
         }
-        
-        // Loading overlay
-        function showLoading() {
-            document.getElementById('loadingOverlay').classList.remove('d-none');
-        }
-        
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.add('d-none');
-        }
-        
-        // API helper functions
-        async function fetchAPI(url, options = {}) {
-            try {
-                showLoading();
-                const response = await fetch(url, options);
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || 'Đã xảy ra lỗi');
+
+        // AJAX Functions
+        function startSystem() {
+            $.ajax({
+                url: '/api/start',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Hệ thống đã khởi động thành công', 'success');
+                        updateStatus();
+                    } else {
+                        showToast('Lỗi: ' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối với máy chủ', 'error');
                 }
-                
-                return data;
-            } catch (error) {
-                console.error('API Error:', error);
-                showToast('Lỗi API', error.message, 'error');
-                throw error;
-            } finally {
-                hideLoading();
-            }
+            });
         }
+
+        function stopSystem() {
+            $.ajax({
+                url: '/api/stop',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Hệ thống đã dừng thành công', 'info');
+                        updateStatus();
+                    } else {
+                        showToast('Lỗi: ' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối với máy chủ', 'error');
+                }
+            });
+        }
+
+        function updateStatus() {
+            $.ajax({
+                url: '/api/status',
+                type: 'GET',
+                success: function(response) {
+                    const statusElement = document.querySelector('.bot-status');
+                    const balanceElement = document.querySelector('.bot-balance');
+                    const positionsElement = document.querySelector('.bot-positions');
+                    const logElement = document.querySelector('.bot-latest-log');
+                    
+                    if (response.running) {
+                        statusElement.className = 'bot-status running';
+                        statusElement.innerHTML = '<i class="fas fa-circle-play"></i><span>Đang Chạy</span>';
+                    } else {
+                        statusElement.className = 'bot-status stopped';
+                        statusElement.innerHTML = '<i class="fas fa-circle-stop"></i><span>Đã Dừng</span>';
+                    }
+                    
+                    balanceElement.innerHTML = `<strong>Số Dư:</strong> ${response.account_balance.toFixed(2)} USDT`;
+                    positionsElement.innerHTML = `<strong>Vị Thế Mở:</strong> ${response.positions_count}`;
+                    
+                    if (response.latest_log) {
+                        logElement.innerHTML = `<strong>Log Mới Nhất:</strong> ${response.latest_log.message}`;
+                    } else {
+                        logElement.innerHTML = `<strong>Log Mới Nhất:</strong> Không có log`;
+                    }
+                },
+                error: function() {
+                    console.error('Không thể cập nhật trạng thái');
+                }
+            });
+        }
+
+        // Automatically update status every 5 seconds
+        setInterval(updateStatus, 5000);
+
+        // Document Ready
+        $(document).ready(function() {
+            updateStatus();
+        });
     </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,1474 +1,331 @@
-{% extends 'common_layout.html' %}
-
+{% extends "common_layout.html" %}
 {% set active_page = 'settings' %}
-
-{% block title %}Cài đặt - Bot Giao Dịch Crypto{% endblock %}
-
-{% block head %}
-<style>
-    /* Loading overlay */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
-    
-    /* Coin selection container */
-    .coin-selection-container {
-        max-height: 300px;
-        overflow-y: auto;
-        background-color: var(--bs-body-bg);
-    }
-    
-    /* Checkbox styling */
-    .trading-coin-checkbox {
-        cursor: pointer;
-    }
-    
-    /* Status badges */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.35rem 0.65rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: 0.25rem;
-    }
-    
-    .status-badge.connected {
-        background-color: #198754;
-        color: #fff;
-    }
-    
-    .status-badge.disconnected {
-        background-color: #dc3545;
-        color: #fff;
-    }
-    
-    .status-badge.testnet {
-        background-color: #fd7e14;
-        color: #fff;
-    }
-    
-    .status-badge.live {
-        background-color: #dc3545;
-        color: #fff;
-    }
-</style>
-{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="mb-3">Cài đặt</h2>
-            
-            <!-- API Mode Indicator -->
-            <div class="d-flex align-items-center mb-3">
-                {% if bot_status.mode == 'demo' %}
-                <div class="status-badge bg-secondary me-2">
-                    <i class="bi bi-life-preserver me-1"></i> Demo Mode
-                </div>
-                {% elif bot_status.mode == 'testnet' %}
-                <div class="status-badge testnet me-2">
-                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Testnet Mode
-                </div>
-                {% else %}
-                <div class="status-badge live me-2">
-                    <i class="bi bi-check-circle-fill me-1"></i> Live Mode
-                </div>
-                {% endif %}
-                
-                <div class="status-badge {{ 'connected' if bot_status.api_connected else 'disconnected' }} me-2">
-                    <i class="bi {{ 'bi-plug-fill' if bot_status.api_connected else 'bi-plug' }} me-1"></i>
-                    {{ 'Đã kết nối' if bot_status.api_connected else 'Chưa kết nối' }}
-                </div>
-            </div>
+            <h2 class="mb-4">Cài Đặt Hệ Thống</h2>
         </div>
     </div>
 
     <div class="row">
-        <!-- Left Column - Settings Tabs -->
-        <div class="col-md-3 mb-4 mb-md-0">
-            <div class="info-card">
-                <div class="list-group list-group-flush" id="settingsTabs" role="tablist">
-                    <a class="list-group-item list-group-item-action active" id="general-tab" data-bs-toggle="list" href="#general" role="tab" aria-controls="general">
-                        <i class="bi bi-gear me-2"></i>
-                        Cài đặt chung
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="api-tab" data-bs-toggle="list" href="#api" role="tab" aria-controls="api">
-                        <i class="bi bi-key me-2"></i>
-                        Kết nối API
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="trading-coins-tab" data-bs-toggle="list" href="#trading-coins" role="tab" aria-controls="trading-coins">
-                        <i class="bi bi-currency-bitcoin me-2"></i>
-                        Đồng coin giao dịch
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="risk-tab" data-bs-toggle="list" href="#risk" role="tab" aria-controls="risk">
-                        <i class="bi bi-shield-exclamation me-2"></i>
-                        Quản lý rủi ro
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="notifications-tab" data-bs-toggle="list" href="#notifications" role="tab" aria-controls="notifications">
-                        <i class="bi bi-bell me-2"></i>
-                        Thông báo
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="advanced-tab" data-bs-toggle="list" href="#advanced" role="tab" aria-controls="advanced">
-                        <i class="bi bi-sliders me-2"></i>
-                        Tùy chọn nâng cao
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="logs-tab" data-bs-toggle="list" href="#logs" role="tab" aria-controls="logs">
-                        <i class="bi bi-journal-text me-2"></i>
-                        Nhật ký hệ thống
-                    </a>
+        <!-- Cài đặt API và Kết nối -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cài Đặt API và Kết Nối</h5>
+                </div>
+                <div class="card-body">
+                    <form id="apiSettingsForm">
+                        <div class="mb-3">
+                            <label for="apiMode" class="form-label">Chế độ API</label>
+                            <select class="form-select" id="apiMode" name="api_mode">
+                                <option value="testnet" {% if config.api_mode == 'testnet' %}selected{% endif %}>Testnet (Môi trường thử nghiệm)</option>
+                                <option value="live" {% if config.api_mode == 'live' %}selected{% endif %}>Live (Giao dịch thực)</option>
+                            </select>
+                            <div class="form-text">
+                                Testnet để thử nghiệm, Live để giao dịch thực với tiền thật.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="apiKeyInput" class="form-label">API Key</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="apiKeyInput" placeholder="Nhập API Key của bạn" value="****">
+                                <button class="btn btn-outline-secondary" type="button" onclick="$('#apiKeyInput').attr('type') == 'password' ? $('#apiKeyInput').attr('type', 'text') : $('#apiKeyInput').attr('type', 'password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="apiSecretInput" class="form-label">API Secret</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="apiSecretInput" placeholder="Nhập API Secret của bạn" value="****">
+                                <button class="btn btn-outline-secondary" type="button" onclick="$('#apiSecretInput').attr('type') == 'password' ? $('#apiSecretInput').attr('type', 'text') : $('#apiSecretInput').attr('type', 'password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-primary" id="testConnectionButton">
+                                <i class="fas fa-plug"></i> Kiểm Tra Kết Nối
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
         
-        <!-- Right Column - Settings Content -->
-        <div class="col-md-9">
-            <div class="tab-content" id="settingsTabsContent">
-                <!-- General Settings -->
-                <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Cài đặt chung</h5>
-                        
-                        <div class="mb-3">
-                            <label for="botMode" class="form-label">Chế độ</label>
-                            <select class="form-select" id="botMode">
-                                <option value="demo" {% if bot_status.mode == 'demo' %}selected{% endif %}>Demo</option>
-                                <option value="testnet" {% if bot_status.mode == 'testnet' %}selected{% endif %}>Testnet</option>
-                                <option value="live" {% if bot_status.mode == 'live' %}selected{% endif %}>Live</option>
-                            </select>
-                            <div class="form-text">
-                                <div class="alert alert-warning mt-2 mb-0">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>
-                                    <strong>Cảnh báo:</strong> Chế độ Live sẽ sử dụng tiền thật từ tài khoản Binance của bạn. Chỉ kích hoạt khi bạn đã sẵn sàng.
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="accountType" class="form-label">Loại tài khoản</label>
-                            <select class="form-select" id="accountType">
-                                <option value="spot" {% if bot_status.account_type == 'spot' %}selected{% endif %}>Spot Trading</option>
-                                <option value="futures" {% if bot_status.account_type == 'futures' %}selected{% endif %}>Futures Trading</option>
-                            </select>
-                            <div class="form-text">
-                                Spot Trading: Giao dịch tiền điện tử thông thường<br>
-                                Futures Trading: Giao dịch hợp đồng tương lai với đòn bẩy
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="strategyMode" class="form-label">Chế độ chiến lược</label>
-                            <select class="form-select" id="strategyMode">
-                                <option value="auto" {% if bot_status.strategy_mode == 'auto' %}selected{% endif %}>Tự động</option>
-                                <option value="manual" {% if bot_status.strategy_mode == 'manual' %}selected{% endif %}>Thủ công</option>
-                            </select>
-                            <div class="form-text">
-                                Tự động: Bot sẽ tự động chọn chiến lược tốt nhất cho điều kiện thị trường<br>
-                                Thủ công: Bạn cần chỉ định chiến lược để sử dụng
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="language" class="form-label">Ngôn ngữ</label>
-                            <select class="form-select" id="language">
-                                <option value="vi" selected>Tiếng Việt</option>
-                                <option value="en">English</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="timezoneSelect" class="form-label">Múi giờ</label>
-                            <select class="form-select" id="timezoneSelect">
-                                <option value="UTC+7" selected>UTC+7 (Việt Nam)</option>
-                                <option value="UTC+8">UTC+8 (Singapore, Philippines)</option>
-                                <option value="UTC+9">UTC+9 (Japan, Korea)</option>
-                                <option value="UTC+0">UTC+0 (London)</option>
-                                <option value="UTC-5">UTC-5 (New York)</option>
-                                <option value="UTC-8">UTC-8 (San Francisco)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="autoStartSwitch" checked>
-                            <label class="form-check-label" for="autoStartSwitch">
-                                Tự động khởi động bot khi hệ thống khởi động
-                            </label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="button" class="btn btn-primary" id="saveGeneralSettings">
-                                <i class="bi bi-save me-2"></i>
-                                Lưu cài đặt
-                            </button>
-                        </div>
-                    </div>
+        <!-- Cài đặt Telegram -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cài Đặt Thông Báo Telegram</h5>
                 </div>
-                
-                <!-- API Settings -->
-                <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Kết nối API Binance</h5>
-                        
-                        <div class="api-guide mb-4">
-                            <h6><i class="bi bi-info-circle me-2"></i>Hướng dẫn kết nối API</h6>
-                            <ol>
-                                <li>Đăng nhập vào {% if bot_status.mode == 'testnet' %}<a href="https://testnet.binancefuture.com/" target="_blank">Binance Testnet</a>{% else %}<a href="https://www.binance.com/en/my/settings/api-management" target="_blank">Binance</a>{% endif %}</li>
-                                <li>Tạo API key với quyền đọc và giao dịch</li>
-                                <li>Sao chép API Key và Secret Key vào form dưới đây</li>
-                                <li>Nhấn "Lưu cấu hình API" để kết nối</li>
-                            </ol>
-                            {% if bot_status.mode == 'testnet' %}
-                            <div class="alert alert-testnet mt-2 mb-0">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Lưu ý:</strong> Bot đang chạy ở chế độ Testnet (thử nghiệm). Giao dịch trên Testnet không ảnh hưởng đến tài khoản thật của bạn.
-                            </div>
-                            {% endif %}
-                        </div>
-                        
+                <div class="card-body">
+                    <form id="telegramSettingsForm">
                         <div class="mb-3">
-                            <label class="form-label">Trạng thái API</label>
-                            <div class="d-flex align-items-center">
-                                <div class="status-badge {{ 'connected' if bot_status.api_connected else 'disconnected' }} me-2">
-                                    <i class="bi {{ 'bi-plug-fill' if bot_status.api_connected else 'bi-plug' }} me-1"></i>
-                                    {{ 'Đã kết nối' if bot_status.api_connected else 'Chưa kết nối' }}
-                                </div>
-                                
-                                {% if bot_status.api_connected %}
-                                <span class="text-muted small ms-2">Kết nối lần cuối: {{ bot_status.last_update }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="apiKey" class="form-label">API Key</label>
+                            <label for="telegramBotToken" class="form-label">Bot Token</label>
                             <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-key"></i>
-                                </span>
-                                <input type="text" class="form-control" id="apiKey" placeholder="API Key">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="secretKey" class="form-label">Secret Key</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-key-fill"></i>
-                                </span>
-                                <input type="password" class="form-control" id="secretKey" placeholder="Secret Key">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleSecretKey">
-                                    <i class="bi bi-eye"></i>
+                                <input type="password" class="form-control" id="telegramBotToken" placeholder="Nhập Bot Token của bạn" value="****">
+                                <button class="btn btn-outline-secondary" type="button" onclick="$('#telegramBotToken').attr('type') == 'password' ? $('#telegramBotToken').attr('type', 'text') : $('#telegramBotToken').attr('type', 'password')">
+                                    <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="apiPermissions" class="form-label">Quyền yêu cầu</label>
-                            <div class="d-flex gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="readPermission" checked disabled>
-                                    <label class="form-check-label" for="readPermission">
-                                        Đọc thông tin tài khoản
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="tradePermission" checked disabled>
-                                    <label class="form-check-label" for="tradePermission">
-                                        Quyền giao dịch
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3" id="apiConnectionStatus">
-                            <!-- API connection status will be displayed here by JavaScript -->
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-primary w-100" id="saveApiSettings">
-                                    <i class="bi bi-save me-2"></i>
-                                    Lưu cấu hình API
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-outline-info w-100" id="testApiConnection">
-                                    <i class="bi bi-lightning-charge me-2"></i>
-                                    Kiểm tra kết nối
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Thêm container để hiển thị lỗi nếu có -->
-                        <div id="apiErrorContainer" class="mt-3" style="min-height: 120px; overflow-y: auto;">
-                            <!-- Thông báo lỗi sẽ được hiển thị ở đây -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Risk Management -->
-                <div class="tab-pane fade" id="risk" role="tabpanel" aria-labelledby="risk-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Quản lý rủi ro</h5>
-                        
-                        <!-- Mức độ rủi ro -->
-                        <div class="mb-4">
-                            <label class="form-label">Mức độ rủi ro</label>
-                            <div class="risk-levels d-flex justify-content-between mb-2">
-                                <div class="btn-group w-100" role="group" aria-label="Risk level options">
-                                    <input type="radio" class="btn-check" name="riskLevel" id="riskVeryLow" value="very_low">
-                                    <label class="btn btn-outline-success" for="riskVeryLow">Rất thấp</label>
-                                    
-                                    <input type="radio" class="btn-check" name="riskLevel" id="riskLow" value="low">
-                                    <label class="btn btn-outline-info" for="riskLow">Thấp</label>
-                                    
-                                    <input type="radio" class="btn-check" name="riskLevel" id="riskMedium" value="medium" checked>
-                                    <label class="btn btn-outline-primary" for="riskMedium">Trung bình</label>
-                                    
-                                    <input type="radio" class="btn-check" name="riskLevel" id="riskHigh" value="high">
-                                    <label class="btn btn-outline-warning" for="riskHigh">Cao</label>
-                                    
-                                    <input type="radio" class="btn-check" name="riskLevel" id="riskVeryHigh" value="very_high">
-                                    <label class="btn btn-outline-danger" for="riskVeryHigh">Rất cao</label>
-                                </div>
-                            </div>
-                            <div class="risk-level-info p-3 border rounded mb-2" id="riskLevelInfo">
-                                <!-- Thông tin chi tiết về mức độ rủi ro sẽ hiển thị ở đây -->
-                                <h6 class="mb-2">Mức độ rủi ro: <span class="fw-bold text-primary">Trung bình</span></h6>
-                                <ul class="mb-0">
-                                    <li>Rủi ro mỗi giao dịch: <span class="fw-bold">0.5-1.0%</span> số dư</li>
-                                    <li>Số vị thế tối đa: <span class="fw-bold">5</span> vị thế</li>
-                                    <li>Ngưỡng drawdown để giảm rủi ro: <span class="fw-bold">10%</span></li>
-                                    <li>Tỷ lệ risk/reward tối thiểu: <span class="fw-bold">1:1.5</span></li>
-                                </ul>
-                            </div>
                             <div class="form-text">
-                                Chọn mức độ rủi ro phù hợp với chiến lược giao dịch của bạn. Mức độ rủi ro sẽ ảnh hưởng đến tất cả các tham số quản lý rủi ro.
-                            </div>
-                        </div>
-                        
-                        <hr>
-                        
-                        <!-- Tùy chỉnh tham số -->
-                        <h6 class="mb-3">Tùy chỉnh tham số</h6>
-                        
-                        <div class="mb-4">
-                            <label for="riskPerTrade" class="form-label d-flex justify-content-between">
-                                <span>Rủi ro mỗi giao dịch</span>
-                                <span id="riskPerTradeValue">1.0%</span>
-                            </label>
-                            <input type="range" class="form-range" id="riskPerTrade" min="0.1" max="5" step="0.1" value="1.0">
-                            <div class="form-text">
-                                Phần trăm số dư tài khoản có thể rủi ro trong mỗi giao dịch
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="maxPositions" class="form-label d-flex justify-content-between">
-                                <span>Số vị thế tối đa</span>
-                                <span id="maxPositionsValue">5</span>
-                            </label>
-                            <input type="range" class="form-range" id="maxPositions" min="1" max="20" step="1" value="5">
-                            <div class="form-text">
-                                Số lượng vị thế tối đa có thể mở cùng lúc
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="maxRiskTotal" class="form-label d-flex justify-content-between">
-                                <span>Tổng rủi ro tối đa</span>
-                                <span id="maxRiskTotalValue">20%</span>
-                            </label>
-                            <input type="range" class="form-range" id="maxRiskTotal" min="5" max="50" step="5" value="20">
-                            <div class="form-text">
-                                Tổng rủi ro tối đa trên toàn bộ danh mục
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="defaultStopLoss" class="form-label">Stop Loss mặc định</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="defaultStopLoss" value="2" min="0.1" step="0.1">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="defaultTakeProfit" class="form-label">Take Profit mặc định</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="defaultTakeProfit" value="4" min="0.1" step="0.1">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-4">
-                            <input class="form-check-input" type="checkbox" id="dynamicRiskSwitch" checked>
-                            <label class="form-check-label" for="dynamicRiskSwitch">
-                                Quản lý rủi ro động theo biến động thị trường
-                            </label>
-                            <div class="form-text">
-                                Tự động điều chỉnh cỡ vị thế và stop loss theo biến động thị trường
-                            </div>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-4">
-                            <input class="form-check-input" type="checkbox" id="useTrailingStopSwitch" checked>
-                            <label class="form-check-label" for="useTrailingStopSwitch">
-                                Sử dụng Trailing Stop
-                            </label>
-                            <div class="form-text">
-                                Tự động điều chỉnh stop loss theo giá di chuyển
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary" id="saveRiskSettings">
-                                <i class="bi bi-save me-2"></i>
-                                Lưu cài đặt
-                            </button>
-                            <div class="alert alert-info" role="alert">
-                                <i class="bi bi-info-circle-fill me-2"></i>
-                                Cấu hình quản lý rủi ro sẽ được áp dụng cho tất cả các giao dịch mới. 
-                                Mức độ rủi ro cao hơn có thể mang lại lợi nhuận lớn hơn nhưng cũng có thể dẫn đến tổn thất lớn hơn.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Notifications -->
-                <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Thông báo</h5>
-                        
-                        <!-- Telegram Notifications -->
-                        <div class="mb-4">
-                            <h6 class="mb-3">Telegram Notifications</h6>
-                            
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="telegramEnabledSwitch" {{ 'checked' if telegram_config.enabled else '' }}>
-                                <label class="form-check-label" for="telegramEnabledSwitch">
-                                    Kích hoạt thông báo Telegram
-                                </label>
-                            </div>
-                            
-                            <div id="telegramSettings" {{ 'style="display: none;"' if not telegram_config.enabled else '' }}>
-                                <div class="mb-3">
-                                    <label for="telegramBotToken" class="form-label">Bot Token</label>
-                                    <input type="text" class="form-control" id="telegramBotToken" placeholder="Bot Token" value="{{ telegram_config.bot_token }}">
-                                    <div class="form-text">
-                                        Liên hệ <a href="https://t.me/BotFather" target="_blank">@BotFather</a> trên Telegram để tạo bot mới và lấy token
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="telegramChatId" class="form-label">Chat ID</label>
-                                    <input type="text" class="form-control" id="telegramChatId" placeholder="Chat ID" value="{{ telegram_config.chat_id }}">
-                                    <div class="form-text">
-                                        Liên hệ <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> trên Telegram để lấy Chat ID
-                                    </div>
-                                </div>
-                                
-                                <!-- Trạng thái kết nối Telegram -->
-                                <div class="mb-3">
-                                    <label class="form-label">Trạng thái kết nối</label>
-                                    <div id="telegramConnectionStatus">
-                                        <span class="badge bg-secondary"><i class="bi bi-question-circle"></i> Chưa kiểm tra</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Container hiển thị thông báo lỗi/thành công -->
-                                <div id="telegramMessageContainer" class="mb-3" style="display: none;"></div>
-                                
-                                <div class="card mb-3">
-                                    <div class="card-header bg-light">
-                                        <i class="bi bi-bell me-2"></i>Cài đặt thông báo chi tiết
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyTradingSignals" {{ 'checked' if telegram_config.get('notify_new_trades', True) else '' }}>
-                                            <label class="form-check-label" for="notifyTradingSignals">
-                                                Thông báo tín hiệu giao dịch
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyPositionOpened" {{ 'checked' if telegram_config.get('notify_position_opened', True) else '' }}>
-                                            <label class="form-check-label" for="notifyPositionOpened">
-                                                Thông báo khi mở vị thế
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyPositionClosed" {{ 'checked' if telegram_config.get('notify_position_closed', True) else '' }}>
-                                            <label class="form-check-label" for="notifyPositionClosed">
-                                                Thông báo khi đóng vị thế
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyBotStatus" {{ 'checked' if telegram_config.get('notify_bot_status', True) else '' }}>
-                                            <label class="form-check-label" for="notifyBotStatus">
-                                                Thông báo khi bot khởi động/dừng
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyBalanceUpdates" checked>
-                                            <label class="form-check-label" for="notifyBalanceUpdates">
-                                                Thông báo thay đổi số dư
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" id="notifyErrors" {{ 'checked' if telegram_config.get('notify_error_status', True) else '' }}>
-                                            <label class="form-check-label" for="notifyErrors">
-                                                Thông báo lỗi hệ thống
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifyDailyReport" {{ 'checked' if telegram_config.get('notify_daily_summary', False) else '' }}>
-                                            <label class="form-check-label" for="notifyDailyReport">
-                                                Nhận báo cáo hiệu suất hàng ngày
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <button type="button" class="btn btn-primary btn-sm w-100" id="saveTelegramSettings">
-                                            <i class="bi bi-save me-2"></i>
-                                            Lưu cài đặt
-                                        </button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <button type="button" class="btn btn-outline-primary btn-sm w-100" id="testTelegramBtn">
-                                            <i class="bi bi-send me-2"></i>
-                                            Gửi tin nhắn test
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <!-- Notification Settings -->
-                        <h6 class="mb-3">Thiết lập thông báo</h6>
-                        
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="notifyTradeSignals" checked>
-                            <label class="form-check-label" for="notifyTradeSignals">
-                                Thông báo tín hiệu giao dịch
-                            </label>
-                        </div>
-                        
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="notifyOrderUpdates" checked>
-                            <label class="form-check-label" for="notifyOrderUpdates">
-                                Thông báo cập nhật lệnh (mở/đóng vị thế)
-                            </label>
-                        </div>
-                        
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="notifyProfitLoss" checked>
-                            <label class="form-check-label" for="notifyProfitLoss">
-                                Thông báo P/L khi đóng vị thế
-                            </label>
-                        </div>
-                        
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="notifyErrors" checked>
-                            <label class="form-check-label" for="notifyErrors">
-                                Thông báo lỗi hệ thống
-                            </label>
-                        </div>
-                        
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="notifyDailyReport" checked>
-                            <label class="form-check-label" for="notifyDailyReport">
-                                Nhận báo cáo hiệu suất hàng ngày
-                            </label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="button" class="btn btn-primary" id="saveNotificationSettings">
-                                <i class="bi bi-save me-2"></i>
-                                Lưu cài đặt
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Trading Coins Settings -->
-                <div class="tab-pane fade" id="trading-coins" role="tabpanel" aria-labelledby="trading-coins-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Cài đặt đồng coin giao dịch</h5>
-                        
-                        <div class="alert alert-info mb-4">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <strong>Thông tin:</strong> Chọn các đồng coin bạn muốn bot giao dịch. Nếu không chọn đồng coin nào, bot sẽ mặc định giao dịch BTCUSDT.
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Chọn đồng coin giao dịch</label>
-                            <div class="coin-selection-container border rounded p-3">
-                                <div class="row">
-                                    {% for coin in available_coins %}
-                                    <div class="col-md-4 mb-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input trading-coin-checkbox" type="checkbox" 
-                                                   id="coin-{{ coin }}" value="{{ coin }}"
-                                                   {% if coin in selected_trading_coins %}checked{% endif %}>
-                                            <label class="form-check-label" for="coin-{{ coin }}">
-                                                {{ coin }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mb-3">
-                            <button type="button" class="btn btn-sm btn-secondary" id="selectAllCoins">
-                                <i class="bi bi-check-all me-1"></i> Chọn tất cả
-                            </button>
-                            <button type="button" class="btn btn-sm btn-secondary" id="deselectAllCoins">
-                                <i class="bi bi-x-lg me-1"></i> Bỏ chọn tất cả
-                            </button>
-                            <button type="button" class="btn btn-sm btn-secondary" id="resetDefaultCoin">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại mặc định
-                            </button>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="button" class="btn btn-primary" id="saveTradingCoinsSettings">
-                                <i class="bi bi-save me-2"></i>
-                                Lưu cài đặt đồng coin
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Settings -->
-                <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
-                    <div class="info-card">
-                        <h5 class="mb-3">Tùy chọn nâng cao</h5>
-                        
-                        <div class="alert alert-warning mb-4">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>Cảnh báo:</strong> Thay đổi các tùy chọn nâng cao có thể ảnh hưởng đến hoạt động của bot. Chỉ thay đổi nếu bạn hiểu rõ ý nghĩa của chúng.
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="updateInterval" class="form-label">Chu kỳ cập nhật dữ liệu (giây)</label>
-                            <input type="number" class="form-control" id="updateInterval" value="10" min="5" max="60" step="1">
-                            <div class="form-text">
-                                Chu kỳ làm mới dữ liệu thị trường từ API
+                                Lấy từ BotFather trên Telegram.
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="dataHistoryDays" class="form-label">Số ngày dữ liệu lịch sử</label>
-                            <input type="number" class="form-control" id="dataHistoryDays" value="30" min="1" max="100" step="1">
+                            <label for="telegramChatId" class="form-label">Chat ID</label>
+                            <input type="text" class="form-control" id="telegramChatId" placeholder="Nhập Chat ID của bạn" value="****">
                             <div class="form-text">
-                                Số ngày dữ liệu lịch sử được lưu trữ và sử dụng cho phân tích
+                                ID người dùng hoặc nhóm để nhận thông báo.
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="backtestPeriodDays" class="form-label">Số ngày dữ liệu cho backtest</label>
-                            <input type="number" class="form-control" id="backtestPeriodDays" value="60" min="7" max="365" step="1">
-                            <div class="form-text">
-                                Số ngày dữ liệu sử dụng cho backtest và tối ưu hóa chiến lược
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableTelegramNotifications" 
+                                       {% if config.telegram_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="enableTelegramNotifications">Bật thông báo Telegram</label>
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="logLevel" class="form-label">Log Level</label>
-                            <select class="form-select" id="logLevel">
-                                <option value="DEBUG">DEBUG</option>
-                                <option value="INFO" selected>INFO</option>
-                                <option value="WARNING">WARNING</option>
-                                <option value="ERROR">ERROR</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="enableTradingTimeConstraint">
-                            <label class="form-check-label" for="enableTradingTimeConstraint">
-                                Kích hoạt ràng buộc thời gian giao dịch
-                            </label>
-                        </div>
-                        
-                        <div class="row mb-3" id="tradingTimeConstraints" style="display: none;">
-                            <div class="col-md-6">
-                                <label for="tradingStartTime" class="form-label">Thời gian bắt đầu</label>
-                                <input type="time" class="form-control" id="tradingStartTime" value="09:00">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="tradingEndTime" class="form-label">Thời gian kết thúc</label>
-                                <input type="time" class="form-control" id="tradingEndTime" value="22:00">
-                            </div>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="enableDetailedLogging">
-                            <label class="form-check-label" for="enableDetailedLogging">
-                                Kích hoạt ghi log chi tiết
-                            </label>
-                        </div>
-                        
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="autoOptimizeStrategies" checked>
-                            <label class="form-check-label" for="autoOptimizeStrategies">
-                                Tự động tối ưu hóa chiến lược
-                            </label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="button" class="btn btn-primary" id="saveAdvancedSettings">
-                                <i class="bi bi-save me-2"></i>
-                                Lưu cài đặt
+                            <button type="button" class="btn btn-primary" id="testTelegramButton">
+                                <i class="fab fa-telegram"></i> Gửi Tin Nhắn Kiểm Tra
                             </button>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- System Logs -->
-                <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
-                    <div class="info-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Nhật ký hệ thống</h5>
-                            <div>
-                                <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="refreshLogsBtn">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>
-                                    Làm mới
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" id="downloadLogsBtn">
-                                    <i class="bi bi-download me-1"></i>
-                                    Tải xuống
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="logFilter" class="form-label">Lọc nhật ký</label>
-                            <select class="form-select form-select-sm" id="logFilter">
-                                <option value="all">Tất cả</option>
-                                <option value="info">Thông tin</option>
-                                <option value="warning">Cảnh báo</option>
-                                <option value="error">Lỗi</option>
-                                <option value="trade">Giao dịch</option>
-                                <option value="system">Hệ thống</option>
-                            </select>
-                        </div>
-                        
-                        <div class="log-container mb-3 bg-dark p-3 rounded" style="height: 500px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
-                            <div id="logContent">
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:30:45]</span> <span class="text-primary">[INFO]</span> Bot khởi động thành công</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:30:46]</span> <span class="text-primary">[INFO]</span> Đang kết nối đến Binance API...</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:30:48]</span> <span class="text-success">[INFO]</span> Kết nối API thành công</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:31:02]</span> <span class="text-primary">[INFO]</span> Đang tải dữ liệu thị trường cho BTCUSDT</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:32:15]</span> <span class="text-warning">[WARNING]</span> Truy vấn API bị giới hạn, đang thử lại sau 1 giây</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:33:45]</span> <span class="text-primary">[INFO]</span> Đang phân tích tín hiệu thị trường</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:34:12]</span> <span class="text-primary">[INFO]</span> Tín hiệu RSI: 68.5 (Trung lập)</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:35:03]</span> <span class="text-primary">[INFO]</span> Tín hiệu MACD: Bullish Cross phát hiện</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:35:07]</span> <span class="text-info">[TRADE]</span> Đang mở vị thế BUY cho BTCUSDT tại giá 71250.50</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:35:08]</span> <span class="text-info">[TRADE]</span> Vị thế BUY đã được mở: 0.01 BTCUSDT @ 71250.50</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:35:09]</span> <span class="text-info">[TRADE]</span> Stop Loss đặt tại: 70250.50, Take Profit đặt tại: 73250.50</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:40:22]</span> <span class="text-primary">[INFO]</span> Thị trường đang trong giai đoạn Uptrend (xác suất 72%)</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:45:38]</span> <span class="text-info">[TRADE]</span> Vị thế BUY BTCUSDT: P/L hiện tại: +125.50 USD (+0.18%)</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 14:50:15]</span> <span class="text-info">[TRADE]</span> Trailing Stop được cập nhật: 70750.50</div>
-                                <div class="log-entry"><span class="text-secondary">[2025-03-03 15:02:45]</span> <span class="text-info">[TRADE]</span> Đóng vị thế BUY BTCUSDT tại giá 72500.25, P/L: +350.00 USD (+1.75%)</div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="autoRefreshLogs">
-                            <label class="form-check-label" for="autoRefreshLogs">
-                                Tự động làm mới
-                            </label>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
+        </div>
+        
+        <!-- Cài đặt Quản lý Rủi ro -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cài Đặt Quản Lý Rủi Ro</h5>
+                </div>
+                <div class="card-body">
+                    <form id="riskSettingsForm">
+                        <div class="mb-3">
+                            <label for="riskLevel" class="form-label">Mức độ rủi ro</label>
+                            <select class="form-select" id="riskLevel" name="risk_level">
+                                <option value="10" {% if config.risk_level == '10' %}selected{% endif %}>10% - An toàn</option>
+                                <option value="15" {% if config.risk_level == '15' %}selected{% endif %}>15% - Cân bằng</option>
+                                <option value="20" {% if config.risk_level == '20' %}selected{% endif %}>20% - Chấp nhận rủi ro</option>
+                                <option value="30" {% if config.risk_level == '30' %}selected{% endif %}>30% - Rủi ro cao</option>
+                            </select>
+                            <div class="form-text">
+                                Mức độ rủi ro càng cao, lợi nhuận tiềm năng và mức đòn bẩy càng lớn.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="maxLeverage" class="form-label">Đòn bẩy tối đa: <span id="maxLeverageValue">{{ config.max_leverage }}x</span></label>
+                            <input type="range" class="form-range" id="maxLeverage" min="1" max="20" step="1" value="{{ config.max_leverage }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableTrailingStop" 
+                                       {% if config.trailing_stop %}checked{% endif %}>
+                                <label class="form-check-label" for="enableTrailingStop">Bật Trailing Stop</label>
+                            </div>
+                            <div class="form-text">
+                                Tự động điều chỉnh điểm dừng lỗ khi giá di chuyển có lợi.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableSlManagement" 
+                                       {% if config.sltp_management %}checked{% endif %}>
+                                <label class="form-check-label" for="enableSlManagement">Bật quản lý SL/TP</label>
+                            </div>
+                            <div class="form-text">
+                                Tự động điều chỉnh điểm dừng lỗ và lấy lợi nhuận.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cài đặt Giao Dịch -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cài Đặt Giao Dịch</h5>
+                </div>
+                <div class="card-body">
+                    <form id="tradingSettingsForm">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableAutoTrading" 
+                                       {% if config.auto_trading %}checked{% endif %}>
+                                <label class="form-check-label" for="enableAutoTrading">Bật giao dịch tự động</label>
+                            </div>
+                            <div class="form-text">
+                                Cho phép hệ thống tự động mở vị thế dựa trên tín hiệu.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableMarketAnalysis" 
+                                       {% if config.market_analysis %}checked{% endif %}>
+                                <label class="form-check-label" for="enableMarketAnalysis">Bật phân tích thị trường</label>
+                            </div>
+                            <div class="form-text">
+                                Phân tích thị trường để xác định cơ hội giao dịch.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="symbolsToTrade" class="form-label">Cặp tiền theo dõi</label>
+                            <select class="form-select" id="symbolsToTrade" multiple size="5">
+                                <option value="BTCUSDT" selected>BTC/USDT</option>
+                                <option value="ETHUSDT" selected>ETH/USDT</option>
+                                <option value="BNBUSDT" selected>BNB/USDT</option>
+                                <option value="SOLUSDT">SOL/USDT</option>
+                                <option value="ADAUSDT">ADA/USDT</option>
+                                <option value="XRPUSDT">XRP/USDT</option>
+                                <option value="DOGEUSDT">DOGE/USDT</option>
+                                <option value="DOTUSDT">DOT/USDT</option>
+                            </select>
+                            <div class="form-text">
+                                Giữ Ctrl để chọn nhiều cặp tiền.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Nút lưu cài đặt -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <button class="btn btn-primary btn-lg" id="saveSettingsButton">
+                <i class="fas fa-save"></i> Lưu Tất Cả Cài Đặt
+            </button>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<!-- Thêm container cho alerts ở đầu trang -->
-<div id="alertContainer" class="alert-container position-fixed top-4 start-50 translate-middle-x" style="z-index: 1050; width: 90%; max-width: 500px;"></div>
-
-<!-- Thêm container cho toasts -->
-<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;"></div>
-
-<!-- Sử dụng module script -->
-<script type="module">
-    // Import từ ui-helpers.js và settings-handlers.js
-    import { showAlert, showLoading, hideLoading, showToast } from '/static/js/ui-helpers.js';
-    import { initSettingsPage } from '/static/js/settings-handlers.js';
-    
-    // Cung cấp các hàm chính cho window object để có thể gọi từ HTML events
-    window.showAlert = showAlert;
-    window.showLoading = showLoading;
-    window.hideLoading = hideLoading;
-    window.showToast = showToast;
-    
-    // Khởi tạo trang settings
-    document.addEventListener('DOMContentLoaded', function() {
-        initSettingsPage();
-    });
-</script>
 <script>
-    // Fallback script cho trường hợp module không hoạt động
-    document.addEventListener('DOMContentLoaded', function() {
-        // Kiểm tra nếu initSettingsPage đã được thực thi qua module
-        if (typeof window._settingsPageInitialized === 'undefined') {
-            console.log('Fallback script initialized!');
-            // Đặt cờ để tránh khởi tạo lại
-            window._settingsPageInitialized = true;
-        // Tạo element alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.role = 'alert';
-        
-        // Thêm biểu tượng phù hợp
-        let icon = 'info-circle';
-        if (type === 'success') icon = 'check-circle';
-        if (type === 'danger') icon = 'exclamation-triangle';
-        if (type === 'warning') icon = 'exclamation-circle';
-        
-        // Thêm nội dung
-        alertDiv.innerHTML = `
-            <i class="bi bi-${icon} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        
-        // Thêm vào đầu trang
-        const content = document.querySelector('.tab-content');
-        if (content) {
-            content.parentNode.insertBefore(alertDiv, content);
-            
-            // Tự động ẩn sau 5 giây
-            setTimeout(() => {
-                alertDiv.classList.remove('show');
-                setTimeout(() => alertDiv.remove(), 300);
-            }, 5000);
-        }
-    }
+    // Cập nhật label đòn bẩy
+    $('#maxLeverage').on('input', function() {
+        $('#maxLeverageValue').text($(this).val() + 'x');
+    });
     
-    // Hàm hiển thị loading
-    function showLoading() {
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'loadingOverlay';
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Đang tải...</span></div>';
-        document.body.appendChild(loadingOverlay);
-    }
+    // Cập nhật mức độ rủi ro
+    $('#riskLevel').on('change', function() {
+        const riskLevel = parseInt($(this).val());
+        let leverage = 1;
+        
+        // Thiết lập đòn bẩy tương ứng với mức rủi ro
+        switch (riskLevel) {
+            case 10:
+                leverage = 1;
+                break;
+            case 15:
+                leverage = 2;
+                break;
+            case 20:
+                leverage = 5;
+                break;
+            case 30:
+                leverage = 10;
+                break;
+        }
+        
+        $('#maxLeverage').val(leverage);
+        $('#maxLeverageValue').text(leverage + 'x');
+    });
     
-    // Hàm ẩn loading
-    function hideLoading() {
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) {
-            loadingOverlay.remove();
-        }
-    }
-    
-    // Hàm hiển thị toast
-    function showToast(title, message, type = 'info') {
-        // Sử dụng Bootstrap để hiển thị toast
-        const toastContainer = document.getElementById('toastContainer');
+    // Kiểm tra kết nối API
+    $('#testConnectionButton').on('click', function() {
+        // Hiển thị thông báo đang kiểm tra
+        showToast('Đang kiểm tra kết nối API...', 'info');
         
-        // Tạo toast container nếu chưa có
-        if (!toastContainer) {
-            const container = document.createElement('div');
-            container.id = 'toastContainer';
-            container.className = 'toast-container position-fixed top-0 end-0 p-3';
-            container.style.zIndex = '1060';
-            document.body.appendChild(container);
-        }
-        
-        // Tạo toast
-        const toastId = 'toast-' + Date.now();
-        const toast = document.createElement('div');
-        toast.id = toastId;
-        toast.className = 'toast';
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
-        
-        // Thêm biểu tượng phù hợp
-        let icon = 'info-circle';
-        let bgClass = 'bg-info';
-        if (type === 'success') {
-            icon = 'check-circle-fill';
-            bgClass = 'bg-success';
-        }
-        if (type === 'error' || type === 'danger') {
-            icon = 'exclamation-triangle-fill';
-            bgClass = 'bg-danger';
-            type = 'danger';
-        }
-        if (type === 'warning') {
-            icon = 'exclamation-triangle-fill';
-            bgClass = 'bg-warning';
-        }
-        
-        // Thêm nội dung
-        toast.innerHTML = `
-            <div class="toast-header ${bgClass} text-white">
-                <i class="bi bi-${icon} me-2"></i>
-                <strong class="me-auto">${title}</strong>
-                <small>Vừa xong</small>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        `;
-        
-        // Thêm vào container
-        document.getElementById('toastContainer').appendChild(toast);
-        
-        // Hiển thị toast
-        const toastElement = new bootstrap.Toast(document.getElementById(toastId));
-        toastElement.show();
-        
-        // Tự động xoá sau khi ẩn
-        const element = document.getElementById(toastId);
-        element.addEventListener('hidden.bs.toast', function() {
-            element.remove();
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Trading Coins Selection Handlers
-        const selectAllCoinsBtn = document.getElementById('selectAllCoins');
-        const deselectAllCoinsBtn = document.getElementById('deselectAllCoins');
-        const resetDefaultCoinBtn = document.getElementById('resetDefaultCoin');
-        const saveTradingCoinsBtn = document.getElementById('saveTradingCoinsSettings');
-        const tradingCoinCheckboxes = document.querySelectorAll('.trading-coin-checkbox');
-        
-        // Select all coins
-        selectAllCoinsBtn.addEventListener('click', function() {
-            tradingCoinCheckboxes.forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        });
-        
-        // Deselect all coins
-        deselectAllCoinsBtn.addEventListener('click', function() {
-            tradingCoinCheckboxes.forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        });
-        
-        // Reset to default (BTCUSDT only)
-        resetDefaultCoinBtn.addEventListener('click', function() {
-            tradingCoinCheckboxes.forEach(checkbox => {
-                checkbox.checked = checkbox.value === 'BTCUSDT';
-            });
-        });
-        
-        // Save trading coins settings
-        saveTradingCoinsBtn.addEventListener('click', function() {
-            const selectedCoins = [];
-            tradingCoinCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedCoins.push(checkbox.value);
-                }
-            });
-            
-            // Send to backend API
-            fetch('/api/trading/coins', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    coins: selectedCoins
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success alert
-                    showAlert('success', 'Danh sách đồng coin giao dịch đã được cập nhật thành công!');
-                    
-                    // Update UI to reflect selected coins
-                    if (data.selected_coins && data.selected_coins.length > 0) {
-                        tradingCoinCheckboxes.forEach(checkbox => {
-                            checkbox.checked = data.selected_coins.includes(checkbox.value);
-                        });
-                    }
+        // Đường dẫn API thực tế có thể khác
+        $.ajax({
+            url: '/api/test_api_connection',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showToast('Kết nối API thành công!', 'success');
                 } else {
-                    showAlert('danger', 'Có lỗi xảy ra khi cập nhật danh sách đồng coin giao dịch.');
+                    showToast('Lỗi kết nối API: ' + response.message, 'error');
                 }
-            })
-            .catch(error => {
-                console.error('Error saving trading coins:', error);
-                showAlert('danger', 'Có lỗi xảy ra khi kết nối đến máy chủ.');
-            });
-        });
-        
-        // Toggle Secret Key Visibility
-        document.getElementById('toggleSecretKey').addEventListener('click', function() {
-            const secretKeyInput = document.getElementById('secretKey');
-            const eyeIcon = this.querySelector('i');
-            
-            if (secretKeyInput.type === 'password') {
-                secretKeyInput.type = 'text';
-                eyeIcon.classList.remove('bi-eye');
-                eyeIcon.classList.add('bi-eye-slash');
-            } else {
-                secretKeyInput.type = 'password';
-                eyeIcon.classList.remove('bi-eye-slash');
-                eyeIcon.classList.add('bi-eye');
+            },
+            error: function(xhr, status, error) {
+                showToast('Lỗi kết nối máy chủ: ' + error, 'error');
             }
         });
+    });
+    
+    // Kiểm tra kết nối Telegram
+    $('#testTelegramButton').on('click', function() {
+        // Hiển thị thông báo đang kiểm tra
+        showToast('Đang gửi tin nhắn kiểm tra...', 'info');
         
-        // Risk Per Trade Slider
-        const riskPerTradeSlider = document.getElementById('riskPerTrade');
-        const riskPerTradeValue = document.getElementById('riskPerTradeValue');
-        
-        riskPerTradeSlider.addEventListener('input', function() {
-            riskPerTradeValue.textContent = this.value + '%';
-        });
-        
-        // Max Positions Slider
-        const maxPositionsSlider = document.getElementById('maxPositions');
-        const maxPositionsValue = document.getElementById('maxPositionsValue');
-        
-        maxPositionsSlider.addEventListener('input', function() {
-            maxPositionsValue.textContent = this.value;
-        });
-        
-        // Max Risk Total Slider
-        const maxRiskTotalSlider = document.getElementById('maxRiskTotal');
-        const maxRiskTotalValue = document.getElementById('maxRiskTotalValue');
-        
-        maxRiskTotalSlider.addEventListener('input', function() {
-            maxRiskTotalValue.textContent = this.value + '%';
-        });
-        
-        // Toggle Telegram Settings
-        const telegramEnabledSwitch = document.getElementById('telegramEnabledSwitch');
-        const telegramSettings = document.getElementById('telegramSettings');
-        
-        telegramEnabledSwitch.addEventListener('change', function() {
-            if (this.checked) {
-                telegramSettings.style.display = 'block';
-            } else {
-                telegramSettings.style.display = 'none';
-            }
-        });
-        
-        // Toggle Trading Time Constraints
-        const enableTradingTimeConstraint = document.getElementById('enableTradingTimeConstraint');
-        const tradingTimeConstraints = document.getElementById('tradingTimeConstraints');
-        
-        enableTradingTimeConstraint.addEventListener('change', function() {
-            if (this.checked) {
-                tradingTimeConstraints.style.display = 'flex';
-            } else {
-                tradingTimeConstraints.style.display = 'none';
-            }
-        });
-        
-        // Save General Settings
-        document.getElementById('saveGeneralSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Get form values
-            const botMode = document.getElementById('botMode').value;
-            const accountType = document.getElementById('accountType').value;
-            const strategyMode = document.getElementById('strategyMode').value;
-            const language = document.getElementById('language').value;
-            const timezone = document.getElementById('timezoneSelect').value;
-            const autoStart = document.getElementById('autoStartSwitch').checked;
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/general', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    bot_mode: botMode,
-                    account_type: accountType,
-                    strategy_mode: strategyMode,
-                    language: language,
-                    timezone: timezone,
-                    auto_start: autoStart
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt chung đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Save API Settings
-        document.getElementById('saveApiSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Get form values
-            const apiKey = document.getElementById('apiKey').value;
-            const secretKey = document.getElementById('secretKey').value;
-            
-            if (!apiKey || !secretKey) {
-                hideLoading();
-                showAlert('danger', 'Vui lòng nhập API Key và Secret Key');
-                return;
-            }
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/api', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    api_key: apiKey,
-                    secret_key: secretKey
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt API đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving API settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt API. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Test API Connection
-        document.getElementById('testApiConnection').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Get form values
-            const apiKey = document.getElementById('apiKey').value;
-            const secretKey = document.getElementById('secretKey').value;
-            
-            if (!apiKey || !secretKey) {
-                hideLoading();
-                showAlert('danger', 'Vui lòng nhập API Key và Secret Key');
-                return;
-            }
-            
-            // Gửi dữ liệu để kiểm tra kết nối API (giả lập)
-            fetch('/api/test-connection', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    api_key: apiKey,
-                    secret_key: secretKey
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Kết nối API thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error testing API connection:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi kiểm tra kết nối. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Save Risk Settings
-        document.getElementById('saveRiskSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Lấy các giá trị từ form
-            const riskPerTrade = document.getElementById('riskPerTrade').value;
-            const maxPositions = document.getElementById('maxPositions').value;
-            const maxRiskTotal = document.getElementById('maxRiskTotal').value;
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/risk', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    risk_per_trade: riskPerTrade,
-                    max_positions: maxPositions,
-                    max_risk_total: maxRiskTotal
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt quản lý rủi ro đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving risk settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt quản lý rủi ro. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Save Telegram Settings
-        document.getElementById('saveTelegramSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Get form values
-            const botToken = document.getElementById('telegramBotToken').value;
-            const chatId = document.getElementById('telegramChatId').value;
-            
-            if (!botToken || !chatId) {
-                hideLoading();
-                showAlert('danger', 'Vui lòng nhập Bot Token và Chat ID');
-                return;
-            }
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/telegram', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    bot_token: botToken,
-                    chat_id: chatId
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt Telegram đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving Telegram settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt Telegram. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Test Telegram
-        document.getElementById('testTelegramBtn').addEventListener('click', function() {
-            // Show loading
-            showLoading('Đang gửi tin nhắn test...');
-            
-            // Get form values
-            const botToken = document.getElementById('telegramBotToken').value;
-            const chatId = document.getElementById('telegramChatId').value;
-            
-            if (!botToken || !chatId) {
-                hideLoading();
-                showAlert('danger', 'Vui lòng nhập Bot Token và Chat ID');
-                return;
-            }
-            
-            // Send test message
-            fetch('/test-telegram', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    bot_token: botToken,
-                    chat_id: chatId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-                
-                if (data.success) {
-                    showAlert('success', 'Tin nhắn test đã được gửi. Vui lòng kiểm tra Telegram của bạn.');
+        // Đường dẫn API thực tế có thể khác
+        $.ajax({
+            url: '/api/test_telegram',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showToast('Đã gửi tin nhắn kiểm tra thành công!', 'success');
                 } else {
-                    showAlert('danger', data.message || 'Không thể gửi tin nhắn test');
+                    showToast('Lỗi gửi tin nhắn: ' + response.message, 'error');
                 }
-            })
-            .catch(error => {
-                hideLoading();
-                showAlert('danger', 'Không thể kết nối đến máy chủ');
-                console.error('Error testing Telegram:', error);
-            });
+            },
+            error: function(xhr, status, error) {
+                showToast('Lỗi kết nối máy chủ: ' + error, 'error');
+            }
         });
+    });
+    
+    // Lưu cài đặt
+    $('#saveSettingsButton').on('click', function() {
+        // Thu thập dữ liệu từ các form
+        const settings = {
+            api_mode: $('#apiMode').val(),
+            risk_level: $('#riskLevel').val(),
+            max_leverage: parseInt($('#maxLeverage').val()),
+            trailing_stop: $('#enableTrailingStop').is(':checked'),
+            sltp_management: $('#enableSlManagement').is(':checked'),
+            auto_trading: $('#enableAutoTrading').is(':checked'),
+            market_analysis: $('#enableMarketAnalysis').is(':checked'),
+            telegram_notifications: $('#enableTelegramNotifications').is(':checked')
+        };
         
-        // Save Notification Settings
-        document.getElementById('saveNotificationSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Lấy các giá trị từ form
-            const notifyOnTrade = document.getElementById('notifyOnTrade').checked;
-            const notifyOnStopLoss = document.getElementById('notifyOnStopLoss').checked;
-            const notifyOnTakeProfit = document.getElementById('notifyOnTakeProfit').checked;
-            const notifyOnSignal = document.getElementById('notifyOnSignal').checked;
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/notifications', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    notify_on_trade: notifyOnTrade,
-                    notify_on_stop_loss: notifyOnStopLoss,
-                    notify_on_take_profit: notifyOnTakeProfit,
-                    notify_on_signal: notifyOnSignal
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt thông báo đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving notification settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt thông báo. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Save Advanced Settings
-        document.getElementById('saveAdvancedSettings').addEventListener('click', function() {
-            // Show loading
-            showLoading();
-            
-            // Lấy các giá trị từ form (giả sử)
-            const enableTradingTimeConstraint = document.getElementById('enableTradingTimeConstraint').checked;
-            
-            // Các giá trị khác có thể thêm vào đây
-            
-            // Gửi dữ liệu tới backend (giả lập)
-            fetch('/api/settings/advanced', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    enable_trading_time_constraint: enableTradingTimeConstraint
-                    // Các giá trị khác có thể thêm vào đây
-                })
-            })
-            .then(response => {
-                // Giả lập response thành công
-                hideLoading();
-                showAlert('success', 'Cài đặt nâng cao đã được lưu thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error saving advanced settings:', error);
-                hideLoading();
-                showAlert('danger', 'Có lỗi xảy ra khi lưu cài đặt nâng cao. Vui lòng thử lại sau.');
-            });
-        });
-        
-        // Refresh Logs
-        document.getElementById('refreshLogsBtn').addEventListener('click', function() {
-            // Show loading in log container
-            const logContent = document.getElementById('logContent');
-            logContent.innerHTML = '<div class="text-center my-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2">Đang tải...</span></div>';
-            
-            // Gửi yêu cầu lấy log mới nhất (giả lập)
-            fetch('/api/logs/recent', {
-                method: 'GET'
-            })
-            .then(response => {
-                // Giả lập response thành công
-                // Sample log entries
-                const logEntries = [
-                    '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:10:22]</span> <span class="text-primary">[INFO]</span> Dữ liệu thị trường được cập nhật</div>',
-                    '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:11:15]</span> <span class="text-primary">[INFO]</span> Tín hiệu RSI: 72.3 (Oversold)</div>',
-                    '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:12:03]</span> <span class="text-warning">[WARNING]</span> RSI vượt ngưỡng overbought</div>',
-                    '<div class="log-entry"><span class="text-secondary">[2025-03-03 15:15:45]</span> <span class="text-info">[TRADE]</span> Đang mở vị thế SELL cho ETHUSDT tại giá 3150.25</div>'
-                ];
-                
-                // Add the original log entries or replace with new logs
-                let originalEntries = logContent.innerHTML;
-                logContent.innerHTML = logEntries.join('\n') + originalEntries;
-                
-                showAlert('success', 'Nhật ký đã được làm mới thành công!');
-            })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error('Error refreshing logs:', error);
-                logContent.innerHTML = '<div class="alert alert-danger">Có lỗi xảy ra khi tải nhật ký. Vui lòng thử lại sau.</div>';
-            });
-        });
-        
-        // Download Logs
-        document.getElementById('downloadLogsBtn').addEventListener('click', function() {
-            // In a real app, you would fetch the full logs from the server
-            const logEntries = document.getElementById('logContent').innerText;
-            
-            // Create a blob with the log content
-            const blob = new Blob([logEntries], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            // Create a download link
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'bot_logs_' + new Date().toISOString().split('T')[0] + '.txt';
-            a.click();
-            
-            // Clean up
-            URL.revokeObjectURL(url);
-            
-            // Hiển thị thông báo thành công
-            showAlert('success', 'Nhật ký đã được tải xuống thành công!');
-        });
-        
-        // Auto-refresh logs
-        const autoRefreshLogs = document.getElementById('autoRefreshLogs');
-        let logRefreshInterval;
-        
-        autoRefreshLogs.addEventListener('change', function() {
-            if (this.checked) {
-                logRefreshInterval = setInterval(() => {
-                    document.getElementById('refreshLogsBtn').click();
-                }, 30000); // Refresh every 30 seconds
-            } else {
-                clearInterval(logRefreshInterval);
+        // API thực tế để lưu cài đặt
+        $.ajax({
+            url: '/api/update_settings',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(settings),
+            success: function(response) {
+                if (response.success) {
+                    showToast('Cài đặt đã được lưu thành công!', 'success');
+                } else {
+                    showToast('Lỗi khi lưu cài đặt: ' + response.message, 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                showToast('Lỗi kết nối máy chủ: ' + error, 'error');
             }
         });
     });

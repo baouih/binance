@@ -1,0 +1,439 @@
+{% extends "common_layout.html" %}
+{% set active_page = 'test' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4">Kiểm Tra Hệ Thống</h2>
+            <p>Sử dụng trang này để kiểm tra các chức năng của hệ thống giao dịch.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Trạng thái kiểm tra -->
+        <div class="col-md-4">
+            <div class="card test-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Trạng Thái Kiểm Tra</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Kết nối API
+                            <span id="apiStatus" class="test-status 
+                                {% if status.test_results.api_connection.passed == true %}
+                                    status-success
+                                {% elif status.test_results.api_connection.passed == false %}
+                                    status-error
+                                {% else %}
+                                    status-not-tested
+                                {% endif %}
+                            ">
+                                {{ status.test_results.api_connection.status }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Dữ liệu thị trường
+                            <span id="marketStatus" class="test-status 
+                                {% if status.test_results.market_data.passed == true %}
+                                    status-success
+                                {% elif status.test_results.market_data.passed == false %}
+                                    status-error
+                                {% else %}
+                                    status-not-tested
+                                {% endif %}
+                            ">
+                                {{ status.test_results.market_data.status }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Thông báo Telegram
+                            <span id="telegramStatus" class="test-status 
+                                {% if status.test_results.telegram.passed == true %}
+                                    status-success
+                                {% elif status.test_results.telegram.passed == false %}
+                                    status-error
+                                {% else %}
+                                    status-not-tested
+                                {% endif %}
+                            ">
+                                {{ status.test_results.telegram.status }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Quản lý vị thế
+                            <span id="positionStatus" class="test-status 
+                                {% if status.test_results.position_management.passed == true %}
+                                    status-success
+                                {% elif status.test_results.position_management.passed == false %}
+                                    status-error
+                                {% else %}
+                                    status-not-tested
+                                {% endif %}
+                            ">
+                                {{ status.test_results.position_management.status }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Phân tích kỹ thuật
+                            <span id="technicalStatus" class="test-status 
+                                {% if status.test_results.technical_analysis.passed == true %}
+                                    status-success
+                                {% elif status.test_results.technical_analysis.passed == false %}
+                                    status-error
+                                {% else %}
+                                    status-not-tested
+                                {% endif %}
+                            ">
+                                {{ status.test_results.technical_analysis.status }}
+                            </span>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-primary" id="testAllButton">
+                            <i class="fas fa-vial"></i> Kiểm Tra Tất Cả
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trạng thái hệ thống -->
+            <div class="card test-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Trạng Thái Hệ Thống</h5>
+                </div>
+                <div class="card-body">
+                    <div class="status-card text-center mb-0 border-0 shadow-none">
+                        <div class="status-icon">
+                            <i class="fas {{ 'fa-circle-play running' if status.running else 'fa-circle-stop stopped' }}"></i>
+                        </div>
+                        <div class="status-label">Trạng Thái Hệ Thống</div>
+                        <div class="status-value mb-3">{{ 'Đang Chạy' if status.running else 'Đã Dừng' }}</div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="startSystem()" {{ 'disabled' if status.running else '' }}>
+                                <i class="fas fa-play"></i> Khởi Động
+                            </button>
+                            <button class="btn btn-danger" onclick="stopSystem()" {{ 'disabled' if not status.running else '' }}>
+                                <i class="fas fa-stop"></i> Dừng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Các nút kiểm tra và log -->
+        <div class="col-md-8">
+            <div class="card test-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Các Bài Kiểm Tra</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-primary w-100" id="testApiButton">
+                                <i class="fas fa-plug"></i> Kiểm Tra Kết Nối API
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-primary w-100" id="testMarketButton">
+                                <i class="fas fa-chart-line"></i> Kiểm Tra Dữ Liệu Thị Trường
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-primary w-100" id="testTelegramButton">
+                                <i class="fab fa-telegram"></i> Kiểm Tra Thông Báo Telegram
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-primary w-100" id="testPositionButton">
+                                <i class="fas fa-wallet"></i> Kiểm Tra Quản Lý Vị Thế
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-primary w-100" id="testTechnicalButton">
+                                <i class="fas fa-chart-bar"></i> Kiểm Tra Phân Tích Kỹ Thuật
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-outline-primary w-100" id="addPositionButton">
+                                <i class="fas fa-plus-circle"></i> Thêm Vị Thế Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Log kiểm tra -->
+            <div class="card test-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Nhật Ký Kiểm Tra</h5>
+                    <button class="btn btn-sm btn-outline-danger" id="clearLogsButton">
+                        <i class="fas fa-trash-alt"></i> Xóa
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="log-container" id="testLogContainer">
+                        {% for log in status.logs %}
+                        <div class="log-entry {{ log.type }}">
+                            <small>{{ log.timestamp }}</small><br>
+                            {{ log.message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cập nhật trạng thái kiểm tra
+    function updateTestStatus(testName, result) {
+        const statusElement = document.getElementById(testName + 'Status');
+        
+        if (result.passed === true) {
+            statusElement.className = 'test-status status-success';
+        } else if (result.passed === false) {
+            statusElement.className = 'test-status status-error';
+        } else {
+            statusElement.className = 'test-status status-pending';
+        }
+        
+        statusElement.textContent = result.status;
+    }
+    
+    // Cập nhật log
+    function updateLogs() {
+        $.ajax({
+            url: '/api/logs',
+            type: 'GET',
+            success: function(response) {
+                const logContainer = document.getElementById('testLogContainer');
+                let logsHtml = '';
+                
+                response.logs.forEach(log => {
+                    logsHtml += `
+                        <div class="log-entry ${log.type}">
+                            <small>${log.timestamp}</small><br>
+                            ${log.message}
+                        </div>
+                    `;
+                });
+                
+                logContainer.innerHTML = logsHtml;
+            }
+        });
+    }
+    
+    // Kiểm tra API
+    function testApiConnection() {
+        updateTestStatus('api', { status: 'Đang kiểm tra', passed: null });
+        
+        $.ajax({
+            url: '/api/test_api_connection',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateTestStatus('api', response.result);
+                    showToast('Kiểm tra kết nối API thành công', 'success');
+                } else {
+                    updateTestStatus('api', { status: 'Lỗi', passed: false });
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+                
+                updateLogs();
+            },
+            error: function() {
+                updateTestStatus('api', { status: 'Lỗi kết nối', passed: false });
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Kiểm tra dữ liệu thị trường
+    function testMarketData() {
+        updateTestStatus('market', { status: 'Đang kiểm tra', passed: null });
+        
+        $.ajax({
+            url: '/api/test_market_data',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateTestStatus('market', response.result);
+                    showToast('Kiểm tra dữ liệu thị trường thành công', 'success');
+                } else {
+                    updateTestStatus('market', { status: 'Lỗi', passed: false });
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+                
+                updateLogs();
+            },
+            error: function() {
+                updateTestStatus('market', { status: 'Lỗi kết nối', passed: false });
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Kiểm tra Telegram
+    function testTelegram() {
+        updateTestStatus('telegram', { status: 'Đang kiểm tra', passed: null });
+        
+        $.ajax({
+            url: '/api/test_telegram',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateTestStatus('telegram', response.result);
+                    showToast('Kiểm tra thông báo Telegram thành công', 'success');
+                } else {
+                    updateTestStatus('telegram', { status: 'Lỗi', passed: false });
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+                
+                updateLogs();
+            },
+            error: function() {
+                updateTestStatus('telegram', { status: 'Lỗi kết nối', passed: false });
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Kiểm tra quản lý vị thế
+    function testPositionManagement() {
+        updateTestStatus('position', { status: 'Đang kiểm tra', passed: null });
+        
+        $.ajax({
+            url: '/api/test_position_management',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateTestStatus('position', response.result);
+                    showToast('Kiểm tra quản lý vị thế thành công', 'success');
+                } else {
+                    updateTestStatus('position', { status: 'Lỗi', passed: false });
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+                
+                updateLogs();
+            },
+            error: function() {
+                updateTestStatus('position', { status: 'Lỗi kết nối', passed: false });
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Kiểm tra phân tích kỹ thuật
+    function testTechnicalAnalysis() {
+        updateTestStatus('technical', { status: 'Đang kiểm tra', passed: null });
+        
+        $.ajax({
+            url: '/api/test_technical_analysis',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateTestStatus('technical', response.result);
+                    showToast('Kiểm tra phân tích kỹ thuật thành công', 'success');
+                } else {
+                    updateTestStatus('technical', { status: 'Lỗi', passed: false });
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+                
+                updateLogs();
+            },
+            error: function() {
+                updateTestStatus('technical', { status: 'Lỗi kết nối', passed: false });
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Thêm vị thế test
+    function addTestPosition() {
+        $.ajax({
+            url: '/api/add_position',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showToast('Đã thêm vị thế test', 'success');
+                    updateLogs();
+                } else {
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Xóa nhật ký
+    function clearLogs() {
+        $.ajax({
+            url: '/api/clear_logs',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    const logContainer = document.getElementById('testLogContainer');
+                    logContainer.innerHTML = '';
+                    showToast('Đã xóa nhật ký', 'info');
+                } else {
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Kiểm tra tất cả
+    function testAll() {
+        showToast('Bắt đầu kiểm tra tất cả các chức năng', 'info');
+        
+        // Kiểm tra tuần tự
+        testApiConnection();
+        
+        setTimeout(function() {
+            testMarketData();
+            
+            setTimeout(function() {
+                testTelegram();
+                
+                setTimeout(function() {
+                    testPositionManagement();
+                    
+                    setTimeout(function() {
+                        testTechnicalAnalysis();
+                        showToast('Hoàn thành kiểm tra tất cả các chức năng', 'success');
+                    }, 2500);
+                }, 1500);
+            }, 1500);
+        }, 1500);
+    }
+    
+    // Document Ready
+    $(document).ready(function() {
+        // Gán sự kiện cho các nút
+        $('#testApiButton').click(testApiConnection);
+        $('#testMarketButton').click(testMarketData);
+        $('#testTelegramButton').click(testTelegram);
+        $('#testPositionButton').click(testPositionManagement);
+        $('#testTechnicalButton').click(testTechnicalAnalysis);
+        $('#testAllButton').click(testAll);
+        $('#addPositionButton').click(addTestPosition);
+        $('#clearLogsButton').click(clearLogs);
+        
+        // Cập nhật log mỗi 5 giây
+        setInterval(updateLogs, 5000);
+    });
+</script>
+{% endblock %}

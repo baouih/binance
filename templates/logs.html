@@ -1,0 +1,389 @@
+{% extends "common_layout.html" %}
+{% set active_page = 'logs' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Nhật Ký Hệ Thống</h2>
+            <div>
+                <button class="btn btn-outline-primary me-2" id="refreshLogsButton">
+                    <i class="fas fa-sync-alt"></i> Làm Mới
+                </button>
+                <button class="btn btn-outline-danger" id="clearLogsButton">
+                    <i class="fas fa-trash-alt"></i> Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc và tìm kiếm -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bộ Lọc Nhật Ký</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="filterLogType" class="form-label">Loại nhật ký</label>
+                            <select class="form-select" id="filterLogType">
+                                <option value="">Tất cả</option>
+                                <option value="INFO">Thông tin</option>
+                                <option value="ERROR">Lỗi</option>
+                                <option value="WARNING">Cảnh báo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="searchLogText" class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" id="searchLogText" placeholder="Tìm kiếm nội dung...">
+                        </div>
+                        <div class="col-md-4 mb-3 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" id="applyLogFiltersButton">
+                                <i class="fas fa-filter"></i> Áp Dụng Bộ Lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tổng quan nhật ký -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-clipboard-list running"></i>
+                </div>
+                <div class="status-label">Tổng Số Nhật Ký</div>
+                <div class="status-value" id="totalLogs">{{ status.logs|length }}</div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-info-circle running"></i>
+                </div>
+                <div class="status-label">Thông Tin</div>
+                <div class="status-value" id="infoLogs">
+                    {% set info_count = status.logs|selectattr('type', 'equalto', 'INFO')|list|length %}
+                    {{ info_count }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-exclamation-triangle warning"></i>
+                </div>
+                <div class="status-label">Cảnh Báo</div>
+                <div class="status-value" id="warningLogs">
+                    {% set warning_count = status.logs|selectattr('type', 'equalto', 'WARNING')|list|length %}
+                    {{ warning_count }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-times-circle stopped"></i>
+                </div>
+                <div class="status-label">Lỗi</div>
+                <div class="status-value" id="errorLogs">
+                    {% set error_count = status.logs|selectattr('type', 'equalto', 'ERROR')|list|length %}
+                    {{ error_count }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách nhật ký -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Danh Sách Nhật Ký</h5>
+                    <span class="badge bg-primary" id="logCount">{{ status.logs|length }} mục</span>
+                </div>
+                <div class="card-body">
+                    <div class="log-container" id="logContainer">
+                        {% for log in status.logs %}
+                        <div class="log-entry {{ log.type }}" data-timestamp="{{ log.timestamp }}" data-type="{{ log.type }}">
+                            <div class="log-header">
+                                <span class="badge 
+                                      {% if log.type == 'INFO' %}bg-info
+                                      {% elif log.type == 'WARNING' %}bg-warning
+                                      {% elif log.type == 'ERROR' %}bg-danger
+                                      {% endif %}">{{ log.type }}</span>
+                                <small>{{ log.timestamp }}</small>
+                            </div>
+                            <div class="log-content">{{ log.message }}</div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if not status.logs %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard fa-3x mb-3 text-muted"></i>
+                            <h5>Không có nhật ký</h5>
+                            <p>Chưa có nhật ký nào được ghi lại.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phân tích nhật ký -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Phân Tích Nhật Ký</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Hoạt Động Gần Đây</h6>
+                            <ul class="list-group" id="recentActivitiesList">
+                                {% for log in status.logs[:5] %}
+                                    <li class="list-group-item 
+                                               {% if log.type == 'ERROR' %}list-group-item-danger
+                                               {% elif log.type == 'WARNING' %}list-group-item-warning
+                                               {% else %}list-group-item-info{% endif %}">
+                                        <small>{{ log.timestamp }}</small><br>
+                                        {{ log.message }}
+                                    </li>
+                                {% endfor %}
+                                
+                                {% if not status.logs %}
+                                    <li class="list-group-item text-center text-muted">Không có hoạt động gần đây</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Lỗi Gần Đây</h6>
+                            <ul class="list-group" id="recentErrorsList">
+                                {% set error_logs = status.logs|selectattr('type', 'equalto', 'ERROR')|list %}
+                                {% for log in error_logs[:5] %}
+                                    <li class="list-group-item list-group-item-danger">
+                                        <small>{{ log.timestamp }}</small><br>
+                                        {{ log.message }}
+                                    </li>
+                                {% endfor %}
+                                
+                                {% if not error_logs %}
+                                    <li class="list-group-item text-center text-muted">Không có lỗi gần đây</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .log-container {
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .log-entry {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+    }
+    
+    .log-content {
+        font-family: Consolas, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    
+    .log-entry.INFO {
+        border-left: 3px solid #0dcaf0;
+    }
+    
+    .log-entry.WARNING {
+        border-left: 3px solid #ffc107;
+    }
+    
+    .log-entry.ERROR {
+        border-left: 3px solid #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cập nhật danh sách nhật ký
+    function updateLogs() {
+        $.ajax({
+            url: '/api/logs',
+            type: 'GET',
+            success: function(response) {
+                const logs = response.logs;
+                
+                // Cập nhật số lượng
+                $('#totalLogs').text(logs.length);
+                $('#logCount').text(logs.length + ' mục');
+                
+                const infoLogs = logs.filter(log => log.type === 'INFO').length;
+                const warningLogs = logs.filter(log => log.type === 'WARNING').length;
+                const errorLogs = logs.filter(log => log.type === 'ERROR').length;
+                
+                $('#infoLogs').text(infoLogs);
+                $('#warningLogs').text(warningLogs);
+                $('#errorLogs').text(errorLogs);
+                
+                // Áp dụng bộ lọc
+                const typeFilter = $('#filterLogType').val();
+                const searchText = $('#searchLogText').val().toLowerCase();
+                
+                // Cập nhật danh sách
+                let logsHtml = '';
+                const filteredLogs = logs.filter(log => {
+                    // Kiểm tra loại nhật ký
+                    if (typeFilter && log.type !== typeFilter) {
+                        return false;
+                    }
+                    
+                    // Kiểm tra nội dung
+                    if (searchText && !log.message.toLowerCase().includes(searchText)) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                if (filteredLogs.length > 0) {
+                    filteredLogs.forEach(log => {
+                        let badgeClass = '';
+                        if (log.type === 'INFO') badgeClass = 'bg-info';
+                        else if (log.type === 'WARNING') badgeClass = 'bg-warning';
+                        else if (log.type === 'ERROR') badgeClass = 'bg-danger';
+                        
+                        logsHtml += `
+                            <div class="log-entry ${log.type}" data-timestamp="${log.timestamp}" data-type="${log.type}">
+                                <div class="log-header">
+                                    <span class="badge ${badgeClass}">${log.type}</span>
+                                    <small>${log.timestamp}</small>
+                                </div>
+                                <div class="log-content">${log.message}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    logsHtml = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-filter fa-3x mb-3 text-muted"></i>
+                            <h5>Không tìm thấy nhật ký nào</h5>
+                            <p>Không có nhật ký nào phù hợp với bộ lọc.</p>
+                        </div>
+                    `;
+                }
+                
+                $('#logContainer').html(logsHtml);
+                
+                // Cập nhật danh sách hoạt động gần đây
+                let recentActivitiesHtml = '';
+                if (logs.length > 0) {
+                    logs.slice(0, 5).forEach(log => {
+                        let itemClass = 'list-group-item-info';
+                        if (log.type === 'ERROR') itemClass = 'list-group-item-danger';
+                        else if (log.type === 'WARNING') itemClass = 'list-group-item-warning';
+                        
+                        recentActivitiesHtml += `
+                            <li class="list-group-item ${itemClass}">
+                                <small>${log.timestamp}</small><br>
+                                ${log.message}
+                            </li>
+                        `;
+                    });
+                } else {
+                    recentActivitiesHtml = `<li class="list-group-item text-center text-muted">Không có hoạt động gần đây</li>`;
+                }
+                
+                $('#recentActivitiesList').html(recentActivitiesHtml);
+                
+                // Cập nhật danh sách lỗi gần đây
+                let recentErrorsHtml = '';
+                const recentErrors = logs.filter(log => log.type === 'ERROR').slice(0, 5);
+                
+                if (recentErrors.length > 0) {
+                    recentErrors.forEach(log => {
+                        recentErrorsHtml += `
+                            <li class="list-group-item list-group-item-danger">
+                                <small>${log.timestamp}</small><br>
+                                ${log.message}
+                            </li>
+                        `;
+                    });
+                } else {
+                    recentErrorsHtml = `<li class="list-group-item text-center text-muted">Không có lỗi gần đây</li>`;
+                }
+                
+                $('#recentErrorsList').html(recentErrorsHtml);
+            }
+        });
+    }
+    
+    // Xóa nhật ký
+    function clearLogs() {
+        if (confirm('Bạn có chắc chắn muốn xóa tất cả nhật ký không?')) {
+            $.ajax({
+                url: '/api/clear_logs',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Đã xóa nhật ký', 'success');
+                        updateLogs();
+                    } else {
+                        showToast('Lỗi: ' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối với máy chủ', 'error');
+                }
+            });
+        }
+    }
+    
+    // Document Ready
+    $(document).ready(function() {
+        // Gán sự kiện
+        $('#refreshLogsButton').click(updateLogs);
+        $('#clearLogsButton').click(clearLogs);
+        $('#applyLogFiltersButton').click(updateLogs);
+        
+        // Bắt sự kiện nhấn Enter trong ô tìm kiếm
+        $('#searchLogText').keypress(function(e) {
+            if (e.which === 13) {
+                updateLogs();
+            }
+        });
+        
+        // Cập nhật nhật ký mỗi 5 giây
+        setInterval(updateLogs, 5000);
+    });
+</script>
+{% endblock %}

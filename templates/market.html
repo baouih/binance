@@ -1,332 +1,165 @@
-{% extends 'common_layout.html' %}
-
+{% extends "common_layout.html" %}
 {% set active_page = 'market' %}
-
-{% block title %}Phân tích thị trường - Bot Giao Dịch Crypto{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="mb-3">Phân tích thị trường</h2>
-            
-            <!-- Symbol Selector -->
-            <div class="symbol-selection mb-4">
-                {% for symbol in fake_symbols %}
-                <div class="symbol-item {% if symbol == 'BTCUSDT' %}active{% endif %}" data-symbol="{{ symbol }}">
-                    {{ symbol }}
-                </div>
-                {% endfor %}
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Dữ Liệu Thị Trường</h2>
+            <div>
+                <button class="btn btn-outline-primary" id="refreshMarketButton">
+                    <i class="fas fa-sync-alt"></i> Làm Mới
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Left Column - Price Chart -->
-        <div class="col-md-8">
-            <div class="info-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h4 class="mb-0" id="selectedSymbolTitle">BTC/USDT</h4>
-                        <div class="d-flex align-items-center">
-                            <div class="info-value me-2" id="currentPrice">${{ market_data.btc_price|default(fake_prices.BTCUSDT|round(2), true) }}</div>
-                            <div class="price-change {{ 'positive' if market_data.btc_change_24h|default(0) > 0 else 'negative' if market_data.btc_change_24h|default(0) < 0 else '' }}" id="priceChange">
-                                {{ market_data.btc_change_24h|default(0)|round(2) }}%
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary timeframe-btn active" data-timeframe="1h">1h</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary timeframe-btn" data-timeframe="4h">4h</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary timeframe-btn" data-timeframe="1d">1d</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary timeframe-btn" data-timeframe="1w">1w</button>
-                        </div>
-                        <a href="https://testnet.binancefuture.com/en/futures/BTCUSDT" class="btn btn-sm btn-outline-primary ms-2" target="_blank">
-                            <i class="bi bi-box-arrow-up-right me-1"></i>
-                            Mở Binance
-                        </a>
-                    </div>
+    <!-- Thống kê thị trường -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-chart-line running"></i>
                 </div>
-                
-                <div style="height: 500px;" id="priceChartContainer">
-                    <canvas id="priceChart"></canvas>
-                </div>
-                
-                <div class="row mt-3">
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">24h Cao nhất</div>
-                        <div class="info-value" id="high24h">${{ market_data.high_24h|default(fake_prices.BTCUSDT * 1.02|round(2), true) }}</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">24h Thấp nhất</div>
-                        <div class="info-value" id="low24h">${{ market_data.low_24h|default(fake_prices.BTCUSDT * 0.98|round(2), true) }}</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">24h Khối lượng</div>
-                        <div class="info-value" id="volume24h">${{ market_data.volume|default(149000000|round(0), true) }}</div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-label">24h Giao dịch</div>
-                        <div class="info-value" id="trades24h">{{ market_data.trades|default(125600, true) }}</div>
-                    </div>
+                <div class="status-label">Giá BTC</div>
+                <div class="status-value" id="btcPrice">
+                    {% for item in status.market_data if item.symbol == 'BTCUSDT' %}
+                        {{ item.price }}
+                    {% else %}
+                        N/A
+                    {% endfor %}
                 </div>
             </div>
-            
-            <!-- Technical Analysis -->
-            <div class="info-card">
-                <h5 class="mb-3">Phân tích kỹ thuật</h5>
-                
-                <div class="row">
-                    <div class="col-md-5">
-                        <table class="table table-sm custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Chỉ báo</th>
-                                    <th>Giá trị</th>
-                                    <th>Tín hiệu</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>RSI (14)</td>
-                                    <td>{{ market_data.technical_indicators.oscillators.rsi.value|default(62, true) }}</td>
-                                    <td>
-                                        {% set signal = market_data.technical_indicators.oscillators.rsi.signal|default('neutral', true) %}
-                                        {% if signal == 'bullish' %}
-                                        <span class="text-success">Mua</span>
-                                        {% elif signal == 'bearish' %}
-                                        <span class="text-danger">Bán</span>
-                                        {% else %}
-                                        <span class="text-warning">Trung lập</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>MACD</td>
-                                    <td>{{ market_data.technical_indicators.oscillators.macd.value|default(125, true) }}</td>
-                                    <td>
-                                        {% set signal = market_data.technical_indicators.oscillators.macd.signal|default('bullish', true) %}
-                                        {% if signal == 'bullish' %}
-                                        <span class="text-success">Mua</span>
-                                        {% elif signal == 'bearish' %}
-                                        <span class="text-danger">Bán</span>
-                                        {% else %}
-                                        <span class="text-warning">Trung lập</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Stochastic</td>
-                                    <td>{{ market_data.technical_indicators.oscillators.stoch.value|default(75, true) }}</td>
-                                    <td>
-                                        {% set signal = market_data.technical_indicators.oscillators.stoch.signal|default('neutral', true) %}
-                                        {% if signal == 'bullish' %}
-                                        <span class="text-success">Mua</span>
-                                        {% elif signal == 'bearish' %}
-                                        <span class="text-danger">Bán</span>
-                                        {% else %}
-                                        <span class="text-warning">Trung lập</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Bollinger Bands</td>
-                                    <td>Width: {{ (market_data.indicators.bb_upper / market_data.indicators.bb_lower * 100 - 100)|default(2.5, true)|round(2) }}%</td>
-                                    <td>
-                                        {% set price = market_data.btc_price|default(fake_prices.BTCUSDT, true) %}
-                                        {% set bb_upper = market_data.indicators.bb_upper|default(price * 1.02, true) %}
-                                        {% set bb_lower = market_data.indicators.bb_lower|default(price * 0.98, true) %}
-                                        
-                                        {% if price > bb_upper %}
-                                        <span class="text-danger">Bán</span>
-                                        {% elif price < bb_lower %}
-                                        <span class="text-success">Mua</span>
-                                        {% else %}
-                                        <span class="text-warning">Trung lập</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Moving Averages</td>
-                                    <td>
-                                        {% set ma50 = market_data.indicators.ema50|default(fake_prices.BTCUSDT * 0.99, true) %}
-                                        {% set ma200 = market_data.indicators.ema200|default(fake_prices.BTCUSDT * 0.97, true) %}
-                                        {% if ma50 > ma200 %}
-                                        MA50 > MA200
-                                        {% else %}
-                                        MA50 < MA200
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if ma50 > ma200 %}
-                                        <span class="text-success">Mua</span>
-                                        {% else %}
-                                        <span class="text-danger">Bán</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-7">
-                        <div class="mb-3">
-                            <h6>Tổng hợp tín hiệu:</h6>
-                            <div class="d-flex align-items-center">
-                                <div class="progress flex-grow-1" style="height: 24px;">
-                                    {% set buy_percent = 60 %}
-                                    {% set neutral_percent = 20 %}
-                                    {% set sell_percent = 20 %}
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ buy_percent }}%" aria-valuenow="{{ buy_percent }}" aria-valuemin="0" aria-valuemax="100">Mua: {{ buy_percent }}%</div>
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ neutral_percent }}%" aria-valuenow="{{ neutral_percent }}" aria-valuemin="0" aria-valuemax="100">Trung lập: {{ neutral_percent }}%</div>
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width: {{ sell_percent }}%" aria-valuenow="{{ sell_percent }}" aria-valuemin="0" aria-valuemax="100">Bán: {{ sell_percent }}%</div>
-                                </div>
-                            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-chart-pie running"></i>
+                </div>
+                <div class="status-label">Giá ETH</div>
+                <div class="status-value" id="ethPrice">
+                    {% for item in status.market_data if item.symbol == 'ETHUSDT' %}
+                        {{ item.price }}
+                    {% else %}
+                        N/A
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-signal running"></i>
+                </div>
+                <div class="status-label">Tín Hiệu Mua</div>
+                <div class="status-value" id="buySignals">
+                    {% set buy_count = status.market_data|selectattr('signal', 'search', 'Mua')|list|length %}
+                    {{ buy_count }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="status-card text-center">
+                <div class="status-icon">
+                    <i class="fas fa-signal stopped"></i>
+                </div>
+                <div class="status-label">Tín Hiệu Bán</div>
+                <div class="status-value" id="sellSignals">
+                    {% set sell_count = status.market_data|selectattr('signal', 'search', 'Bán')|list|length %}
+                    {{ sell_count }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bộ Lọc</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="filterSymbol" class="form-label">Cặp tiền</label>
+                            <input type="text" class="form-control" id="filterSymbol" placeholder="VD: BTC, ETH...">
                         </div>
-                        
-                        <div>
-                            <h6>Mức hỗ trợ và kháng cự:</h6>
-                            <div class="mb-3">
-                                <div class="info-label">Kháng cự</div>
-                                <div class="d-flex flex-wrap gap-2">
-                                    {% for resistance in market_data.market_analysis.major_resistances|default([74000, 76000, 78000], true) %}
-                                    <div class="badge bg-danger">{{ resistance }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="info-label">Hỗ trợ</div>
-                                <div class="d-flex flex-wrap gap-2">
-                                    {% for support in market_data.market_analysis.major_supports|default([68500, 67000, 65200], true) %}
-                                    <div class="badge bg-success">{{ support }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filterSignal" class="form-label">Tín hiệu</label>
+                            <select class="form-select" id="filterSignal">
+                                <option value="">Tất cả</option>
+                                <option value="Mua">Mua</option>
+                                <option value="Bán">Bán</option>
+                                <option value="Chờ">Chờ</option>
+                            </select>
                         </div>
-                        
-                        <div class="alert alert-secondary">
-                            <h6>Nhận định:</h6>
-                            <p>{{ market_data.market_analysis.analysis_summary|default('Thị trường đang trong xu hướng tăng với khối lượng ổn định. Các chỉ báo kỹ thuật cho thấy khả năng tiếp tục đà tăng nhưng có thể có điều chỉnh ngắn hạn tại các vùng kháng cự.', true) }}</p>
+                        <div class="col-md-3 mb-3">
+                            <label for="filterTrend" class="form-label">Xu hướng</label>
+                            <select class="form-select" id="filterTrend">
+                                <option value="">Tất cả</option>
+                                <option value="Tăng">Tăng</option>
+                                <option value="Giảm">Giảm</option>
+                                <option value="Sideway">Sideway</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" id="applyFiltersButton">
+                                <i class="fas fa-filter"></i> Áp Dụng Bộ Lọc
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Right Column - Market Info and News -->
-        <div class="col-md-4">
-            <!-- Market Sentiment -->
-            <div class="info-card">
-                <h5 class="mb-3">Tâm lý thị trường</h5>
-                
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <div class="info-label">Biến động</div>
-                        <div class="info-value">{{ market_data.market_analysis.btc_volatility|default(2.3, true) }}%</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="info-label">Chỉ số Fear & Greed</div>
-                        <div class="info-value">{{ market_data.market_analysis.fear_greed_index|default(65, true) }}</div>
-                    </div>
+    </div>
+
+    <!-- Bảng dữ liệu thị trường -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Dữ Liệu Thị Trường</h5>
+                    <span class="badge bg-primary" id="marketItemCount">{{ status.market_data|length }} cặp tiền</span>
                 </div>
-                
-                <div class="mb-3">
-                    <div class="info-label">Tâm lý thị trường</div>
-                    <div class="progress" style="height: 24px;">
-                        {% set sentiment = market_data.market_analysis.market_sentiment|default(65, true) %}
-                        <div class="progress-bar 
-                            {% if sentiment >= 75 %}bg-success
-                            {% elif sentiment >= 50 %}bg-info
-                            {% elif sentiment >= 25 %}bg-warning
-                            {% else %}bg-danger{% endif %}" 
-                            role="progressbar" 
-                            style="width: {{ sentiment }}%" 
-                            aria-valuenow="{{ sentiment }}" 
-                            aria-valuemin="0" 
-                            aria-valuemax="100">
-                            {{ sentiment }}%
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-1">
-                        <small>Bi quan</small>
-                        <small>Trung lập</small>
-                        <small>Lạc quan</small>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="info-label">Chế độ thị trường</div>
-                    <div class="info-value">{{ market_data.market_analysis.market_cycle|default('Uptrend', true) }}</div>
-                </div>
-            </div>
-            
-            <!-- Top Gainers & Losers -->
-            <div class="info-card">
-                <ul class="nav nav-tabs mb-3" id="marketTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="gainers-tab" data-bs-toggle="tab" data-bs-target="#gainers" type="button" role="tab" aria-controls="gainers" aria-selected="true">Top Tăng</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="losers-tab" data-bs-toggle="tab" data-bs-target="#losers" type="button" role="tab" aria-controls="losers" aria-selected="false">Top Giảm</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="marketTabsContent">
-                    <div class="tab-pane fade show active" id="gainers" role="tabpanel" aria-labelledby="gainers-tab">
-                        <table class="table table-sm custom-table">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="marketTable">
                             <thead>
                                 <tr>
-                                    <th>Symbol</th>
+                                    <th>Cặp Tiền</th>
                                     <th>Giá</th>
-                                    <th>Thay đổi</th>
+                                    <th>Thay Đổi 24h</th>
+                                    <th>Khối Lượng</th>
+                                    <th>Tín Hiệu</th>
+                                    <th>Xu Hướng</th>
+                                    <th>Hành Động</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for coin in market_data.top_gainers|default([
-                                    {'symbol': 'SOL', 'name': 'Solana', 'price': 137.50, 'change': 5.2, 'volume': 280},
-                                    {'symbol': 'AVAX', 'name': 'Avalanche', 'price': 35.20, 'change': 4.8, 'volume': 120},
-                                    {'symbol': 'DOT', 'name': 'Polkadot', 'price': 7.85, 'change': 4.2, 'volume': 95},
-                                    {'symbol': 'LINK', 'name': 'Chainlink', 'price': 18.45, 'change': 3.9, 'volume': 78},
-                                    {'symbol': 'ETH', 'name': 'Ethereum', 'price': 3150.00, 'change': 3.1, 'volume': 450}
-                                ], true) %}
+                                {% for item in status.market_data %}
                                 <tr>
+                                    <td>{{ item.symbol }}</td>
+                                    <td>{{ item.price }}</td>
+                                    <td class="{{ 'text-success' if '+' in item.change_24h else 'text-danger' }}">{{ item.change_24h }}</td>
+                                    <td>{{ item.volume }}</td>
+                                    <td class="
+                                        {% if 'Mua' in item.signal %}signal-buy
+                                        {% elif 'Bán' in item.signal %}signal-sell
+                                        {% else %}signal-neutral{% endif %}
+                                    ">{{ item.signal }}</td>
+                                    <td class="
+                                        {% if 'Tăng' in item.trend %}trend-up
+                                        {% elif 'Giảm' in item.trend %}trend-down
+                                        {% else %}trend-sideways{% endif %}
+                                    ">{{ item.trend }}</td>
                                     <td>
-                                        <div>{{ coin.symbol }}</div>
-                                        <div class="small text-muted">{{ coin.name }}</div>
-                                    </td>
-                                    <td>${{ coin.price }}</td>
-                                    <td>
-                                        <span class="price-change positive">+{{ coin.change }}%</span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tab-pane fade" id="losers" role="tabpanel" aria-labelledby="losers-tab">
-                        <table class="table table-sm custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Giá</th>
-                                    <th>Thay đổi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for coin in market_data.top_losers|default([
-                                    {'symbol': 'DOGE', 'name': 'Dogecoin', 'price': 0.12, 'change': -2.8, 'volume': 110},
-                                    {'symbol': 'BNB', 'name': 'Binance Coin', 'price': 410.00, 'change': -1.5, 'volume': 150},
-                                    {'symbol': 'XRP', 'name': 'Ripple', 'price': 0.48, 'change': -1.2, 'volume': 95},
-                                    {'symbol': 'ADA', 'name': 'Cardano', 'price': 0.42, 'change': -0.9, 'volume': 85},
-                                    {'symbol': 'MATIC', 'name': 'Polygon', 'price': 0.68, 'change': -0.7, 'volume': 65}
-                                ], true) %}
-                                <tr>
-                                    <td>
-                                        <div>{{ coin.symbol }}</div>
-                                        <div class="small text-muted">{{ coin.name }}</div>
-                                    </td>
-                                    <td>${{ coin.price }}</td>
-                                    <td>
-                                        <span class="price-change negative">{{ coin.change }}%</span>
+                                        <button class="btn btn-sm btn-primary open-position-btn" data-symbol="{{ item.symbol }}">
+                                            <i class="fas fa-plus"></i> Mở Vị Thế
+                                        </button>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -335,53 +168,91 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Market News -->
-            <div class="info-card">
-                <h5 class="mb-3">Tin tức thị trường</h5>
-                
-                {% for news in market_data.market_news|default([
-                    {
-                        'title': 'Bitcoin vượt ngưỡng 70.000 USD lần đầu tiên kể từ tháng 3',
-                        'source': 'CoinDesk',
-                        'time': '2h trước',
-                        'impact': 'positive',
-                        'url': '#'
-                    },
-                    {
-                        'title': 'Ethereum chuẩn bị cập nhật mạng lưới mới vào tháng 4',
-                        'source': 'CryptoNews',
-                        'time': '5h trước',
-                        'impact': 'positive',
-                        'url': '#'
-                    },
-                    {
-                        'title': 'Binance giới thiệu các công cụ giao dịch mới dành cho nhà đầu tư',
-                        'source': 'Binance Blog',
-                        'time': '1 ngày trước',
-                        'impact': 'neutral',
-                        'url': '#'
-                    }
-                ], true) %}
-                <div class="d-flex mb-3">
-                    <div class="me-3">
-                        {% if news.impact == 'positive' %}
-                        <div class="indicator green" style="width: 16px; height: 16px;"></div>
-                        {% elif news.impact == 'negative' %}
-                        <div class="indicator red" style="width: 16px; height: 16px;"></div>
-                        {% else %}
-                        <div class="indicator yellow" style="width: 16px; height: 16px;"></div>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <a href="{{ news.url }}" target="_blank" class="text-decoration-none">{{ news.title }}</a>
-                        <div class="small text-muted d-flex justify-content-between">
-                            <span>{{ news.source }}</span>
-                            <span>{{ news.time }}</span>
+        </div>
+    </div>
+
+    <!-- Phân tích xu hướng -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Phân Tích Xu Hướng Thị Trường</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">Xu Hướng Tăng</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group" id="upTrendList">
+                                        {% set up_trend = status.market_data|selectattr('trend', 'search', 'Tăng')|list %}
+                                        {% for item in up_trend[:5] %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ item.symbol }}
+                                                <span class="badge bg-success rounded-pill">{{ item.change_24h }}</span>
+                                            </li>
+                                        {% endfor %}
+                                        {% if up_trend|length > 5 %}
+                                            <li class="list-group-item text-center text-muted">
+                                                <small>...và {{ up_trend|length - 5 }} cặp khác</small>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-warning text-white">
+                                    <h6 class="mb-0">Xu Hướng Sideway</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group" id="sidewayTrendList">
+                                        {% set sideway_trend = status.market_data|selectattr('trend', 'search', 'Sideway')|list %}
+                                        {% for item in sideway_trend[:5] %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ item.symbol }}
+                                                <span class="badge bg-warning rounded-pill">{{ item.change_24h }}</span>
+                                            </li>
+                                        {% endfor %}
+                                        {% if sideway_trend|length > 5 %}
+                                            <li class="list-group-item text-center text-muted">
+                                                <small>...và {{ sideway_trend|length - 5 }} cặp khác</small>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="mb-0">Xu Hướng Giảm</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group" id="downTrendList">
+                                        {% set down_trend = status.market_data|selectattr('trend', 'search', 'Giảm')|list %}
+                                        {% for item in down_trend[:5] %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ item.symbol }}
+                                                <span class="badge bg-danger rounded-pill">{{ item.change_24h }}</span>
+                                            </li>
+                                        {% endfor %}
+                                        {% if down_trend|length > 5 %}
+                                            <li class="list-group-item text-center text-muted">
+                                                <small>...và {{ down_trend|length - 5 }} cặp khác</small>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div>
@@ -390,186 +261,225 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sample price data (replace with actual data in production)
-        const priceData = {
-            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-            datasets: [{
-                label: 'Price',
-                data: [
-                    69842, 70123, 71505, 70980, 71250, 71300, 71100, 
-                    70800, 71000, 71200, 71500, 71800, 72100, 71900, 
-                    71700, 71500, 71200, 71600, 71800, 72000, 71800, 
-                    71600, 71400, 71250
-                ],
-                borderColor: 'rgba(255, 159, 64, 1)',
-                backgroundColor: 'rgba(255, 159, 64, 0.1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                pointHoverRadius: 5,
-                pointHitRadius: 10,
-                fill: true,
-                tension: 0.4
-            }]
-        };
-
-        // Volume data
-        const volumeData = {
-            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
-            datasets: [{
-                label: 'Volume',
-                data: [
-                    4500, 5200, 7800, 6100, 5500, 5800, 6200, 
-                    5900, 6000, 6500, 7200, 8100, 8800, 7500, 
-                    7000, 6800, 6400, 7200, 7800, 8200, 7500, 
-                    6800, 6200, 5900
-                ],
-                backgroundColor: 'rgba(75, 192, 192, 0.4)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        };
-
-        // Price chart
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        const priceChart = new Chart(ctx, {
-            type: 'line',
-            data: priceData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        position: 'right'
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `Price: $${context.raw.toFixed(2)}`;
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false
+    // Cập nhật dữ liệu thị trường
+    function updateMarketData() {
+        $.ajax({
+            url: '/api/market_data',
+            type: 'GET',
+            success: function(response) {
+                const marketData = response.market_data;
+                
+                // Cập nhật số lượng
+                $('#marketItemCount').text(marketData.length + ' cặp tiền');
+                
+                // Cập nhật giá BTC và ETH
+                const btcData = marketData.find(item => item.symbol === 'BTCUSDT');
+                const ethData = marketData.find(item => item.symbol === 'ETHUSDT');
+                
+                if (btcData) {
+                    $('#btcPrice').text(btcData.price);
                 }
-            }
-        });
-
-        // Symbol selector
-        document.querySelectorAll('.symbol-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Remove active class from all items
-                document.querySelectorAll('.symbol-item').forEach(el => {
-                    el.classList.remove('active');
+                
+                if (ethData) {
+                    $('#ethPrice').text(ethData.price);
+                }
+                
+                // Cập nhật số tín hiệu
+                const buySignals = marketData.filter(item => item.signal.includes('Mua')).length;
+                const sellSignals = marketData.filter(item => item.signal.includes('Bán')).length;
+                
+                $('#buySignals').text(buySignals);
+                $('#sellSignals').text(sellSignals);
+                
+                // Cập nhật bảng
+                let tableHtml = '';
+                marketData.forEach(item => {
+                    // Áp dụng bộ lọc
+                    if (!shouldDisplayMarketItem(item)) {
+                        return;
+                    }
+                    
+                    const changeClass = item.change_24h.includes('+') ? 'text-success' : 'text-danger';
+                    
+                    let signalClass = '';
+                    if (item.signal.includes('Mua')) {
+                        signalClass = 'signal-buy';
+                    } else if (item.signal.includes('Bán')) {
+                        signalClass = 'signal-sell';
+                    } else {
+                        signalClass = 'signal-neutral';
+                    }
+                    
+                    let trendClass = '';
+                    if (item.trend.includes('Tăng')) {
+                        trendClass = 'trend-up';
+                    } else if (item.trend.includes('Giảm')) {
+                        trendClass = 'trend-down';
+                    } else {
+                        trendClass = 'trend-sideways';
+                    }
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${item.symbol}</td>
+                            <td>${item.price}</td>
+                            <td class="${changeClass}">${item.change_24h}</td>
+                            <td>${item.volume}</td>
+                            <td class="${signalClass}">${item.signal}</td>
+                            <td class="${trendClass}">${item.trend}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary open-position-btn" data-symbol="${item.symbol}">
+                                    <i class="fas fa-plus"></i> Mở Vị Thế
+                                </button>
+                            </td>
+                        </tr>
+                    `;
                 });
                 
-                // Add active class to clicked item
-                this.classList.add('active');
+                $('#marketTable tbody').html(tableHtml);
                 
-                // Update selected symbol
-                const symbol = this.dataset.symbol;
-                updateSymbolData(symbol);
-            });
-        });
-        
-        // Timeframe selector
-        document.querySelectorAll('.timeframe-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all buttons
-                document.querySelectorAll('.timeframe-btn').forEach(el => {
-                    el.classList.remove('active');
+                // Cập nhật danh sách xu hướng
+                updateTrendLists(marketData);
+                
+                // Gán lại sự kiện cho các nút
+                $('.open-position-btn').click(function() {
+                    const symbol = $(this).data('symbol');
+                    openPositionForSymbol(symbol);
                 });
-                
-                // Add active class to clicked button
-                this.classList.add('active');
-                
-                // Update timeframe
-                const timeframe = this.dataset.timeframe;
-                updateTimeframeData(timeframe);
-            });
+            }
+        });
+    }
+    
+    // Cập nhật danh sách xu hướng
+    function updateTrendLists(marketData) {
+        // Xu hướng tăng
+        const upTrend = marketData.filter(item => item.trend.includes('Tăng'));
+        let upTrendHtml = '';
+        
+        upTrend.slice(0, 5).forEach(item => {
+            upTrendHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.symbol}
+                    <span class="badge bg-success rounded-pill">${item.change_24h}</span>
+                </li>
+            `;
         });
         
-        // Update symbol data
-        function updateSymbolData(symbol) {
-            // Update UI elements
-            document.getElementById('selectedSymbolTitle').textContent = symbol;
-            
-            // In a real app, you would fetch and update the actual data
-            // For now, we'll just generate random data
-            const randomPrice = Math.random() * 1000 + 100;
-            const randomChange = (Math.random() * 10) - 5;
-            
-            document.getElementById('currentPrice').textContent = `$${randomPrice.toFixed(2)}`;
-            
-            const priceChangeEl = document.getElementById('priceChange');
-            priceChangeEl.textContent = `${randomChange.toFixed(2)}%`;
-            priceChangeEl.className = 'price-change';
-            if (randomChange > 0) {
-                priceChangeEl.classList.add('positive');
-            } else if (randomChange < 0) {
-                priceChangeEl.classList.add('negative');
-            }
-            
-            // Generate new random data for chart
-            const newData = Array.from({length: 24}, () => Math.random() * 100 + randomPrice - 50);
-            priceChart.data.datasets[0].data = newData;
-            priceChart.update();
-            
-            // Update other elements
-            document.getElementById('high24h').textContent = `$${(randomPrice * 1.03).toFixed(2)}`;
-            document.getElementById('low24h').textContent = `$${(randomPrice * 0.97).toFixed(2)}`;
-            document.getElementById('volume24h').textContent = `$${(Math.random() * 100000000).toFixed(0)}`;
-            document.getElementById('trades24h').textContent = `${Math.floor(Math.random() * 150000)}`;
+        if (upTrend.length > 5) {
+            upTrendHtml += `
+                <li class="list-group-item text-center text-muted">
+                    <small>...và ${upTrend.length - 5} cặp khác</small>
+                </li>
+            `;
         }
         
-        // Update timeframe data
-        function updateTimeframeData(timeframe) {
-            // In a real app, you would fetch and update the data based on timeframe
-            // For now, we'll just adjust the chart labels
-            
-            let labels = [];
-            switch(timeframe) {
-                case '1h':
-                    labels = Array.from({length: 60}, (_, i) => `${i}m`);
-                    break;
-                case '4h':
-                    labels = Array.from({length: 24}, (_, i) => `${i * 10}m`);
-                    break;
-                case '1d':
-                    labels = Array.from({length: 24}, (_, i) => `${i}:00`);
-                    break;
-                case '1w':
-                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                    break;
-            }
-            
-            // Update chart labels
-            priceChart.data.labels = labels;
-            
-            // Generate new random data
-            const currentPrice = parseFloat(document.getElementById('currentPrice').textContent.replace('$', ''));
-            const newData = Array.from({length: labels.length}, () => Math.random() * 100 + currentPrice - 50);
-            priceChart.data.datasets[0].data = newData;
-            
-            priceChart.update();
+        $('#upTrendList').html(upTrendHtml);
+        
+        // Xu hướng sideway
+        const sidewayTrend = marketData.filter(item => item.trend.includes('Sideway'));
+        let sidewayTrendHtml = '';
+        
+        sidewayTrend.slice(0, 5).forEach(item => {
+            sidewayTrendHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.symbol}
+                    <span class="badge bg-warning rounded-pill">${item.change_24h}</span>
+                </li>
+            `;
+        });
+        
+        if (sidewayTrend.length > 5) {
+            sidewayTrendHtml += `
+                <li class="list-group-item text-center text-muted">
+                    <small>...và ${sidewayTrend.length - 5} cặp khác</small>
+                </li>
+            `;
         }
+        
+        $('#sidewayTrendList').html(sidewayTrendHtml);
+        
+        // Xu hướng giảm
+        const downTrend = marketData.filter(item => item.trend.includes('Giảm'));
+        let downTrendHtml = '';
+        
+        downTrend.slice(0, 5).forEach(item => {
+            downTrendHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${item.symbol}
+                    <span class="badge bg-danger rounded-pill">${item.change_24h}</span>
+                </li>
+            `;
+        });
+        
+        if (downTrend.length > 5) {
+            downTrendHtml += `
+                <li class="list-group-item text-center text-muted">
+                    <small>...và ${downTrend.length - 5} cặp khác</small>
+                </li>
+            `;
+        }
+        
+        $('#downTrendList').html(downTrendHtml);
+    }
+    
+    // Kiểm tra xem item có nên hiển thị theo bộ lọc không
+    function shouldDisplayMarketItem(item) {
+        const symbolFilter = $('#filterSymbol').val().toUpperCase();
+        const signalFilter = $('#filterSignal').val();
+        const trendFilter = $('#filterTrend').val();
+        
+        // Kiểm tra cặp tiền
+        if (symbolFilter && !item.symbol.includes(symbolFilter)) {
+            return false;
+        }
+        
+        // Kiểm tra tín hiệu
+        if (signalFilter && !item.signal.includes(signalFilter)) {
+            return false;
+        }
+        
+        // Kiểm tra xu hướng
+        if (trendFilter && !item.trend.includes(trendFilter)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Mở vị thế cho một cặp tiền
+    function openPositionForSymbol(symbol) {
+        $.ajax({
+            url: '/api/add_position',
+            type: 'POST',
+            data: JSON.stringify({ symbol: symbol }),
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.success) {
+                    showToast(`Đã mở vị thế ${symbol}`, 'success');
+                } else {
+                    showToast('Lỗi: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Lỗi kết nối với máy chủ', 'error');
+            }
+        });
+    }
+    
+    // Document Ready
+    $(document).ready(function() {
+        // Gán sự kiện
+        $('#refreshMarketButton').click(updateMarketData);
+        $('#applyFiltersButton').click(updateMarketData);
+        
+        // Gán sự kiện cho các nút mở vị thế
+        $('.open-position-btn').click(function() {
+            const symbol = $(this).data('symbol');
+            openPositionForSymbol(symbol);
+        });
+        
+        // Cập nhật dữ liệu thị trường mỗi 10 giây
+        setInterval(updateMarketData, 10000);
     });
 </script>
 {% endblock %}
