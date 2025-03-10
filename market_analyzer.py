@@ -2,491 +2,593 @@
 # -*- coding: utf-8 -*-
 
 """
-Module phân tích thị trường cho hệ thống giao dịch
-Tương tác với Binance API để lấy dữ liệu thị trường thực tế
+Module phân tích thị trường
 """
 
 import os
-import logging
-import time
 import json
+import time
+import math
+import logging
 import traceback
 from datetime import datetime, timedelta
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from binance.client import Client
-from binance.exceptions import BinanceAPIException
-import talib
+from typing import Dict, List, Tuple, Union, Any
 
-# Cấu hình logging
+# Thiết lập logging
 logger = logging.getLogger("market_analyzer")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+try:
+    # Sử dụng python-binance cho việc gọi API
+    import requests
+    from binance.client import Client
+    from binance.exceptions import BinanceAPIException
+    import pandas as pd
+    import numpy as np
+    
+    # Ghi log nếu import thành công
+    logger.info("Đã import các thư viện cần thiết")
+except ImportError as e:
+    logger.error(f"Lỗi khi import thư viện: {str(e)}")
 
 class MarketAnalyzer:
     """
-    Lớp phân tích thị trường, tương tác với Binance API
-    và cung cấp các phân tích kỹ thuật
+    Lớp phân tích thị trường sử dụng API Binance
     """
-    
-    def __init__(self, api_key=None, api_secret=None, testnet=True):
+    def __init__(self, testnet=True):
         """
-        Khởi tạo với thông tin API
+        Khởi tạo phân tích thị trường
         
-        :param api_key: Binance API key
-        :param api_secret: Binance API secret
-        :param testnet: Sử dụng testnet (True) hoặc mainnet (False)
+        :param testnet: Sử dụng testnet hay không
         """
-        self.api_key = api_key or os.environ.get("BINANCE_TESTNET_API_KEY")
-        self.api_secret = api_secret or os.environ.get("BINANCE_TESTNET_API_SECRET")
         self.testnet = testnet
         self.client = None
-        self.connect()
+        self.initialized = False
+        
+        # Khởi tạo API client
+        self.initialize_client()
     
-    def connect(self):
-        """Kết nối tới Binance API"""
+    def initialize_client(self):
+        """Khởi tạo client API"""
         try:
-            self.client = Client(
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-                testnet=self.testnet
-            )
-            # Kiểm tra kết nối
-            self.client.ping()
-            logger.info("✅ Kết nối Binance API thành công")
-            return True
+            # Lấy khóa API từ biến môi trường
+            api_key = os.environ.get("BINANCE_TESTNET_API_KEY")
+            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET")
+            
+            if not api_key or not api_secret:
+                logger.warning("API key hoặc API secret không được cung cấp")
+                return
+            
+            # Khởi tạo client
+            self.client = Client(api_key, api_secret, testnet=self.testnet)
+            
+            # Test kết nối
+            self.client.get_account()
+            
+            self.initialized = True
+            logger.info("Đã khởi tạo Binance API client thành công")
+        
         except BinanceAPIException as e:
-            logger.error(f"❌ Lỗi kết nối Binance API: {str(e)}")
-            return False
+            logger.error(f"Lỗi API Binance: {str(e)}")
         except Exception as e:
-            logger.error(f"❌ Lỗi không xác định khi kết nối Binance API: {str(e)}")
-            logger.error(traceback.format_exc())
-            return False
+            logger.error(f"Lỗi khi khởi tạo client: {str(e)}")
     
-    def is_connected(self):
-        """Kiểm tra xem API có kết nối không"""
-        if not self.client:
-            return False
+    def get_market_overview(self) -> Dict[str, Any]:
+        """
+        Lấy tổng quan thị trường
+        
+        :return: Dict với thông tin thị trường
+        """
+        if not self.initialized:
+            return {"status": "error", "message": "API client chưa được khởi tạo"}
         
         try:
-            self.client.ping()
-            return True
-        except:
-            return False
-    
-    def reconnect(self):
-        """Kết nối lại nếu mất kết nối"""
-        logger.info("Đang kết nối lại với Binance API...")
-        return self.connect()
-    
-    def get_market_overview(self):
-        """
-        Lấy tổng quan thị trường cho 5 coin phổ biến
-        
-        :return: Dictionary chứa thông tin thị trường
-        """
-        if not self.is_connected() and not self.reconnect():
-            logger.error("Không thể kết nối tới Binance API")
-            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
-        
-        try:
-            symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT"]
+            symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "AVAXUSDT"]
             market_data = []
             
             for symbol in symbols:
-                # Lấy thông tin ticker
-                ticker = self.client.get_ticker(symbol=symbol)
-                
-                # Lấy thông tin giao dịch 24h
-                ticker_24h = self.client.get_ticker(symbol=symbol)
-                
-                # Đánh giá sơ bộ dựa trên thay đổi giá
-                price_change = float(ticker_24h['priceChangePercent'])
-                if price_change > 3:
-                    signal = "Mua"
-                    strength = "Mạnh" if price_change > 5 else "Trung bình"
-                elif price_change < -3:
-                    signal = "Bán"
-                    strength = "Mạnh" if price_change < -5 else "Trung bình"
-                else:
-                    signal = "Giữ"
-                    strength = "Yếu"
-                
-                market_data.append({
-                    'symbol': symbol,
-                    'price': float(ticker['lastPrice']),
-                    'change_24h': price_change,
-                    'volume': float(ticker['volume']),
-                    'high_24h': float(ticker['highPrice']),
-                    'low_24h': float(ticker['lowPrice']),
-                    'signal': signal,
-                    'strength': strength
-                })
+                try:
+                    # Lấy ticker
+                    ticker = self.client.get_ticker(symbol=symbol)
+                    
+                    # Tính toán khối lượng thành USD
+                    volume_usdt = float(ticker["volume"]) * float(ticker["lastPrice"])
+                    
+                    # Thêm vào danh sách
+                    market_data.append({
+                        "symbol": symbol,
+                        "price": float(ticker["lastPrice"]),
+                        "change_24h": float(ticker["priceChangePercent"]),
+                        "volume": volume_usdt,
+                        "high_24h": float(ticker["highPrice"]),
+                        "low_24h": float(ticker["lowPrice"])
+                    })
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy dữ liệu cho {symbol}: {str(e)}")
             
-            return {
-                "status": "success",
-                "market_data": market_data,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+            # Sắp xếp theo khối lượng giảm dần
+            market_data.sort(key=lambda x: x["volume"], reverse=True)
             
-        except BinanceAPIException as e:
-            logger.error(f"Lỗi Binance API khi lấy tổng quan thị trường: {str(e)}")
-            return {"status": "error", "message": f"Lỗi Binance API: {str(e)}"}
-        except Exception as e:
-            logger.error(f"Lỗi không xác định khi lấy tổng quan thị trường: {str(e)}")
-            logger.error(traceback.format_exc())
-            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
-    
-    def get_klines(self, symbol, interval, limit=100):
-        """
-        Lấy dữ liệu K-lines (nến) cho biểu đồ
+            return {"status": "success", "data": market_data}
         
-        :param symbol: Cặp tiền, ví dụ BTCUSDT
-        :param interval: Khung thời gian, ví dụ 1h, 4h, 1d
-        :param limit: Số lượng nến
-        :return: DataFrame chứa dữ liệu nến
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi API Binance: {str(e)}")
+            return {"status": "error", "message": str(e)}
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy tổng quan thị trường: {str(e)}")
+            return {"status": "error", "message": str(e)}
+    
+    def get_klines(self, symbol: str, interval: str, limit: int = 100) -> pd.DataFrame:
         """
-        if not self.is_connected() and not self.reconnect():
-            logger.error("Không thể kết nối tới Binance API")
-            return None
+        Lấy dữ liệu nến (klines)
+        
+        :param symbol: Cặp giao dịch (ví dụ: BTCUSDT)
+        :param interval: Khung thời gian (ví dụ: 1h, 4h, 1d)
+        :param limit: Số lượng nến tối đa
+        :return: DataFrame với dữ liệu nến
+        """
+        if not self.initialized:
+            logger.error("API client chưa được khởi tạo")
+            return pd.DataFrame()
         
         try:
+            # Lấy dữ liệu nến từ Binance
             klines = self.client.get_klines(
                 symbol=symbol,
                 interval=interval,
                 limit=limit
             )
             
-            # Chuyển đổi sang DataFrame
+            # Chuyển đổi dữ liệu thành DataFrame
             df = pd.DataFrame(klines, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 
-                'volume', 'close_time', 'quote_asset_volume',
-                'number_of_trades', 'taker_buy_base_asset_volume',
-                'taker_buy_quote_asset_volume', 'ignore'
+                'timestamp', 'open', 'high', 'low', 'close', 'volume',
+                'close_time', 'quote_asset_volume', 'number_of_trades',
+                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
             ])
             
             # Chuyển đổi kiểu dữ liệu
             df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            df['open'] = df['open'].astype(float)
-            df['high'] = df['high'].astype(float)
-            df['low'] = df['low'].astype(float)
-            df['close'] = df['close'].astype(float)
-            df['volume'] = df['volume'].astype(float)
+            df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
+            
+            numeric_columns = ['open', 'high', 'low', 'close', 'volume', 
+                               'quote_asset_volume', 'number_of_trades',
+                               'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume']
+            
+            for col in numeric_columns:
+                df[col] = pd.to_numeric(df[col])
             
             # Đặt timestamp làm index
             df.set_index('timestamp', inplace=True)
             
             return df
-            
-        except BinanceAPIException as e:
-            logger.error(f"Lỗi Binance API khi lấy dữ liệu K-lines: {str(e)}")
-            return None
-        except Exception as e:
-            logger.error(f"Lỗi không xác định khi lấy dữ liệu K-lines: {str(e)}")
-            logger.error(traceback.format_exc())
-            return None
-    
-    def analyze_technical(self, symbol, interval):
-        """
-        Phân tích kỹ thuật cho một cặp tiền và khung thời gian
         
-        :param symbol: Cặp tiền, ví dụ BTCUSDT
-        :param interval: Khung thời gian, ví dụ 1h, 4h, 1d
-        :return: Dictionary chứa các chỉ báo kỹ thuật và đánh giá
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi API Binance: {str(e)}")
+            return pd.DataFrame()
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu nến: {str(e)}")
+            return pd.DataFrame()
+    
+    def calculate_rsi(self, closes: pd.Series, period: int = 14) -> pd.Series:
         """
+        Tính toán chỉ báo RSI (Relative Strength Index)
+        
+        :param closes: Series giá đóng cửa
+        :param period: Chu kỳ RSI
+        :return: Series chứa giá trị RSI
+        """
+        # Tính toán thay đổi giá
+        delta = closes.diff()
+        
+        # Tách các giá trị dương và âm
+        gain = delta.copy()
+        loss = delta.copy()
+        gain[gain < 0] = 0
+        loss[loss > 0] = 0
+        loss = abs(loss)
+        
+        # Tính toán giá trị trung bình
+        avg_gain = gain.rolling(window=period).mean()
+        avg_loss = loss.rolling(window=period).mean()
+        
+        # Tính toán RS và RSI
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        
+        return rsi
+    
+    def calculate_sma(self, data: pd.Series, period: int) -> pd.Series:
+        """
+        Tính toán chỉ báo SMA (Simple Moving Average)
+        
+        :param data: Series dữ liệu
+        :param period: Chu kỳ SMA
+        :return: Series chứa giá trị SMA
+        """
+        return data.rolling(window=period).mean()
+    
+    def calculate_ema(self, data: pd.Series, period: int) -> pd.Series:
+        """
+        Tính toán chỉ báo EMA (Exponential Moving Average)
+        
+        :param data: Series dữ liệu
+        :param period: Chu kỳ EMA
+        :return: Series chứa giá trị EMA
+        """
+        return data.ewm(span=period, adjust=False).mean()
+    
+    def calculate_macd(self, closes: pd.Series, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9) -> Tuple[pd.Series, pd.Series, pd.Series]:
+        """
+        Tính toán chỉ báo MACD (Moving Average Convergence Divergence)
+        
+        :param closes: Series giá đóng cửa
+        :param fast_period: Chu kỳ nhanh
+        :param slow_period: Chu kỳ chậm
+        :param signal_period: Chu kỳ đường tín hiệu
+        :return: Tuple (macd, signal, histogram)
+        """
+        # Tính toán EMA nhanh và chậm
+        ema_fast = self.calculate_ema(closes, fast_period)
+        ema_slow = self.calculate_ema(closes, slow_period)
+        
+        # Tính toán MACD Line
+        macd_line = ema_fast - ema_slow
+        
+        # Tính toán Signal Line
+        signal_line = self.calculate_ema(macd_line, signal_period)
+        
+        # Tính toán Histogram
+        histogram = macd_line - signal_line
+        
+        return macd_line, signal_line, histogram
+    
+    def calculate_bollinger_bands(self, closes: pd.Series, period: int = 20, num_std: float = 2.0) -> Tuple[pd.Series, pd.Series, pd.Series]:
+        """
+        Tính toán chỉ báo Bollinger Bands
+        
+        :param closes: Series giá đóng cửa
+        :param period: Chu kỳ
+        :param num_std: Số độ lệch chuẩn
+        :return: Tuple (upper_band, middle_band, lower_band)
+        """
+        # Tính toán SMA
+        middle_band = self.calculate_sma(closes, period)
+        
+        # Tính toán độ lệch chuẩn
+        std = closes.rolling(window=period).std()
+        
+        # Tính toán upper và lower bands
+        upper_band = middle_band + (std * num_std)
+        lower_band = middle_band - (std * num_std)
+        
+        return upper_band, middle_band, lower_band
+    
+    def calculate_atr(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
+        """
+        Tính toán chỉ báo ATR (Average True Range)
+        
+        :param df: DataFrame dữ liệu nến
+        :param period: Chu kỳ
+        :return: Series chứa giá trị ATR
+        """
+        # Tính toán True Range
+        high_low = df['high'] - df['low']
+        high_close_prev = np.abs(df['high'] - df['close'].shift(1))
+        low_close_prev = np.abs(df['low'] - df['close'].shift(1))
+        
+        true_range = pd.concat([high_low, high_close_prev, low_close_prev], axis=1).max(axis=1)
+        
+        # Tính toán ATR
+        atr = true_range.rolling(window=period).mean()
+        
+        return atr
+    
+    def analyze_technical(self, symbol: str, interval: str) -> Dict[str, Any]:
+        """
+        Phân tích kỹ thuật cho một cặp tiền
+        
+        :param symbol: Cặp giao dịch (ví dụ: BTCUSDT)
+        :param interval: Khung thời gian (ví dụ: 1h, 4h, 1d)
+        :return: Dict với phân tích kỹ thuật
+        """
+        if not self.initialized:
+            return {"status": "error", "message": "API client chưa được khởi tạo"}
+        
         try:
-            # Lấy dữ liệu K-lines
-            df = self.get_klines(symbol, interval, limit=100)
-            if df is None:
-                return {"status": "error", "message": "Không thể lấy dữ liệu K-lines"}
+            # Lấy dữ liệu nến
+            df = self.get_klines(symbol, interval, 100)
             
-            # Tính RSI
-            df['rsi'] = talib.RSI(df['close'], timeperiod=14)
+            if df.empty:
+                return {"status": "error", "message": "Không thể lấy dữ liệu nến"}
             
-            # Tính MACD
-            macd, macd_signal, macd_hist = talib.MACD(
-                df['close'], 
-                fastperiod=12, 
-                slowperiod=26, 
-                signalperiod=9
-            )
-            df['macd'] = macd
-            df['macd_signal'] = macd_signal
-            df['macd_hist'] = macd_hist
+            # Tính toán các chỉ báo kỹ thuật
             
-            # Tính Bollinger Bands
-            upper, middle, lower = talib.BBANDS(
-                df['close'], 
-                timeperiod=20,
-                nbdevup=2,
-                nbdevdn=2,
-                matype=0
-            )
-            df['bb_upper'] = upper
-            df['bb_middle'] = middle
-            df['bb_lower'] = lower
+            # RSI
+            rsi = self.calculate_rsi(df['close'])
+            latest_rsi = rsi.iloc[-1]
             
-            # Tính MA
-            df['ma50'] = talib.MA(df['close'], timeperiod=50)
-            df['ma200'] = talib.MA(df['close'], timeperiod=200)
+            # MACD
+            macd, signal, histogram = self.calculate_macd(df['close'])
+            latest_macd = macd.iloc[-1]
+            latest_signal = signal.iloc[-1]
+            latest_histogram = histogram.iloc[-1]
             
-            # Tính Stochastic
-            slowk, slowd = talib.STOCH(
-                df['high'], 
-                df['low'], 
-                df['close'],
-                fastk_period=5,
-                slowk_period=3,
-                slowk_matype=0,
-                slowd_period=3,
-                slowd_matype=0
-            )
-            df['stoch_k'] = slowk
-            df['stoch_d'] = slowd
+            # Bollinger Bands
+            upper_band, middle_band, lower_band = self.calculate_bollinger_bands(df['close'])
+            latest_upper = upper_band.iloc[-1]
+            latest_middle = middle_band.iloc[-1]
+            latest_lower = lower_band.iloc[-1]
             
-            # Lấy giá trị cuối cùng
-            last_row = df.iloc[-1]
-            current_price = last_row['close']
+            # Moving Averages
+            sma_20 = self.calculate_sma(df['close'], 20)
+            sma_50 = self.calculate_sma(df['close'], 50)
+            sma_200 = self.calculate_sma(df['close'], 50)  # Giả lập SMA 200 với SMA 50 vì dữ liệu ít
             
-            # Đánh giá RSI
-            rsi = last_row['rsi']
-            if rsi > 70:
-                rsi_signal = "Quá mua"
-            elif rsi < 30:
-                rsi_signal = "Quá bán"
+            latest_sma_20 = sma_20.iloc[-1]
+            latest_sma_50 = sma_50.iloc[-1]
+            latest_sma_200 = sma_200.iloc[-1]
+            
+            # ATR
+            atr = self.calculate_atr(df)
+            latest_atr = atr.iloc[-1]
+            
+            # Giá hiện tại
+            current_price = df['close'].iloc[-1]
+            
+            # Phân tích tín hiệu
+            
+            # Tín hiệu RSI
+            if latest_rsi > 70:
+                rsi_signal = "Bán"
+            elif latest_rsi < 30:
+                rsi_signal = "Mua"
             else:
-                rsi_signal = "Trung tính"
+                rsi_signal = "Trung lập"
             
-            # Đánh giá MACD
-            macd_last = last_row['macd']
-            macd_signal_last = last_row['macd_signal']
-            macd_hist_last = last_row['macd_hist']
-            
-            if macd_last > macd_signal_last:
-                macd_trend = "Tăng"
-                if macd_hist_last > 0 and macd_hist_last > df['macd_hist'][-2]:
-                    macd_signal = "Mua mạnh"
-                else:
-                    macd_signal = "Mua"
-            elif macd_last < macd_signal_last:
-                macd_trend = "Giảm"
-                if macd_hist_last < 0 and macd_hist_last < df['macd_hist'][-2]:
-                    macd_signal = "Bán mạnh"
-                else:
-                    macd_signal = "Bán"
+            # Tín hiệu MACD
+            if latest_macd > latest_signal and latest_histogram > 0 and latest_histogram > histogram.iloc[-2]:
+                macd_signal = "Mua"
+            elif latest_macd < latest_signal and latest_histogram < 0 and latest_histogram < histogram.iloc[-2]:
+                macd_signal = "Bán"
             else:
-                macd_trend = "Đi ngang"
-                macd_signal = "Trung tính"
+                macd_signal = "Trung lập"
             
-            # Đánh giá Bollinger Bands
-            bb_upper_last = last_row['bb_upper']
-            bb_lower_last = last_row['bb_lower']
+            # Tín hiệu Bollinger Bands
+            bb_width = (latest_upper - latest_lower) / latest_middle
             
-            if current_price > bb_upper_last:
-                bb_signal = "Quá mua"
-            elif current_price < bb_lower_last:
-                bb_signal = "Quá bán"
+            if current_price > latest_upper:
+                bb_signal = "Bán"
+            elif current_price < latest_lower:
+                bb_signal = "Mua"
+            elif bb_width < 0.1:  # Dải hẹp, chuẩn bị breakout
+                bb_signal = "Chuẩn bị breakout"
             else:
-                # Tính % vị trí trong BB
-                bb_range = bb_upper_last - bb_lower_last
-                if bb_range == 0:
-                    bb_position = 50
-                else:
-                    bb_position = ((current_price - bb_lower_last) / bb_range) * 100
-                
-                if bb_position > 80:
-                    bb_signal = "Gần quá mua"
-                elif bb_position < 20:
-                    bb_signal = "Gần quá bán"
-                else:
-                    bb_signal = "Trung tính"
+                bb_signal = "Trung lập"
             
-            # Đánh giá MA
-            ma50_last = last_row['ma50']
-            ma200_last = last_row['ma200']
-            
-            if ma50_last > ma200_last:
-                ma_signal = "Tín hiệu mua (Xu hướng tăng)"
-            elif ma50_last < ma200_last:
-                ma_signal = "Tín hiệu bán (Xu hướng giảm)"
+            # Tín hiệu Moving Average
+            if latest_sma_20 > latest_sma_50 and latest_sma_20 > latest_sma_200:
+                ma_signal = "Mua"
+            elif latest_sma_20 < latest_sma_50 and latest_sma_20 < latest_sma_200:
+                ma_signal = "Bán"
             else:
-                ma_signal = "Trung tính"
-            
-            # Đánh giá Stochastic
-            stoch_k_last = last_row['stoch_k']
-            stoch_d_last = last_row['stoch_d']
-            
-            if stoch_k_last > 80 and stoch_d_last > 80:
-                stoch_signal = "Quá mua"
-            elif stoch_k_last < 20 and stoch_d_last < 20:
-                stoch_signal = "Quá bán"
-            elif stoch_k_last > stoch_d_last:
-                stoch_signal = "Mua"
-            elif stoch_k_last < stoch_d_last:
-                stoch_signal = "Bán"
-            else:
-                stoch_signal = "Trung tính"
+                ma_signal = "Trung lập"
             
             # Tổng hợp tín hiệu
-            indicators = [
-                {"name": "RSI(14)", "value": f"{rsi:.2f}", "signal": rsi_signal},
-                {"name": "MACD", "value": macd_trend, "signal": macd_signal},
-                {"name": "MA(50) vs MA(200)", "value": f"MA50: {ma50_last:.2f}, MA200: {ma200_last:.2f}", "signal": ma_signal},
-                {"name": "Bollinger Bands", "value": f"Upper: {bb_upper_last:.2f}, Lower: {bb_lower_last:.2f}", "signal": bb_signal},
-                {"name": "Stochastic", "value": f"K: {stoch_k_last:.2f}, D: {stoch_d_last:.2f}", "signal": stoch_signal}
-            ]
+            signals = [rsi_signal, macd_signal, bb_signal, ma_signal]
+            buy_count = signals.count("Mua")
+            sell_count = signals.count("Bán")
             
-            # Đánh giá tổng thể
-            buy_signals = sum(1 for ind in indicators if "mua" in ind["signal"].lower())
-            sell_signals = sum(1 for ind in indicators if "bán" in ind["signal"].lower())
-            
-            if buy_signals > sell_signals:
+            if buy_count > sell_count and buy_count >= 2:
                 overall_signal = "Mua"
-                if buy_signals >= 4:
+                if buy_count >= 3:
                     strength = "Mạnh"
                 else:
                     strength = "Trung bình"
-            elif sell_signals > buy_signals:
+            elif sell_count > buy_count and sell_count >= 2:
                 overall_signal = "Bán"
-                if sell_signals >= 4:
+                if sell_count >= 3:
                     strength = "Mạnh"
                 else:
                     strength = "Trung bình"
             else:
-                overall_signal = "Giữ"
+                overall_signal = "Trung lập"
                 strength = "Yếu"
             
-            return {
+            # Phân tích xu hướng
+            if sma_20.iloc[-1] > sma_20.iloc[-5] and sma_50.iloc[-1] > sma_50.iloc[-5]:
+                short_term_trend = "Tăng"
+            elif sma_20.iloc[-1] < sma_20.iloc[-5] and sma_50.iloc[-1] < sma_50.iloc[-5]:
+                short_term_trend = "Giảm"
+            else:
+                short_term_trend = "Sideway"
+            
+            if sma_50.iloc[-1] > sma_50.iloc[-10]:
+                mid_term_trend = "Tăng"
+            elif sma_50.iloc[-1] < sma_50.iloc[-10]:
+                mid_term_trend = "Giảm"
+            else:
+                mid_term_trend = "Sideway"
+            
+            if sma_200.iloc[-1] > sma_200.iloc[-20]:
+                long_term_trend = "Tăng"
+            elif sma_200.iloc[-1] < sma_200.iloc[-20]:
+                long_term_trend = "Giảm"
+            else:
+                long_term_trend = "Sideway"
+            
+            # Xác định các mức hỗ trợ/kháng cự
+            support_resistance = []
+            
+            # Giá cao nhất và thấp nhất trong 100 nến
+            highest_high = df['high'].max()
+            lowest_low = df['low'].min()
+            
+            # Thêm mức hỗ trợ/kháng cự
+            support_resistance.append({"type": "Kháng cự 1", "value": highest_high})
+            support_resistance.append({"type": "Kháng cự 2", "value": current_price + latest_atr * 2})
+            support_resistance.append({"type": "Hỗ trợ 1", "value": lowest_low})
+            support_resistance.append({"type": "Hỗ trợ 2", "value": current_price - latest_atr * 2})
+            
+            # Tạo kết quả
+            result = {
                 "status": "success",
                 "symbol": symbol,
                 "interval": interval,
                 "price": current_price,
-                "indicators": indicators,
                 "overall_signal": overall_signal,
                 "strength": strength,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "short_term_trend": short_term_trend,
+                "mid_term_trend": mid_term_trend,
+                "long_term_trend": long_term_trend,
+                "support_resistance": support_resistance,
+                "indicators": [
+                    {"name": "RSI", "value": f"{latest_rsi:.2f}", "signal": rsi_signal},
+                    {"name": "MACD", "value": f"MACD: {latest_macd:.2f}, Signal: {latest_signal:.2f}, Histogram: {latest_histogram:.2f}", "signal": macd_signal},
+                    {"name": "Bollinger Bands", "value": f"Upper: {latest_upper:.2f}, Middle: {latest_middle:.2f}, Lower: {latest_lower:.2f}", "signal": bb_signal},
+                    {"name": "Moving Averages", "value": f"SMA20: {latest_sma_20:.2f}, SMA50: {latest_sma_50:.2f}, SMA200: {latest_sma_200:.2f}", "signal": ma_signal},
+                    {"name": "ATR", "value": f"{latest_atr:.2f}", "signal": "N/A"}
+                ]
             }
+            
+            return result
             
         except Exception as e:
             logger.error(f"Lỗi khi phân tích kỹ thuật: {str(e)}")
             logger.error(traceback.format_exc())
-            return {"status": "error", "message": f"Lỗi khi phân tích kỹ thuật: {str(e)}"}
+            return {"status": "error", "message": str(e)}
     
-    def get_account_info(self):
+    def get_account_info(self) -> Dict[str, Any]:
         """
-        Lấy thông tin tài khoản Binance
+        Lấy thông tin tài khoản
         
-        :return: Dictionary chứa thông tin tài khoản
+        :return: Dict với thông tin tài khoản
         """
-        if not self.is_connected() and not self.reconnect():
-            logger.error("Không thể kết nối tới Binance API")
-            return {"status": "error", "message": "Không thể kết nối tới Binance API"}
+        if not self.initialized:
+            return {"status": "error", "message": "API client chưa được khởi tạo"}
         
         try:
-            account = self.client.futures_account()
+            # Lấy thông tin tài khoản futures
+            account_info = self.client.futures_account()
             
-            # Chuẩn bị dữ liệu tài khoản
-            account_info = {
-                "balance": float(account['totalWalletBalance']),
-                "unrealized_pnl": float(account['totalUnrealizedProfit']),
-                "margin_balance": float(account['totalMarginBalance']),
-                "available_balance": float(account['availableBalance']),
-                "leverage": account.get('leverage', 1),
+            # Tạo dữ liệu trả về
+            account_data = {
+                "balance": float(account_info["totalWalletBalance"]),
+                "unrealized_pnl": float(account_info["totalUnrealizedProfit"]),
+                "margin_balance": float(account_info["totalMarginBalance"]),
                 "positions": []
             }
             
             # Lấy thông tin vị thế
-            positions = [p for p in account['positions'] if float(p['positionAmt']) != 0]
+            for position in account_info["positions"]:
+                # Chỉ lấy các vị thế có số lượng khác 0
+                if float(position["positionAmt"]) != 0:
+                    account_data["positions"].append({
+                        "symbol": position["symbol"],
+                        "side": "LONG" if float(position["positionAmt"]) > 0 else "SHORT",
+                        "amount": abs(float(position["positionAmt"])),
+                        "entry_price": float(position["entryPrice"]),
+                        "mark_price": float(position["markPrice"]),
+                        "unrealized_pnl": float(position["unrealizedProfit"]),
+                        "leverage": float(position["leverage"])
+                    })
             
-            for position in positions:
-                symbol = position['symbol']
-                side = "LONG" if float(position['positionAmt']) > 0 else "SHORT"
-                entry_price = float(position['entryPrice'])
-                mark_price = float(position['markPrice'])
-                amount = abs(float(position['positionAmt']))
-                leverage = int(position['leverage'])
-                unrealized_pnl = float(position['unrealizedProfit'])
-                
-                # Tính % lợi nhuận
-                if entry_price == 0:
-                    profit_percent = 0
-                else:
-                    if side == "LONG":
-                        profit_percent = ((mark_price - entry_price) / entry_price) * 100 * leverage
-                    else:
-                        profit_percent = ((entry_price - mark_price) / entry_price) * 100 * leverage
-                
-                position_info = {
-                    "symbol": symbol,
-                    "side": side,
-                    "entry_price": entry_price,
-                    "mark_price": mark_price,
-                    "amount": amount,
-                    "leverage": leverage,
-                    "unrealized_pnl": unrealized_pnl,
-                    "profit_percent": profit_percent
-                }
-                
-                account_info["positions"].append(position_info)
-            
-            return {
-                "status": "success",
-                "account": account_info,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+            return {"status": "success", "account": account_data}
             
         except BinanceAPIException as e:
-            logger.error(f"Lỗi Binance API khi lấy thông tin tài khoản: {str(e)}")
-            return {"status": "error", "message": f"Lỗi Binance API: {str(e)}"}
+            logger.error(f"Lỗi API Binance: {str(e)}")
+            return {"status": "error", "message": str(e)}
         except Exception as e:
-            logger.error(f"Lỗi không xác định khi lấy thông tin tài khoản: {str(e)}")
-            logger.error(traceback.format_exc())
-            return {"status": "error", "message": f"Lỗi hệ thống: {str(e)}"}
-
-# Hàm để thử nghiệm module
-def test_market_analyzer():
-    """Hàm kiểm tra chức năng của MarketAnalyzer"""
-    # Cấu hình logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            logger.error(f"Lỗi khi lấy thông tin tài khoản: {str(e)}")
+            return {"status": "error", "message": str(e)}
     
-    print("Đang kiểm tra MarketAnalyzer...")
+    def get_market_data(self, symbol: str, interval: str) -> Dict[str, Any]:
+        """
+        Lấy dữ liệu thị trường cho một cặp tiền
+        
+        :param symbol: Cặp giao dịch (ví dụ: BTCUSDT)
+        :param interval: Khung thời gian (ví dụ: 1h, 4h, 1d)
+        :return: Dict với dữ liệu thị trường
+        """
+        if not self.initialized:
+            return {"status": "error", "message": "API client chưa được khởi tạo"}
+        
+        try:
+            # Lấy dữ liệu nến
+            df = self.get_klines(symbol, interval, 100)
+            
+            if df.empty:
+                return {"status": "error", "message": "Không thể lấy dữ liệu nến"}
+            
+            # Lấy ticker hiện tại
+            ticker = self.client.get_ticker(symbol=symbol)
+            
+            # Tính toán khối lượng thành USD
+            volume_usdt = float(ticker["volume"]) * float(ticker["lastPrice"])
+            
+            # Tạo kết quả
+            result = {
+                "status": "success",
+                "symbol": symbol,
+                "interval": interval,
+                "price": float(ticker["lastPrice"]),
+                "change_24h": float(ticker["priceChangePercent"]),
+                "volume": volume_usdt,
+                "high_24h": float(ticker["highPrice"]),
+                "low_24h": float(ticker["lowPrice"]),
+                "open": float(df['open'].iloc[-1]),
+                "close": float(df['close'].iloc[-1]),
+                "high": float(df['high'].iloc[-1]),
+                "low": float(df['low'].iloc[-1])
+            }
+            
+            return result
+            
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi API Binance: {str(e)}")
+            return {"status": "error", "message": str(e)}
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu thị trường: {str(e)}")
+            return {"status": "error", "message": str(e)}
+
+# Hàm kiểm tra kết nối
+def test_analyzer():
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logger.info("Đang kiểm tra MarketAnalyzer...")
+    
+    # Tạo instance
     analyzer = MarketAnalyzer(testnet=True)
     
-    if not analyzer.is_connected():
-        print("❌ Không thể kết nối tới Binance API")
-        return
-    
-    print("✅ Đã kết nối tới Binance API")
-    
-    # Kiểm tra tổng quan thị trường
+    # Kiểm tra kết nối
+    logger.info("Đang lấy tổng quan thị trường...")
     overview = analyzer.get_market_overview()
     if overview["status"] == "success":
-        print("✅ Lấy tổng quan thị trường thành công")
-        for data in overview["market_data"]:
-            print(f"  - {data['symbol']}: {data['price']} ({data['change_24h']}%)")
+        logger.info(f"Đã tìm thấy {len(overview['data'])} cặp tiền")
     else:
-        print(f"❌ Lỗi khi lấy tổng quan thị trường: {overview.get('message', 'Unknown error')}")
+        logger.error(f"Lỗi: {overview.get('message', 'Không rõ lỗi')}")
     
-    # Kiểm tra phân tích kỹ thuật
+    # Phân tích kỹ thuật
+    logger.info("Đang phân tích kỹ thuật cho BTCUSDT...")
     analysis = analyzer.analyze_technical("BTCUSDT", "1h")
     if analysis["status"] == "success":
-        print("✅ Phân tích kỹ thuật thành công")
-        print(f"  - Giá hiện tại: {analysis['price']}")
-        print(f"  - Tín hiệu tổng thể: {analysis['overall_signal']} ({analysis['strength']})")
-        for ind in analysis["indicators"]:
-            print(f"  - {ind['name']}: {ind['value']} ({ind['signal']})")
+        logger.info(f"Tín hiệu: {analysis['overall_signal']} ({analysis['strength']})")
+        logger.info(f"Xu hướng ngắn hạn: {analysis['short_term_trend']}")
+        logger.info(f"Xu hướng trung hạn: {analysis['mid_term_trend']}")
+        logger.info(f"Xu hướng dài hạn: {analysis['long_term_trend']}")
+        
+        for indicator in analysis["indicators"]:
+            logger.info(f"{indicator['name']}: {indicator['value']} - {indicator['signal']}")
     else:
-        print(f"❌ Lỗi khi phân tích kỹ thuật: {analysis.get('message', 'Unknown error')}")
+        logger.error(f"Lỗi: {analysis.get('message', 'Không rõ lỗi')}")
     
-    # Kiểm tra thông tin tài khoản
-    account_info = analyzer.get_account_info()
-    if account_info["status"] == "success":
-        print("✅ Lấy thông tin tài khoản thành công")
-        print(f"  - Số dư: {account_info['account']['balance']} USDT")
-        print(f"  - Unrealized P/L: {account_info['account']['unrealized_pnl']} USDT")
-        print(f"  - Margin Balance: {account_info['account']['margin_balance']} USDT")
-        print(f"  - Số vị thế đang mở: {len(account_info['account']['positions'])}")
+    # Lấy thông tin tài khoản
+    logger.info("Đang lấy thông tin tài khoản...")
+    account = analyzer.get_account_info()
+    if account["status"] == "success":
+        logger.info(f"Số dư: {account['account']['balance']} USDT")
+        logger.info(f"Unrealized PnL: {account['account']['unrealized_pnl']} USDT")
+        logger.info(f"Số lượng vị thế: {len(account['account']['positions'])}")
     else:
-        print(f"❌ Lỗi khi lấy thông tin tài khoản: {account_info.get('message', 'Unknown error')}")
+        logger.error(f"Lỗi: {account.get('message', 'Không rõ lỗi')}")
 
 if __name__ == "__main__":
-    test_market_analyzer()
+    test_analyzer()

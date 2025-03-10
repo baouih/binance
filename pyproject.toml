@@ -42,4 +42,5 @@ dependencies = [
     "pyqt5>=5.15.11",
     "pyqtgraph>=0.13.7",
     "pyinstaller>=6.12.0",
+    "cairosvg>=2.7.1",
 ]
