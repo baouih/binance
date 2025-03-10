@@ -1,0 +1,25 @@
+{
+    "risk_percentage": 0.01,
+    "max_positions": 5,
+    "leverage": 5,
+    "position_size_percentage": 0.1,
+    "partial_take_profit": {
+        "enabled": false,
+        "levels": [
+            {"percentage": 30, "profit_percentage": 2},
+            {"percentage": 30, "profit_percentage": 5},
+            {"percentage": 40, "profit_percentage": 10}
+        ]
+    },
+    "stop_loss_percentage": 0.015,
+    "take_profit_percentage": 0.03,
+    "trailing_stop": {
+        "enabled": true,
+        "activation_percentage": 2,
+        "trailing_percentage": 1.5
+    },
+    "trading_hours_restriction": {
+        "enabled": false,
+        "trading_hours": ["09:00-12:00", "14:00-21:00"]
+    }
+}

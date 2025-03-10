@@ -2,1980 +2,1931 @@
 # -*- coding: utf-8 -*-
 
 """
-Module giao diện người dùng desktop nâng cao
+Module giao diện desktop nâng cao
 """
 
 import os
 import sys
-import time
 import json
+import time
 import logging
-import threading
-from datetime import datetime
+import traceback
+from datetime import datetime, timedelta
+from functools import partial
+from typing import Dict, List, Tuple, Union, Any, Optional
 
 # PyQt5 imports
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, 
-                           QHBoxLayout, QLabel, QPushButton, QComboBox, QTextEdit, 
-                           QTableWidget, QTableWidgetItem, QHeaderView, QLineEdit, 
-                           QMessageBox, QProgressBar, QFrame, QGridLayout, QCheckBox, 
-                           QSpinBox, QDoubleSpinBox, QSlider, QGroupBox, QRadioButton,
-                           QSplitter, QSizePolicy, QFileDialog, QAction, QToolBar,
-                           QStatusBar, QMenu, QMenuBar, QSystemTrayIcon, QScrollArea)
-from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QSettings, QSize, QPoint, QUrl
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QDesktopServices, QTextCursor
+from PyQt5.QtWidgets import (
+    QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QTabWidget, QComboBox, QLineEdit, QFormLayout, QGroupBox, QMessageBox, QGridLayout,
+    QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QCheckBox, QDoubleSpinBox,
+    QSpinBox, QTextEdit, QSizePolicy, QSplitter, QStatusBar, QToolBar, QAction, QMenu,
+    QSystemTrayIcon, QStyle
+)
+from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
 
-# Logging setup
-logger = logging.getLogger('trading_gui')
+# Thiết lập logging
+logger = logging.getLogger("enhanced_trading_gui")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-class UpdateThread(QThread):
-    """Thread để cập nhật dữ liệu từ máy chủ"""
-    update_signal = pyqtSignal(dict)
-    error_signal = pyqtSignal(str)
+# Import các module từ dự án
+try:
+    from market_analyzer import MarketAnalyzer
+    from position_manager import PositionManager
+    from risk_manager import RiskManager
+    logger.info("Đã import thành công các module từ dự án")
+except ImportError as e:
+    logger.error(f"Lỗi khi import module: {str(e)}")
+    from typing import Any
+    # Tạo các class giả trong trường hợp import thất bại
+    class MarketAnalyzer:
+        def __init__(self, *args, **kwargs):
+            pass
     
-    def __init__(self, app):
+    class PositionManager:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class RiskManager:
+        def __init__(self, *args, **kwargs):
+            pass
+
+class RefreshThread(QThread):
+    """Thread cập nhật dữ liệu theo thời gian thực"""
+    signal = pyqtSignal(dict)
+    
+    def __init__(self, market_analyzer, position_manager, interval=10):
+        """
+        Khởi tạo thread cập nhật
+        
+        :param market_analyzer: Đối tượng MarketAnalyzer
+        :param position_manager: Đối tượng PositionManager
+        :param interval: Khoảng thời gian cập nhật (giây)
+        """
         super().__init__()
-        self.app = app
+        self.market_analyzer = market_analyzer
+        self.position_manager = position_manager
+        self.interval = interval
         self.running = True
     
     def run(self):
+        """Chạy thread"""
         while self.running:
             try:
-                # Cập nhật tổng quan thị trường
-                market_overview = self.app.market_analyzer.get_market_overview()
+                # Lấy dữ liệu thị trường
+                market_data = {}
+                if self.market_analyzer:
+                    market_overview = self.market_analyzer.get_market_overview()
+                    if market_overview.get("status") == "success":
+                        market_data["market_overview"] = market_overview.get("data", [])
                 
-                # Cập nhật vị thế đang mở
-                positions = self.app.position_manager.get_all_positions()
+                # Lấy danh sách vị thế
+                positions = []
+                if self.position_manager:
+                    positions = self.position_manager.get_all_positions()
+                market_data["positions"] = positions
                 
-                # Chạy một chu kỳ của bot
-                if self.app.trading_bot:
-                    cycle_result = self.app.trading_bot.run_cycle()
-                else:
-                    cycle_result = {"actions": [], "errors": []}
+                # Lấy số dư tài khoản
+                account_balance = {}
+                if self.position_manager:
+                    account_info = self.position_manager.get_account_balance()
+                    if account_info.get("status") == "success":
+                        account_balance = account_info.get("balance", {})
+                market_data["account_balance"] = account_balance
                 
-                # Tổng hợp kết quả
-                update_data = {
-                    "market_overview": market_overview,
-                    "positions": positions,
-                    "cycle_result": cycle_result,
-                    "timestamp": datetime.now()
-                }
-                
-                # Gửi tín hiệu cập nhật
-                self.update_signal.emit(update_data)
-                
-            except Exception as e:
-                error_msg = f"Lỗi khi cập nhật dữ liệu: {str(e)}"
-                logger.error(error_msg)
-                self.error_signal.emit(error_msg)
+                # Phát tín hiệu với dữ liệu mới
+                self.signal.emit(market_data)
             
-            # Tạm dừng 10 giây
-            time.sleep(10)
+            except Exception as e:
+                logger.error(f"Lỗi trong thread cập nhật: {str(e)}", exc_info=True)
+            
+            # Ngủ theo khoảng thời gian cập nhật
+            time.sleep(self.interval)
     
     def stop(self):
+        """Dừng thread"""
         self.running = False
         self.wait()
 
-class TradingApp(QMainWindow):
-    """Giao diện người dùng desktop nâng cao"""
+class EnhancedTradingGUI(QMainWindow):
+    """Giao diện đồ họa nâng cao cho giao dịch"""
     
     def __init__(self):
+        """Khởi tạo giao diện đồ họa"""
         super().__init__()
-        self.setWindowTitle("Crypto Trading Bot Desktop")
-        self.setMinimumSize(1200, 800)
         
-        # Khởi tạo các biến
-        self.market_analyzer = None
-        self.signal_generator = None
-        self.position_manager = None
-        self.risk_manager = None
-        self.trading_bot = None
-        self.telegram_notifier = None
-        self.config = {}
+        # Thiết lập thuộc tính cửa sổ
+        self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
+        self.setGeometry(100, 100, 1280, 800)
         
-        # Kiểm tra tệp cấu hình
-        if os.path.exists("account_config.json"):
-            try:
-                with open("account_config.json", "r", encoding="utf-8") as f:
-                    self.config = json.load(f)
-            except Exception as e:
-                logger.error(f"Lỗi khi đọc tệp cấu hình: {str(e)}")
+        # Thiết lập icon
+        self.setWindowIcon(QIcon("static/icons/app_icon.png"))
+        
+        # Khởi tạo các đối tượng
+        self.init_objects()
         
         # Thiết lập giao diện
-        self.setup_ui()
+        self.init_ui()
         
-        # Kiểm tra khả năng kết nối API
-        self.check_api_connection()
+        # Khởi tạo thread cập nhật
+        self.init_refresh_thread()
         
-        # Khởi động luồng cập nhật
-        self.update_thread = None
+        # Kết nối các sự kiện
+        self.connect_events()
+        
+        # Tải cấu hình
+        self.load_config()
     
-    def setup_ui(self):
-        """Thiết lập giao diện người dùng"""
-        # Widget chính
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        
-        # Layout chính
-        main_layout = QVBoxLayout(central_widget)
-        
-        # Tạo thanh menu
-        self.create_menu()
-        
-        # Tạo thanh công cụ
-        self.create_toolbar()
-        
-        # Tab widget
-        self.tabs = QTabWidget()
-        main_layout.addWidget(self.tabs)
-        
-        # Tạo các tab
-        self.create_dashboard_tab()
-        self.create_positions_tab()
-        self.create_market_tab()
-        self.create_settings_tab()
-        self.create_logs_tab()
-        
-        # Thanh trạng thái
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("Sẵn sàng")
-        
-        # Thanh tiến trình (ẩn ban đầu)
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setRange(0, 100)
-        self.progress_bar.setValue(0)
-        self.progress_bar.setVisible(False)
-        self.status_bar.addPermanentWidget(self.progress_bar)
-    
-    def create_menu(self):
-        """Tạo thanh menu"""
-        # Menu chính
-        menubar = self.menuBar()
-        
-        # Menu Tệp
-        file_menu = menubar.addMenu("Tệp")
-        
-        # Hành động trong menu Tệp
-        connect_action = QAction(QIcon("static/img/connect.png"), "Kết nối API", self)
-        connect_action.triggered.connect(self.check_api_connection)
-        file_menu.addAction(connect_action)
-        
-        reconnect_action = QAction(QIcon("static/img/reconnect.png"), "Kết nối lại", self)
-        reconnect_action.triggered.connect(self.reconnect_api)
-        file_menu.addAction(reconnect_action)
-        
-        file_menu.addSeparator()
-        
-        save_config_action = QAction(QIcon("static/img/save.png"), "Lưu cấu hình", self)
-        save_config_action.triggered.connect(self.save_config)
-        file_menu.addAction(save_config_action)
-        
-        load_config_action = QAction(QIcon("static/img/load.png"), "Tải cấu hình", self)
-        load_config_action.triggered.connect(self.load_config)
-        file_menu.addAction(load_config_action)
-        
-        file_menu.addSeparator()
-        
-        exit_action = QAction(QIcon("static/img/exit.png"), "Thoát", self)
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
-        
-        # Menu Giao dịch
-        trading_menu = menubar.addMenu("Giao dịch")
-        
-        start_bot_action = QAction(QIcon("static/img/start.png"), "Bắt đầu bot", self)
-        start_bot_action.triggered.connect(self.start_bot)
-        trading_menu.addAction(start_bot_action)
-        
-        stop_bot_action = QAction(QIcon("static/img/stop.png"), "Dừng bot", self)
-        stop_bot_action.triggered.connect(self.stop_bot)
-        trading_menu.addAction(stop_bot_action)
-        
-        trading_menu.addSeparator()
-        
-        market_order_action = QAction(QIcon("static/img/market.png"), "Lệnh thị trường", self)
-        market_order_action.triggered.connect(self.show_market_order_dialog)
-        trading_menu.addAction(market_order_action)
-        
-        limit_order_action = QAction(QIcon("static/img/limit.png"), "Lệnh giới hạn", self)
-        limit_order_action.triggered.connect(self.show_limit_order_dialog)
-        trading_menu.addAction(limit_order_action)
-        
-        trading_menu.addSeparator()
-        
-        close_position_action = QAction(QIcon("static/img/close.png"), "Đóng vị thế", self)
-        close_position_action.triggered.connect(self.show_close_position_dialog)
-        trading_menu.addAction(close_position_action)
-        
-        # Menu Công cụ
-        tools_menu = menubar.addMenu("Công cụ")
-        
-        trailing_stop_action = QAction(QIcon("static/img/trailing.png"), "Trailing Stop", self)
-        trailing_stop_action.triggered.connect(self.show_trailing_stop_dialog)
-        tools_menu.addAction(trailing_stop_action)
-        
-        partial_tp_action = QAction(QIcon("static/img/partial.png"), "Chốt lời một phần", self)
-        partial_tp_action.triggered.connect(self.show_partial_tp_dialog)
-        tools_menu.addAction(partial_tp_action)
-        
-        tools_menu.addSeparator()
-        
-        risk_calculator_action = QAction(QIcon("static/img/calculator.png"), "Tính toán rủi ro", self)
-        risk_calculator_action.triggered.connect(self.show_risk_calculator)
-        tools_menu.addAction(risk_calculator_action)
-        
-        position_size_action = QAction(QIcon("static/img/size.png"), "Tính kích thước vị thế", self)
-        position_size_action.triggered.connect(self.show_position_size_calculator)
-        tools_menu.addAction(position_size_action)
-        
-        # Menu Trợ giúp
-        help_menu = menubar.addMenu("Trợ giúp")
-        
-        about_action = QAction(QIcon("static/img/about.png"), "Giới thiệu", self)
-        about_action.triggered.connect(self.show_about)
-        help_menu.addAction(about_action)
-        
-        doc_action = QAction(QIcon("static/img/doc.png"), "Tài liệu", self)
-        doc_action.triggered.connect(self.open_documentation)
-        help_menu.addAction(doc_action)
-        
-        update_action = QAction(QIcon("static/img/update.png"), "Kiểm tra cập nhật", self)
-        update_action.triggered.connect(self.check_updates)
-        help_menu.addAction(update_action)
-    
-    def create_toolbar(self):
-        """Tạo thanh công cụ"""
-        toolbar = QToolBar("Thanh công cụ chính")
-        toolbar.setIconSize(QSize(24, 24))
-        self.addToolBar(toolbar)
-        
-        # Thêm các hành động vào thanh công cụ
-        connect_action = QAction(QIcon("static/img/connect.png"), "Kết nối API", self)
-        connect_action.triggered.connect(self.check_api_connection)
-        toolbar.addAction(connect_action)
-        
-        toolbar.addSeparator()
-        
-        start_bot_action = QAction(QIcon("static/img/start.png"), "Bắt đầu bot", self)
-        start_bot_action.triggered.connect(self.start_bot)
-        toolbar.addAction(start_bot_action)
-        
-        stop_bot_action = QAction(QIcon("static/img/stop.png"), "Dừng bot", self)
-        stop_bot_action.triggered.connect(self.stop_bot)
-        toolbar.addAction(stop_bot_action)
-        
-        toolbar.addSeparator()
-        
-        market_action = QAction(QIcon("static/img/market.png"), "Lệnh thị trường", self)
-        market_action.triggered.connect(self.show_market_order_dialog)
-        toolbar.addAction(market_action)
-        
-        close_action = QAction(QIcon("static/img/close.png"), "Đóng vị thế", self)
-        close_action.triggered.connect(self.show_close_position_dialog)
-        toolbar.addAction(close_action)
-        
-        toolbar.addSeparator()
-        
-        setting_action = QAction(QIcon("static/img/settings.png"), "Cài đặt", self)
-        setting_action.triggered.connect(lambda: self.tabs.setCurrentIndex(3))  # Chuyển đến tab Settings
-        toolbar.addAction(setting_action)
-    
-    def create_dashboard_tab(self):
-        """Tạo tab Tổng quan"""
-        dashboard_tab = QWidget()
-        layout = QVBoxLayout(dashboard_tab)
-        
-        # Header
-        header_layout = QHBoxLayout()
-        self.account_balance_label = QLabel("Số dư tài khoản: 0 USDT")
-        self.account_balance_label.setFont(QFont("Arial", 14, QFont.Bold))
-        header_layout.addWidget(self.account_balance_label)
-        
-        self.pnl_label = QLabel("Lợi nhuận: 0 USDT")
-        self.pnl_label.setFont(QFont("Arial", 14))
-        header_layout.addWidget(self.pnl_label)
-        
-        header_layout.addStretch()
-        
-        self.risk_level_label = QLabel(f"Mức rủi ro: {self.config.get('risk_level', 10)}%")
-        self.risk_level_label.setFont(QFont("Arial", 14))
-        header_layout.addWidget(self.risk_level_label)
-        
-        layout.addLayout(header_layout)
-        
-        # Separator
-        line = QFrame()
-        line.setFrameShape(QFrame.HLine)
-        line.setFrameShadow(QFrame.Sunken)
-        layout.addWidget(line)
-        
-        # Main content
-        content_layout = QHBoxLayout()
-        
-        # Left panel - Portfolio
-        portfolio_group = QGroupBox("Danh mục đầu tư")
-        portfolio_layout = QVBoxLayout(portfolio_group)
-        
-        self.positions_table = QTableWidget(0, 5)
-        self.positions_table.setHorizontalHeaderLabels(["Cặp", "Vị thế", "Số lượng", "Giá vào", "Lợi nhuận"])
-        self.positions_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        portfolio_layout.addWidget(self.positions_table)
-        
-        content_layout.addWidget(portfolio_group, 3)
-        
-        # Right panel - Market
-        market_group = QGroupBox("Thị trường")
-        market_layout = QVBoxLayout(market_group)
-        
-        self.market_table = QTableWidget(0, 5)
-        self.market_table.setHorizontalHeaderLabels(["Cặp", "Giá", "Thay đổi 24h", "Khối lượng", "Tín hiệu"])
-        self.market_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        market_layout.addWidget(self.market_table)
-        
-        content_layout.addWidget(market_group, 2)
-        
-        layout.addLayout(content_layout, 3)
-        
-        # Bottom panel - Bot Actions
-        actions_group = QGroupBox("Hành động của Bot")
-        actions_layout = QVBoxLayout(actions_group)
-        
-        self.bot_log = QTextEdit()
-        self.bot_log.setReadOnly(True)
-        actions_layout.addWidget(self.bot_log)
-        
-        layout.addWidget(actions_group, 1)
-        
-        # Bottom buttons
-        buttons_layout = QHBoxLayout()
-        
-        start_button = QPushButton("Bắt đầu Bot")
-        start_button.clicked.connect(self.start_bot)
-        buttons_layout.addWidget(start_button)
-        
-        stop_button = QPushButton("Dừng Bot")
-        stop_button.clicked.connect(self.stop_bot)
-        buttons_layout.addWidget(stop_button)
-        
-        buttons_layout.addStretch()
-        
-        telegram_button = QPushButton("Gửi thông báo Telegram")
-        telegram_button.clicked.connect(self.send_telegram_notification)
-        buttons_layout.addWidget(telegram_button)
-        
-        layout.addLayout(buttons_layout)
-        
-        # Add to tabs
-        self.tabs.addTab(dashboard_tab, "Tổng quan")
-    
-    def create_positions_tab(self):
-        """Tạo tab Vị thế"""
-        positions_tab = QWidget()
-        layout = QVBoxLayout(positions_tab)
-        
-        # Header
-        header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel("Quản lý Vị thế"))
-        header_layout.addStretch()
-        
-        refresh_button = QPushButton("Làm mới")
-        refresh_button.clicked.connect(self.refresh_positions)
-        header_layout.addWidget(refresh_button)
-        
-        layout.addLayout(header_layout)
-        
-        # Positions table
-        self.detailed_positions_table = QTableWidget(0, 8)
-        self.detailed_positions_table.setHorizontalHeaderLabels([
-            "Cặp", "Vị thế", "Số lượng", "Giá vào", "Giá hiện tại", 
-            "Stop Loss", "Take Profit", "Lợi nhuận"
-        ])
-        self.detailed_positions_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        layout.addWidget(self.detailed_positions_table)
-        
-        # Position actions
-        actions_layout = QHBoxLayout()
-        
-        close_button = QPushButton("Đóng vị thế")
-        close_button.clicked.connect(self.close_selected_position)
-        actions_layout.addWidget(close_button)
-        
-        edit_sl_button = QPushButton("Chỉnh sửa SL")
-        edit_sl_button.clicked.connect(self.edit_sl)
-        actions_layout.addWidget(edit_sl_button)
-        
-        edit_tp_button = QPushButton("Chỉnh sửa TP")
-        edit_tp_button.clicked.connect(self.edit_tp)
-        actions_layout.addWidget(edit_tp_button)
-        
-        add_trailing_button = QPushButton("Thêm Trailing Stop")
-        add_trailing_button.clicked.connect(self.add_trailing_stop)
-        actions_layout.addWidget(add_trailing_button)
-        
-        partial_tp_button = QPushButton("Chốt lời một phần")
-        partial_tp_button.clicked.connect(self.show_partial_tp_dialog)
-        actions_layout.addWidget(partial_tp_button)
-        
-        layout.addLayout(actions_layout)
-        
-        # Add to tabs
-        self.tabs.addTab(positions_tab, "Vị thế")
-    
-    def create_market_tab(self):
-        """Tạo tab Thị trường"""
-        market_tab = QWidget()
-        layout = QVBoxLayout(market_tab)
-        
-        # Market controls
-        controls_layout = QHBoxLayout()
-        
-        controls_layout.addWidget(QLabel("Cặp:"))
-        self.symbol_combo = QComboBox()
-        self.symbol_combo.addItems(["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"])
-        self.symbol_combo.setCurrentText(self.config.get("symbols", ["BTCUSDT"])[0])
-        self.symbol_combo.currentTextChanged.connect(self.update_market_analysis)
-        controls_layout.addWidget(self.symbol_combo)
-        
-        controls_layout.addWidget(QLabel("Khung thời gian:"))
-        self.timeframe_combo = QComboBox()
-        self.timeframe_combo.addItems(["1m", "5m", "15m", "1h", "4h", "1d"])
-        self.timeframe_combo.setCurrentText(self.config.get("timeframes", ["1h"])[0])
-        self.timeframe_combo.currentTextChanged.connect(self.update_market_analysis)
-        controls_layout.addWidget(self.timeframe_combo)
-        
-        refresh_button = QPushButton("Phân tích")
-        refresh_button.clicked.connect(self.update_market_analysis)
-        controls_layout.addWidget(refresh_button)
-        
-        order_button = QPushButton("Đặt lệnh")
-        order_button.clicked.connect(self.show_market_order_dialog)
-        controls_layout.addWidget(order_button)
-        
-        layout.addLayout(controls_layout)
-        
-        # Market content
-        content_layout = QHBoxLayout()
-        
-        # Left panel - Market data
-        market_data_group = QGroupBox("Dữ liệu thị trường")
-        market_data_layout = QVBoxLayout(market_data_group)
-        
-        self.market_data_text = QTextEdit()
-        self.market_data_text.setReadOnly(True)
-        market_data_layout.addWidget(self.market_data_text)
-        
-        content_layout.addWidget(market_data_group, 1)
-        
-        # Right panel - Technical analysis
-        ta_group = QGroupBox("Phân tích kỹ thuật")
-        ta_layout = QVBoxLayout(ta_group)
-        
-        self.ta_text = QTextEdit()
-        self.ta_text.setReadOnly(True)
-        ta_layout.addWidget(self.ta_text)
-        
-        content_layout.addWidget(ta_group, 1)
-        
-        layout.addLayout(content_layout)
-        
-        # Bottom panel - Signals
-        signals_group = QGroupBox("Tín hiệu giao dịch")
-        signals_layout = QVBoxLayout(signals_group)
-        
-        self.signals_table = QTableWidget(0, 7)
-        self.signals_table.setHorizontalHeaderLabels([
-            "Cặp", "Khung thời gian", "Tín hiệu", "Giá vào", "Stop Loss", 
-            "Take Profit", "Tin cậy"
-        ])
-        self.signals_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        signals_layout.addWidget(self.signals_table)
-        
-        # Signal actions
-        signal_actions_layout = QHBoxLayout()
-        
-        execute_signal_button = QPushButton("Thực thi tín hiệu")
-        execute_signal_button.clicked.connect(self.execute_selected_signal)
-        signal_actions_layout.addWidget(execute_signal_button)
-        
-        ignore_signal_button = QPushButton("Bỏ qua tín hiệu")
-        ignore_signal_button.clicked.connect(self.ignore_selected_signal)
-        signal_actions_layout.addWidget(ignore_signal_button)
-        
-        signals_layout.addLayout(signal_actions_layout)
-        
-        layout.addWidget(signals_group)
-        
-        # Add to tabs
-        self.tabs.addTab(market_tab, "Thị trường")
-    
-    def create_settings_tab(self):
-        """Tạo tab Cài đặt"""
-        settings_tab = QWidget()
-        layout = QVBoxLayout(settings_tab)
-        
-        # Create a scroll area
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_content = QWidget()
-        scroll_layout = QVBoxLayout(scroll_content)
-        
-        # API Settings
-        api_group = QGroupBox("Cài đặt API")
-        api_layout = QGridLayout(api_group)
-        
-        api_layout.addWidget(QLabel("Testnet:"), 0, 0)
-        self.testnet_checkbox = QCheckBox()
-        self.testnet_checkbox.setChecked(self.config.get("testnet", True))
-        api_layout.addWidget(self.testnet_checkbox, 0, 1)
-        
-        api_layout.addWidget(QLabel("API Key:"), 1, 0)
-        self.api_key_input = QLineEdit()
-        self.api_key_input.setEchoMode(QLineEdit.Password)
-        self.api_key_input.setPlaceholderText("API Key Binance")
-        api_layout.addWidget(self.api_key_input, 1, 1)
-        
-        api_layout.addWidget(QLabel("API Secret:"), 2, 0)
-        self.api_secret_input = QLineEdit()
-        self.api_secret_input.setEchoMode(QLineEdit.Password)
-        self.api_secret_input.setPlaceholderText("API Secret Binance")
-        api_layout.addWidget(self.api_secret_input, 2, 1)
-        
-        api_test_button = QPushButton("Kiểm tra API")
-        api_test_button.clicked.connect(self.check_api_connection)
-        api_layout.addWidget(api_test_button, 3, 1)
-        
-        scroll_layout.addWidget(api_group)
-        
-        # Telegram Settings
-        telegram_group = QGroupBox("Cài đặt Telegram")
-        telegram_layout = QGridLayout(telegram_group)
-        
-        telegram_layout.addWidget(QLabel("Bật thông báo:"), 0, 0)
-        self.telegram_enabled_checkbox = QCheckBox()
-        self.telegram_enabled_checkbox.setChecked(self.config.get("telegram_notifications", False))
-        telegram_layout.addWidget(self.telegram_enabled_checkbox, 0, 1)
-        
-        telegram_layout.addWidget(QLabel("Bot Token:"), 1, 0)
-        self.telegram_token_input = QLineEdit()
-        self.telegram_token_input.setEchoMode(QLineEdit.Password)
-        self.telegram_token_input.setPlaceholderText("Telegram Bot Token")
-        telegram_layout.addWidget(self.telegram_token_input, 1, 1)
-        
-        telegram_layout.addWidget(QLabel("Chat ID:"), 2, 0)
-        self.telegram_chat_id_input = QLineEdit()
-        self.telegram_chat_id_input.setPlaceholderText("Telegram Chat ID")
-        telegram_layout.addWidget(self.telegram_chat_id_input, 2, 1)
-        
-        telegram_test_button = QPushButton("Kiểm tra Telegram")
-        telegram_test_button.clicked.connect(self.test_telegram)
-        telegram_layout.addWidget(telegram_test_button, 3, 1)
-        
-        scroll_layout.addWidget(telegram_group)
-        
-        # Trading Settings
-        trading_group = QGroupBox("Cài đặt Giao dịch")
-        trading_layout = QGridLayout(trading_group)
-        
-        trading_layout.addWidget(QLabel("Mức độ rủi ro:"), 0, 0)
-        self.risk_level_combo = QComboBox()
-        self.risk_level_combo.addItems(["10%", "15%", "20%", "30%"])
-        current_risk = str(self.config.get("risk_level", 10)) + "%"
-        current_index = self.risk_level_combo.findText(current_risk)
-        self.risk_level_combo.setCurrentIndex(current_index if current_index >= 0 else 0)
-        trading_layout.addWidget(self.risk_level_combo, 0, 1)
-        
-        trading_layout.addWidget(QLabel("Cặp tiền:"), 1, 0)
-        self.symbols_input = QLineEdit()
-        self.symbols_input.setText(", ".join(self.config.get("symbols", ["BTCUSDT", "ETHUSDT"])))
-        trading_layout.addWidget(self.symbols_input, 1, 1)
-        
-        trading_layout.addWidget(QLabel("Khung thời gian:"), 2, 0)
-        self.timeframes_input = QLineEdit()
-        self.timeframes_input.setText(", ".join(self.config.get("timeframes", ["1h", "4h"])))
-        trading_layout.addWidget(self.timeframes_input, 2, 1)
-        
-        trading_layout.addWidget(QLabel("Trailing Stop:"), 3, 0)
-        self.trailing_stop_checkbox = QCheckBox()
-        self.trailing_stop_checkbox.setChecked(self.config.get("auto_trailing_stop", True))
-        trading_layout.addWidget(self.trailing_stop_checkbox, 3, 1)
-        
-        scroll_layout.addWidget(trading_group)
-        
-        # Notification Settings
-        notification_group = QGroupBox("Cài đặt Thông báo")
-        notification_layout = QGridLayout(notification_group)
-        
-        notification_layout.addWidget(QLabel("Giờ không làm phiền:"), 0, 0)
-        self.quiet_hours_checkbox = QCheckBox()
-        self.quiet_hours_checkbox.setChecked(self.config.get("quiet_hours", {}).get("enabled", False))
-        notification_layout.addWidget(self.quiet_hours_checkbox, 0, 1)
-        
-        notification_layout.addWidget(QLabel("Bắt đầu:"), 1, 0)
-        self.quiet_start_input = QLineEdit()
-        self.quiet_start_input.setText(self.config.get("quiet_hours", {}).get("start", "22:00"))
-        notification_layout.addWidget(self.quiet_start_input, 1, 1)
-        
-        notification_layout.addWidget(QLabel("Kết thúc:"), 2, 0)
-        self.quiet_end_input = QLineEdit()
-        self.quiet_end_input.setText(self.config.get("quiet_hours", {}).get("end", "07:00"))
-        notification_layout.addWidget(self.quiet_end_input, 2, 1)
-        
-        scroll_layout.addWidget(notification_group)
-        
-        # Auto Update Settings
-        update_group = QGroupBox("Cài đặt Tự động Cập nhật")
-        update_layout = QGridLayout(update_group)
-        
-        update_layout.addWidget(QLabel("Tự động cập nhật:"), 0, 0)
-        self.auto_update_checkbox = QCheckBox()
-        self.auto_update_checkbox.setChecked(self.config.get("auto_update", True))
-        update_layout.addWidget(self.auto_update_checkbox, 0, 1)
-        
-        update_layout.addWidget(QLabel("Tần suất kiểm tra (giờ):"), 1, 0)
-        self.update_frequency_spin = QSpinBox()
-        self.update_frequency_spin.setRange(1, 24)
-        self.update_frequency_spin.setValue(self.config.get("update_frequency", 24))
-        update_layout.addWidget(self.update_frequency_spin, 1, 1)
-        
-        check_update_button = QPushButton("Kiểm tra cập nhật ngay")
-        check_update_button.clicked.connect(self.check_updates)
-        update_layout.addWidget(check_update_button, 2, 1)
-        
-        scroll_layout.addWidget(update_group)
-        
-        # Add buttons at the bottom
-        buttons_layout = QHBoxLayout()
-        
-        save_button = QPushButton("Lưu cài đặt")
-        save_button.clicked.connect(self.save_settings)
-        buttons_layout.addWidget(save_button)
-        
-        defaults_button = QPushButton("Khôi phục mặc định")
-        defaults_button.clicked.connect(self.reset_settings)
-        buttons_layout.addWidget(defaults_button)
-        
-        scroll_layout.addLayout(buttons_layout)
-        
-        # Set up scroll area
-        scroll_area.setWidget(scroll_content)
-        layout.addWidget(scroll_area)
-        
-        # Add to tabs
-        self.tabs.addTab(settings_tab, "Cài đặt")
-    
-    def create_logs_tab(self):
-        """Tạo tab Nhật ký"""
-        logs_tab = QWidget()
-        layout = QVBoxLayout(logs_tab)
-        
-        # Controls
-        controls_layout = QHBoxLayout()
-        
-        controls_layout.addWidget(QLabel("Loại nhật ký:"))
-        self.log_type_combo = QComboBox()
-        self.log_type_combo.addItems(["Bot", "Giao dịch", "Thị trường", "Lỗi", "Tất cả"])
-        self.log_type_combo.currentTextChanged.connect(self.load_logs)
-        controls_layout.addWidget(self.log_type_combo)
-        
-        refresh_logs_button = QPushButton("Làm mới")
-        refresh_logs_button.clicked.connect(self.load_logs)
-        controls_layout.addWidget(refresh_logs_button)
-        
-        clear_logs_button = QPushButton("Xóa nhật ký")
-        clear_logs_button.clicked.connect(self.clear_logs)
-        controls_layout.addWidget(clear_logs_button)
-        
-        layout.addLayout(controls_layout)
-        
-        # Log viewer
-        self.log_viewer = QTextEdit()
-        self.log_viewer.setReadOnly(True)
-        self.log_viewer.setFont(QFont("Courier", 10))
-        layout.addWidget(self.log_viewer)
-        
-        # Add to tabs
-        self.tabs.addTab(logs_tab, "Nhật ký")
-    
-    def check_api_connection(self):
-        """Kiểm tra kết nối API"""
-        self.status_bar.showMessage("Đang kiểm tra kết nối API...")
-        self.progress_bar.setVisible(True)
-        self.progress_bar.setValue(30)
-        
+    def init_objects(self):
+        """Khởi tạo các đối tượng cần thiết"""
         try:
-            # Thử nhập các module cần thiết
-            from market_analyzer import MarketAnalyzer
-            from signal_generator import SignalGenerator
-            from position_manager import PositionManager
-            from risk_manager import RiskManager
-            from trading_bot import TradingBot
-            from advanced_telegram_notifier import TelegramNotifier
-            
-            # Lấy API key từ cấu hình hoặc từ biến môi trường
+            # Kiểm tra các khóa API
             api_key = os.environ.get("BINANCE_TESTNET_API_KEY")
             api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET")
             
-            self.progress_bar.setValue(50)
+            if not api_key or not api_secret:
+                self.show_missing_api_keys_error()
             
-            # Kiểm tra kết nối API
+            # Khởi tạo các đối tượng
             self.market_analyzer = MarketAnalyzer(testnet=True)
+            self.position_manager = PositionManager(testnet=True)
             
-            market_check = self.market_analyzer.get_market_overview()
-            if market_check["status"] != "success":
-                raise Exception(f"Lỗi kết nối: {market_check.get('message', 'Không rõ lỗi')}")
+            # Tải cấu hình rủi ro từ file
+            risk_config = self.load_risk_config()
             
-            self.progress_bar.setValue(70)
-            
-            # Khởi tạo các thành phần khác
-            self.signal_generator = SignalGenerator(self.market_analyzer, self.config)
-            
-            risk_level = self.config.get("risk_level", 10)
-            risk_config_file = f"risk_configs/risk_level_{risk_level}.json"
-            risk_config = {}
-            
-            if os.path.exists(risk_config_file):
-                with open(risk_config_file, "r") as f:
-                    risk_config = json.load(f)
-            
-            self.position_manager = PositionManager(testnet=True, risk_config=risk_config)
+            # Khởi tạo Risk Manager
             self.risk_manager = RiskManager(self.position_manager, risk_config)
             
-            self.progress_bar.setValue(90)
-            
-            # Kiểm tra Telegram nếu được bật
-            telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-            telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-            
-            if self.config.get("telegram_notifications", False) and telegram_token and telegram_chat_id:
-                self.telegram_notifier = TelegramNotifier()
-                
-                # Gửi thông báo kết nối thành công
-                self.telegram_notifier.send_message("Kết nối thành công với Bot Trading")
-            
-            # Khởi tạo bot
-            self.trading_bot = TradingBot(
-                market_analyzer=self.market_analyzer,
-                signal_generator=self.signal_generator,
-                position_manager=self.position_manager,
-                risk_manager=self.risk_manager,
-                telegram_notifier=self.telegram_notifier,
-                config=self.config
-            )
-            
-            self.progress_bar.setValue(100)
-            self.status_bar.showMessage("Kết nối API thành công", 3000)
-            
-            # Hiển thị thông báo thành công
-            QMessageBox.information(self, "Kết nối thành công", "Đã kết nối thành công đến API Binance Testnet")
-            
-            # Khởi động luồng cập nhật
-            self.start_update_thread()
-            
-            # Cập nhật giao diện
-            self.update_dashboard()
-            
-        except Exception as e:
-            error_msg = f"Lỗi kết nối API: {str(e)}"
-            logger.error(error_msg)
-            self.status_bar.showMessage("Kết nối API thất bại", 3000)
-            self.progress_bar.setVisible(False)
-            
-            # Hiển thị thông báo lỗi
-            QMessageBox.critical(self, "Lỗi kết nối", f"Không thể kết nối đến API: {str(e)}")
-    
-    def reconnect_api(self):
-        """Kết nối lại API"""
-        if self.update_thread:
-            self.update_thread.stop()
-            self.update_thread = None
+            logger.info("Đã khởi tạo các đối tượng")
         
-        self.check_api_connection()
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi tạo các đối tượng: {str(e)}", exc_info=True)
+            self.market_analyzer = None
+            self.position_manager = None
+            self.risk_manager = None
     
-    def start_update_thread(self):
-        """Khởi động luồng cập nhật"""
-        if self.trading_bot and not self.update_thread:
-            self.update_thread = UpdateThread(self)
-            self.update_thread.update_signal.connect(self.update_from_thread)
-            self.update_thread.error_signal.connect(self.show_error)
-            self.update_thread.start()
-    
-    def update_from_thread(self, data):
-        """Cập nhật dữ liệu từ luồng"""
+    def load_risk_config(self) -> Dict[str, Any]:
+        """
+        Tải cấu hình rủi ro từ file
+        
+        :return: Dict với cấu hình rủi ro
+        """
         try:
-            # Cập nhật tổng quan
-            market_overview = data.get("market_overview", {"status": "error"})
-            positions = data.get("positions", [])
-            cycle_result = data.get("cycle_result", {"actions": [], "errors": []})
+            # Tải cấu hình từ file
+            config_file = "risk_configs/desktop_risk_config.json"
             
-            # Cập nhật dashboard
-            if market_overview["status"] == "success":
-                self.update_market_tables(market_overview["data"])
-            
-            if positions:
-                self.update_position_tables(positions)
-            
-            # Cập nhật log bot
-            for action in cycle_result.get("actions", []):
-                self.bot_log.append(f"{datetime.now().strftime('%H:%M:%S')} - {action}")
-            
-            for error in cycle_result.get("errors", []):
-                self.bot_log.append(f"{datetime.now().strftime('%H:%M:%S')} - Lỗi: {error}")
+            # Kiểm tra xem file có tồn tại không
+            if os.path.exists(config_file):
+                with open(config_file, "r") as f:
+                    risk_config = json.load(f)
+                logger.info(f"Đã tải cấu hình rủi ro từ {config_file}")
+                return risk_config
+            else:
+                # Sử dụng cấu hình mặc định
+                risk_config = {
+                    "risk_percentage": 0.01,  # 1% rủi ro trên mỗi giao dịch
+                    "max_positions": 5,  # Số lượng vị thế tối đa
+                    "leverage": 5,  # Đòn bẩy mặc định
+                    "position_size_percentage": 0.1,  # 10% số dư cho mỗi vị thế
+                    "partial_take_profit": {
+                        "enabled": False,
+                        "levels": [
+                            {"percentage": 30, "profit_percentage": 2},
+                            {"percentage": 30, "profit_percentage": 5},
+                            {"percentage": 40, "profit_percentage": 10}
+                        ]
+                    },
+                    "stop_loss_percentage": 0.015,  # 1.5% Stop Loss
+                    "take_profit_percentage": 0.03,  # 3% Take Profit
+                    "trailing_stop": {
+                        "enabled": True,
+                        "activation_percentage": 2,
+                        "trailing_percentage": 1.5
+                    },
+                    "trading_hours_restriction": {
+                        "enabled": False,
+                        "trading_hours": ["09:00-12:00", "14:00-21:00"]
+                    }
+                }
                 
-            # Đảm bảo cuộn xuống cuối
-            self.bot_log.moveCursor(QTextCursor.End)
+                # Tạo thư mục nếu chưa tồn tại
+                os.makedirs(os.path.dirname(config_file), exist_ok=True)
+                
+                # Lưu cấu hình mặc định
+                with open(config_file, "w") as f:
+                    json.dump(risk_config, f, indent=4)
+                
+                logger.info(f"Đã tạo cấu hình rủi ro mặc định tại {config_file}")
+                return risk_config
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi tải cấu hình rủi ro: {str(e)}", exc_info=True)
+            # Trả về cấu hình mặc định
+            return {}
+    
+    def init_ui(self):
+        """Thiết lập giao diện người dùng"""
+        # Tạo widget trung tâm và layout chính
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        
+        # Tạo toolbar
+        self.create_toolbar()
+        
+        # Tạo tab container
+        self.tab_widget = QTabWidget()
+        main_layout.addWidget(self.tab_widget)
+        
+        # Tạo các tab
+        self.create_dashboard_tab()
+        self.create_trading_tab()
+        self.create_positions_tab()
+        self.create_market_analysis_tab()
+        self.create_settings_tab()
+        
+        # Tạo thanh trạng thái
+        self.create_status_bar()
+    
+    def create_toolbar(self):
+        """Tạo thanh công cụ"""
+        toolbar = QToolBar("Main Toolbar")
+        toolbar.setIconSize(QSize(24, 24))
+        self.addToolBar(toolbar)
+        
+        # Nút refresh dữ liệu
+        refresh_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_BrowserReload)), "Cập nhật dữ liệu", self)
+        refresh_action.triggered.connect(self.refresh_data)
+        toolbar.addAction(refresh_action)
+        
+        toolbar.addSeparator()
+        
+        # Nút đăng nhập/tài khoản
+        account_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_DialogApplyButton)), "Tài khoản", self)
+        account_action.triggered.connect(self.show_account_info)
+        toolbar.addAction(account_action)
+        
+        # Nút cài đặt
+        settings_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_FileDialogDetailedView)), "Cài đặt", self)
+        settings_action.triggered.connect(lambda: self.tab_widget.setCurrentIndex(4))  # Chuyển đến tab cài đặt
+        toolbar.addAction(settings_action)
+        
+        # Nút trợ giúp
+        help_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_MessageBoxQuestion)), "Trợ giúp", self)
+        help_action.triggered.connect(self.show_help)
+        toolbar.addAction(help_action)
+        
+        # Thêm spacer
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        toolbar.addWidget(spacer)
+        
+        # Hiển thị thông tin phiên bản
+        version_label = QLabel("Phiên bản 1.0.0")
+        toolbar.addWidget(version_label)
+    
+    def create_dashboard_tab(self):
+        """Tạo tab tổng quan"""
+        dashboard_tab = QWidget()
+        layout = QVBoxLayout(dashboard_tab)
+        
+        # Tạo phần hiển thị số dư tài khoản
+        balance_group = QGroupBox("Số dư tài khoản")
+        balance_layout = QGridLayout(balance_group)
+        
+        # Các thành phần hiển thị số dư
+        self.total_balance_label = QLabel("0.00 USDT")
+        self.total_balance_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        balance_layout.addWidget(QLabel("Tổng số dư:"), 0, 0)
+        balance_layout.addWidget(self.total_balance_label, 0, 1)
+        
+        self.available_balance_label = QLabel("0.00 USDT")
+        balance_layout.addWidget(QLabel("Số dư khả dụng:"), 1, 0)
+        balance_layout.addWidget(self.available_balance_label, 1, 1)
+        
+        self.unrealized_pnl_label = QLabel("0.00 USDT")
+        balance_layout.addWidget(QLabel("Lợi nhuận chưa thực hiện:"), 2, 0)
+        balance_layout.addWidget(self.unrealized_pnl_label, 2, 1)
+        
+        layout.addWidget(balance_group)
+        
+        # Tạo phần hiển thị các vị thế đang mở
+        positions_group = QGroupBox("Vị thế đang mở")
+        positions_layout = QVBoxLayout(positions_group)
+        
+        self.positions_table = QTableWidget(0, 8)
+        self.positions_table.setHorizontalHeaderLabels([
+            "Cặp", "Hướng", "Kích thước", "Giá vào", "Giá hiện tại", "SL", "TP", "Lợi nhuận"
+        ])
+        self.positions_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        positions_layout.addWidget(self.positions_table)
+        
+        layout.addWidget(positions_group)
+        
+        # Tạo phần hiển thị thị trường
+        market_group = QGroupBox("Thị trường")
+        market_layout = QVBoxLayout(market_group)
+        
+        self.market_table = QTableWidget(0, 4)
+        self.market_table.setHorizontalHeaderLabels([
+            "Cặp", "Giá", "Thay đổi 24h", "Khối lượng"
+        ])
+        self.market_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        market_layout.addWidget(self.market_table)
+        
+        layout.addWidget(market_group)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(dashboard_tab, "Tổng quan")
+    
+    def create_trading_tab(self):
+        """Tạo tab giao dịch"""
+        trading_tab = QWidget()
+        layout = QHBoxLayout(trading_tab)
+        
+        # Tạo khung giao dịch bên trái
+        trading_frame = QWidget()
+        trading_layout = QVBoxLayout(trading_frame)
+        
+        # Tạo form nhập thông tin giao dịch
+        form_group = QGroupBox("Đặt lệnh mới")
+        form_layout = QFormLayout(form_group)
+        
+        # Chọn cặp giao dịch
+        self.symbol_combo = QComboBox()
+        self.symbol_combo.addItems([
+            "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT", 
+            "ADAUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "AVAXUSDT"
+        ])
+        form_layout.addRow("Cặp giao dịch:", self.symbol_combo)
+        
+        # Chọn hướng giao dịch
+        self.side_combo = QComboBox()
+        self.side_combo.addItems(["LONG", "SHORT"])
+        form_layout.addRow("Hướng giao dịch:", self.side_combo)
+        
+        # Nhập kích thước vị thế
+        self.amount_spin = QDoubleSpinBox()
+        self.amount_spin.setDecimals(3)
+        self.amount_spin.setMinimum(0.001)
+        self.amount_spin.setMaximum(100.0)
+        self.amount_spin.setValue(0.01)
+        form_layout.addRow("Kích thước:", self.amount_spin)
+        
+        # Đòn bẩy
+        self.leverage_spin = QSpinBox()
+        self.leverage_spin.setMinimum(1)
+        self.leverage_spin.setMaximum(20)
+        self.leverage_spin.setValue(5)
+        form_layout.addRow("Đòn bẩy:", self.leverage_spin)
+        
+        # Stop Loss
+        self.stop_loss_spin = QDoubleSpinBox()
+        self.stop_loss_spin.setDecimals(2)
+        self.stop_loss_spin.setMinimum(0.0)
+        self.stop_loss_spin.setMaximum(100000.0)
+        self.stop_loss_checkbox = QCheckBox("Tự động")
+        self.stop_loss_checkbox.setChecked(True)
+        self.stop_loss_spin.setEnabled(False)
+        
+        sl_layout = QHBoxLayout()
+        sl_layout.addWidget(self.stop_loss_spin)
+        sl_layout.addWidget(self.stop_loss_checkbox)
+        form_layout.addRow("Stop Loss:", sl_layout)
+        
+        # Take Profit
+        self.take_profit_spin = QDoubleSpinBox()
+        self.take_profit_spin.setDecimals(2)
+        self.take_profit_spin.setMinimum(0.0)
+        self.take_profit_spin.setMaximum(100000.0)
+        self.take_profit_checkbox = QCheckBox("Tự động")
+        self.take_profit_checkbox.setChecked(True)
+        self.take_profit_spin.setEnabled(False)
+        
+        tp_layout = QHBoxLayout()
+        tp_layout.addWidget(self.take_profit_spin)
+        tp_layout.addWidget(self.take_profit_checkbox)
+        form_layout.addRow("Take Profit:", tp_layout)
+        
+        trading_layout.addWidget(form_group)
+        
+        # Nút đặt lệnh
+        buttons_layout = QHBoxLayout()
+        
+        self.calculate_button = QPushButton("Tính toán vị thế")
+        self.calculate_button.clicked.connect(self.calculate_position)
+        buttons_layout.addWidget(self.calculate_button)
+        
+        self.open_long_button = QPushButton("Mở Long")
+        self.open_long_button.setStyleSheet("background-color: #22C55E; color: white; font-weight: bold;")
+        self.open_long_button.clicked.connect(lambda: self.open_position("LONG"))
+        buttons_layout.addWidget(self.open_long_button)
+        
+        self.open_short_button = QPushButton("Mở Short")
+        self.open_short_button.setStyleSheet("background-color: #EF4444; color: white; font-weight: bold;")
+        self.open_short_button.clicked.connect(lambda: self.open_position("SHORT"))
+        buttons_layout.addWidget(self.open_short_button)
+        
+        trading_layout.addLayout(buttons_layout)
+        
+        # Tạo khung thông tin giao dịch
+        info_group = QGroupBox("Thông tin giao dịch")
+        info_layout = QFormLayout(info_group)
+        
+        self.current_price_label = QLabel("0.00 USDT")
+        info_layout.addRow("Giá hiện tại:", self.current_price_label)
+        
+        self.position_value_label = QLabel("0.00 USDT")
+        info_layout.addRow("Giá trị vị thế:", self.position_value_label)
+        
+        self.margin_required_label = QLabel("0.00 USDT")
+        info_layout.addRow("Margin yêu cầu:", self.margin_required_label)
+        
+        self.risk_percentage_label = QLabel("0.00%")
+        info_layout.addRow("Phần trăm rủi ro:", self.risk_percentage_label)
+        
+        self.liquidation_price_label = QLabel("0.00 USDT")
+        info_layout.addRow("Giá thanh lý:", self.liquidation_price_label)
+        
+        trading_layout.addWidget(info_group)
+        
+        # Thêm các widget vào layout
+        layout.addWidget(trading_frame, 1)
+        
+        # Tạo khung phân tích thị trường bên phải
+        analysis_frame = QWidget()
+        analysis_layout = QVBoxLayout(analysis_frame)
+        
+        # Chọn cặp để phân tích
+        analysis_symbol_layout = QHBoxLayout()
+        self.analysis_symbol_combo = QComboBox()
+        self.analysis_symbol_combo.addItems([
+            "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT", 
+            "ADAUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "AVAXUSDT"
+        ])
+        analysis_symbol_layout.addWidget(QLabel("Cặp:"))
+        analysis_symbol_layout.addWidget(self.analysis_symbol_combo)
+        
+        self.analysis_interval_combo = QComboBox()
+        self.analysis_interval_combo.addItems(["1m", "5m", "15m", "1h", "4h", "1d"])
+        self.analysis_interval_combo.setCurrentText("1h")
+        analysis_symbol_layout.addWidget(QLabel("Khung thời gian:"))
+        analysis_symbol_layout.addWidget(self.analysis_interval_combo)
+        
+        self.analyze_button = QPushButton("Phân tích")
+        self.analyze_button.clicked.connect(self.analyze_market)
+        analysis_symbol_layout.addWidget(self.analyze_button)
+        
+        analysis_layout.addLayout(analysis_symbol_layout)
+        
+        # Kết quả phân tích
+        analysis_result_group = QGroupBox("Kết quả phân tích kỹ thuật")
+        analysis_result_layout = QVBoxLayout(analysis_result_group)
+        
+        self.analysis_result_text = QTextEdit()
+        self.analysis_result_text.setReadOnly(True)
+        analysis_result_layout.addWidget(self.analysis_result_text)
+        
+        analysis_layout.addWidget(analysis_result_group)
+        
+        # Tín hiệu giao dịch
+        signals_group = QGroupBox("Tín hiệu giao dịch")
+        signals_layout = QGridLayout(signals_group)
+        
+        self.signal_label = QLabel("N/A")
+        self.signal_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        signals_layout.addWidget(QLabel("Tín hiệu:"), 0, 0)
+        signals_layout.addWidget(self.signal_label, 0, 1)
+        
+        self.strength_label = QLabel("N/A")
+        signals_layout.addWidget(QLabel("Độ mạnh:"), 1, 0)
+        signals_layout.addWidget(self.strength_label, 1, 1)
+        
+        self.trend_label = QLabel("N/A")
+        signals_layout.addWidget(QLabel("Xu hướng:"), 2, 0)
+        signals_layout.addWidget(self.trend_label, 2, 1)
+        
+        analysis_layout.addWidget(signals_group)
+        
+        # Thêm các widget vào layout
+        layout.addWidget(analysis_frame, 1)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(trading_tab, "Giao dịch")
+    
+    def create_positions_tab(self):
+        """Tạo tab quản lý vị thế"""
+        positions_tab = QWidget()
+        layout = QVBoxLayout(positions_tab)
+        
+        # Tạo bảng vị thế
+        self.positions_detail_table = QTableWidget(0, 9)
+        self.positions_detail_table.setHorizontalHeaderLabels([
+            "Cặp", "Hướng", "Kích thước", "Giá vào", "Giá hiện tại", "SL", "TP", "Lợi nhuận", "Thao tác"
+        ])
+        self.positions_detail_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        layout.addWidget(self.positions_detail_table)
+        
+        # Tạo phần quản lý vị thế
+        management_group = QGroupBox("Quản lý vị thế")
+        management_layout = QFormLayout(management_group)
+        
+        # Chọn vị thế để quản lý
+        self.manage_symbol_combo = QComboBox()
+        management_layout.addRow("Cặp giao dịch:", self.manage_symbol_combo)
+        
+        # Cập nhật Stop Loss và Take Profit
+        self.manage_sl_spin = QDoubleSpinBox()
+        self.manage_sl_spin.setDecimals(2)
+        self.manage_sl_spin.setMinimum(0.0)
+        self.manage_sl_spin.setMaximum(100000.0)
+        management_layout.addRow("Stop Loss mới:", self.manage_sl_spin)
+        
+        self.manage_tp_spin = QDoubleSpinBox()
+        self.manage_tp_spin.setDecimals(2)
+        self.manage_tp_spin.setMinimum(0.0)
+        self.manage_tp_spin.setMaximum(100000.0)
+        management_layout.addRow("Take Profit mới:", self.manage_tp_spin)
+        
+        # Tạo các nút quản lý
+        manage_buttons_layout = QHBoxLayout()
+        
+        self.update_sltp_button = QPushButton("Cập nhật SL/TP")
+        self.update_sltp_button.clicked.connect(self.update_sltp)
+        manage_buttons_layout.addWidget(self.update_sltp_button)
+        
+        self.close_position_button = QPushButton("Đóng vị thế")
+        self.close_position_button.clicked.connect(self.close_position)
+        self.close_position_button.setStyleSheet("background-color: #EF4444; color: white; font-weight: bold;")
+        manage_buttons_layout.addWidget(self.close_position_button)
+        
+        management_layout.addRow("", manage_buttons_layout)
+        
+        layout.addWidget(management_group)
+        
+        # Tạo phần lịch sử giao dịch
+        history_group = QGroupBox("Lịch sử giao dịch")
+        history_layout = QVBoxLayout(history_group)
+        
+        self.history_table = QTableWidget(0, 7)
+        self.history_table.setHorizontalHeaderLabels([
+            "Cặp", "Hướng", "Giá", "Kích thước", "Phí", "Lợi nhuận", "Thời gian"
+        ])
+        self.history_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        history_layout.addWidget(self.history_table)
+        
+        self.refresh_history_button = QPushButton("Cập nhật lịch sử")
+        self.refresh_history_button.clicked.connect(self.refresh_history)
+        history_layout.addWidget(self.refresh_history_button)
+        
+        layout.addWidget(history_group)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(positions_tab, "Quản lý vị thế")
+    
+    def create_market_analysis_tab(self):
+        """Tạo tab phân tích thị trường"""
+        market_tab = QWidget()
+        layout = QVBoxLayout(market_tab)
+        
+        # Tạo phần thông tin thị trường
+        market_info_layout = QHBoxLayout()
+        
+        # Chọn cặp để phân tích
+        self.market_symbol_combo = QComboBox()
+        self.market_symbol_combo.addItems([
+            "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT", 
+            "ADAUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "AVAXUSDT"
+        ])
+        market_info_layout.addWidget(QLabel("Cặp:"))
+        market_info_layout.addWidget(self.market_symbol_combo)
+        
+        self.market_interval_combo = QComboBox()
+        self.market_interval_combo.addItems(["1m", "5m", "15m", "1h", "4h", "1d"])
+        self.market_interval_combo.setCurrentText("1h")
+        market_info_layout.addWidget(QLabel("Khung thời gian:"))
+        market_info_layout.addWidget(self.market_interval_combo)
+        
+        self.market_analyze_button = QPushButton("Phân tích")
+        self.market_analyze_button.clicked.connect(self.analyze_market_detail)
+        market_info_layout.addWidget(self.market_analyze_button)
+        
+        layout.addLayout(market_info_layout)
+        
+        # Tạo phần hiển thị kết quả phân tích
+        analysis_detail_widget = QSplitter(Qt.Horizontal)
+        
+        # Phần trái: chỉ báo kỹ thuật
+        indicators_group = QGroupBox("Chỉ báo kỹ thuật")
+        indicators_layout = QVBoxLayout(indicators_group)
+        
+        self.indicators_table = QTableWidget(0, 3)
+        self.indicators_table.setHorizontalHeaderLabels([
+            "Chỉ báo", "Giá trị", "Tín hiệu"
+        ])
+        self.indicators_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        indicators_layout.addWidget(self.indicators_table)
+        
+        analysis_detail_widget.addWidget(indicators_group)
+        
+        # Phần phải: thông tin chi tiết
+        detail_group = QGroupBox("Thông tin chi tiết")
+        detail_layout = QVBoxLayout(detail_group)
+        
+        self.market_detail_text = QTextEdit()
+        self.market_detail_text.setReadOnly(True)
+        detail_layout.addWidget(self.market_detail_text)
+        
+        analysis_detail_widget.addWidget(detail_group)
+        
+        layout.addWidget(analysis_detail_widget)
+        
+        # Tạo phần hỗ trợ/kháng cự
+        support_resistance_group = QGroupBox("Mức hỗ trợ và kháng cự")
+        support_resistance_layout = QVBoxLayout(support_resistance_group)
+        
+        self.support_resistance_table = QTableWidget(0, 2)
+        self.support_resistance_table.setHorizontalHeaderLabels([
+            "Loại", "Giá trị"
+        ])
+        self.support_resistance_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        support_resistance_layout.addWidget(self.support_resistance_table)
+        
+        layout.addWidget(support_resistance_group)
+        
+        # Tạo phần xu hướng thị trường
+        trend_group = QGroupBox("Xu hướng thị trường")
+        trend_layout = QGridLayout(trend_group)
+        
+        self.short_term_trend_label = QLabel("N/A")
+        trend_layout.addWidget(QLabel("Ngắn hạn:"), 0, 0)
+        trend_layout.addWidget(self.short_term_trend_label, 0, 1)
+        
+        self.mid_term_trend_label = QLabel("N/A")
+        trend_layout.addWidget(QLabel("Trung hạn:"), 0, 2)
+        trend_layout.addWidget(self.mid_term_trend_label, 0, 3)
+        
+        self.long_term_trend_label = QLabel("N/A")
+        trend_layout.addWidget(QLabel("Dài hạn:"), 0, 4)
+        trend_layout.addWidget(self.long_term_trend_label, 0, 5)
+        
+        layout.addWidget(trend_group)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(market_tab, "Phân tích thị trường")
+    
+    def create_settings_tab(self):
+        """Tạo tab cài đặt"""
+        settings_tab = QWidget()
+        layout = QVBoxLayout(settings_tab)
+        
+        # Tạo phần cài đặt API
+        api_group = QGroupBox("Cài đặt API")
+        api_layout = QFormLayout(api_group)
+        
+        self.api_key_edit = QLineEdit()
+        self.api_key_edit.setEchoMode(QLineEdit.Password)
+        api_layout.addRow("API Key:", self.api_key_edit)
+        
+        self.api_secret_edit = QLineEdit()
+        self.api_secret_edit.setEchoMode(QLineEdit.Password)
+        api_layout.addRow("API Secret:", self.api_secret_edit)
+        
+        self.testnet_checkbox = QCheckBox("Sử dụng testnet")
+        self.testnet_checkbox.setChecked(True)
+        api_layout.addRow("", self.testnet_checkbox)
+        
+        self.save_api_button = QPushButton("Lưu cài đặt API")
+        self.save_api_button.clicked.connect(self.save_api_settings)
+        api_layout.addRow("", self.save_api_button)
+        
+        layout.addWidget(api_group)
+        
+        # Tạo phần cài đặt rủi ro
+        risk_group = QGroupBox("Cài đặt rủi ro")
+        risk_layout = QFormLayout(risk_group)
+        
+        self.risk_percentage_spin = QDoubleSpinBox()
+        self.risk_percentage_spin.setDecimals(2)
+        self.risk_percentage_spin.setMinimum(0.1)
+        self.risk_percentage_spin.setMaximum(10.0)
+        self.risk_percentage_spin.setValue(1.0)
+        self.risk_percentage_spin.setSuffix("%")
+        risk_layout.addRow("Phần trăm rủi ro:", self.risk_percentage_spin)
+        
+        self.max_positions_spin = QSpinBox()
+        self.max_positions_spin.setMinimum(1)
+        self.max_positions_spin.setMaximum(20)
+        self.max_positions_spin.setValue(5)
+        risk_layout.addRow("Số lượng vị thế tối đa:", self.max_positions_spin)
+        
+        self.default_leverage_spin = QSpinBox()
+        self.default_leverage_spin.setMinimum(1)
+        self.default_leverage_spin.setMaximum(20)
+        self.default_leverage_spin.setValue(5)
+        risk_layout.addRow("Đòn bẩy mặc định:", self.default_leverage_spin)
+        
+        self.position_size_percentage_spin = QDoubleSpinBox()
+        self.position_size_percentage_spin.setDecimals(2)
+        self.position_size_percentage_spin.setMinimum(1.0)
+        self.position_size_percentage_spin.setMaximum(50.0)
+        self.position_size_percentage_spin.setValue(10.0)
+        self.position_size_percentage_spin.setSuffix("%")
+        risk_layout.addRow("Phần trăm số dư cho mỗi vị thế:", self.position_size_percentage_spin)
+        
+        self.stop_loss_percentage_spin = QDoubleSpinBox()
+        self.stop_loss_percentage_spin.setDecimals(2)
+        self.stop_loss_percentage_spin.setMinimum(0.5)
+        self.stop_loss_percentage_spin.setMaximum(10.0)
+        self.stop_loss_percentage_spin.setValue(1.5)
+        self.stop_loss_percentage_spin.setSuffix("%")
+        risk_layout.addRow("Phần trăm Stop Loss:", self.stop_loss_percentage_spin)
+        
+        self.take_profit_percentage_spin = QDoubleSpinBox()
+        self.take_profit_percentage_spin.setDecimals(2)
+        self.take_profit_percentage_spin.setMinimum(0.5)
+        self.take_profit_percentage_spin.setMaximum(20.0)
+        self.take_profit_percentage_spin.setValue(3.0)
+        self.take_profit_percentage_spin.setSuffix("%")
+        risk_layout.addRow("Phần trăm Take Profit:", self.take_profit_percentage_spin)
+        
+        self.trailing_stop_checkbox = QCheckBox("Bật Trailing Stop")
+        self.trailing_stop_checkbox.setChecked(True)
+        risk_layout.addRow("", self.trailing_stop_checkbox)
+        
+        self.partial_tp_checkbox = QCheckBox("Bật chốt lời một phần")
+        self.partial_tp_checkbox.setChecked(False)
+        risk_layout.addRow("", self.partial_tp_checkbox)
+        
+        self.trading_hours_checkbox = QCheckBox("Giới hạn giờ giao dịch")
+        self.trading_hours_checkbox.setChecked(False)
+        risk_layout.addRow("", self.trading_hours_checkbox)
+        
+        self.save_risk_button = QPushButton("Lưu cài đặt rủi ro")
+        self.save_risk_button.clicked.connect(self.save_risk_settings)
+        risk_layout.addRow("", self.save_risk_button)
+        
+        layout.addWidget(risk_group)
+        
+        # Tạo phần cài đặt giao diện
+        ui_group = QGroupBox("Cài đặt giao diện")
+        ui_layout = QFormLayout(ui_group)
+        
+        self.dark_mode_checkbox = QCheckBox("Chế độ tối")
+        self.dark_mode_checkbox.setChecked(False)
+        self.dark_mode_checkbox.toggled.connect(self.toggle_dark_mode)
+        ui_layout.addRow("", self.dark_mode_checkbox)
+        
+        self.refresh_interval_spin = QSpinBox()
+        self.refresh_interval_spin.setMinimum(5)
+        self.refresh_interval_spin.setMaximum(60)
+        self.refresh_interval_spin.setValue(10)
+        self.refresh_interval_spin.setSuffix(" giây")
+        ui_layout.addRow("Thời gian cập nhật:", self.refresh_interval_spin)
+        
+        self.notifications_checkbox = QCheckBox("Bật thông báo")
+        self.notifications_checkbox.setChecked(True)
+        ui_layout.addRow("", self.notifications_checkbox)
+        
+        self.save_ui_button = QPushButton("Lưu cài đặt giao diện")
+        self.save_ui_button.clicked.connect(self.save_ui_settings)
+        ui_layout.addRow("", self.save_ui_button)
+        
+        layout.addWidget(ui_group)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(settings_tab, "Cài đặt")
+    
+    def create_status_bar(self):
+        """Tạo thanh trạng thái"""
+        self.statusBar = QStatusBar()
+        self.setStatusBar(self.statusBar)
+        
+        self.status_label = QLabel("Sẵn sàng")
+        self.statusBar.addWidget(self.status_label, 1)
+        
+        self.connection_label = QLabel("Trạng thái kết nối: Chưa kết nối")
+        self.statusBar.addPermanentWidget(self.connection_label)
+        
+        self.last_update_label = QLabel("Cập nhật lần cuối: N/A")
+        self.statusBar.addPermanentWidget(self.last_update_label)
+    
+    def init_refresh_thread(self):
+        """Khởi tạo thread cập nhật dữ liệu"""
+        self.refresh_thread = RefreshThread(self.market_analyzer, self.position_manager)
+        self.refresh_thread.signal.connect(self.update_data)
+        self.refresh_thread.start()
+    
+    def connect_events(self):
+        """Kết nối các sự kiện"""
+        # Kết nối sự kiện cho Stop Loss và Take Profit checkbox
+        self.stop_loss_checkbox.toggled.connect(lambda checked: self.stop_loss_spin.setEnabled(not checked))
+        self.take_profit_checkbox.toggled.connect(lambda checked: self.take_profit_spin.setEnabled(not checked))
+        
+        # Kết nối sự kiện thay đổi cặp giao dịch
+        self.symbol_combo.currentTextChanged.connect(self.update_trading_info)
+        
+        # Kết nối sự kiện thay đổi vị thế quản lý
+        self.manage_symbol_combo.currentTextChanged.connect(self.update_manage_position)
+        
+        # Kết nối sự kiện double-click vào bảng vị thế
+        self.positions_table.cellDoubleClicked.connect(lambda row, col: self.select_position_from_table(self.positions_table, row))
+        self.positions_detail_table.cellDoubleClicked.connect(lambda row, col: self.select_position_from_table(self.positions_detail_table, row))
+    
+    def load_config(self):
+        """Tải cấu hình từ file"""
+        try:
+            # Tải cấu hình API
+            api_key = os.environ.get("BINANCE_TESTNET_API_KEY", "")
+            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET", "")
+            
+            self.api_key_edit.setText(api_key)
+            self.api_secret_edit.setText(api_secret)
+            
+            # Tải cấu hình rủi ro nếu có Risk Manager
+            if self.risk_manager:
+                risk_config = self.risk_manager.risk_config
+                
+                self.risk_percentage_spin.setValue(risk_config.get("risk_percentage", 0.01) * 100)
+                self.max_positions_spin.setValue(risk_config.get("max_positions", 5))
+                self.default_leverage_spin.setValue(risk_config.get("leverage", 5))
+                self.position_size_percentage_spin.setValue(risk_config.get("position_size_percentage", 0.1) * 100)
+                self.stop_loss_percentage_spin.setValue(risk_config.get("stop_loss_percentage", 0.015) * 100)
+                self.take_profit_percentage_spin.setValue(risk_config.get("take_profit_percentage", 0.03) * 100)
+                
+                self.trailing_stop_checkbox.setChecked(risk_config.get("trailing_stop", {}).get("enabled", True))
+                self.partial_tp_checkbox.setChecked(risk_config.get("partial_take_profit", {}).get("enabled", False))
+                self.trading_hours_checkbox.setChecked(risk_config.get("trading_hours_restriction", {}).get("enabled", False))
+            
+            # Cập nhật UI
+            self.refresh_data()
+            
+            logger.info("Đã tải cấu hình thành công")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi tải cấu hình: {str(e)}", exc_info=True)
+    
+    def update_data(self, data: Dict[str, Any]):
+        """
+        Cập nhật dữ liệu từ thread cập nhật
+        
+        :param data: Dữ liệu cập nhật
+        """
+        try:
+            # Cập nhật thông tin tài khoản
+            account_balance = data.get("account_balance", {})
+            self.update_account_balance(account_balance)
+            
+            # Cập nhật danh sách vị thế
+            positions = data.get("positions", [])
+            self.update_positions(positions)
+            
+            # Cập nhật thông tin thị trường
+            market_overview = data.get("market_overview", [])
+            self.update_market_overview(market_overview)
+            
+            # Cập nhật thông tin giao dịch
+            self.update_trading_info()
+            
+            # Cập nhật trạng thái kết nối
+            self.connection_label.setText("Trạng thái kết nối: Đã kết nối")
+            
+            # Cập nhật thời gian cập nhật lần cuối
+            current_time = datetime.now().strftime("%H:%M:%S")
+            self.last_update_label.setText(f"Cập nhật lần cuối: {current_time}")
+            
+            # Cập nhật danh sách vị thế trong combobox
+            self.update_position_combos(positions)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật dữ liệu: {str(e)}", exc_info=True)
+    
+    def update_account_balance(self, account_balance: Dict[str, Any]):
+        """
+        Cập nhật thông tin số dư tài khoản
+        
+        :param account_balance: Thông tin số dư tài khoản
+        """
+        total_balance = account_balance.get("total_balance", 0)
+        available_balance = account_balance.get("available_balance", 0)
+        unrealized_pnl = account_balance.get("unrealized_pnl", 0)
+        
+        # Cập nhật các label
+        self.total_balance_label.setText(f"{total_balance:.2f} USDT")
+        self.available_balance_label.setText(f"{available_balance:.2f} USDT")
+        
+        # Thay đổi màu sắc dựa trên lợi nhuận
+        if unrealized_pnl > 0:
+            self.unrealized_pnl_label.setStyleSheet("color: #22C55E;")  # Màu xanh khi lời
+        elif unrealized_pnl < 0:
+            self.unrealized_pnl_label.setStyleSheet("color: #EF4444;")  # Màu đỏ khi lỗ
+        else:
+            self.unrealized_pnl_label.setStyleSheet("")  # Màu mặc định
+        
+        self.unrealized_pnl_label.setText(f"{unrealized_pnl:.2f} USDT")
+    
+    def update_positions(self, positions: List[Dict[str, Any]]):
+        """
+        Cập nhật danh sách vị thế
+        
+        :param positions: Danh sách vị thế
+        """
+        # Cập nhật bảng vị thế trong tab tổng quan
+        self.positions_table.setRowCount(len(positions))
+        
+        for row, position in enumerate(positions):
+            symbol = position.get("symbol", "")
+            side = position.get("side", "")
+            size = position.get("size", 0)
+            entry_price = position.get("entry_price", 0)
+            mark_price = position.get("mark_price", 0)
+            stop_loss = position.get("stop_loss", "N/A")
+            take_profit = position.get("take_profit", "N/A")
+            unrealized_pnl = position.get("unrealized_pnl", 0)
+            profit_percent = position.get("profit_percent", 0)
+            
+            # Tạo các item cho bảng
+            self.positions_table.setItem(row, 0, QTableWidgetItem(symbol))
+            
+            side_item = QTableWidgetItem(side)
+            if side == "LONG":
+                side_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Long
+            else:
+                side_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Short
+            self.positions_table.setItem(row, 1, side_item)
+            
+            self.positions_table.setItem(row, 2, QTableWidgetItem(f"{size:.4f}"))
+            self.positions_table.setItem(row, 3, QTableWidgetItem(f"{entry_price:.2f}"))
+            self.positions_table.setItem(row, 4, QTableWidgetItem(f"{mark_price:.2f}"))
+            
+            self.positions_table.setItem(row, 5, QTableWidgetItem(f"{stop_loss}" if stop_loss != "N/A" else "N/A"))
+            self.positions_table.setItem(row, 6, QTableWidgetItem(f"{take_profit}" if take_profit != "N/A" else "N/A"))
+            
+            pnl_item = QTableWidgetItem(f"{unrealized_pnl:.2f} ({profit_percent:.2f}%)")
+            if unrealized_pnl > 0:
+                pnl_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
+            elif unrealized_pnl < 0:
+                pnl_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
+            self.positions_table.setItem(row, 7, pnl_item)
+        
+        # Cập nhật bảng vị thế trong tab quản lý vị thế
+        self.positions_detail_table.setRowCount(len(positions))
+        
+        for row, position in enumerate(positions):
+            symbol = position.get("symbol", "")
+            side = position.get("side", "")
+            size = position.get("size", 0)
+            entry_price = position.get("entry_price", 0)
+            mark_price = position.get("mark_price", 0)
+            stop_loss = position.get("stop_loss", "N/A")
+            take_profit = position.get("take_profit", "N/A")
+            unrealized_pnl = position.get("unrealized_pnl", 0)
+            profit_percent = position.get("profit_percent", 0)
+            
+            # Tạo các item cho bảng
+            self.positions_detail_table.setItem(row, 0, QTableWidgetItem(symbol))
+            
+            side_item = QTableWidgetItem(side)
+            if side == "LONG":
+                side_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Long
+            else:
+                side_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Short
+            self.positions_detail_table.setItem(row, 1, side_item)
+            
+            self.positions_detail_table.setItem(row, 2, QTableWidgetItem(f"{size:.4f}"))
+            self.positions_detail_table.setItem(row, 3, QTableWidgetItem(f"{entry_price:.2f}"))
+            self.positions_detail_table.setItem(row, 4, QTableWidgetItem(f"{mark_price:.2f}"))
+            
+            self.positions_detail_table.setItem(row, 5, QTableWidgetItem(f"{stop_loss}" if stop_loss != "N/A" else "N/A"))
+            self.positions_detail_table.setItem(row, 6, QTableWidgetItem(f"{take_profit}" if take_profit != "N/A" else "N/A"))
+            
+            pnl_item = QTableWidgetItem(f"{unrealized_pnl:.2f} ({profit_percent:.2f}%)")
+            if unrealized_pnl > 0:
+                pnl_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
+            elif unrealized_pnl < 0:
+                pnl_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
+            self.positions_detail_table.setItem(row, 7, pnl_item)
+            
+            # Tạo nút đóng vị thế
+            close_button = QPushButton("Đóng")
+            close_button.setStyleSheet("background-color: #EF4444; color: white;")
+            close_button.clicked.connect(lambda checked, s=symbol: self.close_position_from_table(s))
+            
+            # Thêm nút vào bảng
+            self.positions_detail_table.setCellWidget(row, 8, close_button)
+    
+    def update_market_overview(self, market_overview: List[Dict[str, Any]]):
+        """
+        Cập nhật thông tin tổng quan thị trường
+        
+        :param market_overview: Thông tin tổng quan thị trường
+        """
+        self.market_table.setRowCount(len(market_overview))
+        
+        for row, market_data in enumerate(market_overview):
+            symbol = market_data.get("symbol", "")
+            price = market_data.get("price", 0)
+            change_24h = market_data.get("change_24h", 0)
+            volume = market_data.get("volume", 0)
+            
+            # Tạo các item cho bảng
+            self.market_table.setItem(row, 0, QTableWidgetItem(symbol))
+            self.market_table.setItem(row, 1, QTableWidgetItem(f"{price:.2f}"))
+            
+            change_item = QTableWidgetItem(f"{change_24h:.2f}%")
+            if change_24h > 0:
+                change_item.setForeground(QColor("#22C55E"))  # Màu xanh khi tăng
+            elif change_24h < 0:
+                change_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi giảm
+            self.market_table.setItem(row, 2, change_item)
+            
+            # Format khối lượng theo đơn vị K, M, B
+            if volume >= 1_000_000_000:
+                volume_str = f"{volume / 1_000_000_000:.2f}B"
+            elif volume >= 1_000_000:
+                volume_str = f"{volume / 1_000_000:.2f}M"
+            elif volume >= 1_000:
+                volume_str = f"{volume / 1_000:.2f}K"
+            else:
+                volume_str = f"{volume:.2f}"
+            
+            self.market_table.setItem(row, 3, QTableWidgetItem(volume_str))
+    
+    def update_trading_info(self):
+        """Cập nhật thông tin giao dịch"""
+        symbol = self.symbol_combo.currentText()
+        
+        try:
+            # Lấy giá hiện tại
+            if self.market_analyzer and self.market_analyzer.client:
+                symbol_ticker = self.market_analyzer.client.futures_symbol_ticker(symbol=symbol)
+                current_price = float(symbol_ticker["price"])
+                
+                # Cập nhật giá hiện tại
+                self.current_price_label.setText(f"{current_price:.2f} USDT")
+                
+                # Tính toán giá trị vị thế
+                amount = self.amount_spin.value()
+                position_value = amount * current_price
+                self.position_value_label.setText(f"{position_value:.2f} USDT")
+                
+                # Tính toán margin yêu cầu
+                leverage = self.leverage_spin.value()
+                margin_required = position_value / leverage
+                self.margin_required_label.setText(f"{margin_required:.2f} USDT")
+                
+                # Tính toán phần trăm rủi ro
+                if self.position_manager and self.position_manager.client:
+                    account_info = self.position_manager.get_account_balance()
+                    if account_info.get("status") == "success":
+                        total_balance = account_info.get("balance", {}).get("total_balance", 0)
+                        if total_balance > 0:
+                            risk_percentage = margin_required / total_balance * 100
+                            self.risk_percentage_label.setText(f"{risk_percentage:.2f}%")
+                
+                # Tính toán giá thanh lý (giả sử)
+                if side == "LONG":
+                    liquidation_price = current_price * (1 - (1 / leverage) * 0.9)  # 90% margin
+                else:
+                    liquidation_price = current_price * (1 + (1 / leverage) * 0.9)  # 90% margin
+                
+                self.liquidation_price_label.setText(f"{liquidation_price:.2f} USDT")
+                
+                # Tính toán SL và TP tự động
+                if self.stop_loss_checkbox.isChecked() or self.take_profit_checkbox.isChecked():
+                    if self.risk_manager:
+                        side = self.side_combo.currentText()
+                        sl_tp = self.risk_manager.calculate_sl_tp(symbol, side, current_price)
+                        
+                        if self.stop_loss_checkbox.isChecked():
+                            self.stop_loss_spin.setValue(sl_tp["stop_loss"])
+                        
+                        if self.take_profit_checkbox.isChecked():
+                            self.take_profit_spin.setValue(sl_tp["take_profit"])
             
         except Exception as e:
-            logger.error(f"Lỗi khi cập nhật từ luồng: {str(e)}")
+            logger.error(f"Lỗi khi cập nhật thông tin giao dịch: {str(e)}", exc_info=True)
     
-    def show_error(self, error_msg):
-        """Hiển thị thông báo lỗi"""
-        self.status_bar.showMessage(error_msg, 5000)
-        logger.error(error_msg)
-        self.bot_log.append(f"{datetime.now().strftime('%H:%M:%S')} - Lỗi: {error_msg}")
+    def update_position_combos(self, positions: List[Dict[str, Any]]):
+        """
+        Cập nhật danh sách vị thế trong combobox
+        
+        :param positions: Danh sách vị thế
+        """
+        # Lưu lại giá trị hiện tại
+        current_symbol = self.manage_symbol_combo.currentText()
+        
+        # Xóa tất cả các item
+        self.manage_symbol_combo.clear()
+        
+        # Thêm các vị thế vào combobox
+        for position in positions:
+            symbol = position.get("symbol", "")
+            self.manage_symbol_combo.addItem(symbol)
+        
+        # Khôi phục lại giá trị nếu có thể
+        index = self.manage_symbol_combo.findText(current_symbol)
+        if index >= 0:
+            self.manage_symbol_combo.setCurrentIndex(index)
+        
+        # Cập nhật thông tin vị thế quản lý
+        self.update_manage_position()
     
-    def update_dashboard(self):
-        """Cập nhật tab Tổng quan"""
-        if not self.market_analyzer:
+    def update_manage_position(self):
+        """Cập nhật thông tin vị thế đang quản lý"""
+        symbol = self.manage_symbol_combo.currentText()
+        
+        # Nếu không có vị thế nào được chọn
+        if not symbol:
+            self.manage_sl_spin.setValue(0)
+            self.manage_tp_spin.setValue(0)
             return
         
-        try:
-            # Lấy thông tin tài khoản
-            account_info = self.market_analyzer.get_account_info()
-            if account_info["status"] == "success":
-                balance = account_info["account"]["balance"]
-                pnl = account_info["account"].get("unrealized_pnl", 0)
+        # Tìm vị thế trong danh sách
+        for row in range(self.positions_detail_table.rowCount()):
+            if self.positions_detail_table.item(row, 0).text() == symbol:
+                # Lấy thông tin SL và TP
+                stop_loss_item = self.positions_detail_table.item(row, 5)
+                take_profit_item = self.positions_detail_table.item(row, 6)
                 
-                self.account_balance_label.setText(f"Số dư tài khoản: {balance:.2f} USDT")
-                self.pnl_label.setText(f"Lợi nhuận: {pnl:.2f} USDT")
+                stop_loss = float(stop_loss_item.text()) if stop_loss_item.text() != "N/A" else 0
+                take_profit = float(take_profit_item.text()) if take_profit_item.text() != "N/A" else 0
                 
-                # Đặt màu cho PnL
-                if pnl > 0:
-                    self.pnl_label.setStyleSheet("color: green;")
-                elif pnl < 0:
-                    self.pnl_label.setStyleSheet("color: red;")
-                else:
-                    self.pnl_label.setStyleSheet("")
-            
-            # Lấy thông tin thị trường
-            market_overview = self.market_analyzer.get_market_overview()
-            if market_overview["status"] == "success":
-                self.update_market_tables(market_overview["data"])
-            
-            # Lấy vị thế đang mở
-            positions = self.position_manager.get_all_positions()
-            self.update_position_tables(positions)
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi cập nhật dashboard: {str(e)}")
+                # Cập nhật các spinbox
+                self.manage_sl_spin.setValue(stop_loss)
+                self.manage_tp_spin.setValue(take_profit)
+                
+                break
     
-    def update_market_tables(self, market_data):
-        """Cập nhật bảng thị trường"""
+    def calculate_position(self):
+        """Tính toán kích thước vị thế dựa trên rủi ro"""
         try:
-            # Cập nhật bảng thị trường trong tab Tổng quan
-            self.market_table.setRowCount(len(market_data))
+            if not self.position_manager or not self.risk_manager:
+                self.show_error("Không thể tính toán vị thế", "Chưa khởi tạo PositionManager hoặc RiskManager")
+                return
             
-            for i, item in enumerate(market_data):
-                # Lấy dữ liệu
-                symbol = item["symbol"]
-                price = item["price"]
-                change_24h = item["change_24h"]
-                volume = item["volume"]
-                high_24h = item["high_24h"]
-                low_24h = item["low_24h"]
-                
-                # Tạo các mục trong bảng
-                self.market_table.setItem(i, 0, QTableWidgetItem(symbol))
-                self.market_table.setItem(i, 1, QTableWidgetItem(f"{price:.2f}"))
-                
-                # Đặt màu cho thay đổi 24h
-                change_item = QTableWidgetItem(f"{change_24h:.2f}%")
-                if change_24h > 0:
-                    change_item.setForeground(QColor("green"))
-                elif change_24h < 0:
-                    change_item.setForeground(QColor("red"))
-                self.market_table.setItem(i, 2, change_item)
-                
-                self.market_table.setItem(i, 3, QTableWidgetItem(f"{volume:.2f}"))
-                
-                # Tạo tín hiệu dựa trên biến động giá
-                signal = "Trung lập"
-                if change_24h > 3:
-                    signal = "Mua mạnh"
-                elif change_24h > 1:
-                    signal = "Mua"
-                elif change_24h < -3:
-                    signal = "Bán mạnh"
-                elif change_24h < -1:
-                    signal = "Bán"
-                
-                signal_item = QTableWidgetItem(signal)
-                if "Mua" in signal:
-                    signal_item.setForeground(QColor("green"))
-                elif "Bán" in signal:
-                    signal_item.setForeground(QColor("red"))
-                self.market_table.setItem(i, 4, signal_item)
-                
+            # Lấy số dư tài khoản
+            account_info = self.position_manager.get_account_balance()
+            if account_info.get("status") != "success":
+                self.show_error("Không thể lấy số dư tài khoản", account_info.get("message", "Lỗi không xác định"))
+                return
+            
+            total_balance = account_info.get("balance", {}).get("total_balance", 0)
+            
+            # Tính toán kích thước vị thế
+            symbol = self.symbol_combo.currentText()
+            position_size = self.risk_manager.calculate_position_size(total_balance, symbol)
+            
+            # Cập nhật kích thước vị thế
+            self.amount_spin.setValue(position_size)
+            
+            # Thông báo thành công
+            self.status_label.setText(f"Đã tính toán kích thước vị thế: {position_size:.4f}")
+            
+            # Cập nhật thông tin giao dịch
+            self.update_trading_info()
+        
         except Exception as e:
-            logger.error(f"Lỗi khi cập nhật bảng thị trường: {str(e)}")
+            logger.error(f"Lỗi khi tính toán kích thước vị thế: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi tính toán kích thước vị thế", str(e))
     
-    def update_position_tables(self, positions):
-        """Cập nhật bảng vị thế"""
+    def open_position(self, side_override=None):
+        """
+        Mở vị thế mới
+        
+        :param side_override: Ghi đè hướng giao dịch (tùy chọn)
+        """
         try:
-            # Cập nhật bảng vị thế trong tab Tổng quan
-            self.positions_table.setRowCount(len(positions))
-            self.detailed_positions_table.setRowCount(len(positions))
+            if not self.position_manager:
+                self.show_error("Không thể mở vị thế", "Chưa khởi tạo PositionManager")
+                return
             
-            for i, position in enumerate(positions):
-                # Lấy dữ liệu
-                symbol = position["symbol"]
-                side = position["side"]
-                quantity = position["size"]
-                entry_price = position["entry_price"]
-                current_price = position["mark_price"]
-                profit = position["unrealized_pnl"]
-                profit_percent = position["profit_percent"]
-                stop_loss = position.get("stop_loss", 0)
-                take_profit = position.get("take_profit", 0)
+            # Lấy thông tin giao dịch
+            symbol = self.symbol_combo.currentText()
+            side = side_override if side_override else self.side_combo.currentText()
+            amount = self.amount_spin.value()
+            leverage = self.leverage_spin.value()
+            
+            stop_loss = None if self.stop_loss_checkbox.isChecked() else self.stop_loss_spin.value()
+            take_profit = None if self.take_profit_checkbox.isChecked() else self.take_profit_spin.value()
+            
+            # Kiểm tra tính hợp lệ của vị thế
+            if self.risk_manager:
+                is_valid, reason = self.risk_manager.validate_new_position(symbol, side, amount)
+                if not is_valid:
+                    self.show_error("Vị thế không hợp lệ", reason)
+                    return
                 
-                # Cập nhật bảng tổng quan
-                self.positions_table.setItem(i, 0, QTableWidgetItem(symbol))
-                self.positions_table.setItem(i, 1, QTableWidgetItem(side))
-                self.positions_table.setItem(i, 2, QTableWidgetItem(f"{quantity:.4f}"))
-                self.positions_table.setItem(i, 3, QTableWidgetItem(f"{entry_price:.2f}"))
+                # Tính toán SL và TP tự động nếu cần
+                if self.stop_loss_checkbox.isChecked() or self.take_profit_checkbox.isChecked():
+                    # Lấy giá hiện tại
+                    symbol_ticker = self.position_manager.client.futures_symbol_ticker(symbol=symbol)
+                    current_price = float(symbol_ticker["price"])
+                    
+                    sl_tp = self.risk_manager.calculate_sl_tp(symbol, side, current_price)
+                    
+                    if self.stop_loss_checkbox.isChecked():
+                        stop_loss = sl_tp["stop_loss"]
+                    
+                    if self.take_profit_checkbox.isChecked():
+                        take_profit = sl_tp["take_profit"]
                 
-                # Đặt màu cho lợi nhuận
-                profit_item = QTableWidgetItem(f"{profit:.2f} ({profit_percent:.2f}%)")
-                if profit > 0:
-                    profit_item.setForeground(QColor("green"))
-                elif profit < 0:
-                    profit_item.setForeground(QColor("red"))
-                self.positions_table.setItem(i, 4, profit_item)
+                # Kiểm tra tính hợp lệ của SL và TP
+                if stop_loss is not None and take_profit is not None:
+                    symbol_ticker = self.position_manager.client.futures_symbol_ticker(symbol=symbol)
+                    current_price = float(symbol_ticker["price"])
+                    
+                    is_valid_sltp, reason_sltp = self.risk_manager.validate_sl_tp(symbol, side, current_price, stop_loss, take_profit)
+                    if not is_valid_sltp:
+                        self.show_error("SL và TP không hợp lệ", reason_sltp)
+                        return
+            
+            # Xác nhận trước khi đặt lệnh
+            reply = QMessageBox.question(
+                self, 
+                "Xác nhận giao dịch", 
+                f"Bạn có chắc chắn muốn mở vị thế {side} trên {symbol} với kích thước {amount:.4f} không?",
+                QMessageBox.Yes | QMessageBox.No, 
+                QMessageBox.No
+            )
+            
+            if reply == QMessageBox.No:
+                return
+            
+            # Mở vị thế
+            result = self.position_manager.open_position(symbol, side, amount, stop_loss, take_profit, leverage)
+            
+            if result.get("status") == "success":
+                self.show_info("Đặt lệnh thành công", f"Đã mở vị thế {side} trên {symbol} với kích thước {amount:.4f}")
+                self.status_label.setText(f"Đã mở vị thế {side} trên {symbol}")
                 
-                # Cập nhật bảng chi tiết
-                self.detailed_positions_table.setItem(i, 0, QTableWidgetItem(symbol))
+                # Cập nhật dữ liệu
+                self.refresh_data()
+            else:
+                self.show_error("Lỗi khi đặt lệnh", result.get("message", "Lỗi không xác định"))
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi mở vị thế: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi mở vị thế", str(e))
+    
+    def update_sltp(self):
+        """Cập nhật Stop Loss và Take Profit"""
+        try:
+            if not self.position_manager:
+                self.show_error("Không thể cập nhật SL/TP", "Chưa khởi tạo PositionManager")
+                return
+            
+            # Lấy thông tin vị thế
+            symbol = self.manage_symbol_combo.currentText()
+            if not symbol:
+                self.show_error("Không thể cập nhật SL/TP", "Chưa chọn vị thế")
+                return
+            
+            stop_loss = self.manage_sl_spin.value()
+            take_profit = self.manage_tp_spin.value()
+            
+            # Cập nhật SL và TP
+            result = self.position_manager.update_sl_tp(symbol, None, stop_loss, take_profit)
+            
+            if result.get("status") == "success":
+                self.show_info("Cập nhật thành công", f"Đã cập nhật SL/TP cho {symbol}")
+                self.status_label.setText(f"Đã cập nhật SL/TP cho {symbol}")
+                
+                # Cập nhật dữ liệu
+                self.refresh_data()
+            else:
+                self.show_error("Lỗi khi cập nhật SL/TP", result.get("message", "Lỗi không xác định"))
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật SL/TP: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi cập nhật SL/TP", str(e))
+    
+    def close_position(self):
+        """Đóng vị thế được chọn"""
+        try:
+            if not self.position_manager:
+                self.show_error("Không thể đóng vị thế", "Chưa khởi tạo PositionManager")
+                return
+            
+            # Lấy thông tin vị thế
+            symbol = self.manage_symbol_combo.currentText()
+            if not symbol:
+                self.show_error("Không thể đóng vị thế", "Chưa chọn vị thế")
+                return
+            
+            # Xác nhận trước khi đóng vị thế
+            reply = QMessageBox.question(
+                self, 
+                "Xác nhận đóng vị thế", 
+                f"Bạn có chắc chắn muốn đóng vị thế {symbol} không?",
+                QMessageBox.Yes | QMessageBox.No, 
+                QMessageBox.No
+            )
+            
+            if reply == QMessageBox.No:
+                return
+            
+            # Đóng vị thế
+            result = self.position_manager.close_position(symbol)
+            
+            if result.get("status") == "success":
+                self.show_info("Đóng vị thế thành công", f"Đã đóng vị thế {symbol} với lợi nhuận {result.get('profit', 0):.2f} USDT ({result.get('profit_percent', 0):.2f}%)")
+                self.status_label.setText(f"Đã đóng vị thế {symbol}")
+                
+                # Cập nhật dữ liệu
+                self.refresh_data()
+            else:
+                self.show_error("Lỗi khi đóng vị thế", result.get("message", "Lỗi không xác định"))
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đóng vị thế: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi đóng vị thế", str(e))
+    
+    def close_position_from_table(self, symbol: str):
+        """
+        Đóng vị thế từ bảng
+        
+        :param symbol: Cặp giao dịch
+        """
+        try:
+            if not self.position_manager:
+                self.show_error("Không thể đóng vị thế", "Chưa khởi tạo PositionManager")
+                return
+            
+            # Xác nhận trước khi đóng vị thế
+            reply = QMessageBox.question(
+                self, 
+                "Xác nhận đóng vị thế", 
+                f"Bạn có chắc chắn muốn đóng vị thế {symbol} không?",
+                QMessageBox.Yes | QMessageBox.No, 
+                QMessageBox.No
+            )
+            
+            if reply == QMessageBox.No:
+                return
+            
+            # Đóng vị thế
+            result = self.position_manager.close_position(symbol)
+            
+            if result.get("status") == "success":
+                self.show_info("Đóng vị thế thành công", f"Đã đóng vị thế {symbol} với lợi nhuận {result.get('profit', 0):.2f} USDT ({result.get('profit_percent', 0):.2f}%)")
+                self.status_label.setText(f"Đã đóng vị thế {symbol}")
+                
+                # Cập nhật dữ liệu
+                self.refresh_data()
+            else:
+                self.show_error("Lỗi khi đóng vị thế", result.get("message", "Lỗi không xác định"))
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi đóng vị thế: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi đóng vị thế", str(e))
+    
+    def select_position_from_table(self, table, row: int):
+        """
+        Chọn vị thế từ bảng
+        
+        :param table: Bảng chứa vị thế
+        :param row: Chỉ số hàng
+        """
+        # Lấy thông tin vị thế
+        symbol = table.item(row, 0).text()
+        
+        # Chọn vị thế trong combobox quản lý
+        index = self.manage_symbol_combo.findText(symbol)
+        if index >= 0:
+            self.manage_symbol_combo.setCurrentIndex(index)
+            
+            # Chuyển đến tab quản lý vị thế
+            self.tab_widget.setCurrentIndex(2)
+    
+    def refresh_history(self):
+        """Cập nhật lịch sử giao dịch"""
+        try:
+            if not self.position_manager:
+                self.show_error("Không thể cập nhật lịch sử", "Chưa khởi tạo PositionManager")
+                return
+            
+            # Lấy lịch sử giao dịch
+            history = self.position_manager.get_position_history(limit=20)
+            
+            # Cập nhật bảng lịch sử
+            self.history_table.setRowCount(len(history))
+            
+            for row, trade in enumerate(history):
+                symbol = trade.get("symbol", "")
+                side = trade.get("side", "")
+                price = trade.get("price", 0)
+                quantity = trade.get("quantity", 0)
+                commission = trade.get("commission", 0)
+                realized_pnl = trade.get("realized_pnl", 0)
+                time = trade.get("time", "")
+                
+                # Tạo các item cho bảng
+                self.history_table.setItem(row, 0, QTableWidgetItem(symbol))
                 
                 side_item = QTableWidgetItem(side)
                 if side == "LONG":
-                    side_item.setForeground(QColor("green"))
+                    side_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Long
                 else:
-                    side_item.setForeground(QColor("red"))
-                self.detailed_positions_table.setItem(i, 1, side_item)
+                    side_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Short
+                self.history_table.setItem(row, 1, side_item)
                 
-                self.detailed_positions_table.setItem(i, 2, QTableWidgetItem(f"{quantity:.4f}"))
-                self.detailed_positions_table.setItem(i, 3, QTableWidgetItem(f"{entry_price:.2f}"))
-                self.detailed_positions_table.setItem(i, 4, QTableWidgetItem(f"{current_price:.2f}"))
-                self.detailed_positions_table.setItem(i, 5, QTableWidgetItem(f"{stop_loss:.2f}"))
-                self.detailed_positions_table.setItem(i, 6, QTableWidgetItem(f"{take_profit:.2f}"))
+                self.history_table.setItem(row, 2, QTableWidgetItem(f"{price:.2f}"))
+                self.history_table.setItem(row, 3, QTableWidgetItem(f"{quantity:.4f}"))
+                self.history_table.setItem(row, 4, QTableWidgetItem(f"{commission:.4f}"))
                 
-                # Đặt màu cho lợi nhuận chi tiết
-                detailed_profit_item = QTableWidgetItem(f"{profit:.2f} ({profit_percent:.2f}%)")
-                if profit > 0:
-                    detailed_profit_item.setForeground(QColor("green"))
-                elif profit < 0:
-                    detailed_profit_item.setForeground(QColor("red"))
-                self.detailed_positions_table.setItem(i, 7, detailed_profit_item)
+                pnl_item = QTableWidgetItem(f"{realized_pnl:.2f}")
+                if realized_pnl > 0:
+                    pnl_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
+                elif realized_pnl < 0:
+                    pnl_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
+                self.history_table.setItem(row, 5, pnl_item)
                 
+                self.history_table.setItem(row, 6, QTableWidgetItem(time))
+            
+            self.status_label.setText("Đã cập nhật lịch sử giao dịch")
+        
         except Exception as e:
-            logger.error(f"Lỗi khi cập nhật bảng vị thế: {str(e)}")
+            logger.error(f"Lỗi khi cập nhật lịch sử giao dịch: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi cập nhật lịch sử giao dịch", str(e))
     
-    def start_bot(self):
-        """Bắt đầu bot giao dịch"""
-        if not self.trading_bot:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi bắt đầu bot.")
-            return
-        
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                    "Bạn có chắc muốn bắt đầu bot giao dịch?\n\nBot sẽ tự động thực hiện giao dịch dựa trên cài đặt của bạn.",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            # Bắt đầu luồng cập nhật nếu chưa chạy
-            if not self.update_thread:
-                self.start_update_thread()
-            
-            self.status_bar.showMessage("Bot đã bắt đầu chạy", 3000)
-            self.bot_log.append(f"{datetime.now().strftime('%H:%M:%S')} - Bot đã bắt đầu chạy")
-            
-            # Gửi thông báo Telegram
-            if self.telegram_notifier:
-                self.telegram_notifier.send_message("Bot giao dịch đã được bật")
-    
-    def stop_bot(self):
-        """Dừng bot giao dịch"""
-        if not self.update_thread:
-            QMessageBox.warning(self, "Lỗi", "Bot chưa được bắt đầu.")
-            return
-        
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                    "Bạn có chắc muốn dừng bot giao dịch?\n\nBot sẽ không thực hiện giao dịch mới, nhưng các vị thế hiện tại vẫn được giữ.",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            # Dừng luồng cập nhật
-            self.update_thread.stop()
-            self.update_thread = None
-            
-            self.status_bar.showMessage("Bot đã dừng", 3000)
-            self.bot_log.append(f"{datetime.now().strftime('%H:%M:%S')} - Bot đã dừng")
-            
-            # Gửi thông báo Telegram
-            if self.telegram_notifier:
-                self.telegram_notifier.send_message("Bot giao dịch đã bị tắt")
-    
-    def save_config(self):
-        """Lưu cấu hình hiện tại"""
+    def analyze_market(self):
+        """Phân tích thị trường"""
         try:
-            # Cập nhật cấu hình từ giao diện
-            risk_level = int(self.risk_level_combo.currentText().replace("%", ""))
-            symbols = [s.strip() for s in self.symbols_input.text().split(",")]
-            timeframes = [t.strip() for t in self.timeframes_input.text().split(",")]
-            
-            self.config["risk_level"] = risk_level
-            self.config["symbols"] = symbols
-            self.config["timeframes"] = timeframes
-            self.config["testnet"] = self.testnet_checkbox.isChecked()
-            self.config["telegram_notifications"] = self.telegram_enabled_checkbox.isChecked()
-            self.config["auto_trailing_stop"] = self.trailing_stop_checkbox.isChecked()
-            
-            self.config["quiet_hours"] = {
-                "enabled": self.quiet_hours_checkbox.isChecked(),
-                "start": self.quiet_start_input.text(),
-                "end": self.quiet_end_input.text()
-            }
-            
-            self.config["auto_update"] = self.auto_update_checkbox.isChecked()
-            self.config["update_frequency"] = self.update_frequency_spin.value()
-            
-            # Lưu cấu hình
-            with open("account_config.json", "w", encoding="utf-8") as f:
-                json.dump(self.config, f, indent=4)
-            
-            # Lưu API key và secret nếu được cung cấp
-            api_key = self.api_key_input.text()
-            api_secret = self.api_secret_input.text()
-            
-            if api_key and api_secret:
-                # Đặt biến môi trường
-                os.environ["BINANCE_TESTNET_API_KEY"] = api_key
-                os.environ["BINANCE_TESTNET_API_SECRET"] = api_secret
-            
-            # Lưu thông tin Telegram nếu được cung cấp
-            telegram_token = self.telegram_token_input.text()
-            telegram_chat_id = self.telegram_chat_id_input.text()
-            
-            if telegram_token and telegram_chat_id:
-                # Đặt biến môi trường
-                os.environ["TELEGRAM_BOT_TOKEN"] = telegram_token
-                os.environ["TELEGRAM_CHAT_ID"] = telegram_chat_id
-            
-            self.status_bar.showMessage("Cấu hình đã được lưu", 3000)
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu cấu hình: {str(e)}")
-            QMessageBox.critical(self, "Lỗi", f"Không thể lưu cấu hình: {str(e)}")
-    
-    def load_config(self):
-        """Tải cấu hình từ tệp"""
-        file_path, _ = QFileDialog.getOpenFileName(self, "Chọn tệp cấu hình", "", "JSON Files (*.json)")
-        
-        if file_path:
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    new_config = json.load(f)
-                
-                # Cập nhật cấu hình
-                self.config.update(new_config)
-                
-                # Cập nhật giao diện
-                self.testnet_checkbox.setChecked(self.config.get("testnet", True))
-                self.telegram_enabled_checkbox.setChecked(self.config.get("telegram_notifications", False))
-                self.trailing_stop_checkbox.setChecked(self.config.get("auto_trailing_stop", True))
-                
-                risk_level = str(self.config.get("risk_level", 10)) + "%"
-                current_index = self.risk_level_combo.findText(risk_level)
-                self.risk_level_combo.setCurrentIndex(current_index if current_index >= 0 else 0)
-                
-                self.symbols_input.setText(", ".join(self.config.get("symbols", ["BTCUSDT", "ETHUSDT"])))
-                self.timeframes_input.setText(", ".join(self.config.get("timeframes", ["1h", "4h"])))
-                
-                self.quiet_hours_checkbox.setChecked(self.config.get("quiet_hours", {}).get("enabled", False))
-                self.quiet_start_input.setText(self.config.get("quiet_hours", {}).get("start", "22:00"))
-                self.quiet_end_input.setText(self.config.get("quiet_hours", {}).get("end", "07:00"))
-                
-                self.auto_update_checkbox.setChecked(self.config.get("auto_update", True))
-                self.update_frequency_spin.setValue(self.config.get("update_frequency", 24))
-                
-                self.status_bar.showMessage(f"Cấu hình đã được tải từ {file_path}", 3000)
-                
-            except Exception as e:
-                logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể tải cấu hình: {str(e)}")
-    
-    def save_settings(self):
-        """Lưu cài đặt từ tab Settings"""
-        self.save_config()
-        self.risk_level_label.setText(f"Mức rủi ro: {self.config.get('risk_level', 10)}%")
-        QMessageBox.information(self, "Thành công", "Cài đặt đã được lưu")
-        
-        # Kết nối lại API nếu đã có
-        if self.market_analyzer:
-            self.reconnect_api()
-    
-    def reset_settings(self):
-        """Khôi phục cài đặt mặc định"""
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                    "Bạn có chắc muốn khôi phục cài đặt mặc định?\n\nMọi cài đặt tùy chỉnh sẽ bị mất.",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            # Cài đặt mặc định
-            default_config = {
-                "risk_level": 10,
-                "symbols": ["BTCUSDT", "ETHUSDT"],
-                "timeframes": ["1h", "4h"],
-                "testnet": True,
-                "telegram_notifications": True,
-                "quiet_hours": {
-                    "enabled": False,
-                    "start": "22:00",
-                    "end": "07:00"
-                },
-                "auto_trailing_stop": True,
-                "language": "vi",
-                "auto_update": True,
-                "update_frequency": 24
-            }
-            
-            # Cập nhật cấu hình
-            self.config = default_config
-            
-            # Cập nhật giao diện
-            self.testnet_checkbox.setChecked(True)
-            self.telegram_enabled_checkbox.setChecked(True)
-            self.trailing_stop_checkbox.setChecked(True)
-            
-            risk_level = "10%"
-            current_index = self.risk_level_combo.findText(risk_level)
-            self.risk_level_combo.setCurrentIndex(current_index if current_index >= 0 else 0)
-            
-            self.symbols_input.setText("BTCUSDT, ETHUSDT")
-            self.timeframes_input.setText("1h, 4h")
-            
-            self.quiet_hours_checkbox.setChecked(False)
-            self.quiet_start_input.setText("22:00")
-            self.quiet_end_input.setText("07:00")
-            
-            self.auto_update_checkbox.setChecked(True)
-            self.update_frequency_spin.setValue(24)
-            
-            # Lưu cấu hình
-            with open("account_config.json", "w", encoding="utf-8") as f:
-                json.dump(default_config, f, indent=4)
-            
-            self.status_bar.showMessage("Cài đặt đã được khôi phục về mặc định", 3000)
-    
-    def test_telegram(self):
-        """Kiểm tra kết nối Telegram"""
-        telegram_token = self.telegram_token_input.text()
-        telegram_chat_id = self.telegram_chat_id_input.text()
-        
-        if not telegram_token or not telegram_chat_id:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng nhập Bot Token và Chat ID Telegram")
-            return
-        
-        try:
-            # Đặt biến môi trường
-            os.environ["TELEGRAM_BOT_TOKEN"] = telegram_token
-            os.environ["TELEGRAM_CHAT_ID"] = telegram_chat_id
-            
-            # Khởi tạo notifier
-            from advanced_telegram_notifier import TelegramNotifier
-            telegram_notifier = TelegramNotifier()
-            
-            # Gửi tin nhắn kiểm tra
-            test_message = "Đây là tin nhắn kiểm tra từ Bot Trading"
-            telegram_notifier.send_message(test_message)
-            
-            self.telegram_notifier = telegram_notifier
-            self.status_bar.showMessage("Đã gửi tin nhắn kiểm tra đến Telegram", 3000)
-            
-            QMessageBox.information(self, "Thành công", "Tin nhắn kiểm tra đã được gửi đến Telegram")
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi kiểm tra Telegram: {str(e)}")
-            QMessageBox.critical(self, "Lỗi", f"Không thể kết nối đến Telegram: {str(e)}")
-    
-    def send_telegram_notification(self):
-        """Gửi thông báo Telegram tùy chỉnh"""
-        if not self.telegram_notifier:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến Telegram. Vui lòng kiểm tra cài đặt Telegram.")
-            return
-        
-        # Lấy nội dung thông báo
-        from PyQt5.QtWidgets import QInputDialog
-        text, ok = QInputDialog.getText(self, "Thông báo Telegram", "Nhập nội dung thông báo:")
-        
-        if ok and text:
-            try:
-                self.telegram_notifier.send_message(text)
-                self.status_bar.showMessage("Đã gửi thông báo đến Telegram", 3000)
-            except Exception as e:
-                logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể gửi thông báo Telegram: {str(e)}")
-    
-    def update_market_analysis(self):
-        """Cập nhật phân tích thị trường"""
-        if not self.market_analyzer:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi phân tích thị trường.")
-            return
-        
-        symbol = self.symbol_combo.currentText()
-        timeframe = self.timeframe_combo.currentText()
-        
-        try:
-            # Hiển thị thông báo đang xử lý
-            self.status_bar.showMessage(f"Đang phân tích {symbol} trên khung thời gian {timeframe}...")
-            self.progress_bar.setVisible(True)
-            self.progress_bar.setValue(30)
-            
-            # Lấy dữ liệu thị trường
-            market_data = self.market_analyzer.get_market_data(symbol, timeframe)
-            
-            if market_data["status"] == "success":
-                # Hiển thị dữ liệu thị trường
-                data_text = f"Cặp: {symbol}\n"
-                data_text += f"Khung thời gian: {timeframe}\n"
-                data_text += f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-                
-                data_text += f"Giá hiện tại: {market_data['price']:.2f}\n"
-                data_text += f"Thay đổi 24h: {market_data['change_24h']:.2f}%\n"
-                data_text += f"Khối lượng 24h: {market_data['volume']:.2f}\n"
-                data_text += f"Cao nhất 24h: {market_data['high_24h']:.2f}\n"
-                data_text += f"Thấp nhất 24h: {market_data['low_24h']:.2f}\n\n"
-                
-                data_text += f"Giá mở: {market_data['open']:.2f}\n"
-                data_text += f"Giá đóng: {market_data['close']:.2f}\n"
-                data_text += f"Giá cao: {market_data['high']:.2f}\n"
-                data_text += f"Giá thấp: {market_data['low']:.2f}\n"
-                
-                self.market_data_text.setText(data_text)
-            else:
-                self.market_data_text.setText(f"Lỗi khi lấy dữ liệu thị trường: {market_data.get('message', 'Không rõ lỗi')}")
-            
-            self.progress_bar.setValue(60)
-            
-            # Phân tích kỹ thuật
-            analysis = self.market_analyzer.analyze_technical(symbol, timeframe)
-            
-            if analysis["status"] == "success":
-                # Hiển thị phân tích kỹ thuật
-                ta_text = f"Tín hiệu tổng hợp: {analysis['overall_signal']} ({analysis['strength']})\n\n"
-                
-                ta_text += "Các chỉ báo kỹ thuật:\n"
-                for indicator in analysis.get("indicators", []):
-                    ta_text += f"- {indicator['name']}: {indicator['value']} ({indicator['signal']})\n"
-                
-                ta_text += "\nTrend Analysis:\n"
-                ta_text += f"- Xu hướng ngắn hạn: {analysis.get('short_term_trend', 'Không rõ')}\n"
-                ta_text += f"- Xu hướng trung hạn: {analysis.get('mid_term_trend', 'Không rõ')}\n"
-                ta_text += f"- Xu hướng dài hạn: {analysis.get('long_term_trend', 'Không rõ')}\n"
-                
-                ta_text += "\nSupport/Resistance:\n"
-                for level in analysis.get("support_resistance", []):
-                    ta_text += f"- {level['type']}: {level['value']:.2f}\n"
-                
-                self.ta_text.setText(ta_text)
-            else:
-                self.ta_text.setText(f"Lỗi khi phân tích kỹ thuật: {analysis.get('message', 'Không rõ lỗi')}")
-            
-            self.progress_bar.setValue(90)
-            
-            # Lấy tín hiệu giao dịch
-            if self.signal_generator:
-                signals = self.signal_generator.generate_signals([symbol], [timeframe])
-                
-                # Hiển thị tín hiệu giao dịch
-                self.signals_table.setRowCount(len(signals))
-                
-                for i, signal in enumerate(signals):
-                    # Lấy dữ liệu
-                    signal_symbol = signal["symbol"]
-                    signal_timeframe = signal["timeframe"]
-                    side = signal["side"]
-                    entry_price = signal["entry_price"]
-                    stop_loss = signal["stop_loss"]
-                    take_profit = signal["take_profit"]
-                    confidence = signal["confidence"]
-                    
-                    # Tạo các mục trong bảng
-                    self.signals_table.setItem(i, 0, QTableWidgetItem(signal_symbol))
-                    self.signals_table.setItem(i, 1, QTableWidgetItem(signal_timeframe))
-                    
-                    # Đặt màu cho hướng giao dịch
-                    side_item = QTableWidgetItem(side)
-                    if side == "LONG":
-                        side_item.setForeground(QColor("green"))
-                    else:
-                        side_item.setForeground(QColor("red"))
-                    self.signals_table.setItem(i, 2, side_item)
-                    
-                    self.signals_table.setItem(i, 3, QTableWidgetItem(f"{entry_price:.2f}"))
-                    self.signals_table.setItem(i, 4, QTableWidgetItem(f"{stop_loss:.2f}"))
-                    self.signals_table.setItem(i, 5, QTableWidgetItem(f"{take_profit:.2f}"))
-                    self.signals_table.setItem(i, 6, QTableWidgetItem(f"{confidence}%"))
-            
-            self.progress_bar.setValue(100)
-            self.status_bar.showMessage("Phân tích hoàn tất", 3000)
-            self.progress_bar.setVisible(False)
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi phân tích thị trường: {str(e)}")
-            self.status_bar.showMessage("Phân tích thất bại", 3000)
-            self.progress_bar.setVisible(False)
-            
-            # Hiển thị thông báo lỗi
-            QMessageBox.critical(self, "Lỗi phân tích", f"Không thể phân tích thị trường: {str(e)}")
-    
-    def refresh_positions(self):
-        """Làm mới danh sách vị thế"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi làm mới vị thế.")
-            return
-        
-        try:
-            positions = self.position_manager.get_all_positions()
-            self.update_position_tables(positions)
-            self.status_bar.showMessage("Đã làm mới danh sách vị thế", 3000)
-        except Exception as e:
-            logger.error(f"Lỗi khi làm mới vị thế: {str(e)}")
-            QMessageBox.critical(self, "Lỗi", f"Không thể làm mới vị thế: {str(e)}")
-    
-    def close_selected_position(self):
-        """Đóng vị thế đã chọn"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi đóng vị thế.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.detailed_positions_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để đóng.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.detailed_positions_table.item(selected_row, 0).text()
-        side = self.detailed_positions_table.item(selected_row, 1).text()
-        
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                    f"Bạn có chắc muốn đóng vị thế {side} trên {symbol}?",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            try:
-                result = self.position_manager.close_position(symbol)
-                
-                if result["status"] == "success":
-                    self.status_bar.showMessage(f"Đã đóng vị thế {side} trên {symbol}", 3000)
-                    self.refresh_positions()
-                    
-                    # Gửi thông báo Telegram
-                    if self.telegram_notifier:
-                        self.telegram_notifier.send_message(f"Đã đóng vị thế {side} trên {symbol}")
-                else:
-                    QMessageBox.critical(self, "Lỗi", f"Không thể đóng vị thế: {result.get('message', 'Không rõ lỗi')}")
-            except Exception as e:
-                logger.error(f"Lỗi khi đóng vị thế: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể đóng vị thế: {str(e)}")
-    
-    def edit_sl(self):
-        """Chỉnh sửa Stop Loss"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi chỉnh sửa SL.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.detailed_positions_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để chỉnh sửa SL.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.detailed_positions_table.item(selected_row, 0).text()
-        side = self.detailed_positions_table.item(selected_row, 1).text()
-        current_sl = float(self.detailed_positions_table.item(selected_row, 5).text())
-        
-        # Lấy SL mới
-        from PyQt5.QtWidgets import QInputDialog
-        new_sl, ok = QInputDialog.getDouble(self, "Chỉnh sửa Stop Loss", 
-                                           f"Nhập Stop Loss mới cho {symbol} {side}:", 
-                                           current_sl, 0, 1000000, 2)
-        
-        if ok:
-            try:
-                result = self.position_manager.update_sl_tp(symbol, side, new_sl)
-                
-                if result["status"] == "success":
-                    self.status_bar.showMessage(f"Đã cập nhật SL cho {symbol} {side}", 3000)
-                    self.refresh_positions()
-                    
-                    # Gửi thông báo Telegram
-                    if self.telegram_notifier:
-                        self.telegram_notifier.send_sltp_update(symbol, side, current_sl, new_sl, "Cập nhật thủ công")
-                else:
-                    QMessageBox.critical(self, "Lỗi", f"Không thể cập nhật SL: {result.get('message', 'Không rõ lỗi')}")
-            except Exception as e:
-                logger.error(f"Lỗi khi cập nhật SL: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể cập nhật SL: {str(e)}")
-    
-    def edit_tp(self):
-        """Chỉnh sửa Take Profit"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi chỉnh sửa TP.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.detailed_positions_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để chỉnh sửa TP.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.detailed_positions_table.item(selected_row, 0).text()
-        side = self.detailed_positions_table.item(selected_row, 1).text()
-        current_tp = float(self.detailed_positions_table.item(selected_row, 6).text())
-        
-        # Lấy TP mới
-        from PyQt5.QtWidgets import QInputDialog
-        new_tp, ok = QInputDialog.getDouble(self, "Chỉnh sửa Take Profit", 
-                                           f"Nhập Take Profit mới cho {symbol} {side}:", 
-                                           current_tp, 0, 1000000, 2)
-        
-        if ok:
-            try:
-                result = self.position_manager.update_sl_tp(symbol, side, None, new_tp)
-                
-                if result["status"] == "success":
-                    self.status_bar.showMessage(f"Đã cập nhật TP cho {symbol} {side}", 3000)
-                    self.refresh_positions()
-                    
-                    # Gửi thông báo Telegram
-                    if self.telegram_notifier:
-                        self.telegram_notifier.send_message(f"Đã cập nhật Take Profit cho {symbol} {side}: {current_tp:.2f} -> {new_tp:.2f}")
-                else:
-                    QMessageBox.critical(self, "Lỗi", f"Không thể cập nhật TP: {result.get('message', 'Không rõ lỗi')}")
-            except Exception as e:
-                logger.error(f"Lỗi khi cập nhật TP: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể cập nhật TP: {str(e)}")
-    
-    def add_trailing_stop(self):
-        """Thêm Trailing Stop cho vị thế đã chọn"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi thêm Trailing Stop.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.detailed_positions_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để thêm Trailing Stop.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.detailed_positions_table.item(selected_row, 0).text()
-        side = self.detailed_positions_table.item(selected_row, 1).text()
-        
-        # Form để lấy tham số Trailing Stop
-        from PyQt5.QtWidgets import QDialog, QFormLayout, QDialogButtonBox
-        
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Thêm Trailing Stop")
-        layout = QFormLayout(dialog)
-        
-        activation_spinbox = QDoubleSpinBox()
-        activation_spinbox.setRange(0.5, 20)
-        activation_spinbox.setValue(2)
-        activation_spinbox.setSuffix("%")
-        layout.addRow("Điểm kích hoạt (% lợi nhuận):", activation_spinbox)
-        
-        callback_spinbox = QDoubleSpinBox()
-        callback_spinbox.setRange(0.1, 10)
-        callback_spinbox.setValue(1)
-        callback_spinbox.setSuffix("%")
-        layout.addRow("Callback (%):", callback_spinbox)
-        
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dialog.accept)
-        buttons.rejected.connect(dialog.reject)
-        layout.addRow(buttons)
-        
-        if dialog.exec_() == QDialog.Accepted:
-            activation_percent = activation_spinbox.value()
-            callback_percent = callback_spinbox.value()
-            
-            try:
-                # Trong thực tế, bạn sẽ cần một hàm hoặc lớp để xử lý trailing stop
-                # Đây chỉ là giả lập
-                self.status_bar.showMessage(f"Đã thêm Trailing Stop cho {symbol} {side} (Kích hoạt: {activation_percent}%, Callback: {callback_percent}%)", 3000)
-                
-                # Giả lập cập nhật
-                QMessageBox.information(self, "Thành công", f"Đã thêm Trailing Stop cho {symbol} {side}\nKích hoạt: {activation_percent}%\nCallback: {callback_percent}%")
-                
-                # Gửi thông báo Telegram
-                if self.telegram_notifier:
-                    self.telegram_notifier.send_message(f"Đã thêm Trailing Stop cho {symbol} {side}\nKích hoạt: {activation_percent}%\nCallback: {callback_percent}%")
-            except Exception as e:
-                logger.error(f"Lỗi khi thêm Trailing Stop: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể thêm Trailing Stop: {str(e)}")
-    
-    def show_partial_tp_dialog(self):
-        """Hiển thị hộp thoại chốt lời một phần"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi chốt lời một phần.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.detailed_positions_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để chốt lời một phần.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.detailed_positions_table.item(selected_row, 0).text()
-        side = self.detailed_positions_table.item(selected_row, 1).text()
-        
-        # Form để lấy tham số chốt lời một phần
-        from PyQt5.QtWidgets import QDialog, QFormLayout, QDialogButtonBox
-        
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Chốt lời một phần")
-        layout = QFormLayout(dialog)
-        
-        percentage_spinbox = QSpinBox()
-        percentage_spinbox.setRange(10, 90)
-        percentage_spinbox.setValue(50)
-        percentage_spinbox.setSuffix("%")
-        layout.addRow("Phần trăm chốt lời:", percentage_spinbox)
-        
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dialog.accept)
-        buttons.rejected.connect(dialog.reject)
-        layout.addRow(buttons)
-        
-        if dialog.exec_() == QDialog.Accepted:
-            percentage = percentage_spinbox.value()
-            
-            try:
-                # Trong thực tế, bạn sẽ cần một hàm hoặc lớp để xử lý chốt lời một phần
-                # Đây chỉ là giả lập
-                self.status_bar.showMessage(f"Đã chốt lời {percentage}% vị thế {symbol} {side}", 3000)
-                
-                # Giả lập cập nhật
-                QMessageBox.information(self, "Thành công", f"Đã chốt lời {percentage}% vị thế {symbol} {side}")
-                
-                # Gửi thông báo Telegram
-                if self.telegram_notifier:
-                    self.telegram_notifier.send_message(f"Đã chốt lời {percentage}% vị thế {symbol} {side}")
-            except Exception as e:
-                logger.error(f"Lỗi khi chốt lời một phần: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể chốt lời một phần: {str(e)}")
-    
-    def show_market_order_dialog(self):
-        """Hiển thị hộp thoại đặt lệnh thị trường"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi đặt lệnh.")
-            return
-        
-        # Form để lấy tham số lệnh
-        from PyQt5.QtWidgets import QDialog, QFormLayout, QDialogButtonBox
-        
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Đặt lệnh thị trường")
-        layout = QFormLayout(dialog)
-        
-        symbol_combo = QComboBox()
-        symbol_combo.addItems(["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"])
-        layout.addRow("Cặp:", symbol_combo)
-        
-        side_combo = QComboBox()
-        side_combo.addItems(["LONG", "SHORT"])
-        layout.addRow("Hướng:", side_combo)
-        
-        amount_spinbox = QDoubleSpinBox()
-        amount_spinbox.setRange(0.001, 1000)
-        amount_spinbox.setValue(0.01)
-        layout.addRow("Số lượng:", amount_spinbox)
-        
-        leverage_spinbox = QSpinBox()
-        leverage_spinbox.setRange(1, 125)
-        leverage_spinbox.setValue(10)
-        layout.addRow("Đòn bẩy:", leverage_spinbox)
-        
-        sl_checkbox = QCheckBox("Thêm Stop Loss")
-        sl_checkbox.setChecked(True)
-        layout.addRow(sl_checkbox)
-        
-        sl_spinbox = QDoubleSpinBox()
-        sl_spinbox.setRange(0.01, 100000)
-        sl_spinbox.setValue(1000)
-        layout.addRow("Stop Loss (%):", sl_spinbox)
-        
-        tp_checkbox = QCheckBox("Thêm Take Profit")
-        tp_checkbox.setChecked(True)
-        layout.addRow(tp_checkbox)
-        
-        tp_spinbox = QDoubleSpinBox()
-        tp_spinbox.setRange(0.01, 100000)
-        tp_spinbox.setValue(2000)
-        layout.addRow("Take Profit (%):", tp_spinbox)
-        
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dialog.accept)
-        buttons.rejected.connect(dialog.reject)
-        layout.addRow(buttons)
-        
-        if dialog.exec_() == QDialog.Accepted:
-            symbol = symbol_combo.currentText()
-            side = side_combo.currentText()
-            amount = amount_spinbox.value()
-            leverage = leverage_spinbox.value()
-            
-            # Thiết lập Stop Loss và Take Profit
-            stop_loss = None
-            take_profit = None
-            
-            if sl_checkbox.isChecked():
-                stop_loss = sl_spinbox.value()
-            
-            if tp_checkbox.isChecked():
-                take_profit = tp_spinbox.value()
-            
-            try:
-                # Đặt lệnh
-                result = self.position_manager.open_position(
-                    symbol=symbol,
-                    side=side,
-                    amount=amount,
-                    stop_loss=stop_loss,
-                    take_profit=take_profit,
-                    leverage=leverage
-                )
-                
-                if result["status"] == "success":
-                    self.status_bar.showMessage(f"Đã đặt lệnh {side} trên {symbol}", 3000)
-                    self.refresh_positions()
-                    
-                    # Gửi thông báo Telegram
-                    if self.telegram_notifier:
-                        self.telegram_notifier.send_message(f"Đã đặt lệnh {side} trên {symbol} với số lượng {amount}")
-                else:
-                    QMessageBox.critical(self, "Lỗi", f"Không thể đặt lệnh: {result.get('message', 'Không rõ lỗi')}")
-            except Exception as e:
-                logger.error(f"Lỗi khi đặt lệnh: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể đặt lệnh: {str(e)}")
-    
-    def show_limit_order_dialog(self):
-        """Hiển thị hộp thoại đặt lệnh giới hạn"""
-        # TODO: Implement limit order
-        QMessageBox.information(self, "Thông báo", "Chức năng đặt lệnh giới hạn đang được phát triển")
-    
-    def show_close_position_dialog(self):
-        """Hiển thị hộp thoại đóng vị thế"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi đóng vị thế.")
-            return
-        
-        try:
-            positions = self.position_manager.get_all_positions()
-            
-            if not positions:
-                QMessageBox.information(self, "Thông báo", "Không có vị thế nào đang mở")
+            if not self.market_analyzer:
+                self.show_error("Không thể phân tích thị trường", "Chưa khởi tạo MarketAnalyzer")
                 return
             
-            # Form để chọn vị thế đóng
-            from PyQt5.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
+            # Lấy thông tin cặp giao dịch và khung thời gian
+            symbol = self.analysis_symbol_combo.currentText()
+            interval = self.analysis_interval_combo.currentText()
             
-            dialog = QDialog(self)
-            dialog.setWindowTitle("Đóng vị thế")
-            layout = QVBoxLayout(dialog)
+            # Phân tích kỹ thuật
+            analysis = self.market_analyzer.analyze_technical(symbol, interval)
             
-            position_table = QTableWidget(len(positions), 5)
-            position_table.setHorizontalHeaderLabels(["Cặp", "Vị thế", "Số lượng", "Giá vào", "Lợi nhuận"])
-            position_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-            
-            for i, position in enumerate(positions):
-                # Lấy dữ liệu
-                symbol = position["symbol"]
-                side = position["side"]
-                quantity = position["size"]
-                entry_price = position["entry_price"]
-                profit = position["unrealized_pnl"]
-                profit_percent = position["profit_percent"]
+            if analysis.get("status") == "success":
+                # Cập nhật kết quả phân tích
+                self.analysis_result_text.clear()
                 
-                # Tạo các mục trong bảng
-                position_table.setItem(i, 0, QTableWidgetItem(symbol))
-                position_table.setItem(i, 1, QTableWidgetItem(side))
-                position_table.setItem(i, 2, QTableWidgetItem(f"{quantity:.4f}"))
-                position_table.setItem(i, 3, QTableWidgetItem(f"{entry_price:.2f}"))
+                # Tạo nội dung phân tích
+                content = f"<h3>Phân tích kỹ thuật cho {symbol} ({interval})</h3>"
+                content += f"<p>Giá hiện tại: {analysis.get('price', 0):.2f} USDT</p>"
+                content += f"<p>Tín hiệu: <b>{analysis.get('overall_signal', 'N/A')}</b></p>"
+                content += f"<p>Độ mạnh: <b>{analysis.get('strength', 'N/A')}</b></p>"
                 
-                # Đặt màu cho lợi nhuận
-                profit_item = QTableWidgetItem(f"{profit:.2f} ({profit_percent:.2f}%)")
-                if profit > 0:
-                    profit_item.setForeground(QColor("green"))
-                elif profit < 0:
-                    profit_item.setForeground(QColor("red"))
-                position_table.setItem(i, 4, profit_item)
-            
-            layout.addWidget(position_table)
-            
-            buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-            buttons.accepted.connect(dialog.accept)
-            buttons.rejected.connect(dialog.reject)
-            layout.addWidget(buttons)
-            
-            if dialog.exec_() == QDialog.Accepted:
-                selected_rows = position_table.selectedIndexes()
-                if not selected_rows:
-                    QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một vị thế để đóng.")
-                    return
+                content += "<h4>Xu hướng</h4>"
+                content += f"<p>Ngắn hạn: {analysis.get('short_term_trend', 'N/A')}</p>"
+                content += f"<p>Trung hạn: {analysis.get('mid_term_trend', 'N/A')}</p>"
+                content += f"<p>Dài hạn: {analysis.get('long_term_trend', 'N/A')}</p>"
                 
-                selected_row = selected_rows[0].row()
-                symbol = position_table.item(selected_row, 0).text()
-                side = position_table.item(selected_row, 1).text()
+                content += "<h4>Các chỉ báo</h4>"
+                for indicator in analysis.get("indicators", []):
+                    content += f"<p><b>{indicator.get('name', 'N/A')}</b>: {indicator.get('value', 'N/A')} - <i>{indicator.get('signal', 'N/A')}</i></p>"
                 
-                reply = QMessageBox.question(self, "Xác nhận", 
-                                           f"Bạn có chắc muốn đóng vị thế {side} trên {symbol}?",
-                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                content += "<h4>Hỗ trợ và kháng cự</h4>"
+                for sr in analysis.get("support_resistance", []):
+                    content += f"<p><b>{sr.get('type', 'N/A')}</b>: {sr.get('value', 0):.2f}</p>"
                 
-                if reply == QMessageBox.Yes:
-                    result = self.position_manager.close_position(symbol)
-                    
-                    if result["status"] == "success":
-                        self.status_bar.showMessage(f"Đã đóng vị thế {side} trên {symbol}", 3000)
-                        self.refresh_positions()
-                        
-                        # Gửi thông báo Telegram
-                        if self.telegram_notifier:
-                            self.telegram_notifier.send_message(f"Đã đóng vị thế {side} trên {symbol}")
-                    else:
-                        QMessageBox.critical(self, "Lỗi", f"Không thể đóng vị thế: {result.get('message', 'Không rõ lỗi')}")
-        except Exception as e:
-            logger.error(f"Lỗi khi hiển thị hộp thoại đóng vị thế: {str(e)}")
-            QMessageBox.critical(self, "Lỗi", f"Không thể hiển thị hộp thoại đóng vị thế: {str(e)}")
-    
-    def show_trailing_stop_dialog(self):
-        """Hiển thị hộp thoại Trailing Stop"""
-        # TODO: Implement trailing stop dialog
-        QMessageBox.information(self, "Thông báo", "Chức năng Trailing Stop đang được phát triển")
-    
-    def show_risk_calculator(self):
-        """Hiển thị bộ tính toán rủi ro"""
-        # TODO: Implement risk calculator
-        QMessageBox.information(self, "Thông báo", "Chức năng tính toán rủi ro đang được phát triển")
-    
-    def show_position_size_calculator(self):
-        """Hiển thị bộ tính toán kích thước vị thế"""
-        # TODO: Implement position size calculator
-        QMessageBox.information(self, "Thông báo", "Chức năng tính toán kích thước vị thế đang được phát triển")
-    
-    def execute_selected_signal(self):
-        """Thực thi tín hiệu đã chọn"""
-        if not self.position_manager:
-            QMessageBox.warning(self, "Lỗi", "Chưa kết nối được đến API. Vui lòng kết nối trước khi thực thi tín hiệu.")
-            return
-        
-        # Lấy dòng đã chọn
-        selected_rows = self.signals_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một tín hiệu để thực thi.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        symbol = self.signals_table.item(selected_row, 0).text()
-        side = self.signals_table.item(selected_row, 2).text()
-        entry_price = float(self.signals_table.item(selected_row, 3).text())
-        stop_loss = float(self.signals_table.item(selected_row, 4).text())
-        take_profit = float(self.signals_table.item(selected_row, 5).text())
-        
-        # Lấy kích thước vị thế
-        account_info = self.market_analyzer.get_account_info()
-        if account_info["status"] != "success":
-            QMessageBox.critical(self, "Lỗi", f"Không thể lấy thông tin tài khoản: {account_info.get('message', 'Không rõ lỗi')}")
-            return
-        
-        account_balance = account_info["account"]["balance"]
-        position_size = self.risk_manager.calculate_position_size(account_balance, symbol)
-        
-        # Xác nhận
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                   f"Bạn có chắc muốn thực thi tín hiệu {side} trên {symbol}?\n\nGiá vào: {entry_price:.2f}\nStop Loss: {stop_loss:.2f}\nTake Profit: {take_profit:.2f}\nKích thước: {position_size:.4f}",
-                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            try:
-                result = self.position_manager.open_position(
-                    symbol=symbol,
-                    side=side,
-                    amount=position_size,
-                    stop_loss=stop_loss,
-                    take_profit=take_profit
-                )
+                self.analysis_result_text.setHtml(content)
                 
-                if result["status"] == "success":
-                    self.status_bar.showMessage(f"Đã thực thi tín hiệu {side} trên {symbol}", 3000)
-                    self.refresh_positions()
-                    
-                    # Gửi thông báo Telegram
-                    if self.telegram_notifier:
-                        self.telegram_notifier.send_message(f"Đã thực thi tín hiệu {side} trên {symbol} với giá {entry_price:.2f}")
+                # Cập nhật các label tín hiệu
+                self.signal_label.setText(analysis.get("overall_signal", "N/A"))
+                if analysis.get("overall_signal") == "Mua":
+                    self.signal_label.setStyleSheet("color: #22C55E; font-size: 16px; font-weight: bold;")
+                elif analysis.get("overall_signal") == "Bán":
+                    self.signal_label.setStyleSheet("color: #EF4444; font-size: 16px; font-weight: bold;")
                 else:
-                    QMessageBox.critical(self, "Lỗi", f"Không thể thực thi tín hiệu: {result.get('message', 'Không rõ lỗi')}")
-            except Exception as e:
-                logger.error(f"Lỗi khi thực thi tín hiệu: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể thực thi tín hiệu: {str(e)}")
-    
-    def ignore_selected_signal(self):
-        """Bỏ qua tín hiệu đã chọn"""
-        # Lấy dòng đã chọn
-        selected_rows = self.signals_table.selectedIndexes()
-        if not selected_rows:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn một tín hiệu để bỏ qua.")
-            return
-        
-        selected_row = selected_rows[0].row()
-        self.signals_table.removeRow(selected_row)
-        self.status_bar.showMessage("Đã bỏ qua tín hiệu", 3000)
-    
-    def load_logs(self):
-        """Tải nhật ký"""
-        try:
-            log_type = self.log_type_combo.currentText()
-            log_file = ""
-            
-            if log_type == "Bot":
-                log_file = "desktop_app.log"
-            elif log_type == "Giao dịch":
-                log_file = "logs/trading.log"
-            elif log_type == "Thị trường":
-                log_file = "logs/market.log"
-            elif log_type == "Lỗi":
-                log_file = "logs/error.log"
-            elif log_type == "Tất cả":
-                log_file = "logs/all.log"
-            
-            if os.path.exists(log_file):
-                with open(log_file, "r", encoding="utf-8") as f:
-                    log_content = f.read()
-                self.log_viewer.setText(log_content)
+                    self.signal_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+                
+                self.strength_label.setText(analysis.get("strength", "N/A"))
+                self.trend_label.setText(analysis.get("short_term_trend", "N/A"))
+                
+                self.status_label.setText(f"Đã phân tích thị trường cho {symbol} ({interval})")
             else:
-                self.log_viewer.setText(f"Không tìm thấy tệp nhật ký: {log_file}")
-            
-            # Di chuyển con trỏ đến cuối
-            self.log_viewer.moveCursor(QTextCursor.End)
-            
+                self.show_error("Lỗi khi phân tích thị trường", analysis.get("message", "Lỗi không xác định"))
+        
         except Exception as e:
-            logger.error(f"Lỗi khi tải nhật ký: {str(e)}")
-            self.log_viewer.setText(f"Lỗi khi tải nhật ký: {str(e)}")
+            logger.error(f"Lỗi khi phân tích thị trường: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi phân tích thị trường", str(e))
     
-    def clear_logs(self):
-        """Xóa nhật ký"""
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                   "Bạn có chắc muốn xóa nhật ký?",
-                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            log_type = self.log_type_combo.currentText()
-            log_file = ""
+    def analyze_market_detail(self):
+        """Phân tích thị trường chi tiết"""
+        try:
+            if not self.market_analyzer:
+                self.show_error("Không thể phân tích thị trường", "Chưa khởi tạo MarketAnalyzer")
+                return
             
-            if log_type == "Bot":
-                log_file = "desktop_app.log"
-            elif log_type == "Giao dịch":
-                log_file = "logs/trading.log"
-            elif log_type == "Thị trường":
-                log_file = "logs/market.log"
-            elif log_type == "Lỗi":
-                log_file = "logs/error.log"
-            elif log_type == "Tất cả":
-                log_file = "logs/all.log"
+            # Lấy thông tin cặp giao dịch và khung thời gian
+            symbol = self.market_symbol_combo.currentText()
+            interval = self.market_interval_combo.currentText()
             
-            try:
-                if os.path.exists(log_file):
-                    # Xóa nội dung tệp
-                    with open(log_file, "w", encoding="utf-8") as f:
-                        f.write("Nhật ký đã được xóa lúc " + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
+            # Phân tích kỹ thuật
+            analysis = self.market_analyzer.analyze_technical(symbol, interval)
+            
+            if analysis.get("status") == "success":
+                # Cập nhật bảng chỉ báo
+                indicators = analysis.get("indicators", [])
+                self.indicators_table.setRowCount(len(indicators))
+                
+                for row, indicator in enumerate(indicators):
+                    name = indicator.get("name", "")
+                    value = indicator.get("value", "")
+                    signal = indicator.get("signal", "")
                     
-                    self.log_viewer.setText("Nhật ký đã được xóa")
-                    self.status_bar.showMessage("Đã xóa nhật ký", 3000)
+                    self.indicators_table.setItem(row, 0, QTableWidgetItem(name))
+                    self.indicators_table.setItem(row, 1, QTableWidgetItem(str(value)))
+                    
+                    signal_item = QTableWidgetItem(signal)
+                    if signal == "Mua":
+                        signal_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Mua
+                    elif signal == "Bán":
+                        signal_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Bán
+                    self.indicators_table.setItem(row, 2, signal_item)
+                
+                # Cập nhật bảng hỗ trợ/kháng cự
+                support_resistance = analysis.get("support_resistance", [])
+                self.support_resistance_table.setRowCount(len(support_resistance))
+                
+                for row, sr in enumerate(support_resistance):
+                    type_sr = sr.get("type", "")
+                    value = sr.get("value", 0)
+                    
+                    self.support_resistance_table.setItem(row, 0, QTableWidgetItem(type_sr))
+                    self.support_resistance_table.setItem(row, 1, QTableWidgetItem(f"{value:.2f}"))
+                
+                # Cập nhật thông tin chi tiết
+                self.market_detail_text.clear()
+                
+                # Tạo nội dung chi tiết
+                content = f"<h3>Phân tích chi tiết cho {symbol} ({interval})</h3>"
+                content += f"<p>Giá hiện tại: {analysis.get('price', 0):.2f} USDT</p>"
+                content += f"<p>Tín hiệu tổng hợp: <b>{analysis.get('overall_signal', 'N/A')}</b></p>"
+                content += f"<p>Độ mạnh: <b>{analysis.get('strength', 'N/A')}</b></p>"
+                
+                content += "<h4>Phân tích xu hướng</h4>"
+                content += "<p>Xu hướng ngắn hạn (dựa trên SMA20 và SMA50):</p>"
+                content += f"<p><b>{analysis.get('short_term_trend', 'N/A')}</b></p>"
+                
+                content += "<p>Xu hướng trung hạn (dựa trên SMA50):</p>"
+                content += f"<p><b>{analysis.get('mid_term_trend', 'N/A')}</b></p>"
+                
+                content += "<p>Xu hướng dài hạn (dựa trên SMA200):</p>"
+                content += f"<p><b>{analysis.get('long_term_trend', 'N/A')}</b></p>"
+                
+                content += "<h4>Gợi ý giao dịch</h4>"
+                if analysis.get("overall_signal") == "Mua":
+                    content += "<p style='color: #22C55E;'><b>Mua:</b> Xem xét mở vị thế LONG khi có dấu hiệu xác nhận xu hướng.</p>"
+                    content += "<p>Stop Loss: Đặt dưới mức hỗ trợ gần nhất hoặc dưới mức giá hiện tại 1.5%.</p>"
+                    content += "<p>Take Profit: Đặt tại mức kháng cự gần nhất hoặc trên mức giá hiện tại 3%.</p>"
+                elif analysis.get("overall_signal") == "Bán":
+                    content += "<p style='color: #EF4444;'><b>Bán:</b> Xem xét mở vị thế SHORT khi có dấu hiệu xác nhận xu hướng.</p>"
+                    content += "<p>Stop Loss: Đặt trên mức kháng cự gần nhất hoặc trên mức giá hiện tại 1.5%.</p>"
+                    content += "<p>Take Profit: Đặt tại mức hỗ trợ gần nhất hoặc dưới mức giá hiện tại 3%.</p>"
                 else:
-                    self.log_viewer.setText(f"Không tìm thấy tệp nhật ký: {log_file}")
-            except Exception as e:
-                logger.error(f"Lỗi khi xóa nhật ký: {str(e)}")
-                QMessageBox.critical(self, "Lỗi", f"Không thể xóa nhật ký: {str(e)}")
-    
-    def show_about(self):
-        """Hiển thị thông tin giới thiệu"""
-        about_text = """<h2>Crypto Trading Bot Desktop</h2>
-        <p>Phiên bản: 1.0.0</p>
-        <p>Được phát triển bởi: Replit AI Assistant</p>
-        <p>Bản quyền © 2025</p>
-        <p>Phần mềm giao dịch bot tiền điện tử với các chức năng nâng cao:</p>
-        <ul>
-            <li>Phân tích kỹ thuật đa khung thời gian</li>
-            <li>Quản lý vị thế tự động</li>
-            <li>Nhiều mức độ rủi ro</li>
-            <li>Thông báo Telegram</li>
-            <li>Trailing Stop và chốt lời một phần</li>
-            <li>Tự động cập nhật</li>
-        </ul>
-        """
+                    content += "<p><b>Chờ đợi:</b> Thị trường đang sideway, chờ tín hiệu rõ ràng hơn.</p>"
+                
+                self.market_detail_text.setHtml(content)
+                
+                # Cập nhật các label xu hướng
+                self.short_term_trend_label.setText(analysis.get("short_term_trend", "N/A"))
+                self.mid_term_trend_label.setText(analysis.get("mid_term_trend", "N/A"))
+                self.long_term_trend_label.setText(analysis.get("long_term_trend", "N/A"))
+                
+                # Thiết lập màu sắc cho xu hướng
+                if analysis.get("short_term_trend") == "Tăng":
+                    self.short_term_trend_label.setStyleSheet("color: #22C55E;")
+                elif analysis.get("short_term_trend") == "Giảm":
+                    self.short_term_trend_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.short_term_trend_label.setStyleSheet("")
+                
+                if analysis.get("mid_term_trend") == "Tăng":
+                    self.mid_term_trend_label.setStyleSheet("color: #22C55E;")
+                elif analysis.get("mid_term_trend") == "Giảm":
+                    self.mid_term_trend_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.mid_term_trend_label.setStyleSheet("")
+                
+                if analysis.get("long_term_trend") == "Tăng":
+                    self.long_term_trend_label.setStyleSheet("color: #22C55E;")
+                elif analysis.get("long_term_trend") == "Giảm":
+                    self.long_term_trend_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.long_term_trend_label.setStyleSheet("")
+                
+                self.status_label.setText(f"Đã phân tích chi tiết thị trường cho {symbol} ({interval})")
+            else:
+                self.show_error("Lỗi khi phân tích thị trường", analysis.get("message", "Lỗi không xác định"))
         
-        QMessageBox.about(self, "Giới thiệu", about_text)
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích thị trường chi tiết: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi phân tích thị trường chi tiết", str(e))
     
-    def open_documentation(self):
-        """Mở tài liệu hướng dẫn"""
-        if os.path.exists("HƯỚNG_DẪN_SỬ_DỤNG.md"):
-            # Mở tệp trong trình duyệt mặc định
-            url = QUrl.fromLocalFile(os.path.abspath("HƯỚNG_DẪN_SỬ_DỤNG.md"))
-            QDesktopServices.openUrl(url)
-        else:
-            QMessageBox.information(self, "Thông báo", "Tài liệu hướng dẫn chưa được tạo")
+    def save_api_settings(self):
+        """Lưu cài đặt API"""
+        try:
+            # Lấy thông tin API
+            api_key = self.api_key_edit.text()
+            api_secret = self.api_secret_edit.text()
+            testnet = self.testnet_checkbox.isChecked()
+            
+            # Kiểm tra thông tin API
+            if not api_key or not api_secret:
+                self.show_error("Thông tin API không hợp lệ", "API Key và API Secret không được để trống")
+                return
+            
+            # Lưu API key và secret vào biến môi trường
+            os.environ["BINANCE_TESTNET_API_KEY"] = api_key
+            os.environ["BINANCE_TESTNET_API_SECRET"] = api_secret
+            
+            # Khởi tạo lại các đối tượng
+            self.market_analyzer = MarketAnalyzer(testnet=testnet)
+            self.position_manager = PositionManager(testnet=testnet)
+            
+            # Tải cấu hình rủi ro từ file
+            risk_config = self.load_risk_config()
+            
+            # Khởi tạo Risk Manager
+            self.risk_manager = RiskManager(self.position_manager, risk_config)
+            
+            # Thông báo thành công
+            self.show_info("Lưu cài đặt API thành công", "Đã lưu cài đặt API và khởi tạo lại các đối tượng")
+            self.status_label.setText("Đã lưu cài đặt API")
+            
+            # Cập nhật dữ liệu
+            self.refresh_data()
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cài đặt API: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi lưu cài đặt API", str(e))
     
-    def check_updates(self):
-        """Kiểm tra cập nhật"""
-        self.status_bar.showMessage("Đang kiểm tra cập nhật...", 3000)
-        self.progress_bar.setVisible(True)
-        self.progress_bar.setValue(50)
-        
-        # TODO: Implement update checker
-        QMessageBox.information(self, "Kiểm tra cập nhật", "Bạn đang sử dụng phiên bản mới nhất (1.0.0)")
-        
-        self.progress_bar.setValue(100)
-        self.progress_bar.setVisible(False)
-    
-    def closeEvent(self, event):
-        """Xử lý sự kiện đóng cửa sổ"""
-        reply = QMessageBox.question(self, "Xác nhận", 
-                                   "Bạn có chắc muốn thoát?\n\nNếu bot đang chạy, nó sẽ bị dừng.",
-                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            # Dừng luồng cập nhật nếu đang chạy
-            if self.update_thread:
-                self.update_thread.stop()
+    def save_risk_settings(self):
+        """Lưu cài đặt rủi ro"""
+        try:
+            # Lấy thông tin cài đặt rủi ro
+            risk_percentage = self.risk_percentage_spin.value() / 100
+            max_positions = self.max_positions_spin.value()
+            leverage = self.default_leverage_spin.value()
+            position_size_percentage = self.position_size_percentage_spin.value() / 100
+            stop_loss_percentage = self.stop_loss_percentage_spin.value() / 100
+            take_profit_percentage = self.take_profit_percentage_spin.value() / 100
+            
+            trailing_stop_enabled = self.trailing_stop_checkbox.isChecked()
+            partial_tp_enabled = self.partial_tp_checkbox.isChecked()
+            trading_hours_enabled = self.trading_hours_checkbox.isChecked()
+            
+            # Tạo cấu hình rủi ro mới
+            risk_config = {
+                "risk_percentage": risk_percentage,
+                "max_positions": max_positions,
+                "leverage": leverage,
+                "position_size_percentage": position_size_percentage,
+                "partial_take_profit": {
+                    "enabled": partial_tp_enabled,
+                    "levels": [
+                        {"percentage": 30, "profit_percentage": 2},
+                        {"percentage": 30, "profit_percentage": 5},
+                        {"percentage": 40, "profit_percentage": 10}
+                    ]
+                },
+                "stop_loss_percentage": stop_loss_percentage,
+                "take_profit_percentage": take_profit_percentage,
+                "trailing_stop": {
+                    "enabled": trailing_stop_enabled,
+                    "activation_percentage": 2,
+                    "trailing_percentage": 1.5
+                },
+                "trading_hours_restriction": {
+                    "enabled": trading_hours_enabled,
+                    "trading_hours": ["09:00-12:00", "14:00-21:00"]
+                }
+            }
+            
+            # Lưu cấu hình rủi ro vào file
+            config_file = "risk_configs/desktop_risk_config.json"
+            
+            # Tạo thư mục nếu chưa tồn tại
+            os.makedirs(os.path.dirname(config_file), exist_ok=True)
             
             # Lưu cấu hình
-            self.save_config()
+            with open(config_file, "w") as f:
+                json.dump(risk_config, f, indent=4)
             
-            # Gửi thông báo Telegram
-            if self.telegram_notifier:
-                self.telegram_notifier.send_message("Ứng dụng đã được đóng")
+            # Cập nhật Risk Manager
+            if self.risk_manager:
+                self.risk_manager.risk_config = risk_config
             
-            event.accept()
+            # Thông báo thành công
+            self.show_info("Lưu cài đặt rủi ro thành công", "Đã lưu cài đặt rủi ro vào file")
+            self.status_label.setText("Đã lưu cài đặt rủi ro")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cài đặt rủi ro: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi lưu cài đặt rủi ro", str(e))
+    
+    def save_ui_settings(self):
+        """Lưu cài đặt giao diện"""
+        try:
+            # Lấy thông tin cài đặt giao diện
+            dark_mode = self.dark_mode_checkbox.isChecked()
+            refresh_interval = self.refresh_interval_spin.value()
+            notifications = self.notifications_checkbox.isChecked()
+            
+            # Lưu cài đặt giao diện vào QSettings
+            settings = QSettings("TradingBot", "Desktop")
+            settings.setValue("dark_mode", dark_mode)
+            settings.setValue("refresh_interval", refresh_interval)
+            settings.setValue("notifications", notifications)
+            
+            # Cập nhật giao diện
+            self.toggle_dark_mode(dark_mode)
+            
+            # Cập nhật thời gian cập nhật
+            if self.refresh_thread:
+                self.refresh_thread.interval = refresh_interval
+            
+            # Thông báo thành công
+            self.show_info("Lưu cài đặt giao diện thành công", "Đã lưu cài đặt giao diện")
+            self.status_label.setText("Đã lưu cài đặt giao diện")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu cài đặt giao diện: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi lưu cài đặt giao diện", str(e))
+    
+    def toggle_dark_mode(self, enabled: bool):
+        """
+        Bật/tắt chế độ tối
+        
+        :param enabled: Bật hay tắt
+        """
+        if enabled:
+            # Thiết lập bảng màu tối
+            palette = QPalette()
+            palette.setColor(QPalette.Window, QColor(53, 53, 53))
+            palette.setColor(QPalette.WindowText, Qt.white)
+            palette.setColor(QPalette.Base, QColor(25, 25, 25))
+            palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+            palette.setColor(QPalette.ToolTipBase, Qt.black)
+            palette.setColor(QPalette.ToolTipText, Qt.white)
+            palette.setColor(QPalette.Text, Qt.white)
+            palette.setColor(QPalette.Button, QColor(53, 53, 53))
+            palette.setColor(QPalette.ButtonText, Qt.white)
+            palette.setColor(QPalette.BrightText, Qt.red)
+            palette.setColor(QPalette.Link, QColor(42, 130, 218))
+            palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+            palette.setColor(QPalette.HighlightedText, Qt.black)
+            
+            self.setPalette(palette)
         else:
-            event.ignore()
+            # Khôi phục bảng màu mặc định
+            self.setPalette(self.style().standardPalette())
+    
+    def refresh_data(self):
+        """Cập nhật dữ liệu"""
+        try:
+            # Lấy dữ liệu thị trường
+            market_data = {}
+            if self.market_analyzer:
+                market_overview = self.market_analyzer.get_market_overview()
+                if market_overview.get("status") == "success":
+                    market_data["market_overview"] = market_overview.get("data", [])
+            
+            # Lấy danh sách vị thế
+            positions = []
+            if self.position_manager:
+                positions = self.position_manager.get_all_positions()
+            market_data["positions"] = positions
+            
+            # Lấy số dư tài khoản
+            account_balance = {}
+            if self.position_manager:
+                account_info = self.position_manager.get_account_balance()
+                if account_info.get("status") == "success":
+                    account_balance = account_info.get("balance", {})
+            market_data["account_balance"] = account_balance
+            
+            # Cập nhật dữ liệu
+            self.update_data(market_data)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật dữ liệu: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi cập nhật dữ liệu", str(e))
+    
+    def show_account_info(self):
+        """Hiển thị thông tin tài khoản"""
+        try:
+            if not self.position_manager:
+                self.show_error("Không thể hiển thị thông tin tài khoản", "Chưa khởi tạo PositionManager")
+                return
+            
+            # Lấy thông tin tài khoản
+            account_info = self.position_manager.get_account_balance()
+            
+            if account_info.get("status") == "success":
+                balance = account_info.get("balance", {})
+                
+                # Tạo thông tin tài khoản
+                info = f"<h3>Thông tin tài khoản</h3>"
+                info += f"<p><b>Tổng số dư:</b> {balance.get('total_balance', 0):.2f} USDT</p>"
+                info += f"<p><b>Số dư khả dụng:</b> {balance.get('available_balance', 0):.2f} USDT</p>"
+                info += f"<p><b>Lợi nhuận chưa thực hiện:</b> {balance.get('unrealized_pnl', 0):.2f} USDT</p>"
+                info += f"<p><b>Margin ban đầu của vị thế:</b> {balance.get('position_initial_margin', 0):.2f} USDT</p>"
+                info += f"<p><b>Margin ban đầu của lệnh mở:</b> {balance.get('open_order_initial_margin', 0):.2f} USDT</p>"
+                info += f"<p><b>Số tiền rút tối đa:</b> {balance.get('max_withdraw_amount', 0):.2f} USDT</p>"
+                
+                # Hiển thị thông tin
+                QMessageBox.information(self, "Thông tin tài khoản", info)
+            else:
+                self.show_error("Lỗi khi lấy thông tin tài khoản", account_info.get("message", "Lỗi không xác định"))
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi hiển thị thông tin tài khoản: {str(e)}", exc_info=True)
+            self.show_error("Lỗi khi hiển thị thông tin tài khoản", str(e))
+    
+    def show_help(self):
+        """Hiển thị trợ giúp"""
+        help_text = """<h3>Trợ giúp</h3>
+<p><b>1. Tổng quan:</b> Hiển thị số dư tài khoản, vị thế đang mở và thông tin thị trường.</p>
+<p><b>2. Giao dịch:</b> Mở vị thế mới và phân tích thị trường.</p>
+<p><b>3. Quản lý vị thế:</b> Quản lý các vị thế đang mở và xem lịch sử giao dịch.</p>
+<p><b>4. Phân tích thị trường:</b> Phân tích kỹ thuật chi tiết.</p>
+<p><b>5. Cài đặt:</b> Cấu hình API, rủi ro và giao diện.</p>
 
-# Chạy ứng dụng nếu được gọi trực tiếp
+<h4>Hướng dẫn giao dịch</h4>
+<p>1. Chọn cặp giao dịch và hướng giao dịch (LONG/SHORT)</p>
+<p>2. Nhập kích thước vị thế hoặc nhấn "Tính toán vị thế" để tính toán tự động</p>
+<p>3. Thiết lập đòn bẩy, Stop Loss và Take Profit</p>
+<p>4. Nhấn "Mở Long" hoặc "Mở Short" để đặt lệnh</p>
+
+<h4>Phân tích thị trường</h4>
+<p>1. Chọn cặp giao dịch và khung thời gian</p>
+<p>2. Nhấn "Phân tích" để xem phân tích kỹ thuật</p>
+<p>3. Xem các chỉ báo kỹ thuật, tín hiệu và gợi ý giao dịch</p>
+
+<h4>Quản lý vị thế</h4>
+<p>1. Chọn vị thế cần quản lý</p>
+<p>2. Cập nhật Stop Loss và Take Profit</p>
+<p>3. Đóng vị thế khi cần thiết</p>
+<p>4. Xem lịch sử giao dịch để theo dõi hiệu suất</p>
+
+<h4>Gợi ý</h4>
+<p>- Sử dụng chế độ tối để giảm mỏi mắt khi giao dịch vào ban đêm</p>
+<p>- Kiểm tra trang thái kết nối ở thanh trạng thái</p>
+<p>- Cập nhật dữ liệu thường xuyên để có thông tin mới nhất</p>
+"""
+        
+        QMessageBox.information(self, "Trợ giúp", help_text)
+    
+    def show_missing_api_keys_error(self):
+        """Hiển thị lỗi thiếu API key"""
+        error_text = """<h3>Lỗi: Thiếu API Keys</h3>
+<p>Ứng dụng cần API keys từ Binance Testnet để hoạt động. Vui lòng làm theo các bước sau:</p>
+<ol>
+<li>Truy cập trang web Binance Testnet: <a href="https://testnet.binance.vision/">https://testnet.binance.vision/</a></li>
+<li>Đăng nhập và tạo API keys mới</li>
+<li>Nhập API Key và API Secret vào tab Cài đặt của ứng dụng</li>
+<li>Đảm bảo đã chọn "Sử dụng testnet"</li>
+<li>Nhấn "Lưu cài đặt API" để áp dụng cài đặt</li>
+</ol>
+<p>Nếu bạn chưa có tài khoản Binance Testnet, hãy đăng ký tài khoản mới trên trang web Binance Testnet.</p>
+"""
+        
+        QMessageBox.warning(self, "Thiếu API Keys", error_text)
+    
+    def show_error(self, title: str, message: str):
+        """
+        Hiển thị thông báo lỗi
+        
+        :param title: Tiêu đề
+        :param message: Nội dung
+        """
+        QMessageBox.critical(self, title, message)
+    
+    def show_info(self, title: str, message: str):
+        """
+        Hiển thị thông báo thông tin
+        
+        :param title: Tiêu đề
+        :param message: Nội dung
+        """
+        QMessageBox.information(self, title, message)
+    
+    def closeEvent(self, event):
+        """
+        Sự kiện đóng cửa sổ
+        
+        :param event: Sự kiện
+        """
+        # Dừng thread cập nhật
+        if hasattr(self, "refresh_thread") and self.refresh_thread:
+            self.refresh_thread.stop()
+        
+        # Chấp nhận sự kiện đóng cửa sổ
+        event.accept()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = TradingApp()
+    window = EnhancedTradingGUI()
     window.show()
     sys.exit(app.exec_())
