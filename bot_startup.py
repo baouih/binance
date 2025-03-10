@@ -139,7 +139,7 @@ class BotManager:
         
         # Lưu file
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=4)
         
         logger.info(f"Đã tạo file cấu hình rủi ro mặc định: {path}")
@@ -162,7 +162,7 @@ class BotManager:
         }
         
         # Lưu file
-        with open("account_config.json", "w") as f:
+        with open("account_config.json", "w", encoding="utf-8") as f:
             json.dump(config, f, indent=4)
         
         logger.info("Đã tạo file cấu hình tài khoản mặc định")
@@ -333,7 +333,7 @@ class BotManager:
                     config["telegram_chat_id"] = os.environ.get("TELEGRAM_CHAT_ID")
                 
                 # Lưu lại file
-                with open("account_config.json", "w") as f:
+                with open("account_config.json", "w", encoding="utf-8") as f:
                     json.dump(config, f, indent=4)
                 
                 logger.info("Đã cập nhật thông tin API từ biến môi trường")

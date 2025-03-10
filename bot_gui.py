@@ -1604,7 +1604,7 @@ class MainWindow(QMainWindow):
             self.log_text.clear()
             
             # Đọc và lọc log
-            with open(log_file, 'r') as f:
+            with open(log_file, 'r', encoding="utf-8") as f:
                 for line in f:
                     # Lọc theo cấp độ log
                     if log_level != "DEBUG" and log_level not in line:
