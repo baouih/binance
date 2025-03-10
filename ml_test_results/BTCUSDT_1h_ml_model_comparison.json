@@ -80,7 +80,7 @@
         "largest_loss_pct": 0,
         "sharpe_ratio": 0
       },
-      "execution_time": 1.445319652557373
+      "execution_time": 1.4891374111175537
     },
     "BTCUSDT_1h_1m_target3d": {
       "initial_balance": 10000,
@@ -105,7 +105,7 @@
         "largest_loss_pct": 0,
         "sharpe_ratio": 0
       },
-      "execution_time": 1.3026728630065918
+      "execution_time": 1.324018955230713
     },
     "BTCUSDT_1h_3m_target1d": {
       "initial_balance": 10000,
@@ -130,7 +130,7 @@
         "largest_loss_pct": 0,
         "sharpe_ratio": 0
       },
-      "execution_time": 1.2668676376342773
+      "execution_time": 1.3841838836669922
     },
     "BTCUSDT_1h_3m_target3d": {
       "initial_balance": 10000,
@@ -155,7 +155,7 @@
         "largest_loss_pct": 0,
         "sharpe_ratio": 0
       },
-      "execution_time": 1.411452054977417
+      "execution_time": 1.4744234085083008
     },
     "high_risk": {
       "initial_balance": 10000,
@@ -236,7 +236,7 @@
         "largest_loss_pct": -5.043690476190477,
         "sharpe_ratio": -0.7837059254148828
       },
-      "execution_time": 1.7228069305419922
+      "execution_time": 1.3335678577423096
     }
   }
 }

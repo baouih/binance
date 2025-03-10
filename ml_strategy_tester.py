@@ -421,52 +421,67 @@ class MLStrategyTester:
             else:
                 feature_list = features
 
-            # Thêm các tính năng còn thiếu trong DataFrame
-            required_features = set(feature_list)
-            existing_features = set(df.columns)
-            
-            # Lọc các đặc trưng có sẵn
-            available_features = [f for f in feature_list if f in df.columns]
-            
-            if len(available_features) < len(feature_list):
-                missing_features = required_features - existing_features
-                logger.warning(f"Thiếu {len(missing_features)} đặc trưng: {missing_features}")
+            # Sử dụng MLFeatureCalculator để tính toán các tính năng còn thiếu
+            try:
+                from ml_feature_calculator import MLFeatureCalculator
                 
-                # Thêm một số tính năng cơ bản nếu thiếu
-                for feature in missing_features:
-                    if feature == 'sma5':
-                        df['sma5'] = df['close'].rolling(window=5).mean()
-                    elif feature == 'sma10':
-                        df['sma10'] = df['close'].rolling(window=10).mean()
-                    elif feature == 'sma20':
-                        df['sma20'] = df['close'].rolling(window=20).mean()
-                    elif feature == 'sma50':
-                        df['sma50'] = df['close'].rolling(window=50).mean()
-                    elif feature == 'sma100':
-                        df['sma100'] = df['close'].rolling(window=100).mean()
-                    elif feature == 'ema5':
-                        df['ema5'] = df['close'].ewm(span=5, adjust=False).mean()
-                    elif feature == 'ema10':
-                        df['ema10'] = df['close'].ewm(span=10, adjust=False).mean()
-                    elif feature == 'ema20':
-                        df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
-                    elif feature == 'ema50':
-                        df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
-                    elif feature == 'price_sma20_ratio' and 'sma20' in df.columns:
-                        df['price_sma20_ratio'] = df['close'] / df['sma20']
-                    elif feature == 'price_sma50_ratio' and 'sma50' in df.columns:
-                        df['price_sma50_ratio'] = df['close'] / df['sma50']
-                    elif feature == 'volume_sma5':
-                        df['volume_sma5'] = df['volume'].rolling(window=5).mean()
-                    elif feature == 'volume_ratio' and 'volume_sma5' in df.columns:
-                        df['volume_ratio'] = df['volume'] / df['volume_sma5']
-                    elif feature == 'volatility':
-                        df['volatility'] = df['close'].pct_change().rolling(window=20).std()
-                    elif feature == 'daily_return':
-                        df['daily_return'] = df['close'].pct_change(24)
-                    elif feature == 'weekly_return':
-                        df['weekly_return'] = df['close'].pct_change(24*7)
+                # Tạo bộ tính toán tính năng với danh sách tính năng của mô hình
+                feature_calculator = MLFeatureCalculator(features_list=feature_list)
+                
+                # Tính toán tất cả các tính năng cần thiết
+                df = feature_calculator.calculate_live_features(df)
+                
+                logger.info(f"Đã tính toán {len(feature_list)} tính năng cần thiết cho mô hình")
+            except Exception as e:
+                logger.error(f"Lỗi khi sử dụng MLFeatureCalculator: {str(e)}")
+                logger.warning("Quay lại phương pháp tính tính năng cũ")
+                
+                # Thêm các tính năng còn thiếu trong DataFrame
+                required_features = set(feature_list)
+                existing_features = set(df.columns)
+                
+                # Lọc các đặc trưng có sẵn
+                available_features = [f for f in feature_list if f in df.columns]
+                
+                if len(available_features) < len(feature_list):
+                    missing_features = required_features - existing_features
+                    logger.warning(f"Thiếu {len(missing_features)} đặc trưng: {missing_features}")
                     
+                    # Thêm một số tính năng cơ bản nếu thiếu
+                    for feature in missing_features:
+                        if feature == 'sma5':
+                            df['sma5'] = df['close'].rolling(window=5).mean()
+                        elif feature == 'sma10':
+                            df['sma10'] = df['close'].rolling(window=10).mean()
+                        elif feature == 'sma20':
+                            df['sma20'] = df['close'].rolling(window=20).mean()
+                        elif feature == 'sma50':
+                            df['sma50'] = df['close'].rolling(window=50).mean()
+                        elif feature == 'sma100':
+                            df['sma100'] = df['close'].rolling(window=100).mean()
+                        elif feature == 'ema5':
+                            df['ema5'] = df['close'].ewm(span=5, adjust=False).mean()
+                        elif feature == 'ema10':
+                            df['ema10'] = df['close'].ewm(span=10, adjust=False).mean()
+                        elif feature == 'ema20':
+                            df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
+                        elif feature == 'ema50':
+                            df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
+                        elif feature == 'price_sma20_ratio' and 'sma20' in df.columns:
+                            df['price_sma20_ratio'] = df['close'] / df['sma20']
+                        elif feature == 'price_sma50_ratio' and 'sma50' in df.columns:
+                            df['price_sma50_ratio'] = df['close'] / df['sma50']
+                        elif feature == 'volume_sma5':
+                            df['volume_sma5'] = df['volume'].rolling(window=5).mean()
+                        elif feature == 'volume_ratio' and 'volume_sma5' in df.columns:
+                            df['volume_ratio'] = df['volume'] / df['volume_sma5']
+                        elif feature == 'volatility':
+                            df['volatility'] = df['close'].pct_change().rolling(window=20).std()
+                        elif feature == 'daily_return':
+                            df['daily_return'] = df['close'].pct_change(24)
+                        elif feature == 'weekly_return':
+                            df['weekly_return'] = df['close'].pct_change(24*7)
+            
             # Cập nhật lại danh sách tính năng có sẵn
             available_features = [f for f in feature_list if f in df.columns]
             
@@ -493,18 +508,69 @@ class MLStrategyTester:
             # Dự đoán
             predictions = model.predict(X_scaled)
             
-            # Đặt tín hiệu
-            df_strategy['signal'] = predictions
+            # Áp dụng chiến lược quyết định mạnh hơn
+            df_strategy['raw_prediction'] = predictions
+            df_strategy['signal'] = predictions  # Sử dụng dự đoán nguyên gốc làm tín hiệu mặc định
             
-            # Nếu mô hình hỗ trợ predict_proba, lấy xác suất
+            # Nếu mô hình hỗ trợ predict_proba, sử dụng xác suất để quyết định mạnh hơn
             if hasattr(model, 'predict_proba'):
                 try:
                     probas = model.predict_proba(X_scaled)
-                    # Lấy xác suất cho từng lớp
+                    # Lưu xác suất cho từng lớp
                     for i, class_label in enumerate(model.classes_):
-                        df_strategy[f'prob_{class_label}'] = probas[:, i]
-                except:
-                    pass
+                        col_name = f'prob_{class_label}'
+                        df_strategy[col_name] = probas[:, i]
+                    
+                    # Chỉ đặt tín hiệu khi xác suất vượt ngưỡng
+                    confidence_threshold = 0.40  # Giảm ngưỡng tin cậy xuống mức thấp hơn (xác suất phải > 40%)
+                    
+                    # Đặt tín hiệu mua khi dự đoán là 1 và xác suất cao
+                    if 'prob_1' in df_strategy.columns:
+                        # Kết hợp xác suất với các chỉ báo kỹ thuật
+                        if 'rsi' in df_strategy.columns:
+                            # Nếu RSI quá bán (< 40), giảm ngưỡng tin cậy xuống thấp hơn
+                            rsi_oversold = df_strategy['rsi'] < 40
+                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI quá bán
+                            
+                            # Mua khi dự đoán = 1 và (xác suất > ngưỡng hoặc RSI quá bán và xác suất > ngưỡng thấp hơn)
+                            buy_signals = (predictions == 1) & (
+                                (df_strategy['prob_1'] > confidence_threshold) | 
+                                (rsi_oversold & (df_strategy['prob_1'] > (confidence_threshold - rsi_confidence_boost)))
+                            )
+                        else:
+                            # Nếu không có RSI, chỉ dùng xác suất
+                            buy_signals = (predictions == 1) & (df_strategy['prob_1'] > confidence_threshold)
+                        
+                        df_strategy.loc[buy_signals, 'signal'] = 1
+                    
+                    # Đặt tín hiệu bán khi dự đoán là 0 và xác suất cao
+                    if 'prob_0' in df_strategy.columns:
+                        # Kết hợp xác suất với các chỉ báo kỹ thuật
+                        if 'rsi' in df_strategy.columns:
+                            # Nếu RSI quá mua (> 60), giảm ngưỡng tin cậy xuống thấp hơn
+                            rsi_overbought = df_strategy['rsi'] > 60
+                            rsi_confidence_boost = 0.20  # Giảm 20% ngưỡng khi RSI quá mua
+                            
+                            # Bán khi dự đoán = 0 và (xác suất > ngưỡng hoặc RSI quá mua và xác suất > ngưỡng thấp hơn)
+                            sell_signals = (predictions == 0) & (
+                                (df_strategy['prob_0'] > confidence_threshold) | 
+                                (rsi_overbought & (df_strategy['prob_0'] > (confidence_threshold - rsi_confidence_boost)))
+                            )
+                        else:
+                            # Nếu không có RSI, chỉ dùng xác suất
+                            sell_signals = (predictions == 0) & (df_strategy['prob_0'] > confidence_threshold)
+                        
+                        df_strategy.loc[sell_signals, 'signal'] = -1
+                        
+                    logger.info(f"Áp dụng ngưỡng tin cậy {confidence_threshold} cho tín hiệu")
+                except Exception as e:
+                    logger.error(f"Lỗi khi xử lý xác suất dự đoán: {str(e)}")
+                    # Nếu không thể xử lý xác suất, sử dụng dự đoán nguyên gốc
+                    df_strategy['signal'] = predictions
+            else:
+                # Nếu mô hình không hỗ trợ predict_proba, áp dụng logic khác
+                logger.info("Mô hình không hỗ trợ predict_proba, sử dụng tín hiệu dự đoán trực tiếp")
+                df_strategy['signal'] = predictions
             
             return df_strategy
             
@@ -576,7 +642,7 @@ class MLStrategyTester:
                 df_strategy = strategy_func(df)
             else:
                 df_strategy = df.copy()
-                df_strategy['signal'] = 0  # Không có tín hiệu
+                df_strategy['signal'] = predictions  # Sử dụng dự đoán trực tiếp làm tín hiệu mặc định
             
             # Khởi tạo các biến theo dõi
             balance = float(initial_balance)
