@@ -9,6 +9,12 @@ import os
 import sys
 import logging
 import threading
+import io
+
+# Sửa lỗi mã hóa tiếng Việt
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 

@@ -2088,6 +2088,25 @@ class EnhancedTradingGUI(QMainWindow):
         """
         QMessageBox.information(self, title, message)
     
+    def test_api_connection(self):
+        """Kiểm tra kết nối API Binance"""
+        try:
+            from api_data_validator import validate_binance_credentials
+            
+            api_key = os.environ.get("BINANCE_TESTNET_API_KEY")
+            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET")
+            
+            result = validate_binance_credentials(api_key, api_secret, testnet=True)
+            
+            if result["is_valid"]:
+                QMessageBox.information(self, "Kết nối thành công", 
+                    "Kết nối API Binance Testnet thành công!")
+            else:
+                QMessageBox.warning(self, "Lỗi kết nối", 
+                    f"Không thể kết nối: {result['message']}")
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi kiểm tra kết nối: {str(e)}")
+    
     def closeEvent(self, event):
         """
         Sự kiện đóng cửa sổ
