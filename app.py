@@ -1,35 +1,29 @@
 import os
+import json
+import logging
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from database import db
+from flask_socketio import SocketIO
 
-# Create the Flask app
+# Thiết lập logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("trading_web.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("trading_web")
+
+# Khởi tạo Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 
-# Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///trading_bot.db")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
+# Khởi tạo SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Initialize the app with the extension
-db.init_app(app)
-
-# Import views after app is created to avoid circular imports
-from views import register_routes
-register_routes(app)
-
-# Initialize app context and database
-with app.app_context():
-    # Import models to ensure they're registered with SQLAlchemy
-    from database.models import User, TradingPosition, TradingStrategy, TradingHistory
-    
-    # Create tables if they don't exist
-    db.create_all()
-    
-    # Create templates directory if it doesn't exist
-    os.makedirs('templates', exist_ok=True)
+# Đảm bảo thư mục templates tồn tại
+os.makedirs('templates', exist_ok=True)
     
     # Create default templates if they don't exist
     if not os.path.exists('templates/index.html'):

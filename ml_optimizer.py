@@ -53,6 +53,33 @@ class MLOptimizer:
         self.strategy_params = {}
         self.market_regimes = []
         
+class AdvancedMLOptimizer(MLOptimizer):
+    """Lớp tối ưu hóa nâng cao sử dụng mô hình học máy"""
+    
+    def __init__(self, 
+                 models_dir: str = 'models', 
+                 results_dir: str = 'test_results',
+                 use_advanced_features: bool = True,
+                 feature_selection_method: str = 'recursive',
+                 ensemble_method: str = 'stacking'):
+        """
+        Khởi tạo Advanced ML Optimizer
+        
+        Args:
+            models_dir (str): Thư mục lưu mô hình
+            results_dir (str): Thư mục lưu kết quả
+            use_advanced_features (bool): Có sử dụng các đặc trưng nâng cao không
+            feature_selection_method (str): Phương pháp lựa chọn đặc trưng
+            ensemble_method (str): Phương pháp kết hợp mô hình
+        """
+        super().__init__(models_dir, results_dir)
+        self.use_advanced_features = use_advanced_features
+        self.feature_selection_method = feature_selection_method
+        self.ensemble_method = ensemble_method
+        self.hyperparams = {}
+        self.feature_importance = None
+        self.ensemble_models = {}
+        
     def load_backtest_results(self, results_dir: str = None) -> List[Dict]:
         """
         Tải kết quả backtest từ file
