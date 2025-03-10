@@ -1,343 +1,432 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Risk Level Manager - Quản lý các mức độ rủi ro khác nhau
+"""
+
 import os
 import json
 import logging
-from typing import Dict, Any, Optional
-import copy
+import argparse
+import shutil
+from pathlib import Path
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, 
-                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+# Thiết lập logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('risk_manager')
 
 class RiskLevelManager:
     """
-    Manages risk level configurations for the trading bot.
-    Supports changing between different predefined risk profiles.
+    Lớp quản lý các mức độ rủi ro khác nhau
     """
+    
+    # Các mức rủi ro mặc định được hỗ trợ
+    SUPPORTED_RISK_LEVELS = ["10", "15", "20", "30"]
+    
+    # Thư mục chứa cấu hình rủi ro
+    RISK_CONFIG_DIR = "risk_configs"
+    
     def __init__(self):
-        self.base_config_path = "risk_configs/advanced_risk_config.json"
-        self.risk_configs = {
-            "10": "risk_configs/risk_level_10.json",
-            "15": "risk_configs/risk_level_15.json", 
-            "20": "risk_configs/risk_level_20.json",
-            "30": "risk_configs/risk_level_30.json"
-        }
-        self.current_risk_level = "10"  # Default to lowest risk
-        self.base_config = self._load_base_config()
+        """Khởi tạo"""
+        # Đảm bảo thư mục cấu hình tồn tại
+        os.makedirs(self.RISK_CONFIG_DIR, exist_ok=True)
         
-        # Create risk configs directory if it doesn't exist
-        os.makedirs("risk_configs", exist_ok=True)
+        # Load các cấu hình rủi ro hiện có
+        self.risk_configs = self._load_risk_configs()
+    
+    def _load_risk_configs(self):
+        """Tải tất cả cấu hình rủi ro hiện có"""
+        risk_configs = {}
         
-        # Create default risk configurations if they don't exist
-        self._create_default_risk_configs()
+        # Tìm tất cả file cấu hình
+        config_files = list(Path(self.RISK_CONFIG_DIR).glob("risk_level_*.json"))
         
-    def _load_base_config(self) -> Dict[str, Any]:
-        """Load the base configuration file or create it if it doesn't exist"""
-        if not os.path.exists(self.base_config_path):
-            # Create default base config
-            default_config = {
-                "max_open_positions": 3,
-                "position_size_percent": 2.0,
-                "stop_loss_percent": 1.0,
-                "take_profit_percent": 3.0,
-                "trailing_stop_percent": 0.5,
-                "max_daily_trades": 10,
-                "max_daily_drawdown_percent": 5.0,
-                "use_adaptive_position_sizing": True,
-                "use_dynamic_stop_loss": True,
-                "leverage": 1
-            }
+        for config_file in config_files:
+            # Lấy mức rủi ro từ tên file
+            risk_level = config_file.stem.split("_")[-1]
             
-            # Ensure the directory exists
-            os.makedirs(os.path.dirname(self.base_config_path), exist_ok=True)
-            
-            with open(self.base_config_path, 'w') as f:
-                json.dump(default_config, f, indent=4)
-            
-            return default_config
+            try:
+                # Đọc file cấu hình
+                with open(config_file, "r") as f:
+                    config = json.load(f)
+                
+                # Lưu vào dictionary
+                risk_configs[risk_level] = config
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi đọc file cấu hình {config_file}: {str(e)}")
         
-        try:
-            with open(self.base_config_path, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
-            logger.error(f"Error loading base config: {e}")
-            return {}
-            
-    def _create_default_risk_configs(self) -> None:
-        """Create the default risk configuration files if they don't exist"""
-        # Risk level 10% - Conservative
-        risk_10_config = {
-            "max_open_positions": 2,
-            "position_size_percent": 1.0,
-            "stop_loss_percent": 1.0,
-            "take_profit_percent": 2.0,
-            "trailing_stop_percent": 0.3,
-            "max_daily_trades": 5,
-            "max_daily_drawdown_percent": 3.0,
-            "use_adaptive_position_sizing": True,
-            "use_dynamic_stop_loss": True,
-            "leverage": 1,
-            "risk_multipliers": {
-                "stop_loss_multiplier": 1.0,
-                "take_profit_multiplier": 1.0,
-                "trailing_stop_callback": 0.1,
-                "position_size_multiplier": 1.0
-            }
-        }
+        return risk_configs
+    
+    def create_default_configs(self, force=False):
+        """Tạo các file cấu hình mặc định cho các mức rủi ro được hỗ trợ"""
+        for risk_level in self.SUPPORTED_RISK_LEVELS:
+            self.create_risk_config(risk_level, force=force)
+    
+    def create_risk_config(self, risk_level, force=False):
+        """
+        Tạo file cấu hình cho một mức rủi ro cụ thể
         
-        # Risk level 15% - Moderate
-        risk_15_config = {
+        Args:
+            risk_level (str): Mức độ rủi ro
+            force (bool): Ghi đè nếu file đã tồn tại
+        """
+        if risk_level not in self.SUPPORTED_RISK_LEVELS:
+            logger.warning(f"Mức rủi ro {risk_level} không được hỗ trợ")
+        
+        # Tạo tên file
+        filename = f"{self.RISK_CONFIG_DIR}/risk_level_{risk_level}.json"
+        
+        # Kiểm tra file đã tồn tại chưa
+        if os.path.exists(filename) and not force:
+            logger.info(f"File cấu hình {filename} đã tồn tại, bỏ qua")
+            return
+        
+        # Tạo cấu hình mặc định
+        risk_level_float = float(risk_level) / 100.0
+        config = {
+            "risk_level": int(risk_level),
             "max_open_positions": 3,
-            "position_size_percent": 2.0,
-            "stop_loss_percent": 1.5,
-            "take_profit_percent": 3.0,
-            "trailing_stop_percent": 0.5,
             "max_daily_trades": 8,
-            "max_daily_drawdown_percent": 5.0,
-            "use_adaptive_position_sizing": True,
-            "use_dynamic_stop_loss": True,
-            "leverage": 2,
-            "risk_multipliers": {
-                "stop_loss_multiplier": 1.5,
-                "take_profit_multiplier": 1.5,
-                "trailing_stop_callback": 0.15,
-                "position_size_multiplier": 1.5
-            }
-        }
-        
-        # Risk level 20% - Aggressive
-        risk_20_config = {
-            "max_open_positions": 4,
-            "position_size_percent": 3.0,
+            "position_size_percent": risk_level_float,
+            "max_risk_per_trade": risk_level_float,
             "stop_loss_percent": 2.0,
             "take_profit_percent": 4.0,
-            "trailing_stop_percent": 0.7,
-            "max_daily_trades": 12,
-            "max_daily_drawdown_percent": 7.0,
-            "use_adaptive_position_sizing": True,
-            "use_dynamic_stop_loss": True,
-            "leverage": 3,
-            "risk_multipliers": {
-                "stop_loss_multiplier": 2.0,
-                "take_profit_multiplier": 2.0,
-                "trailing_stop_callback": 0.2,
-                "position_size_multiplier": 2.0
+            "max_leverage": 10,
+            "default_leverage": 5,
+            "use_trailing_stop": True,
+            "trailing_stop_activation": 1.5,
+            "trailing_stop_distance": 1.0,
+            "enable_martingale": False,
+            "martingale_factor": 1.5,
+            "max_martingale_steps": 2,
+            "risk_adjustment_factor": 1.0,
+            "volatility_adjustment": True,
+            "max_daily_drawdown_percent": float(risk_level) * 2,
+            "max_total_drawdown_percent": float(risk_level) * 3,
+            "capital_preservation_ratio": 0.5,
+            "trade_filters": {
+                "min_volume_24h": 10000000,
+                "min_price_change_24h": 1.0,
+                "max_price_change_24h": 15.0,
+                "min_price": 0.00000100
+            },
+            "entry_confirmation": {
+                "required_signals": 2,
+                "min_signal_strength": 0.6,
+                "use_volume_confirmation": True,
+                "use_trend_confirmation": True
+            },
+            "exit_strategy": {
+                "use_dynamic_take_profit": True,
+                "partial_take_profits": [
+                    {"percent": 30, "price_target": 2.0},
+                    {"percent": 30, "price_target": 3.0},
+                    {"percent": 40, "price_target": 4.0}
+                ],
+                "use_dynamic_stop_loss": True,
+                "max_trade_duration_hours": 48
+            },
+            "time_filters": {
+                "enabled": False,
+                "trading_hours": {
+                    "start": "00:00",
+                    "end": "23:59"
+                },
+                "avoid_high_volatility_times": True
             }
         }
         
-        # Risk level 30% - Very Aggressive
-        risk_30_config = {
-            "max_open_positions": 5,
-            "position_size_percent": 5.0,
-            "stop_loss_percent": 3.0,
-            "take_profit_percent": 6.0,
-            "trailing_stop_percent": 1.0,
-            "max_daily_trades": 15,
-            "max_daily_drawdown_percent": 10.0,
-            "use_adaptive_position_sizing": True,
-            "use_dynamic_stop_loss": True,
-            "leverage": 5,
-            "risk_multipliers": {
-                "stop_loss_multiplier": 3.0,
-                "take_profit_multiplier": 3.0,
-                "trailing_stop_callback": 0.3,
-                "position_size_multiplier": 3.0
-            }
-        }
-        
-        risk_configs = {
-            "10": risk_10_config,
-            "15": risk_15_config,
-            "20": risk_20_config,
-            "30": risk_30_config
-        }
-        
-        for risk_level, config in risk_configs.items():
-            file_path = self.risk_configs[risk_level]
-            if not os.path.exists(file_path):
-                os.makedirs(os.path.dirname(file_path), exist_ok=True)
-                with open(file_path, 'w') as f:
-                    json.dump(config, f, indent=4)
-                logger.info(f"Created default risk config for level {risk_level}%")
-                
-    def get_current_risk_level(self) -> str:
-        """Get the current risk level"""
-        return self.current_risk_level
-    
-    def get_risk_config(self, risk_level: Optional[str] = None) -> Dict[str, Any]:
-        """Get the configuration for a specific risk level or the current risk level"""
-        if risk_level is None:
-            risk_level = self.current_risk_level
+        # Thay đổi các tham số dựa trên mức rủi ro
+        if risk_level == "10":
+            # Cấu hình cho mức rủi ro thấp (10%)
+            config["max_open_positions"] = 2
+            config["max_daily_trades"] = 5
+            config["stop_loss_percent"] = 1.5
+            config["take_profit_percent"] = 3.0
+            config["max_leverage"] = 5
+            config["default_leverage"] = 3
+            config["trade_filters"]["min_volume_24h"] = 20000000
+            config["exit_strategy"]["partial_take_profits"] = [
+                {"percent": 50, "price_target": 1.5},
+                {"percent": 50, "price_target": 3.0}
+            ]
             
-        if risk_level not in self.risk_configs:
-            logger.error(f"Invalid risk level: {risk_level}. Using default level 10%.")
+        elif risk_level == "15":
+            # Cấu hình cho mức rủi ro trung bình thấp (15%)
+            config["max_open_positions"] = 3
+            config["max_daily_trades"] = 6
+            config["stop_loss_percent"] = 2.0
+            config["take_profit_percent"] = 3.5
+            config["max_leverage"] = 7
+            config["default_leverage"] = 4
+            
+        elif risk_level == "20":
+            # Cấu hình cho mức rủi ro trung bình (20%)
+            # Giữ nguyên cấu hình mặc định
+            pass
+            
+        elif risk_level == "30":
+            # Cấu hình cho mức rủi ro cao (30%)
+            config["max_open_positions"] = 4
+            config["max_daily_trades"] = 10
+            config["stop_loss_percent"] = 3.0
+            config["take_profit_percent"] = 6.0
+            config["max_leverage"] = 15
+            config["default_leverage"] = 7
+            config["trailing_stop_activation"] = 2.0
+            config["trailing_stop_distance"] = 1.5
+            config["enable_martingale"] = True
+            config["max_martingale_steps"] = 3
+            config["trade_filters"]["min_volume_24h"] = 5000000
+            config["trade_filters"]["max_price_change_24h"] = 25.0
+            config["entry_confirmation"]["required_signals"] = 1
+            config["entry_confirmation"]["min_signal_strength"] = 0.5
+            config["exit_strategy"]["partial_take_profits"] = [
+                {"percent": 20, "price_target": 2.0},
+                {"percent": 30, "price_target": 4.0},
+                {"percent": 50, "price_target": 6.0}
+            ]
+        
+        # Lưu cấu hình
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, "w") as f:
+            json.dump(config, f, indent=4)
+        
+        logger.info(f"Đã tạo file cấu hình {filename}")
+        
+        # Cập nhật lại dictionary cấu hình
+        self.risk_configs[risk_level] = config
+    
+    def get_risk_config(self, risk_level):
+        """
+        Lấy cấu hình cho một mức rủi ro cụ thể
+        
+        Args:
+            risk_level (str): Mức độ rủi ro
+            
+        Returns:
+            dict: Cấu hình rủi ro
+        """
+        # Kiểm tra risk_level có hợp lệ không
+        if risk_level not in self.SUPPORTED_RISK_LEVELS:
+            logger.warning(f"Mức rủi ro {risk_level} không được hỗ trợ, sử dụng mức mặc định 10")
             risk_level = "10"
-            
-        try:
-            with open(self.risk_configs[risk_level], 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
-            logger.error(f"Error loading risk config for level {risk_level}: {e}")
-            return {}
-    
-    def apply_risk_config(self, risk_level: str) -> bool:
-        """Apply a specific risk level configuration to the system"""
-        if risk_level not in self.risk_configs:
-            logger.error(f"Invalid risk level: {risk_level}. Valid levels are: {list(self.risk_configs.keys())}")
-            return False
-            
-        try:
-            # Load the risk configuration
-            risk_config = self.get_risk_config(risk_level)
-            if not risk_config:
-                return False
-                
-            # Update account_config.json with the new risk parameters
-            self._update_account_config(risk_config)
-            
-            # Set the current risk level
-            self.current_risk_level = risk_level
-            
-            logger.info(f"Successfully applied risk level {risk_level}%")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error applying risk level {risk_level}: {str(e)}")
-            return False
-    
-    def _update_account_config(self, risk_config: Dict[str, Any]) -> None:
-        """Update the account configuration with the new risk parameters"""
-        account_config_path = "account_config.json"
         
-        try:
-            # Load existing account config
-            if os.path.exists(account_config_path):
-                with open(account_config_path, 'r') as f:
+        # Lấy từ cache nếu có
+        if risk_level in self.risk_configs:
+            return self.risk_configs[risk_level]
+        
+        # Tạo file cấu hình nếu chưa có
+        self.create_risk_config(risk_level)
+        
+        # Trả về cấu hình
+        return self.risk_configs[risk_level]
+    
+    def set_active_risk_level(self, risk_level):
+        """
+        Thiết lập mức rủi ro hiện tại
+        
+        Args:
+            risk_level (str): Mức độ rủi ro
+        """
+        # Kiểm tra risk_level có hợp lệ không
+        if risk_level not in self.SUPPORTED_RISK_LEVELS:
+            logger.warning(f"Mức rủi ro {risk_level} không được hỗ trợ, sử dụng mức mặc định 10")
+            risk_level = "10"
+        
+        # Lấy cấu hình
+        config = self.get_risk_config(risk_level)
+        
+        # Cập nhật file account_config.json nếu có
+        if os.path.exists("account_config.json"):
+            try:
+                with open("account_config.json", "r") as f:
                     account_config = json.load(f)
-            else:
-                account_config = {}
                 
-            # Update account config with risk parameters
-            if "risk_parameters" not in account_config:
-                account_config["risk_parameters"] = {}
+                # Cập nhật risk_level
+                account_config["risk_level"] = int(risk_level)
                 
-            # Copy risk config values to account config
-            for key, value in risk_config.items():
-                if key != "risk_multipliers":  # Handle risk multipliers separately
-                    account_config["risk_parameters"][key] = value
-            
-            # Ensure risk multipliers are properly set
-            if "risk_multipliers" in risk_config and "risk_multipliers" not in account_config["risk_parameters"]:
-                account_config["risk_parameters"]["risk_multipliers"] = {}
+                # Lưu lại
+                with open("account_config.json", "w") as f:
+                    json.dump(account_config, f, indent=4)
                 
-            if "risk_multipliers" in risk_config:
-                for key, value in risk_config["risk_multipliers"].items():
-                    account_config["risk_parameters"]["risk_multipliers"][key] = value
-            
-            # Save updated config
-            with open(account_config_path, 'w') as f:
-                json.dump(account_config, f, indent=4)
+                logger.info(f"Đã cập nhật mức rủi ro {risk_level} trong account_config.json")
                 
-            logger.info(f"Updated account configuration with risk level parameters")
-            
-        except Exception as e:
-            logger.error(f"Error updating account configuration: {str(e)}")
-            raise
+            except Exception as e:
+                logger.error(f"Lỗi khi cập nhật account_config.json: {str(e)}")
+        
+        # Tạo file active_risk_level.txt
+        with open("active_risk_level.txt", "w") as f:
+            f.write(risk_level)
+        
+        logger.info(f"Đã thiết lập mức rủi ro hiện tại: {risk_level}")
     
-    def get_risk_level_description(self, risk_level: Optional[str] = None) -> Dict[str, Any]:
-        """Get a human-readable description of a risk level"""
-        if risk_level is None:
-            risk_level = self.current_risk_level
-            
-        risk_descriptions = {
-            "10": {
-                "name": "Bảo Thủ (10%)",
-                "description": "Chiến lược rủi ro thấp nhất, ưu tiên bảo toàn vốn. Sử dụng stop loss hẹp, kích thước vị thế nhỏ và leverage thấp. Phù hợp cho người mới bắt đầu hoặc muốn giao dịch an toàn.",
-                "pros": ["Bảo vệ vốn tốt", "Ít bị cuốn vào cảm xúc", "Phù hợp cho thị trường biến động cao"],
-                "cons": ["Lợi nhuận tiềm năng thấp hơn", "Tốc độ tăng trưởng chậm"]
-            },
-            "15": {
-                "name": "Vừa Phải (15%)",
-                "description": "Chiến lược cân bằng giữa rủi ro và lợi nhuận. Sử dụng stop loss rộng hơn, kích thước vị thế trung bình và leverage khiêm tốn. Phù hợp cho người có kinh nghiệm cơ bản.",
-                "pros": ["Cân bằng giữa bảo vệ vốn và tăng trưởng", "Linh hoạt trong các điều kiện thị trường"],
-                "cons": ["Rủi ro cao hơn mức bảo thủ", "Cần kiến thức thị trường tốt hơn"]
-            },
-            "20": {
-                "name": "Tích Cực (20%)",
-                "description": "Chiến lược ưu tiên tăng trưởng nhanh với rủi ro cao hơn. Sử dụng stop loss rộng, kích thước vị thế lớn và leverage cao. Phù hợp cho người có kinh nghiệm.",
-                "pros": ["Tiềm năng lợi nhuận cao", "Tận dụng tốt các cơ hội thị trường"],
-                "cons": ["Rủi ro drawdown đáng kể", "Yêu cầu kỷ luật giao dịch cao", "Cần khả năng quản lý cảm xúc tốt"]
-            },
-            "30": {
-                "name": "Mạo Hiểm (30%)",
-                "description": "Chiến lược rủi ro cao nhất, ưu tiên tuyệt đối cho việc tăng trưởng nhanh. Sử dụng stop loss rất rộng, kích thước vị thế rất lớn và leverage cao. Chỉ phù hợp cho người chuyên nghiệp.",
-                "pros": ["Tiềm năng lợi nhuận rất cao", "Tăng trưởng tài khoản nhanh trong điều kiện thuận lợi"],
-                "cons": ["Rủi ro mất vốn cao", "Không phù hợp với thị trường biến động", "Yêu cầu kinh nghiệm và kỷ luật rất cao"]
-            }
-        }
+    def get_active_risk_level(self):
+        """
+        Lấy mức rủi ro hiện tại
         
-        if risk_level not in risk_descriptions:
-            logger.warning(f"No description available for risk level {risk_level}. Using default level 10%.")
-            risk_level = "10"
-            
-        # Add the actual configuration values to the description
-        risk_config = self.get_risk_config(risk_level)
-        if risk_config:
-            risk_descriptions[risk_level]["configuration"] = {
-                "Vị thế tối đa": risk_config.get("max_open_positions", "N/A"),
-                "Kích thước vị thế (%)": risk_config.get("position_size_percent", "N/A"),
-                "Stop Loss (%)": risk_config.get("stop_loss_percent", "N/A"),
-                "Take Profit (%)": risk_config.get("take_profit_percent", "N/A"),
-                "Trailing Stop (%)": risk_config.get("trailing_stop_percent", "N/A"),
-                "Giao dịch tối đa mỗi ngày": risk_config.get("max_daily_trades", "N/A"),
-                "Drawdown tối đa mỗi ngày (%)": risk_config.get("max_daily_drawdown_percent", "N/A"),
-                "Leverage": risk_config.get("leverage", "N/A")
-            }
-            
-        return risk_descriptions[risk_level]
-        
-    def create_custom_risk_level(self, name: str, config: Dict[str, Any]) -> bool:
-        """Create a custom risk level configuration"""
-        if name in self.risk_configs:
-            logger.warning(f"Risk level {name} already exists. Overwriting.")
-            
-        file_path = f"risk_configs/risk_level_{name}.json"
-        
-        try:
-            # Create base config if doesn't exist
-            if not self.base_config:
-                self.base_config = self._load_base_config()
+        Returns:
+            str: Mức độ rủi ro hiện tại
+        """
+        # Kiểm tra file active_risk_level.txt
+        if os.path.exists("active_risk_level.txt"):
+            try:
+                with open("active_risk_level.txt", "r") as f:
+                    risk_level = f.read().strip()
                 
-            # Start with a copy of the base config and merge with custom config
-            merged_config = copy.deepcopy(self.base_config)
-            for key, value in config.items():
-                merged_config[key] = value
+                if risk_level in self.SUPPORTED_RISK_LEVELS:
+                    return risk_level
                 
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            
-            # Save the custom risk level
-            with open(file_path, 'w') as f:
-                json.dump(merged_config, f, indent=4)
-                
-            # Add to available risk levels
-            self.risk_configs[name] = file_path
-            
-            logger.info(f"Successfully created custom risk level: {name}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error creating custom risk level {name}: {str(e)}")
-            return False
-            
-    def get_all_risk_levels(self) -> Dict[str, Dict[str, Any]]:
-        """Get information about all available risk levels"""
-        result = {}
+            except Exception as e:
+                logger.error(f"Lỗi khi đọc active_risk_level.txt: {str(e)}")
         
-        for risk_level in self.risk_configs.keys():
-            result[risk_level] = {
-                "description": self.get_risk_level_description(risk_level),
-                "config": self.get_risk_config(risk_level)
-            }
+        # Kiểm tra trong account_config.json
+        if os.path.exists("account_config.json"):
+            try:
+                with open("account_config.json", "r") as f:
+                    account_config = json.load(f)
+                
+                risk_level = str(account_config.get("risk_level", 10))
+                
+                if risk_level in self.SUPPORTED_RISK_LEVELS:
+                    return risk_level
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi đọc account_config.json: {str(e)}")
+        
+        # Mặc định là 10
+        return "10"
+    
+    def export_risk_configs(self, output_dir="exported_risk_configs"):
+        """
+        Xuất tất cả cấu hình rủi ro ra một thư mục khác
+        
+        Args:
+            output_dir (str): Thư mục đích
+        """
+        # Tạo thư mục đích
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Tạo cấu hình mặc định nếu chưa có
+        self.create_default_configs()
+        
+        # Sao chép các file cấu hình
+        for risk_level in self.SUPPORTED_RISK_LEVELS:
+            src_file = f"{self.RISK_CONFIG_DIR}/risk_level_{risk_level}.json"
+            dst_file = f"{output_dir}/risk_level_{risk_level}.json"
             
-        return result
+            if os.path.exists(src_file):
+                shutil.copy2(src_file, dst_file)
+                logger.info(f"Đã xuất {src_file} -> {dst_file}")
+    
+    def import_risk_configs(self, input_dir="imported_risk_configs"):
+        """
+        Nhập cấu hình rủi ro từ một thư mục khác
+        
+        Args:
+            input_dir (str): Thư mục nguồn
+        """
+        # Kiểm tra thư mục nguồn
+        if not os.path.exists(input_dir):
+            logger.error(f"Thư mục {input_dir} không tồn tại")
+            return
+        
+        # Nhập các file cấu hình
+        for risk_level in self.SUPPORTED_RISK_LEVELS:
+            src_file = f"{input_dir}/risk_level_{risk_level}.json"
+            dst_file = f"{self.RISK_CONFIG_DIR}/risk_level_{risk_level}.json"
+            
+            if os.path.exists(src_file):
+                # Sao chép file
+                os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+                shutil.copy2(src_file, dst_file)
+                logger.info(f"Đã nhập {src_file} -> {dst_file}")
+                
+                # Tải lại cấu hình
+                try:
+                    with open(dst_file, "r") as f:
+                        config = json.load(f)
+                    
+                    self.risk_configs[risk_level] = config
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi đọc file cấu hình {dst_file}: {str(e)}")
+    
+    def show_risk_configs(self):
+        """Hiển thị tất cả cấu hình rủi ro hiện có"""
+        # Tạo cấu hình mặc định nếu chưa có
+        self.create_default_configs()
+        
+        print("===== CẤU HÌNH RỦI RO =====")
+        
+        for risk_level in sorted(self.SUPPORTED_RISK_LEVELS):
+            config = self.get_risk_config(risk_level)
+            active = " (ĐANG DÙNG)" if risk_level == self.get_active_risk_level() else ""
+            
+            print(f"\n--- MỨC RỦI RO {risk_level}%{active} ---")
+            print(f"Số vị thế tối đa: {config['max_open_positions']}")
+            print(f"Số giao dịch tối đa mỗi ngày: {config['max_daily_trades']}")
+            print(f"Phần trăm vốn mỗi giao dịch: {config['position_size_percent'] * 100:.1f}%")
+            print(f"Rủi ro tối đa mỗi giao dịch: {config['max_risk_per_trade'] * 100:.1f}%")
+            print(f"Phần trăm stoploss: {config['stop_loss_percent']:.1f}%")
+            print(f"Phần trăm takeprofit: {config['take_profit_percent']:.1f}%")
+            print(f"Đòn bẩy tối đa: {config['max_leverage']}x")
+            print(f"Đòn bẩy mặc định: {config['default_leverage']}x")
+            print(f"Sử dụng trailing stop: {'Có' if config['use_trailing_stop'] else 'Không'}")
+            print(f"Sử dụng martingale: {'Có' if config.get('enable_martingale', False) else 'Không'}")
+            
+            # Thêm thông tin về chiến lược exit nếu có
+            if "exit_strategy" in config:
+                print("\nChiến lược thoát:")
+                print(f"  Take profit động: {'Có' if config['exit_strategy'].get('use_dynamic_take_profit', False) else 'Không'}")
+                print(f"  Stop loss động: {'Có' if config['exit_strategy'].get('use_dynamic_stop_loss', False) else 'Không'}")
+                
+                # Thông tin về partial take profits
+                if "partial_take_profits" in config["exit_strategy"]:
+                    print("  Take profit từng phần:")
+                    for i, tp in enumerate(config["exit_strategy"]["partial_take_profits"]):
+                        print(f"    - {tp['percent']}% tại mục tiêu {tp['price_target']}%")
+
+def main():
+    """Hàm main"""
+    parser = argparse.ArgumentParser(description="Risk Level Manager - Quản lý các mức độ rủi ro")
+    parser.add_argument("--create-default", action="store_true", help="Tạo tất cả các file cấu hình mặc định")
+    parser.add_argument("--force", action="store_true", help="Ghi đè các file cấu hình đã tồn tại")
+    parser.add_argument("--set-active", type=str, help="Thiết lập mức rủi ro hiện tại (10, 15, 20, 30)")
+    parser.add_argument("--show", action="store_true", help="Hiển thị tất cả cấu hình rủi ro")
+    parser.add_argument("--export", type=str, help="Xuất cấu hình rủi ro ra thư mục")
+    parser.add_argument("--import", dest="import_dir", type=str, help="Nhập cấu hình rủi ro từ thư mục")
+    
+    args = parser.parse_args()
+    
+    # Khởi tạo risk manager
+    risk_manager = RiskLevelManager()
+    
+    # Xử lý các tùy chọn
+    if args.create_default:
+        risk_manager.create_default_configs(force=args.force)
+        print("Đã tạo tất cả các file cấu hình mặc định")
+    
+    if args.set_active:
+        risk_manager.set_active_risk_level(args.set_active)
+        print(f"Đã thiết lập mức rủi ro hiện tại: {args.set_active}%")
+    
+    if args.export:
+        risk_manager.export_risk_configs(args.export)
+        print(f"Đã xuất cấu hình rủi ro ra thư mục: {args.export}")
+    
+    if args.import_dir:
+        risk_manager.import_risk_configs(args.import_dir)
+        print(f"Đã nhập cấu hình rủi ro từ thư mục: {args.import_dir}")
+    
+    if args.show or not (args.create_default or args.set_active or args.export or args.import_dir):
+        # Mặc định hiển thị cấu hình nếu không có tùy chọn nào khác
+        risk_manager.show_risk_configs()
+
+if __name__ == "__main__":
+    main()
