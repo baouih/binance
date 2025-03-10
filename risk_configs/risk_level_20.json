@@ -1,17 +1,18 @@
 {
-    "max_position_size_percent": 2.0,
-    "max_open_positions": 5,
-    "stop_loss_percent": 1.0,
-    "take_profit_percent": 2.5,
-    "leverage": 7,
-    "max_daily_loss_percent": 4.0,
-    "enable_trailing_stop": true,
-    "trailing_stop_callback": 0.25,
-    "use_smart_entry": true,
-    "smart_entry_threshold": 0.75,
-    "use_market_regime_filter": true,
-    "use_volatility_filter": true,
-    "session_start_hour": 0,
-    "session_end_hour": 24,
-    "auto_compounding": true
+    "max_open_positions": 4,
+    "position_size_percent": 3.0,
+    "stop_loss_percent": 2.0,
+    "take_profit_percent": 4.0,
+    "trailing_stop_percent": 0.7,
+    "max_daily_trades": 12,
+    "max_daily_drawdown_percent": 7.0,
+    "use_adaptive_position_sizing": true,
+    "use_dynamic_stop_loss": true,
+    "leverage": 3,
+    "risk_multipliers": {
+        "stop_loss_multiplier": 2.0,
+        "take_profit_multiplier": 2.0,
+        "trailing_stop_callback": 0.2,
+        "position_size_multiplier": 2.0
+    }
 }

@@ -1,136 +1,37 @@
 import os
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from database import db
 
-
-class Base(DeclarativeBase):
-    pass
-
-
-db = SQLAlchemy(model_class=Base)
-# create the app
+# Create the Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 
-# configure the database, relative to the app instance folder
+# Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///trading_bot.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
-# initialize the app with the extension, flask-sqlalchemy >= 3.0.x
+
+# Initialize the app with the extension
 db.init_app(app)
 
-# Define User model
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256))
-    api_key = db.Column(db.String(128))
-    api_secret = db.Column(db.String(128))
-    telegram_token = db.Column(db.String(128))
-    telegram_chat_id = db.Column(db.String(128))
+# Import views after app is created to avoid circular imports
+from views import register_routes
+register_routes(app)
 
-# Other models
-class TradingPosition(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    symbol = db.Column(db.String(20), nullable=False)
-    side = db.Column(db.String(10), nullable=False)  # LONG or SHORT
-    entry_price = db.Column(db.Float, nullable=False)
-    current_price = db.Column(db.Float)
-    amount = db.Column(db.Float, nullable=False)
-    leverage = db.Column(db.Integer, default=1)
-    stop_loss = db.Column(db.Float)
-    take_profit = db.Column(db.Float)
-    pnl = db.Column(db.Float, default=0)
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-
-# Routes
-@app.route('/')
-def index():
-    """Trang chủ"""
-    return render_template('index.html', title="Hệ Thống Bot Giao Dịch")
-
-@app.route('/dashboard')
-def dashboard():
-    """Trang dashboard"""
-    return render_template('dashboard.html', title="Dashboard")
-
-@app.route('/api/status')
-def status():
-    """API endpoint cho trạng thái hệ thống"""
-    return jsonify({
-        "status": "running",
-        "version": "1.0.0",
-        "uptime": "12h 30m",
-        "system_info": {
-            "python_version": "3.11.2",
-            "platform": "Linux"
-        }
-    })
-
-@app.route('/api/risk-levels')
-def risk_levels():
-    """API endpoint cho các mức rủi ro"""
-    risk_levels = [
-        {"name": "10%", "description": "Rủi ro thấp, an toàn cho người mới bắt đầu"},
-        {"name": "15%", "description": "Rủi ro vừa phải, cân bằng giữa rủi ro và lợi nhuận"},
-        {"name": "20%", "description": "Rủi ro trung bình cao, cho trader có kinh nghiệm"},
-        {"name": "30%", "description": "Rủi ro cao, chỉ dành cho trader chuyên nghiệp"}
-    ]
-    return jsonify(risk_levels)
-
-@app.route('/api/change-risk', methods=['POST'])
-def change_risk():
-    """API endpoint để thay đổi mức rủi ro"""
-    risk_level = request.json.get('risk_level')
-    if risk_level in ['10', '15', '20', '30']:
-        try:
-            from risk_level_manager import RiskLevelManager
-            risk_manager = RiskLevelManager()
-            success = risk_manager.apply_risk_config(risk_level)
-            
-            if success:
-                return jsonify({"success": True, "message": f"Đã thay đổi mức rủi ro sang {risk_level}%"})
-            else:
-                return jsonify({"success": False, "message": "Lỗi khi thay đổi mức rủi ro"}), 500
-                
-        except Exception as e:
-            return jsonify({"success": False, "message": f"Lỗi: {str(e)}"}), 500
-    else:
-        return jsonify({"success": False, "message": "Mức rủi ro không hợp lệ"}), 400
-
-@app.route('/api/update-bot', methods=['POST'])
-def update_bot():
-    """API endpoint để cập nhật bot"""
-    try:
-        from update_packages.update_bot import BotUpdater
-        updater = BotUpdater()
-        success = updater.update()
-        
-        if success:
-            return jsonify({"success": True, "message": "Bot đã được cập nhật thành công"})
-        else:
-            return jsonify({"success": False, "message": "Không có cập nhật mới hoặc cập nhật thất bại"}), 500
-            
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Lỗi khi cập nhật bot: {str(e)}"}), 500
-
-# Khởi tạo cơ sở dữ liệu
+# Initialize app context and database
 with app.app_context():
-    # Tạo bảng nếu chưa tồn tại
+    # Import models to ensure they're registered with SQLAlchemy
+    from database.models import User, TradingPosition, TradingStrategy, TradingHistory
+    
+    # Create tables if they don't exist
     db.create_all()
     
-    # Khởi tạo thư mục templates nếu chưa tồn tại
+    # Create templates directory if it doesn't exist
     os.makedirs('templates', exist_ok=True)
     
-    # Tạo template index.html mặc định nếu chưa tồn tại
+    # Create default templates if they don't exist
     if not os.path.exists('templates/index.html'):
         with open('templates/index.html', 'w') as f:
             f.write("""
@@ -218,7 +119,7 @@ with app.app_context():
 </html>
             """)
     
-    # Tạo template dashboard.html mặc định nếu chưa tồn tại
+    # Create dashboard.html if it doesn't exist
     if not os.path.exists('templates/dashboard.html'):
         with open('templates/dashboard.html', 'w') as f:
             f.write("""
@@ -466,124 +367,129 @@ with app.app_context():
                         
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px;">Take Profit (%):</label>
-                            <input type="number" id="take-profit" value="3.0" min="0.1" max="20" step="0.1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <input type="number" id="take-profit" value="3.0" min="0.5" max="20" step="0.5" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
                     </div>
                     
                     <div style="flex: 1; min-width: 300px;">
-                        <h3>Đòn Bẩy & Bảo Vệ</h3>
+                        <h3>Chiến Lược Nâng Cao</h3>
                         
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px;">Đòn Bẩy:</label>
-                            <select id="leverage" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                                <option value="1">1x</option>
-                                <option value="3">3x</option>
-                                <option value="5" selected>5x</option>
-                                <option value="10">10x</option>
-                                <option value="20">20x</option>
-                            </select>
+                            <label style="display: block; margin-bottom: 5px;">Trailing Stop (%):</label>
+                            <input type="number" id="trailing-stop" value="0.5" min="0.1" max="5" step="0.1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px;">Thua Lỗ Tối Đa Mỗi Ngày (%):</label>
-                            <input type="number" id="max-daily-loss" value="5.0" min="1" max="20" step="0.5" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <label style="display: block; margin-bottom: 5px;">Số Vị Thế Tối Đa:</label>
+                            <input type="number" id="max-positions" value="3" min="1" max="10" step="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <label><input type="checkbox" id="use-trailing-stop"> Sử Dụng Trailing Stop</label>
+                            <label style="display: block; margin-bottom: 5px;">Dừng Lỗ Thích Nghi:</label>
+                            <input type="checkbox" id="adaptive-stop-loss" checked>
+                            <span>Tự động điều chỉnh stop loss dựa trên biến động thị trường</span>
                         </div>
                     </div>
                 </div>
                 
-                <button type="button" class="btn" onclick="saveRiskSettings()">Lưu Thiết Lập Rủi Ro</button>
+                <button type="button" class="btn" onclick="saveRiskSettings()">Lưu Cài Đặt Rủi Ro</button>
             </div>
             
             <div id="strategies" class="tab-content">
                 <h2>Chiến Lược Giao Dịch</h2>
+                <p>Danh sách các chiến lược giao dịch có sẵn.</p>
                 
-                <div style="margin-bottom: 20px;">
-                    <h3>Chiến Lược Hiện Tại</h3>
-                    <select id="active-strategy" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
-                        <option value="low_risk_strategy">Low Risk Strategy</option>
-                        <option value="medium_risk_strategy">Medium Risk Strategy</option>
-                        <option value="high_risk_strategy">High Risk Strategy</option>
-                        <option value="trending_strategy">Trending Strategy</option>
-                        <option value="ranging_strategy">Ranging Strategy</option>
-                        <option value="adaptive_strategy">Adaptive Strategy</option>
-                        <option value="ml_integrated_strategy">ML Integrated Strategy</option>
-                    </select>
-                    
-                    <button type="button" class="btn" onclick="activateStrategy()">Kích Hoạt Chiến Lược</button>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background-color: #f0f2f5;">
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Tên</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Mô Tả</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Trạng Thái</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">Đảo Chiều RSI</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">Giao dịch khi RSI đảo chiều từ vùng quá mua/quá bán</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; color: green;">Hoạt Động</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;">Cấu Hình</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px; background-color: #dc3545;">Dừng</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">Đột Phá Bollinger</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">Giao dịch khi giá đột phá dải Bollinger</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; color: gray;">Không Hoạt Động</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;">Cấu Hình</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px; background-color: #28a745;">Kích Hoạt</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">MA Cross</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">Giao dịch khi MA ngắn cắt MA dài</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; color: gray;">Không Hoạt Động</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;">Cấu Hình</button>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px; background-color: #28a745;">Kích Hoạt</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 
-                <div style="margin-top: 30px;">
-                    <h3>Tham Số Chiến Lược</h3>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px;">Activation Threshold:</label>
-                        <input type="number" id="activation-threshold" value="80" min="0" max="100" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px;">Callback Rate:</label>
-                        <input type="number" id="callback-rate" value="20" min="0" max="100" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px;">Trend Confirmation Periods:</label>
-                        <input type="number" id="trend-confirmation" value="3" min="1" max="10" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    </div>
-                    
-                    <button type="button" class="btn" onclick="saveStrategySettings()">Lưu Tham Số</button>
-                </div>
+                <button class="btn">Thêm Chiến Lược Mới</button>
             </div>
             
             <div id="logs" class="tab-content">
-                <h2>Logs</h2>
+                <h2>Nhật Ký Hệ Thống</h2>
+                <div style="height: 400px; overflow-y: auto; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; padding: 10px; font-family: monospace; font-size: 14px;">
+                    <div>[2025-03-10 08:15:23] INFO: Hệ thống khởi động</div>
+                    <div>[2025-03-10 08:15:24] INFO: Kết nối thành công đến API Binance</div>
+                    <div>[2025-03-10 08:15:25] INFO: Tải thành công cấu hình rủi ro: 10%</div>
+                    <div>[2025-03-10 08:30:15] INFO: Phát hiện tín hiệu mua BTC/USDT</div>
+                    <div>[2025-03-10 08:30:16] INFO: Mở vị thế LONG BTC/USDT tại $60,000</div>
+                    <div>[2025-03-10 08:45:30] INFO: Phát hiện tín hiệu bán ETH/USDT</div>
+                    <div>[2025-03-10 08:45:31] INFO: Mở vị thế SHORT ETH/USDT tại $2,200</div>
+                    <div>[2025-03-10 09:15:45] INFO: Cập nhật stop loss cho BTC/USDT: $59,400</div>
+                    <div>[2025-03-10 09:30:22] INFO: Cập nhật take profit cho ETH/USDT: $2,134</div>
+                    <div>[2025-03-10 10:00:00] INFO: Phân tích dữ liệu thị trường hoàn tất</div>
+                </div>
                 
-                <div style="margin-bottom: 15px;">
-                    <select id="log-filter" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-right: 10px;">
-                        <option value="all">Tất Cả Logs</option>
-                        <option value="trades">Logs Giao Dịch</option>
-                        <option value="errors">Logs Lỗi</option>
-                        <option value="system">Logs Hệ Thống</option>
+                <div style="margin-top: 20px;">
+                    <label style="display: block; margin-bottom: 5px;">Mức Độ Log:</label>
+                    <select id="log-level" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="info">INFO</option>
+                        <option value="debug">DEBUG</option>
+                        <option value="warning">WARNING</option>
+                        <option value="error">ERROR</option>
                     </select>
-                    
-                    <button type="button" class="btn" onclick="refreshLogs()">Làm Mới</button>
                 </div>
                 
-                <div id="log-container" style="background-color: #f0f2f5; border-radius: 5px; padding: 15px; height: 400px; overflow-y: auto; font-family: monospace; white-space: pre-wrap;">
-                    [2025-03-10 02:14:44] INFO: Khởi động hệ thống bot giao dịch
-                    [2025-03-10 02:14:47] INFO: Đã tải cấu hình tài khoản từ account_config.json
-                    [2025-03-10 02:14:47] INFO: Kết nối đến môi trường TESTNET Binance
-                    [2025-03-10 02:14:48] INFO: Đã lấy thông tin vị thế từ account API
-                    [2025-03-10 02:14:48] INFO: Đã lấy dữ liệu thị trường từ API: BTCUSDT=81627.10, ETHUSDT=2046.49...
-                </div>
+                <button type="button" class="btn" style="margin-top: 10px;" onclick="clearLogs()">Xóa Logs</button>
+                <button type="button" class="btn" style="margin-top: 10px;" onclick="downloadLogs()">Tải Logs</button>
             </div>
         </div>
     </div>
     
-    <div class="footer">
-        <p>Trading Bot System &copy; 2025</p>
-    </div>
-    
     <script>
         function showTab(tabId) {
-            // Ẩn tất cả tab
+            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Hiển thị tab được chọn
-            document.getElementById(tabId).classList.add('active');
-            
-            // Cập nhật menu
+            // Remove active class from all menu items
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Highlight menu item
-            event.target.classList.add('active');
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to selected menu item
+            document.querySelector(`.menu-item[onclick="showTab('${tabId}')"]`).classList.add('active');
         }
         
         function changeRiskLevel() {
@@ -603,29 +509,24 @@ with app.app_context():
             .then(data => {
                 if (data.success) {
                     riskStatus.textContent = data.message;
-                    riskStatus.style.color = 'green';
-                    
-                    // Cập nhật hiển thị mức rủi ro hiện tại
                     document.getElementById('current-risk-level').textContent = riskLevel + '%';
                 } else {
-                    riskStatus.textContent = data.message;
-                    riskStatus.style.color = 'red';
+                    riskStatus.textContent = 'Lỗi: ' + data.message;
                 }
             })
             .catch(error => {
                 console.error('Lỗi:', error);
-                riskStatus.textContent = 'Lỗi khi thay đổi mức rủi ro!';
-                riskStatus.style.color = 'red';
+                riskStatus.textContent = 'Lỗi kết nối đến server';
             });
         }
         
         function updateBot() {
-            if (confirm('Bạn có chắc muốn cập nhật bot?')) {
+            if (confirm('Bạn có chắc chắn muốn cập nhật bot không?')) {
                 fetch('/api/update-bot', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    }
+                    },
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -637,7 +538,7 @@ with app.app_context():
                 })
                 .catch(error => {
                     console.error('Lỗi:', error);
-                    alert('Lỗi khi cập nhật bot!');
+                    alert('Lỗi kết nối đến server');
                 });
             }
         }
@@ -647,28 +548,19 @@ with app.app_context():
         }
         
         function saveRiskSettings() {
-            alert('Đã lưu thiết lập rủi ro!');
+            alert('Đã lưu cài đặt rủi ro!');
         }
         
-        function activateStrategy() {
-            const strategy = document.getElementById('active-strategy').value;
-            alert('Đã kích hoạt chiến lược: ' + strategy);
+        function clearLogs() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả logs không?')) {
+                alert('Đã xóa logs!');
+            }
         }
         
-        function saveStrategySettings() {
-            alert('Đã lưu tham số chiến lược!');
-        }
-        
-        function refreshLogs() {
-            const filter = document.getElementById('log-filter').value;
-            console.log('Đang lọc logs với filter:', filter);
-            // Tại đây sẽ gọi API để lấy logs theo filter
+        function downloadLogs() {
+            alert('Đang tải logs...');
         }
     </script>
 </body>
 </html>
             """)
-
-if __name__ == "__main__":
-    # Để chạy ứng dụng trong development
-    app.run(host="0.0.0.0", port=5000, debug=True)
