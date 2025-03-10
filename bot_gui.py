@@ -1134,7 +1134,7 @@ class MainWindow(QMainWindow):
         
         if os.path.exists(config_file):
             try:
-                with open(config_file, 'r') as f:
+                with open(config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)
                 
                 # Tải các thông số API
@@ -1221,8 +1221,8 @@ class MainWindow(QMainWindow):
             config["update_interval"] = self.update_interval_spin.value()
             
             # Lưu file
-            with open(config_file, 'w') as f:
-                json.dump(config, f, indent=4)
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=4, ensure_ascii=False)
             
             logger.info("Đã lưu cấu hình vào file account_config.json")
             QMessageBox.information(self, "Lưu Cấu Hình", "Cấu hình đã được lưu thành công!")
@@ -1298,7 +1298,7 @@ class MainWindow(QMainWindow):
         try:
             config_path = f"risk_configs/risk_level_{risk_level}.json"
             if os.path.exists(config_path):
-                with open(config_path, 'r') as f:
+                with open(config_path, 'r', encoding='utf-8') as f:
                     risk_config = json.load(f)
                 
                 # Cập nhật UI với các tham số rủi ro
