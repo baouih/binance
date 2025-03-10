@@ -71,6 +71,12 @@ class PositionManager:
         :param testnet: Sử dụng testnet hay không
         """
         self.testnet = testnet
+        self.client = None
+        
+        # Tạo thư mục logs nếu không tồn tại
+        os.makedirs("logs", exist_ok=True)
+        
+        # Tạo client (kết nối API)
         self.client = self._create_client()
         
         logger.info("Đã khởi tạo Position Manager")
@@ -87,12 +93,21 @@ class PositionManager:
             
             if not api_key or not api_secret:
                 logger.error("Thiếu API Key hoặc API Secret")
+                self._log_connection_failure("missing_credentials", "Thiếu API Key hoặc API Secret")
                 return None
             
             client = Client(api_key, api_secret, testnet=self.testnet)
             
             # Kiểm tra kết nối
             client.ping()
+            
+            # Thử lấy thông tin tài khoản để xác minh kết nối hoạt động đầy đủ
+            server_time = client.get_server_time()
+            if server_time:
+                logger.info(f"Thời gian máy chủ Binance: {datetime.datetime.fromtimestamp(server_time['serverTime']/1000)}")
+            
+            # Lưu thông tin kết nối thành công
+            self._log_connection_success()
             
             logger.info("Đã kết nối thành công với Binance API")
             return client
