@@ -47,8 +47,8 @@ def check_api_keys():
 
 def save_config(config, file_path="config.json"):
     """Lưu cấu hình vào file"""
-    with open(file_path, 'w') as f:
-        json.dump(config, f, indent=2)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
     logger.info(f"Đã lưu cấu hình vào {file_path}")
 
 def load_config(file_path="config.json"):
