@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Bot GUI - Giao diện đồ họa cho hệ thống giao dịch
+Bot GUI - Giao diện đồ họa cho hệ thống giao dịch 24/7
+
+Phiên bản này được tối ưu hóa để chạy liên tục 24/7 với việc giám sát và quản lý rủi ro tự động.
+Ứng dụng có thể biên dịch thành file exe để chạy trên hệ điều hành Windows.
 """
 
 import os
