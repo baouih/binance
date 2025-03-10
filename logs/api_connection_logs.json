@@ -1,0 +1,16 @@
+[
+    {
+        "timestamp": "2025-03-10 13:45:02",
+        "status": "success",
+        "api_type": "binance",
+        "mode": "testnet"
+    },
+    {
+        "timestamp": "2025-03-10 13:45:02",
+        "status": "error",
+        "api_type": "binance",
+        "mode": "testnet",
+        "error_type": "unknown_error",
+        "error_message": "'Client' object has no attribute 'ping'"
+    }
+]

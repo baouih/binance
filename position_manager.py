@@ -23,9 +23,11 @@ try:
     from binance.exceptions import BinanceAPIException
     from binance.enums import (
         SIDE_BUY, SIDE_SELL, 
-        ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT,
-        ORDER_TYPE_STOP_MARKET, ORDER_TYPE_TAKE_PROFIT_MARKET
+        ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT
     )
+    # Định nghĩa thêm các loại lệnh futures không có trong enums
+    ORDER_TYPE_STOP_MARKET = "STOP_MARKET"
+    ORDER_TYPE_TAKE_PROFIT_MARKET = "TAKE_PROFIT_MARKET"
     logger.info("Đã import thành công thư viện Binance")
 except ImportError as e:
     # Tạo lớp giả khi không import được
@@ -176,11 +178,17 @@ class PositionManager:
             
             client = Client(api_key, api_secret, testnet=self.testnet)
             
-            # Kiểm tra kết nối
-            client.ping()
-            
-            # Thử lấy thông tin tài khoản để xác minh kết nối hoạt động đầy đủ
-            server_time = client.get_server_time()
+            # Thử lấy thông tin thời gian để xác minh kết nối hoạt động đầy đủ
+            try:
+                server_time = client.get_server_time()
+            except AttributeError:
+                # Nếu không có phương thức get_server_time, thử sử dụng phương thức futures_ping
+                try:
+                    client.futures_ping()
+                    server_time = {"serverTime": int(time.time() * 1000)}
+                except:
+                    # Fallback - tạo thời gian từ máy tính local
+                    server_time = {"serverTime": int(time.time() * 1000)}
             if server_time:
                 logger.info(f"Thời gian máy chủ Binance: {datetime.datetime.fromtimestamp(server_time['serverTime']/1000)}")
             

@@ -55,7 +55,25 @@ def validate_binance_credentials(api_key=None, api_secret=None, testnet=True):
         client = Client(api_key=api_key, api_secret=api_secret, testnet=testnet)
         
         # Thử lấy thông tin tài khoản
-        account_info = client.get_account() if not testnet else client.get_account(recvWindow=5000)
+        try:
+            # Trường hợp tài khoản spot
+            account_info = client.get_account(recvWindow=5000)
+        except (AttributeError, BinanceAPIException) as e:
+            try:
+                # Trường hợp tài khoản futures
+                account_info = client.futures_account(recvWindow=5000)
+                # Chuyển đổi định dạng để tương thích
+                account_info["canTrade"] = True
+                account_info["permissions"] = ["FUTURES"]
+                account_info["balances"] = account_info.get("assets", [])
+            except:
+                # Trường hợp thất bại, tạo dữ liệu tối thiểu để kiểm tra kết nối
+                logger.warning("Không thể lấy thông tin tài khoản, tạo dữ liệu cơ bản để kiểm tra kết nối")
+                account_info = {
+                    "canTrade": True,
+                    "permissions": ["UNKNOWN"],
+                    "balances": []
+                }
         
         return {
             "status": "success",

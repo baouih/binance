@@ -1,0 +1,188 @@
+[
+    {
+        "timestamp": "2025-03-10 13:44:46",
+        "results": {
+            "required_files": {
+                "Giao di\u1ec7n ch\u00ednh": true,
+                "Entry point": true,
+                "\u0110\u00f3ng g\u00f3i exe": true,
+                "Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng": true,
+                "Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf": true,
+                "Qu\u1ea3n l\u00fd r\u1ee7i ro": true,
+                "C\u1eadp nh\u1eadt t\u1ef1 \u0111\u1ed9ng": true,
+                "C\u1ea5u h\u00ecnh m\u00f4i tr\u01b0\u1eddng m\u1eabu": true
+            },
+            "gui_components": {
+                "Kh\u1edfi t\u1ea1o UI": true,
+                "Tab T\u1ed5ng quan": false,
+                "Tab Giao d\u1ecbch": false,
+                "Tab Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf": false,
+                "Tab Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng": false,
+                "Tab C\u00e0i \u0111\u1eb7t": false,
+                "C\u1eadp nh\u1eadt th\u1ecb tr\u01b0\u1eddng": false,
+                "M\u1edf v\u1ecb th\u1ebf": true,
+                "\u0110\u00f3ng v\u1ecb th\u1ebf": true,
+                "C\u1eadp nh\u1eadt SL/TP": false,
+                "Ph\u00e2n t\u00edch k\u1ef9 thu\u1eadt": true,
+                "C\u1ea5u h\u00ecnh API": true,
+                "C\u1ea5u h\u00ecnh Telegram": true,
+                "C\u1ea5u h\u00ecnh r\u1ee7i ro": true,
+                "Ki\u1ec3m tra c\u1eadp nh\u1eadt": false
+            },
+            "api_functions": {
+                "K\u1ebft n\u1ed1i Binance API": true,
+                "L\u1ea5y d\u1eef li\u1ec7u th\u1ecb tr\u01b0\u1eddng": true,
+                "L\u1ea5y d\u1eef li\u1ec7u l\u1ecbch s\u1eed": true,
+                "L\u1ea5y th\u00f4ng tin t\u00e0i kho\u1ea3n": true,
+                "M\u1edf v\u1ecb th\u1ebf": true,
+                "\u0110\u00f3ng v\u1ecb th\u1ebf": true,
+                "C\u1eadp nh\u1eadt SL/TP": true,
+                "L\u1ea5y danh s\u00e1ch v\u1ecb th\u1ebf": true,
+                "T\u00ednh to\u00e1n ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt": true,
+                "Ph\u00e2n t\u00edch c\u01a1 h\u1ed9i giao d\u1ecbch": true
+            },
+            "auto_update": {
+                "Ki\u1ec3m tra phi\u00ean b\u1ea3n": true,
+                "T\u1ea3i b\u1ea3n c\u1eadp nh\u1eadt": true,
+                "C\u00e0i \u0111\u1eb7t c\u1eadp nh\u1eadt": true,
+                "Kh\u1edfi \u0111\u1ed9ng sau c\u1eadp nh\u1eadt": false
+            },
+            "exe_packaging": {
+                "PyInstaller config": true,
+                "Icon included": true,
+                "Include resources": true,
+                "One-file option": false,
+                "Splash screen": false
+            },
+            "telegram": {
+                "G\u1eedi th\u00f4ng b\u00e1o": true,
+                "\u0110\u1ecbnh d\u1ea1ng tin nh\u1eafn": true,
+                "Th\u00f4ng b\u00e1o v\u1ecb th\u1ebf": true,
+                "Th\u00f4ng b\u00e1o c\u01a1 h\u1ed9i": true,
+                "Th\u00f4ng b\u00e1o l\u1ed7i": true
+            },
+            "documentation": {
+                "README desktop": true,
+                "H\u01b0\u1edbng d\u1eabn s\u1eed d\u1ee5ng": true,
+                "H\u01b0\u1edbng d\u1eabn exe": true,
+                "README telegram": true
+            }
+        },
+        "completion_rates": {
+            "required_files": 100.0,
+            "gui_components": 46.666666666666664,
+            "api_functions": 100.0,
+            "auto_update": 75.0,
+            "exe_packaging": 60.0,
+            "telegram": 100.0,
+            "documentation": 100.0
+        },
+        "overall_rate": 78.43137254901961,
+        "missing_items": [
+            "gui_components: Tab T\u1ed5ng quan",
+            "gui_components: Tab Giao d\u1ecbch",
+            "gui_components: Tab Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf",
+            "gui_components: Tab Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng",
+            "gui_components: Tab C\u00e0i \u0111\u1eb7t",
+            "gui_components: C\u1eadp nh\u1eadt th\u1ecb tr\u01b0\u1eddng",
+            "gui_components: C\u1eadp nh\u1eadt SL/TP",
+            "gui_components: Ki\u1ec3m tra c\u1eadp nh\u1eadt",
+            "auto_update: Kh\u1edfi \u0111\u1ed9ng sau c\u1eadp nh\u1eadt",
+            "exe_packaging: One-file option",
+            "exe_packaging: Splash screen"
+        ]
+    },
+    {
+        "timestamp": "2025-03-10 13:44:53",
+        "results": {
+            "required_files": {
+                "Giao di\u1ec7n ch\u00ednh": true,
+                "Entry point": true,
+                "\u0110\u00f3ng g\u00f3i exe": true,
+                "Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng": true,
+                "Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf": true,
+                "Qu\u1ea3n l\u00fd r\u1ee7i ro": true,
+                "C\u1eadp nh\u1eadt t\u1ef1 \u0111\u1ed9ng": true,
+                "C\u1ea5u h\u00ecnh m\u00f4i tr\u01b0\u1eddng m\u1eabu": true
+            },
+            "gui_components": {
+                "Kh\u1edfi t\u1ea1o UI": true,
+                "Tab T\u1ed5ng quan": false,
+                "Tab Giao d\u1ecbch": false,
+                "Tab Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf": false,
+                "Tab Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng": false,
+                "Tab C\u00e0i \u0111\u1eb7t": false,
+                "C\u1eadp nh\u1eadt th\u1ecb tr\u01b0\u1eddng": false,
+                "M\u1edf v\u1ecb th\u1ebf": true,
+                "\u0110\u00f3ng v\u1ecb th\u1ebf": true,
+                "C\u1eadp nh\u1eadt SL/TP": false,
+                "Ph\u00e2n t\u00edch k\u1ef9 thu\u1eadt": true,
+                "C\u1ea5u h\u00ecnh API": true,
+                "C\u1ea5u h\u00ecnh Telegram": true,
+                "C\u1ea5u h\u00ecnh r\u1ee7i ro": true,
+                "Ki\u1ec3m tra c\u1eadp nh\u1eadt": false
+            },
+            "api_functions": {
+                "K\u1ebft n\u1ed1i Binance API": true,
+                "L\u1ea5y d\u1eef li\u1ec7u th\u1ecb tr\u01b0\u1eddng": true,
+                "L\u1ea5y d\u1eef li\u1ec7u l\u1ecbch s\u1eed": true,
+                "L\u1ea5y th\u00f4ng tin t\u00e0i kho\u1ea3n": true,
+                "M\u1edf v\u1ecb th\u1ebf": true,
+                "\u0110\u00f3ng v\u1ecb th\u1ebf": true,
+                "C\u1eadp nh\u1eadt SL/TP": true,
+                "L\u1ea5y danh s\u00e1ch v\u1ecb th\u1ebf": true,
+                "T\u00ednh to\u00e1n ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt": true,
+                "Ph\u00e2n t\u00edch c\u01a1 h\u1ed9i giao d\u1ecbch": true
+            },
+            "auto_update": {
+                "Ki\u1ec3m tra phi\u00ean b\u1ea3n": true,
+                "T\u1ea3i b\u1ea3n c\u1eadp nh\u1eadt": true,
+                "C\u00e0i \u0111\u1eb7t c\u1eadp nh\u1eadt": true,
+                "Kh\u1edfi \u0111\u1ed9ng sau c\u1eadp nh\u1eadt": false
+            },
+            "exe_packaging": {
+                "PyInstaller config": true,
+                "Icon included": true,
+                "Include resources": true,
+                "One-file option": false,
+                "Splash screen": false
+            },
+            "telegram": {
+                "G\u1eedi th\u00f4ng b\u00e1o": true,
+                "\u0110\u1ecbnh d\u1ea1ng tin nh\u1eafn": true,
+                "Th\u00f4ng b\u00e1o v\u1ecb th\u1ebf": true,
+                "Th\u00f4ng b\u00e1o c\u01a1 h\u1ed9i": true,
+                "Th\u00f4ng b\u00e1o l\u1ed7i": true
+            },
+            "documentation": {
+                "README desktop": true,
+                "H\u01b0\u1edbng d\u1eabn s\u1eed d\u1ee5ng": true,
+                "H\u01b0\u1edbng d\u1eabn exe": true,
+                "README telegram": true
+            }
+        },
+        "completion_rates": {
+            "required_files": 100.0,
+            "gui_components": 46.666666666666664,
+            "api_functions": 100.0,
+            "auto_update": 75.0,
+            "exe_packaging": 60.0,
+            "telegram": 100.0,
+            "documentation": 100.0
+        },
+        "overall_rate": 78.43137254901961,
+        "missing_items": [
+            "gui_components: Tab T\u1ed5ng quan",
+            "gui_components: Tab Giao d\u1ecbch",
+            "gui_components: Tab Qu\u1ea3n l\u00fd v\u1ecb th\u1ebf",
+            "gui_components: Tab Ph\u00e2n t\u00edch th\u1ecb tr\u01b0\u1eddng",
+            "gui_components: Tab C\u00e0i \u0111\u1eb7t",
+            "gui_components: C\u1eadp nh\u1eadt th\u1ecb tr\u01b0\u1eddng",
+            "gui_components: C\u1eadp nh\u1eadt SL/TP",
+            "gui_components: Ki\u1ec3m tra c\u1eadp nh\u1eadt",
+            "auto_update: Kh\u1edfi \u0111\u1ed9ng sau c\u1eadp nh\u1eadt",
+            "exe_packaging: One-file option",
+            "exe_packaging: Splash screen"
+        ]
+    }
+]

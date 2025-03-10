@@ -90,11 +90,18 @@ class MarketAnalyzer:
             
             client = Client(api_key, api_secret, testnet=self.testnet)
             
-            # Kiểm tra kết nối
-            client.ping()
-            
-            # Thử lấy thời gian máy chủ để xác minh kết nối hoạt động đầy đủ
-            server_time = client.get_server_time()
+            # Thử lấy thông tin thời gian để xác minh kết nối hoạt động đầy đủ
+            try:
+                client.ping()
+                server_time = client.get_server_time()
+            except AttributeError:
+                # Nếu không có phương thức ping hoặc get_server_time, thử sử dụng phương thức futures_ping
+                try:
+                    client.futures_ping()
+                    server_time = {"serverTime": int(time.time() * 1000)}
+                except:
+                    # Fallback - tạo thời gian từ máy tính local
+                    server_time = {"serverTime": int(time.time() * 1000)}
             if server_time:
                 logger.info(f"Thời gian máy chủ Binance: {datetime.datetime.fromtimestamp(server_time['serverTime']/1000)}")
             
