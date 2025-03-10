@@ -234,6 +234,52 @@ def validate_api_credentials():
     # Tổng hợp kết quả
     all_valid = all(result.get("is_valid", False) for result in results.values())
     
+    # Lưu kết quả kiểm tra vào file JSON
+    try:
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        result_data = {
+            "timestamp": timestamp,
+            "status": "success" if all_valid else "warning",
+            "all_valid": all_valid,
+            "results": results
+        }
+        
+        # Kiểm tra xem đã có file kết quả cũ chưa
+        history_results = []
+        if os.path.exists("api_validation_history.json"):
+            try:
+                with open("api_validation_history.json", "r", encoding="utf-8") as history_file:
+                    history_results = json.load(history_file)
+                    
+                    # Đảm bảo history_results là list
+                    if not isinstance(history_results, list):
+                        history_results = []
+            except:
+                history_results = []
+        
+        # Thêm kết quả mới vào lịch sử
+        history_results.append(result_data)
+        
+        # Giới hạn lịch sử chỉ lưu tối đa 20 bản ghi gần nhất
+        if len(history_results) > 20:
+            history_results = history_results[-20:]
+        
+        # Lưu lịch sử kiểm tra vào file
+        with open("api_validation_history.json", "w", encoding="utf-8") as history_file:
+            json.dump(history_results, history_file, indent=4)
+        
+        # Lưu kết quả kiểm tra hiện tại vào file riêng
+        with open("api_validation_result.json", "w", encoding="utf-8") as file:
+            json.dump(result_data, file, indent=4)
+        
+        logger.info("Đã lưu kết quả kiểm tra API vào api_validation_result.json")
+        logger.info("Đã cập nhật lịch sử kiểm tra API trong api_validation_history.json")
+    
+    except Exception as e:
+        logger.error(f"Lỗi khi lưu kết quả kiểm tra API: {str(e)}", exc_info=True)
+    
     return {
         "status": "success" if all_valid else "warning",
         "all_valid": all_valid,

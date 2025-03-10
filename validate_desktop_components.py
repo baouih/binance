@@ -449,15 +449,44 @@ def run_full_validation():
     
     # Lưu kết quả kiểm tra vào file JSON
     try:
+        # Thêm thông tin thời gian vào kết quả
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        result_data = {
+            "timestamp": timestamp,
+            "results": results,
+            "completion_rates": completion_rates,
+            "overall_rate": overall_rate,
+            "missing_items": missing_items
+        }
+        
+        # Kiểm tra xem đã có file kết quả cũ chưa
+        old_results = []
+        if os.path.exists("component_validation_history.json"):
+            try:
+                with open("component_validation_history.json", "r", encoding="utf-8") as history_file:
+                    old_results = json.load(history_file)
+                    
+                    # Đảm bảo old_results là list
+                    if not isinstance(old_results, list):
+                        old_results = []
+            except:
+                old_results = []
+        
+        # Thêm kết quả mới vào lịch sử
+        old_results.append(result_data)
+        
+        # Lưu lịch sử kiểm tra vào file
+        with open("component_validation_history.json", "w", encoding="utf-8") as history_file:
+            json.dump(old_results, history_file, indent=4)
+        
+        # Lưu kết quả kiểm tra hiện tại vào file riêng
         with open("component_validation_result.json", "w", encoding="utf-8") as file:
-            json.dump({
-                "results": results,
-                "completion_rates": completion_rates,
-                "overall_rate": overall_rate,
-                "missing_items": missing_items
-            }, file, indent=4)
+            json.dump(result_data, file, indent=4)
         
         logger.info("Đã lưu kết quả kiểm tra vào component_validation_result.json")
+        logger.info("Đã lưu lịch sử kiểm tra vào component_validation_history.json")
     
     except Exception as e:
         logger.error(f"Lỗi khi lưu kết quả kiểm tra: {str(e)}", exc_info=True)
