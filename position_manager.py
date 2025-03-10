@@ -80,6 +80,84 @@ class PositionManager:
         self.client = self._create_client()
         
         logger.info("Đã khởi tạo Position Manager")
+        
+    def _log_connection_success(self):
+        """Ghi nhận kết nối thành công"""
+        try:
+            connection_log = {
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": "success",
+                "api_type": "binance",
+                "mode": "testnet" if self.testnet else "mainnet"
+            }
+            
+            # Lưu log kết nối
+            self._save_connection_log(connection_log)
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu log kết nối thành công: {str(e)}")
+    
+    def _log_connection_failure(self, error_type, error_message):
+        """
+        Ghi nhận lỗi kết nối
+        
+        :param error_type: Loại lỗi
+        :param error_message: Thông báo lỗi
+        """
+        try:
+            connection_log = {
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": "error",
+                "api_type": "binance",
+                "mode": "testnet" if self.testnet else "mainnet",
+                "error_type": error_type,
+                "error_message": error_message
+            }
+            
+            # Lưu log kết nối
+            self._save_connection_log(connection_log)
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu log kết nối thất bại: {str(e)}")
+    
+    def _save_connection_log(self, log_entry):
+        """
+        Lưu log kết nối
+        
+        :param log_entry: Thông tin log cần lưu
+        """
+        try:
+            # Tạo thư mục logs nếu không tồn tại
+            os.makedirs("logs", exist_ok=True)
+            
+            log_file = "logs/api_connection_logs.json"
+            connection_logs = []
+            
+            # Đọc log cũ nếu có
+            if os.path.exists(log_file):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        connection_logs = json.load(f)
+                        
+                        # Đảm bảo connection_logs là list
+                        if not isinstance(connection_logs, list):
+                            connection_logs = []
+                except:
+                    connection_logs = []
+            
+            # Thêm log mới
+            connection_logs.append(log_entry)
+            
+            # Giới hạn số lượng log (giữ 100 log gần nhất)
+            if len(connection_logs) > 100:
+                connection_logs = connection_logs[-100:]
+            
+            # Lưu log
+            with open(log_file, "w", encoding="utf-8") as f:
+                json.dump(connection_logs, f, indent=4)
+                
+        except Exception as e:
+            logger.error(f"Lỗi khi lưu log kết nối: {str(e)}")
     
     def _create_client(self):
         """
@@ -113,11 +191,17 @@ class PositionManager:
             return client
         
         except BinanceAPIException as e:
-            logger.error(f"Lỗi khi kết nối với Binance API: {str(e)}")
+            error_code = getattr(e, "code", "unknown")
+            error_message = str(e)
+            
+            logger.error(f"Lỗi Binance API: Code {error_code} - {error_message}")
+            self._log_connection_failure(f"api_error_{error_code}", error_message)
             return None
-        
+            
         except Exception as e:
-            logger.error(f"Lỗi không xác định khi tạo client: {str(e)}", exc_info=True)
+            logger.error(f"Lỗi không xác định khi kết nối tới Binance API: {str(e)}")
+            logger.error(traceback.format_exc())
+            self._log_connection_failure("unknown_error", str(e))
             return None
     
     def get_account_balance(self) -> Dict[str, Any]:
