@@ -90,7 +90,7 @@ class MultiCoinBot:
     def _load_config(self):
         """Tải cấu hình từ file"""
         try:
-            with open(self.config_file, 'r') as f:
+            with open(self.config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
             return config
         except Exception as e:

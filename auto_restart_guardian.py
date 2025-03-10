@@ -89,14 +89,14 @@ class GuardianMonitor:
         }
         
         # Lưu file
-        with open(GUARDIAN_STATUS_FILE, "w") as f:
-            json.dump(status, f, indent=4)
+        with open(GUARDIAN_STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(status, f, indent=4, ensure_ascii=False)
     
     def _update_status(self, status="running", bot_status=None):
         """Cập nhật file trạng thái"""
         if os.path.exists(GUARDIAN_STATUS_FILE):
             try:
-                with open(GUARDIAN_STATUS_FILE, "r") as f:
+                with open(GUARDIAN_STATUS_FILE, "r", encoding="utf-8") as f:
                     current_status = json.load(f)
             except:
                 current_status = {}
@@ -130,8 +130,8 @@ class GuardianMonitor:
         current_status["last_check"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         # Lưu file
-        with open(GUARDIAN_STATUS_FILE, "w") as f:
-            json.dump(current_status, f, indent=4)
+        with open(GUARDIAN_STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(current_status, f, indent=4, ensure_ascii=False)
     
     def _signal_handler(self, sig, frame):
         """Xử lý tín hiệu"""
@@ -286,7 +286,7 @@ class GuardianMonitor:
             # Bot đang chạy, kiểm tra heartbeat
             if os.path.exists(BOT_HEARTBEAT_FILE):
                 try:
-                    with open(BOT_HEARTBEAT_FILE, "r") as f:
+                    with open(BOT_HEARTBEAT_FILE, "r", encoding="utf-8") as f:
                         heartbeat = json.load(f)
                     
                     # Kiểm tra thời gian cập nhật
