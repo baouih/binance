@@ -1342,6 +1342,26 @@ class BinanceAPI:
             logger.error(f"Lỗi khi đặt take profit cho {symbol}: {str(e)}")
             return {"error": str(e)}
 
+    def test_connection(self) -> bool:
+        """
+        Kiểm tra kết nối với Binance API
+        
+        Returns:
+            bool: True nếu kết nối thành công, False nếu không
+        """
+        try:
+            if self.account_type == 'futures':
+                # Kiểm tra kết nối bằng cách lấy thông tin tài khoản
+                self.futures_account_balance()
+            else:
+                # Kiểm tra kết nối bằng cách lấy thông tin tài khoản
+                self.get_account()
+            logger.info("Kết nối tới Binance API thành công")
+            return True
+        except Exception as e:
+            logger.error(f"Kết nối tới Binance API thất bại: {str(e)}")
+            raise Exception(f"Không thể kết nối tới Binance API: {str(e)}")
+            
     def download_historical_data(self, 
                              symbol: str, 
                              interval: str, 

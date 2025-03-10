@@ -22,6 +22,7 @@
     "position_size_limit": 800,
     "order_types": ["MARKET", "LIMIT", "STOP", "TAKE_PROFIT"],
     "risk_per_trade": 10.0,
+    "risk_level": 10,
     "capital_allocation": {
         "BTC": 0.3,
         "ETH": 0.2,
