@@ -27,11 +27,23 @@ logger = logging.getLogger("desktop_validation")
 
 # Import các module
 try:
-    from dotenv import load_dotenv
+    # Import dotenv để tải biến môi trường
+    try:
+        from dotenv import load_dotenv
+        logger.info("Đã import dotenv")
+    except ImportError:
+        logger.warning("Không thể import dotenv, sẽ sử dụng os.environ")
+        def load_dotenv():
+            logger.info("Hàm load_dotenv giả được gọi")
+            return True
+    
+    # Import các module chính
     from market_analyzer import MarketAnalyzer
     from position_manager import PositionManager
     from risk_manager import RiskManager
     from auto_update_client import AutoUpdater
+    
+    import datetime
     
     logger.info("Đã import thành công các module")
 except ImportError as e:

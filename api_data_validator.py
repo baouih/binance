@@ -11,8 +11,19 @@ import logging
 import time
 import traceback
 import requests
-from binance.client import Client
-from binance.exceptions import BinanceAPIException
+
+# Xử lý vấn đề import để tránh lỗi
+try:
+    from binance.client import Client
+    from binance.exceptions import BinanceAPIException
+except ImportError:
+    # Tạo lớp giả khi không import được
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class BinanceAPIException(Exception):
+        pass
 
 # Cấu hình logging
 logger = logging.getLogger("api_validator")

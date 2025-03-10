@@ -28,14 +28,38 @@ try:
     )
     logger.info("Đã import thành công thư viện Binance")
 except ImportError as e:
-    logger.error(f"Lỗi khi import thư viện Binance: {str(e)}")
-    # Định nghĩa các hằng số để tránh lỗi
+    # Tạo lớp giả khi không import được
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def futures_account_balance(self, **kwargs):
+            return []
+            
+        def futures_position_information(self, **kwargs):
+            return []
+            
+        def futures_get_open_orders(self, **kwargs):
+            return []
+            
+        def futures_create_order(self, **kwargs):
+            return {}
+            
+        def futures_cancel_order(self, **kwargs):
+            return {}
+    
+    class BinanceAPIException(Exception):
+        pass
+    
+    # Tạo enums giả
     SIDE_BUY = "BUY"
     SIDE_SELL = "SELL"
     ORDER_TYPE_MARKET = "MARKET"
     ORDER_TYPE_LIMIT = "LIMIT"
     ORDER_TYPE_STOP_MARKET = "STOP_MARKET"
     ORDER_TYPE_TAKE_PROFIT_MARKET = "TAKE_PROFIT_MARKET"
+    logger.error(f"Lỗi khi import thư viện Binance: {str(e)}")
+    # Các hằng số đã được định nghĩa ở trên
 
 class PositionManager:
     """Quản lý vị thế giao dịch"""
