@@ -51,7 +51,7 @@ class RiskLevelManager:
             
             try:
                 # Đọc file cấu hình
-                with open(config_file, "r") as f:
+                with open(config_file, "r", encoding="utf-8") as f:
                     config = json.load(f)
                 
                 # Lưu vào dictionary
@@ -194,7 +194,7 @@ class RiskLevelManager:
         
         # Lưu cấu hình
         os.makedirs(os.path.dirname(filename), exist_ok=True)
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=4)
         
         logger.info(f"Đã tạo file cấu hình {filename}")
@@ -252,7 +252,7 @@ class RiskLevelManager:
                 account_config["risk_level"] = int(risk_level)
                 
                 # Lưu lại
-                with open("account_config.json", "w") as f:
+                with open("account_config.json", "w", encoding="utf-8") as f:
                     json.dump(account_config, f, indent=4)
                 
                 logger.info(f"Đã cập nhật mức rủi ro {risk_level} trong account_config.json")

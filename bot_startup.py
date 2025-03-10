@@ -189,7 +189,7 @@ class BotManager:
         """Cập nhật file trạng thái"""
         if os.path.exists(status_file):
             try:
-                with open(status_file, "r") as f:
+                with open(status_file, "r", encoding="utf-8") as f:
                     current_status = json.load(f)
             except:
                 current_status = {}
