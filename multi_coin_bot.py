@@ -31,14 +31,10 @@ logger = logging.getLogger('multi_coin_bot')
 
 # Đường dẫn tương đối
 sys.path.append(".")
-from app.binance_api import BinanceAPI
-from app.data_processor import DataProcessor
-from app.market_regime_detector import MarketRegimeDetector
-try:
-    from app.composite_indicator import CompositeIndicator
-except ImportError:
-    # Sử dụng phiên bản từ thư mục gốc nếu không tìm thấy trong app/
-    from composite_indicator import CompositeIndicator
+from binance_api import BinanceAPI
+from data_processor import DataProcessor
+from market_regime_detector import MarketRegimeDetector
+from composite_indicator import CompositeIndicator
 from telegram_notify import telegram_notifier
 from market_sentiment_analyzer import market_sentiment_analyzer
 

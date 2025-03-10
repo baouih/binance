@@ -34,11 +34,11 @@ logger = logging.getLogger('ml_strategy_tester')
 # Thêm thư mục gốc vào sys.path để import các module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
-    from app.binance_api import BinanceAPI
-    from app.data_processor import DataProcessor
-    from app.simple_feature_engineering import SimpleFeatureEngineering
-    from app.market_regime_detector import MarketRegimeDetector
-    from app.advanced_ml_optimizer import AdvancedMLOptimizer
+    from binance_api import BinanceAPI
+    from data_processor import DataProcessor
+    from simple_feature_engineering import SimpleFeatureEngineering
+    from market_regime_detector import MarketRegimeDetector
+    from ml_optimizer import AdvancedMLOptimizer
     from fibonacci_helper import FibonacciAnalyzer, add_fibonacci_signals
     from adaptive_risk_manager import AdaptiveRiskManager, add_atr_to_dataframe
 except ImportError as e:

@@ -12,11 +12,11 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from app.binance_api import BinanceAPI
-from app.data_processor import DataProcessor
-from app.market_regime_detector import MarketRegimeDetector
-from app.advanced_ml_optimizer import AdvancedMLOptimizer
-from app.advanced_ml_strategy import AdvancedMLStrategy
+from binance_api import BinanceAPI
+from data_processor import DataProcessor
+from market_regime_detector import MarketRegimeDetector
+from ml_optimizer import AdvancedMLOptimizer
+from advanced_trading_system import AdvancedMLStrategy
 
 from multi_timeframe_analyzer import MultiTimeframeAnalyzer
 from composite_indicator import CompositeIndicator

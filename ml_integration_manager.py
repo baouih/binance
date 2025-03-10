@@ -196,7 +196,7 @@ class MLIntegrationManager:
         
         # Tải cấu hình từ file nếu tồn tại
         if os.path.exists(self.config_path):
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
                 try:
                     loaded_config = json.load(f)
                     # Cập nhật cấu hình mặc định với cấu hình đã tải
@@ -205,7 +205,7 @@ class MLIntegrationManager:
                     logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
         else:
             # Lưu cấu hình mặc định
-            with open(self.config_path, 'w') as f:
+            with open(self.config_path, 'w', encoding='utf-8') as f:
                 json.dump(default_config, f, indent=4)
             
             logger.info(f"Đã tạo file cấu hình mới tại {self.config_path}")
@@ -1513,7 +1513,7 @@ class MLIntegrationManager:
     def save_state(self) -> None:
         """Lưu trạng thái hiện tại"""
         # Lưu cấu hình
-        with open(self.config_path, 'w') as f:
+        with open(self.config_path, 'w', encoding='utf-8') as f:
             json.dump(self.config, f, indent=4)
         
         # Lưu mô hình market regime
