@@ -206,7 +206,7 @@ class MLIntegrationManager:
         else:
             # Lưu cấu hình mặc định
             with open(self.config_path, 'w', encoding='utf-8') as f:
-                json.dump(default_config, f, indent=4)
+                json.dump(default_config, f, indent=4, ensure_ascii=False)
             
             logger.info(f"Đã tạo file cấu hình mới tại {self.config_path}")
         
