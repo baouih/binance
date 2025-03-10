@@ -489,8 +489,14 @@ class EnhancedTradingGUI(QMainWindow):
         api_layout.addWidget(QLabel("BINANCE_TESTNET_API_SECRET"), 2, 0)
         
         self.test_api_button = QPushButton("Kiểm tra kết nối API")
-        self.test_api_button.clicked.connect(self.validate_api_credentials)
+        self.test_api_button.clicked.connect(self.test_api_connection)
         api_layout.addWidget(self.test_api_button, 3, 0, 1, 2)
+        
+        # Hiển thị trạng thái API
+        self.api_status_result = QLabel("Chưa kiểm tra")
+        self.api_status_result.setStyleSheet("font-weight: bold;")
+        api_layout.addWidget(QLabel("Trạng thái:"), 4, 0)
+        api_layout.addWidget(self.api_status_result, 4, 1)
         
         api_group.setLayout(api_layout)
         layout.addWidget(api_group)
@@ -591,6 +597,49 @@ class EnhancedTradingGUI(QMainWindow):
             self.connection_status.setText("API: Lỗi kết nối")
             self.api_status_label.setText("API Binance: Lỗi kết nối")
             return False
+            
+    def test_api_connection(self):
+        """Kiểm tra kết nối API và hiển thị kết quả"""
+        self.update_log("Đang kiểm tra kết nối API Binance...")
+        self.api_status_result.setText("Đang kiểm tra...")
+        
+        try:
+            api_key = os.environ.get("BINANCE_TESTNET_API_KEY")
+            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET")
+            
+            if not api_key or not api_secret:
+                self.api_status_result.setText("Thiếu API key hoặc secret")
+                self.api_status_result.setStyleSheet("color: red; font-weight: bold;")
+                self.update_log("Lỗi: Thiếu API key hoặc secret")
+                QMessageBox.critical(self, "Lỗi", "Thiếu API key hoặc secret. Vui lòng kiểm tra biến môi trường.")
+                return
+            
+            # Kiểm tra API credentials và lấy thông tin tài khoản
+            from api_data_validator import validate_api_credentials, get_account_balance
+            is_valid = validate_api_credentials(api_key, api_secret, testnet=True)
+            
+            if is_valid:
+                balance = get_account_balance(api_key, api_secret, testnet=True)
+                
+                self.api_status_result.setText("Kết nối thành công")
+                self.api_status_result.setStyleSheet("color: green; font-weight: bold;")
+                self.update_log("API Binance kết nối thành công")
+                
+                if balance is not None:
+                    self.update_log(f"Số dư tài khoản: {balance} USDT")
+                    QMessageBox.information(self, "Thành công", f"Kết nối API thành công!\nSố dư tài khoản: {balance} USDT")
+                else:
+                    QMessageBox.information(self, "Thành công", "Kết nối API thành công! Không lấy được số dư tài khoản.")
+            else:
+                self.api_status_result.setText("Kết nối thất bại")
+                self.api_status_result.setStyleSheet("color: red; font-weight: bold;")
+                self.update_log("Lỗi: Kết nối API Binance thất bại")
+                QMessageBox.critical(self, "Lỗi", "Không thể kết nối tới API Binance. Vui lòng kiểm tra lại thông tin đăng nhập.")
+        except Exception as e:
+            self.api_status_result.setText("Lỗi kết nối")
+            self.api_status_result.setStyleSheet("color: red; font-weight: bold;")
+            self.update_log(f"Lỗi khi kiểm tra API: {str(e)}")
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi kiểm tra API: {str(e)}")
     
     def start_bot(self):
         """Bắt đầu chạy bot"""
