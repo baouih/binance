@@ -7,6 +7,7 @@ Công cụ đóng gói ứng dụng desktop giao dịch
 
 import os
 import sys
+import json
 import shutil
 import logging
 import subprocess
@@ -587,6 +588,29 @@ def main():
         logger.info("Đã tạo file thực thi thành công")
     else:
         logger.error("Không thể tạo file thực thi")
+
+def save_config(config, file_path):
+    """
+    Lưu cấu hình ra file JSON
+    
+    :param config: Dict cấu hình
+    :param file_path: Đường dẫn file
+    """
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, ensure_ascii=False, indent=4)
+
+def load_config(file_path):
+    """
+    Tải cấu hình từ file JSON
+    
+    :param file_path: Đường dẫn file
+    :return: Dict cấu hình
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 if __name__ == "__main__":
     main()
