@@ -437,6 +437,8 @@ def get_market_data():
         "market_data": STATUS["market_data"]
     })
 
+# Tạm thời bỏ socketio handlers vì chưa import đúng cách
+
 @app.route('/api/positions', methods=['GET'])
 def get_positions():
     return jsonify({

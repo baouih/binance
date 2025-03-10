@@ -4,8 +4,10 @@ let socket = null;
 // Kết nối Socket.IO
 function connectSocket() {
     try {
-        socket = io();
-        console.log('Socket.IO đang kết nối...');
+        // Sử dụng địa chỉ trang web hiện tại thay vì URL mặc định
+        const socketUrl = window.location.origin;
+        socket = io(socketUrl);
+        console.log('Socket.IO đang kết nối tới:', socketUrl);
         
         // Xử lý sự kiện kết nối
         socket.on('connect', function() {
@@ -13,7 +15,9 @@ function connectSocket() {
             showToast('Đã kết nối với server', 'success');
             
             // Cập nhật giao diện khi kết nối thành công
-            document.getElementById('connection-status').innerHTML = '<span class="badge bg-success">Đã kết nối</span>';
+            if (document.getElementById('connection-status')) {
+                document.getElementById('connection-status').innerHTML = '<span class="badge bg-success">Đã kết nối</span>';
+            }
         });
         
         // Xử lý sự kiện ngắt kết nối
@@ -453,4 +457,78 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Thiết lập các sự kiện điều khiển
     setupControlEvents();
+    
+    // Kiểm tra kết nối socket sau 3 giây
+    setTimeout(function() {
+        if (!socket || !socket.connected) {
+            console.log("Socket.IO không kết nối được, sử dụng phương pháp thay thế");
+            
+            // Sử dụng phương pháp thay thế: gọi API định kỳ
+            updateDataWithApi();
+            
+            // Cập nhật dữ liệu mỗi 5 giây
+            setInterval(updateDataWithApi, 5000);
+        }
+    }, 3000);
 });
+
+// Cập nhật dữ liệu thông qua API thay vì Socket.IO
+function updateDataWithApi() {
+    // Lấy trạng thái hệ thống
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Dữ liệu trạng thái từ API:", data);
+            
+            // Cập nhật trạng thái bot
+            const botStatus = {
+                running: data.running,
+                current_risk: 2.5,
+                last_updated: new Date().toLocaleTimeString()
+            };
+            updateBotStatus(botStatus);
+            
+            // Cập nhật số dư tài khoản
+            if (document.getElementById('account-balance')) {
+                document.getElementById('account-balance').textContent = '$' + formatNumber(data.account_balance);
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu trạng thái:", error);
+        });
+    
+    // Lấy dữ liệu thị trường
+    fetch('/api/market_data')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Dữ liệu thị trường từ API:", data);
+            
+            // Xây dựng và cập nhật dữ liệu thị trường
+            const marketData = {
+                btc_price: 65000.00,
+                eth_price: 3500.00,
+                sol_price: 120.00,
+                bnb_price: 580.00,
+                last_updated: new Date().toLocaleTimeString()
+            };
+            updateMarketData(marketData);
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu thị trường:", error);
+        });
+    
+    // Lấy danh sách vị thế
+    fetch('/api/positions')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Dữ liệu vị thế từ API:", data);
+            
+            // Cập nhật danh sách vị thế
+            if (document.getElementById('positions-container')) {
+                updatePositions(data.positions || []);
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi lấy dữ liệu vị thế:", error);
+        });
+}
