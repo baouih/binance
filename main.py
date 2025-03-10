@@ -175,11 +175,23 @@ def background_update():
 
 @app.route('/')
 def index():
+    # Kiểm tra nếu là thiết bị di động
+    user_agent = request.headers.get('User-Agent', '')
+    is_mobile = 'Mobile' in user_agent or 'Android' in user_agent or 'iPhone' in user_agent
+    
     config = load_config()
-    return render_template('index.html', 
-                          status=STATUS, 
-                          config=config,
-                          active_page="dashboard")
+    
+    if is_mobile:
+        # Sử dụng template đơn giản cho thiết bị di động
+        return render_template('index-simple.html', 
+                              status=STATUS, 
+                              config=config)
+    else:
+        # Sử dụng template đầy đủ cho desktop
+        return render_template('index.html', 
+                              status=STATUS, 
+                              config=config,
+                              active_page="dashboard")
 
 @app.route('/market')
 def market():
