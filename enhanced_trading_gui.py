@@ -513,6 +513,12 @@ class EnhancedTradingGUI(QMainWindow):
         self.test_telegram_button.clicked.connect(self.test_telegram)
         telegram_layout.addWidget(self.test_telegram_button, 3, 0, 1, 2)
         
+        # Hiển thị trạng thái Telegram
+        self.telegram_status_result = QLabel("Chưa kiểm tra")
+        self.telegram_status_result.setStyleSheet("font-weight: bold;")
+        telegram_layout.addWidget(QLabel("Trạng thái:"), 4, 0)
+        telegram_layout.addWidget(self.telegram_status_result, 4, 1)
+        
         telegram_group.setLayout(telegram_layout)
         layout.addWidget(telegram_group)
         
@@ -902,20 +908,42 @@ class EnhancedTradingGUI(QMainWindow):
     
     def test_telegram(self):
         """Kiểm tra kết nối Telegram"""
+        self.update_log("Đang kiểm tra kết nối Telegram...")
+        self.telegram_status_result.setText("Đang kiểm tra...")
+        
         try:
             token = os.environ.get("TELEGRAM_BOT_TOKEN")
             chat_id = os.environ.get("TELEGRAM_CHAT_ID")
             
             if not token or not chat_id:
+                self.telegram_status_result.setText("Thiếu thông tin")
+                self.telegram_status_result.setStyleSheet("color: red; font-weight: bold;")
+                self.update_log("Lỗi: Thiếu thông tin TELEGRAM_BOT_TOKEN hoặc TELEGRAM_CHAT_ID")
                 QMessageBox.critical(self, "Lỗi", "Thiếu thông tin TELEGRAM_BOT_TOKEN hoặc TELEGRAM_CHAT_ID.")
                 return
             
+            # Tạo đối tượng TelegramNotifier
             telegram = TelegramNotifier(token=token, chat_id=chat_id)
-            telegram.send_message("🤖 Đây là tin nhắn kiểm tra từ Trading Bot.")
             
-            QMessageBox.information(self, "Thông báo", "Đã gửi tin nhắn kiểm tra tới Telegram. Vui lòng kiểm tra để xác nhận.")
+            # Gửi tin nhắn kiểm tra
+            message = f"🤖 Đây là tin nhắn kiểm tra từ Trading Bot. [Thời gian: {datetime.now().strftime('%H:%M:%S')}]"
+            result = telegram.send_message(message)
+            
+            if result:
+                self.telegram_status_result.setText("Gửi thành công")
+                self.telegram_status_result.setStyleSheet("color: green; font-weight: bold;")
+                self.update_log("Đã gửi tin nhắn kiểm tra đến Telegram thành công")
+                QMessageBox.information(self, "Thành công", "Kết nối Telegram thành công! Đã gửi tin nhắn kiểm tra.")
+            else:
+                self.telegram_status_result.setText("Gửi thất bại")
+                self.telegram_status_result.setStyleSheet("color: red; font-weight: bold;")
+                self.update_log("Lỗi: Gửi tin nhắn Telegram thất bại")
+                QMessageBox.critical(self, "Lỗi", "Không thể gửi tin nhắn tới Telegram. Vui lòng kiểm tra lại thông tin.")
         except Exception as e:
-            QMessageBox.critical(self, "Lỗi", f"Không thể kết nối tới Telegram: {str(e)}")
+            self.telegram_status_result.setText("Lỗi kết nối")
+            self.telegram_status_result.setStyleSheet("color: red; font-weight: bold;")
+            self.update_log(f"Lỗi khi kiểm tra Telegram: {str(e)}")
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi kiểm tra Telegram: {str(e)}")
     
     def save_settings(self):
         """Lưu cài đặt"""
