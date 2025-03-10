@@ -1372,7 +1372,7 @@ class MainWindow(QMainWindow):
             
             # Lưu vào file
             config_path = f"risk_configs/risk_level_{self.current_risk_level}.json"
-            with open(config_path, 'w') as f:
+            with open(config_path, 'w', encoding="utf-8") as f:
                 json.dump(risk_config, f, indent=4)
             
             logger.info(f"Đã lưu cấu hình rủi ro {self.current_risk_level}%")
@@ -1404,7 +1404,7 @@ class MainWindow(QMainWindow):
             strategy_file = strategy.lower().replace(" ", "_") + ".json"
             strategy_path = os.path.join("strategies", strategy_file)
             
-            with open(strategy_path, 'w') as f:
+            with open(strategy_path, 'w', encoding="utf-8") as f:
                 json.dump(strategy_params, f, indent=4)
             
             logger.info(f"Đã lưu cấu hình chiến lược {strategy}")
@@ -1412,13 +1412,13 @@ class MainWindow(QMainWindow):
             # Cập nhật cấu hình tài khoản với chiến lược hiện tại
             config_file = "account_config.json"
             if os.path.exists(config_file):
-                with open(config_file, 'r') as f:
+                with open(config_file, 'r', encoding="utf-8") as f:
                     config = json.load(f)
                 
                 config["active_strategy"] = strategy
                 config["strategy_file"] = strategy_file
                 
-                with open(config_file, 'w') as f:
+                with open(config_file, 'w', encoding="utf-8") as f:
                     json.dump(config, f, indent=4)
             
             QMessageBox.information(self, "Kích Hoạt Chiến Lược", 
@@ -1449,7 +1449,7 @@ class MainWindow(QMainWindow):
             strategy_file = strategy.lower().replace(" ", "_") + ".json"
             strategy_path = os.path.join("strategies", strategy_file)
             
-            with open(strategy_path, 'w') as f:
+            with open(strategy_path, 'w', encoding="utf-8") as f:
                 json.dump(strategy_params, f, indent=4)
             
             logger.info(f"Đã lưu tham số chiến lược {strategy}")
@@ -1475,13 +1475,18 @@ class MainWindow(QMainWindow):
                               "Vui lòng cấu hình API Key và Secret trong tab Cài Đặt.")
             return
         
-        # Lưu cấu hình
-        self.save_config()
-        
-        # Khởi tạo thread bot
-        self.bot_thread = BotThread(self, risk_level=self.current_risk_level)
-        self.bot_thread.update_signal.connect(self.append_log)
-        self.bot_thread.error_signal.connect(self.handle_bot_error)
+        try:
+            # Lưu cấu hình
+            self.save_config()
+            
+            # Khởi tạo thread bot
+            self.bot_thread = BotThread(self, risk_level=self.current_risk_level)
+            self.bot_thread.update_signal.connect(self.append_log)
+            self.bot_thread.error_signal.connect(self.handle_bot_error)
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi tạo bot: {str(e)}")
+            QMessageBox.critical(self, "Lỗi Khởi Động", f"Không thể khởi động bot: {str(e)}")
+            return
         
         # Bắt đầu bot
         self.bot_thread.start()
