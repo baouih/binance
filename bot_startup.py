@@ -182,7 +182,7 @@ class BotManager:
         }
         
         # Lưu file
-        with open(status_file, "w") as f:
+        with open(status_file, "w", encoding="utf-8") as f:
             json.dump(status, f, indent=4)
     
     def _update_status(self, status="running", error=None):
@@ -223,7 +223,7 @@ class BotManager:
         current_status["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         # Lưu file
-        with open(status_file, "w") as f:
+        with open(status_file, "w", encoding="utf-8") as f:
             json.dump(current_status, f, indent=4)
     
     def _signal_handler(self, sig, frame):
@@ -296,7 +296,7 @@ class BotManager:
         else:
             # Kiểm tra file cấu hình
             if os.path.exists("account_config.json"):
-                with open("account_config.json", "r") as f:
+                with open("account_config.json", "r", encoding="utf-8") as f:
                     config = json.load(f)
                 
                 # Kiểm tra thông tin API
@@ -312,7 +312,7 @@ class BotManager:
         # Chỉ cập nhật nếu file tồn tại
         if os.path.exists("account_config.json"):
             try:
-                with open("account_config.json", "r") as f:
+                with open("account_config.json", "r", encoding="utf-8") as f:
                     config = json.load(f)
                 
                 # Cập nhật từ biến môi trường
@@ -495,7 +495,7 @@ class BotManager:
         heartbeat_file = "bot_heartbeat.json"
         if os.path.exists(heartbeat_file):
             try:
-                with open(heartbeat_file, "r") as f:
+                with open(heartbeat_file, "r", encoding="utf-8") as f:
                     heartbeat = json.load(f)
                 
                 # Kiểm tra thời gian cập nhật
@@ -550,7 +550,7 @@ class BotManager:
         self.is_running = False
         
         # Tạo file stop signal
-        with open("bot_stop_signal", "w") as f:
+        with open("bot_stop_signal", "w", encoding="utf-8") as f:
             f.write("stop")
         
         # Cập nhật trạng thái
