@@ -22,12 +22,23 @@ app.secret_key = os.environ.get("SESSION_SECRET", "trading_bot_secret_key")
 # Khởi tạo SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Import từ main.py - Đây là file chứa các routes và logic chính
+from main import *
+
+# Cập nhật app cho main.py
+import main
+main.app = app
+
 # Đảm bảo thư mục templates tồn tại
 os.makedirs('templates', exist_ok=True)
+
+# Thêm đoạn mã để chạy socketio
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
     
-    # Create default templates if they don't exist
-    if not os.path.exists('templates/index.html'):
-        with open('templates/index.html', 'w') as f:
+# Đoạn code tạo templates mặc định đã bị vô hiệu hóa để sử dụng templates gốc
+if False and not os.path.exists('templates/index.html'):
+    with open('templates/index.html', 'w') as f:
             f.write("""
 <!DOCTYPE html>
 <html>
@@ -113,9 +124,9 @@ os.makedirs('templates', exist_ok=True)
 </html>
             """)
     
-    # Create dashboard.html if it doesn't exist
-    if not os.path.exists('templates/dashboard.html'):
-        with open('templates/dashboard.html', 'w') as f:
+# Vô hiệu hóa tạo dashboard.html
+if False and not os.path.exists('templates/dashboard.html'):
+    with open('templates/dashboard.html', 'w') as f:
             f.write("""
 <!DOCTYPE html>
 <html>
