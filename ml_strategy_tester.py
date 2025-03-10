@@ -642,7 +642,11 @@ class MLStrategyTester:
                 df_strategy = strategy_func(df)
             else:
                 df_strategy = df.copy()
-                df_strategy['signal'] = predictions  # Sử dụng dự đoán trực tiếp làm tín hiệu mặc định
+                # Fix lỗi 'predictions' không được định nghĩa trong backtest_strategy
+                if 'predictions' in locals():
+                    df_strategy['signal'] = predictions
+                else:
+                    df_strategy['signal'] = 0  # Sử dụng 0 làm giá trị mặc định nếu không có predictions
             
             # Khởi tạo các biến theo dõi
             balance = float(initial_balance)
