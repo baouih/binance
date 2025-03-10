@@ -429,8 +429,8 @@ class BotManager:
                 
                 # Khởi động trong thread riêng
                 bot_thread = threading.Thread(
-                    target=bot_module.main,
-                    args=(args,)
+                    target=bot_module.main
+                    # args=(args,)  # Bỏ dòng này để sửa lỗi
                 )
                 bot_thread.daemon = True
                 bot_thread.start()

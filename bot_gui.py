@@ -1184,7 +1184,7 @@ class MainWindow(QMainWindow):
         try:
             # Kiểm tra xem file đã tồn tại chưa
             if os.path.exists(config_file):
-                with open(config_file, 'r') as f:
+                with open(config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)
             else:
                 config = {}
@@ -1198,6 +1198,14 @@ class MainWindow(QMainWindow):
             config["telegram_token"] = self.telegram_token_input.text()
             config["telegram_chat_id"] = self.telegram_chat_id_input.text()
             config["telegram_enabled"] = self.telegram_checkbox.isChecked()
+            
+            # Lưu lại cấu hình vào file
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=4, ensure_ascii=False)
+                
+            # Hiển thị thông báo
+            QMessageBox.information(self, "Thành công", "Đã lưu cài đặt API thành công!")
+            logger.info("Đã lưu cấu hình API thành công")
             
             # Cập nhật các thông số khác
             config["auto_trading"] = self.auto_trading_checkbox.isChecked()
