@@ -1,171 +1,59 @@
 {
-    "symbols_to_analyze": [
-        "BTCUSDT",
-        "ETHUSDT",
-        "BNBUSDT",
-        "XRPUSDT",
-        "ADAUSDT",
-        "DOGEUSDT",
-        "MATICUSDT",
-        "SOLUSDT",
-        "DOTUSDT",
-        "AVAXUSDT",
-        "LTCUSDT",
-        "LINKUSDT",
-        "UNIUSDT",
-        "ATOMUSDT"
-    ],
-    "timeframes": [
-        "5m",
-        "15m",
-        "1h",
-        "4h",
-        "1d"
-    ],
+    "account_config": "account_config.json",
+    "testnet": true,
     "primary_timeframe": "1h",
+    "timeframes": ["5m", "15m", "1h", "4h", "1d"],
+    "symbols_to_analyze": [
+        "BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT", 
+        "XRPUSDT", "DOTUSDT", "SOLUSDT", "LTCUSDT", "LINKUSDT", 
+        "MATICUSDT", "AVAXUSDT", "TRXUSDT", "UNIUSDT"
+    ],
+    "analysis_interval": 1800,
     "indicators": {
-        "moving_averages": {
-            "enabled": true,
-            "periods": [
-                20,
-                50,
-                100,
-                200
-            ],
-            "types": [
-                "SMA",
-                "EMA"
-            ]
-        },
-        "oscillators": {
-            "enabled": true,
-            "rsi": {
-                "enabled": true,
-                "period": 14,
-                "overbought": 70,
-                "oversold": 30
-            },
-            "macd": {
-                "enabled": true,
-                "fast_period": 12,
-                "slow_period": 26,
-                "signal_period": 9
-            },
-            "stochastic": {
-                "enabled": true,
-                "k_period": 14,
-                "d_period": 3,
-                "smooth_k": 3
-            }
-        },
-        "volume": {
-            "enabled": true,
-            "vwap": true,
-            "obv": true
-        },
-        "volatility": {
-            "enabled": true,
-            "bollinger_bands": {
-                "enabled": true,
-                "period": 20,
-                "std_dev": 2.0
-            },
-            "atr": {
-                "enabled": true,
-                "period": 14
-            }
-        },
-        "support_resistance": {
-            "enabled": true,
-            "lookback_periods": 100,
-            "zone_threshold": 0.02
-        }
+        "sma": [20, 50, 100, 200],
+        "ema": [9, 21, 55, 100],
+        "rsi": 14,
+        "macd": {"fast": 12, "slow": 26, "signal": 9},
+        "bollinger": {"window": 20, "std": 2},
+        "atr": 14,
+        "stoch": {"k": 14, "d": 3, "smooth": 3},
+        "volume_sma": 20
     },
-    "market_regimes": {
-        "detection": {
-            "enabled": true,
-            "lookback_periods": 30,
-            "update_frequency": "daily"
-        },
-        "regimes": [
-            "trending_up",
-            "trending_down",
-            "ranging",
-            "high_volatility",
-            "low_volatility"
-        ]
+    "market_regime": {
+        "volatility_threshold": 2.5,
+        "trend_strength_threshold": 3.0,
+        "volume_surge_threshold": 2.0
     },
-    "strategy_settings": {
-        "entry_conditions": {
-            "trending_market": {
-                "indicators": [
-                    "moving_averages",
-                    "macd",
-                    "volume"
-                ],
-                "confirmation_count": 2
-            },
-            "ranging_market": {
-                "indicators": [
-                    "rsi",
-                    "bollinger_bands",
-                    "support_resistance"
-                ],
-                "confirmation_count": 2
-            },
-            "volatile_market": {
-                "indicators": [
-                    "atr",
-                    "obv",
-                    "support_resistance"
-                ],
-                "confirmation_count": 3
-            }
-        },
-        "exit_conditions": {
-            "take_profit": {
-                "default_percentage": 5.0,
-                "adjust_by_volatility": true
-            },
-            "stop_loss": {
-                "default_percentage": 3.0,
-                "adjust_by_volatility": true
-            },
-            "trailing_stop": {
-                "enabled": true,
-                "activation_percentage": 1.0,
-                "callback_percentage": 0.5
-            },
-            "indicator_based": {
-                "enabled": true,
-                "indicators": [
-                    "rsi",
-                    "macd",
-                    "bollinger_bands"
-                ]
-            }
-        },
-        "risk_management": {
-            "max_risk_per_trade": 1.0,
-            "max_trades_per_day": 5,
-            "max_active_trades": 3,
-            "correlation_threshold": 0.7
-        }
+    "patterns": [
+        "engulfing", "doji", "hammer", "shooting_star", 
+        "morning_star", "evening_star", "three_white_soldiers", 
+        "three_black_crows", "piercing_line", "dark_cloud_cover"
+    ],
+    "data_window": 200,
+    "notifications": {
+        "enable": true,
+        "only_strong_signals": true,
+        "min_confidence": 70,
+        "notification_interval": 3600,
+        "detailed_reports": true
     },
-    "analysis_thresholds": {
-        "strong_buy": 80,
-        "buy": 60,
-        "neutral": 40,
-        "sell": 20,
-        "strong_sell": 0
+    "telegram": {
+        "enable": true,
+        "send_charts": true,
+        "send_market_updates": true,
+        "send_signal_alerts": true
     },
-    "no_trade_reasons_categories": [
-        "market_conditions",
-        "technical_indicators",
-        "risk_management",
-        "volatility",
-        "liquidity",
-        "correlation",
-        "fundamental"
-    ]
+    "risk_management": {
+        "max_positions": 5,
+        "max_risk_per_trade": 1.0,
+        "max_daily_drawdown": 5.0,
+        "correlation_threshold": 0.7
+    },
+    "system_settings": {
+        "debug_mode": true,
+        "cache_data": true,
+        "cache_expiry": 300,
+        "log_level": "INFO",
+        "save_analysis_files": true
+    }
 }

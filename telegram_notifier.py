@@ -1,969 +1,598 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Module xử lý thông báo Telegram cho ứng dụng desktop
+Telegram Notifier
+--------------
+Module cung cấp chức năng gửi thông báo qua Telegram Bot
+Hỗ trợ định dạng thông báo, gửi ảnh, và nhiều loại thông báo khác nhau
 """
 
 import os
 import json
 import logging
-import datetime
-import traceback
 import requests
-import time
-import hashlib
-from typing import Dict, List, Any, Optional, Union
+from datetime import datetime
+from typing import Dict, List, Union, Optional, Any
+import traceback
 
 # Thiết lập logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-
 logger = logging.getLogger("telegram_notifier")
 
 class TelegramNotifier:
     """
-    Lớp xử lý gửi thông báo đến Telegram
+    Lớp cung cấp chức năng gửi thông báo qua Telegram Bot
     """
     
-    def __init__(self, token: Optional[str] = None, chat_id: Optional[str] = None):
+    def __init__(self, token: str = None, chat_id: str = None, enabled: bool = True):
         """
-        Khởi tạo TelegramNotifier
+        Khởi tạo Telegram Notifier
         
-        :param token: Telegram Bot Token
-        :param chat_id: Telegram Chat ID
+        Args:
+            token: Token của Telegram Bot
+            chat_id: ID của chat để gửi thông báo
+            enabled: Trạng thái bật/tắt thông báo
         """
-        self.token = token or os.environ.get("TELEGRAM_BOT_TOKEN")
-        self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
-        self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
-        self.enabled = bool(self.token and self.chat_id)
+        self.token = token or os.environ.get('TELEGRAM_BOT_TOKEN')
+        self.chat_id = chat_id or os.environ.get('TELEGRAM_CHAT_ID')
+        self.enabled = enabled
         
-        # Cache lưu trữ thông báo gần đây để tránh spam
-        self.recent_messages = {}
-        self.message_cooldown = 10  # Giảm xuống 10 giây để thông báo nhiều hơn
+        # URL cơ sở để gọi Telegram API
+        self.api_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
         
-        # Lưu trữ dữ liệu thông báo trước đó để so sánh
-        self.previous_system_status = None
-        self.last_notification_time = {}
+        # Kiểm tra cấu hình
+        if not self.token or not self.chat_id:
+            self._load_config_from_file()
         
-        # Kiểm tra cài đặt
-        if not self.token:
-            logger.warning("Thiếu Telegram Bot Token")
-        
-        if not self.chat_id:
-            logger.warning("Thiếu Telegram Chat ID")
+        # Thông báo trạng thái
+        if self.enabled and self.token and self.chat_id:
+            logger.info("Telegram Notifier đã được kích hoạt")
+        elif not self.enabled:
+            logger.info("Telegram Notifier đã được tắt")
+        else:
+            logger.warning("Telegram Notifier không thể kích hoạt do thiếu token hoặc chat_id")
+            self.enabled = False
     
-    def set_credentials(self, token: str, chat_id: str) -> Dict[str, Any]:
-        """
-        Thiết lập token và chat_id mới
+    def _load_config_from_file(self):
+        """Tải cấu hình từ file"""
+        config_files = [
+            'telegram_config.json',
+            'configs/telegram_config.json',
+            'config.json',
+            'configs/config.json',
+            'account_config.json'
+        ]
         
-        :param token: Telegram Bot Token mới
-        :param chat_id: Telegram Chat ID mới
-        :return: Kết quả kiểm tra kết nối
-        """
-        self.token = token
-        self.chat_id = chat_id
-        self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
-        self.enabled = bool(self.token and self.chat_id)
+        for config_file in config_files:
+            if os.path.exists(config_file):
+                try:
+                    with open(config_file, 'r') as f:
+                        config = json.load(f)
+                    
+                    self.token = self.token or config.get('telegram_bot_token')
+                    self.chat_id = self.chat_id or config.get('telegram_chat_id')
+                    
+                    if self.token and self.chat_id:
+                        self.api_url = f"https://api.telegram.org/bot{self.token}"
+                        logger.info(f"Đã tải cấu hình Telegram từ {config_file}")
+                        return
+                except Exception as e:
+                    logger.warning(f"Lỗi khi tải cấu hình Telegram từ {config_file}: {e}")
         
-        # Kiểm tra kết nối
-        return self.test_connection()
+        logger.warning("Không tìm thấy cấu hình Telegram trong các file")
     
-    def test_connection(self) -> Dict[str, Any]:
+    def send_notification(self, level: str, message: str, parse_mode: str = "HTML") -> bool:
         """
-        Kiểm tra kết nối Telegram
+        Gửi thông báo với mức độ được chỉ định
         
-        :return: Kết quả kiểm tra kết nối
+        Args:
+            level: Mức độ thông báo (info, warning, error, success)
+            message: Nội dung thông báo
+            parse_mode: Chế độ phân tích cú pháp (HTML, Markdown)
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
         """
         if not self.enabled:
-            return {
-                "status": "error",
-                "message": "Thiếu cấu hình Telegram (Bot Token hoặc Chat ID)"
-            }
+            logger.info(f"Telegram Notifier đã bị tắt. Bỏ qua thông báo: {message[:50]}...")
+            return False
+        
+        # Thêm emoji theo mức độ
+        if level == "info":
+            icon = "ℹ️"
+        elif level == "warning":
+            icon = "⚠️"
+        elif level == "error":
+            icon = "🔴"
+        elif level == "success":
+            icon = "✅"
+        else:
+            icon = "🔔"
+        
+        formatted_message = f"{icon} {message}"
+        return self.send_message(formatted_message, parse_mode)
+    
+    def send_message(self, message: str, parse_mode: str = "HTML") -> bool:
+        """
+        Gửi tin nhắn Telegram
+        
+        Args:
+            message: Nội dung tin nhắn
+            parse_mode: Chế độ phân tích cú pháp (HTML, Markdown)
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info(f"Bỏ qua tin nhắn Telegram: {message[:50]}...")
+            return False
         
         try:
-            # Gửi tin nhắn test
-            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            message = f"🔄 Kiểm tra kết nối Telegram thành công!\n⏱️ Thời gian: {current_time}"
+            url = f"{self.api_url}/sendMessage"
+            data = {
+                "chat_id": self.chat_id,
+                "text": message,
+                "parse_mode": parse_mode
+            }
             
-            response = requests.get(
-                f"{self.base_url}/sendMessage",
-                params={
-                    "chat_id": self.chat_id,
-                    "text": message,
-                    "parse_mode": "HTML"
-                }
-            )
+            response = requests.post(url, data=data, timeout=10)
             
             if response.status_code == 200:
-                return {
-                    "status": "success",
-                    "message": "Kết nối Telegram thành công"
-                }
-            else:
-                return {
-                    "status": "error",
-                    "message": f"Lỗi kết nối Telegram: {response.json().get('description', 'Lỗi không xác định')}"
-                }
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}"
-            }
-    
-    def _is_duplicate_message(self, message: str, notification_type: str, bypass_duplicate: bool = False) -> bool:
-        """
-        Kiểm tra tin nhắn đã gửi gần đây để tránh spam
-        
-        :param message: Nội dung tin nhắn
-        :param notification_type: Loại thông báo
-        :param bypass_duplicate: Nếu True, luôn cho phép gửi tin nhắn (bỏ qua kiểm tra trùng lặp)
-        :return: True nếu tin nhắn là trùng lặp trong khoảng thời gian cho phép
-        """
-        # Nếu bypass_duplicate = True, luôn cho phép gửi tin nhắn
-        if bypass_duplicate:
-            return False
-            
-        # Tạo mã hash đơn giản cho tin nhắn
-        msg_hash = hashlib.md5(message.encode('utf-8')).hexdigest()
-        
-        # Lấy thời gian hiện tại
-        current_time = time.time()
-        
-        # Kiểm tra trong cache tin nhắn gần đây
-        if notification_type in self.recent_messages and msg_hash in self.recent_messages[notification_type]:
-            last_time = self.recent_messages[notification_type][msg_hash]
-            
-            # Nếu tin nhắn đã gửi trong khoảng thời gian cooldown
-            if current_time - last_time < self.message_cooldown:
-                logger.info(f"Bỏ qua tin nhắn trùng lặp loại '{notification_type}' (gửi gần đây trong vòng {self.message_cooldown}s)")
+                logger.info("Đã gửi tin nhắn Telegram thành công")
                 return True
+            else:
+                logger.error(f"Lỗi khi gửi tin nhắn Telegram: {response.status_code} - {response.text}")
+                return False
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi tin nhắn Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
+    
+    def send_photo(self, photo_path: str, caption: str = "", parse_mode: str = "HTML") -> bool:
+        """
+        Gửi ảnh qua Telegram
         
-        # Lưu tin nhắn vào cache
-        if notification_type not in self.recent_messages:
-            self.recent_messages[notification_type] = {}
+        Args:
+            photo_path: Đường dẫn đến file ảnh
+            caption: Chú thích cho ảnh
+            parse_mode: Chế độ phân tích cú pháp (HTML, Markdown)
             
-        self.recent_messages[notification_type][msg_hash] = current_time
-        return False
-        
-    def send_message(self, message: str, parse_mode: str = "HTML", notification_type: str = "general", bypass_duplicate: bool = False) -> Dict[str, Any]:
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
         """
-        Gửi tin nhắn đến Telegram
-        
-        :param message: Nội dung tin nhắn
-        :param parse_mode: Chế độ định dạng (HTML, Markdown, MarkdownV2)
-        :param notification_type: Loại thông báo để kiểm tra trùng lặp
-        :param bypass_duplicate: Nếu True, luôn gửi tin nhắn ngay cả khi trùng lặp
-        :return: Kết quả gửi tin nhắn
-        """
-        if not self.enabled:
-            logger.warning("Không thể gửi tin nhắn: Thiếu cấu hình Telegram")
-            return {
-                "status": "error",
-                "message": "Thiếu cấu hình Telegram (Bot Token hoặc Chat ID)"
-            }
-        
-        # Kiểm tra xem có phải là thông báo trùng lặp không
-        if self._is_duplicate_message(message, notification_type, bypass_duplicate):
-            return {
-                "status": "skipped",
-                "message": "Bỏ qua tin nhắn trùng lặp để tránh spam"
-            }
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info(f"Bỏ qua gửi ảnh Telegram: {photo_path}")
+            return False
         
         try:
-            response = requests.get(
-                f"{self.base_url}/sendMessage",
-                params={
+            url = f"{self.api_url}/sendPhoto"
+            
+            # Kiểm tra xem file ảnh có tồn tại không
+            if not os.path.exists(photo_path):
+                logger.error(f"File ảnh không tồn tại: {photo_path}")
+                return False
+            
+            with open(photo_path, 'rb') as photo:
+                files = {'photo': photo}
+                data = {
                     "chat_id": self.chat_id,
-                    "text": message,
+                    "caption": caption,
                     "parse_mode": parse_mode
                 }
-            )
+                
+                response = requests.post(url, data=data, files=files, timeout=30)
+                
+                if response.status_code == 200:
+                    logger.info(f"Đã gửi ảnh Telegram thành công: {photo_path}")
+                    return True
+                else:
+                    logger.error(f"Lỗi khi gửi ảnh Telegram: {response.status_code} - {response.text}")
+                    return False
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi ảnh Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
+    
+    def send_document(self, document_path: str, caption: str = "", parse_mode: str = "HTML") -> bool:
+        """
+        Gửi tài liệu qua Telegram
+        
+        Args:
+            document_path: Đường dẫn đến file tài liệu
+            caption: Chú thích cho tài liệu
+            parse_mode: Chế độ phân tích cú pháp (HTML, Markdown)
             
-            if response.status_code == 200:
-                return {
-                    "status": "success",
-                    "message": "Đã gửi tin nhắn thành công"
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info(f"Bỏ qua gửi tài liệu Telegram: {document_path}")
+            return False
+        
+        try:
+            url = f"{self.api_url}/sendDocument"
+            
+            # Kiểm tra xem file tài liệu có tồn tại không
+            if not os.path.exists(document_path):
+                logger.error(f"File tài liệu không tồn tại: {document_path}")
+                return False
+            
+            with open(document_path, 'rb') as document:
+                files = {'document': document}
+                data = {
+                    "chat_id": self.chat_id,
+                    "caption": caption,
+                    "parse_mode": parse_mode
                 }
+                
+                response = requests.post(url, data=data, files=files, timeout=30)
+                
+                if response.status_code == 200:
+                    logger.info(f"Đã gửi tài liệu Telegram thành công: {document_path}")
+                    return True
+                else:
+                    logger.error(f"Lỗi khi gửi tài liệu Telegram: {response.status_code} - {response.text}")
+                    return False
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi tài liệu Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
+    
+    def send_market_analysis(self, market_data: Dict) -> bool:
+        """
+        Gửi phân tích thị trường
+        
+        Args:
+            market_data: Dữ liệu phân tích thị trường
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info("Bỏ qua gửi phân tích thị trường Telegram")
+            return False
+        
+        try:
+            # Tạo tin nhắn phân tích thị trường
+            message = "<b>📊 PHÂN TÍCH THỊ TRƯỜNG</b>\n\n"
+            
+            # Thêm thông tin thị trường tổng thể
+            market_status = market_data.get('market_status', 'UNKNOWN')
+            status_emoji = "🟢" if market_status == 'BULLISH' else "🔴" if market_status == 'BEARISH' else "⚪"
+            
+            message += f"<b>Trạng thái thị trường:</b> {status_emoji} {market_status}\n"
+            message += f"<b>Giá BTC:</b> ${market_data.get('btc_price', 0):,.2f}\n"
+            message += f"<b>Thay đổi 24h:</b> {market_data.get('btc_price_change_24h', 0):+.2f}%\n\n"
+            
+            # Thêm top gainers/losers
+            if 'top_gainers' in market_data and market_data['top_gainers']:
+                message += "<b>Top tăng giá:</b>\n"
+                
+                for i, coin in enumerate(market_data['top_gainers'][:3], 1):
+                    symbol = coin.get('symbol', '').replace('USDT', '')
+                    price = coin.get('price', 0)
+                    change = coin.get('price_change_24h', 0)
+                    
+                    message += f"{i}. {symbol}: ${price:,.2f} ({change:+.2f}%)\n"
+                
+                message += "\n"
+            
+            if 'top_losers' in market_data and market_data['top_losers']:
+                message += "<b>Top giảm giá:</b>\n"
+                
+                for i, coin in enumerate(market_data['top_losers'][:3], 1):
+                    symbol = coin.get('symbol', '').replace('USDT', '')
+                    price = coin.get('price', 0)
+                    change = coin.get('price_change_24h', 0)
+                    
+                    message += f"{i}. {symbol}: ${price:,.2f} ({change:+.2f}%)\n"
+                
+                message += "\n"
+            
+            # Thêm phân tích BTC
+            if 'btc_analysis' in market_data:
+                btc_analysis = market_data['btc_analysis']
+                btc_signal = btc_analysis.get('overall_signal', 'NEUTRAL')
+                btc_confidence = btc_analysis.get('confidence', 0)
+                
+                message += "<b>Phân tích BTC:</b>\n"
+                
+                signal_emoji = "⚪"
+                if btc_signal in ['STRONG_BUY', 'BUY']:
+                    signal_emoji = "🟢"
+                elif btc_signal in ['STRONG_SELL', 'SELL']:
+                    signal_emoji = "🔴"
+                
+                message += f"- Tín hiệu: {signal_emoji} {btc_signal}\n"
+                message += f"- Độ tin cậy: {btc_confidence}%\n\n"
+            
+            # Thêm chế độ thị trường
+            if 'market_regime' in market_data:
+                regime = market_data['market_regime']
+                message += "<b>Chế độ thị trường:</b>\n"
+                
+                primary = regime.get('primary', 'RANGE_BOUND')
+                volatility = regime.get('volatility', 'NORMAL')
+                
+                message += f"- Primary: {primary}\n"
+                message += f"- Volatility: {volatility}\n\n"
+            
+            # Thêm thời gian
+            message += f"⏱ <i>Thời gian: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
+            
+            # Gửi tin nhắn
+            return self.send_message(message, parse_mode="HTML")
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi phân tích thị trường Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
+    
+    def send_signal_alert(self, signal_data: Dict) -> bool:
+        """
+        Gửi cảnh báo tín hiệu giao dịch
+        
+        Args:
+            signal_data: Dữ liệu tín hiệu giao dịch
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info("Bỏ qua gửi cảnh báo tín hiệu Telegram")
+            return False
+        
+        try:
+            # Lấy thông tin tín hiệu
+            symbol = signal_data.get('symbol', 'UNKNOWN')
+            signal = signal_data.get('signal', 'NEUTRAL')
+            confidence = signal_data.get('confidence', 0)
+            price = signal_data.get('price', 0)
+            description = signal_data.get('description', '')
+            
+            # Xác định emoji và tiêu đề
+            signal_emoji = "⚪"
+            title = "CẬP NHẬT THỊ TRƯỜNG"
+            
+            if signal in ['STRONG_BUY', 'BUY']:
+                signal_emoji = "🟢"
+                title = "TÍN HIỆU MUA"
+            elif signal in ['STRONG_SELL', 'SELL']:
+                signal_emoji = "🔴"
+                title = "TÍN HIỆU BÁN"
+            
+            # Tạo tin nhắn
+            message = f"<b>{signal_emoji} {title}: {symbol}</b>\n\n"
+            
+            # Symbol và giá
+            symbol_name = symbol.replace("USDT", "")
+            message += f"<b>{symbol_name}:</b> ${price:,.2f}\n"
+            message += f"<b>Tín hiệu:</b> {signal}\n"
+            message += f"<b>Độ tin cậy:</b> {confidence}%\n\n"
+            
+            # Thêm giá mục tiêu và stop loss
+            target_price = signal_data.get('target_price', 0)
+            stop_loss = signal_data.get('stop_loss', 0)
+            
+            if target_price > 0:
+                target_pct = (target_price - price) / price * 100
+                message += f"<b>Giá mục tiêu:</b> ${target_price:,.2f} ({target_pct:+.2f}%)\n"
+            
+            if stop_loss > 0:
+                sl_pct = (stop_loss - price) / price * 100
+                message += f"<b>Stop Loss:</b> ${stop_loss:,.2f} ({sl_pct:+.2f}%)\n\n"
+            
+            # Thêm mô tả
+            if description:
+                message += f"<b>Phân tích:</b>\n{description}\n\n"
+            
+            # Thêm thời gian
+            message += f"⏱ <i>Thời gian: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
+            
+            # Gửi tin nhắn
+            return self.send_message(message, parse_mode="HTML")
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi cảnh báo tín hiệu Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
+    
+    def send_trade_notification(self, trade_data: Dict) -> bool:
+        """
+        Gửi thông báo giao dịch
+        
+        Args:
+            trade_data: Dữ liệu giao dịch
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info("Bỏ qua gửi thông báo giao dịch Telegram")
+            return False
+        
+        try:
+            # Lấy thông tin giao dịch
+            symbol = trade_data.get('symbol', 'UNKNOWN')
+            side = trade_data.get('side', 'UNKNOWN')
+            entry_price = trade_data.get('entry_price', 0)
+            quantity = trade_data.get('quantity', 0)
+            take_profit = trade_data.get('take_profit', 0)
+            stop_loss = trade_data.get('stop_loss', 0)
+            reason = trade_data.get('reason', '')
+            
+            # Xác định emoji và tiêu đề
+            if side == 'BUY':
+                emoji = "🟢"
+                title = "MUA/LONG"
+            elif side == 'SELL':
+                emoji = "🔴"
+                title = "BÁN/SHORT"
             else:
-                error_msg = response.json().get('description', 'Lỗi không xác định')
-                logger.error(f"Lỗi khi gửi tin nhắn Telegram: {error_msg}")
-                return {
-                    "status": "error",
-                    "message": f"Lỗi khi gửi tin nhắn Telegram: {error_msg}"
-                }
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi tin nhắn Telegram: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi tin nhắn Telegram: {str(e)}"
-            }
-    
-    def notify_position_opened(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Thông báo mở vị thế mới
-        
-        :param position_data: Dữ liệu vị thế
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Lấy thông tin vị thế
-            symbol = position_data.get("symbol", "Unknown")
-            side = position_data.get("side", "Unknown")
-            entry_price = position_data.get("entry_price", 0)
-            amount = position_data.get("amount", 0)
-            leverage = position_data.get("leverage", 1)
-            stop_loss = position_data.get("stop_loss", 0)
-            take_profit = position_data.get("take_profit", 0)
+                emoji = "⚪"
+                title = "GIAO DỊCH"
             
-            # Định dạng tin nhắn
-            message = (
-                f"🚀 <b>ĐÃ MỞ VỊ THẾ MỚI</b>\n\n"
-                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
-                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
-                f"💰 <b>Giá vào lệnh:</b> {entry_price}\n"
-                f"📏 <b>Kích thước:</b> {amount} ({leverage}x)\n"
-                f"🛑 <b>Stop Loss:</b> {stop_loss}\n"
-                f"🎯 <b>Take Profit:</b> {take_profit}\n\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            # Tạo tin nhắn
+            message = f"<b>{emoji} {title}: {symbol}</b>\n\n"
             
-            # Gửi tin nhắn
-            return self.send_message(message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo mở vị thế: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo mở vị thế: {str(e)}"
-            }
-    
-    def notify_position_closed(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Thông báo đóng vị thế
-        
-        :param position_data: Dữ liệu vị thế
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Lấy thông tin vị thế
-            symbol = position_data.get("symbol", "Unknown")
-            side = position_data.get("side", "Unknown")
-            entry_price = position_data.get("entry_price", 0)
-            exit_price = position_data.get("exit_price", 0)
-            amount = position_data.get("amount", 0)
-            profit_loss = position_data.get("profit_loss", 0)
-            profit_percentage = position_data.get("profit_percentage", 0)
-            duration = position_data.get("duration", "Unknown")
-            close_reason = position_data.get("close_reason", "Manual")
+            # Symbol và giá
+            symbol_name = symbol.replace("USDT", "")
+            message += f"<b>{symbol_name}:</b> ${entry_price:,.2f}\n"
+            message += f"<b>Số lượng:</b> {quantity}\n"
             
-            # Xác định emoji dựa trên kết quả
-            result_emoji = "🟢" if profit_loss > 0 else "🔴"
+            # Thêm take profit và stop loss
+            if take_profit > 0:
+                tp_pct = (take_profit - entry_price) / entry_price * 100
+                tp_sign = "+" if side == 'BUY' else "-"
+                message += f"<b>Take Profit:</b> ${take_profit:,.2f} ({tp_sign}{abs(tp_pct):.2f}%)\n"
             
-            # Định dạng tin nhắn
-            message = (
-                f"{result_emoji} <b>ĐÃ ĐÓNG VỊ THẾ</b>\n\n"
-                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
-                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
-                f"💰 <b>Giá vào lệnh:</b> {entry_price}\n"
-                f"💰 <b>Giá ra lệnh:</b> {exit_price}\n"
-                f"📏 <b>Kích thước:</b> {amount}\n"
-                f"💵 <b>Lợi nhuận:</b> {profit_loss:.2f} USDT ({profit_percentage:.2f}%)\n"
-                f"⏱️ <b>Thời gian nắm giữ:</b> {duration}\n"
-                f"📝 <b>Lý do đóng:</b> {close_reason}\n\n"
-                f"🕒 <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            if stop_loss > 0:
+                sl_pct = (stop_loss - entry_price) / entry_price * 100
+                sl_sign = "-" if side == 'BUY' else "+"
+                message += f"<b>Stop Loss:</b> ${stop_loss:,.2f} ({sl_sign}{abs(sl_pct):.2f}%)\n"
+            
+            # Tính Risk/Reward
+            if take_profit > 0 and stop_loss > 0:
+                if side == 'BUY':
+                    risk = entry_price - stop_loss
+                    reward = take_profit - entry_price
+                else:
+                    risk = stop_loss - entry_price
+                    reward = entry_price - take_profit
+                
+                if risk > 0:
+                    rr_ratio = reward / risk
+                    message += f"<b>Risk/Reward:</b> 1:{rr_ratio:.2f}\n"
+            
+            message += "\n"
+            
+            # Thêm lý do
+            if reason:
+                message += f"<b>Lý do:</b>\n{reason}\n\n"
+            
+            # Thêm thời gian
+            message += f"⏱ <i>Thời gian: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
             
             # Gửi tin nhắn
-            return self.send_message(message)
-        
+            return self.send_message(message, parse_mode="HTML")
+            
         except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo đóng vị thế: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo đóng vị thế: {str(e)}"
-            }
+            logger.error(f"Lỗi khi gửi thông báo giao dịch Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
     
-    def notify_sl_tp_update(self, position_data: Dict[str, Any]) -> Dict[str, Any]:
+    def send_bot_status(self, status_data: Dict) -> bool:
         """
-        Thông báo cập nhật SL/TP
+        Gửi trạng thái của bot
         
-        :param position_data: Dữ liệu vị thế
-        :return: Kết quả gửi tin nhắn
+        Args:
+            status_data: Dữ liệu trạng thái
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
         """
+        if not self.enabled or not self.token or not self.chat_id:
+            logger.info("Bỏ qua gửi trạng thái bot Telegram")
+            return False
+        
         try:
-            # Lấy thông tin vị thế
-            symbol = position_data.get("symbol", "Unknown")
-            side = position_data.get("side", "Unknown")
-            current_price = position_data.get("current_price", 0)
-            old_sl = position_data.get("old_sl", 0)
-            old_tp = position_data.get("old_tp", 0)
-            new_sl = position_data.get("new_sl", 0)
-            new_tp = position_data.get("new_tp", 0)
+            # Lấy thông tin trạng thái
+            status = status_data.get('status', 'UNKNOWN')
+            uptime = status_data.get('uptime', 0)
+            active_positions = status_data.get('active_positions', 0)
+            account_balance = status_data.get('account_balance', 0)
+            pnl_24h = status_data.get('pnl_24h', 0)
             
-            # Định dạng tin nhắn
-            message = (
-                f"🔄 <b>CẬP NHẬT SL/TP</b>\n\n"
-                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
-                f"📈 <b>Hướng:</b> {'LONG 📈' if side.upper() == 'LONG' else 'SHORT 📉'}\n"
-                f"💰 <b>Giá hiện tại:</b> {current_price}\n"
-                f"🛑 <b>Stop Loss cũ:</b> {old_sl} ➡️ <b>Stop Loss mới:</b> {new_sl}\n"
-                f"🎯 <b>Take Profit cũ:</b> {old_tp} ➡️ <b>Take Profit mới:</b> {new_tp}\n\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-            
-            # Gửi tin nhắn
-            return self.send_message(message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo cập nhật SL/TP: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo cập nhật SL/TP: {str(e)}"
-            }
-    
-    def notify_trading_opportunity(self, opportunity_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Thông báo cơ hội giao dịch
-        
-        :param opportunity_data: Dữ liệu cơ hội giao dịch
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Lấy thông tin cơ hội
-            symbol = opportunity_data.get("symbol", "Unknown")
-            signal = opportunity_data.get("signal", "Unknown")
-            price = opportunity_data.get("price", 0)
-            strength = opportunity_data.get("strength", "Unknown")
-            timeframe = opportunity_data.get("timeframe", "Unknown")
-            indicators = opportunity_data.get("indicators", [])
-            reason = opportunity_data.get("reason", "Unknown")
-            
-            # Xác định emoji dựa trên tín hiệu
-            signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
-            
-            # Định dạng thông tin chỉ báo
-            indicators_str = ""
-            for indicator in indicators:
-                indicators_str += f"  • {indicator.get('name')}: {indicator.get('value')} - {indicator.get('signal')}\n"
-            
-            # Định dạng tin nhắn
-            message = (
-                f"🔍 <b>CƠ HỘI GIAO DỊCH MỚI</b> {signal_emoji}\n\n"
-                f"📊 <b>Cặp giao dịch:</b> {symbol}\n"
-                f"📈 <b>Tín hiệu:</b> {signal.upper()}\n"
-                f"💰 <b>Giá hiện tại:</b> {price}\n"
-                f"⏲️ <b>Khung thời gian:</b> {timeframe}\n"
-                f"💪 <b>Độ mạnh:</b> {strength}\n"
-                f"📝 <b>Lý do:</b> {reason}\n\n"
-                f"📊 <b>Chỉ báo:</b>\n{indicators_str}\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-            
-            # Gửi tin nhắn
-            return self.send_message(message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo cơ hội giao dịch: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo cơ hội giao dịch: {str(e)}"
-            }
-    
-    def send_bot_status(self, status: str, mode: str, uptime: str, stats: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Gửi trạng thái bot
-        
-        :param status: Trạng thái bot ("running", "stopped", "restarting")
-        :param mode: Chế độ bot ("testnet", "live")
-        :param uptime: Thời gian hoạt động
-        :param stats: Dữ liệu thống kê
-        :return: Kết quả gửi tin nhắn
-        """
-        
-        # Xử lý với API mới
-        try:
-            # Xác định emoji dựa trên trạng thái
-            if status.lower() == "running":
+            # Xác định emoji
+            if status == 'RUNNING':
                 emoji = "✅"
-                title = "BOT ĐANG CHẠY"
-            elif status.lower() == "stopped":
-                emoji = "⛔"
-                title = "BOT ĐÃ DỪNG"
-            elif status.lower() == "restarting":
-                emoji = "🔄"
-                title = "BOT ĐANG KHỞI ĐỘNG LẠI"
+            elif status == 'STOPPED':
+                emoji = "🛑"
+            elif status == 'WARNING':
+                emoji = "⚠️"
+            elif status == 'ERROR':
+                emoji = "🔴"
             else:
                 emoji = "ℹ️"
-                title = "TRẠNG THÁI BOT"
             
-            # Định dạng thống kê
-            stats_str = ""
-            for key, value in stats.items():
-                stats_str += f"• {key}: {value}\n"
+            # Tạo tin nhắn
+            message = f"<b>{emoji} BOT STATUS: {status}</b>\n\n"
             
-            # Định dạng chế độ
-            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
-            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
+            # Thêm thông tin
+            message += f"<b>Uptime:</b> {uptime}\n"
+            message += f"<b>Vị thế hoạt động:</b> {active_positions}\n"
+            message += f"<b>Số dư tài khoản:</b> ${account_balance:,.2f}\n"
             
-            # Định dạng tin nhắn
-            message = (
-                f"{emoji} <b>{title}</b>\n\n"
-                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
-                f"⏱️ <b>Uptime:</b> {uptime}\n\n"
-                f"📊 <b>Thống kê:</b>\n{stats_str}\n"
-                f"🕒 <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            if pnl_24h != 0:
+                pnl_emoji = "📈" if pnl_24h > 0 else "📉"
+                message += f"<b>P&L 24h:</b> {pnl_emoji} ${pnl_24h:+,.2f}\n\n"
+            
+            # Thêm thông tin bổ sung
+            if 'additional_info' in status_data:
+                message += "<b>Thông tin bổ sung:</b>\n"
+                
+                for key, value in status_data['additional_info'].items():
+                    message += f"- {key}: {value}\n"
+                
+                message += "\n"
+            
+            # Thêm thời gian
+            message += f"⏱ <i>Thời gian: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
             
             # Gửi tin nhắn
-            return self.send_message(message)
-        
+            return self.send_message(message, parse_mode="HTML")
+            
         except Exception as e:
-            logger.error(f"Lỗi khi gửi trạng thái bot: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi trạng thái bot: {str(e)}"
-            }
+            logger.error(f"Lỗi khi gửi trạng thái bot Telegram: {e}")
+            logger.debug(traceback.format_exc())
+            return False
     
-    def notify_bot_status(self, status: str, details: Optional[str] = None) -> Dict[str, Any]:
+    def send_startup_notification(self) -> bool:
         """
-        Thông báo trạng thái bot
+        Gửi thông báo khởi động hệ thống
         
-        :param status: Trạng thái bot ("started", "stopped", "error")
-        :param details: Chi tiết bổ sung
-        :return: Kết quả gửi tin nhắn
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
         """
+        message = "<b>🚀 HỆ THỐNG ĐÃ KHỞI ĐỘNG</b>\n\n"
+        message += f"<b>Phiên bản:</b> 1.0.0\n"
+        message += f"<b>Thời gian khởi động:</b> {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}\n"
+        
+        # Lấy thông tin tài khoản nếu có thể
         try:
-            # Xác định emoji và tiêu đề dựa trên trạng thái
-            if status.lower() == "started":
-                emoji = "✅"
-                title = "BOT ĐÃ KHỞI ĐỘNG"
-            elif status.lower() == "stopped":
-                emoji = "⛔"
-                title = "BOT ĐÃ DỪNG"
-            elif status.lower() == "error":
-                emoji = "❗"
-                title = "LỖI BOT"
-            else:
-                emoji = "ℹ️"
-                title = "TRẠNG THÁI BOT"
+            from enhanced_binance_api import get_account_balance
+            balance = get_account_balance(testnet=True)
             
-            # Định dạng tin nhắn
-            message = (
-                f"{emoji} <b>{title}</b>\n\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-            
-            # Thêm chi tiết nếu có
-            if details:
-                message += f"\n\n📝 <b>Chi tiết:</b> {details}"
-            
-            # Gửi tin nhắn
-            return self.send_message(message)
+            if balance:
+                message += "\n<b>Số dư tài khoản:</b>\n"
+                
+                for symbol, amount in balance.items():
+                    if amount > 0:
+                        message += f"- {symbol}: {amount:,.2f}\n"
+        except Exception:
+            pass
         
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo trạng thái bot: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo trạng thái bot: {str(e)}"
-            }
-    
-    def notify_error(self, error_type: str, message: str, details: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Thông báo lỗi
-        
-        :param error_type: Loại lỗi
-        :param message: Thông báo lỗi
-        :param details: Chi tiết bổ sung
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Định dạng tin nhắn
-            error_message = (
-                f"❌ <b>LỖI: {error_type}</b>\n\n"
-                f"📝 <b>Thông báo:</b> {message}\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-            
-            # Thêm chi tiết nếu có
-            if details:
-                error_message += f"\n\n📋 <b>Chi tiết:</b>\n<pre>{details}</pre>"
-            
-            # Gửi tin nhắn
-            return self.send_message(error_message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo lỗi: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo lỗi: {str(e)}"
-            }
-    
-    def notify_system_update(self, version: str, changes: List[str]) -> Dict[str, Any]:
-        """
-        Thông báo cập nhật hệ thống
-        
-        :param version: Phiên bản mới
-        :param changes: Danh sách thay đổi
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Định dạng danh sách thay đổi
-            changes_str = ""
-            for i, change in enumerate(changes, 1):
-                changes_str += f"  {i}. {change}\n"
-            
-            # Định dạng tin nhắn
-            message = (
-                f"🆕 <b>CẬP NHẬT HỆ THỐNG</b>\n\n"
-                f"📦 <b>Phiên bản mới:</b> {version}\n\n"
-                f"📋 <b>Thay đổi:</b>\n{changes_str}\n"
-                f"⏱️ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-            
-            # Gửi tin nhắn
-            return self.send_message(message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}"
-            }
-    
-    def send_startup_notification(self, account_balance: float, positions: List[Dict[str, Any]],
-                            unrealized_pnl: float, market_data: Dict[str, Any], mode: str) -> Dict[str, Any]:
-        """
-        Gửi thông báo khởi động hệ thống với phân tích đa coin 
-        
-        :param account_balance: Số dư tài khoản
-        :param positions: Danh sách vị thế
-        :param unrealized_pnl: PnL chưa thực hiện
-        :param market_data: Dữ liệu thị trường
-        :param mode: Chế độ API (testnet/live)
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Định dạng chế độ API
-            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
-            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
-            
-            # Lấy giá BTC và các coin khác từ market_data
-            btc_price = market_data.get('btc_price', 0)
-            eth_price = market_data.get('eth_price', 0)
-            btc_change = market_data.get('btc_change_24h', 0)
-            eth_change = market_data.get('eth_change_24h', 0)
-            
-            # Lấy xu hướng thị trường
-            market_trends = market_data.get('market_trends', {})
-            
-            # Lấy khuyến nghị từ bot (nếu có)
-            recommendations = market_data.get('recommendations', [])
-            
-            # Định dạng danh sách vị thế
-            positions_str = ""
-            active_position_count = 0
-            
-            if positions:
-                for i, pos in enumerate(positions, 1):
-                    symbol = pos.get('symbol', 'Unknown')
-                    position_type = pos.get('type', 'Unknown')
-                    size = pos.get('size', 0)
-                    entry_price = pos.get('entry_price', 0)
-                    pnl = pos.get('pnl', 0)
-                    pnl_percent = pos.get('pnl_percent', 0)
-                    
-                    active_position_count += 1
-                    
-                    # Xác định emoji dựa trên loại vị thế và PnL
-                    type_emoji = "📈" if position_type.upper() == "LONG" else "📉"
-                    result_emoji = "🟢" if pnl > 0 else "🔴"
-                    
-                    positions_str += f"  {result_emoji} {type_emoji} <b>{symbol}</b>: {size} @ {entry_price} ({pnl_percent:.2f}%)\n"
-            else:
-                positions_str = "  Không có vị thế đang mở.\n"
-            
-            # Phân tích thị trường và tạo khuyến nghị
-            market_analysis = self._analyze_market(market_data)
-            
-            # Tạo thông báo khởi động
-            message = (
-                f"🚀 <b>HỆ THỐNG GIAO DỊCH ĐÃ KHỞI ĐỘNG</b>\n\n"
-                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
-                f"⏰ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-                f"🏦 <b>THÔNG TIN TÀI KHOẢN</b>\n"
-                f"💰 <b>Số dư:</b> {account_balance:.2f} USDT\n"
-                f"💵 <b>PnL chưa thực hiện:</b> {unrealized_pnl:.2f} USDT\n"
-                f"📋 <b>Vị thế đang mở:</b> {active_position_count}\n"
-            )
-            
-            if positions_str:
-                message += f"\n📊 <b>CHI TIẾT VỊ THẾ</b>\n{positions_str}\n"
-                
-            # Thêm thông tin thị trường với nhiều coin hơn
-            message += f"\n📈 <b>TỔNG QUAN THỊ TRƯỜNG</b>\n"
-            
-            # Thêm BTC và ETH (chính)
-            message += f"  • BTC: ${btc_price:.2f} ({btc_change:+.2f}%)\n"
-            message += f"  • ETH: ${eth_price:.2f} ({eth_change:+.2f}%)\n"
-            
-            # Thêm các altcoin phổ biến khác nếu có dữ liệu
-            bnb_price = market_data.get('bnb_price', 0)
-            bnb_change = market_data.get('bnb_change_24h', 0)
-            if bnb_price > 0:
-                message += f"  • BNB: ${bnb_price:.2f} ({bnb_change:+.2f}%)\n"
-                
-            sol_price = market_data.get('sol_price', 0)
-            sol_change = market_data.get('sol_change_24h', 0)
-            if sol_price > 0:
-                message += f"  • SOL: ${sol_price:.2f} ({sol_change:+.2f}%)\n"
-                
-            doge_price = market_data.get('doge_price', 0)
-            doge_change = market_data.get('doge_change_24h', 0)
-            if doge_price > 0:
-                message += f"  • DOGE: ${doge_price:.4f} ({doge_change:+.2f}%)\n"
-                
-            link_price = market_data.get('link_price', 0)
-            link_change = market_data.get('link_change_24h', 0)
-            if link_price > 0:
-                message += f"  • LINK: ${link_price:.2f} ({link_change:+.2f}%)\n"
-            
-            # Thêm phân tích thị trường
-            if market_analysis:
-                message += f"\n🔍 <b>PHÂN TÍCH THỊ TRƯỜNG</b>\n{market_analysis}\n"
-            
-            # Thêm top 5 coin biến động mạnh nhất
-            if market_trends:
-                volatile_coins = sorted(market_trends.items(), key=lambda x: abs(x[1]), reverse=True)[:5]
-                if volatile_coins:
-                    message += f"\n📊 <b>TOP COIN BIẾN ĐỘNG MẠNH (24H)</b>\n"
-                    for symbol, change in volatile_coins:
-                        trend_emoji = "📈" if change > 0 else "📉"
-                        message += f"  • {symbol}: {trend_emoji} {change:+.2f}%\n"
-            
-            # Thêm khuyến nghị nếu có
-            if recommendations:
-                message += f"\n💡 <b>KHUYẾN NGHỊ GIAO DỊCH</b>\n"
-                for rec in recommendations[:3]:  # Chỉ lấy top 3 khuyến nghị
-                    symbol = rec.get('symbol', 'Unknown')
-                    signal = rec.get('signal', 'Unknown')
-                    signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
-                    strength = rec.get('strength', 'Unknown')
-                    timeframe = rec.get('timeframe', 'Unknown')
-                    message += f"  • {signal_emoji} <b>{symbol}:</b> {signal.upper()} (Độ mạnh: {strength}, TF: {timeframe})\n"
-            
-            # Gửi tin nhắn với bypass_duplicate=True để đảm bảo luôn gửi khi khởi động
-            return self.send_message(message, notification_type='startup_notification', bypass_duplicate=True)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}"
-            }
-            
-    def _analyze_market(self, market_data: Dict[str, Any]) -> str:
-        """
-        Phân tích thị trường dựa trên dữ liệu
-        
-        :param market_data: Dữ liệu thị trường
-        :return: Phân tích thị trường dạng văn bản
-        """
-        try:
-            # Lấy dữ liệu thị trường
-            btc_change = market_data.get('btc_change_24h', 0)
-            eth_change = market_data.get('eth_change_24h', 0)
-            bnb_change = market_data.get('bnb_change_24h', 0)
-            sol_change = market_data.get('sol_change_24h', 0)
-            fear_greed = market_data.get('sentiment', {}).get('value', 50)
-            sentiment = market_data.get('sentiment', {}).get('text', 'Trung tính')
-            market_trends = market_data.get('market_trends', {})
-            
-            # Xác định trạng thái thị trường dựa trên BTC
-            market_state = "Trung tính"
-            state_emoji = "⚖️"
-            
-            if btc_change > 3:
-                market_state = "Tăng mạnh"
-                state_emoji = "🚀"
-            elif btc_change > 1:
-                market_state = "Tăng nhẹ"
-                state_emoji = "📈"
-            elif btc_change < -3:
-                market_state = "Giảm mạnh"
-                state_emoji = "📉"
-            elif btc_change < -1:
-                market_state = "Giảm nhẹ" 
-                state_emoji = "⬇️"
-                
-            # Xác định xu hướng chung của thị trường
-            positive_coins = sum(1 for change in market_trends.values() if change > 0)
-            total_coins = len(market_trends) if market_trends else 1
-            positive_ratio = positive_coins / total_coins if total_coins > 0 else 0.5
-            
-            trend_description = ""
-            if positive_ratio > 0.7:
-                trend_description = "Thị trường đang tăng mạnh. Hầu hết các coin đều trong xu hướng tăng."
-            elif positive_ratio > 0.5:
-                trend_description = "Thị trường đang tăng nhẹ. Đa số các coin đang có xu hướng tích cực."
-            elif positive_ratio < 0.3:
-                trend_description = "Thị trường đang giảm mạnh. Hầu hết các coin đều trong xu hướng giảm."
-            elif positive_ratio < 0.5:
-                trend_description = "Thị trường đang giảm nhẹ. Đa số các coin đang có xu hướng tiêu cực."
-            else:
-                trend_description = "Thị trường đang đi ngang. Các coin không có xu hướng rõ ràng."
-                
-            # Phân tích đa coin 
-            coin_analysis = []
-            
-            # Phân tích BTC
-            if abs(btc_change) > 5:
-                direction = "tăng" if btc_change > 0 else "giảm"
-                coin_analysis.append(f"<b>BTC</b> đang {direction} mạnh {abs(btc_change):.2f}% trong 24h qua")
-            elif abs(btc_change) > 2:
-                direction = "tăng" if btc_change > 0 else "giảm"
-                coin_analysis.append(f"<b>BTC</b> đang {direction} nhẹ {abs(btc_change):.2f}% trong 24h qua")
-                
-            # Phân tích ETH
-            if abs(eth_change) > 5:
-                direction = "tăng" if eth_change > 0 else "giảm"
-                coin_analysis.append(f"<b>ETH</b> đang {direction} mạnh {abs(eth_change):.2f}% trong 24h qua")
-            elif abs(eth_change) > 2:
-                direction = "tăng" if eth_change > 0 else "giảm"
-                coin_analysis.append(f"<b>ETH</b> đang {direction} nhẹ {abs(eth_change):.2f}% trong 24h qua")
-                
-            # Phân tích BNB
-            if bnb_change != 0 and abs(bnb_change) > 5:
-                direction = "tăng" if bnb_change > 0 else "giảm"
-                coin_analysis.append(f"<b>BNB</b> đang {direction} mạnh {abs(bnb_change):.2f}% trong 24h qua")
-            elif bnb_change != 0 and abs(bnb_change) > 2:
-                direction = "tăng" if bnb_change > 0 else "giảm"
-                coin_analysis.append(f"<b>BNB</b> đang {direction} nhẹ {abs(bnb_change):.2f}% trong 24h qua")
-                
-            # Phân tích SOL
-            if sol_change != 0 and abs(sol_change) > 5:
-                direction = "tăng" if sol_change > 0 else "giảm"
-                coin_analysis.append(f"<b>SOL</b> đang {direction} mạnh {abs(sol_change):.2f}% trong 24h qua")
-            elif sol_change != 0 and abs(sol_change) > 2:
-                direction = "tăng" if sol_change > 0 else "giảm"
-                coin_analysis.append(f"<b>SOL</b> đang {direction} nhẹ {abs(sol_change):.2f}% trong 24h qua")
-                
-            # Tổng hợp phân tích
-            analysis = (
-                f"  {state_emoji} <b>Trạng thái:</b> {market_state}\n"
-                f"  😮 <b>Chỉ số sợ hãi/tham lam:</b> {fear_greed} - {sentiment}\n"
-            )
-            
-            if trend_description:
-                analysis += f"  📋 <b>Nhận định:</b> {trend_description}\n"
-                
-            # Thêm phân tích từng coin
-            if coin_analysis:
-                analysis += f"\n  🔎 <b>Phân tích đa coin:</b>\n"
-                for insight in coin_analysis:
-                    analysis += f"  • {insight}\n"
-                
-            return analysis
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi phân tích thị trường: {str(e)}", exc_info=True)
-            return ""
-            
-    def send_system_status(self, account_balance: float, positions: List[Dict[str, Any]], 
-                      unrealized_pnl: float, market_data: Dict[str, Any], mode: str) -> Dict[str, Any]:
-        """
-        Gửi trạng thái hệ thống
-        
-        :param account_balance: Số dư tài khoản
-        :param positions: Danh sách vị thế
-        :param unrealized_pnl: PnL chưa thực hiện
-        :param market_data: Dữ liệu thị trường
-        :param mode: Chế độ API (testnet/live)
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Kiểm tra thời gian kể từ thông báo trạng thái cuối cùng
-            current_time = time.time()
-            last_status_time = self.last_notification_time.get('system_status', 0)
-            
-            # Nếu chưa đến thời gian để gửi lại thông báo mới (5 phút)
-            if current_time - last_status_time < self.message_cooldown:
-                logger.info(f"Bỏ qua thông báo trạng thái hệ thống (đã gửi trong vòng {self.message_cooldown}s)")
-                return {
-                    "status": "skipped",
-                    "message": "Bỏ qua thông báo trạng thái hệ thống (quá sớm)"
-                }
-                
-            # Định dạng chế độ API
-            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
-            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
-            
-            # Lấy giá BTC và các coin khác từ market_data
-            btc_price = market_data.get('btc_price', 0)
-            market_trends = market_data.get('market_trends', {})
-            market_volumes = market_data.get('market_volumes', {})
-            
-            # Định dạng danh sách vị thế
-            positions_str = ""
-            total_profit = 0
-            active_position_count = 0
-            
-            if positions:
-                for i, pos in enumerate(positions, 1):
-                    symbol = pos.get('symbol', 'Unknown')
-                    position_type = pos.get('type', 'Unknown')
-                    size = pos.get('size', 0)
-                    entry_price = pos.get('entry_price', 0)
-                    current_price = pos.get('current_price', 0)
-                    pnl = pos.get('pnl', 0)
-                    pnl_percent = pos.get('pnl_percent', 0)
-                    stop_loss = pos.get('stop_loss', 0)
-                    take_profit = pos.get('take_profit', 0)
-                    
-                    active_position_count += 1
-                    
-                    # Xác định emoji dựa trên loại vị thế và PnL
-                    type_emoji = "📈" if position_type.upper() == "LONG" else "📉"
-                    pnl_emoji = "🟢" if pnl > 0 else "🔴"
-                    
-                    positions_str += (
-                        f"  {i}. {type_emoji} <b>{symbol}</b>: "
-                        f"{size} @ {entry_price}\n"
-                        f"     {pnl_emoji} PnL: {pnl:.2f} USDT ({pnl_percent:.2f}%)\n"
-                        f"     🛑 SL: {stop_loss} | 🎯 TP: {take_profit}\n"
-                    )
-                    
-                    total_profit += pnl
-            else:
-                positions_str = "  Không có vị thế đang mở\n"
-            
-            # Lấy thông tin xu hướng thị trường
-            market_trend_str = ""
-            if market_trends:
-                for symbol, change in market_trends.items():
-                    if isinstance(change, (int, float)):
-                        trend_emoji = "🟢" if change > 0 else "🔴"
-                        market_trend_str += f"  • {symbol}: {trend_emoji} {change:.2f}%\n"
-            
-            # Định dạng tin nhắn
-            message = (
-                f"🖥️ <b>TRẠNG THÁI HỆ THỐNG</b>\n\n"
-                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
-                f"💰 <b>Số dư tài khoản:</b> {account_balance:.2f} USDT\n"
-                f"📊 <b>BTC/USDT:</b> ${btc_price:.2f}\n"
-                f"💵 <b>PnL chưa thực hiện:</b> {unrealized_pnl:.2f} USDT\n\n"
-            )
-            
-            # Thêm thông tin vị thế
-            message += f"📋 <b>Vị thế đang mở ({active_position_count}):</b>\n{positions_str}\n"
-            
-            # Thêm thông tin xu hướng thị trường nếu có
-            if market_trend_str:
-                message += f"📈 <b>Xu hướng thị trường (24h):</b>\n{market_trend_str}\n"
-            
-            # Thêm khuyến nghị nếu có từ bot
-            if market_data.get('recommendations'):
-                rec_str = ""
-                for rec in market_data.get('recommendations', []):
-                    symbol = rec.get('symbol', 'Unknown')
-                    signal = rec.get('signal', 'Unknown')
-                    signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
-                    strength = rec.get('strength', 'Unknown')
-                    rec_str += f"  • {signal_emoji} {symbol}: {signal.upper()} (Độ mạnh: {strength})\n"
-                
-                if rec_str:
-                    message += f"🔍 <b>Khuyến nghị giao dịch:</b>\n{rec_str}\n"
-            
-            # Thêm thời gian cập nhật
-            message += f"⏱️ <b>Cập nhật lúc:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            
-            # Cập nhật thời gian thông báo cuối cùng
-            self.last_notification_time['system_status'] = current_time
-            
-            # Gửi tin nhắn
-            return self.send_message(message, notification_type='system_status')
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi trạng thái hệ thống: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi trạng thái hệ thống: {str(e)}"
-            }
-            
-    def notify_daily_summary(self, summary_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Gửi báo cáo tổng kết hàng ngày
-        
-        :param summary_data: Dữ liệu tổng kết
-        :return: Kết quả gửi tin nhắn
-        """
-        try:
-            # Lấy thông tin tổng kết
-            date = summary_data.get("date", datetime.datetime.now().strftime("%Y-%m-%d"))
-            total_trades = summary_data.get("total_trades", 0)
-            win_trades = summary_data.get("win_trades", 0)
-            loss_trades = summary_data.get("loss_trades", 0)
-            win_rate = summary_data.get("win_rate", 0)
-            total_profit_loss = summary_data.get("total_profit_loss", 0)
-            best_trade = summary_data.get("best_trade", {})
-            worst_trade = summary_data.get("worst_trade", {})
-            
-            # Định dạng tin nhắn
-            message = (
-                f"📊 <b>TỔNG KẾT GIAO DỊCH NGÀY {date}</b>\n\n"
-                f"🔢 <b>Tổng số giao dịch:</b> {total_trades}\n"
-                f"✅ <b>Thắng:</b> {win_trades}\n"
-                f"❌ <b>Thua:</b> {loss_trades}\n"
-                f"📈 <b>Tỷ lệ thắng:</b> {win_rate:.2f}%\n"
-                f"💰 <b>Tổng lợi nhuận:</b> {total_profit_loss:.2f} USDT\n\n"
-            )
-            
-            # Thêm thông tin về giao dịch tốt nhất
-            if best_trade:
-                message += (
-                    f"🏆 <b>Giao dịch tốt nhất:</b>\n"
-                    f"  • Cặp giao dịch: {best_trade.get('symbol', 'N/A')}\n"
-                    f"  • Hướng: {best_trade.get('side', 'N/A')}\n"
-                    f"  • Lợi nhuận: {best_trade.get('profit', 0):.2f} USDT ({best_trade.get('profit_percentage', 0):.2f}%)\n\n"
-                )
-            
-            # Thêm thông tin về giao dịch tệ nhất
-            if worst_trade:
-                message += (
-                    f"📉 <b>Giao dịch tệ nhất:</b>\n"
-                    f"  • Cặp giao dịch: {worst_trade.get('symbol', 'N/A')}\n"
-                    f"  • Hướng: {worst_trade.get('side', 'N/A')}\n"
-                    f"  • Lỗ: {worst_trade.get('loss', 0):.2f} USDT ({worst_trade.get('loss_percentage', 0):.2f}%)\n\n"
-                )
-            
-            # Gửi tin nhắn
-            return self.send_message(message)
-        
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi báo cáo tổng kết hàng ngày: {str(e)}", exc_info=True)
-            return {
-                "status": "error",
-                "message": f"Lỗi khi gửi báo cáo tổng kết hàng ngày: {str(e)}"
-            }
-            
-# Singleton instance
-_instance = None
+        return self.send_notification("info", message)
 
-def get_notifier() -> TelegramNotifier:
-    """
-    Lấy instance của TelegramNotifier
+# Test nếu chạy trực tiếp
+if __name__ == "__main__":
+    # Thiết lập logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
-    :return: TelegramNotifier instance
-    """
-    global _instance
-    if _instance is None:
-        _instance = TelegramNotifier()
-    return _instance
+    # Kiểm tra và test thông báo
+    notifier = TelegramNotifier()
+    
+    if notifier.enabled:
+        print("Telegram Notifier đã được kích hoạt")
+        
+        # Gửi thông báo thử nghiệm
+        notifier.send_notification("info", "Đây là thông báo thử nghiệm từ <b>Telegram Notifier</b>")
+        
+        # Gửi thông báo khởi động
+        notifier.send_startup_notification()
+    else:
+        print("Telegram Notifier không được kích hoạt")
+        print("Hãy cung cấp TELEGRAM_BOT_TOKEN và TELEGRAM_CHAT_ID trong biến môi trường hoặc file cấu hình")

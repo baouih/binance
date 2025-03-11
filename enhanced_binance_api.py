@@ -2,449 +2,695 @@
 # -*- coding: utf-8 -*-
 
 """
-Module API Binance tăng cường
-
-Module này cải thiện kết nối với Binance bằng cách:
-1. Tự động chuyển đổi giữa API Testnet và API chính khi cần lấy dữ liệu lịch sử
-2. Hỗ trợ tự động thử lại khi API không phản hồi hoặc bị lỗi
-3. Ghi log chi tiết về quá trình lấy dữ liệu
+Enhanced Binance API
+------------------
+Module cung cấp lớp truy cập đến Binance API với các tính năng mở rộng,
+hỗ trợ cho cả Spot và Futures, đồng thời tương thích với testnet.
 """
 
 import os
-import sys
 import json
 import time
 import logging
+import hashlib
+import hmac
+import urllib.parse
 import requests
-from typing import Dict, List, Any, Optional, Union, Tuple
+from typing import Dict, List, Union, Optional, Any
 from datetime import datetime, timedelta
 
+# Thử import Binance Client
+try:
+    from binance.client import Client
+    from binance.exceptions import BinanceAPIException, BinanceRequestException
+    BINANCE_PYTHON_IMPORTED = True
+except ImportError:
+    BINANCE_PYTHON_IMPORTED = False
+
 # Thiết lập logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("enhanced_binance_api.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
 logger = logging.getLogger("enhanced_binance_api")
 
-# Import module Binance API gốc
-try:
-    from binance_api import BinanceAPI
-except ImportError as e:
-    logger.error(f"Lỗi import module: {e}")
-    logger.error("Đảm bảo đang chạy từ thư mục gốc của dự án")
-    sys.exit(1)
-
 class EnhancedBinanceAPI:
-    """Lớp API Binance tăng cường với khả năng tự động điều chỉnh giữa Testnet và API chính"""
+    """
+    Lớp cung cấp các chức năng để tương tác với Binance API
+    Hỗ trợ cả Spot và Futures với khả năng sử dụng testnet
+    """
     
-    # Các URL cơ sở
-    TESTNET_FUTURES_BASE_URL = "https://testnet.binancefuture.com"
-    MAINNET_FUTURES_BASE_URL = "https://fapi.binance.com"
-    
-    # Các URL cơ sở của thị trường spot
-    TESTNET_SPOT_BASE_URL = "https://testnet.binance.vision"
-    MAINNET_SPOT_BASE_URL = "https://api.binance.com"
-    
-    def __init__(self, config_path: str = 'account_config.json', 
-                 testnet: bool = True, 
-                 auto_fallback: bool = True):
+    def __init__(self, api_key: str = None, api_secret: str = None, testnet: bool = False):
         """
-        Khởi tạo enhanced Binance API
+        Khởi tạo Binance API client
         
         Args:
-            config_path (str): Đường dẫn tới file cấu hình
-            testnet (bool): Có sử dụng Testnet không
-            auto_fallback (bool): Tự động chuyển sang API chính khi API Testnet thất bại
+            api_key: API key (nếu None, sẽ lấy từ biến môi trường BINANCE_API_KEY hoặc BINANCE_TESTNET_API_KEY)
+            api_secret: API secret (nếu None, sẽ lấy từ biến môi trường BINANCE_API_SECRET hoặc BINANCE_TESTNET_API_SECRET)
+            testnet: True nếu sử dụng testnet, False nếu sử dụng mainnet
         """
-        self.config_path = config_path
         self.testnet = testnet
-        self.auto_fallback = auto_fallback
+        self.client = None
+        self.spot_client = None
+        self.futures_client = None
         
-        # Tải cấu hình
-        self.config = self._load_config()
+        # Các URL base cho các API
+        self.spot_api_url = "https://api.binance.com"
+        self.futures_api_url = "https://fapi.binance.com"
+        self.spot_testnet_url = "https://testnet.binance.vision"
+        self.futures_testnet_url = "https://testnet.binancefuture.com"
         
-        # Khởi tạo Binance API gốc
-        self.binance_api = BinanceAPI()
+        # Tải các API key và secret
+        api_key, api_secret = self._load_api_credentials(api_key, api_secret)
         
-        # Thiết lập API key từ file cấu hình
-        self.api_key = self.config.get('api_key', '')
-        self.api_secret = self.config.get('api_secret', '')
-        
-        # Đường dẫn URL
-        self._set_base_urls()
-        
-        # Lượt thử API và số lần thử lại
-        self.retry_count = 3
-        self.retry_delay_seconds = 2
-        
-        logger.info(f"Đã khởi tạo Enhanced Binance API (testnet={testnet}, auto_fallback={auto_fallback})")
+        # Khởi tạo client
+        self._init_client(api_key, api_secret)
     
-    def _load_config(self) -> Dict:
+    def _load_api_credentials(self, api_key: Optional[str], api_secret: Optional[str]) -> tuple:
         """
-        Tải cấu hình từ file
-        
-        Returns:
-            Dict: Cấu hình đã tải
-        """
-        try:
-            with open(self.config_path, 'r') as f:
-                config = json.load(f)
-            logger.info(f"Đã tải cấu hình từ {self.config_path}")
-            return config
-        except Exception as e:
-            logger.error(f"Lỗi khi tải cấu hình: {e}")
-            # Cấu hình mặc định
-            return {
-                "api_key": "",
-                "api_secret": "",
-                "api_mode": "testnet"
-            }
-    
-    def _set_base_urls(self) -> None:
-        """Thiết lập các URL cơ sở dựa trên chế độ testnet"""
-        if self.testnet:
-            self.futures_base_url = self.TESTNET_FUTURES_BASE_URL
-            self.spot_base_url = self.TESTNET_SPOT_BASE_URL
-            logger.info("Sử dụng URLs Binance Testnet")
-        else:
-            self.futures_base_url = self.MAINNET_FUTURES_BASE_URL
-            self.spot_base_url = self.MAINNET_SPOT_BASE_URL
-            logger.info("Sử dụng URLs Binance Mainnet")
-    
-    def _make_request(self, 
-                     method: str, 
-                     endpoint: str, 
-                     params: Dict = None, 
-                     data: Dict = None, 
-                     headers: Dict = None,
-                     use_mainnet: bool = False) -> Dict:
-        """
-        Thực hiện yêu cầu HTTP tới API Binance
+        Tải API key và secret từ biến môi trường hoặc file config
         
         Args:
-            method (str): Phương thức HTTP (GET, POST, DELETE)
-            endpoint (str): Endpoint API
-            params (Dict, optional): Tham số query string
-            data (Dict, optional): Dữ liệu gửi trong body
-            headers (Dict, optional): Headers
-            use_mainnet (bool): Sử dụng API chính thay vì API testnet
+            api_key: API key từ tham số
+            api_secret: API secret từ tham số
             
         Returns:
-            Dict: Dữ liệu từ API
+            tuple: (api_key, api_secret)
         """
-        # Xác định base URL
-        base_url = self.MAINNET_FUTURES_BASE_URL if use_mainnet else self.futures_base_url
+        # Nếu đã cung cấp key và secret từ tham số, sử dụng chúng
+        if api_key and api_secret:
+            return api_key, api_secret
         
-        # Tạo URL đầy đủ
-        url = f"{base_url}{endpoint}"
+        # Thử đọc từ biến môi trường
+        if self.testnet:
+            env_api_key = os.environ.get('BINANCE_TESTNET_API_KEY')
+            env_api_secret = os.environ.get('BINANCE_TESTNET_API_SECRET')
+        else:
+            env_api_key = os.environ.get('BINANCE_API_KEY')
+            env_api_secret = os.environ.get('BINANCE_API_SECRET')
         
-        # Headers mặc định
-        if not headers:
-            headers = {}
+        if env_api_key and env_api_secret:
+            logger.info("Đã tìm thấy API key và secret trong biến môi trường")
+            return env_api_key, env_api_secret
         
-        # Thêm API key vào header nếu có
-        if self.api_key:
-            headers['X-MBX-APIKEY'] = self.api_key
+        # Thử đọc từ file account_config.json
+        config_files = ['account_config.json', 'config.json', 'configs/account_config.json']
         
-        # Số lần thử lại
-        retries = 0
-        last_error = None
-        
-        while retries < self.retry_count:
-            try:
-                if method == 'GET':
-                    response = requests.get(url, params=params, headers=headers)
-                elif method == 'POST':
-                    response = requests.post(url, params=params, data=data, headers=headers)
-                elif method == 'DELETE':
-                    response = requests.delete(url, params=params, headers=headers)
-                else:
-                    logger.error(f"Phương thức không được hỗ trợ: {method}")
-                    return {'error': f"Phương thức không được hỗ trợ: {method}"}
+        for config_file in config_files:
+            if os.path.exists(config_file):
+                try:
+                    with open(config_file, 'r') as f:
+                        config = json.load(f)
+                    
+                    if self.testnet:
+                        config_api_key = config.get('binance_testnet_api_key') or config.get('testnet_api_key')
+                        config_api_secret = config.get('binance_testnet_api_secret') or config.get('testnet_api_secret')
+                    else:
+                        config_api_key = config.get('binance_api_key') or config.get('api_key')
+                        config_api_secret = config.get('binance_api_secret') or config.get('api_secret')
+                    
+                    if config_api_key and config_api_secret:
+                        logger.info(f"Đã tìm thấy API key và secret trong file {config_file}")
+                        return config_api_key, config_api_secret
                 
-                # Kiểm tra mã trạng thái HTTP
+                except Exception as e:
+                    logger.warning(f"Lỗi khi đọc file {config_file}: {e}")
+        
+        # Nếu không tìm thấy, trả về None và sử dụng API public
+        logger.warning("Không tìm thấy API key và secret. Sử dụng API public.")
+        return None, None
+    
+    def _init_client(self, api_key: Optional[str], api_secret: Optional[str]):
+        """
+        Khởi tạo client
+        
+        Args:
+            api_key: API key
+            api_secret: API secret
+        """
+        try:
+            # Sử dụng python-binance nếu đã import thành công
+            if BINANCE_PYTHON_IMPORTED:
+                if self.testnet:
+                    self.client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret,
+                        testnet=True
+                    )
+                    
+                    self.spot_client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret,
+                        testnet=True
+                    )
+                    
+                    self.futures_client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret,
+                        testnet=True
+                    )
+                    
+                    logger.info("Đã khởi tạo Binance TestNet Client")
+                else:
+                    self.client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret
+                    )
+                    
+                    self.spot_client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret
+                    )
+                    
+                    self.futures_client = Client(
+                        api_key=api_key,
+                        api_secret=api_secret
+                    )
+                    
+                    logger.info("Đã khởi tạo Binance MainNet Client")
+            else:
+                # Nếu không import được python-binance, sử dụng requests trực tiếp
+                logger.warning("Không tìm thấy module python-binance. Sử dụng requests trực tiếp.")
+                self.api_key = api_key
+                self.api_secret = api_secret
+        
+        except (BinanceAPIException, BinanceRequestException) as e:
+            logger.error(f"Lỗi khi khởi tạo Binance Client: {e}")
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi khởi tạo Binance Client: {e}")
+    
+    def test_connection(self) -> bool:
+        """
+        Kiểm tra kết nối đến Binance API
+        
+        Returns:
+            bool: True nếu kết nối thành công, False nếu không
+        """
+        try:
+            if self.client:
+                # Sử dụng python-binance nếu đã import thành công
+                if self.testnet:
+                    # Kiểm tra kết nối futures testnet
+                    self.client.futures_ping()
+                    logger.info("Kết nối đến Binance Futures TestNet thành công")
+                else:
+                    # Kiểm tra kết nối spot mainnet
+                    self.client.ping()
+                    logger.info("Kết nối đến Binance Spot MainNet thành công")
+                
+                # Lấy thời gian server
+                server_time = self.client.get_server_time()
+                server_time_dt = datetime.fromtimestamp(server_time['serverTime'] / 1000)
+                logger.info(f"Thời gian máy chủ Binance: {server_time_dt}")
+                
+                return True
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/ping"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/ping"
+                
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    logger.info("Kết nối đến Binance API thành công")
+                    return True
+                else:
+                    logger.error(f"Kết nối đến Binance API thất bại: {response.text}")
+                    return False
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra kết nối đến Binance API: {e}")
+            return False
+    
+    def _get_account_info(self) -> Dict:
+        """
+        Lấy thông tin tài khoản
+        
+        Returns:
+            Dict: Thông tin tài khoản
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    return self.client.futures_account()
+                else:
+                    return self.client.get_account()
+            else:
+                # TODO: Implement using requests
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v2/account"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/account"
+                
+                # Thêm mã xác thực nếu có
+                if self.api_key and self.api_secret:
+                    timestamp = int(time.time() * 1000)
+                    params = {
+                        'timestamp': timestamp
+                    }
+                    
+                    query_string = urllib.parse.urlencode(params)
+                    signature = hmac.new(
+                        self.api_secret.encode('utf-8'),
+                        query_string.encode('utf-8'),
+                        hashlib.sha256
+                    ).hexdigest()
+                    
+                    params['signature'] = signature
+                    
+                    headers = {
+                        'X-MBX-APIKEY': self.api_key
+                    }
+                    
+                    response = requests.get(url, params=params, headers=headers, timeout=10)
+                    if response.status_code == 200:
+                        return response.json()
+                    else:
+                        logger.error(f"Lỗi khi lấy thông tin tài khoản: {response.text}")
+                        return {}
+                else:
+                    logger.warning("Không có API key và secret để lấy thông tin tài khoản")
+                    return {}
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy thông tin tài khoản: {e}")
+            return {}
+    
+    def get_account_balance(self) -> Dict[str, float]:
+        """
+        Lấy số dư tài khoản
+        
+        Returns:
+            Dict[str, float]: Số dư tài khoản
+        """
+        try:
+            if self.testnet:
+                # Lấy số dư của tài khoản futures testnet
+                account_info = self._get_account_info()
+                
+                if 'assets' in account_info:
+                    balances = {}
+                    for asset in account_info['assets']:
+                        symbol = asset.get('asset', '')
+                        balance = float(asset.get('walletBalance', 0))
+                        if balance > 0:
+                            balances[symbol] = balance
+                    
+                    return balances
+                else:
+                    logger.warning("Không tìm thấy thông tin số dư tài khoản futures")
+                    return {}
+            else:
+                # Lấy số dư của tài khoản spot mainnet
+                account_info = self._get_account_info()
+                
+                if 'balances' in account_info:
+                    balances = {}
+                    for balance in account_info['balances']:
+                        symbol = balance.get('asset', '')
+                        free = float(balance.get('free', 0))
+                        locked = float(balance.get('locked', 0))
+                        total = free + locked
+                        if total > 0:
+                            balances[symbol] = total
+                    
+                    return balances
+                else:
+                    logger.warning("Không tìm thấy thông tin số dư tài khoản spot")
+                    return {}
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy số dư tài khoản: {e}")
+            return {}
+    
+    def get_symbol_price(self, symbol: str) -> Optional[float]:
+        """
+        Lấy giá hiện tại của một symbol
+        
+        Args:
+            symbol: Symbol cần lấy giá (ví dụ: BTCUSDT)
+            
+        Returns:
+            Optional[float]: Giá hiện tại hoặc None nếu không lấy được
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    # Sử dụng futures API cho testnet
+                    ticker = self.client.futures_symbol_ticker(symbol=symbol)
+                    if 'price' in ticker:
+                        return float(ticker['price'])
+                else:
+                    # Sử dụng spot API cho mainnet
+                    ticker = self.client.get_symbol_ticker(symbol=symbol)
+                    if 'price' in ticker:
+                        return float(ticker['price'])
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/ticker/price"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/ticker/price"
+                
+                params = {
+                    'symbol': symbol
+                }
+                
+                response = requests.get(url, params=params, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'price' in data:
+                        return float(data['price'])
+            
+            logger.warning(f"Không lấy được giá của {symbol}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy giá của {symbol}: {e}")
+            return None
+    
+    def get_klines(self, symbol: str, interval: str, limit: int = 500, start_time: int = None, end_time: int = None) -> Optional[List]:
+        """
+        Lấy dữ liệu K-lines (biểu đồ nến)
+        
+        Args:
+            symbol: Symbol cần lấy dữ liệu (ví dụ: BTCUSDT)
+            interval: Khoảng thời gian (1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M)
+            limit: Số lượng nến cần lấy (tối đa 1000)
+            start_time: Thời gian bắt đầu (milliseconds)
+            end_time: Thời gian kết thúc (milliseconds)
+            
+        Returns:
+            Optional[List]: Dữ liệu K-lines hoặc None nếu không lấy được
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    # Sử dụng futures API cho testnet
+                    klines = self.client.futures_klines(
+                        symbol=symbol,
+                        interval=interval,
+                        limit=limit,
+                        startTime=start_time,
+                        endTime=end_time
+                    )
+                    return klines
+                else:
+                    # Sử dụng spot API cho mainnet
+                    klines = self.client.get_klines(
+                        symbol=symbol,
+                        interval=interval,
+                        limit=limit,
+                        startTime=start_time,
+                        endTime=end_time
+                    )
+                    return klines
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/klines"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/klines"
+                
+                params = {
+                    'symbol': symbol,
+                    'interval': interval,
+                    'limit': limit
+                }
+                
+                if start_time:
+                    params['startTime'] = start_time
+                
+                if end_time:
+                    params['endTime'] = end_time
+                
+                response = requests.get(url, params=params, timeout=10)
                 if response.status_code == 200:
                     return response.json()
+            
+            logger.warning(f"Không lấy được dữ liệu K-lines cho {symbol}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy dữ liệu K-lines cho {symbol}: {e}")
+            return None
+    
+    def get_24h_ticker(self, symbol: str = None) -> Union[Dict, List[Dict], None]:
+        """
+        Lấy thông tin ticker 24h
+        
+        Args:
+            symbol: Symbol cần lấy thông tin (ví dụ: BTCUSDT), nếu None sẽ lấy tất cả
+            
+        Returns:
+            Union[Dict, List[Dict], None]: Thông tin ticker 24h hoặc None nếu không lấy được
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    # Sử dụng futures API cho testnet
+                    if symbol:
+                        ticker = self.client.futures_ticker_24hr(symbol=symbol)
+                        return ticker
+                    else:
+                        tickers = self.client.futures_ticker_24hr()
+                        return tickers
                 else:
-                    error_msg = f"{response.status_code} {response.reason} for url: {url}"
-                    logger.error(f"API request error: {error_msg}")
-                    
-                    # Nếu API testnet lỗi và có auto_fallback, thử dùng API chính cho đọc dữ liệu
-                    if self.auto_fallback and self.testnet and not use_mainnet and method == 'GET':
-                        logger.info(f"Thử sử dụng Binance Mainnet API cho {endpoint}")
-                        return self._make_request(method, endpoint, params, data, headers, use_mainnet=True)
-                    
-                    # Lưu lỗi và thử lại
-                    last_error = error_msg
-                    retries += 1
-                    time.sleep(self.retry_delay_seconds)
-            except Exception as e:
-                logger.error(f"Lỗi khi gửi yêu cầu: {str(e)}")
-                last_error = str(e)
-                retries += 1
-                time.sleep(self.retry_delay_seconds)
-        
-        # Nếu tất cả các lần thử đều thất bại
-        logger.error(f"Đã thử lại {self.retry_count} lần nhưng vẫn thất bại: {last_error}")
-        return {'error': last_error}
-    
-    def get_klines(self, 
-                  symbol: str, 
-                  interval: str, 
-                  limit: int = 1000, 
-                  start_time: int = None,
-                  end_time: int = None) -> List:
-        """
-        Lấy dữ liệu K-lines (nến) từ Binance
-        
-        Args:
-            symbol (str): Symbol cặp giao dịch
-            interval (str): Khoảng thời gian (1m, 5m, 15m, 1h, 4h, 1d)
-            limit (int): Số lượng nến tối đa
-            start_time (int, optional): Thời gian bắt đầu (timestamp)
-            end_time (int, optional): Thời gian kết thúc (timestamp)
+                    # Sử dụng spot API cho mainnet
+                    if symbol:
+                        ticker = self.client.get_ticker(symbol=symbol)
+                        return ticker
+                    else:
+                        tickers = self.client.get_ticker()
+                        return tickers
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/ticker/24hr"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/ticker/24hr"
+                
+                params = {}
+                if symbol:
+                    params['symbol'] = symbol
+                
+                response = requests.get(url, params=params, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
             
-        Returns:
-            List: Danh sách các nến
-        """
-        endpoint = "/fapi/v1/klines"
-        params = {
-            'symbol': symbol,
-            'interval': interval,
-            'limit': limit
-        }
-        
-        if start_time:
-            params['startTime'] = start_time
+            logger.warning(f"Không lấy được thông tin ticker 24h cho {symbol if symbol else 'tất cả'}")
+            return None
             
-        if end_time:
-            params['endTime'] = end_time
-        
-        logger.info(f"Lấy dữ liệu K-lines cho {symbol} (interval={interval}, limit={limit})")
-        
-        # Gọi API
-        response = self._make_request('GET', endpoint, params=params)
-        
-        # Kiểm tra lỗi
-        if 'error' in response:
-            logger.error(f"Lỗi khi lấy K-lines: {response['error']}")
-            return []
-        
-        # Kiểm tra xem có phải list không
-        if not isinstance(response, list):
-            logger.error(f"Định dạng phản hồi không đúng: {response}")
-            return []
-        
-        logger.info(f"Đã lấy {len(response)} K-lines cho {symbol} (interval={interval})")
-        return response
-    
-    def get_historical_data(self, 
-                           symbol: str, 
-                           interval: str, 
-                           days_back: int = 30) -> List:
-        """
-        Lấy dữ liệu lịch sử theo số ngày
-        
-        Args:
-            symbol (str): Symbol cặp giao dịch
-            interval (str): Khoảng thời gian (1m, 5m, 15m, 1h, 4h, 1d)
-            days_back (int): Số ngày dữ liệu lấy ngược về quá khứ
-            
-        Returns:
-            List: Danh sách các nến
-        """
-        # Tính timestamp
-        end_time = int(datetime.now().timestamp() * 1000)
-        start_time = int((datetime.now() - timedelta(days=days_back)).timestamp() * 1000)
-        
-        # Tính toán số lượng nến tối đa dựa trên khoảng thời gian
-        max_candles = self._calculate_max_candles(interval, days_back)
-        
-        logger.info(f"Lấy dữ liệu lịch sử {days_back} ngày cho {symbol} (interval={interval})")
-        
-        # Lấy dữ liệu
-        klines = self.get_klines(
-            symbol=symbol,
-            interval=interval,
-            limit=max_candles,
-            start_time=start_time,
-            end_time=end_time
-        )
-        
-        return klines
-    
-    def _calculate_max_candles(self, interval: str, days: int) -> int:
-        """
-        Tính toán số lượng nến tối đa dựa trên khoảng thời gian và số ngày
-        
-        Args:
-            interval (str): Khoảng thời gian (1m, 5m, 15m, 1h, 4h, 1d)
-            days (int): Số ngày
-            
-        Returns:
-            int: Số lượng nến tối đa
-        """
-        minutes_in_day = 24 * 60
-        
-        # Chuyển đổi khoảng thời gian thành phút
-        if interval == '1m':
-            interval_minutes = 1
-        elif interval == '5m':
-            interval_minutes = 5
-        elif interval == '15m':
-            interval_minutes = 15
-        elif interval == '1h':
-            interval_minutes = 60
-        elif interval == '4h':
-            interval_minutes = 240
-        elif interval == '1d':
-            interval_minutes = 1440
-        else:
-            logger.warning(f"Khoảng thời gian không được hỗ trợ: {interval}, sử dụng 1h")
-            interval_minutes = 60
-        
-        # Tính toán số lượng nến
-        return int(days * minutes_in_day / interval_minutes)
-    
-    def get_ticker_price(self, symbol: str) -> float:
-        """
-        Lấy giá hiện tại của một cặp giao dịch
-        
-        Args:
-            symbol (str): Symbol cặp giao dịch
-            
-        Returns:
-            float: Giá hiện tại
-        """
-        endpoint = "/fapi/v1/ticker/price"
-        params = {'symbol': symbol}
-        
-        logger.info(f"Lấy giá hiện tại cho {symbol}")
-        
-        # Gọi API
-        response = self._make_request('GET', endpoint, params=params)
-        
-        # Kiểm tra lỗi
-        if 'error' in response:
-            logger.error(f"Lỗi khi lấy giá hiện tại: {response['error']}")
-            return 0.0
-        
-        # Trả về giá
-        if 'price' in response:
-            price = float(response['price'])
-            logger.info(f"Giá hiện tại của {symbol}: {price}")
-            return price
-        else:
-            logger.error(f"Không tìm thấy giá trong phản hồi: {response}")
-            return 0.0
-    
-    def get_all_tickers(self) -> Dict[str, float]:
-        """
-        Lấy giá hiện tại của tất cả các cặp giao dịch
-        
-        Returns:
-            Dict[str, float]: Dictionary với key là symbol và value là giá
-        """
-        endpoint = "/fapi/v1/ticker/price"
-        
-        logger.info("Lấy giá hiện tại cho tất cả các cặp giao dịch")
-        
-        # Gọi API
-        response = self._make_request('GET', endpoint)
-        
-        # Kiểm tra lỗi
-        if 'error' in response:
-            logger.error(f"Lỗi khi lấy tất cả giá: {response['error']}")
-            return {}
-        
-        # Kiểm tra xem có phải list không
-        if not isinstance(response, list):
-            logger.error(f"Định dạng phản hồi không đúng: {response}")
-            return {}
-        
-        # Chuyển đổi thành dictionary
-        tickers = {}
-        for item in response:
-            if 'symbol' in item and 'price' in item:
-                tickers[item['symbol']] = float(item['price'])
-        
-        logger.info(f"Đã lấy giá cho {len(tickers)} cặp giao dịch")
-        return tickers
-    
-    def get_open_positions(self) -> List[Dict]:
-        """
-        Lấy danh sách các vị thế đang mở
-        
-        Returns:
-            List[Dict]: Danh sách các vị thế mở
-        """
-        # Sử dụng API gốc vì cần ký request
-        logger.info("Lấy danh sách vị thế đang mở")
-        
-        # Delegate to original BinanceAPI
-        try:
-            positions = self.binance_api.get_positions()
-            logger.info(f"Đã lấy {len(positions)} vị thế đang mở")
-            return positions
         except Exception as e:
-            logger.error(f"Lỗi khi lấy vị thế: {str(e)}")
-            return []
+            logger.error(f"Lỗi khi lấy thông tin ticker 24h: {e}")
+            return None
     
-    def get_account_balance(self) -> Dict:
+    def get_exchange_info(self, symbol: str = None) -> Dict:
         """
-        Lấy thông tin số dư tài khoản
+        Lấy thông tin của sàn
+        
+        Args:
+            symbol: Symbol cần lấy thông tin (ví dụ: BTCUSDT), nếu None sẽ lấy tất cả
+            
+        Returns:
+            Dict: Thông tin của sàn
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    # Sử dụng futures API cho testnet
+                    if symbol:
+                        exchange_info = self.client.futures_exchange_info()
+                        # Lọc thông tin cho symbol cụ thể
+                        for s in exchange_info.get('symbols', []):
+                            if s.get('symbol') == symbol:
+                                return s
+                        return {}
+                    else:
+                        return self.client.futures_exchange_info()
+                else:
+                    # Sử dụng spot API cho mainnet
+                    if symbol:
+                        exchange_info = self.client.get_exchange_info()
+                        # Lọc thông tin cho symbol cụ thể
+                        for s in exchange_info.get('symbols', []):
+                            if s.get('symbol') == symbol:
+                                return s
+                        return {}
+                    else:
+                        return self.client.get_exchange_info()
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/exchangeInfo"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/exchangeInfo"
+                
+                params = {}
+                if symbol:
+                    params['symbol'] = symbol
+                
+                response = requests.get(url, params=params, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    if symbol:
+                        # Lọc thông tin cho symbol cụ thể
+                        for s in data.get('symbols', []):
+                            if s.get('symbol') == symbol:
+                                return s
+                        return {}
+                    else:
+                        return data
+            
+            logger.warning(f"Không lấy được thông tin sàn cho {symbol if symbol else 'tất cả'}")
+            return {}
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy thông tin sàn: {e}")
+            return {}
+    
+    def get_ticker(self, symbol: str = None) -> Union[Dict, List[Dict], None]:
+        """
+        Lấy thông tin ticker hiện tại (giá hiện tại)
+        
+        Args:
+            symbol: Symbol cần lấy thông tin (ví dụ: BTCUSDT), nếu None sẽ lấy tất cả
+            
+        Returns:
+            Union[Dict, List[Dict], None]: Thông tin ticker hoặc None nếu không lấy được
+        """
+        try:
+            if self.client:
+                if self.testnet:
+                    # Sử dụng futures API cho testnet
+                    if symbol:
+                        return self.client.futures_ticker(symbol=symbol)
+                    else:
+                        return self.client.futures_ticker()
+                else:
+                    # Sử dụng spot API cho mainnet
+                    if symbol:
+                        return self.client.get_ticker(symbol=symbol)
+                    else:
+                        return self.client.get_ticker()
+            else:
+                # Sử dụng requests trực tiếp
+                if self.testnet:
+                    url = f"{self.futures_testnet_url}/fapi/v1/ticker/price"
+                else:
+                    url = f"{self.spot_api_url}/api/v3/ticker/price"
+                
+                params = {}
+                if symbol:
+                    params['symbol'] = symbol
+                
+                response = requests.get(url, params=params, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+            
+            logger.warning(f"Không lấy được thông tin ticker cho {symbol if symbol else 'tất cả'}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy thông tin ticker: {e}")
+            return None
+    
+    def get_market_overview(self) -> List[Dict]:
+        """
+        Lấy tổng quan thị trường (danh sách các cặp tiền, giá, khối lượng, biến động...)
         
         Returns:
-            Dict: Thông tin số dư
+            List[Dict]: Danh sách thông tin các cặp tiền
         """
-        # Sử dụng API gốc vì cần ký request
-        logger.info("Lấy thông tin số dư tài khoản")
-        
-        # Delegate to original BinanceAPI
         try:
-            balance = self.binance_api.get_account_balance()
-            logger.info(f"Đã lấy thông tin số dư tài khoản")
-            return balance
+            # Lấy thông tin ticker 24h cho tất cả các cặp tiền
+            if self.testnet:
+                tickers = self.get_24h_ticker()
+            else:
+                tickers = self.get_24h_ticker()
+            
+            if not tickers:
+                logger.warning("Không lấy được thông tin ticker 24h")
+                return []
+            
+            # Chuyển đổi dữ liệu
+            market_overview = []
+            for ticker in tickers:
+                if isinstance(ticker, dict):
+                    symbol = ticker.get('symbol', '')
+                    
+                    # Chỉ lấy các cặp tiền USDT
+                    if symbol.endswith('USDT'):
+                        price_change_percent = float(ticker.get('priceChangePercent', 0))
+                        
+                        market_data = {
+                            'symbol': symbol,
+                            'price': float(ticker.get('lastPrice', 0)),
+                            'price_change_24h': price_change_percent,
+                            'volume_24h': float(ticker.get('quoteVolume', 0)),
+                            'high_24h': float(ticker.get('highPrice', 0)),
+                            'low_24h': float(ticker.get('lowPrice', 0))
+                        }
+                        
+                        market_overview.append(market_data)
+            
+            # Sắp xếp theo khối lượng giảm dần
+            market_overview.sort(key=lambda x: x['volume_24h'], reverse=True)
+            
+            return market_overview
+            
         except Exception as e:
-            logger.error(f"Lỗi khi lấy số dư tài khoản: {str(e)}")
-            return {}
+            logger.error(f"Lỗi khi lấy tổng quan thị trường: {e}")
+            return []
 
+# Tạo một hàm trợ giúp để lấy giá tài sản
+def get_asset_price(symbol: str = "BTCUSDT", testnet: bool = False) -> float:
+    """
+    Hàm trợ giúp để lấy giá của một tài sản
+    
+    Args:
+        symbol: Symbol cần lấy giá (ví dụ: BTCUSDT)
+        testnet: True nếu sử dụng testnet, False nếu sử dụng mainnet
+        
+    Returns:
+        float: Giá hiện tại hoặc 0 nếu không lấy được
+    """
+    api = EnhancedBinanceAPI(testnet=testnet)
+    price = api.get_symbol_price(symbol)
+    return price if price else 0
 
-# Hàm chính để kiểm thử
-def main():
-    """Hàm kiểm thử Enhanced Binance API"""
-    try:
-        # Khởi tạo Enhanced Binance API
-        api = EnhancedBinanceAPI(testnet=True, auto_fallback=True)
+# Tạo một hàm trợ giúp để lấy số dư tài khoản
+def get_account_balance(testnet: bool = False) -> Dict[str, float]:
+    """
+    Hàm trợ giúp để lấy số dư tài khoản
+    
+    Args:
+        testnet: True nếu sử dụng testnet, False nếu sử dụng mainnet
         
-        # Lấy giá hiện tại
-        btc_price = api.get_ticker_price("BTCUSDT")
-        print(f"Giá Bitcoin hiện tại: {btc_price}")
-        
-        # Lấy dữ liệu lịch sử
-        btc_history = api.get_historical_data("BTCUSDT", "1h", days_back=7)
-        print(f"Số lượng nến Bitcoin (1h, 7 ngày): {len(btc_history)}")
-        
-        # Lấy tất cả giá
-        all_tickers = api.get_all_tickers()
-        print(f"Số lượng cặp giao dịch: {len(all_tickers)}")
-        
-        # Lấy danh sách vị thế mở
-        positions = api.get_open_positions()
-        print(f"Số lượng vị thế mở: {len(positions)}")
-        
-        # Lấy thông tin số dư
-        balance = api.get_account_balance()
-        print(f"Số dư tài khoản: {balance}")
-        
-        return 0
-    except Exception as e:
-        logger.error(f"Lỗi không mong đợi: {e}")
-        return 1
+    Returns:
+        Dict[str, float]: Số dư tài khoản
+    """
+    api = EnhancedBinanceAPI(testnet=testnet)
+    return api.get_account_balance()
 
+# Chạy test nếu file được thực thi trực tiếp
 if __name__ == "__main__":
-    sys.exit(main())
+    # Thiết lập logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Kiểm tra kết nối
+    api = EnhancedBinanceAPI(testnet=True)
+    
+    if api.test_connection():
+        print("Kết nối đến Binance API thành công!")
+        
+        # Lấy giá BTC/USDT
+        btc_price = api.get_symbol_price("BTCUSDT")
+        print(f"Giá BTC/USDT: ${btc_price:,.2f}")
+        
+        # Lấy số dư tài khoản
+        balance = api.get_account_balance()
+        for symbol, amount in balance.items():
+            print(f"Số dư {symbol}: {amount:,.8f}")
+    else:
+        print("Kết nối đến Binance API thất bại!")

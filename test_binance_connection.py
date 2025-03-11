@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-Kiểm tra kết nối với Binance API
+Test Binance Connection
+----------------------
+Script kiểm tra kết nối với Binance API và lấy giá BTCUSDT
 """
 
 import os
-import json
-import logging
 import sys
+import time
+import logging
+import argparse
 from datetime import datetime
 
 # Thiết lập logging
@@ -16,114 +19,116 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("api_test.log"),
-        logging.StreamHandler()
+        logging.StreamHandler(sys.stdout)
     ]
 )
-logger = logging.getLogger("api_test")
+logger = logging.getLogger("test_binance_connection")
 
-def load_config():
-    """Tải cấu hình từ file account_config.json"""
+def test_connection():
+    """Kiểm tra kết nối với Binance API và lấy giá BTCUSDT"""
     try:
-        if os.path.exists("account_config.json"):
-            with open("account_config.json", "r") as f:
-                config = json.load(f)
-            logger.info("Đã tải cấu hình từ account_config.json")
-            return config
+        # Nhập các module cần thiết
+        logger.info("Nhập module EnhancedBinanceAPI...")
+        from enhanced_binance_api import EnhancedBinanceAPI
+        
+        # Kiểm tra các biến môi trường
+        api_key = os.environ.get('BINANCE_TESTNET_API_KEY')
+        api_secret = os.environ.get('BINANCE_TESTNET_API_SECRET')
+        
+        if not api_key or not api_secret:
+            logger.warning("Không tìm thấy API key và secret trong biến môi trường")
+            logger.info("Sử dụng cấu hình từ file account_config.json")
         else:
-            logger.error("Không tìm thấy file account_config.json")
-            return None
-    except Exception as e:
-        logger.error(f"Lỗi khi tải cấu hình: {e}")
-        return None
-
-def test_binance_connection():
-    """Kiểm tra kết nối với Binance API"""
-    config = load_config()
-    if not config:
-        print("Không thể tải cấu hình. Vui lòng kiểm tra file account_config.json")
-        return False
-    
-    # Kiểm tra API key và secret
-    api_key = config.get("api_key", "")
-    api_secret = config.get("api_secret", "")
-    
-    if not api_key or not api_secret:
-        print("API key hoặc API secret chưa được cấu hình")
-        return False
-    
-    # Kiểm tra chế độ testnet
-    testnet = config.get("testnet", True)
-    print(f"Chế độ API: {'Testnet' if testnet else 'Thực'}")
-    
-    # Thử kết nối với Binance API
-    try:
-        from binance.client import Client
+            logger.info("Đã tìm thấy API key và secret trong biến môi trường")
         
-        # Khởi tạo client
-        print("Đang kết nối với Binance API...")
-        if testnet:
-            client = Client(api_key, api_secret, testnet=True)
+        # Khởi tạo API
+        logger.info("Khởi tạo kết nối Binance API...")
+        api = EnhancedBinanceAPI(testnet=True)
+        
+        # Kiểm tra kết nối
+        logger.info("Kiểm tra kết nối...")
+        if not api.test_connection():
+            logger.error("Không thể kết nối tới Binance API")
+            return False
+        
+        # Lấy số dư tài khoản
+        logger.info("Lấy số dư tài khoản...")
+        account_balance = api.get_account_balance()
+        logger.info(f"Số dư tài khoản: {account_balance}")
+        
+        # Lấy giá BTCUSDT
+        logger.info("Lấy giá BTCUSDT...")
+        btc_price = api.get_symbol_price("BTCUSDT")
+        
+        if btc_price:
+            logger.info(f"Giá BTC/USDT: ${btc_price:,.2f}")
         else:
-            client = Client(api_key, api_secret)
+            logger.error("Không thể lấy giá BTC/USDT")
+            return False
         
-        # Kiểm tra kết nối bằng cách lấy thông tin thị trường
-        print("Kiểm tra kết nối bằng cách lấy thông tin thị trường...")
-        ticker = client.get_ticker(symbol='BTCUSDT')
+        # Lấy thông tin thị trường tổng thể
+        logger.info("Lấy thông tin thị trường tổng thể...")
+        market_overview = api.get_market_overview()
         
-        print(f"Kết nối thành công! Giá BTC hiện tại: {ticker['lastPrice']}")
-        
-        # Thử lấy thông tin tài khoản
-        print("Kiểm tra thông tin tài khoản...")
-        if testnet:
-            account = client.futures_account()
+        if market_overview:
+            # Hiển thị top 5 coin
+            logger.info("Top 5 coin theo volume:")
+            for i, coin in enumerate(market_overview[:5], 1):
+                symbol = coin.get('symbol', '')
+                price = coin.get('price', 0)
+                change = coin.get('price_change_24h', 0)
+                volume = coin.get('volume_24h', 0)
+                logger.info(f"{i}. {symbol}: ${price:,.2f} ({change:+.2f}%) - Volume: ${volume:,.2f}")
         else:
-            account = client.futures_account()
+            logger.warning("Không thể lấy thông tin thị trường tổng thể")
         
-        print("Thông tin tài khoản:")
-        print(f"- Tổng số dư: {account['totalWalletBalance']} USDT")
-        print(f"- Số dư khả dụng: {account['availableBalance']} USDT")
+        # Thử lấy dữ liệu K-lines
+        logger.info("Lấy dữ liệu K-lines cho BTCUSDT (1h, 10 candles)...")
+        klines = api.get_klines("BTCUSDT", "1h", limit=10)
         
-        # Kiểm tra lấy danh sách vị thế
-        positions = [p for p in account['positions'] if float(p['positionAmt']) != 0]
-        print(f"Số vị thế đang mở: {len(positions)}")
-        for pos in positions:
-            symbol = pos['symbol']
-            amount = float(pos['positionAmt'])
-            entry_price = float(pos['entryPrice'])
-            unrealized_pnl = float(pos['unrealizedProfit'])
-            leverage = pos['leverage']
+        if klines:
+            logger.info(f"Đã lấy {len(klines)} candles")
             
-            direction = "LONG" if amount > 0 else "SHORT"
-            print(f"- {symbol}: {direction}, Số lượng: {abs(amount)}, Giá vào: {entry_price}, P/L: {unrealized_pnl}, Đòn bẩy: {leverage}x")
+            # Hiển thị candle mới nhất
+            latest_candle = klines[-1]
+            open_time = datetime.fromtimestamp(latest_candle[0] / 1000)
+            open_price = float(latest_candle[1])
+            high_price = float(latest_candle[2])
+            low_price = float(latest_candle[3])
+            close_price = float(latest_candle[4])
+            volume = float(latest_candle[5])
+            
+            logger.info(f"Candle mới nhất ({open_time}):")
+            logger.info(f"  Open: ${open_price:,.2f}")
+            logger.info(f"  High: ${high_price:,.2f}")
+            logger.info(f"  Low: ${low_price:,.2f}")
+            logger.info(f"  Close: ${close_price:,.2f}")
+            logger.info(f"  Volume: {volume:,.2f}")
+        else:
+            logger.warning("Không thể lấy dữ liệu K-lines")
         
+        logger.info("Kết nối thành công tới Binance API!")
         return True
-        
+    
     except Exception as e:
-        print(f"Lỗi khi kết nối với Binance API: {e}")
-        logger.error(f"Lỗi khi kết nối với Binance API: {e}")
+        logger.error(f"Lỗi khi kiểm tra kết nối: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 def main():
-    print("=" * 50)
-    print("KIỂM TRA KẾT NỐI BINANCE API")
-    print("=" * 50)
+    """Hàm chính"""
+    parser = argparse.ArgumentParser(description='Kiểm tra kết nối với Binance API')
+    args = parser.parse_args()
     
-    result = test_binance_connection()
+    success = test_connection()
     
-    print("\nKết quả:")
-    if result:
-        print("✅ Kết nối API thành công!")
+    if success:
+        logger.info("Kiểm tra kết nối thành công")
+        sys.exit(0)
     else:
-        print("❌ Kết nối API thất bại!")
-    
-    print("\nHướng dẫn:")
-    print("1. Nếu kết nối thất bại, kiểm tra lại API key và API secret trong file account_config.json")
-    print("2. Đảm bảo tài khoản Binance của bạn đã được kích hoạt Futures")
-    print("3. Nếu sử dụng testnet, đảm bảo bạn đã đăng ký tài khoản Binance Futures Testnet")
-    
-    print("\nThời gian kiểm tra:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("=" * 50)
+        logger.error("Kiểm tra kết nối thất bại")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

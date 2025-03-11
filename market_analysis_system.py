@@ -1,89 +1,100 @@
 #!/usr/bin/env python3
-"""
-Hệ thống phân tích thị trường và vào/ra lệnh tổng hợp
+# -*- coding: utf-8 -*-
 
-Module này cung cấp:
-1. Phân tích tổng thể thị trường crypto
-2. Phân tích chi tiết từng đồng tiền
-3. Xác định điểm vào/ra lệnh tối ưu
-4. Ghi log và phân tích lý do không đánh coin sau khi phân tích
-5. Hệ thống logic vào/ra lệnh thống nhất
+"""
+Market Analysis System
+--------------------
+Module cung cấp hệ thống phân tích thị trường tiên tiến,
+tạo tín hiệu giao dịch và đề xuất dựa trên nhiều chỉ báo kỹ thuật và phân tích xu hướng.
 """
 
 import os
 import json
 import time
 import logging
-import datetime
-import pandas as pd
+import math
+from typing import Dict, List, Union, Optional, Any, Tuple
+from datetime import datetime, timedelta
+
 import numpy as np
-import matplotlib.pyplot as plt
-from typing import Dict, List, Tuple, Optional, Any, Union
-from binance_api import BinanceAPI
+import pandas as pd
+
+from enhanced_binance_api import EnhancedBinanceAPI
 
 # Thiết lập logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("market_analysis_system")
-
-# Đường dẫn file
-MARKET_ANALYSIS_CONFIG = "configs/market_analysis_config.json"
-MARKET_ANALYSIS_RESULTS = "reports/market_analysis_results.json"
-TRADING_DECISIONS_LOG = "logs/trading_decisions.log"
-NO_TRADE_REASONS_LOG = "logs/no_trade_reasons.log"
-MARKET_REGIME_DATA = "data/market_regime_data.json"
 
 class MarketAnalysisSystem:
     """
-    Hệ thống phân tích thị trường và logic vào/ra lệnh toàn diện
+    Hệ thống phân tích thị trường tiên tiến
+    Cung cấp các phương thức để phân tích thị trường, xác định xu hướng,
+    tính toán các chỉ báo kỹ thuật và sinh tín hiệu giao dịch
     """
     
-    def __init__(self, config_path: str = MARKET_ANALYSIS_CONFIG):
+    def __init__(self, config_path: str = "configs/market_analysis_config.json"):
         """
         Khởi tạo hệ thống phân tích thị trường
         
         Args:
-            config_path (str): Đường dẫn đến file cấu hình
+            config_path: Đường dẫn đến file cấu hình
         """
         self.config_path = config_path
-        self.config = self._load_or_create_config()
-        self.api = BinanceAPI()
+        self.config = self._load_config()
         
-        # Tạo các thư mục cần thiết
-        self._ensure_directories()
+        # Khởi tạo Binance API
+        use_testnet = self.config.get('testnet', True)
+        self.api = EnhancedBinanceAPI(testnet=use_testnet)
         
-        # Lưu lịch sử phân tích
-        self.analysis_history = self._load_analysis_history()
+        # Kiểm tra kết nối
+        if not self.api.test_connection():
+            logger.warning("Không thể kết nối tới Binance API. Một số chức năng có thể không hoạt động.")
         
-        # Lưu lịch sử quyết định không giao dịch
-        self.no_trade_reasons = self._load_no_trade_reasons()
+        # Cache dữ liệu
+        self.cache = {}
+        self.cache_expiry = {}
+        self.cache_enabled = self.config.get('system_settings', {}).get('cache_data', True)
+        self.cache_ttl = self.config.get('system_settings', {}).get('cache_expiry', 300)  # 5 phút
         
-        # Dữ liệu chế độ thị trường
-        self.market_regime_data = self._load_market_regime_data()
-        
-        logger.info("Đã khởi tạo hệ thống phân tích thị trường")
+        logger.info("Đã khởi tạo Market Analysis System")
     
-    def _ensure_directories(self):
-        """Tạo các thư mục cần thiết nếu chưa tồn tại"""
-        directories = [
-            "configs",
-            "reports",
-            "logs",
-            "data",
-            "charts/market_analysis"
-        ]
-        
-        for directory in directories:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-                logger.info(f"Đã tạo thư mục: {directory}")
-    
-    def _load_or_create_config(self) -> Dict:
+    def _load_config(self) -> Dict:
         """
-        Tải cấu hình hoặc tạo mới nếu chưa tồn tại
+        Tải cấu hình từ file
         
         Returns:
-            Dict: Cấu hình hệ thống phân tích
+            Dict: Cấu hình đã tải
         """
+        default_config = {
+            "testnet": True,
+            "primary_timeframe": "1h",
+            "timeframes": ["5m", "15m", "1h", "4h", "1d"],
+            "symbols_to_analyze": ["BTCUSDT", "ETHUSDT", "BNBUSDT"],
+            "analysis_interval": 1800,  # 30 phút
+            "indicators": {
+                "sma": [20, 50, 100, 200],
+                "ema": [9, 21, 55, 100],
+                "rsi": 14,
+                "macd": {"fast": 12, "slow": 26, "signal": 9},
+                "bollinger": {"window": 20, "std": 2},
+                "atr": 14,
+                "stoch": {"k": 14, "d": 3, "smooth": 3},
+                "volume_sma": 20
+            },
+            "market_regime": {
+                "volatility_threshold": 2.5,
+                "trend_strength_threshold": 3.0,
+                "volume_surge_threshold": 2.0
+            },
+            "data_window": 200,
+            "system_settings": {
+                "debug_mode": True,
+                "cache_data": True,
+                "cache_expiry": 300,
+                "log_level": "INFO",
+                "save_analysis_files": True
+            }
+        }
+        
         if os.path.exists(self.config_path):
             try:
                 with open(self.config_path, 'r') as f:
@@ -91,1728 +102,1714 @@ class MarketAnalysisSystem:
                 logger.info(f"Đã tải cấu hình từ {self.config_path}")
                 return config
             except Exception as e:
-                logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
+                logger.error(f"Lỗi khi tải cấu hình: {e}")
+                logger.info("Sử dụng cấu hình mặc định")
+        else:
+            logger.warning(f"Không tìm thấy file cấu hình {self.config_path}. Sử dụng cấu hình mặc định.")
         
-        # Tạo cấu hình mặc định
-        default_config = {
-            "symbols_to_analyze": [
-                "BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", 
-                "DOGEUSDT", "MATICUSDT", "SOLUSDT", "DOTUSDT", "AVAXUSDT",
-                "LTCUSDT", "LINKUSDT", "UNIUSDT", "ATOMUSDT"
-            ],
-            "timeframes": ["5m", "15m", "1h", "4h", "1d"],
-            "primary_timeframe": "1h",
-            "indicators": {
-                "moving_averages": {
-                    "enabled": True,
-                    "periods": [20, 50, 100, 200],
-                    "types": ["SMA", "EMA"]
-                },
-                "oscillators": {
-                    "enabled": True,
-                    "rsi": {
-                        "enabled": True,
-                        "period": 14,
-                        "overbought": 70,
-                        "oversold": 30
-                    },
-                    "macd": {
-                        "enabled": True,
-                        "fast_period": 12,
-                        "slow_period": 26,
-                        "signal_period": 9
-                    },
-                    "stochastic": {
-                        "enabled": True,
-                        "k_period": 14,
-                        "d_period": 3,
-                        "smooth_k": 3
-                    }
-                },
-                "volume": {
-                    "enabled": True,
-                    "vwap": True,
-                    "obv": True
-                },
-                "volatility": {
-                    "enabled": True,
-                    "bollinger_bands": {
-                        "enabled": True,
-                        "period": 20,
-                        "std_dev": 2.0
-                    },
-                    "atr": {
-                        "enabled": True,
-                        "period": 14
-                    }
-                },
-                "support_resistance": {
-                    "enabled": True,
-                    "lookback_periods": 100,
-                    "zone_threshold": 0.02
-                }
-            },
-            "market_regimes": {
-                "detection": {
-                    "enabled": True,
-                    "lookback_periods": 30,
-                    "update_frequency": "daily"
-                },
-                "regimes": [
-                    "trending_up",
-                    "trending_down",
-                    "ranging",
-                    "high_volatility",
-                    "low_volatility"
-                ]
-            },
-            "strategy_settings": {
-                "entry_conditions": {
-                    "trending_market": {
-                        "indicators": ["moving_averages", "macd", "volume"],
-                        "confirmation_count": 2
-                    },
-                    "ranging_market": {
-                        "indicators": ["rsi", "bollinger_bands", "support_resistance"],
-                        "confirmation_count": 2
-                    },
-                    "volatile_market": {
-                        "indicators": ["atr", "obv", "support_resistance"],
-                        "confirmation_count": 3
-                    }
-                },
-                "exit_conditions": {
-                    "take_profit": {
-                        "default_percentage": 5.0,
-                        "adjust_by_volatility": True
-                    },
-                    "stop_loss": {
-                        "default_percentage": 3.0,
-                        "adjust_by_volatility": True
-                    },
-                    "trailing_stop": {
-                        "enabled": True,
-                        "activation_percentage": 1.0,
-                        "callback_percentage": 0.5
-                    },
-                    "indicator_based": {
-                        "enabled": True,
-                        "indicators": ["rsi", "macd", "bollinger_bands"]
-                    }
-                },
-                "risk_management": {
-                    "max_risk_per_trade": 1.0,  # % của tài khoản
-                    "max_trades_per_day": 5,
-                    "max_active_trades": 3,
-                    "correlation_threshold": 0.7  # Không mở vị thế tương quan cao
-                }
-            },
-            "analysis_thresholds": {
-                "strong_buy": 80,
-                "buy": 60,
-                "neutral": 40,
-                "sell": 20,
-                "strong_sell": 0
-            },
-            "no_trade_reasons_categories": [
-                "market_conditions",
-                "technical_indicators",
-                "risk_management",
-                "volatility",
-                "liquidity",
-                "correlation",
-                "fundamental"
-            ]
-        }
-        
-        # Lưu cấu hình mặc định
-        try:
-            # Đảm bảo thư mục tồn tại
-            os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-            
-            with open(self.config_path, 'w') as f:
-                json.dump(default_config, f, indent=4)
-            
-            logger.info(f"Đã tạo cấu hình mặc định tại {self.config_path}")
-            return default_config
-        except Exception as e:
-            logger.error(f"Lỗi khi tạo cấu hình mặc định: {str(e)}")
-            return default_config
+        return default_config
     
-    def _load_analysis_history(self) -> List[Dict]:
+    def get_historical_data(self, symbol: str, timeframe: str, limit: int = None) -> Optional[pd.DataFrame]:
         """
-        Tải lịch sử phân tích
-        
-        Returns:
-            List[Dict]: Lịch sử phân tích
-        """
-        if os.path.exists(MARKET_ANALYSIS_RESULTS):
-            try:
-                with open(MARKET_ANALYSIS_RESULTS, 'r') as f:
-                    history = json.load(f)
-                logger.info(f"Đã tải {len(history)} bản ghi phân tích từ {MARKET_ANALYSIS_RESULTS}")
-                return history
-            except Exception as e:
-                logger.error(f"Lỗi khi tải lịch sử phân tích: {str(e)}")
-        
-        return []
-    
-    def _save_analysis_history(self) -> bool:
-        """
-        Lưu lịch sử phân tích
-        
-        Returns:
-            bool: True nếu lưu thành công, False nếu thất bại
-        """
-        try:
-            # Đảm bảo thư mục tồn tại
-            os.makedirs(os.path.dirname(MARKET_ANALYSIS_RESULTS), exist_ok=True)
-            
-            with open(MARKET_ANALYSIS_RESULTS, 'w') as f:
-                json.dump(self.analysis_history, f, indent=4)
-            
-            logger.info(f"Đã lưu {len(self.analysis_history)} bản ghi phân tích vào {MARKET_ANALYSIS_RESULTS}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu lịch sử phân tích: {str(e)}")
-            return False
-    
-    def _load_no_trade_reasons(self) -> List[Dict]:
-        """
-        Tải lịch sử lý do không giao dịch
-        
-        Returns:
-            List[Dict]: Lịch sử lý do không giao dịch
-        """
-        if os.path.exists(NO_TRADE_REASONS_LOG):
-            try:
-                with open(NO_TRADE_REASONS_LOG, 'r') as f:
-                    reasons = json.load(f)
-                logger.info(f"Đã tải {len(reasons)} bản ghi lý do không giao dịch từ {NO_TRADE_REASONS_LOG}")
-                return reasons
-            except Exception as e:
-                logger.error(f"Lỗi khi tải lý do không giao dịch: {str(e)}")
-        
-        return []
-    
-    def _save_no_trade_reasons(self) -> bool:
-        """
-        Lưu lịch sử lý do không giao dịch
-        
-        Returns:
-            bool: True nếu lưu thành công, False nếu thất bại
-        """
-        try:
-            # Đảm bảo thư mục tồn tại
-            os.makedirs(os.path.dirname(NO_TRADE_REASONS_LOG), exist_ok=True)
-            
-            with open(NO_TRADE_REASONS_LOG, 'w') as f:
-                json.dump(self.no_trade_reasons, f, indent=4)
-            
-            logger.info(f"Đã lưu {len(self.no_trade_reasons)} bản ghi lý do không giao dịch vào {NO_TRADE_REASONS_LOG}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu lý do không giao dịch: {str(e)}")
-            return False
-    
-    def _load_market_regime_data(self) -> Dict:
-        """
-        Tải dữ liệu chế độ thị trường
-        
-        Returns:
-            Dict: Dữ liệu chế độ thị trường
-        """
-        if os.path.exists(MARKET_REGIME_DATA):
-            try:
-                with open(MARKET_REGIME_DATA, 'r') as f:
-                    data = json.load(f)
-                logger.info(f"Đã tải dữ liệu chế độ thị trường từ {MARKET_REGIME_DATA}")
-                return data
-            except Exception as e:
-                logger.error(f"Lỗi khi tải dữ liệu chế độ thị trường: {str(e)}")
-        
-        # Tạo dữ liệu mặc định
-        default_data = {
-            "last_updated": "",
-            "btc_dominance": 0,
-            "total_market_cap": 0,
-            "global_regime": "unknown",
-            "symbols_regime": {}
-        }
-        
-        return default_data
-    
-    def _save_market_regime_data(self) -> bool:
-        """
-        Lưu dữ liệu chế độ thị trường
-        
-        Returns:
-            bool: True nếu lưu thành công, False nếu thất bại
-        """
-        try:
-            # Đảm bảo thư mục tồn tại
-            os.makedirs(os.path.dirname(MARKET_REGIME_DATA), exist_ok=True)
-            
-            with open(MARKET_REGIME_DATA, 'w') as f:
-                json.dump(self.market_regime_data, f, indent=4)
-            
-            logger.info(f"Đã lưu dữ liệu chế độ thị trường vào {MARKET_REGIME_DATA}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi lưu dữ liệu chế độ thị trường: {str(e)}")
-            return False
-    
-    def log_trading_decision(self, decision_data: Dict) -> bool:
-        """
-        Ghi log quyết định giao dịch
+        Lấy dữ liệu lịch sử
         
         Args:
-            decision_data (Dict): Thông tin quyết định giao dịch
+            symbol: Symbol cần lấy dữ liệu (ví dụ: BTCUSDT)
+            timeframe: Khoảng thời gian (1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M)
+            limit: Số lượng nến cần lấy (mặc định lấy từ cấu hình data_window)
             
         Returns:
-            bool: True nếu ghi log thành công, False nếu thất bại
+            Optional[pd.DataFrame]: DataFrame chứa dữ liệu lịch sử hoặc None nếu không lấy được
         """
         try:
-            # Đảm bảo thư mục tồn tại
-            os.makedirs(os.path.dirname(TRADING_DECISIONS_LOG), exist_ok=True)
+            # Kiểm tra cache
+            cache_key = f"{symbol}_{timeframe}"
+            if self.cache_enabled and cache_key in self.cache:
+                cache_time = self.cache_expiry.get(cache_key, 0)
+                if time.time() - cache_time < self.cache_ttl:
+                    logger.debug(f"Sử dụng dữ liệu cache cho {symbol} {timeframe}")
+                    return self.cache[cache_key].copy()
             
-            # Thêm thời gian
-            if 'timestamp' not in decision_data:
-                decision_data['timestamp'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Nếu không có limit, lấy từ cấu hình
+            if limit is None:
+                limit = self.config.get('data_window', 200)
             
-            # Ghi vào file log
-            with open(TRADING_DECISIONS_LOG, 'a') as f:
-                json_str = json.dumps(decision_data)
-                f.write(f"{json_str}\n")
-            
-            logger.info(f"Đã ghi log quyết định giao dịch cho {decision_data.get('symbol', 'unknown')}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi ghi log quyết định giao dịch: {str(e)}")
-            return False
-    
-    def log_no_trade_reason(self, symbol: str, timeframe: str, reasons: List[Dict]) -> bool:
-        """
-        Ghi log lý do không giao dịch
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            timeframe (str): Khung thời gian
-            reasons (List[Dict]): Danh sách lý do
-            
-        Returns:
-            bool: True nếu ghi log thành công, False nếu thất bại
-        """
-        try:
-            entry = {
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "symbol": symbol,
-                "timeframe": timeframe,
-                "price": self._get_current_price(symbol),
-                "reasons": reasons
-            }
-            
-            # Thêm vào lịch sử
-            self.no_trade_reasons.append(entry)
-            
-            # Giới hạn kích thước (giữ 1000 bản ghi gần nhất)
-            if len(self.no_trade_reasons) > 1000:
-                self.no_trade_reasons = self.no_trade_reasons[-1000:]
-            
-            # Lưu vào file
-            self._save_no_trade_reasons()
-            
-            logger.info(f"Đã ghi log {len(reasons)} lý do không giao dịch cho {symbol}")
-            return True
-        except Exception as e:
-            logger.error(f"Lỗi khi ghi log lý do không giao dịch: {str(e)}")
-            return False
-    
-    def _get_current_price(self, symbol: str) -> float:
-        """
-        Lấy giá hiện tại của một mã
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            
-        Returns:
-            float: Giá hiện tại
-        """
-        try:
-            ticker = self.api.get_symbol_ticker(symbol)
-            if ticker and 'price' in ticker:
-                return float(ticker['price'])
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy giá hiện tại của {symbol}: {str(e)}")
-        
-        return 0.0
-    
-    def analyze_global_market(self) -> Dict:
-        """
-        Phân tích thị trường toàn cầu
-        
-        Returns:
-            Dict: Kết quả phân tích thị trường toàn cầu
-        """
-        logger.info("Đang phân tích thị trường toàn cầu...")
-        
-        try:
-            # Lấy dữ liệu thị trường
-            btc_data = self._get_klines_data("BTCUSDT", "1d", 30)
-            
-            result = {
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "global_market_cap": 0,  # Cần API bên ngoài
-                "btc_dominance": 0,      # Cần API bên ngoài
-                "btc_price": self._get_current_price("BTCUSDT"),
-                "btc_volatility": self._calculate_volatility(btc_data) if btc_data is not None else 0,
-                "market_trend": "unknown",
-                "market_regime": "unknown",
-                "sentiment": "neutral",
-                "symbols_correlation": self._calculate_symbols_correlation()
-            }
-            
-            # Xác định xu hướng thị trường
-            if btc_data is not None:
-                result["market_trend"] = self._determine_trend(btc_data)
-                result["market_regime"] = self._detect_market_regime(btc_data)
-            
-            # Cập nhật dữ liệu chế độ thị trường
-            self.market_regime_data["last_updated"] = result["timestamp"]
-            self.market_regime_data["btc_dominance"] = result["btc_dominance"]
-            self.market_regime_data["global_regime"] = result["market_regime"]
-            self._save_market_regime_data()
-            
-            logger.info(f"Đã phân tích thị trường toàn cầu, chế độ: {result['market_regime']}")
-            return result
-        except Exception as e:
-            logger.error(f"Lỗi khi phân tích thị trường toàn cầu: {str(e)}")
-            return {
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "error": str(e),
-                "market_trend": "unknown",
-                "market_regime": "unknown"
-            }
-    
-    def analyze_symbol(self, symbol: str, timeframe: str = None) -> Dict:
-        """
-        Phân tích chi tiết một cặp tiền
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            timeframe (str, optional): Khung thời gian, nếu None sẽ sử dụng primary_timeframe
-            
-        Returns:
-            Dict: Kết quả phân tích
-        """
-        if timeframe is None:
-            timeframe = self.config.get("primary_timeframe", "1h")
-        
-        logger.info(f"Đang phân tích {symbol} trên khung {timeframe}...")
-        
-        try:
-            # Lấy dữ liệu giá
-            klines_data = self._get_klines_data(symbol, timeframe, 200)
-            
-            if klines_data is None or len(klines_data) < 100:
-                logger.warning(f"Không đủ dữ liệu để phân tích {symbol}")
-                return {
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                    "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    "error": "Không đủ dữ liệu",
-                    "score": 0,
-                    "recommendation": "neutral"
-                }
-            
-            # Phân tích chỉ báo kỹ thuật
-            indicators = self._calculate_indicators(symbol, klines_data, timeframe)
-            
-            # Phân tích hỗ trợ/kháng cự
-            support_resistance = self._analyze_support_resistance(klines_data)
-            
-            # Phân tích điểm vào/ra
-            entry_exit_points = self._analyze_entry_exit_points(symbol, klines_data, indicators, support_resistance)
-            
-            # Tính điểm tổng hợp
-            score = self._calculate_analysis_score(indicators, entry_exit_points)
-            
-            # Xác định khuyến nghị
-            recommendation = self._determine_recommendation(score)
-            
-            # Phát hiện chế độ thị trường cho symbol
-            market_regime = self._detect_market_regime(klines_data)
-            
-            # Phân tích biến động
-            volatility = self._calculate_volatility(klines_data)
-            
-            # Tổng hợp kết quả
-            result = {
-                "symbol": symbol,
-                "timeframe": timeframe,
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "price": {
-                    "current": self._get_current_price(symbol),
-                    "open": float(klines_data[-1][1]),
-                    "high": float(klines_data[-1][2]),
-                    "low": float(klines_data[-1][3]),
-                    "close": float(klines_data[-1][4]),
-                    "volume": float(klines_data[-1][5])
-                },
-                "indicators": indicators,
-                "support_resistance": support_resistance,
-                "market_regime": market_regime,
-                "volatility": volatility,
-                "entry_exit_points": entry_exit_points,
-                "score": score,
-                "recommendation": recommendation
-            }
-            
-            # Cập nhật dữ liệu chế độ thị trường cho symbol
-            self.market_regime_data["symbols_regime"][symbol] = {
-                "timeframe": timeframe,
-                "regime": market_regime,
-                "volatility": volatility,
-                "last_updated": result["timestamp"]
-            }
-            self._save_market_regime_data()
-            
-            # Lưu vào lịch sử phân tích
-            self.analysis_history.append(result)
-            
-            # Giới hạn kích thước lịch sử (giữ 1000 bản ghi gần nhất)
-            if len(self.analysis_history) > 1000:
-                self.analysis_history = self.analysis_history[-1000:]
-            
-            # Lưu lịch sử phân tích
-            self._save_analysis_history()
-            
-            logger.info(f"Đã phân tích {symbol}, điểm: {score}, khuyến nghị: {recommendation}")
-            
-            # Tạo biểu đồ phân tích nếu cần
-            self._generate_analysis_chart(symbol, timeframe, klines_data, result)
-            
-            return result
-        except Exception as e:
-            logger.error(f"Lỗi khi phân tích {symbol}: {str(e)}")
-            return {
-                "symbol": symbol,
-                "timeframe": timeframe,
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "error": str(e),
-                "score": 0,
-                "recommendation": "neutral"
-            }
-    
-    def _get_klines_data(self, symbol: str, timeframe: str, limit: int = 200) -> Optional[List]:
-        """
-        Lấy dữ liệu k-lines từ Binance
-        
-        Args:
-            symbol (str): Mã cặp tiền
-            timeframe (str): Khung thời gian
-            limit (int): Số lượng nến
-            
-        Returns:
-            Optional[List]: Dữ liệu k-lines hoặc None nếu lỗi
-        """
-        try:
+            # Lấy dữ liệu K-lines từ API
             klines = self.api.get_klines(symbol=symbol, interval=timeframe, limit=limit)
-            if klines and len(klines) > 0:
-                return klines
-            else:
-                logger.warning(f"Không có dữ liệu k-lines cho {symbol} {timeframe}")
+            
+            if not klines or len(klines) == 0:
+                logger.warning(f"Không lấy được dữ liệu K-lines cho {symbol} {timeframe}")
                 return None
+            
+            # Chuyển đổi dữ liệu sang DataFrame
+            df = pd.DataFrame(klines, columns=[
+                'open_time', 'open', 'high', 'low', 'close', 'volume',
+                'close_time', 'quote_asset_volume', 'number_of_trades',
+                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+            ])
+            
+            # Chuyển đổi kiểu dữ liệu
+            numeric_columns = ['open', 'high', 'low', 'close', 'volume',
+                               'quote_asset_volume', 'number_of_trades',
+                               'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume']
+            
+            for col in numeric_columns:
+                df[col] = pd.to_numeric(df[col])
+            
+            # Chuyển đổi thời gian
+            df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
+            df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
+            
+            # Đặt index
+            df.set_index('open_time', inplace=True)
+            
+            # Lưu vào cache
+            if self.cache_enabled:
+                self.cache[cache_key] = df.copy()
+                self.cache_expiry[cache_key] = time.time()
+            
+            return df
+            
         except Exception as e:
-            logger.error(f"Lỗi khi lấy dữ liệu k-lines cho {symbol} {timeframe}: {str(e)}")
+            logger.error(f"Lỗi khi lấy dữ liệu lịch sử cho {symbol} {timeframe}: {e}")
             return None
     
-    def _calculate_indicators(self, symbol: str, klines_data: List, timeframe: str) -> Dict:
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Tính toán các chỉ báo kỹ thuật
         
         Args:
-            symbol (str): Mã cặp tiền
-            klines_data (List): Dữ liệu k-lines
-            timeframe (str): Khung thời gian
+            df: DataFrame chứa dữ liệu lịch sử
             
         Returns:
-            Dict: Kết quả các chỉ báo
+            pd.DataFrame: DataFrame đã thêm các chỉ báo
         """
         try:
-            # Chuyển đổi dữ liệu thành DataFrame
-            df = pd.DataFrame(klines_data, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
+            # Tạo bản sao để không ảnh hưởng đến dữ liệu gốc
+            df = df.copy()
             
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
+            # Lấy cấu hình chỉ báo
+            indicators_config = self.config.get('indicators', {})
             
-            # Chuyển đổi timestamp
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+            # Tính toán SMA
+            sma_periods = indicators_config.get('sma', [20, 50, 100, 200])
+            for period in sma_periods:
+                df[f'sma_{period}'] = df['close'].rolling(window=period).mean()
             
-            # Khởi tạo kết quả
-            result = {
-                "moving_averages": {},
-                "oscillators": {},
-                "volume": {},
-                "volatility": {}
-            }
+            # Tính toán EMA
+            ema_periods = indicators_config.get('ema', [9, 21, 55, 100])
+            for period in ema_periods:
+                df[f'ema_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
             
-            # Tính moving averages
-            if self.config["indicators"]["moving_averages"]["enabled"]:
-                for period in self.config["indicators"]["moving_averages"]["periods"]:
-                    if "SMA" in self.config["indicators"]["moving_averages"]["types"]:
-                        df[f'sma_{period}'] = df['close'].rolling(window=period).mean()
-                        result["moving_averages"][f"sma_{period}"] = df[f'sma_{period}'].iloc[-1]
-                    
-                    if "EMA" in self.config["indicators"]["moving_averages"]["types"]:
-                        df[f'ema_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
-                        result["moving_averages"][f"ema_{period}"] = df[f'ema_{period}'].iloc[-1]
+            # Tính toán RSI
+            rsi_period = indicators_config.get('rsi', 14)
+            delta = df['close'].diff()
+            gain = delta.where(delta > 0, 0)
+            loss = -delta.where(delta < 0, 0)
+            avg_gain = gain.rolling(window=rsi_period).mean()
+            avg_loss = loss.rolling(window=rsi_period).mean()
+            rs = avg_gain / avg_loss
+            df['rsi'] = 100 - (100 / (1 + rs))
             
-            # Tính RSI
-            if self.config["indicators"]["oscillators"]["rsi"]["enabled"]:
-                period = self.config["indicators"]["oscillators"]["rsi"]["period"]
-                delta = df['close'].diff()
-                gain = delta.mask(delta < 0, 0)
-                loss = -delta.mask(delta > 0, 0)
-                avg_gain = gain.rolling(window=period).mean()
-                avg_loss = loss.rolling(window=period).mean()
-                rs = avg_gain / avg_loss
-                df['rsi'] = 100 - (100 / (1 + rs))
-                result["oscillators"]["rsi"] = df['rsi'].iloc[-1]
+            # Tính toán MACD
+            macd_config = indicators_config.get('macd', {"fast": 12, "slow": 26, "signal": 9})
+            fast_period = macd_config.get('fast', 12)
+            slow_period = macd_config.get('slow', 26)
+            signal_period = macd_config.get('signal', 9)
             
-            # Tính MACD
-            if self.config["indicators"]["oscillators"]["macd"]["enabled"]:
-                fast = self.config["indicators"]["oscillators"]["macd"]["fast_period"]
-                slow = self.config["indicators"]["oscillators"]["macd"]["slow_period"]
-                signal = self.config["indicators"]["oscillators"]["macd"]["signal_period"]
-                
-                df['ema_fast'] = df['close'].ewm(span=fast, adjust=False).mean()
-                df['ema_slow'] = df['close'].ewm(span=slow, adjust=False).mean()
-                df['macd'] = df['ema_fast'] - df['ema_slow']
-                df['macd_signal'] = df['macd'].ewm(span=signal, adjust=False).mean()
-                df['macd_histogram'] = df['macd'] - df['macd_signal']
-                
-                result["oscillators"]["macd"] = {
-                    "macd": df['macd'].iloc[-1],
-                    "signal": df['macd_signal'].iloc[-1],
-                    "histogram": df['macd_histogram'].iloc[-1]
-                }
+            df['ema_fast'] = df['close'].ewm(span=fast_period, adjust=False).mean()
+            df['ema_slow'] = df['close'].ewm(span=slow_period, adjust=False).mean()
+            df['macd'] = df['ema_fast'] - df['ema_slow']
+            df['macd_signal'] = df['macd'].ewm(span=signal_period, adjust=False).mean()
+            df['macd_histogram'] = df['macd'] - df['macd_signal']
             
-            # Tính Stochastic
-            if self.config["indicators"]["oscillators"]["stochastic"]["enabled"]:
-                k_period = self.config["indicators"]["oscillators"]["stochastic"]["k_period"]
-                d_period = self.config["indicators"]["oscillators"]["stochastic"]["d_period"]
-                smooth_k = self.config["indicators"]["oscillators"]["stochastic"]["smooth_k"]
-                
-                df['stoch_k'] = 100 * ((df['close'] - df['low'].rolling(window=k_period).min()) / 
-                               (df['high'].rolling(window=k_period).max() - df['low'].rolling(window=k_period).min()))
-                df['stoch_k'] = df['stoch_k'].rolling(window=smooth_k).mean()
-                df['stoch_d'] = df['stoch_k'].rolling(window=d_period).mean()
-                
-                result["oscillators"]["stochastic"] = {
-                    "k": df['stoch_k'].iloc[-1],
-                    "d": df['stoch_d'].iloc[-1]
-                }
+            # Tính toán Bollinger Bands
+            bb_config = indicators_config.get('bollinger', {"window": 20, "std": 2})
+            bb_window = bb_config.get('window', 20)
+            bb_std = bb_config.get('std', 2)
             
-            # Tính chỉ báo khối lượng
-            if self.config["indicators"]["volume"]["enabled"]:
-                # Volume Moving Average
-                df['volume_sma'] = df['volume'].rolling(window=20).mean()
-                
-                # OBV (On-Balance Volume)
-                if self.config["indicators"]["volume"]["obv"]:
-                    df['obv'] = (np.sign(df['close'].diff()) * df['volume']).fillna(0).cumsum()
-                    result["volume"]["obv"] = df['obv'].iloc[-1]
-                
-                # Chỉ số khối lượng tương đối
-                df['relative_volume'] = df['volume'] / df['volume'].rolling(window=20).mean()
-                
-                result["volume"]["current"] = df['volume'].iloc[-1]
-                result["volume"]["sma_20"] = df['volume_sma'].iloc[-1]
-                result["volume"]["relative"] = df['relative_volume'].iloc[-1]
+            df['bb_middle'] = df['close'].rolling(window=bb_window).mean()
+            df['bb_std'] = df['close'].rolling(window=bb_window).std()
+            df['bb_upper'] = df['bb_middle'] + (df['bb_std'] * bb_std)
+            df['bb_lower'] = df['bb_middle'] - (df['bb_std'] * bb_std)
+            df['bb_width'] = (df['bb_upper'] - df['bb_lower']) / df['bb_middle']
             
-            # Tính chỉ báo biến động
-            if self.config["indicators"]["volatility"]["enabled"]:
-                # Bollinger Bands
-                if self.config["indicators"]["volatility"]["bollinger_bands"]["enabled"]:
-                    period = self.config["indicators"]["volatility"]["bollinger_bands"]["period"]
-                    std_dev = self.config["indicators"]["volatility"]["bollinger_bands"]["std_dev"]
-                    
-                    df['bb_middle'] = df['close'].rolling(window=period).mean()
-                    df['bb_std'] = df['close'].rolling(window=period).std()
-                    df['bb_upper'] = df['bb_middle'] + (df['bb_std'] * std_dev)
-                    df['bb_lower'] = df['bb_middle'] - (df['bb_std'] * std_dev)
-                    df['bb_width'] = (df['bb_upper'] - df['bb_lower']) / df['bb_middle']
-                    
-                    result["volatility"]["bollinger_bands"] = {
-                        "upper": df['bb_upper'].iloc[-1],
-                        "middle": df['bb_middle'].iloc[-1],
-                        "lower": df['bb_lower'].iloc[-1],
-                        "width": df['bb_width'].iloc[-1]
-                    }
-                
-                # ATR (Average True Range)
-                if self.config["indicators"]["volatility"]["atr"]["enabled"]:
-                    period = self.config["indicators"]["volatility"]["atr"]["period"]
-                    
-                    df['tr0'] = abs(df['high'] - df['low'])
-                    df['tr1'] = abs(df['high'] - df['close'].shift())
-                    df['tr2'] = abs(df['low'] - df['close'].shift())
-                    df['tr'] = df[['tr0', 'tr1', 'tr2']].max(axis=1)
-                    df['atr'] = df['tr'].rolling(window=period).mean()
-                    
-                    result["volatility"]["atr"] = df['atr'].iloc[-1]
-                    result["volatility"]["atr_percent"] = df['atr'].iloc[-1] / df['close'].iloc[-1] * 100
+            # Tính toán ATR
+            atr_period = indicators_config.get('atr', 14)
+            df['tr1'] = abs(df['high'] - df['low'])
+            df['tr2'] = abs(df['high'] - df['close'].shift())
+            df['tr3'] = abs(df['low'] - df['close'].shift())
+            df['tr'] = df[['tr1', 'tr2', 'tr3']].max(axis=1)
+            df['atr'] = df['tr'].rolling(window=atr_period).mean()
             
-            return result
+            # Tính toán Stochastic
+            stoch_config = indicators_config.get('stoch', {"k": 14, "d": 3, "smooth": 3})
+            stoch_k = stoch_config.get('k', 14)
+            stoch_d = stoch_config.get('d', 3)
+            stoch_smooth = stoch_config.get('smooth', 3)
+            
+            df['stoch_k_raw'] = 100 * (df['close'] - df['low'].rolling(window=stoch_k).min()) / (
+                df['high'].rolling(window=stoch_k).max() - df['low'].rolling(window=stoch_k).min()
+            )
+            df['stoch_k'] = df['stoch_k_raw'].rolling(window=stoch_smooth).mean()
+            df['stoch_d'] = df['stoch_k'].rolling(window=stoch_d).mean()
+            
+            # Tính toán Volume SMA
+            volume_sma_period = indicators_config.get('volume_sma', 20)
+            df['volume_sma'] = df['volume'].rolling(window=volume_sma_period).mean()
+            df['volume_ratio'] = df['volume'] / df['volume_sma']
+            
+            # Tính toán thêm - Chaikin Money Flow
+            period = 20
+            mf_multiplier = ((df['close'] - df['low']) - (df['high'] - df['close'])) / (df['high'] - df['low'])
+            mf_volume = mf_multiplier * df['volume']
+            df['cmf'] = mf_volume.rolling(window=period).sum() / df['volume'].rolling(window=period).sum()
+            
+            # Tính toán Ichimoku
+            tenkan_period = 9
+            kijun_period = 26
+            senkou_span_b_period = 52
+            
+            df['tenkan_sen'] = (df['high'].rolling(window=tenkan_period).max() + df['low'].rolling(window=tenkan_period).min()) / 2
+            df['kijun_sen'] = (df['high'].rolling(window=kijun_period).max() + df['low'].rolling(window=kijun_period).min()) / 2
+            df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2).shift(kijun_period)
+            df['senkou_span_b'] = ((df['high'].rolling(window=senkou_span_b_period).max() + df['low'].rolling(window=senkou_span_b_period).min()) / 2).shift(kijun_period)
+            df['chikou_span'] = df['close'].shift(-kijun_period)
+            
+            return df
+            
         except Exception as e:
-            logger.error(f"Lỗi khi tính chỉ báo cho {symbol}: {str(e)}")
-            return {
-                "moving_averages": {},
-                "oscillators": {},
-                "volume": {},
-                "volatility": {}
-            }
+            logger.error(f"Lỗi khi tính toán chỉ báo: {e}")
+            return df
     
-    def _analyze_support_resistance(self, klines_data: List) -> Dict:
+    def identify_patterns(self, df: pd.DataFrame) -> Dict:
         """
-        Phân tích các mức hỗ trợ/kháng cự
+        Xác định các mẫu nến (candlestick patterns)
         
         Args:
-            klines_data (List): Dữ liệu k-lines
+            df: DataFrame chứa dữ liệu lịch sử
             
         Returns:
-            Dict: Các mức hỗ trợ/kháng cự
+            Dict: Dictionary chứa các mẫu nến đã phát hiện
         """
         try:
-            # Chuyển đổi dữ liệu
-            df = pd.DataFrame(klines_data, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
+            patterns = {}
             
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
+            # Tạo bản sao để đảm bảo dữ liệu không bị thay đổi
+            df = df.copy()
             
-            # Tìm các đỉnh và đáy
-            price_history = df['close'].values
+            # Lấy 10 nến gần nhất để phân tích
+            recent_candles = df.iloc[-10:].copy()
             
-            # Tối đa hóa tìm mức đủ dài
-            high_points = []
-            low_points = []
+            # --- MẪU NẾN ĐƠN ---
             
-            # Sử dụng thuật toán fractals
-            for i in range(2, len(price_history) - 2):
-                # Đỉnh (high)
-                if (price_history[i] > price_history[i-1] and 
-                    price_history[i] > price_history[i-2] and 
-                    price_history[i] > price_history[i+1] and 
-                    price_history[i] > price_history[i+2]):
-                    high_points.append((i, price_history[i]))
+            # Mẫu Doji
+            recent_candles['body_size'] = abs(recent_candles['close'] - recent_candles['open'])
+            recent_candles['shadow_size'] = recent_candles['high'] - recent_candles['low']
+            doji = recent_candles[recent_candles['body_size'] < 0.1 * recent_candles['shadow_size']]
+            
+            if not doji.empty:
+                last_doji = doji.iloc[-1]
+                patterns['doji'] = {
+                    'detected': True,
+                    'index': doji.index[-1],
+                    'strength': 'weak' if len(doji) == 1 else 'medium' if len(doji) == 2 else 'strong'
+                }
+            
+            # Mẫu Hammer
+            latest = df.iloc[-1]
+            prev = df.iloc[-2]
+            body_size = abs(latest['close'] - latest['open'])
+            lower_shadow = min(latest['close'], latest['open']) - latest['low']
+            upper_shadow = latest['high'] - max(latest['close'], latest['open'])
+            
+            if (lower_shadow > 2 * body_size) and (upper_shadow < 0.1 * body_size) and (latest['close'] > latest['open']):
+                patterns['hammer'] = {
+                    'detected': True,
+                    'index': df.index[-1],
+                    'strength': 'strong' if prev['close'] < prev['open'] else 'medium'
+                }
+            
+            # Mẫu Shooting Star
+            if (upper_shadow > 2 * body_size) and (lower_shadow < 0.1 * body_size) and (latest['close'] < latest['open']):
+                patterns['shooting_star'] = {
+                    'detected': True,
+                    'index': df.index[-1],
+                    'strength': 'strong' if prev['close'] > prev['open'] else 'medium'
+                }
+            
+            # --- MẪU NẾN KẾT HỢP ---
+            
+            # Mẫu Engulfing
+            if len(df) >= 2:
+                current = df.iloc[-1]
+                previous = df.iloc[-2]
                 
-                # Đáy (low)
-                if (price_history[i] < price_history[i-1] and 
-                    price_history[i] < price_history[i-2] and 
-                    price_history[i] < price_history[i+1] and 
-                    price_history[i] < price_history[i+2]):
-                    low_points.append((i, price_history[i]))
+                current_body_size = abs(current['close'] - current['open'])
+                previous_body_size = abs(previous['close'] - previous['open'])
+                
+                # Bullish Engulfing
+                if (current['close'] > current['open']) and (previous['close'] < previous['open']):
+                    if (current['open'] < previous['close']) and (current['close'] > previous['open']):
+                        if current_body_size > previous_body_size:
+                            patterns['bullish_engulfing'] = {
+                                'detected': True,
+                                'index': df.index[-1],
+                                'strength': 'strong' if current_body_size > 1.5 * previous_body_size else 'medium'
+                            }
+                
+                # Bearish Engulfing
+                if (current['close'] < current['open']) and (previous['close'] > previous['open']):
+                    if (current['open'] > previous['close']) and (current['close'] < previous['open']):
+                        if current_body_size > previous_body_size:
+                            patterns['bearish_engulfing'] = {
+                                'detected': True,
+                                'index': df.index[-1],
+                                'strength': 'strong' if current_body_size > 1.5 * previous_body_size else 'medium'
+                            }
             
-            # Lọc mức S/R quan trọng bằng cách gộp các mức gần nhau
-            zone_threshold = self.config["indicators"]["support_resistance"]["zone_threshold"] * price_history[-1]
+            # Mẫu Morning Star
+            if len(df) >= 3:
+                first = df.iloc[-3]
+                middle = df.iloc[-2]
+                last = df.iloc[-1]
+                
+                first_body_size = abs(first['close'] - first['open'])
+                middle_body_size = abs(middle['close'] - middle['open'])
+                last_body_size = abs(last['close'] - last['open'])
+                
+                if (first['close'] < first['open']) and (last['close'] > last['open']):
+                    if middle_body_size < 0.5 * first_body_size:
+                        if (last['close'] > (first['open'] + first['close']) / 2):
+                            patterns['morning_star'] = {
+                                'detected': True,
+                                'index': df.index[-1],
+                                'strength': 'strong'
+                            }
+            
+            # Mẫu Evening Star
+            if len(df) >= 3:
+                first = df.iloc[-3]
+                middle = df.iloc[-2]
+                last = df.iloc[-1]
+                
+                first_body_size = abs(first['close'] - first['open'])
+                middle_body_size = abs(middle['close'] - middle['open'])
+                last_body_size = abs(last['close'] - last['open'])
+                
+                if (first['close'] > first['open']) and (last['close'] < last['open']):
+                    if middle_body_size < 0.5 * first_body_size:
+                        if (last['close'] < (first['open'] + first['close']) / 2):
+                            patterns['evening_star'] = {
+                                'detected': True,
+                                'index': df.index[-1],
+                                'strength': 'strong'
+                            }
+            
+            return patterns
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi xác định mẫu nến: {e}")
+            return {}
+    
+    def analyze_trend(self, df: pd.DataFrame) -> Dict:
+        """
+        Phân tích xu hướng
+        
+        Args:
+            df: DataFrame chứa dữ liệu lịch sử với các chỉ báo
+            
+        Returns:
+            Dict: Kết quả phân tích xu hướng
+        """
+        try:
+            result = {
+                'primary_trend': 'NEUTRAL',
+                'secondary_trend': 'NEUTRAL',
+                'trend_strength': 0,
+                'support_levels': [],
+                'resistance_levels': [],
+                'key_level': 0
+            }
+            
+            # Lấy các giá trị gần nhất
+            latest = df.iloc[-1]
+            
+            # Phân tích xu hướng dựa trên MA
+            sma_short = latest.get('sma_50', latest.get('sma_20', 0))
+            sma_long = latest.get('sma_200', latest.get('sma_100', 0))
+            ema_short = latest.get('ema_21', latest.get('ema_9', 0))
+            ema_long = latest.get('ema_100', latest.get('ema_55', 0))
+            current_price = latest['close']
+            
+            # Kiểm tra xu hướng theo giá và MA
+            price_above_short_ma = current_price > sma_short and current_price > ema_short
+            price_below_short_ma = current_price < sma_short and current_price < ema_short
+            short_ma_above_long_ma = sma_short > sma_long and ema_short > ema_long
+            short_ma_below_long_ma = sma_short < sma_long and ema_short < ema_long
+            
+            # Xác định xu hướng
+            if price_above_short_ma and short_ma_above_long_ma:
+                result['primary_trend'] = 'UPTREND'
+            elif price_below_short_ma and short_ma_below_long_ma:
+                result['primary_trend'] = 'DOWNTREND'
+            
+            # Xác định xu hướng thứ cấp dựa trên MACD
+            macd = latest.get('macd', 0)
+            macd_signal = latest.get('macd_signal', 0)
+            macd_histogram = latest.get('macd_histogram', 0)
+            
+            if macd > macd_signal and macd_histogram > 0:
+                result['secondary_trend'] = 'UPTREND'
+            elif macd < macd_signal and macd_histogram < 0:
+                result['secondary_trend'] = 'DOWNTREND'
+            
+            # Đánh giá độ mạnh của xu hướng
+            trend_strength = 0
+            
+            # 1. Độ mạnh từ giá và MA
+            if result['primary_trend'] == 'UPTREND':
+                price_ma_ratio = current_price / sma_long - 1
+                trend_strength += min(5, price_ma_ratio * 100)  # Tối đa 5 điểm
+            elif result['primary_trend'] == 'DOWNTREND':
+                price_ma_ratio = 1 - current_price / sma_long
+                trend_strength += min(5, price_ma_ratio * 100)  # Tối đa 5 điểm
+            
+            # 2. Độ mạnh từ MACD
+            if result['secondary_trend'] == result['primary_trend']:
+                trend_strength += 2  # Thêm 2 điểm nếu xu hướng chính và phụ khớp nhau
+                
+                # Điểm thêm từ độ lớn của MACD histogram
+                macd_strength = min(3, abs(macd_histogram) / current_price * 1000)
+                trend_strength += macd_strength
+            
+            # 3. Độ mạnh từ RSI
+            rsi = latest.get('rsi', 50)
+            if result['primary_trend'] == 'UPTREND' and rsi > 50:
+                trend_strength += min(2, (rsi - 50) / 10)  # Tối đa 2 điểm cho RSI trên 50
+            elif result['primary_trend'] == 'DOWNTREND' and rsi < 50:
+                trend_strength += min(2, (50 - rsi) / 10)  # Tối đa 2 điểm cho RSI dưới 50
+            
+            result['trend_strength'] = round(trend_strength, 1)
+            
+            # Xác định mức hỗ trợ và kháng cự
+            # 1. Sử dụng Swing High/Low
+            swing_high = df['high'].rolling(window=5, center=True).max()
+            swing_low = df['low'].rolling(window=5, center=True).min()
             
             resistance_levels = []
             support_levels = []
             
-            # Gộp các đỉnh gần nhau
-            if high_points:
-                high_points.sort(key=lambda x: x[1], reverse=True)  # Sắp xếp theo giá từ cao xuống thấp
+            for i in range(5, len(df) - 5):
+                # Xác định Swing High
+                if df['high'].iloc[i] == swing_high.iloc[i] and df['high'].iloc[i] > df['high'].iloc[i+1] and df['high'].iloc[i] > df['high'].iloc[i-1]:
+                    resistance_levels.append(df['high'].iloc[i])
                 
-                current_zone = [high_points[0]]
-                current_price = high_points[0][1]
-                
-                for i in range(1, len(high_points)):
-                    if abs(high_points[i][1] - current_price) <= zone_threshold:
-                        current_zone.append(high_points[i])
-                    else:
-                        # Tính giá trung bình của zone
-                        avg_price = sum(point[1] for point in current_zone) / len(current_zone)
-                        resistance_levels.append(avg_price)
-                        
-                        # Bắt đầu zone mới
-                        current_zone = [high_points[i]]
-                        current_price = high_points[i][1]
-                
-                # Xử lý zone cuối cùng
-                if current_zone:
-                    avg_price = sum(point[1] for point in current_zone) / len(current_zone)
-                    resistance_levels.append(avg_price)
+                # Xác định Swing Low
+                if df['low'].iloc[i] == swing_low.iloc[i] and df['low'].iloc[i] < df['low'].iloc[i+1] and df['low'].iloc[i] < df['low'].iloc[i-1]:
+                    support_levels.append(df['low'].iloc[i])
             
-            # Gộp các đáy gần nhau
-            if low_points:
-                low_points.sort(key=lambda x: x[1])  # Sắp xếp theo giá từ thấp lên cao
-                
-                current_zone = [low_points[0]]
-                current_price = low_points[0][1]
-                
-                for i in range(1, len(low_points)):
-                    if abs(low_points[i][1] - current_price) <= zone_threshold:
-                        current_zone.append(low_points[i])
-                    else:
-                        # Tính giá trung bình của zone
-                        avg_price = sum(point[1] for point in current_zone) / len(current_zone)
-                        support_levels.append(avg_price)
-                        
-                        # Bắt đầu zone mới
-                        current_zone = [low_points[i]]
-                        current_price = low_points[i][1]
-                
-                # Xử lý zone cuối cùng
-                if current_zone:
-                    avg_price = sum(point[1] for point in current_zone) / len(current_zone)
-                    support_levels.append(avg_price)
+            # 2. Thêm mức MA làm hỗ trợ/kháng cự
+            if result['primary_trend'] == 'UPTREND':
+                support_levels.extend([sma_short, ema_short])
+            elif result['primary_trend'] == 'DOWNTREND':
+                resistance_levels.extend([sma_short, ema_short])
             
-            # Lọc các mức gần với giá hiện tại
-            current_price = float(klines_data[-1][4])  # Giá đóng cửa
+            # 3. Thêm mức Fibonacci
+            high = df['high'].max()
+            low = df['low'].min()
+            fib_range = high - low
             
-            nearby_resistance = [price for price in resistance_levels if price > current_price]
-            nearby_resistance.sort()  # Sắp xếp tăng dần
+            if result['primary_trend'] == 'UPTREND':
+                resistance_levels.extend([
+                    low + fib_range * 0.618,
+                    low + fib_range * 0.786,
+                    low + fib_range * 1.0,
+                    low + fib_range * 1.272
+                ])
+                support_levels.extend([
+                    low + fib_range * 0.236,
+                    low + fib_range * 0.382,
+                    low + fib_range * 0.5
+                ])
+            else:
+                resistance_levels.extend([
+                    low + fib_range * 0.5,
+                    low + fib_range * 0.618,
+                    low + fib_range * 0.786,
+                    low + fib_range * 1.0
+                ])
+                support_levels.extend([
+                    low,
+                    low + fib_range * 0.236,
+                    low + fib_range * 0.382
+                ])
             
-            nearby_support = [price for price in support_levels if price < current_price]
-            nearby_support.sort(reverse=True)  # Sắp xếp giảm dần
+            # Lọc và phân loại mức hỗ trợ/kháng cự
+            current_price = latest['close']
             
-            result = {
-                "current_price": current_price,
-                "resistance_levels": resistance_levels,
-                "support_levels": support_levels,
-                "nearest_resistance": nearby_resistance[0] if nearby_resistance else None,
-                "nearest_support": nearby_support[0] if nearby_support else None
-            }
+            # Lọc mức hỗ trợ dưới giá hiện tại
+            filtered_supports = list(filter(lambda x: x < current_price, support_levels))
+            filtered_supports.sort(reverse=True)  # Sắp xếp giảm dần
+            
+            # Lọc mức kháng cự trên giá hiện tại
+            filtered_resistance = list(filter(lambda x: x > current_price, resistance_levels))
+            filtered_resistance.sort()  # Sắp xếp tăng dần
+            
+            # Lấy 3 mức gần nhất
+            result['support_levels'] = filtered_supports[:3]
+            result['resistance_levels'] = filtered_resistance[:3]
+            
+            # Xác định mức giá quan trọng nhất (key level)
+            if result['primary_trend'] == 'UPTREND' and filtered_resistance:
+                result['key_level'] = filtered_resistance[0]  # Mức kháng cự gần nhất
+            elif result['primary_trend'] == 'DOWNTREND' and filtered_supports:
+                result['key_level'] = filtered_supports[0]  # Mức hỗ trợ gần nhất
+            else:
+                result['key_level'] = current_price  # Mức giá hiện tại
             
             return result
+            
         except Exception as e:
-            logger.error(f"Lỗi khi phân tích hỗ trợ/kháng cự: {str(e)}")
+            logger.error(f"Lỗi khi phân tích xu hướng: {e}")
             return {
-                "current_price": float(klines_data[-1][4]) if klines_data else 0,
-                "resistance_levels": [],
-                "support_levels": [],
-                "nearest_resistance": None,
-                "nearest_support": None
+                'primary_trend': 'NEUTRAL',
+                'secondary_trend': 'NEUTRAL',
+                'trend_strength': 0,
+                'support_levels': [],
+                'resistance_levels': [],
+                'key_level': 0
             }
     
-    def _analyze_entry_exit_points(self, symbol: str, klines_data: List, indicators: Dict, support_resistance: Dict) -> Dict:
+    def analyze_volatility(self, df: pd.DataFrame) -> Dict:
         """
-        Phân tích các điểm vào/ra lệnh
+        Phân tích biến động
         
         Args:
-            symbol (str): Mã cặp tiền
-            klines_data (List): Dữ liệu k-lines
-            indicators (Dict): Chỉ báo kỹ thuật
-            support_resistance (Dict): Thông tin hỗ trợ/kháng cự
+            df: DataFrame chứa dữ liệu lịch sử với các chỉ báo
             
         Returns:
-            Dict: Thông tin điểm vào/ra lệnh
+            Dict: Kết quả phân tích biến động
         """
         try:
-            current_price = float(klines_data[-1][4])  # Giá đóng cửa
-            market_regime = self._detect_market_regime(klines_data)
-            
-            # Khởi tạo kết quả
             result = {
-                "long": {
-                    "entry_points": [],
-                    "exit_points": {
-                        "take_profit": [],
-                        "stop_loss": []
-                    },
-                    "reasoning": []
+                'current_volatility': 0,
+                'volatility_state': 'NORMAL',
+                'volatility_change': 'STABLE',
+                'atr': 0,
+                'atr_percent': 0,
+                'bollinger_width': 0,
+                'volatility_score': 0
+            }
+            
+            # Lấy giá trị gần nhất
+            latest = df.iloc[-1]
+            recent = df.iloc[-10:]
+            
+            # ATR và ATR %
+            atr = latest.get('atr', 0)
+            close_price = latest['close']
+            atr_percent = (atr / close_price * 100) if close_price > 0 else 0
+            
+            result['atr'] = atr
+            result['atr_percent'] = atr_percent
+            
+            # Bollinger Width
+            bb_width = latest.get('bb_width', 0)
+            result['bollinger_width'] = bb_width
+            
+            # Tính toán điểm biến động
+            volatility_score = 0
+            
+            # 1. Đánh giá từ ATR%
+            if atr_percent < 1.0:
+                volatility_score += 1  # Biến động thấp
+            elif atr_percent < 2.0:
+                volatility_score += 2  # Biến động trung bình
+            elif atr_percent < 3.5:
+                volatility_score += 3  # Biến động cao
+            else:
+                volatility_score += 4  # Biến động rất cao
+            
+            # 2. Đánh giá từ Bollinger Width
+            avg_bb_width = recent['bb_width'].mean()
+            if bb_width < 0.5 * avg_bb_width:
+                volatility_score += 0  # Biến động rất thấp
+            elif bb_width < 0.8 * avg_bb_width:
+                volatility_score += 1  # Biến động thấp
+            elif bb_width < 1.2 * avg_bb_width:
+                volatility_score += 2  # Biến động trung bình
+            elif bb_width < 1.5 * avg_bb_width:
+                volatility_score += 3  # Biến động cao
+            else:
+                volatility_score += 4  # Biến động rất cao
+            
+            # 3. Đánh giá từ Price Range
+            recent_range = (recent['high'].max() - recent['low'].min()) / close_price * 100
+            if recent_range < 2.0:
+                volatility_score += 1  # Biến động thấp
+            elif recent_range < 4.0:
+                volatility_score += 2  # Biến động trung bình
+            elif recent_range < 7.0:
+                volatility_score += 3  # Biến động cao
+            else:
+                volatility_score += 4  # Biến động rất cao
+            
+            result['volatility_score'] = round(volatility_score / 3, 1)  # Điểm trung bình
+            
+            # Xác định trạng thái biến động
+            if result['volatility_score'] < 1.5:
+                result['volatility_state'] = 'LOW'
+            elif result['volatility_score'] < 2.5:
+                result['volatility_state'] = 'NORMAL'
+            elif result['volatility_score'] < 3.5:
+                result['volatility_state'] = 'HIGH'
+            else:
+                result['volatility_state'] = 'EXTREME'
+            
+            # Xác định sự thay đổi biến động
+            if len(df) > 20:
+                prev_bb_width = df['bb_width'].iloc[-20:-10].mean()
+                curr_bb_width = df['bb_width'].iloc[-10:].mean()
+                
+                if curr_bb_width < 0.8 * prev_bb_width:
+                    result['volatility_change'] = 'DECREASING'
+                elif curr_bb_width > 1.2 * prev_bb_width:
+                    result['volatility_change'] = 'INCREASING'
+                else:
+                    result['volatility_change'] = 'STABLE'
+            
+            result['current_volatility'] = atr_percent
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích biến động: {e}")
+            return {
+                'current_volatility': 0,
+                'volatility_state': 'NORMAL',
+                'volatility_change': 'STABLE',
+                'atr': 0,
+                'atr_percent': 0,
+                'bollinger_width': 0,
+                'volatility_score': 0
+            }
+    
+    def analyze_momentum(self, df: pd.DataFrame) -> Dict:
+        """
+        Phân tích xung lượng
+        
+        Args:
+            df: DataFrame chứa dữ liệu lịch sử với các chỉ báo
+            
+        Returns:
+            Dict: Kết quả phân tích xung lượng
+        """
+        try:
+            result = {
+                'primary_momentum': 'NEUTRAL',
+                'momentum_strength': 0,
+                'momentum_change': 'STABLE',
+                'rsi': 0,
+                'macd': 0,
+                'stochastic': 0,
+                'momentum_score': 0
+            }
+            
+            # Lấy giá trị gần nhất
+            latest = df.iloc[-1]
+            prev = df.iloc[-2] if len(df) > 1 else latest
+            
+            # Lấy các chỉ số xung lượng
+            rsi = latest.get('rsi', 50)
+            macd = latest.get('macd', 0)
+            macd_signal = latest.get('macd_signal', 0)
+            macd_histogram = latest.get('macd_histogram', 0)
+            stoch_k = latest.get('stoch_k', 50)
+            stoch_d = latest.get('stoch_d', 50)
+            
+            result['rsi'] = rsi
+            result['macd'] = macd
+            result['stochastic'] = stoch_k
+            
+            # Tính toán điểm xung lượng
+            momentum_score = 0
+            
+            # 1. Đánh giá từ RSI
+            if rsi > 70:
+                momentum_score += 2  # Xung lượng tăng mạnh
+            elif rsi > 60:
+                momentum_score += 1  # Xung lượng tăng trung bình
+            elif rsi < 30:
+                momentum_score -= 2  # Xung lượng giảm mạnh
+            elif rsi < 40:
+                momentum_score -= 1  # Xung lượng giảm trung bình
+            
+            # 2. Đánh giá từ MACD
+            if macd > macd_signal:
+                momentum_score += 1  # Xung lượng tăng
+                if macd > 0:
+                    momentum_score += 0.5  # Xung lượng tăng mạnh hơn khi MACD > 0
+            else:
+                momentum_score -= 1  # Xung lượng giảm
+                if macd < 0:
+                    momentum_score -= 0.5  # Xung lượng giảm mạnh hơn khi MACD < 0
+            
+            # 3. Đánh giá từ Stochastic
+            if stoch_k > stoch_d:
+                momentum_score += 0.5  # Xung lượng tăng nhẹ
+                if stoch_k > 80:
+                    momentum_score += 0.5  # Xung lượng tăng mạnh khi ở vùng quá mua
+            else:
+                momentum_score -= 0.5  # Xung lượng giảm nhẹ
+                if stoch_k < 20:
+                    momentum_score -= 0.5  # Xung lượng giảm mạnh khi ở vùng quá bán
+            
+            # 4. Đánh giá từ thay đổi MACD Histogram
+            prev_histogram = prev.get('macd_histogram', 0)
+            if macd_histogram > prev_histogram:
+                momentum_score += 0.5  # Xung lượng tăng
+            else:
+                momentum_score -= 0.5  # Xung lượng giảm
+            
+            # 5. Đánh giá từ CMF
+            cmf = latest.get('cmf', 0)
+            if cmf > 0.05:
+                momentum_score += 0.5  # Xung lượng tăng với dòng tiền vào
+            elif cmf < -0.05:
+                momentum_score -= 0.5  # Xung lượng giảm với dòng tiền ra
+            
+            result['momentum_score'] = round(momentum_score, 1)
+            
+            # Xác định xung lượng chính
+            if momentum_score >= 2.0:
+                result['primary_momentum'] = 'STRONG_BULLISH'
+            elif momentum_score >= 1.0:
+                result['primary_momentum'] = 'BULLISH'
+            elif momentum_score <= -2.0:
+                result['primary_momentum'] = 'STRONG_BEARISH'
+            elif momentum_score <= -1.0:
+                result['primary_momentum'] = 'BEARISH'
+            else:
+                result['primary_momentum'] = 'NEUTRAL'
+            
+            # Xác định độ mạnh xung lượng
+            result['momentum_strength'] = abs(momentum_score)
+            
+            # Xác định sự thay đổi xung lượng
+            if len(df) > 5:
+                prev_rsi = df['rsi'].iloc[-5:-1].mean()
+                prev_macd = df['macd'].iloc[-5:-1].mean()
+                
+                if rsi > prev_rsi and macd > prev_macd:
+                    result['momentum_change'] = 'INCREASING'
+                elif rsi < prev_rsi and macd < prev_macd:
+                    result['momentum_change'] = 'DECREASING'
+                else:
+                    result['momentum_change'] = 'STABLE'
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích xung lượng: {e}")
+            return {
+                'primary_momentum': 'NEUTRAL',
+                'momentum_strength': 0,
+                'momentum_change': 'STABLE',
+                'rsi': 0,
+                'macd': 0,
+                'stochastic': 0,
+                'momentum_score': 0
+            }
+    
+    def analyze_volume(self, df: pd.DataFrame) -> Dict:
+        """
+        Phân tích khối lượng
+        
+        Args:
+            df: DataFrame chứa dữ liệu lịch sử với các chỉ báo
+            
+        Returns:
+            Dict: Kết quả phân tích khối lượng
+        """
+        try:
+            result = {
+                'volume_state': 'NORMAL',
+                'volume_trend': 'NEUTRAL',
+                'money_flow': 'NEUTRAL',
+                'volume_avg': 0,
+                'volume_change': 0,
+                'volume_score': 0
+            }
+            
+            # Lấy giá trị gần nhất
+            latest = df.iloc[-1]
+            recent_volume = df['volume'].iloc[-10:].mean()
+            
+            # Tính toán khối lượng trung bình và thay đổi
+            volume_sma = latest.get('volume_sma', recent_volume)
+            current_volume = latest['volume']
+            volume_ratio = current_volume / volume_sma if volume_sma > 0 else 1
+            volume_change = (current_volume - volume_sma) / volume_sma * 100 if volume_sma > 0 else 0
+            
+            result['volume_avg'] = volume_sma
+            result['volume_change'] = volume_change
+            
+            # Tính toán điểm khối lượng
+            volume_score = 0
+            
+            # 1. Đánh giá từ tỉ lệ khối lượng
+            if volume_ratio > 2.0:
+                volume_score += 3  # Khối lượng rất cao
+            elif volume_ratio > 1.5:
+                volume_score += 2  # Khối lượng cao
+            elif volume_ratio > 1.2:
+                volume_score += 1  # Khối lượng trên trung bình
+            elif volume_ratio < 0.5:
+                volume_score -= 2  # Khối lượng rất thấp
+            elif volume_ratio < 0.8:
+                volume_score -= 1  # Khối lượng thấp
+            
+            # 2. Đánh giá từ Chaikin Money Flow
+            cmf = latest.get('cmf', 0)
+            if cmf > 0.1:
+                volume_score += 2  # Dòng tiền vào mạnh
+            elif cmf > 0.05:
+                volume_score += 1  # Dòng tiền vào
+            elif cmf < -0.1:
+                volume_score -= 2  # Dòng tiền ra mạnh
+            elif cmf < -0.05:
+                volume_score -= 1  # Dòng tiền ra
+            
+            # 3. Đánh giá từ xu hướng khối lượng
+            volume_trend = np.polyfit(range(min(10, len(df))), df['volume'].iloc[-min(10, len(df)):].values, 1)[0]
+            if volume_trend > 0:
+                volume_score += 1  # Khối lượng tăng
+            else:
+                volume_score -= 0.5  # Khối lượng giảm
+            
+            # 4. Đánh giá từ sự phù hợp giữa khối lượng và giá
+            price_change = (latest['close'] - latest['open']) / latest['open'] * 100 if latest['open'] > 0 else 0
+            
+            if price_change > 0 and volume_ratio > 1.2:
+                volume_score += 1  # Khối lượng tăng kèm giá tăng
+            elif price_change < 0 and volume_ratio > 1.2:
+                volume_score -= 1  # Khối lượng tăng kèm giá giảm
+            
+            result['volume_score'] = round(volume_score, 1)
+            
+            # Xác định trạng thái khối lượng
+            if volume_ratio > 1.5:
+                result['volume_state'] = 'HIGH'
+            elif volume_ratio > 1.2:
+                result['volume_state'] = 'ABOVE_AVERAGE'
+            elif volume_ratio < 0.8:
+                result['volume_state'] = 'BELOW_AVERAGE'
+            elif volume_ratio < 0.5:
+                result['volume_state'] = 'LOW'
+            else:
+                result['volume_state'] = 'NORMAL'
+            
+            # Xác định xu hướng khối lượng
+            recent_volumes = df['volume'].iloc[-5:].values
+            if len(recent_volumes) >= 5:
+                slope = np.polyfit(range(5), recent_volumes, 1)[0]
+                if slope > 0:
+                    result['volume_trend'] = 'INCREASING'
+                elif slope < 0:
+                    result['volume_trend'] = 'DECREASING'
+                else:
+                    result['volume_trend'] = 'NEUTRAL'
+            
+            # Xác định dòng tiền
+            if cmf > 0.05:
+                result['money_flow'] = 'INFLOW'
+            elif cmf < -0.05:
+                result['money_flow'] = 'OUTFLOW'
+            else:
+                result['money_flow'] = 'NEUTRAL'
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích khối lượng: {e}")
+            return {
+                'volume_state': 'NORMAL',
+                'volume_trend': 'NEUTRAL',
+                'money_flow': 'NEUTRAL',
+                'volume_avg': 0,
+                'volume_change': 0,
+                'volume_score': 0
+            }
+    
+    def _generate_summary(self, analysis_results: Dict, timeframes: List[str]) -> Dict:
+        """
+        Tạo tóm tắt từ các kết quả phân tích
+        
+        Args:
+            analysis_results: Dictionary chứa kết quả phân tích cho các khung thời gian
+            timeframes: Danh sách các khung thời gian đã phân tích
+            
+        Returns:
+            Dict: Tóm tắt phân tích
+        """
+        try:
+            summary = {
+                'overall_signal': 'NEUTRAL',
+                'confidence': 0,
+                'description': '',
+                'time_horizons': {
+                    'short_term': 'NEUTRAL',
+                    'medium_term': 'NEUTRAL',
+                    'long_term': 'NEUTRAL'
                 },
-                "short": {
-                    "entry_points": [],
-                    "exit_points": {
-                        "take_profit": [],
-                        "stop_loss": []
-                    },
-                    "reasoning": []
-                },
-                "score": {
-                    "long": 0,
-                    "short": 0
+                'price_prediction': {
+                    'support': 0,
+                    'resistance': 0,
+                    'target': 0
                 }
             }
             
-            # Điểm vào lệnh LONG
-            long_entry_reasons = []
+            # Xác định khung thời gian ngắn, trung và dài hạn
+            short_term_tf = ['1m', '5m', '15m']
+            medium_term_tf = ['30m', '1h', '4h']
+            long_term_tf = ['1d', '1w']
             
-            # Điểm vào dựa trên RSI
-            if "oscillators" in indicators and "rsi" in indicators["oscillators"]:
-                rsi = indicators["oscillators"]["rsi"]
-                oversold = self.config["indicators"]["oscillators"]["rsi"]["oversold"]
+            signal_scores = []
+            confidence_scores = []
+            
+            # Phân tích cho từng khung thời gian
+            for timeframe in timeframes:
+                if timeframe not in analysis_results:
+                    continue
                 
-                if rsi < oversold:
-                    result["long"]["entry_points"].append(current_price)
-                    long_entry_reasons.append(f"RSI oversold ({rsi:.2f} < {oversold})")
-            
-            # Điểm vào dựa trên MACD
-            if "oscillators" in indicators and "macd" in indicators["oscillators"]:
-                macd = indicators["oscillators"]["macd"]["macd"]
-                signal = indicators["oscillators"]["macd"]["signal"]
-                histogram = indicators["oscillators"]["macd"]["histogram"]
+                tf_analysis = analysis_results[timeframe]
                 
-                if macd > signal and histogram > 0 and histogram > 0:
-                    result["long"]["entry_points"].append(current_price)
-                    long_entry_reasons.append(f"MACD bullish crossover (histogram: {histogram:.6f})")
-            
-            # Điểm vào dựa trên Bollinger Bands
-            if "volatility" in indicators and "bollinger_bands" in indicators["volatility"]:
-                bb_lower = indicators["volatility"]["bollinger_bands"]["lower"]
+                # 1. Tính toán điểm tín hiệu cho khung thời gian này
+                signal_score = 0
                 
-                if current_price <= bb_lower:
-                    result["long"]["entry_points"].append(current_price)
-                    long_entry_reasons.append(f"Price at/below BB lower ({current_price:.2f} <= {bb_lower:.2f})")
-            
-            # Điểm vào dựa trên mức hỗ trợ
-            if "nearest_support" in support_resistance and support_resistance["nearest_support"]:
-                nearest_support = support_resistance["nearest_support"]
+                # Xu hướng
+                trend_analysis = tf_analysis.get('trend_analysis', {})
+                trend = trend_analysis.get('primary_trend', 'NEUTRAL')
+                trend_strength = trend_analysis.get('trend_strength', 0)
                 
-                if abs(current_price - nearest_support) / current_price < 0.02:  # Nếu giá gần mức hỗ trợ (2%)
-                    result["long"]["entry_points"].append(nearest_support)
-                    long_entry_reasons.append(f"Price near support level ({nearest_support:.2f})")
+                if trend == 'UPTREND':
+                    signal_score += trend_strength / 2
+                elif trend == 'DOWNTREND':
+                    signal_score -= trend_strength / 2
+                
+                # Xung lượng
+                momentum_analysis = tf_analysis.get('momentum_analysis', {})
+                momentum = momentum_analysis.get('primary_momentum', 'NEUTRAL')
+                momentum_strength = momentum_analysis.get('momentum_strength', 0)
+                
+                if momentum == 'STRONG_BULLISH':
+                    signal_score += momentum_strength
+                elif momentum == 'BULLISH':
+                    signal_score += momentum_strength / 2
+                elif momentum == 'STRONG_BEARISH':
+                    signal_score -= momentum_strength
+                elif momentum == 'BEARISH':
+                    signal_score -= momentum_strength / 2
+                
+                # Khối lượng
+                volume_analysis = tf_analysis.get('volume_analysis', {})
+                volume_score = volume_analysis.get('volume_score', 0)
+                money_flow = volume_analysis.get('money_flow', 'NEUTRAL')
+                
+                if money_flow == 'INFLOW':
+                    signal_score += min(1, volume_score / 2)
+                elif money_flow == 'OUTFLOW':
+                    signal_score -= min(1, volume_score / 2)
+                
+                # Mẫu nến
+                pattern_analysis = tf_analysis.get('pattern_analysis', {})
+                
+                for pattern, details in pattern_analysis.items():
+                    if not isinstance(details, dict) or not details.get('detected', False):
+                        continue
+                    
+                    strength = details.get('strength', 'medium')
+                    strength_value = 0.5 if strength == 'weak' else 1.0 if strength == 'medium' else 1.5
+                    
+                    if pattern in ['hammer', 'morning_star', 'bullish_engulfing']:
+                        signal_score += strength_value
+                    elif pattern in ['shooting_star', 'evening_star', 'bearish_engulfing']:
+                        signal_score -= strength_value
+                
+                # 2. Tính toán độ tin cậy
+                confidence = min(95, 50 + 10 * min(4.5, abs(signal_score)))
+                
+                # Thêm vào danh sách để tính trung bình
+                signal_scores.append((timeframe, signal_score))
+                confidence_scores.append(confidence)
+                
+                # 3. Phân loại vào các khung thời gian
+                if timeframe in short_term_tf:
+                    summary['time_horizons']['short_term'] = self._signal_from_score(signal_score)
+                elif timeframe in medium_term_tf:
+                    summary['time_horizons']['medium_term'] = self._signal_from_score(signal_score)
+                elif timeframe in long_term_tf:
+                    summary['time_horizons']['long_term'] = self._signal_from_score(signal_score)
             
-            # Điểm ra (take profit) cho LONG
-            if "nearest_resistance" in support_resistance and support_resistance["nearest_resistance"]:
-                tp_level = support_resistance["nearest_resistance"]
-                result["long"]["exit_points"]["take_profit"].append(tp_level)
+            # Tính toán tín hiệu tổng thể dựa trên trọng số
+            if signal_scores:
+                # Tính trọng số cho từng khung thời gian
+                weighted_scores = []
+                for tf, score in signal_scores:
+                    weight = 1.0
+                    if tf in short_term_tf:
+                        weight = 0.7
+                    elif tf in medium_term_tf:
+                        weight = 1.0
+                    elif tf in long_term_tf:
+                        weight = 1.3
+                    
+                    weighted_scores.append(score * weight)
+                
+                # Tín hiệu tổng thể
+                overall_score = sum(weighted_scores) / sum(weight for _, weight in zip(signal_scores, weighted_scores))
+                summary['overall_signal'] = self._signal_from_score(overall_score)
+                
+                # Độ tin cậy trung bình
+                summary['confidence'] = int(sum(confidence_scores) / len(confidence_scores))
+            
+            # Dự đoán giá
+            current_prices = []
+            supports = []
+            resistances = []
+            
+            for timeframe in timeframes:
+                if timeframe not in analysis_results:
+                    continue
+                
+                tf_analysis = analysis_results[timeframe]
+                trend_analysis = tf_analysis.get('trend_analysis', {})
+                
+                current_price = tf_analysis.get('current_price', 0)
+                support_levels = trend_analysis.get('support_levels', [])
+                resistance_levels = trend_analysis.get('resistance_levels', [])
+                
+                if current_price > 0:
+                    current_prices.append(current_price)
+                
+                if support_levels:
+                    supports.extend(support_levels)
+                
+                if resistance_levels:
+                    resistances.extend(resistance_levels)
+            
+            # Lấy giá hiện tại
+            current_price = current_prices[0] if current_prices else 0
+            
+            # Lọc và tính trung bình cho các mức hỗ trợ/kháng cự
+            if supports:
+                # Lấy mức hỗ trợ gần nhất
+                close_supports = [s for s in supports if s < current_price]
+                if close_supports:
+                    summary['price_prediction']['support'] = max(close_supports)
+            
+            if resistances:
+                # Lấy mức kháng cự gần nhất
+                close_resistances = [r for r in resistances if r > current_price]
+                if close_resistances:
+                    summary['price_prediction']['resistance'] = min(close_resistances)
+            
+            # Tính mức giá mục tiêu dựa trên tín hiệu
+            if summary['overall_signal'] in ['STRONG_BUY', 'BUY'] and summary['price_prediction']['resistance'] > 0:
+                summary['price_prediction']['target'] = summary['price_prediction']['resistance']
+            elif summary['overall_signal'] in ['STRONG_SELL', 'SELL'] and summary['price_prediction']['support'] > 0:
+                summary['price_prediction']['target'] = summary['price_prediction']['support']
             else:
-                # Nếu không có mức kháng cự, sử dụng % mặc định
-                tp_pct = self.config["strategy_settings"]["exit_conditions"]["take_profit"]["default_percentage"] / 100
-                tp_level = current_price * (1 + tp_pct)
-                result["long"]["exit_points"]["take_profit"].append(tp_level)
+                # Giá mục tiêu mặc định
+                if current_price > 0:
+                    if summary['overall_signal'] == 'STRONG_BUY':
+                        summary['price_prediction']['target'] = current_price * 1.05
+                    elif summary['overall_signal'] == 'BUY':
+                        summary['price_prediction']['target'] = current_price * 1.03
+                    elif summary['overall_signal'] == 'STRONG_SELL':
+                        summary['price_prediction']['target'] = current_price * 0.95
+                    elif summary['overall_signal'] == 'SELL':
+                        summary['price_prediction']['target'] = current_price * 0.97
+                    else:
+                        summary['price_prediction']['target'] = current_price
             
-            # Điểm dừng lỗ (stop loss) cho LONG
-            if "nearest_support" in support_resistance and support_resistance["nearest_support"]:
-                sl_level = support_resistance["nearest_support"] * 0.99  # Thêm buffer 1%
-                result["long"]["exit_points"]["stop_loss"].append(sl_level)
-            else:
-                # Nếu không có mức hỗ trợ, sử dụng % mặc định
-                sl_pct = self.config["strategy_settings"]["exit_conditions"]["stop_loss"]["default_percentage"] / 100
-                sl_level = current_price * (1 - sl_pct)
-                result["long"]["exit_points"]["stop_loss"].append(sl_level)
+            # Tạo mô tả
+            description = self._generate_analysis_description(summary, analysis_results, timeframes)
+            summary['description'] = description
             
-            # Điểm vào lệnh SHORT
-            short_entry_reasons = []
+            return summary
             
-            # Điểm vào dựa trên RSI
-            if "oscillators" in indicators and "rsi" in indicators["oscillators"]:
-                rsi = indicators["oscillators"]["rsi"]
-                overbought = self.config["indicators"]["oscillators"]["rsi"]["overbought"]
-                
-                if rsi > overbought:
-                    result["short"]["entry_points"].append(current_price)
-                    short_entry_reasons.append(f"RSI overbought ({rsi:.2f} > {overbought})")
-            
-            # Điểm vào dựa trên MACD
-            if "oscillators" in indicators and "macd" in indicators["oscillators"]:
-                macd = indicators["oscillators"]["macd"]["macd"]
-                signal = indicators["oscillators"]["macd"]["signal"]
-                histogram = indicators["oscillators"]["macd"]["histogram"]
-                
-                if macd < signal and histogram < 0:
-                    result["short"]["entry_points"].append(current_price)
-                    short_entry_reasons.append(f"MACD bearish crossover (histogram: {histogram:.6f})")
-            
-            # Điểm vào dựa trên Bollinger Bands
-            if "volatility" in indicators and "bollinger_bands" in indicators["volatility"]:
-                bb_upper = indicators["volatility"]["bollinger_bands"]["upper"]
-                
-                if current_price >= bb_upper:
-                    result["short"]["entry_points"].append(current_price)
-                    short_entry_reasons.append(f"Price at/above BB upper ({current_price:.2f} >= {bb_upper:.2f})")
-            
-            # Điểm vào dựa trên mức kháng cự
-            if "nearest_resistance" in support_resistance and support_resistance["nearest_resistance"]:
-                nearest_resistance = support_resistance["nearest_resistance"]
-                
-                if abs(current_price - nearest_resistance) / current_price < 0.02:  # Nếu giá gần mức kháng cự (2%)
-                    result["short"]["entry_points"].append(nearest_resistance)
-                    short_entry_reasons.append(f"Price near resistance level ({nearest_resistance:.2f})")
-            
-            # Điểm ra (take profit) cho SHORT
-            if "nearest_support" in support_resistance and support_resistance["nearest_support"]:
-                tp_level = support_resistance["nearest_support"]
-                result["short"]["exit_points"]["take_profit"].append(tp_level)
-            else:
-                # Nếu không có mức hỗ trợ, sử dụng % mặc định
-                tp_pct = self.config["strategy_settings"]["exit_conditions"]["take_profit"]["default_percentage"] / 100
-                tp_level = current_price * (1 - tp_pct)
-                result["short"]["exit_points"]["take_profit"].append(tp_level)
-            
-            # Điểm dừng lỗ (stop loss) cho SHORT
-            if "nearest_resistance" in support_resistance and support_resistance["nearest_resistance"]:
-                sl_level = support_resistance["nearest_resistance"] * 1.01  # Thêm buffer 1%
-                result["short"]["exit_points"]["stop_loss"].append(sl_level)
-            else:
-                # Nếu không có mức kháng cự, sử dụng % mặc định
-                sl_pct = self.config["strategy_settings"]["exit_conditions"]["stop_loss"]["default_percentage"] / 100
-                sl_level = current_price * (1 + sl_pct)
-                result["short"]["exit_points"]["stop_loss"].append(sl_level)
-            
-            # Lưu lý do
-            result["long"]["reasoning"] = long_entry_reasons
-            result["short"]["reasoning"] = short_entry_reasons
-            
-            # Tính điểm dựa trên số lý do
-            result["score"]["long"] = len(long_entry_reasons) * 25  # Mỗi lý do tối đa 25 điểm
-            result["score"]["short"] = len(short_entry_reasons) * 25  # Mỗi lý do tối đa 25 điểm
-            
-            # Điều chỉnh điểm theo chế độ thị trường
-            if market_regime == "trending_up":
-                result["score"]["long"] += 20
-                result["score"]["short"] -= 20
-            elif market_regime == "trending_down":
-                result["score"]["long"] -= 20
-                result["score"]["short"] += 20
-            
-            # Giới hạn điểm từ 0-100
-            result["score"]["long"] = max(0, min(100, result["score"]["long"]))
-            result["score"]["short"] = max(0, min(100, result["score"]["short"]))
-            
-            return result
         except Exception as e:
-            logger.error(f"Lỗi khi phân tích điểm vào/ra lệnh cho {symbol}: {str(e)}")
+            logger.error(f"Lỗi khi tạo tóm tắt phân tích: {e}")
             return {
-                "long": {"entry_points": [], "exit_points": {"take_profit": [], "stop_loss": []}, "reasoning": []},
-                "short": {"entry_points": [], "exit_points": {"take_profit": [], "stop_loss": []}, "reasoning": []},
-                "score": {"long": 0, "short": 0}
+                'overall_signal': 'NEUTRAL',
+                'confidence': 0,
+                'description': 'Không thể tạo tóm tắt do lỗi phân tích',
+                'time_horizons': {
+                    'short_term': 'NEUTRAL',
+                    'medium_term': 'NEUTRAL',
+                    'long_term': 'NEUTRAL'
+                },
+                'price_prediction': {
+                    'support': 0,
+                    'resistance': 0,
+                    'target': 0
+                }
             }
     
-    def _calculate_analysis_score(self, indicators: Dict, entry_exit_points: Dict) -> int:
+    def _signal_from_score(self, score: float) -> str:
         """
-        Tính điểm phân tích tổng hợp
+        Chuyển đổi điểm tín hiệu thành chuỗi tín hiệu
         
         Args:
-            indicators (Dict): Chỉ báo kỹ thuật
-            entry_exit_points (Dict): Thông tin điểm vào/ra lệnh
+            score: Điểm tín hiệu
             
         Returns:
-            int: Điểm phân tích (0-100)
+            str: Chuỗi tín hiệu
         """
-        try:
-            long_score = entry_exit_points["score"]["long"]
-            short_score = entry_exit_points["score"]["short"]
-            
-            # Thiên về long hoặc short
-            if long_score > short_score:
-                final_score = long_score
-            else:
-                final_score = 100 - short_score  # Đảo ngược để 0 = strong sell, 100 = strong buy
-            
-            return final_score
-        except Exception as e:
-            logger.error(f"Lỗi khi tính điểm phân tích: {str(e)}")
-            return 50  # Điểm trung lập
-    
-    def _determine_recommendation(self, score: int) -> str:
-        """
-        Xác định khuyến nghị dựa trên điểm
-        
-        Args:
-            score (int): Điểm phân tích
-            
-        Returns:
-            str: Khuyến nghị
-        """
-        thresholds = self.config["analysis_thresholds"]
-        
-        if score >= thresholds["strong_buy"]:
-            return "strong_buy"
-        elif score >= thresholds["buy"]:
-            return "buy"
-        elif score >= thresholds["neutral"]:
-            return "neutral"
-        elif score >= thresholds["sell"]:
-            return "sell"
+        if score >= 3.0:
+            return 'STRONG_BUY'
+        elif score >= 1.0:
+            return 'BUY'
+        elif score <= -3.0:
+            return 'STRONG_SELL'
+        elif score <= -1.0:
+            return 'SELL'
         else:
-            return "strong_sell"
+            return 'NEUTRAL'
     
-    def _determine_trend(self, klines_data: List) -> str:
+    def _generate_analysis_description(self, summary: Dict, analysis_results: Dict, timeframes: List[str]) -> str:
         """
-        Xác định xu hướng thị trường
+        Tạo mô tả phân tích chi tiết
         
         Args:
-            klines_data (List): Dữ liệu k-lines
+            summary: Tóm tắt phân tích
+            analysis_results: Kết quả phân tích chi tiết
+            timeframes: Danh sách khung thời gian
             
         Returns:
-            str: Xu hướng thị trường
+            str: Mô tả phân tích
         """
         try:
-            # Chuyển đổi dữ liệu
-            closes = [float(kline[4]) for kline in klines_data]
+            description = ""
             
-            # Tính EMA 50
-            ema_period = 50
-            ema = closes[0]
-            k = 2 / (ema_period + 1)
+            # Lấy tín hiệu tổng thể
+            overall_signal = summary.get('overall_signal', 'NEUTRAL')
+            confidence = summary.get('confidence', 0)
             
-            for close in closes[1:]:
-                ema = close * k + ema * (1 - k)
+            # Lấy tín hiệu theo khung thời gian
+            short_term = summary.get('time_horizons', {}).get('short_term', 'NEUTRAL')
+            medium_term = summary.get('time_horizons', {}).get('medium_term', 'NEUTRAL')
+            long_term = summary.get('time_horizons', {}).get('long_term', 'NEUTRAL')
             
-            # So sánh với giá hiện tại
-            current_price = closes[-1]
+            # Lấy dự đoán giá
+            current_price = 0
+            for timeframe in timeframes:
+                if timeframe in analysis_results:
+                    current_price = analysis_results[timeframe].get('current_price', 0)
+                    if current_price > 0:
+                        break
             
-            if current_price > ema * 1.05:  # Nếu giá cao hơn EMA 5%
-                return "bullish"
-            elif current_price < ema * 0.95:  # Nếu giá thấp hơn EMA 5%
-                return "bearish"
+            support = summary.get('price_prediction', {}).get('support', 0)
+            resistance = summary.get('price_prediction', {}).get('resistance', 0)
+            target = summary.get('price_prediction', {}).get('target', 0)
+            
+            # Tạo mô tả tóm tắt
+            if overall_signal == 'STRONG_BUY':
+                description = f"Tín hiệu MUA MẠNH với độ tin cậy {confidence}%. "
+                description += "Các chỉ báo kỹ thuật cho thấy xu hướng tăng rất mạnh. "
+            elif overall_signal == 'BUY':
+                description = f"Tín hiệu MUA với độ tin cậy {confidence}%. "
+                description += "Các chỉ báo kỹ thuật cho thấy xu hướng tăng. "
+            elif overall_signal == 'STRONG_SELL':
+                description = f"Tín hiệu BÁN MẠNH với độ tin cậy {confidence}%. "
+                description += "Các chỉ báo kỹ thuật cho thấy xu hướng giảm rất mạnh. "
+            elif overall_signal == 'SELL':
+                description = f"Tín hiệu BÁN với độ tin cậy {confidence}%. "
+                description += "Các chỉ báo kỹ thuật cho thấy xu hướng giảm. "
             else:
-                return "neutral"
+                description = "Tín hiệu TRUNG LẬP. Các chỉ báo kỹ thuật không cho thấy xu hướng rõ ràng. "
+            
+            # Thêm thông tin về khung thời gian
+            time_horizons = []
+            if short_term != 'NEUTRAL':
+                direction = "tăng" if short_term in ['BUY', 'STRONG_BUY'] else "giảm"
+                time_horizons.append(f"ngắn hạn ({direction})")
+            
+            if medium_term != 'NEUTRAL':
+                direction = "tăng" if medium_term in ['BUY', 'STRONG_BUY'] else "giảm"
+                time_horizons.append(f"trung hạn ({direction})")
+            
+            if long_term != 'NEUTRAL':
+                direction = "tăng" if long_term in ['BUY', 'STRONG_BUY'] else "giảm"
+                time_horizons.append(f"dài hạn ({direction})")
+            
+            if time_horizons:
+                description += "Xu hướng " + ", ".join(time_horizons) + ". "
+            
+            # Thêm thông tin về mức giá
+            if current_price > 0:
+                # Hỗ trợ và kháng cự
+                if support > 0:
+                    support_pct = (support - current_price) / current_price * 100
+                    description += f"Mức hỗ trợ gần nhất ở {support:.2f} ({support_pct:.2f}%). "
+                
+                if resistance > 0:
+                    resist_pct = (resistance - current_price) / current_price * 100
+                    description += f"Mức kháng cự gần nhất ở {resistance:.2f} ({resist_pct:.2f}%). "
+                
+                # Giá mục tiêu
+                if target > 0 and overall_signal != 'NEUTRAL':
+                    target_pct = (target - current_price) / current_price * 100
+                    direction = "tăng" if target > current_price else "giảm"
+                    description += f"Giá mục tiêu {target:.2f} ({direction} {abs(target_pct):.2f}%). "
+            
+            # Thêm chi tiết từ phân tích
+            main_tf = self.config.get('primary_timeframe', '1h')
+            if main_tf in analysis_results:
+                tf_analysis = analysis_results[main_tf]
+                
+                # Biến động
+                volatility = tf_analysis.get('volatility_analysis', {}).get('volatility_state', 'NORMAL')
+                if volatility != 'NORMAL':
+                    if volatility == 'LOW':
+                        description += "Biến động thị trường thấp. "
+                    elif volatility == 'HIGH':
+                        description += "Biến động thị trường cao. "
+                    elif volatility == 'EXTREME':
+                        description += "Biến động thị trường cực kỳ cao. "
+                
+                # Khối lượng
+                volume = tf_analysis.get('volume_analysis', {})
+                vol_state = volume.get('volume_state', 'NORMAL')
+                money_flow = volume.get('money_flow', 'NEUTRAL')
+                
+                if vol_state in ['HIGH', 'ABOVE_AVERAGE'] and money_flow != 'NEUTRAL':
+                    if money_flow == 'INFLOW':
+                        description += "Khối lượng cao với dòng tiền vào. "
+                    else:
+                        description += "Khối lượng cao với dòng tiền ra. "
+                
+                # Mẫu nến
+                patterns = tf_analysis.get('pattern_analysis', {})
+                detected_patterns = []
+                
+                for pattern, details in patterns.items():
+                    if not isinstance(details, dict) or not details.get('detected', False):
+                        continue
+                    
+                    pattern_name = pattern.replace('_', ' ').title()
+                    detected_patterns.append(pattern_name)
+                
+                if detected_patterns:
+                    description += f"Phát hiện mẫu nến: {', '.join(detected_patterns)}. "
+            
+            return description
+            
         except Exception as e:
-            logger.error(f"Lỗi khi xác định xu hướng: {str(e)}")
-            return "unknown"
+            logger.error(f"Lỗi khi tạo mô tả phân tích: {e}")
+            return "Không thể tạo mô tả phân tích do lỗi."
     
-    def _detect_market_regime(self, klines_data: List) -> str:
+    def analyze_symbol(self, symbol: str, timeframe: str = None) -> Dict:
         """
-        Phát hiện chế độ thị trường
+        Phân tích một cặp tiền cụ thể
         
         Args:
-            klines_data (List): Dữ liệu k-lines
+            symbol: Symbol cần phân tích (ví dụ: BTCUSDT)
+            timeframe: Khung thời gian cần phân tích
             
         Returns:
-            str: Chế độ thị trường
+            Dict: Kết quả phân tích
         """
         try:
-            # Chuyển đổi dữ liệu
-            closes = [float(kline[4]) for kline in klines_data]
+            # Nếu không chỉ định khung thời gian, sử dụng khung thời gian chính từ cấu hình
+            if not timeframe:
+                timeframe = self.config.get('primary_timeframe', '1h')
             
-            # Tính biến động
-            volatility = self._calculate_volatility(klines_data)
+            # Lấy danh sách các khung thời gian để phân tích đa khung thời gian
+            all_timeframes = [timeframe]  # Bắt đầu với khung thời gian chỉ định
             
-            # Tính ADX để đo lường sức mạnh xu hướng
-            adx = self._calculate_adx(klines_data)
+            # Thêm các khung thời gian khác từ cấu hình
+            config_timeframes = self.config.get('timeframes', [])
+            for tf in config_timeframes:
+                if tf != timeframe and tf not in all_timeframes:
+                    all_timeframes.append(tf)
             
-            # Phân tích xu hướng
-            trend = self._determine_trend(klines_data)
+            # Giới hạn số lượng khung thời gian để tránh quá tải
+            all_timeframes = all_timeframes[:3]
+            
+            # Lấy giá hiện tại
+            current_price = self.api.get_symbol_price(symbol)
+            
+            if not current_price:
+                logger.warning(f"Không lấy được giá hiện tại của {symbol}")
+                current_price = 0
+            
+            # Kết quả phân tích theo khung thời gian
+            analysis_results = {}
+            
+            for tf in all_timeframes:
+                # Lấy dữ liệu lịch sử
+                df = self.get_historical_data(symbol, tf)
+                
+                if df is None or len(df) < 50:
+                    logger.warning(f"Không đủ dữ liệu lịch sử cho {symbol} {tf}")
+                    continue
+                
+                # Tính toán các chỉ báo
+                df = self.calculate_indicators(df)
+                
+                # Phân tích các khía cạnh khác nhau
+                trend_analysis = self.analyze_trend(df)
+                volatility_analysis = self.analyze_volatility(df)
+                momentum_analysis = self.analyze_momentum(df)
+                volume_analysis = self.analyze_volume(df)
+                pattern_analysis = self.identify_patterns(df)
+                
+                # Gộp vào kết quả
+                analysis_results[tf] = {
+                    'current_price': current_price,
+                    'trend_analysis': trend_analysis,
+                    'volatility_analysis': volatility_analysis,
+                    'momentum_analysis': momentum_analysis,
+                    'volume_analysis': volume_analysis,
+                    'pattern_analysis': pattern_analysis
+                }
+            
+            # Tạo tóm tắt
+            summary = self._generate_summary(analysis_results, all_timeframes)
+            
+            # Tạo kết quả cuối cùng
+            result = {
+                'symbol': symbol,
+                'current_price': current_price,
+                'timeframe': timeframe,
+                'timestamp': datetime.now().isoformat(),
+                'summary': summary,
+                'detailed_analysis': analysis_results
+            }
+            
+            # Lưu kết quả phân tích nếu được cấu hình
+            if self.config.get('system_settings', {}).get('save_analysis_files', True):
+                try:
+                    filename = f"market_analysis_{symbol.lower()}.json"
+                    with open(filename, 'w') as f:
+                        json.dump(result, f, indent=4)
+                    logger.info(f"Đã lưu kết quả phân tích vào {filename}")
+                except Exception as e:
+                    logger.error(f"Lỗi khi lưu kết quả phân tích: {e}")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích symbol {symbol}: {e}")
+            return {
+                'symbol': symbol,
+                'current_price': 0,
+                'timeframe': timeframe,
+                'timestamp': datetime.now().isoformat(),
+                'summary': {
+                    'overall_signal': 'NEUTRAL',
+                    'confidence': 0,
+                    'description': f"Không thể phân tích do lỗi: {e}",
+                    'time_horizons': {
+                        'short_term': 'NEUTRAL',
+                        'medium_term': 'NEUTRAL',
+                        'long_term': 'NEUTRAL'
+                    },
+                    'price_prediction': {
+                        'support': 0,
+                        'resistance': 0,
+                        'target': 0
+                    }
+                },
+                'detailed_analysis': {}
+            }
+    
+    def analyze_market(self) -> Dict:
+        """
+        Phân tích thị trường tổng thể
+        
+        Returns:
+            Dict: Kết quả phân tích thị trường
+        """
+        try:
+            # Lấy tổng quan thị trường
+            market_overview = self.api.get_market_overview()
+            
+            if not market_overview:
+                logger.warning("Không lấy được tổng quan thị trường")
+                return {}
+            
+            # Lấy giá và biến động của BTC (chỉ số chính của thị trường)
+            btc_data = None
+            for coin in market_overview:
+                if coin.get('symbol') == 'BTCUSDT':
+                    btc_data = coin
+                    break
+            
+            btc_price = btc_data.get('price', 0) if btc_data else 0
+            btc_change = btc_data.get('price_change_24h', 0) if btc_data else 0
+            
+            # Sắp xếp các coin theo thay đổi giá
+            top_gainers = sorted(market_overview, key=lambda x: x.get('price_change_24h', 0), reverse=True)[:10]
+            top_losers = sorted(market_overview, key=lambda x: x.get('price_change_24h', 0))[:10]
+            
+            # Xác định trạng thái thị trường
+            market_status = "SIDEWAYS"
+            if btc_change > 2.0:
+                market_status = "BULLISH"
+            elif btc_change > 5.0:
+                market_status = "STRONG_BULLISH"
+            elif btc_change < -2.0:
+                market_status = "BEARISH"
+            elif btc_change < -5.0:
+                market_status = "STRONG_BEARISH"
+            
+            # Phân tích sâu hơn cho BTC
+            btc_analysis = self.analyze_symbol('BTCUSDT')
             
             # Xác định chế độ thị trường
-            if adx > 25:  # Xu hướng mạnh
-                if trend == "bullish":
-                    return "trending_up"
-                elif trend == "bearish":
-                    return "trending_down"
-            
-            # Biến động cao
-            if volatility > 3.0:  # Biến động > 3%
-                return "high_volatility"
-            
-            # Biến động thấp
-            if volatility < 1.0:  # Biến động < 1%
-                return "low_volatility"
-            
-            # Mặc định: thị trường đi ngang
-            return "ranging"
-        except Exception as e:
-            logger.error(f"Lỗi khi phát hiện chế độ thị trường: {str(e)}")
-            return "unknown"
-    
-    def _calculate_volatility(self, klines_data: List) -> float:
-        """
-        Tính biến động thị trường dựa trên ATR%
-        
-        Args:
-            klines_data (List): Dữ liệu k-lines
-            
-        Returns:
-            float: Biến động (%)
-        """
-        try:
-            if len(klines_data) < 14:
-                return 0.0
-            
-            # Chuyển đổi dữ liệu
-            df = pd.DataFrame(klines_data, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
-            
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['open', 'high', 'low', 'close']:
-                df[col] = df[col].astype(float)
-            
-            # Tính True Range
-            df['tr0'] = abs(df['high'] - df['low'])
-            df['tr1'] = abs(df['high'] - df['close'].shift())
-            df['tr2'] = abs(df['low'] - df['close'].shift())
-            df['tr'] = df[['tr0', 'tr1', 'tr2']].max(axis=1)
-            
-            # Tính ATR
-            atr = df['tr'].rolling(window=14).mean().iloc[-1]
-            
-            # Tính ATR%
-            current_price = float(klines_data[-1][4])
-            atr_percent = (atr / current_price) * 100
-            
-            return atr_percent
-        except Exception as e:
-            logger.error(f"Lỗi khi tính biến động: {str(e)}")
-            return 0.0
-    
-    def _calculate_adx(self, klines_data: List, period: int = 14) -> float:
-        """
-        Tính ADX (Average Directional Index)
-        
-        Args:
-            klines_data (List): Dữ liệu k-lines
-            period (int): Chu kỳ
-            
-        Returns:
-            float: Giá trị ADX
-        """
-        try:
-            if len(klines_data) < period * 2:
-                return 0.0
-            
-            # Chuyển đổi dữ liệu
-            df = pd.DataFrame(klines_data, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
-            
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['high', 'low', 'close']:
-                df[col] = df[col].astype(float)
-            
-            # Tính +DM và -DM
-            df['high_diff'] = df['high'].diff()
-            df['low_diff'] = df['low'].diff() * -1
-            
-            df['+DM'] = np.where((df['high_diff'] > df['low_diff']) & (df['high_diff'] > 0), df['high_diff'], 0)
-            df['-DM'] = np.where((df['low_diff'] > df['high_diff']) & (df['low_diff'] > 0), df['low_diff'], 0)
-            
-            # Tính True Range
-            df['tr0'] = abs(df['high'] - df['low'])
-            df['tr1'] = abs(df['high'] - df['close'].shift())
-            df['tr2'] = abs(df['low'] - df['close'].shift())
-            df['TR'] = df[['tr0', 'tr1', 'tr2']].max(axis=1)
-            
-            # Tính +DI và -DI
-            df['ATR'] = df['TR'].rolling(window=period).mean()
-            df['+DI'] = (df['+DM'].rolling(window=period).mean() / df['ATR']) * 100
-            df['-DI'] = (df['-DM'].rolling(window=period).mean() / df['ATR']) * 100
-            
-            # Tính DX và ADX
-            df['DX'] = (abs(df['+DI'] - df['-DI']) / (df['+DI'] + df['-DI'])) * 100
-            df['ADX'] = df['DX'].rolling(window=period).mean()
-            
-            return df['ADX'].iloc[-1]
-        except Exception as e:
-            logger.error(f"Lỗi khi tính ADX: {str(e)}")
-            return 0.0
-    
-    def _calculate_symbols_correlation(self) -> Dict:
-        """
-        Tính tương quan giữa các cặp tiền
-        
-        Returns:
-            Dict: Ma trận tương quan
-        """
-        try:
-            symbols = self.config["symbols_to_analyze"]
-            timeframe = self.config["primary_timeframe"]
-            
-            # Lấy dữ liệu giá đóng cửa
-            price_data = {}
-            
-            for symbol in symbols:
-                klines = self._get_klines_data(symbol, timeframe, 30)
-                if klines:
-                    closes = [float(kline[4]) for kline in klines]
-                    price_data[symbol] = closes
-            
-            # Tính tương quan
-            correlation_matrix = {}
-            
-            for symbol1 in price_data:
-                correlation_matrix[symbol1] = {}
+            regime = {}
+            if btc_analysis and 'summary' in btc_analysis:
+                # Trend
+                primary_trend = btc_analysis['summary'].get('time_horizons', {}).get('medium_term', 'NEUTRAL')
+                if primary_trend == 'STRONG_BUY':
+                    regime['primary'] = 'BULLISH'
+                elif primary_trend == 'BUY':
+                    regime['primary'] = 'SLIGHTLY_BULLISH'
+                elif primary_trend == 'STRONG_SELL':
+                    regime['primary'] = 'BEARISH'
+                elif primary_trend == 'SELL':
+                    regime['primary'] = 'SLIGHTLY_BEARISH'
+                else:
+                    regime['primary'] = 'RANGE_BOUND'
                 
-                for symbol2 in price_data:
-                    if len(price_data[symbol1]) == len(price_data[symbol2]):
-                        correlation = np.corrcoef(price_data[symbol1], price_data[symbol2])[0, 1]
-                        correlation_matrix[symbol1][symbol2] = correlation
-                    else:
-                        correlation_matrix[symbol1][symbol2] = 0
+                # Volatility
+                detailed_analysis = btc_analysis.get('detailed_analysis', {})
+                if '1h' in detailed_analysis:
+                    volatility_state = detailed_analysis['1h'].get('volatility_analysis', {}).get('volatility_state', 'NORMAL')
+                    regime['volatility'] = volatility_state
+                else:
+                    regime['volatility'] = 'NORMAL'
+                
+                # Mô tả
+                regime['description'] = btc_analysis['summary'].get('description', '')
             
-            return correlation_matrix
+            # Kết quả phân tích thị trường
+            market_analysis = {
+                'timestamp': datetime.now().isoformat(),
+                'market_status': market_status,
+                'btc_price': btc_price,
+                'btc_price_change_24h': btc_change,
+                'top_gainers': top_gainers,
+                'top_losers': top_losers,
+                'market_regime': regime,
+                'btc_analysis': btc_analysis.get('summary', {}) if btc_analysis else {}
+            }
+            
+            # Tính toán một số chỉ số thị trường
+            total_market_cap = sum(coin.get('price', 0) * coin.get('volume_24h', 0) / coin.get('price', 1) for coin in market_overview)
+            btc_dominance = 0
+            if total_market_cap > 0 and btc_data:
+                btc_market_cap = btc_data.get('price', 0) * btc_data.get('volume_24h', 0) / btc_data.get('price', 1)
+                btc_dominance = btc_market_cap / total_market_cap * 100
+            
+            market_analysis['total_market_cap'] = total_market_cap
+            market_analysis['btc_dominance'] = btc_dominance
+            
+            # Lưu kết quả phân tích nếu được cấu hình
+            if self.config.get('system_settings', {}).get('save_analysis_files', True):
+                try:
+                    filename = "market_overview.json"
+                    with open(filename, 'w') as f:
+                        json.dump(market_analysis, f, indent=4)
+                    logger.info(f"Đã lưu kết quả phân tích thị trường vào {filename}")
+                except Exception as e:
+                    logger.error(f"Lỗi khi lưu kết quả phân tích thị trường: {e}")
+            
+            return market_analysis
+            
         except Exception as e:
-            logger.error(f"Lỗi khi tính tương quan: {str(e)}")
+            logger.error(f"Lỗi khi phân tích thị trường: {e}")
             return {}
     
-    def _generate_analysis_chart(self, symbol: str, timeframe: str, klines_data: List, analysis_result: Dict) -> bool:
+    def scan_opportunities(self, symbols: List[str] = None) -> List[Dict]:
         """
-        Tạo biểu đồ phân tích
+        Quét cơ hội giao dịch trên nhiều cặp tiền
         
         Args:
-            symbol (str): Mã cặp tiền
-            timeframe (str): Khung thời gian
-            klines_data (List): Dữ liệu k-lines
-            analysis_result (Dict): Kết quả phân tích
+            symbols: Danh sách các cặp tiền cần quét, nếu None sẽ sử dụng danh sách từ cấu hình
             
         Returns:
-            bool: True nếu tạo thành công, False nếu thất bại
+            List[Dict]: Danh sách các cơ hội giao dịch
         """
         try:
-            # Đảm bảo thư mục tồn tại
-            chart_dir = "charts/market_analysis"
-            os.makedirs(chart_dir, exist_ok=True)
+            # Nếu không chỉ định danh sách cặp tiền, sử dụng từ cấu hình
+            if not symbols:
+                symbols = self.config.get('symbols_to_analyze', ["BTCUSDT", "ETHUSDT", "BNBUSDT"])
             
-            # Tạo DataFrame
-            df = pd.DataFrame(klines_data, columns=[
-                'timestamp', 'open', 'high', 'low', 'close', 'volume',
-                'close_time', 'quote_asset_volume', 'number_of_trades',
-                'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-            ])
+            # Khung thời gian chính
+            primary_tf = self.config.get('primary_timeframe', '1h')
             
-            # Chuyển đổi kiểu dữ liệu
-            for col in ['open', 'high', 'low', 'close', 'volume']:
-                df[col] = df[col].astype(float)
+            opportunities = []
             
-            # Chuyển đổi timestamp
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            
-            # Tính các chỉ báo
-            df['sma_20'] = df['close'].rolling(window=20).mean()
-            df['sma_50'] = df['close'].rolling(window=50).mean()
-            
-            # Tạo biểu đồ
-            fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [4, 1, 1]})
-            
-            # Đặt tiêu đề
-            fig.suptitle(f'{symbol} - {timeframe} - Phân tích: {analysis_result["recommendation"].upper()}', fontsize=16)
-            
-            # Vẽ giá
-            ax1.plot(df['timestamp'], df['close'], label='Close')
-            ax1.plot(df['timestamp'], df['sma_20'], label='SMA 20')
-            ax1.plot(df['timestamp'], df['sma_50'], label='SMA 50')
-            
-            # Vẽ các mức hỗ trợ/kháng cự
-            if "support_resistance" in analysis_result:
-                sr_levels = analysis_result["support_resistance"]
+            # Duyệt qua từng cặp tiền
+            for symbol in symbols:
+                logger.info(f"Đang quét cơ hội cho {symbol}...")
                 
-                for level in sr_levels.get("resistance_levels", [])[:3]:  # Chỉ vẽ 3 mức kháng cự quan trọng nhất
-                    ax1.axhline(y=level, color='r', linestyle='--', alpha=0.5)
+                # Phân tích cặp tiền
+                analysis = self.analyze_symbol(symbol, primary_tf)
                 
-                for level in sr_levels.get("support_levels", [])[:3]:  # Chỉ vẽ 3 mức hỗ trợ quan trọng nhất
-                    ax1.axhline(y=level, color='g', linestyle='--', alpha=0.5)
-            
-            # Vẽ điểm vào/ra
-            if "entry_exit_points" in analysis_result:
-                entry_exit = analysis_result["entry_exit_points"]
+                if not analysis:
+                    continue
                 
-                # Điểm vào long
-                for entry in entry_exit.get("long", {}).get("entry_points", []):
-                    ax1.axhline(y=entry, color='blue', linestyle='-', alpha=0.3)
+                # Lấy tín hiệu tổng thể
+                summary = analysis.get('summary', {})
+                signal = summary.get('overall_signal', 'NEUTRAL')
+                confidence = summary.get('confidence', 0)
+                description = summary.get('description', '')
+                current_price = analysis.get('current_price', 0)
                 
-                # Điểm vào short
-                for entry in entry_exit.get("short", {}).get("entry_points", []):
-                    ax1.axhline(y=entry, color='red', linestyle='-', alpha=0.3)
+                # Lấy dự đoán giá
+                price_prediction = summary.get('price_prediction', {})
+                target_price = price_prediction.get('target', 0)
+                support = price_prediction.get('support', 0)
+                resistance = price_prediction.get('resistance', 0)
                 
-                # Take profit và stop loss
-                for tp in entry_exit.get("long", {}).get("exit_points", {}).get("take_profit", []):
-                    ax1.axhline(y=tp, color='green', linestyle=':', alpha=0.5)
+                # Kiểm tra nếu có tín hiệu rõ ràng (không phải NEUTRAL)
+                if signal != 'NEUTRAL' and confidence >= 70:
+                    # Xác định hành động giao dịch
+                    action = "BUY" if signal in ['STRONG_BUY', 'BUY'] else "SELL"
+                    
+                    # Xác định giá vào lệnh và stop loss
+                    entry_price = current_price
+                    stop_loss = 0
+                    
+                    if action == "BUY":
+                        stop_loss = support if support > 0 else current_price * 0.97
+                    else:  # SELL
+                        stop_loss = resistance if resistance > 0 else current_price * 1.03
+                    
+                    # Tính toán tỷ lệ risk/reward
+                    risk = abs(entry_price - stop_loss) / entry_price
+                    reward = abs(target_price - entry_price) / entry_price if target_price > 0 else 0
+                    risk_reward_ratio = reward / risk if risk > 0 else 0
+                    
+                    # Chỉ thêm cơ hội nếu tỷ lệ risk/reward tốt
+                    if risk_reward_ratio >= 1.5:
+                        opportunity = {
+                            'symbol': symbol,
+                            'action': action,
+                            'signal': signal,
+                            'confidence': confidence,
+                            'current_price': current_price,
+                            'target_price': target_price,
+                            'stop_loss': stop_loss,
+                            'risk_reward_ratio': risk_reward_ratio,
+                            'risk': risk * 100,  # Phần trăm
+                            'potential_reward': reward * 100,  # Phần trăm
+                            'timeframe': primary_tf,
+                            'description': description
+                        }
+                        
+                        opportunities.append(opportunity)
                 
-                for sl in entry_exit.get("long", {}).get("exit_points", {}).get("stop_loss", []):
-                    ax1.axhline(y=sl, color='red', linestyle=':', alpha=0.5)
+            # Sắp xếp các cơ hội theo độ tin cậy giảm dần
+            opportunities.sort(key=lambda x: x.get('confidence', 0), reverse=True)
             
-            # Vẽ volume
-            ax2.bar(df['timestamp'], df['volume'], color='blue', alpha=0.5)
-            ax2.set_ylabel('Volume')
+            return opportunities
             
-            # Vẽ điểm
-            ax3.plot(df['timestamp'].iloc[-1], analysis_result.get("score", 50), 'ro', markersize=10)
-            ax3.axhline(y=50, color='black', linestyle='-', alpha=0.3)
-            ax3.set_ylim(0, 100)
-            
-            # Thêm thông tin
-            text = f"Score: {analysis_result.get('score', 50)}/100\n"
-            text += f"Market Regime: {analysis_result.get('market_regime', 'unknown')}\n"
-            text += f"Volatility: {analysis_result.get('volatility', 0):.2f}%\n"
-            
-            if "entry_exit_points" in analysis_result:
-                entry_exit = analysis_result["entry_exit_points"]
-                long_reasons = entry_exit.get("long", {}).get("reasoning", [])
-                short_reasons = entry_exit.get("short", {}).get("reasoning", [])
-                
-                if long_reasons:
-                    text += f"\nLong Reasons ({entry_exit.get('score', {}).get('long', 0)}):\n"
-                    for reason in long_reasons[:3]:  # Chỉ hiện 3 lý do hàng đầu
-                        text += f"- {reason}\n"
-                
-                if short_reasons:
-                    text += f"\nShort Reasons ({entry_exit.get('score', {}).get('short', 0)}):\n"
-                    for reason in short_reasons[:3]:  # Chỉ hiện 3 lý do hàng đầu
-                        text += f"- {reason}\n"
-            
-            ax3.text(df['timestamp'].iloc[0], 50, text, fontsize=10, verticalalignment='center')
-            
-            # Đặt nhãn
-            ax1.set_ylabel('Price')
-            ax3.set_ylabel('Score')
-            ax3.set_xlabel('Time')
-            
-            # Thêm legend
-            ax1.legend()
-            
-            # Điều chỉnh định dạng
-            plt.tight_layout()
-            
-            # Lưu biểu đồ
-            chart_path = f"{chart_dir}/{symbol}_{timeframe}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            plt.savefig(chart_path)
-            plt.close()
-            
-            logger.info(f"Đã tạo biểu đồ phân tích tại {chart_path}")
-            return True
         except Exception as e:
-            logger.error(f"Lỗi khi tạo biểu đồ phân tích: {str(e)}")
-            return False
+            logger.error(f"Lỗi khi quét cơ hội giao dịch: {e}")
+            return []
     
-    def check_trading_conditions(self, symbol: str, timeframe: str = None, direction: str = None) -> Tuple[bool, List[Dict]]:
+    def generate_trading_recommendations(self, symbols: List[str] = None) -> Dict:
         """
-        Kiểm tra điều kiện giao dịch và trả về quyết định cùng các lý do
+        Tạo đề xuất giao dịch
         
         Args:
-            symbol (str): Mã cặp tiền
-            timeframe (str, optional): Khung thời gian
-            direction (str, optional): Hướng giao dịch ('long' hoặc 'short'), nếu None sẽ chọn dựa trên phân tích
+            symbols: Danh sách các cặp tiền cần quét, nếu None sẽ sử dụng danh sách từ cấu hình
             
         Returns:
-            Tuple[bool, List[Dict]]: (Có nên giao dịch không, Danh sách lý do)
+            Dict: Đề xuất giao dịch
         """
-        if timeframe is None:
-            timeframe = self.config["primary_timeframe"]
-        
-        logger.info(f"Đang kiểm tra điều kiện giao dịch cho {symbol} {timeframe} {direction or 'auto'}")
-        
         try:
-            # Phân tích cặp tiền
-            analysis = self.analyze_symbol(symbol, timeframe)
+            # Quét cơ hội
+            opportunities = self.scan_opportunities(symbols)
             
-            # Nếu có lỗi trong phân tích
-            if "error" in analysis:
-                reasons = [{
-                    "category": "technical_indicators",
-                    "reason": f"Lỗi khi phân tích: {analysis['error']}",
-                    "importance": "high"
-                }]
-                self.log_no_trade_reason(symbol, timeframe, reasons)
-                return False, reasons
+            # Phân loại đề xuất
+            buy_signals = [op for op in opportunities if op.get('action') == 'BUY']
+            sell_signals = [op for op in opportunities if op.get('action') == 'SELL']
+            watch_signals = []
             
-            # Xác định hướng giao dịch nếu không được cung cấp
-            if direction is None:
-                if analysis["recommendation"] in ["strong_buy", "buy"]:
-                    direction = "long"
-                elif analysis["recommendation"] in ["strong_sell", "sell"]:
-                    direction = "short"
-                else:
-                    reasons = [{
-                        "category": "technical_indicators",
-                        "reason": f"Không có khuyến nghị rõ ràng (điểm: {analysis['score']})",
-                        "importance": "medium"
-                    }]
-                    self.log_no_trade_reason(symbol, timeframe, reasons)
-                    return False, reasons
-            
-            # Kiểm tra điều kiện về chỉ báo kỹ thuật
-            reasons = []
-            
-            # Không điểm nào
-            if (direction == "long" and analysis["entry_exit_points"]["score"]["long"] == 0) or \
-               (direction == "short" and analysis["entry_exit_points"]["score"]["short"] == 0):
-                reasons.append({
-                    "category": "technical_indicators",
-                    "reason": f"Không có điểm {direction} (điểm: 0)",
-                    "importance": "high"
-                })
-            
-            # Các điểm quá thấp
-            if (direction == "long" and analysis["entry_exit_points"]["score"]["long"] < 50) or \
-               (direction == "short" and analysis["entry_exit_points"]["score"]["short"] < 50):
-                reasons.append({
-                    "category": "technical_indicators",
-                    "reason": f"Điểm {direction} quá thấp ({analysis['entry_exit_points']['score'][direction]})",
-                    "importance": "medium"
-                })
-            
-            # Điểm vào không đủ
-            if len(analysis["entry_exit_points"][direction]["entry_points"]) == 0:
-                reasons.append({
-                    "category": "technical_indicators",
-                    "reason": f"Không có điểm vào cho {direction}",
-                    "importance": "high"
-                })
-            
-            # Điểm ra không đủ
-            if len(analysis["entry_exit_points"][direction]["exit_points"]["take_profit"]) == 0 or \
-               len(analysis["entry_exit_points"][direction]["exit_points"]["stop_loss"]) == 0:
-                reasons.append({
-                    "category": "risk_management",
-                    "reason": f"Thiếu điểm take profit hoặc stop loss cho {direction}",
-                    "importance": "high"
-                })
-            
-            # Chế độ thị trường không phù hợp với hướng giao dịch
-            if direction == "long" and analysis["market_regime"] == "trending_down":
-                reasons.append({
-                    "category": "market_conditions",
-                    "reason": f"Không nên mua khi thị trường đang giảm ({analysis['market_regime']})",
-                    "importance": "high"
-                })
-            elif direction == "short" and analysis["market_regime"] == "trending_up":
-                reasons.append({
-                    "category": "market_conditions",
-                    "reason": f"Không nên bán khi thị trường đang tăng ({analysis['market_regime']})",
-                    "importance": "high"
-                })
-            
-            # Biến động quá cao
-            if analysis.get("volatility", 0) > 5.0:  # Biến động > 5%
-                reasons.append({
-                    "category": "volatility",
-                    "reason": f"Biến động quá cao ({analysis['volatility']:.2f}%)",
-                    "importance": "medium"
-                })
-            
-            # Nếu đang ở thị trường biến động cao mà không có lý do vào lệnh rõ ràng
-            if analysis["market_regime"] == "high_volatility" and len(analysis["entry_exit_points"][direction]["reasoning"]) < 2:
-                reasons.append({
-                    "category": "volatility",
-                    "reason": f"Không đủ lý do vào lệnh trong thị trường biến động cao",
-                    "importance": "medium"
-                })
-            
-            # Nếu có quá nhiều lý do không giao dịch
-            if len(reasons) >= 2:
-                self.log_no_trade_reason(symbol, timeframe, reasons)
-                return False, reasons
-            
-            # Nếu có ít nhất một lý do quan trọng cao
-            for reason in reasons:
-                if reason["importance"] == "high":
-                    self.log_no_trade_reason(symbol, timeframe, reasons)
-                    return False, reasons
-            
-            # Nếu không có lý do nào không giao dịch
-            if len(reasons) == 0:
-                # Ghi log quyết định giao dịch
-                decision_data = {
-                    "symbol": symbol,
-                    "timeframe": timeframe,
-                    "direction": direction,
-                    "price": analysis["price"]["current"],
-                    "score": analysis["entry_exit_points"]["score"][direction],
-                    "entry_points": analysis["entry_exit_points"][direction]["entry_points"],
-                    "take_profit": analysis["entry_exit_points"][direction]["exit_points"]["take_profit"],
-                    "stop_loss": analysis["entry_exit_points"][direction]["exit_points"]["stop_loss"],
-                    "reasoning": analysis["entry_exit_points"][direction]["reasoning"],
-                    "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                self.log_trading_decision(decision_data)
+            # Xác định các cặp tiền cần theo dõi (gần có tín hiệu)
+            if symbols:
+                primary_tf = self.config.get('primary_timeframe', '1h')
                 
-                logger.info(f"Quyết định giao dịch {direction.upper()} cho {symbol} với điểm {analysis['entry_exit_points']['score'][direction]}")
-                return True, []
-            
-            # Nếu có lý do không giao dịch nhưng không quan trọng
-            self.log_no_trade_reason(symbol, timeframe, reasons)
-            return False, reasons
-        except Exception as e:
-            logger.error(f"Lỗi khi kiểm tra điều kiện giao dịch cho {symbol}: {str(e)}")
-            reasons = [{
-                "category": "technical_indicators",
-                "reason": f"Lỗi hệ thống: {str(e)}",
-                "importance": "high"
-            }]
-            self.log_no_trade_reason(symbol, timeframe, reasons)
-            return False, reasons
-    
-    def generate_trading_plan(self) -> Dict:
-        """
-        Tạo kế hoạch giao dịch cho tất cả các cặp tiền được theo dõi
-        
-        Returns:
-            Dict: Kế hoạch giao dịch
-        """
-        logger.info("Đang tạo kế hoạch giao dịch...")
-        
-        try:
-            # Phân tích thị trường toàn cầu
-            global_analysis = self.analyze_global_market()
-            
-            # Phân tích từng cặp tiền
-            symbols_analysis = {}
-            trading_opportunities = []
-            
-            for symbol in self.config["symbols_to_analyze"]:
-                analysis = self.analyze_symbol(symbol, self.config["primary_timeframe"])
-                symbols_analysis[symbol] = analysis
-                
-                # Kiểm tra cơ hội giao dịch
-                if analysis["recommendation"] in ["strong_buy", "buy"]:
-                    can_trade, reasons = self.check_trading_conditions(symbol, self.config["primary_timeframe"], "long")
-                    if can_trade:
-                        trading_opportunities.append({
-                            "symbol": symbol,
-                            "direction": "long",
-                            "timeframe": self.config["primary_timeframe"],
-                            "score": analysis["entry_exit_points"]["score"]["long"],
-                            "reasoning": analysis["entry_exit_points"]["long"]["reasoning"],
-                            "entry_points": analysis["entry_exit_points"]["long"]["entry_points"],
-                            "take_profit": analysis["entry_exit_points"]["long"]["exit_points"]["take_profit"],
-                            "stop_loss": analysis["entry_exit_points"]["long"]["exit_points"]["stop_loss"]
-                        })
-                elif analysis["recommendation"] in ["strong_sell", "sell"]:
-                    can_trade, reasons = self.check_trading_conditions(symbol, self.config["primary_timeframe"], "short")
-                    if can_trade:
-                        trading_opportunities.append({
-                            "symbol": symbol,
-                            "direction": "short",
-                            "timeframe": self.config["primary_timeframe"],
-                            "score": analysis["entry_exit_points"]["score"]["short"],
-                            "reasoning": analysis["entry_exit_points"]["short"]["reasoning"],
-                            "entry_points": analysis["entry_exit_points"]["short"]["entry_points"],
-                            "take_profit": analysis["entry_exit_points"]["short"]["exit_points"]["take_profit"],
-                            "stop_loss": analysis["entry_exit_points"]["short"]["exit_points"]["stop_loss"]
+                for symbol in symbols:
+                    # Bỏ qua các cặp đã có trong các tín hiệu mua/bán
+                    if any(op.get('symbol') == symbol for op in opportunities):
+                        continue
+                    
+                    # Phân tích cặp tiền
+                    analysis = self.analyze_symbol(symbol, primary_tf)
+                    
+                    if not analysis:
+                        continue
+                    
+                    # Lấy tín hiệu tổng thể
+                    summary = analysis.get('summary', {})
+                    signal = summary.get('overall_signal', 'NEUTRAL')
+                    confidence = summary.get('confidence', 0)
+                    
+                    # Nếu có tín hiệu gần với ngưỡng đáng kể
+                    if signal != 'NEUTRAL' and 60 <= confidence < 70:
+                        watch_signals.append({
+                            'symbol': symbol,
+                            'action': 'WATCH',
+                            'current_signal': signal,
+                            'confidence': confidence,
+                            'current_price': analysis.get('current_price', 0),
+                            'description': summary.get('description', ''),
+                            'timeframe': primary_tf
                         })
             
-            # Sắp xếp cơ hội theo điểm
-            trading_opportunities.sort(key=lambda x: x["score"], reverse=True)
+            # Xếp hạng các tín hiệu theo độ tin cậy
+            buy_signals.sort(key=lambda x: x.get('confidence', 0), reverse=True)
+            sell_signals.sort(key=lambda x: x.get('confidence', 0), reverse=True)
+            watch_signals.sort(key=lambda x: x.get('confidence', 0), reverse=True)
             
-            # Tạo kế hoạch giao dịch
-            plan = {
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "global_market": {
-                    "trend": global_analysis["market_trend"],
-                    "regime": global_analysis["market_regime"],
-                    "btc_price": global_analysis["btc_price"]
-                },
-                "symbols_analysis": {
-                    symbol: {
-                        "score": analysis["score"],
-                        "recommendation": analysis["recommendation"],
-                        "market_regime": analysis["market_regime"],
-                        "current_price": analysis["price"]["current"]
-                    } for symbol, analysis in symbols_analysis.items()
-                },
-                "trading_opportunities": trading_opportunities
+            # Tạo đề xuất
+            recommendations = {
+                'timestamp': datetime.now().isoformat(),
+                'top_opportunities': opportunities[:5],  # Top 5 cơ hội
+                'buy_signals': buy_signals,
+                'sell_signals': sell_signals,
+                'watch_signals': watch_signals,
+                'recommendations': buy_signals + sell_signals + watch_signals
             }
             
-            logger.info(f"Đã tạo kế hoạch giao dịch với {len(trading_opportunities)} cơ hội")
-            return plan
+            # Lưu đề xuất nếu được cấu hình
+            if self.config.get('system_settings', {}).get('save_analysis_files', True):
+                try:
+                    filename = "all_recommendations.json"
+                    with open(filename, 'w') as f:
+                        json.dump(recommendations, f, indent=4)
+                    logger.info(f"Đã lưu đề xuất giao dịch vào {filename}")
+                except Exception as e:
+                    logger.error(f"Lỗi khi lưu đề xuất giao dịch: {e}")
+            
+            return recommendations
+            
         except Exception as e:
-            logger.error(f"Lỗi khi tạo kế hoạch giao dịch: {str(e)}")
+            logger.error(f"Lỗi khi tạo đề xuất giao dịch: {e}")
             return {
-                "timestamp": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                "error": str(e),
-                "trading_opportunities": []
+                'timestamp': datetime.now().isoformat(),
+                'top_opportunities': [],
+                'buy_signals': [],
+                'sell_signals': [],
+                'watch_signals': [],
+                'recommendations': []
             }
     
-    def get_no_trade_reasons_summary(self) -> Dict:
+    def generate_market_report(self) -> Dict:
         """
-        Lấy tóm tắt về các lý do không giao dịch
+        Tạo báo cáo thị trường tổng hợp
         
         Returns:
-            Dict: Thống kê về lý do không giao dịch
+            Dict: Báo cáo thị trường
         """
         try:
-            # Đếm số lần xuất hiện của từng loại lý do
-            categories_count = {}
+            # Phân tích thị trường
+            market_analysis = self.analyze_market()
             
-            for entry in self.no_trade_reasons:
-                for reason in entry.get("reasons", []):
-                    category = reason.get("category")
-                    if category:
-                        categories_count[category] = categories_count.get(category, 0) + 1
+            # Lấy các cặp tiền chính
+            primary_symbols = self.config.get('symbols_to_analyze', ["BTCUSDT", "ETHUSDT", "BNBUSDT"])[:5]  # Chỉ lấy 5 cặp hàng đầu
             
-            # Thống kê theo cặp tiền
-            symbols_count = {}
+            # Phân tích mỗi cặp tiền
+            symbol_analysis = {}
+            for symbol in primary_symbols:
+                analysis = self.analyze_symbol(symbol)
+                if analysis:
+                    symbol_analysis[symbol] = {
+                        'current_price': analysis.get('current_price', 0),
+                        'signal': analysis.get('summary', {}).get('overall_signal', 'NEUTRAL'),
+                        'confidence': analysis.get('summary', {}).get('confidence', 0),
+                        'momentum': analysis.get('detailed_analysis', {}).get('1h', {}).get('momentum_analysis', {}).get('primary_momentum', 'NEUTRAL')
+                    }
             
-            for entry in self.no_trade_reasons:
-                symbol = entry.get("symbol")
-                if symbol:
-                    symbols_count[symbol] = symbols_count.get(symbol, 0) + 1
-            
-            # Sắp xếp theo số lượng giảm dần
-            categories_sorted = sorted(categories_count.items(), key=lambda x: x[1], reverse=True)
-            symbols_sorted = sorted(symbols_count.items(), key=lambda x: x[1], reverse=True)
-            
-            # Lấy những lý do chi tiết phổ biến nhất
-            detailed_reasons = {}
-            
-            for entry in self.no_trade_reasons:
-                for reason in entry.get("reasons", []):
-                    reason_text = reason.get("reason")
-                    if reason_text:
-                        detailed_reasons[reason_text] = detailed_reasons.get(reason_text, 0) + 1
-            
-            # Sắp xếp lý do chi tiết
-            detailed_reasons_sorted = sorted(detailed_reasons.items(), key=lambda x: x[1], reverse=True)
-            
-            return {
-                "total_entries": len(self.no_trade_reasons),
-                "by_category": categories_sorted,
-                "by_symbol": symbols_sorted,
-                "top_reasons": detailed_reasons_sorted[:10]
+            # Tạo báo cáo
+            market_report = {
+                'timestamp': datetime.now().isoformat(),
+                'market_summary': {
+                    'status': market_analysis.get('market_status', 'SIDEWAYS'),
+                    'regime': market_analysis.get('market_regime', {}).get('primary', 'RANGE_BOUND'),
+                    'volatility': market_analysis.get('market_regime', {}).get('volatility', 'NORMAL'),
+                    'bitcoin_price': market_analysis.get('btc_price', 0),
+                    'bitcoin_change': market_analysis.get('btc_price_change_24h', 0),
+                    'bitcoin_signal': market_analysis.get('btc_analysis', {}).get('overall_signal', 'NEUTRAL')
+                },
+                'top_symbols': symbol_analysis,
+                'market_outlook': market_analysis.get('market_regime', {}).get('description', '')
             }
+            
+            # Quét cơ hội giao dịch
+            opportunities = self.scan_opportunities(primary_symbols)
+            market_report['trading_opportunities'] = opportunities
+            
+            # Lưu báo cáo nếu được cấu hình
+            if self.config.get('system_settings', {}).get('save_analysis_files', True):
+                try:
+                    filename = "market_report.json"
+                    with open(filename, 'w') as f:
+                        json.dump(market_report, f, indent=4)
+                    logger.info(f"Đã lưu báo cáo thị trường vào {filename}")
+                except Exception as e:
+                    logger.error(f"Lỗi khi lưu báo cáo thị trường: {e}")
+            
+            return market_report
+            
         except Exception as e:
-            logger.error(f"Lỗi khi tổng hợp lý do không giao dịch: {str(e)}")
-            return {"error": str(e)}
+            logger.error(f"Lỗi khi tạo báo cáo thị trường: {e}")
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'market_summary': {},
+                'top_symbols': {},
+                'market_outlook': f"Không thể tạo báo cáo do lỗi: {e}",
+                'trading_opportunities': []
+            }
 
-def main():
-    """Hàm chính"""
-    print("\nHỆ THỐNG PHÂN TÍCH THỊ TRƯỜNG VÀ LOGIC VÀO/RA LỆNH\n")
+# Test nếu chạy trực tiếp
+if __name__ == "__main__":
+    # Thiết lập logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
+    # Khởi tạo hệ thống phân tích
     analyzer = MarketAnalysisSystem()
     
-    print("1. Phân tích thị trường")
-    global_market = analyzer.analyze_global_market()
-    print(f"   Xu hướng: {global_market['market_trend']}")
-    print(f"   Chế độ: {global_market['market_regime']}")
-    print(f"   Giá BTC: ${global_market['btc_price']:.2f}")
+    # Phân tích BTC
+    btc_analysis = analyzer.analyze_symbol("BTCUSDT")
+    print(f"Tín hiệu BTC: {btc_analysis.get('summary', {}).get('overall_signal', 'NEUTRAL')}")
+    print(f"Độ tin cậy: {btc_analysis.get('summary', {}).get('confidence', 0)}%")
+    print(f"Mô tả: {btc_analysis.get('summary', {}).get('description', '')}")
     
-    print("\n2. Sinh kế hoạch giao dịch")
-    plan = analyzer.generate_trading_plan()
-    print(f"   Tìm thấy {len(plan['trading_opportunities'])} cơ hội giao dịch")
+    # Phân tích thị trường
+    market_analysis = analyzer.analyze_market()
+    print(f"Trạng thái thị trường: {market_analysis.get('market_status', 'UNKNOWN')}")
+    print(f"Giá BTC: ${market_analysis.get('btc_price', 0):,.2f}")
+    print(f"Thay đổi BTC 24h: {market_analysis.get('btc_price_change_24h', 0):+.2f}%")
     
-    if plan['trading_opportunities']:
-        print("\n3. Top 3 cơ hội giao dịch:")
-        for i, opportunity in enumerate(plan['trading_opportunities'][:3]):
-            print(f"   {i+1}. {opportunity['symbol']} - {opportunity['direction'].upper()} (Điểm: {opportunity['score']:.1f})")
-            print(f"      - Giá vào: {opportunity['entry_points'][0] if opportunity['entry_points'] else 'N/A'}")
-            print(f"      - Take profit: {opportunity['take_profit'][0] if opportunity['take_profit'] else 'N/A'}")
-            print(f"      - Stop loss: {opportunity['stop_loss'][0] if opportunity['stop_loss'] else 'N/A'}")
-            print(f"      - Lý do: {opportunity['reasoning'][0] if opportunity['reasoning'] else 'N/A'}")
-    
-    print("\n4. Tóm tắt lý do không giao dịch")
-    reasons_summary = analyzer.get_no_trade_reasons_summary()
-    
-    if "error" not in reasons_summary:
-        print(f"   Tổng số bản ghi: {reasons_summary['total_entries']}")
-        
-        print("   Top 3 danh mục:")
-        for category, count in reasons_summary.get('by_category', [])[:3]:
-            print(f"      - {category}: {count}")
-        
-        print("   Top 3 lý do chi tiết:")
-        for reason, count in reasons_summary.get('top_reasons', [])[:3]:
-            print(f"      - {reason}: {count}")
-    
-    print("\nHoàn thành phân tích và sinh kế hoạch giao dịch!")
-
-if __name__ == "__main__":
-    main()
+    # Quét cơ hội giao dịch
+    opportunities = analyzer.scan_opportunities()
+    print(f"Tìm thấy {len(opportunities)} cơ hội giao dịch")
+    for i, opportunity in enumerate(opportunities[:3], 1):  # Chỉ hiển thị 3 cơ hội hàng đầu
+        print(f"{i}. {opportunity.get('symbol')} - {opportunity.get('action')} (Độ tin cậy: {opportunity.get('confidence')}%)")
+        print(f"   Giá hiện tại: ${opportunity.get('current_price', 0):,.2f}")
+        print(f"   Giá mục tiêu: ${opportunity.get('target_price', 0):,.2f}")
+        print(f"   Stop Loss: ${opportunity.get('stop_loss', 0):,.2f}")
+        print(f"   Tỷ lệ R/R: {opportunity.get('risk_reward_ratio', 0):.2f}")
