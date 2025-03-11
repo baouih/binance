@@ -3,6 +3,7 @@
 """
 import os
 import logging
+import signal
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_socketio import SocketIO
@@ -11,6 +12,8 @@ import time
 import schedule
 import json
 import glob
+import subprocess
+import psutil
 
 # Thêm module Telegram Notifier
 from telegram_notifier import TelegramNotifier
@@ -35,6 +38,18 @@ bot_status = {
     'status': 'stopped',
     'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'mode': 'demo',
+}
+
+# Biến toàn cục cho trạng thái dịch vụ hợp nhất
+unified_service_status = {
+    'running': False,
+    'started_at': None,
+    'services': {
+        'sltp_manager': {'active': False, 'last_check': None},
+        'trailing_stop': {'active': False, 'last_check': None},
+        'market_monitor': {'active': False, 'last_check': None}
+    },
+    'pid': None
 }
 
 # Khởi tạo Telegram Notifier
@@ -1411,6 +1426,7 @@ def background_tasks():
     schedule.every(10).seconds.do(update_market_data)
     schedule.every(30).seconds.do(update_account_data)
     schedule.every(15).seconds.do(check_bot_status)
+    schedule.every(60).seconds.do(check_unified_service_status)
     
     while True:
         schedule.run_pending()
@@ -1544,3 +1560,193 @@ else:
     logger.info("Background tasks not auto-started. Use API to start them manually.")
     
 # Không chạy ứng dụng ở đây - được quản lý bởi gunicorn
+# API endpoints để quản lý dịch vụ hợp nhất
+@app.route('/api/services/unified/status')
+def get_unified_service_status():
+    """Lấy trạng thái dịch vụ hợp nhất"""
+    global unified_service_status
+    
+    # Kiểm tra trạng thái process
+    if unified_service_status['pid'] is not None:
+        pid = unified_service_status['pid']
+        if not psutil.pid_exists(pid):
+            # Process không còn chạy nữa
+            unified_service_status['running'] = False
+            unified_service_status['pid'] = None
+            for service in unified_service_status['services'].values():
+                service['active'] = False
+    
+    return jsonify(unified_service_status)
+
+@app.route('/api/services/unified/start', methods=['POST'])
+def start_unified_service():
+    """Khởi động dịch vụ hợp nhất"""
+    global unified_service_status
+    
+    try:
+        # Kiểm tra xem service đã chạy chưa
+        if unified_service_status['running'] and unified_service_status['pid'] is not None:
+            # Kiểm tra xem process còn sống không
+            if psutil.pid_exists(unified_service_status['pid']):
+                return jsonify({
+                    'success': False,
+                    'message': f"Dịch vụ hợp nhất đã đang chạy với PID {unified_service_status['pid']}"
+                })
+        
+        # Khởi động dịch vụ hợp nhất
+        result = subprocess.run(
+            ['./start_unified_service.sh'],
+            shell=True,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            # Đọc PID từ file
+            pid_file = 'unified_trading_service.pid'
+            if os.path.exists(pid_file):
+                with open(pid_file, 'r') as f:
+                    pid = int(f.read().strip())
+                
+                unified_service_status['running'] = True
+                unified_service_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                unified_service_status['pid'] = pid
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ hợp nhất đã được khởi động với PID {pid}"
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': "Không thể xác định PID của dịch vụ hợp nhất"
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f"Không thể khởi động dịch vụ hợp nhất: {result.stderr}"
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/services/unified/stop', methods=['POST'])
+def stop_unified_service():
+    """Dừng dịch vụ hợp nhất"""
+    global unified_service_status
+    
+    try:
+        # Kiểm tra xem service đang chạy không
+        if not unified_service_status['running'] or unified_service_status['pid'] is None:
+            return jsonify({
+                'success': False,
+                'message': "Dịch vụ hợp nhất không hoạt động"
+            })
+        
+        # Lấy PID và gửi tín hiệu thoát
+        pid = unified_service_status['pid']
+        if psutil.pid_exists(pid):
+            # Gửi tín hiệu Terminate (SIGTERM)
+            os.kill(pid, signal.SIGTERM)
+            
+            # Đợi process thoát
+            try:
+                process = psutil.Process(pid)
+                process.wait(timeout=5)  # Đợi tối đa 5 giây
+            except (psutil.NoSuchProcess, psutil.TimeoutExpired):
+                pass
+            
+            # Kiểm tra lại xem process đã thoát chưa
+            if not psutil.pid_exists(pid):
+                # Reset trạng thái
+                unified_service_status['running'] = False
+                unified_service_status['pid'] = None
+                for service in unified_service_status['services'].values():
+                    service['active'] = False
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ hợp nhất với PID {pid} đã được dừng"
+                })
+            else:
+                # Process vẫn còn chạy, thử Force Kill (SIGKILL)
+                os.kill(pid, signal.SIGKILL)
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ hợp nhất với PID {pid} đã được buộc dừng"
+                })
+        else:
+            # Process không còn chạy
+            unified_service_status['running'] = False
+            unified_service_status['pid'] = None
+            for service in unified_service_status['services'].values():
+                service['active'] = False
+            
+            return jsonify({
+                'success': False,
+                'message': f"Không tìm thấy process với PID {pid}"
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi dừng dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+def check_unified_service_status():
+    """Kiểm tra trạng thái hoạt động của dịch vụ hợp nhất"""
+    global unified_service_status
+    
+    try:
+        if unified_service_status['pid'] is not None:
+            # Kiểm tra xem process còn chạy không
+            pid = unified_service_status['pid']
+            if psutil.pid_exists(pid):
+                # Cập nhật thời gian kiểm tra
+                unified_service_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # Đọc log file để cập nhật trạng thái các dịch vụ con
+                log_file = 'unified_service.log'
+                if os.path.exists(log_file):
+                    # Đọc 100 dòng cuối để kiểm tra trạng thái
+                    try:
+                        with open(log_file, 'r') as f:
+                            lines = f.readlines()[-100:]
+                            
+                            # Kiểm tra dịch vụ SLTP Manager
+                            for line in reversed(lines):
+                                if 'Auto SLTP được cấu hình với' in line:
+                                    unified_service_status['services']['sltp_manager']['active'] = True
+                                    unified_service_status['services']['sltp_manager']['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                    break
+                            
+                            # Kiểm tra dịch vụ Trailing Stop
+                            for line in reversed(lines):
+                                if 'Trailing Stop cấu hình với' in line:
+                                    unified_service_status['services']['trailing_stop']['active'] = True
+                                    unified_service_status['services']['trailing_stop']['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                    break
+                            
+                            # Kiểm tra dịch vụ Market Monitor
+                            for line in reversed(lines):
+                                if 'Market Monitor theo dõi các cặp' in line:
+                                    unified_service_status['services']['market_monitor']['active'] = True
+                                    unified_service_status['services']['market_monitor']['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                    break
+                    except Exception as e:
+                        logger.error(f"Lỗi khi đọc log file: {str(e)}")
+            else:
+                # Process không còn chạy
+                logger.warning(f"Dịch vụ hợp nhất với PID {pid} không còn chạy")
+                
+                # Reset trạng thái
+                unified_service_status['running'] = False
+                unified_service_status['pid'] = None
+                for service in unified_service_status['services'].values():
+                    service['active'] = False
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ hợp nhất: {str(e)}")
