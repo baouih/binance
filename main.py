@@ -1563,8 +1563,8 @@ def start_background_tasks():
                         'pnl_percent': pnl_percent
                     })
             
-            # Gửi thông báo trạng thái hệ thống qua Telegram
-            telegram_notifier.send_system_status(
+            # Gửi thông báo khởi động hệ thống với phân tích đa coin qua Telegram
+            telegram_notifier.send_startup_notification(
                 account_balance=account_balance,
                 positions=active_positions,
                 unrealized_pnl=unrealized_pnl,

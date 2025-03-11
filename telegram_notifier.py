@@ -533,6 +533,179 @@ class TelegramNotifier:
                 "message": f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}"
             }
     
+    def send_startup_notification(self, account_balance: float, positions: List[Dict[str, Any]],
+                            unrealized_pnl: float, market_data: Dict[str, Any], mode: str) -> Dict[str, Any]:
+        """
+        Gửi thông báo khởi động hệ thống với phân tích đa coin 
+        
+        :param account_balance: Số dư tài khoản
+        :param positions: Danh sách vị thế
+        :param unrealized_pnl: PnL chưa thực hiện
+        :param market_data: Dữ liệu thị trường
+        :param mode: Chế độ API (testnet/live)
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Định dạng chế độ API
+            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
+            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
+            
+            # Lấy giá BTC và các coin khác từ market_data
+            btc_price = market_data.get('btc_price', 0)
+            eth_price = market_data.get('eth_price', 0)
+            btc_change = market_data.get('btc_change_24h', 0)
+            eth_change = market_data.get('eth_change_24h', 0)
+            
+            # Lấy xu hướng thị trường
+            market_trends = market_data.get('market_trends', {})
+            
+            # Lấy khuyến nghị từ bot (nếu có)
+            recommendations = market_data.get('recommendations', [])
+            
+            # Định dạng danh sách vị thế
+            positions_str = ""
+            active_position_count = 0
+            
+            if positions:
+                for i, pos in enumerate(positions, 1):
+                    symbol = pos.get('symbol', 'Unknown')
+                    position_type = pos.get('type', 'Unknown')
+                    size = pos.get('size', 0)
+                    entry_price = pos.get('entry_price', 0)
+                    pnl = pos.get('pnl', 0)
+                    pnl_percent = pos.get('pnl_percent', 0)
+                    
+                    active_position_count += 1
+                    
+                    # Xác định emoji dựa trên loại vị thế và PnL
+                    type_emoji = "📈" if position_type.upper() == "LONG" else "📉"
+                    result_emoji = "🟢" if pnl > 0 else "🔴"
+                    
+                    positions_str += f"  {result_emoji} {type_emoji} <b>{symbol}</b>: {size} @ {entry_price} ({pnl_percent:.2f}%)\n"
+            else:
+                positions_str = "  Không có vị thế đang mở.\n"
+            
+            # Phân tích thị trường và tạo khuyến nghị
+            market_analysis = self._analyze_market(market_data)
+            
+            # Tạo thông báo khởi động
+            message = (
+                f"🚀 <b>HỆ THỐNG GIAO DỊCH ĐÃ KHỞI ĐỘNG</b>\n\n"
+                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
+                f"⏰ <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                f"🏦 <b>THÔNG TIN TÀI KHOẢN</b>\n"
+                f"💰 <b>Số dư:</b> {account_balance:.2f} USDT\n"
+                f"💵 <b>PnL chưa thực hiện:</b> {unrealized_pnl:.2f} USDT\n"
+                f"📋 <b>Vị thế đang mở:</b> {active_position_count}\n"
+            )
+            
+            if positions_str:
+                message += f"\n📊 <b>CHI TIẾT VỊ THẾ</b>\n{positions_str}\n"
+                
+            # Thêm thông tin thị trường
+            message += (
+                f"\n📈 <b>TỔNG QUAN THỊ TRƯỜNG</b>\n"
+                f"  • BTC: ${btc_price:.2f} ({btc_change:+.2f}%)\n"
+                f"  • ETH: ${eth_price:.2f} ({eth_change:+.2f}%)\n"
+            )
+            
+            # Thêm phân tích thị trường
+            if market_analysis:
+                message += f"\n🔍 <b>PHÂN TÍCH THỊ TRƯỜNG</b>\n{market_analysis}\n"
+            
+            # Thêm top 5 coin biến động mạnh nhất
+            if market_trends:
+                volatile_coins = sorted(market_trends.items(), key=lambda x: abs(x[1]), reverse=True)[:5]
+                if volatile_coins:
+                    message += f"\n📊 <b>TOP COIN BIẾN ĐỘNG MẠNH (24H)</b>\n"
+                    for symbol, change in volatile_coins:
+                        trend_emoji = "📈" if change > 0 else "📉"
+                        message += f"  • {symbol}: {trend_emoji} {change:+.2f}%\n"
+            
+            # Thêm khuyến nghị nếu có
+            if recommendations:
+                message += f"\n💡 <b>KHUYẾN NGHỊ GIAO DỊCH</b>\n"
+                for rec in recommendations[:3]:  # Chỉ lấy top 3 khuyến nghị
+                    symbol = rec.get('symbol', 'Unknown')
+                    signal = rec.get('signal', 'Unknown')
+                    signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
+                    strength = rec.get('strength', 'Unknown')
+                    timeframe = rec.get('timeframe', 'Unknown')
+                    message += f"  • {signal_emoji} <b>{symbol}:</b> {signal.upper()} (Độ mạnh: {strength}, TF: {timeframe})\n"
+            
+            # Gửi tin nhắn
+            return self.send_message(message, notification_type='startup_notification')
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}"
+            }
+            
+    def _analyze_market(self, market_data: Dict[str, Any]) -> str:
+        """
+        Phân tích thị trường dựa trên dữ liệu
+        
+        :param market_data: Dữ liệu thị trường
+        :return: Phân tích thị trường dạng văn bản
+        """
+        try:
+            # Lấy dữ liệu thị trường
+            btc_change = market_data.get('btc_change_24h', 0)
+            fear_greed = market_data.get('sentiment', {}).get('value', 50)
+            sentiment = market_data.get('sentiment', {}).get('text', 'Trung tính')
+            market_trends = market_data.get('market_trends', {})
+            
+            # Xác định trạng thái thị trường dựa trên BTC
+            market_state = "Trung tính"
+            state_emoji = "⚖️"
+            
+            if btc_change > 3:
+                market_state = "Tăng mạnh"
+                state_emoji = "🚀"
+            elif btc_change > 1:
+                market_state = "Tăng nhẹ"
+                state_emoji = "📈"
+            elif btc_change < -3:
+                market_state = "Giảm mạnh"
+                state_emoji = "📉"
+            elif btc_change < -1:
+                market_state = "Giảm nhẹ" 
+                state_emoji = "⬇️"
+                
+            # Xác định xu hướng chung của thị trường
+            positive_coins = sum(1 for change in market_trends.values() if change > 0)
+            total_coins = len(market_trends) if market_trends else 1
+            positive_ratio = positive_coins / total_coins if total_coins > 0 else 0.5
+            
+            trend_description = ""
+            if positive_ratio > 0.7:
+                trend_description = "Thị trường đang tăng mạnh. Hầu hết các coin đều trong xu hướng tăng."
+            elif positive_ratio > 0.5:
+                trend_description = "Thị trường đang tăng nhẹ. Đa số các coin đang có xu hướng tích cực."
+            elif positive_ratio < 0.3:
+                trend_description = "Thị trường đang giảm mạnh. Hầu hết các coin đều trong xu hướng giảm."
+            elif positive_ratio < 0.5:
+                trend_description = "Thị trường đang giảm nhẹ. Đa số các coin đang có xu hướng tiêu cực."
+            else:
+                trend_description = "Thị trường đang đi ngang. Các coin không có xu hướng rõ ràng."
+            
+            # Tổng hợp phân tích
+            analysis = (
+                f"  {state_emoji} <b>Trạng thái:</b> {market_state}\n"
+                f"  😮 <b>Chỉ số sợ hãi/tham lam:</b> {fear_greed} - {sentiment}\n"
+            )
+            
+            if trend_description:
+                analysis += f"  📋 <b>Nhận định:</b> {trend_description}\n"
+                
+            return analysis
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích thị trường: {str(e)}", exc_info=True)
+            return ""
+            
     def send_system_status(self, account_balance: float, positions: List[Dict[str, Any]], 
                       unrealized_pnl: float, market_data: Dict[str, Any], mode: str) -> Dict[str, Any]:
         """
