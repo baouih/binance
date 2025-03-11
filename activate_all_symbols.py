@@ -100,7 +100,8 @@ def get_recommended_symbols():
     return [
         'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 
         'DOGEUSDT', 'DOTUSDT', 'AVAXUSDT', 'MATICUSDT', 'XRPUSDT',
-        'LINKUSDT', 'ATOMUSDT', 'NEARUSDT'
+        'LINKUSDT', 'ATOMUSDT', 'NEARUSDT', 'UNIUSDT', 'ICPUSDT',
+        'LTCUSDT', 'AAVEUSDT', 'SANDUSDT', 'AXSUSDT'
     ]
 
 def check_and_enable_all_symbols():

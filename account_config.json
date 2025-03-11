@@ -14,7 +14,7 @@
     "symbols": [
         "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT",
         "XRPUSDT", "DOGEUSDT", "DOTUSDT", "AVAXUSDT", "LINKUSDT",
-        "LTCUSDT", "UNIUSDT", "ATOMUSDT"
+        "LTCUSDT", "UNIUSDT", "ATOMUSDT", "MATICUSDT", "ICPUSDT"
     ],
     "timeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
     "leverage": 20,
@@ -47,7 +47,7 @@
     "market_monitor_settings": {
         "enabled": true,
         "check_interval": 60,
-        "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+        "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT", "LINKUSDT", "ADAUSDT", "MATICUSDT"],
         "volatility_threshold": 3.0
     },
     "small_account_configs": {
