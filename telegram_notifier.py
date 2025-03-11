@@ -608,12 +608,33 @@ class TelegramNotifier:
             if positions_str:
                 message += f"\n📊 <b>CHI TIẾT VỊ THẾ</b>\n{positions_str}\n"
                 
-            # Thêm thông tin thị trường
-            message += (
-                f"\n📈 <b>TỔNG QUAN THỊ TRƯỜNG</b>\n"
-                f"  • BTC: ${btc_price:.2f} ({btc_change:+.2f}%)\n"
-                f"  • ETH: ${eth_price:.2f} ({eth_change:+.2f}%)\n"
-            )
+            # Thêm thông tin thị trường với nhiều coin hơn
+            message += f"\n📈 <b>TỔNG QUAN THỊ TRƯỜNG</b>\n"
+            
+            # Thêm BTC và ETH (chính)
+            message += f"  • BTC: ${btc_price:.2f} ({btc_change:+.2f}%)\n"
+            message += f"  • ETH: ${eth_price:.2f} ({eth_change:+.2f}%)\n"
+            
+            # Thêm các altcoin phổ biến khác nếu có dữ liệu
+            bnb_price = market_data.get('bnb_price', 0)
+            bnb_change = market_data.get('bnb_change_24h', 0)
+            if bnb_price > 0:
+                message += f"  • BNB: ${bnb_price:.2f} ({bnb_change:+.2f}%)\n"
+                
+            sol_price = market_data.get('sol_price', 0)
+            sol_change = market_data.get('sol_change_24h', 0)
+            if sol_price > 0:
+                message += f"  • SOL: ${sol_price:.2f} ({sol_change:+.2f}%)\n"
+                
+            doge_price = market_data.get('doge_price', 0)
+            doge_change = market_data.get('doge_change_24h', 0)
+            if doge_price > 0:
+                message += f"  • DOGE: ${doge_price:.4f} ({doge_change:+.2f}%)\n"
+                
+            link_price = market_data.get('link_price', 0)
+            link_change = market_data.get('link_change_24h', 0)
+            if link_price > 0:
+                message += f"  • LINK: ${link_price:.2f} ({link_change:+.2f}%)\n"
             
             # Thêm phân tích thị trường
             if market_analysis:
@@ -659,6 +680,9 @@ class TelegramNotifier:
         try:
             # Lấy dữ liệu thị trường
             btc_change = market_data.get('btc_change_24h', 0)
+            eth_change = market_data.get('eth_change_24h', 0)
+            bnb_change = market_data.get('bnb_change_24h', 0)
+            sol_change = market_data.get('sol_change_24h', 0)
             fear_greed = market_data.get('sentiment', {}).get('value', 50)
             sentiment = market_data.get('sentiment', {}).get('text', 'Trung tính')
             market_trends = market_data.get('market_trends', {})
@@ -696,7 +720,42 @@ class TelegramNotifier:
                 trend_description = "Thị trường đang giảm nhẹ. Đa số các coin đang có xu hướng tiêu cực."
             else:
                 trend_description = "Thị trường đang đi ngang. Các coin không có xu hướng rõ ràng."
+                
+            # Phân tích đa coin 
+            coin_analysis = []
             
+            # Phân tích BTC
+            if abs(btc_change) > 5:
+                direction = "tăng" if btc_change > 0 else "giảm"
+                coin_analysis.append(f"<b>BTC</b> đang {direction} mạnh {abs(btc_change):.2f}% trong 24h qua")
+            elif abs(btc_change) > 2:
+                direction = "tăng" if btc_change > 0 else "giảm"
+                coin_analysis.append(f"<b>BTC</b> đang {direction} nhẹ {abs(btc_change):.2f}% trong 24h qua")
+                
+            # Phân tích ETH
+            if abs(eth_change) > 5:
+                direction = "tăng" if eth_change > 0 else "giảm"
+                coin_analysis.append(f"<b>ETH</b> đang {direction} mạnh {abs(eth_change):.2f}% trong 24h qua")
+            elif abs(eth_change) > 2:
+                direction = "tăng" if eth_change > 0 else "giảm"
+                coin_analysis.append(f"<b>ETH</b> đang {direction} nhẹ {abs(eth_change):.2f}% trong 24h qua")
+                
+            # Phân tích BNB
+            if bnb_change != 0 and abs(bnb_change) > 5:
+                direction = "tăng" if bnb_change > 0 else "giảm"
+                coin_analysis.append(f"<b>BNB</b> đang {direction} mạnh {abs(bnb_change):.2f}% trong 24h qua")
+            elif bnb_change != 0 and abs(bnb_change) > 2:
+                direction = "tăng" if bnb_change > 0 else "giảm"
+                coin_analysis.append(f"<b>BNB</b> đang {direction} nhẹ {abs(bnb_change):.2f}% trong 24h qua")
+                
+            # Phân tích SOL
+            if sol_change != 0 and abs(sol_change) > 5:
+                direction = "tăng" if sol_change > 0 else "giảm"
+                coin_analysis.append(f"<b>SOL</b> đang {direction} mạnh {abs(sol_change):.2f}% trong 24h qua")
+            elif sol_change != 0 and abs(sol_change) > 2:
+                direction = "tăng" if sol_change > 0 else "giảm"
+                coin_analysis.append(f"<b>SOL</b> đang {direction} nhẹ {abs(sol_change):.2f}% trong 24h qua")
+                
             # Tổng hợp phân tích
             analysis = (
                 f"  {state_emoji} <b>Trạng thái:</b> {market_state}\n"
@@ -705,6 +764,12 @@ class TelegramNotifier:
             
             if trend_description:
                 analysis += f"  📋 <b>Nhận định:</b> {trend_description}\n"
+                
+            # Thêm phân tích từng coin
+            if coin_analysis:
+                analysis += f"\n  🔎 <b>Phân tích đa coin:</b>\n"
+                for insight in coin_analysis:
+                    analysis += f"  • {insight}\n"
                 
             return analysis
             

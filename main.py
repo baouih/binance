@@ -1001,18 +1001,58 @@ def get_market_data():
             }
         ]
         
+        # Lấy thông tin của các altcoin phổ biến khác
+        try:
+            # BNB
+            bnb_ticker = binance_client.get_symbol_ticker('BNBUSDT')
+            bnb_24h = binance_client.get_24h_ticker('BNBUSDT')
+            if 'price' in bnb_ticker and 'priceChangePercent' in bnb_24h:
+                market_data['bnb_price'] = float(bnb_ticker['price'])
+                market_data['bnb_change_24h'] = float(bnb_24h['priceChangePercent'])
+            else:
+                market_data['bnb_price'] = 0
+                market_data['bnb_change_24h'] = 0
+                
+            # DOGE
+            doge_ticker = binance_client.get_symbol_ticker('DOGEUSDT')
+            doge_24h = binance_client.get_24h_ticker('DOGEUSDT')
+            if 'price' in doge_ticker and 'priceChangePercent' in doge_24h:
+                market_data['doge_price'] = float(doge_ticker['price'])
+                market_data['doge_change_24h'] = float(doge_24h['priceChangePercent'])
+            else:
+                market_data['doge_price'] = 0
+                market_data['doge_change_24h'] = 0
+                
+            # LINK
+            link_ticker = binance_client.get_symbol_ticker('LINKUSDT')
+            link_24h = binance_client.get_24h_ticker('LINKUSDT')
+            if 'price' in link_ticker and 'priceChangePercent' in link_24h:
+                market_data['link_price'] = float(link_ticker['price'])
+                market_data['link_change_24h'] = float(link_24h['priceChangePercent'])
+            else:
+                market_data['link_price'] = 0
+                market_data['link_change_24h'] = 0
+        except Exception as e:
+            logger.warning(f"Không thể lấy dữ liệu của một số altcoin: {str(e)}")
+            
         # Thêm xu hướng thị trường cho thông báo Telegram
         market_data['market_trends'] = {
             'BTC': market_data['btc_change_24h'],
             'ETH': market_data['eth_change_24h'],
-            'SOL': market_data['sol_change_24h']
+            'SOL': market_data['sol_change_24h'],
+            'BNB': market_data.get('bnb_change_24h', 0),
+            'DOGE': market_data.get('doge_change_24h', 0),
+            'LINK': market_data.get('link_change_24h', 0)
         }
         
         # Thêm thông tin khối lượng giao dịch
         market_data['market_volumes'] = {
             'BTC': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 0,
             'ETH': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 0,
-            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 0
+            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 0,
+            'BNB': bnb_24h.get('volume', 0) if isinstance(bnb_24h, dict) else 0,
+            'DOGE': doge_24h.get('volume', 0) if isinstance(doge_24h, dict) else 0,
+            'LINK': link_24h.get('volume', 0) if isinstance(link_24h, dict) else 0
         }
         
         # Thêm chế độ thị trường và dữ liệu khác
@@ -1020,7 +1060,9 @@ def get_market_data():
             'BTC': 'neutral',
             'ETH': 'neutral',
             'SOL': 'neutral',
-            'BNB': 'neutral'
+            'BNB': 'neutral',
+            'DOGE': 'neutral',
+            'LINK': 'neutral'
         }
         
         # Thêm sentiment cho chỉ số sợ hãi/tham lam
@@ -1033,9 +1075,12 @@ def get_market_data():
         
         # Thêm các thông tin khối lượng và xu hướng giao dịch
         market_data['volume_24h'] = {
-            'BTC': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 12345.67,
-            'ETH': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 45678.90,
-            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 987654.32
+            'BTC': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 0,
+            'ETH': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 0,
+            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 0,
+            'BNB': bnb_24h.get('volume', 0) if isinstance(bnb_24h, dict) else 0,
+            'DOGE': doge_24h.get('volume', 0) if isinstance(doge_24h, dict) else 0,
+            'LINK': link_24h.get('volume', 0) if isinstance(link_24h, dict) else 0
         }
         
         # Cập nhật thông tin thị trường hiện tại
@@ -1117,7 +1162,7 @@ def update_market_data():
                 market_data['signals'] = {}
                 
             # Chuẩn bị cập nhật hoặc tạo mới cho từng coin
-            for symbol in ['BTC', 'ETH', 'SOL', 'BNB']:
+            for symbol in ['BTC', 'ETH', 'SOL', 'BNB', 'DOGE', 'LINK']:
                 symbol_price = market_data.get(f"{symbol.lower()}_price", 0)
                 
                 # Chỉ cập nhật nếu có giá thực tế từ API
