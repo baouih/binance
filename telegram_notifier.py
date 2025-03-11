@@ -45,7 +45,7 @@ class TelegramNotifier:
         
         # Cache lưu trữ thông báo gần đây để tránh spam
         self.recent_messages = {}
-        self.message_cooldown = 300  # 5 phút (300 giây)
+        self.message_cooldown = 10  # Giảm xuống 10 giây để thông báo nhiều hơn
         
         # Lưu trữ dữ liệu thông báo trước đó để so sánh
         self.previous_system_status = None
