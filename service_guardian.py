@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
-Service Guardian - Giám sát và khởi động lại dịch vụ
-====================================================
+Guardian dịch vụ - Giám sát và tự động khởi động lại dịch vụ hợp nhất
+khi nó bị lỗi hoặc dừng đột ngột
 
-Script này giám sát và tự động khởi động lại các dịch vụ nếu chúng bị dừng.
-Được thiết kế để chạy liên tục như một dịch vụ hệ thống, đảm bảo các dịch vụ
-quan trọng của hệ thống giao dịch luôn hoạt động.
+Sử dụng:
+1. Đặt script này chạy cùng với dịch vụ hợp nhất
+2. Script sẽ kiểm tra định kỳ xem dịch vụ có đang hoạt động không
+3. Nếu dịch vụ không hoạt động, sẽ tự động khởi động lại
 
-Mode sử dụng:
-1. Chạy như một dịch vụ độc lập: python service_guardian.py
-2. Kiểm tra và khởi động một lần: python service_guardian.py --check-only
-
-Tính năng:
-- Giám sát trạng thái các dịch vụ thường xuyên
-- Ghi nhật ký chi tiết về hoạt động giám sát
-- Tự động khởi động lại dịch vụ nếu không còn hoạt động
-- Gửi thông báo về trạng thái dịch vụ
+Tác giả: BinanceTrader Bot
 """
 
 import os
@@ -25,187 +17,170 @@ import sys
 import time
 import signal
 import logging
-import argparse
 import subprocess
-import json
 from datetime import datetime
-import psutil
 
-# Thiết lập logging
-log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('service_guardian')
-logger.setLevel(logging.INFO)
+# Cấu hình logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("service_guardian.log"),
+        logging.StreamHandler()
+    ]
+)
 
-# File handler
-log_file = 'service_guardian.log'
-file_handler = logging.FileHandler(log_file)
-file_handler.setFormatter(log_formatter)
-logger.addHandler(file_handler)
+# Tạo logger
+logger = logging.getLogger("service_guardian")
 
-# Console handler
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(log_formatter)
-logger.addHandler(console_handler)
+# Thông số cấu hình
+PID_FILE = 'unified_trading_service.pid'
+RESTART_SCRIPT = './start_unified_service.sh'
+CHECK_INTERVAL = 60  # Kiểm tra mỗi 60 giây
+MAX_RESTARTS = 5  # Số lần khởi động lại tối đa trong khoảng thời gian RESTART_WINDOW
+RESTART_WINDOW = 3600  # Cửa sổ thời gian để đếm số lần khởi động lại (giây)
 
-# Danh sách dịch vụ cần giám sát và các thông tin cần thiết
-# Format: name, check_command, start_script, pid_file
-SERVICES = [
-    {
-        'name': 'Auto SLTP Manager',
-        'check_command': 'pgrep -f "python auto_sltp_manager.py"',
-        'start_script': './headless_start_sltp_manager.sh',
-        'pid_file': 'auto_sltp_manager.pid',
-        'direct_command': 'nohup python auto_sltp_manager.py > auto_sltp_manager.log 2>&1 &'
-    },
-    {
-        'name': 'Trailing Stop Service',
-        'check_command': 'pgrep -f "python position_trailing_stop.py"',
-        'start_script': './headless_trailing_stop.sh',
-        'pid_file': 'trailing_stop_service.pid',
-        'direct_command': 'nohup python position_trailing_stop.py --mode service --interval 60 > trailing_stop_service.log 2>&1 &'
-    },
-    # Thêm các dịch vụ khác nếu cần
-]
+# Biến toàn cục
+running = True
+restart_history = []  # Lưu lịch sử thời gian khởi động lại
 
-class ServiceGuardian:
-    def __init__(self, check_only=False):
-        """Khởi tạo Guardian Service."""
-        self.check_only = check_only
-        self.pid = os.getpid()
-        self.write_pid_file()
-        logger.info(f"Service Guardian khởi động với PID {self.pid}")
+
+def signal_handler(sig, frame):
+    """Xử lý tín hiệu khi nhận SIGTERM hoặc SIGINT"""
+    global running
+    logger.info(f"Đã nhận tín hiệu {sig}, dừng guardian...")
+    running = False
+    sys.exit(0)
+
+
+def check_service_running():
+    """Kiểm tra xem dịch vụ có đang chạy không"""
+    if not os.path.exists(PID_FILE):
+        logger.warning(f"File PID {PID_FILE} không tồn tại, dịch vụ có thể không chạy")
+        return False
+    
+    try:
+        with open(PID_FILE, 'r') as f:
+            pid = int(f.read().strip())
         
-        # Xử lý tín hiệu để thoát sạch sẽ
-        signal.signal(signal.SIGTERM, self.handle_sigterm)
-        signal.signal(signal.SIGINT, self.handle_sigterm)
+        # Kiểm tra xem process có tồn tại không
+        os.kill(pid, 0)  # Gửi tín hiệu 0 để kiểm tra process
+        logger.debug(f"Dịch vụ đang chạy với PID {pid}")
+        return True
+    except ProcessLookupError:
+        logger.warning(f"Process với PID {pid} không tồn tại")
+        return False
+    except ValueError:
+        logger.error(f"Không thể đọc PID từ file {PID_FILE}")
+        return False
+    except PermissionError:
+        logger.error(f"Không đủ quyền để kiểm tra process {pid}")
+        return False
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ: {e}")
+        return False
+
+
+def can_restart():
+    """Kiểm tra xem có thể khởi động lại dịch vụ không (giới hạn số lần khởi động lại)"""
+    global restart_history
     
-    def write_pid_file(self):
-        """Ghi PID ra file để có thể kiểm tra sau này."""
-        try:
-            with open('service_guardian.pid', 'w') as f:
-                f.write(str(self.pid))
-        except Exception as e:
-            logger.error(f"Không thể ghi file PID: {e}")
+    now = time.time()
     
-    def handle_sigterm(self, signum, frame):
-        """Xử lý khi nhận tín hiệu thoát."""
-        logger.info("Nhận được tín hiệu thoát, đang dừng dịch vụ...")
-        try:
-            os.remove('service_guardian.pid')
-        except:
-            pass
-        sys.exit(0)
+    # Xóa những lần khởi động lại cũ hơn RESTART_WINDOW
+    restart_history = [t for t in restart_history if now - t < RESTART_WINDOW]
     
-    def check_service(self, service):
-        """Kiểm tra xem dịch vụ có đang chạy không."""
-        try:
-            # Sử dụng cả hai phương pháp để kiểm tra dịch vụ
-            # 1. Kiểm tra thông qua lệnh check_command
-            process = subprocess.run(service['check_command'], shell=True, stdout=subprocess.PIPE)
-            running_by_command = process.returncode == 0
-            
-            # 2. Kiểm tra thông qua file PID
-            running_by_pid = False
-            if os.path.exists(service['pid_file']):
-                with open(service['pid_file'], 'r') as f:
-                    pid = f.read().strip()
-                    running_by_pid = psutil.pid_exists(int(pid)) if pid.isdigit() else False
-            
-            # Dịch vụ được coi là đang chạy nếu một trong hai phương pháp xác nhận
-            return running_by_command or running_by_pid
-        except Exception as e:
-            logger.error(f"Lỗi khi kiểm tra dịch vụ {service['name']}: {e}")
-            return False
+    # Kiểm tra số lần khởi động lại trong cửa sổ thời gian
+    if len(restart_history) >= MAX_RESTARTS:
+        logger.error(f"Đã vượt quá số lần khởi động lại tối đa ({MAX_RESTARTS}) trong {RESTART_WINDOW//60} phút")
+        return False
     
-    def start_service(self, service):
-        """Khởi động dịch vụ."""
-        logger.info(f"Đang khởi động {service['name']}...")
-        try:
-            # Thử khởi động bằng script
-            if os.path.exists(service['start_script']):
-                subprocess.run(f"chmod +x {service['start_script']}", shell=True)
-                result = subprocess.run(service['start_script'], shell=True)
-                if result.returncode == 0:
-                    logger.info(f"Đã khởi động {service['name']} thành công qua script")
-                    return True
-                else:
-                    logger.warning(f"Khởi động {service['name']} qua script thất bại, thử lệnh trực tiếp")
+    return True
+
+
+def restart_service():
+    """Khởi động lại dịch vụ hợp nhất"""
+    global restart_history
+    
+    if not can_restart():
+        logger.warning("Không thể khởi động lại dịch vụ do vượt quá giới hạn")
+        return False
+    
+    logger.info("Đang khởi động lại dịch vụ hợp nhất...")
+    
+    try:
+        # Xóa file PID cũ nếu tồn tại
+        if os.path.exists(PID_FILE):
+            os.remove(PID_FILE)
+            logger.debug(f"Đã xóa file PID cũ {PID_FILE}")
+        
+        # Chạy script khởi động
+        result = subprocess.run([RESTART_SCRIPT], shell=True, capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            logger.info("Đã khởi động lại dịch vụ thành công")
             
-            # Nếu script thất bại hoặc không tồn tại, thử lệnh trực tiếp
-            subprocess.run(service['direct_command'], shell=True)
+            # Thêm vào lịch sử khởi động lại
+            restart_history.append(time.time())
             
-            # Chờ một chút để dịch vụ khởi động
-            time.sleep(3)
+            # Đợi một chút để dịch vụ khởi động
+            time.sleep(5)
             
-            # Kiểm tra xem dịch vụ đã khởi động thành công chưa
-            if self.check_service(service):
-                logger.info(f"Đã khởi động {service['name']} thành công qua lệnh trực tiếp")
+            # Kiểm tra xem dịch vụ đã chạy chưa
+            if check_service_running():
+                logger.info("Xác nhận dịch vụ đã chạy thành công")
                 return True
             else:
-                logger.error(f"Không thể khởi động {service['name']}")
+                logger.warning("Dịch vụ không chạy sau khi khởi động lại")
                 return False
-                
-        except Exception as e:
-            logger.error(f"Lỗi khi khởi động {service['name']}: {e}")
+        else:
+            logger.error(f"Không thể khởi động lại dịch vụ: {result.stderr}")
             return False
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động lại dịch vụ: {e}")
+        return False
+
+
+def main():
+    """Hàm chính để chạy guardian"""
+    logger.info("===== Khởi động Service Guardian =====")
+    logger.info(f"Đường dẫn tới script khởi động: {RESTART_SCRIPT}")
+    logger.info(f"Chu kỳ kiểm tra: {CHECK_INTERVAL} giây")
+    logger.info(f"Số lần khởi động lại tối đa: {MAX_RESTARTS} lần trong {RESTART_WINDOW//60} phút")
     
-    def send_notification(self, message):
-        """Gửi thông báo về trạng thái dịch vụ."""
-        try:
-            # Kiểm tra xem telegram_notifier có tồn tại không
-            if os.path.exists('telegram_notifier.py'):
-                cmd = f'python telegram_notifier.py "{message}" "system"'
-                subprocess.run(cmd, shell=True)
-                logger.info(f"Đã gửi thông báo: {message}")
-            else:
-                logger.warning("Không tìm thấy telegram_notifier.py. Bỏ qua thông báo.")
-        except Exception as e:
-            logger.error(f"Lỗi khi gửi thông báo: {e}")
+    # Đăng ký handler xử lý tín hiệu
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     
-    def run(self):
-        """Chạy vòng lặp chính của Guardian."""
-        logger.info("Service Guardian bắt đầu giám sát các dịch vụ")
-        
-        # Gửi thông báo khởi động
-        self.send_notification("🛡️ Service Guardian đã bắt đầu giám sát hệ thống")
-        
-        # Kiểm tra và khởi động các dịch vụ
-        while True:
-            service_status = []
+    # Khởi đầu thông báo
+    startup_message = """
+    ┌───────────────────────────────────────────────┐
+    │                                               │
+    │         BINANCE TRADER BOT - GUARDIAN         │
+    │                                               │
+    │  Giám sát và tự động khởi động lại dịch vụ    │
+    │                                               │
+    └───────────────────────────────────────────────┘
+    """
+    print(startup_message)
+    
+    # Vòng lặp chính
+    try:
+        while running:
+            # Kiểm tra trạng thái dịch vụ
+            if not check_service_running():
+                logger.warning("Dịch vụ không chạy, đang thử khởi động lại...")
+                restart_service()
             
-            for service in SERVICES:
-                is_running = self.check_service(service)
-                status = "✅ Đang chạy" if is_running else "❌ Không chạy"
-                logger.info(f"{service['name']}: {status}")
-                service_status.append(f"{service['name']}: {status}")
-                
-                if not is_running:
-                    if not self.check_only:
-                        if self.start_service(service):
-                            service_status[-1] = f"{service['name']}: ✅ Đã khởi động lại"
-                            self.send_notification(f"🔄 Dịch vụ {service['name']} đã được khởi động lại tự động")
-                        else:
-                            self.send_notification(f"⚠️ Không thể khởi động lại dịch vụ {service['name']}")
-            
-            # Gửi báo cáo trạng thái các dịch vụ
-            if not all("✅" in status for status in service_status):
-                status_message = "📊 Trạng thái dịch vụ:\n" + "\n".join(service_status)
-                self.send_notification(status_message)
-            
-            # Nếu chỉ kiểm tra một lần thì thoát
-            if self.check_only:
-                break
-            
-            # Chờ đến lần kiểm tra tiếp theo
-            time.sleep(60)  # Kiểm tra mỗi 60 giây
-        
-        logger.info("Service Guardian kết thúc giám sát")
+            # Đợi đến chu kỳ kiểm tra tiếp theo
+            time.sleep(CHECK_INTERVAL)
+    except KeyboardInterrupt:
+        logger.info("Nhận được tín hiệu thoát từ bàn phím")
+    except Exception as e:
+        logger.error(f"Lỗi không mong muốn: {e}")
+    finally:
+        logger.info("===== Đã dừng Service Guardian =====")
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Service Guardian - Giám sát và khởi động lại dịch vụ")
-    parser.add_argument("--check-only", action="store_true", 
-                        help="Chỉ kiểm tra và khởi động các dịch vụ một lần")
-    args = parser.parse_args()
-    
-    guardian = ServiceGuardian(check_only=args.check_only)
-    guardian.run()
+    main()

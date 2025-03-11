@@ -1,514 +1,894 @@
-{% extends "base.html" %}
-{% block title %}Quản lý Dịch vụ{% endblock %}
+{% extends 'base.html' %}
 
-{% block head %}
-{{ super() }}
+{% block title %}Quản lý Dịch vụ | BinanceTrader Bot{% endblock %}
+
+{% block styles %}
 <style>
-  .service-card {
-    border-radius: 10px;
-    margin-bottom: 20px;
-    background-color: #1e2430;
-  }
-  .service-card .card-header {
-    border-bottom: 1px solid #2a3441;
-    padding: 15px 20px;
-  }
-  .service-card .card-body {
-    padding: 20px;
-  }
-  .status-badge {
-    font-size: 0.85rem;
-    padding: 0.35em 0.65em;
-    border-radius: 10px;
-  }
-  .status-badge-active {
-    background-color: #28a745;
-    color: white;
-  }
-  .status-badge-inactive {
-    background-color: #dc3545;
-    color: white;
-  }
-  .service-details {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #171e29;
-    border-radius: 8px;
-  }
-  .service-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  .log-container {
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: #0d1117;
-    padding: 10px;
-    border-radius: 5px;
-    font-family: monospace;
-    font-size: 0.85rem;
-    margin-top: 20px;
-  }
-  .subservice-status {
-    padding: 5px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-  }
-  .subservice-active {
-    background-color: rgba(40, 167, 69, 0.1);
-    border-left: 3px solid #28a745;
-  }
-  .subservice-inactive {
-    background-color: rgba(220, 53, 69, 0.1);
-    border-left: 3px solid #dc3545;
-  }
+    .service-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #495057;
+    }
+    
+    .service-card.active {
+        border-left: 4px solid #28a745;
+    }
+    
+    .service-card.inactive {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .log-container {
+        background-color: #212529;
+        border-radius: 0.375rem;
+        font-family: 'Courier New', monospace;
+        height: 300px;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .log-line {
+        margin: 0;
+        padding: 2px 0;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .log-line.error {
+        color: #dc3545;
+    }
+    
+    .log-line.warning {
+        color: #ffc107;
+    }
+    
+    .log-line.info {
+        color: #17a2b8;
+    }
+    
+    .system-monitor {
+        background-color: #343a40;
+        border-radius: 0.375rem;
+        padding: 1rem;
+    }
+    
+    .progress-label {
+        font-size: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .config-form label {
+        font-weight: 500;
+    }
+    
+    .service-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .service-badge {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    #refreshInterval {
+        width: 80px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-light">Quản lý Dịch vụ</h1>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <!-- Dịch vụ hợp nhất -->
-    <div class="col-md-6">
-      <div class="service-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Dịch vụ Hợp nhất</h5>
-          <div>
-            <span id="status-unified" class="status-badge">Đang kiểm tra...</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <p class="text-muted">Dịch vụ này hợp nhất các tiến trình riêng lẻ để tối ưu hóa tài nguyên hệ thống. Bao gồm các dịch vụ: Auto SLTP, Trailing Stop và Theo dõi thị trường.</p>
-          
-          <div class="service-details">
-            <div class="row">
-              <div class="col-md-6">
-                <p><strong>PID:</strong> <span id="unified-pid">Không có</span></p>
-                <p><strong>Trạng thái:</strong> <span id="unified-status">Không hoạt động</span></p>
-              </div>
-              <div class="col-md-6">
-                <p><strong>Thời gian khởi động:</strong> <span id="unified-started-at">-</span></p>
-                <p><strong>Lần kiểm tra cuối:</strong> <span id="unified-last-check">-</span></p>
-              </div>
-            </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold mb-4">Quản lý Dịch vụ Hợp nhất</h1>
+            <p class="text-muted">Quản lý và giám sát các dịch vụ tự động trong một giao diện thống nhất</p>
             
-            <h6 class="mt-3">Dịch vụ con:</h6>
-            <div id="subservices-container">
-              <div class="subservice-status" id="sltp-manager-status">
-                <span><i class="fas fa-circle"></i> Auto SLTP Manager: <strong>Không rõ</strong></span>
-              </div>
-              <div class="subservice-status" id="trailing-stop-status">
-                <span><i class="fas fa-circle"></i> Trailing Stop Manager: <strong>Không rõ</strong></span>
-              </div>
-              <div class="subservice-status" id="market-monitor-status">
-                <span><i class="fas fa-circle"></i> Market Monitor: <strong>Không rõ</strong></span>
-              </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <button id="startAllServices" class="btn btn-success me-2">
+                        <i class="fas fa-play-circle me-1"></i> Chạy tất cả
+                    </button>
+                    <button id="stopAllServices" class="btn btn-danger me-2">
+                        <i class="fas fa-stop-circle me-1"></i> Dừng tất cả
+                    </button>
+                    <button id="restartAllServices" class="btn btn-warning">
+                        <i class="fas fa-sync me-1"></i> Khởi động lại
+                    </button>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="refreshInterval" class="me-2">Tự làm mới:</label>
+                    <select id="refreshInterval" class="form-select form-select-sm">
+                        <option value="0">Tắt</option>
+                        <option value="5" selected>5s</option>
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">60s</option>
+                    </select>
+                </div>
             </div>
-          </div>
-          
-          <div class="service-actions">
-            <button id="start-unified-btn" class="btn btn-sm btn-primary"><i class="fas fa-play"></i> Khởi động</button>
-            <button id="stop-unified-btn" class="btn btn-sm btn-danger"><i class="fas fa-stop"></i> Dừng lại</button>
-            <button id="refresh-unified-btn" class="btn btn-sm btn-info"><i class="fas fa-sync"></i> Làm mới</button>
-          </div>
         </div>
-      </div>
-      
-      <!-- Cấu hình dịch vụ hợp nhất -->
-      <div class="service-card">
-        <div class="card-header">
-          <h5 class="mb-0">Cấu hình Dịch vụ</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <h6>Auto SLTP</h6>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="auto-sltp-enabled" checked>
-              <label class="form-check-label" for="auto-sltp-enabled">Bật Auto SLTP</label>
-            </div>
-            <div class="row mt-2">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="risk-reward-ratio">Tỷ lệ rủi ro/lợi nhuận</label>
-                  <input type="number" class="form-control form-control-sm" id="risk-reward-ratio" value="2.0" step="0.1" min="1">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="stop-loss-percent">Phần trăm Stop Loss</label>
-                  <input type="number" class="form-control form-control-sm" id="stop-loss-percent" value="2.0" step="0.1" min="0.1">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="mb-3">
-            <h6>Trailing Stop</h6>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="trailing-stop-enabled" checked>
-              <label class="form-check-label" for="trailing-stop-enabled">Bật Trailing Stop</label>
-            </div>
-            <div class="row mt-2">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="activation-percent">Phần trăm kích hoạt</label>
-                  <input type="number" class="form-control form-control-sm" id="activation-percent" value="1.0" step="0.1" min="0.1">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="trailing-percent">Phần trăm theo sau</label>
-                  <input type="number" class="form-control form-control-sm" id="trailing-percent" value="0.5" step="0.1" min="0.1">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="mb-3">
-            <h6>Theo dõi thị trường</h6>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="market-monitor-enabled" checked>
-              <label class="form-check-label" for="market-monitor-enabled">Bật theo dõi thị trường</label>
-            </div>
-            <div class="row mt-2">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="volatility-threshold">Ngưỡng biến động (%)</label>
-                  <input type="number" class="form-control form-control-sm" id="volatility-threshold" value="3.0" step="0.1" min="0.1">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="check-interval">Khoảng thời gian kiểm tra (giây)</label>
-                  <input type="number" class="form-control form-control-sm" id="check-interval" value="60" step="5" min="5">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <button id="save-config-btn" class="btn btn-primary"><i class="fas fa-save"></i> Lưu cấu hình</button>
-        </div>
-      </div>
     </div>
     
-    <!-- Nhật ký hoạt động -->
-    <div class="col-md-6">
-      <div class="service-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Nhật ký hoạt động</h5>
-          <button id="refresh-logs-btn" class="btn btn-sm btn-outline-info"><i class="fas fa-sync"></i> Làm mới</button>
-        </div>
-        <div class="card-body">
-          <div class="log-container" id="log-container">
-            <div id="log-content">
-              <p class="text-muted">Đang tải nhật ký...</p>
+    <!-- Thẻ dịch vụ -->
+    <div class="row mb-4">
+        <!-- Auto SLTP -->
+        <div class="col-md-4 mb-4">
+            <div class="card service-card h-100" id="autoSLTPCard">
+                <div class="card-body">
+                    <span class="service-badge badge bg-danger" id="autoSLTPStatus">Chưa kích hoạt</span>
+                    <div class="text-center mb-3">
+                        <i class="fas fa-shield-alt service-icon text-primary"></i>
+                        <h4 class="card-title">Auto SLTP</h4>
+                        <p class="card-text">Tự động đặt Stop Loss và Take Profit cho các vị thế</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="progress-label">
+                            <span>Lần chạy cuối:</span>
+                            <span id="autoSLTPLastRun">Chưa có</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-success btn-sm service-control-btn me-2" data-service="auto_sltp" data-action="start">
+                            <i class="fas fa-play-circle me-1"></i> Chạy
+                        </button>
+                        <button class="btn btn-danger btn-sm service-control-btn me-2" data-service="auto_sltp" data-action="stop">
+                            <i class="fas fa-stop-circle me-1"></i> Dừng
+                        </button>
+                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#autoSLTPConfigModal">
+                            <i class="fas fa-cog me-1"></i> Cấu hình
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      
-      <!-- Thông tin hệ thống -->
-      <div class="service-card">
-        <div class="card-header">
-          <h5 class="mb-0">Thông tin hệ thống</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <h6>Tài nguyên</h6>
-                <p><strong>CPU:</strong> <span id="cpu-usage">Đang tải...</span></p>
-                <p><strong>RAM:</strong> <span id="ram-usage">Đang tải...</span></p>
-                <p><strong>Disk:</strong> <span id="disk-usage">Đang tải...</span></p>
-              </div>
+        
+        <!-- Trailing Stop -->
+        <div class="col-md-4 mb-4">
+            <div class="card service-card h-100" id="trailingStopCard">
+                <div class="card-body">
+                    <span class="service-badge badge bg-danger" id="trailingStopStatus">Chưa kích hoạt</span>
+                    <div class="text-center mb-3">
+                        <i class="fas fa-chart-line service-icon text-success"></i>
+                        <h4 class="card-title">Trailing Stop</h4>
+                        <p class="card-text">Tự động điều chỉnh Stop Loss theo giá thị trường</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="progress-label">
+                            <span>Lần chạy cuối:</span>
+                            <span id="trailingStopLastRun">Chưa có</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-success btn-sm service-control-btn me-2" data-service="trailing_stop" data-action="start">
+                            <i class="fas fa-play-circle me-1"></i> Chạy
+                        </button>
+                        <button class="btn btn-danger btn-sm service-control-btn me-2" data-service="trailing_stop" data-action="stop">
+                            <i class="fas fa-stop-circle me-1"></i> Dừng
+                        </button>
+                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#trailingStopConfigModal">
+                            <i class="fas fa-cog me-1"></i> Cấu hình
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <h6>Thời gian hoạt động</h6>
-                <p><strong>Hệ thống:</strong> <span id="system-uptime">Đang tải...</span></p>
-                <p><strong>Ứng dụng:</strong> <span id="app-uptime">Đang tải...</span></p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="mb-3">
-            <h6>Trạng thái API</h6>
-            <p><strong>Binance API:</strong> <span id="api-status" class="badge bg-secondary">Không xác định</span></p>
-            <p><strong>Telegram API:</strong> <span id="telegram-status" class="badge bg-secondary">Không xác định</span></p>
-          </div>
         </div>
-      </div>
+        
+        <!-- Market Monitor -->
+        <div class="col-md-4 mb-4">
+            <div class="card service-card h-100" id="marketMonitorCard">
+                <div class="card-body">
+                    <span class="service-badge badge bg-danger" id="marketMonitorStatus">Chưa kích hoạt</span>
+                    <div class="text-center mb-3">
+                        <i class="fas fa-search-dollar service-icon text-warning"></i>
+                        <h4 class="card-title">Market Monitor</h4>
+                        <p class="card-text">Giám sát biến động thị trường, gửi cảnh báo</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="progress-label">
+                            <span>Lần chạy cuối:</span>
+                            <span id="marketMonitorLastRun">Chưa có</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-success btn-sm service-control-btn me-2" data-service="market_monitor" data-action="start">
+                            <i class="fas fa-play-circle me-1"></i> Chạy
+                        </button>
+                        <button class="btn btn-danger btn-sm service-control-btn me-2" data-service="market_monitor" data-action="stop">
+                            <i class="fas fa-stop-circle me-1"></i> Dừng
+                        </button>
+                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#marketMonitorConfigModal">
+                            <i class="fas fa-cog me-1"></i> Cấu hình
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+    
+    <!-- Hàng thứ hai -->
+    <div class="row">
+        <!-- Giám sát hệ thống -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-dark">
+                    <h5 class="mb-0"><i class="fas fa-server me-2"></i>Giám sát hệ thống</h5>
+                </div>
+                <div class="card-body system-monitor">
+                    <div class="mb-3">
+                        <div class="progress-label mb-1">
+                            <span>CPU:</span>
+                            <span id="cpuUsage">0%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" id="cpuProgressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="progress-label mb-1">
+                            <span>Bộ nhớ:</span>
+                            <span id="memoryUsage">0%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" id="memoryProgressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="progress-label mb-1">
+                            <span>Đĩa cứng:</span>
+                            <span id="diskUsage">0%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" id="diskProgressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="small">
+                        <p class="mb-1">
+                            <i class="fas fa-clock me-2"></i>Thời gian hoạt động: <span id="uptime">0 phút</span>
+                        </p>
+                        <p class="mb-1">
+                            <i class="fas fa-microchip me-2"></i>PID: <span id="servicePid">N/A</span>
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>Thời điểm khởi động: <span id="startTime">N/A</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Log hệ thống -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Log dịch vụ</h5>
+                    <div>
+                        <button id="clearLogs" class="btn btn-sm btn-outline-light me-2">
+                            <i class="fas fa-trash me-1"></i> Xóa
+                        </button>
+                        <button id="refreshLogs" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-sync me-1"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="log-container" id="logContainer">
+                        <p class="log-line info">Đang tải log dịch vụ...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal cấu hình Auto SLTP -->
+<div class="modal fade" id="autoSLTPConfigModal" tabindex="-1" aria-labelledby="autoSLTPConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="autoSLTPConfigModalLabel">Cấu hình Auto SLTP</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="autoSLTPConfigForm" class="config-form">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="autoSLTPEnabled" checked>
+                        <label class="form-check-label" for="autoSLTPEnabled">Kích hoạt Auto SLTP</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="riskRewardRatio" class="form-label">Tỉ lệ Risk/Reward:</label>
+                        <input type="number" class="form-control" id="riskRewardRatio" value="2.0" min="0.1" step="0.1">
+                        <div class="form-text">Tỉ lệ giữa Take Profit và Stop Loss</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stopLossPercent" class="form-label">Phần trăm Stop Loss:</label>
+                        <input type="number" class="form-control" id="stopLossPercent" value="2.0" min="0.1" step="0.1">
+                        <div class="form-text">Khoảng cách từ giá vào đến Stop Loss (%)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="autoSLTPCheckInterval" class="form-label">Chu kỳ kiểm tra (giây):</label>
+                        <input type="number" class="form-control" id="autoSLTPCheckInterval" value="30" min="5" step="1">
+                        <div class="form-text">Thời gian giữa các lần kiểm tra và cập nhật SLTP</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveAutoSLTPConfig">Lưu cấu hình</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal cấu hình Trailing Stop -->
+<div class="modal fade" id="trailingStopConfigModal" tabindex="-1" aria-labelledby="trailingStopConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="trailingStopConfigModalLabel">Cấu hình Trailing Stop</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="trailingStopConfigForm" class="config-form">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="trailingStopEnabled" checked>
+                        <label class="form-check-label" for="trailingStopEnabled">Kích hoạt Trailing Stop</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="activationPercent" class="form-label">Phần trăm kích hoạt:</label>
+                        <input type="number" class="form-control" id="activationPercent" value="1.0" min="0.1" step="0.1">
+                        <div class="form-text">Lợi nhuận tối thiểu để kích hoạt trailing stop (%)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="trailingPercent" class="form-label">Phần trăm theo sau:</label>
+                        <input type="number" class="form-control" id="trailingPercent" value="0.5" min="0.1" step="0.1">
+                        <div class="form-text">Khoảng cách từ giá hiện tại đến Stop Loss (%)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="trailingStopCheckInterval" class="form-label">Chu kỳ kiểm tra (giây):</label>
+                        <input type="number" class="form-control" id="trailingStopCheckInterval" value="15" min="5" step="1">
+                        <div class="form-text">Thời gian giữa các lần kiểm tra và cập nhật trailing stop</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveTrailingStopConfig">Lưu cấu hình</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal cấu hình Market Monitor -->
+<div class="modal fade" id="marketMonitorConfigModal" tabindex="-1" aria-labelledby="marketMonitorConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="marketMonitorConfigModalLabel">Cấu hình Market Monitor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="marketMonitorConfigForm" class="config-form">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="marketMonitorEnabled" checked>
+                        <label class="form-check-label" for="marketMonitorEnabled">Kích hoạt Market Monitor</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="monitorSymbols" class="form-label">Cặp tiền theo dõi:</label>
+                        <input type="text" class="form-control" id="monitorSymbols" value="BTCUSDT,ETHUSDT,SOLUSDT">
+                        <div class="form-text">Danh sách cặp tiền cần theo dõi, phân cách bằng dấu phẩy</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="volatilityThreshold" class="form-label">Ngưỡng biến động (%):</label>
+                        <input type="number" class="form-control" id="volatilityThreshold" value="3.0" min="0.1" step="0.1">
+                        <div class="form-text">Mức biến động giá đủ để kích hoạt cảnh báo</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="marketMonitorCheckInterval" class="form-label">Chu kỳ kiểm tra (giây):</label>
+                        <input type="number" class="form-control" id="marketMonitorCheckInterval" value="60" min="30" step="1">
+                        <div class="form-text">Thời gian giữa các lần kiểm tra thị trường</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveMarketMonitorConfig">Lưu cấu hình</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}
 <script>
-  $(document).ready(function() {
-    // Lấy trạng thái dịch vụ hợp nhất
-    function getUnifiedServiceStatus() {
-      $.ajax({
-        url: '/api/services/unified/status',
-        method: 'GET',
-        success: function(data) {
-          updateServiceStatus(data);
-        },
-        error: function(err) {
-          console.error('Lỗi khi lấy trạng thái dịch vụ:', err);
-          $('#status-unified').text('Lỗi').removeClass().addClass('status-badge status-badge-inactive');
+    // Biến toàn cục
+    let refreshTimer = null;
+    let selectedRefreshInterval = 5; // Mặc định 5 giây
+    
+    // Hàm khởi tạo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo tooltips
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => {
+            new bootstrap.Tooltip(tooltip);
+        });
+        
+        // Sự kiện làm mới
+        document.getElementById('refreshLogs').addEventListener('click', fetchLogs);
+        document.getElementById('clearLogs').addEventListener('click', clearLogs);
+        
+        // Sự kiện thay đổi interval
+        document.getElementById('refreshInterval').addEventListener('change', function() {
+            const interval = parseInt(this.value);
+            selectedRefreshInterval = interval;
+            
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+            
+            if (interval > 0) {
+                refreshTimer = setInterval(refreshAllData, interval * 1000);
+            }
+        });
+        
+        // Sự kiện điều khiển dịch vụ
+        document.querySelectorAll('.service-control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const service = this.getAttribute('data-service');
+                const action = this.getAttribute('data-action');
+                controlService(service, action);
+            });
+        });
+        
+        // Sự kiện điều khiển tất cả dịch vụ
+        document.getElementById('startAllServices').addEventListener('click', function() {
+            controlAllServices('start');
+        });
+        
+        document.getElementById('stopAllServices').addEventListener('click', function() {
+            controlAllServices('stop');
+        });
+        
+        document.getElementById('restartAllServices').addEventListener('click', function() {
+            controlAllServices('restart');
+        });
+        
+        // Sự kiện lưu cấu hình
+        document.getElementById('saveAutoSLTPConfig').addEventListener('click', function() {
+            saveServiceConfig('auto_sltp');
+        });
+        
+        document.getElementById('saveTrailingStopConfig').addEventListener('click', function() {
+            saveServiceConfig('trailing_stop');
+        });
+        
+        document.getElementById('saveMarketMonitorConfig').addEventListener('click', function() {
+            saveServiceConfig('market_monitor');
+        });
+        
+        // Tải dữ liệu ban đầu
+        fetchServiceStatus();
+        fetchSystemStatus();
+        fetchLogs();
+        loadServiceConfigs();
+        
+        // Thiết lập làm mới tự động
+        if (selectedRefreshInterval > 0) {
+            refreshTimer = setInterval(refreshAllData, selectedRefreshInterval * 1000);
         }
-      });
+    });
+    
+    // Làm mới tất cả dữ liệu
+    function refreshAllData() {
+        fetchServiceStatus();
+        fetchSystemStatus();
+        fetchLogs();
+    }
+    
+    // Lấy thông tin trạng thái dịch vụ
+    function fetchServiceStatus() {
+        fetch('/api/services/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateServiceStatus(data.services);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy trạng thái dịch vụ:', error);
+            });
     }
     
     // Cập nhật hiển thị trạng thái dịch vụ
-    function updateServiceStatus(data) {
-      // Cập nhật trạng thái chính
-      if (data.running) {
-        $('#status-unified').text('Đang chạy').removeClass().addClass('status-badge status-badge-active');
-        $('#unified-status').text('Đang hoạt động');
-      } else {
-        $('#status-unified').text('Đã dừng').removeClass().addClass('status-badge status-badge-inactive');
-        $('#unified-status').text('Không hoạt động');
-      }
-      
-      // Cập nhật thông tin chi tiết
-      $('#unified-pid').text(data.pid || 'Không có');
-      $('#unified-started-at').text(data.started_at || '-');
-      $('#unified-last-check').text(data.last_check || '-');
-      
-      // Cập nhật trạng thái dịch vụ con
-      updateSubserviceStatus('sltp-manager', data.services.sltp_manager);
-      updateSubserviceStatus('trailing-stop', data.services.trailing_stop);
-      updateSubserviceStatus('market-monitor', data.services.market_monitor);
-    }
-    
-    // Cập nhật hiển thị trạng thái dịch vụ con
-    function updateSubserviceStatus(id, serviceData) {
-      const element = $(`#${id}-status`);
-      if (serviceData && serviceData.active) {
-        element.removeClass('subservice-inactive').addClass('subservice-active');
-        element.find('strong').text('Đang hoạt động');
-        element.find('i').removeClass('fa-circle').addClass('fa-check-circle text-success');
-      } else {
-        element.removeClass('subservice-active').addClass('subservice-inactive');
-        element.find('strong').text('Không hoạt động');
-        element.find('i').removeClass('fa-check-circle text-success').addClass('fa-circle text-danger');
-      }
-    }
-    
-    // Khởi động dịch vụ hợp nhất
-    function startUnifiedService() {
-      $('#start-unified-btn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang khởi động...');
-      
-      $.ajax({
-        url: '/api/services/unified/start',
-        method: 'POST',
-        success: function(data) {
-          if (data.success) {
-            toastr.success(data.message);
-            setTimeout(getUnifiedServiceStatus, 2000);
-          } else {
-            toastr.error(data.message);
-          }
-          $('#start-unified-btn').prop('disabled', false).html('<i class="fas fa-play"></i> Khởi động');
-        },
-        error: function(err) {
-          console.error('Lỗi khi khởi động dịch vụ:', err);
-          toastr.error('Không thể khởi động dịch vụ. Vui lòng kiểm tra log hệ thống.');
-          $('#start-unified-btn').prop('disabled', false).html('<i class="fas fa-play"></i> Khởi động');
-        }
-      });
-    }
-    
-    // Dừng dịch vụ hợp nhất
-    function stopUnifiedService() {
-      $('#stop-unified-btn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang dừng...');
-      
-      $.ajax({
-        url: '/api/services/unified/stop',
-        method: 'POST',
-        success: function(data) {
-          if (data.success) {
-            toastr.success(data.message);
-            setTimeout(getUnifiedServiceStatus, 2000);
-          } else {
-            toastr.error(data.message);
-          }
-          $('#stop-unified-btn').prop('disabled', false).html('<i class="fas fa-stop"></i> Dừng lại');
-        },
-        error: function(err) {
-          console.error('Lỗi khi dừng dịch vụ:', err);
-          toastr.error('Không thể dừng dịch vụ. Vui lòng kiểm tra log hệ thống.');
-          $('#stop-unified-btn').prop('disabled', false).html('<i class="fas fa-stop"></i> Dừng lại');
-        }
-      });
-    }
-    
-    // Lấy nhật ký hoạt động
-    function getServiceLogs() {
-      $('#log-content').html('<p class="text-muted">Đang tải nhật ký...</p>');
-      
-      $.ajax({
-        url: '/api/services/unified/logs',
-        method: 'GET',
-        success: function(data) {
-          if (data.logs && data.logs.length > 0) {
-            let logHtml = '';
-            data.logs.forEach(function(log) {
-              let logClass = '';
-              if (log.includes('ERROR')) {
-                logClass = 'text-danger';
-              } else if (log.includes('WARNING')) {
-                logClass = 'text-warning';
-              } else if (log.includes('INFO')) {
-                logClass = 'text-info';
-              }
-              logHtml += `<p class="${logClass}">${log}</p>`;
-            });
-            $('#log-content').html(logHtml);
-            // Cuộn xuống cuối
-            const logContainer = document.getElementById('log-container');
-            logContainer.scrollTop = logContainer.scrollHeight;
-          } else {
-            $('#log-content').html('<p class="text-muted">Không có nhật ký nào.</p>');
-          }
-        },
-        error: function(err) {
-          console.error('Lỗi khi lấy nhật ký:', err);
-          $('#log-content').html('<p class="text-danger">Không thể tải nhật ký. Vui lòng thử lại sau.</p>');
-        }
-      });
+    function updateServiceStatus(services) {
+        // Auto SLTP
+        const autoSLTP = services.auto_sltp || {};
+        document.getElementById('autoSLTPStatus').textContent = autoSLTP.active ? 'Đang chạy' : 'Đã dừng';
+        document.getElementById('autoSLTPStatus').className = autoSLTP.active ? 'service-badge badge bg-success' : 'service-badge badge bg-danger';
+        document.getElementById('autoSLTPCard').className = autoSLTP.active ? 'card service-card h-100 active' : 'card service-card h-100 inactive';
+        document.getElementById('autoSLTPLastRun').textContent = autoSLTP.last_run ? formatTimeAgo(autoSLTP.last_run) : 'Chưa có';
+        
+        // Trailing Stop
+        const trailingStop = services.trailing_stop || {};
+        document.getElementById('trailingStopStatus').textContent = trailingStop.active ? 'Đang chạy' : 'Đã dừng';
+        document.getElementById('trailingStopStatus').className = trailingStop.active ? 'service-badge badge bg-success' : 'service-badge badge bg-danger';
+        document.getElementById('trailingStopCard').className = trailingStop.active ? 'card service-card h-100 active' : 'card service-card h-100 inactive';
+        document.getElementById('trailingStopLastRun').textContent = trailingStop.last_run ? formatTimeAgo(trailingStop.last_run) : 'Chưa có';
+        
+        // Market Monitor
+        const marketMonitor = services.market_monitor || {};
+        document.getElementById('marketMonitorStatus').textContent = marketMonitor.active ? 'Đang chạy' : 'Đã dừng';
+        document.getElementById('marketMonitorStatus').className = marketMonitor.active ? 'service-badge badge bg-success' : 'service-badge badge bg-danger';
+        document.getElementById('marketMonitorCard').className = marketMonitor.active ? 'card service-card h-100 active' : 'card service-card h-100 inactive';
+        document.getElementById('marketMonitorLastRun').textContent = marketMonitor.last_run ? formatTimeAgo(marketMonitor.last_run) : 'Chưa có';
     }
     
     // Lấy thông tin hệ thống
-    function getSystemInfo() {
-      $.ajax({
-        url: '/api/system/info',
-        method: 'GET',
-        success: function(data) {
-          $('#cpu-usage').text(data.cpu + '%');
-          $('#ram-usage').text(data.memory.used + ' / ' + data.memory.total + ' MB');
-          $('#disk-usage').text(data.disk.used + ' / ' + data.disk.total + ' GB');
-          $('#system-uptime').text(data.uptime.system);
-          $('#app-uptime').text(data.uptime.app);
-          
-          // Cập nhật trạng thái API
-          if (data.api_status.binance) {
-            $('#api-status').text('Đang hoạt động').removeClass().addClass('badge bg-success');
-          } else {
-            $('#api-status').text('Không hoạt động').removeClass().addClass('badge bg-danger');
-          }
-          
-          if (data.api_status.telegram) {
-            $('#telegram-status').text('Đang hoạt động').removeClass().addClass('badge bg-success');
-          } else {
-            $('#telegram-status').text('Không hoạt động').removeClass().addClass('badge bg-danger');
-          }
-        },
-        error: function(err) {
-          console.error('Lỗi khi lấy thông tin hệ thống:', err);
-        }
-      });
+    function fetchSystemStatus() {
+        fetch('/api/services/system')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateSystemStatus(data.system);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy thông tin hệ thống:', error);
+            });
     }
     
-    // Lấy và hiển thị cấu hình
-    function getServiceConfig() {
-      $.ajax({
-        url: '/api/services/unified/config',
-        method: 'GET',
-        success: function(data) {
-          // Auto SLTP
-          $('#auto-sltp-enabled').prop('checked', data.auto_sltp_settings.enabled);
-          $('#risk-reward-ratio').val(data.auto_sltp_settings.risk_reward_ratio);
-          $('#stop-loss-percent').val(data.auto_sltp_settings.stop_loss_percent);
-          
-          // Trailing Stop
-          $('#trailing-stop-enabled').prop('checked', data.trailing_stop_settings.enabled);
-          $('#activation-percent').val(data.trailing_stop_settings.activation_percent);
-          $('#trailing-percent').val(data.trailing_stop_settings.trailing_percent);
-          
-          // Market Monitor
-          $('#market-monitor-enabled').prop('checked', data.market_monitor_settings.enabled);
-          $('#volatility-threshold').val(data.market_monitor_settings.volatility_threshold);
-          $('#check-interval').val(data.market_monitor_settings.check_interval);
-        },
-        error: function(err) {
-          console.error('Lỗi khi lấy cấu hình dịch vụ:', err);
-          toastr.error('Không thể tải cấu hình dịch vụ. Vui lòng thử lại sau.');
+    // Cập nhật thông tin hệ thống
+    function updateSystemStatus(system) {
+        // CPU
+        const cpuPercent = system.cpu_percent || 0;
+        document.getElementById('cpuUsage').textContent = `${cpuPercent.toFixed(1)}%`;
+        document.getElementById('cpuProgressBar').style.width = `${cpuPercent}%`;
+        
+        // Memory
+        const memPercent = system.memory_percent || 0;
+        document.getElementById('memoryUsage').textContent = `${memPercent.toFixed(1)}%`;
+        document.getElementById('memoryProgressBar').style.width = `${memPercent}%`;
+        
+        // Disk
+        const diskPercent = system.disk_percent || 0;
+        document.getElementById('diskUsage').textContent = `${diskPercent.toFixed(1)}%`;
+        document.getElementById('diskProgressBar').style.width = `${diskPercent}%`;
+        
+        // Other info
+        document.getElementById('uptime').textContent = formatUptime(system.uptime || 0);
+        document.getElementById('servicePid').textContent = system.pid || 'N/A';
+        document.getElementById('startTime').textContent = system.start_time ? formatDateTime(system.start_time) : 'N/A';
+    }
+    
+    // Lấy log dịch vụ
+    function fetchLogs() {
+        fetch('/api/services/logs')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateLogs(data.logs);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy log:', error);
+            });
+    }
+    
+    // Cập nhật log
+    function updateLogs(logs) {
+        const logContainer = document.getElementById('logContainer');
+        logContainer.innerHTML = '';
+        
+        if (!logs || logs.length === 0) {
+            const logLine = document.createElement('p');
+            logLine.className = 'log-line info';
+            logLine.textContent = 'Không có log nào';
+            logContainer.appendChild(logLine);
+            return;
         }
-      });
+        
+        logs.forEach(log => {
+            const logLine = document.createElement('p');
+            logLine.className = 'log-line';
+            
+            // Phân loại log
+            if (log.toLowerCase().includes('error') || log.toLowerCase().includes('lỗi')) {
+                logLine.classList.add('error');
+            } else if (log.toLowerCase().includes('warning') || log.toLowerCase().includes('cảnh báo')) {
+                logLine.classList.add('warning');
+            } else {
+                logLine.classList.add('info');
+            }
+            
+            logLine.textContent = log;
+            logContainer.appendChild(logLine);
+        });
+        
+        // Cuộn xuống dưới cùng
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    // Xóa log
+    function clearLogs() {
+        fetch('/api/services/logs/clear', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const logContainer = document.getElementById('logContainer');
+                    logContainer.innerHTML = '<p class="log-line info">Đã xóa log</p>';
+                    showToast('Đã xóa log thành công', 'success');
+                } else {
+                    showToast('Không thể xóa log: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi xóa log:', error);
+                showToast('Lỗi khi xóa log', 'error');
+            });
+    }
+    
+    // Điều khiển dịch vụ
+    function controlService(service, action) {
+        showLoading();
+        
+        fetch('/api/services/control', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                service: service,
+                action: action
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showToast(`Đã ${actionToText(action)} dịch vụ ${serviceToText(service)} thành công`, 'success');
+                    fetchServiceStatus();
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Lỗi khi điều khiển dịch vụ:', error);
+                showToast('Lỗi khi gửi yêu cầu', 'error');
+            });
+    }
+    
+    // Điều khiển tất cả dịch vụ
+    function controlAllServices(action) {
+        showLoading();
+        
+        fetch('/api/services/control/all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: action
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showToast(`Đã ${actionToText(action)} tất cả dịch vụ thành công`, 'success');
+                    fetchServiceStatus();
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Lỗi khi điều khiển tất cả dịch vụ:', error);
+                showToast('Lỗi khi gửi yêu cầu', 'error');
+            });
     }
     
     // Lưu cấu hình dịch vụ
-    function saveServiceConfig() {
-      const config = {
-        auto_sltp_settings: {
-          enabled: $('#auto-sltp-enabled').is(':checked'),
-          risk_reward_ratio: parseFloat($('#risk-reward-ratio').val()),
-          stop_loss_percent: parseFloat($('#stop-loss-percent').val())
-        },
-        trailing_stop_settings: {
-          enabled: $('#trailing-stop-enabled').is(':checked'),
-          activation_percent: parseFloat($('#activation-percent').val()),
-          trailing_percent: parseFloat($('#trailing-percent').val())
-        },
-        market_monitor_settings: {
-          enabled: $('#market-monitor-enabled').is(':checked'),
-          volatility_threshold: parseFloat($('#volatility-threshold').val()),
-          check_interval: parseInt($('#check-interval').val())
+    function saveServiceConfig(service) {
+        let config = {};
+        
+        if (service === 'auto_sltp') {
+            config = {
+                enabled: document.getElementById('autoSLTPEnabled').checked,
+                risk_reward_ratio: parseFloat(document.getElementById('riskRewardRatio').value),
+                stop_loss_percent: parseFloat(document.getElementById('stopLossPercent').value),
+                check_interval: parseInt(document.getElementById('autoSLTPCheckInterval').value)
+            };
+        } else if (service === 'trailing_stop') {
+            config = {
+                enabled: document.getElementById('trailingStopEnabled').checked,
+                activation_percent: parseFloat(document.getElementById('activationPercent').value),
+                trailing_percent: parseFloat(document.getElementById('trailingPercent').value),
+                check_interval: parseInt(document.getElementById('trailingStopCheckInterval').value)
+            };
+        } else if (service === 'market_monitor') {
+            config = {
+                enabled: document.getElementById('marketMonitorEnabled').checked,
+                symbols: document.getElementById('monitorSymbols').value.split(',').map(s => s.trim()),
+                volatility_threshold: parseFloat(document.getElementById('volatilityThreshold').value),
+                check_interval: parseInt(document.getElementById('marketMonitorCheckInterval').value)
+            };
         }
-      };
-      
-      $('#save-config-btn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang lưu...');
-      
-      $.ajax({
-        url: '/api/services/unified/config',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(config),
-        success: function(data) {
-          if (data.success) {
-            toastr.success('Đã lưu cấu hình thành công.');
-          } else {
-            toastr.error(data.message || 'Không thể lưu cấu hình.');
-          }
-          $('#save-config-btn').prop('disabled', false).html('<i class="fas fa-save"></i> Lưu cấu hình');
-        },
-        error: function(err) {
-          console.error('Lỗi khi lưu cấu hình:', err);
-          toastr.error('Không thể lưu cấu hình. Vui lòng thử lại sau.');
-          $('#save-config-btn').prop('disabled', false).html('<i class="fas fa-save"></i> Lưu cấu hình');
-        }
-      });
+        
+        showLoading();
+        
+        fetch('/api/services/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                service: service,
+                config: config
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showToast(`Đã lưu cấu hình ${serviceToText(service)} thành công`, 'success');
+                    
+                    // Đóng modal
+                    const modalId = `#${service}ConfigModal`;
+                    const modalEl = document.querySelector(modalId);
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                    
+                    // Cập nhật trạng thái dịch vụ
+                    fetchServiceStatus();
+                } else {
+                    showToast(`Lỗi: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Lỗi khi lưu cấu hình:', error);
+                showToast('Lỗi khi gửi yêu cầu', 'error');
+            });
     }
     
-    // Gắn kết sự kiện cho các nút
-    $('#start-unified-btn').click(startUnifiedService);
-    $('#stop-unified-btn').click(stopUnifiedService);
-    $('#refresh-unified-btn').click(getUnifiedServiceStatus);
-    $('#refresh-logs-btn').click(getServiceLogs);
-    $('#save-config-btn').click(saveServiceConfig);
+    // Tải cấu hình dịch vụ
+    function loadServiceConfigs() {
+        fetch('/api/services/config/all')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Auto SLTP
+                    const autoSLTPConfig = data.configs.auto_sltp_settings || {};
+                    document.getElementById('autoSLTPEnabled').checked = autoSLTPConfig.enabled !== false;
+                    if (autoSLTPConfig.risk_reward_ratio) document.getElementById('riskRewardRatio').value = autoSLTPConfig.risk_reward_ratio;
+                    if (autoSLTPConfig.stop_loss_percent) document.getElementById('stopLossPercent').value = autoSLTPConfig.stop_loss_percent;
+                    if (autoSLTPConfig.check_interval) document.getElementById('autoSLTPCheckInterval').value = autoSLTPConfig.check_interval;
+                    
+                    // Trailing Stop
+                    const trailingStopConfig = data.configs.trailing_stop_settings || {};
+                    document.getElementById('trailingStopEnabled').checked = trailingStopConfig.enabled !== false;
+                    if (trailingStopConfig.activation_percent) document.getElementById('activationPercent').value = trailingStopConfig.activation_percent;
+                    if (trailingStopConfig.trailing_percent) document.getElementById('trailingPercent').value = trailingStopConfig.trailing_percent;
+                    if (trailingStopConfig.check_interval) document.getElementById('trailingStopCheckInterval').value = trailingStopConfig.check_interval;
+                    
+                    // Market Monitor
+                    const marketMonitorConfig = data.configs.market_monitor_settings || {};
+                    document.getElementById('marketMonitorEnabled').checked = marketMonitorConfig.enabled !== false;
+                    if (marketMonitorConfig.symbols) document.getElementById('monitorSymbols').value = marketMonitorConfig.symbols.join(',');
+                    if (marketMonitorConfig.volatility_threshold) document.getElementById('volatilityThreshold').value = marketMonitorConfig.volatility_threshold;
+                    if (marketMonitorConfig.check_interval) document.getElementById('marketMonitorCheckInterval').value = marketMonitorConfig.check_interval;
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải cấu hình dịch vụ:', error);
+            });
+    }
     
-    // Khởi tạo trang
-    getUnifiedServiceStatus();
-    getServiceLogs();
-    getSystemInfo();
-    getServiceConfig();
+    // Hiển thị thông báo
+    function showToast(message, type) {
+        const toastId = type === 'success' ? 'success-toast' : 'error-toast';
+        const messageId = type === 'success' ? 'toast-message' : 'toast-error-message';
+        
+        const toastEl = document.getElementById(toastId);
+        const messageEl = document.getElementById(messageId);
+        
+        messageEl.textContent = message;
+        
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
     
-    // Tự động làm mới dữ liệu
-    setInterval(getUnifiedServiceStatus, 10000);
-    setInterval(getSystemInfo, 30000);
-  });
+    // Hiển thị loading
+    function showLoading() {
+        document.getElementById('loading-overlay').classList.remove('d-none');
+    }
+    
+    // Ẩn loading
+    function hideLoading() {
+        document.getElementById('loading-overlay').classList.add('d-none');
+    }
+    
+    // Chuyển đổi tên dịch vụ sang dạng hiển thị
+    function serviceToText(service) {
+        switch (service) {
+            case 'auto_sltp': return 'Auto SLTP';
+            case 'trailing_stop': return 'Trailing Stop';
+            case 'market_monitor': return 'Market Monitor';
+            default: return service;
+        }
+    }
+    
+    // Chuyển đổi hành động sang dạng hiển thị
+    function actionToText(action) {
+        switch (action) {
+            case 'start': return 'chạy';
+            case 'stop': return 'dừng';
+            case 'restart': return 'khởi động lại';
+            default: return action;
+        }
+    }
+    
+    // Format thời gian chạy
+    function formatUptime(seconds) {
+        const days = Math.floor(seconds / (24 * 60 * 60));
+        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((seconds % (60 * 60)) / 60);
+        
+        if (days > 0) {
+            return `${days} ngày, ${hours} giờ, ${minutes} phút`;
+        } else if (hours > 0) {
+            return `${hours} giờ, ${minutes} phút`;
+        } else {
+            return `${minutes} phút`;
+        }
+    }
+    
+    // Format thời gian đã qua
+    function formatTimeAgo(timestamp) {
+        const now = new Date();
+        const then = new Date(timestamp);
+        const diffSeconds = Math.floor((now - then) / 1000);
+        
+        if (diffSeconds < 60) {
+            return 'Vừa xong';
+        } else if (diffSeconds < 3600) {
+            const minutes = Math.floor(diffSeconds / 60);
+            return `${minutes} phút trước`;
+        } else if (diffSeconds < 86400) {
+            const hours = Math.floor(diffSeconds / 3600);
+            return `${hours} giờ trước`;
+        } else {
+            const days = Math.floor(diffSeconds / 86400);
+            return `${days} ngày trước`;
+        }
+    }
+    
+    // Format thời gian
+    function formatDateTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString('vi-VN');
+    }
 </script>
 {% endblock %}
