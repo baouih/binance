@@ -31,6 +31,25 @@
     "auto_reduce_leverage": true,
     "enable_trailing_stop": true,
     "enable_dynamic_risk": true,
+    "auto_sltp_settings": {
+        "enabled": true,
+        "check_interval": 30,
+        "risk_reward_ratio": 2.0,
+        "stop_loss_percent": 2.0,
+        "take_profit_percent": 4.0
+    },
+    "trailing_stop_settings": {
+        "enabled": true,
+        "check_interval": 15,
+        "activation_percent": 1.0,
+        "trailing_percent": 0.5
+    },
+    "market_monitor_settings": {
+        "enabled": true,
+        "check_interval": 60,
+        "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+        "volatility_threshold": 3.0
+    },
     "small_account_configs": {
         "100": {
             "leverage": 20,

@@ -44,6 +44,7 @@ bot_status = {
 unified_service_status = {
     'running': False,
     'started_at': None,
+    'last_check': None,
     'services': {
         'sltp_manager': {'active': False, 'last_check': None},
         'trailing_stop': {'active': False, 'last_check': None},
@@ -51,6 +52,33 @@ unified_service_status = {
     },
     'pid': None
 }
+
+# Kiểm tra dịch vụ hợp nhất khi khởi động
+def check_existing_unified_service():
+    """Kiểm tra dịch vụ hợp nhất đã chạy khi khởi động"""
+    global unified_service_status
+    try:
+        pid_file = 'unified_trading_service.pid'
+        if os.path.exists(pid_file):
+            with open(pid_file, 'r') as f:
+                pid = int(f.read().strip())
+                if psutil.pid_exists(pid):
+                    logger.info(f"Phát hiện dịch vụ hợp nhất đang chạy với PID {pid}")
+                    unified_service_status['running'] = True
+                    unified_service_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    unified_service_status['pid'] = pid
+                    # Cập nhật trạng thái các dịch vụ con
+                    check_unified_service_status()
+                    return True
+                else:
+                    logger.warning(f"Tìm thấy file PID nhưng process {pid} không tồn tại, xóa file PID")
+                    os.remove(pid_file)
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra dịch vụ hợp nhất hiện có: {str(e)}")
+    return False
+
+# Kiểm tra dịch vụ hiện có khi ứng dụng khởi động
+check_existing_unified_service()
 
 # Khởi tạo Telegram Notifier
 telegram_notifier = TelegramNotifier()
@@ -277,6 +305,11 @@ def settings():
 def bots():
     """Trang quản lý bot"""
     return render_template('bots.html')
+    
+@app.route('/services')
+def services():
+    """Trang quản lý dịch vụ"""
+    return render_template('services.html')
 
 @app.route('/account')
 def account():
@@ -1692,6 +1725,202 @@ def stop_unified_service():
             })
     except Exception as e:
         logger.error(f"Lỗi khi dừng dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/services/unified/logs', methods=['GET'])
+def get_unified_service_logs():
+    """Lấy nhật ký hoạt động của dịch vụ hợp nhất"""
+    log_file = 'unified_service.log'
+    lines_count = int(request.args.get('lines', 50))  # Số dòng nhật ký muốn lấy
+    
+    try:
+        if os.path.exists(log_file):
+            with open(log_file, 'r', encoding='utf-8') as f:
+                logs = f.readlines()
+                # Lấy n dòng cuối
+                logs = logs[-lines_count:] if lines_count < len(logs) else logs
+                # Làm sạch dữ liệu
+                logs = [log.strip() for log in logs]
+                
+                return jsonify({
+                    'success': True,
+                    'logs': logs
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f"Không tìm thấy file nhật ký: {log_file}",
+                'logs': []
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc nhật ký dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}",
+            'logs': []
+        })
+
+@app.route('/api/services/unified/config', methods=['GET'])
+def get_unified_service_config():
+    """Lấy cấu hình dịch vụ hợp nhất"""
+    try:
+        with open(ACCOUNT_CONFIG_PATH, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+            
+            # Lọc chỉ các cấu hình liên quan đến dịch vụ hợp nhất
+            unified_config = {
+                'auto_sltp_settings': config.get('auto_sltp_settings', {
+                    'enabled': True,
+                    'check_interval': 30,
+                    'risk_reward_ratio': 2.0,
+                    'stop_loss_percent': 2.0,
+                }),
+                'trailing_stop_settings': config.get('trailing_stop_settings', {
+                    'enabled': True,
+                    'check_interval': 15,
+                    'activation_percent': 1.0,
+                    'trailing_percent': 0.5,
+                }),
+                'market_monitor_settings': config.get('market_monitor_settings', {
+                    'enabled': True,
+                    'check_interval': 60,
+                    'symbols': ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'],
+                    'volatility_threshold': 3.0,
+                })
+            }
+            
+            return jsonify(unified_config)
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc cấu hình dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/services/unified/config', methods=['POST'])
+def update_unified_service_config():
+    """Cập nhật cấu hình dịch vụ hợp nhất"""
+    try:
+        # Lấy dữ liệu JSON từ request
+        config_update = request.get_json()
+        
+        if not isinstance(config_update, dict):
+            return jsonify({
+                'success': False,
+                'message': "Dữ liệu cập nhật cấu hình không hợp lệ"
+            })
+        
+        # Đọc cấu hình hiện tại
+        with open(ACCOUNT_CONFIG_PATH, 'r', encoding='utf-8') as f:
+            current_config = json.load(f)
+        
+        # Cập nhật cấu hình
+        if 'auto_sltp_settings' in config_update and isinstance(config_update['auto_sltp_settings'], dict):
+            current_config['auto_sltp_settings'] = {**current_config.get('auto_sltp_settings', {}), **config_update['auto_sltp_settings']}
+            
+        if 'trailing_stop_settings' in config_update and isinstance(config_update['trailing_stop_settings'], dict):
+            current_config['trailing_stop_settings'] = {**current_config.get('trailing_stop_settings', {}), **config_update['trailing_stop_settings']}
+            
+        if 'market_monitor_settings' in config_update and isinstance(config_update['market_monitor_settings'], dict):
+            current_config['market_monitor_settings'] = {**current_config.get('market_monitor_settings', {}), **config_update['market_monitor_settings']}
+        
+        # Cập nhật trường last_updated
+        current_config['last_updated'] = datetime.now().isoformat()
+        
+        # Lưu cấu hình
+        with open(ACCOUNT_CONFIG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(current_config, f, indent=4)
+        
+        return jsonify({
+            'success': True,
+            'message': "Cấu hình đã được cập nhật thành công"
+        })
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật cấu hình dịch vụ hợp nhất: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/system/info', methods=['GET'])
+def get_system_info():
+    """Lấy thông tin về hệ thống và tài nguyên"""
+    try:
+        # Lấy thông tin CPU
+        cpu_percent = psutil.cpu_percent(interval=0.1)
+        
+        # Lấy thông tin bộ nhớ (RAM)
+        memory = psutil.virtual_memory()
+        memory_used = round(memory.used / (1024 * 1024), 2)  # Đổi sang MB
+        memory_total = round(memory.total / (1024 * 1024), 2)  # Đổi sang MB
+        
+        # Lấy thông tin ổ đĩa
+        disk = psutil.disk_usage('/')
+        disk_used = round(disk.used / (1024 * 1024 * 1024), 2)  # Đổi sang GB
+        disk_total = round(disk.total / (1024 * 1024 * 1024), 2)  # Đổi sang GB
+        
+        # Lấy thông tin uptime hệ thống
+        uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
+        uptime_days = uptime.days
+        uptime_hours = uptime.seconds // 3600
+        uptime_minutes = (uptime.seconds % 3600) // 60
+        uptime_str = f"{uptime_days} ngày, {uptime_hours} giờ, {uptime_minutes} phút"
+        
+        # Lấy thông tin uptime ứng dụng
+        app_process = psutil.Process(os.getpid())
+        app_uptime = datetime.now() - datetime.fromtimestamp(app_process.create_time())
+        app_uptime_days = app_uptime.days
+        app_uptime_hours = app_uptime.seconds // 3600
+        app_uptime_minutes = (app_uptime.seconds % 3600) // 60
+        app_uptime_str = f"{app_uptime_days} ngày, {app_uptime_hours} giờ, {app_uptime_minutes} phút"
+        
+        # Kiểm tra trạng thái API
+        api_status = {
+            'binance': False,
+            'telegram': False
+        }
+        
+        # Kiểm tra Binance API
+        try:
+            from binance_api import BinanceAPI
+            api_client = BinanceAPI()
+            api_status['binance'] = api_client.test_connection()
+        except:
+            pass
+        
+        # Kiểm tra Telegram API
+        try:
+            test_result = telegram_notifier.test_connection()
+            api_status['telegram'] = test_result
+        except:
+            pass
+        
+        # Tổng hợp thông tin
+        system_info = {
+            'cpu': cpu_percent,
+            'memory': {
+                'used': memory_used,
+                'total': memory_total,
+                'percent': memory.percent
+            },
+            'disk': {
+                'used': disk_used,
+                'total': disk_total,
+                'percent': disk.percent
+            },
+            'uptime': {
+                'system': uptime_str,
+                'app': app_uptime_str
+            },
+            'api_status': api_status
+        }
+        
+        return jsonify(system_info)
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy thông tin hệ thống: {str(e)}")
         return jsonify({
             'success': False,
             'message': f"Lỗi: {str(e)}"
