@@ -51,7 +51,7 @@ class AutoMarketNotifier:
             return [
                 "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "ADAUSDT", 
                 "DOGEUSDT", "MATICUSDT", "LINKUSDT", "DOTUSDT", "LTCUSDT",
-                "AVAXUSDT", "XRPUSDT", "NEARUSDT"
+                "AVAXUSDT", "XRPUSDT", "NEARUSDT", "ATOMUSDT", "UNIUSDT", "ICPUSDT"
             ]
         except Exception as e:
             logger.error(f"Lỗi khi tải danh sách cặp tiền điện tử: {e}")

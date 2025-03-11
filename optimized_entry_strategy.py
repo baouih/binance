@@ -79,7 +79,17 @@ TOP_COINS = [
     {"symbol": "ETHUSDT", "win_rate": 57.5, "best_timeframe": "1d", "best_session": "London Open"},
     {"symbol": "BNBUSDT", "win_rate": 53.5, "best_timeframe": "4h", "best_session": "London/NY Close"},
     {"symbol": "SOLUSDT", "win_rate": 54.5, "best_timeframe": "1d", "best_session": "Asian-European Transition"},
-    {"symbol": "LINKUSDT", "win_rate": 53.5, "best_timeframe": "1d", "best_session": "Daily Candle Close"}
+    {"symbol": "LINKUSDT", "win_rate": 53.5, "best_timeframe": "1d", "best_session": "Daily Candle Close"},
+    {"symbol": "LTCUSDT", "win_rate": 51.5, "best_timeframe": "1d", "best_session": "London Open"},
+    {"symbol": "ATOMUSDT", "win_rate": 50.5, "best_timeframe": "4h", "best_session": "Asian-European Transition"},
+    {"symbol": "AVAXUSDT", "win_rate": 51.5, "best_timeframe": "4h", "best_session": "New York Open"},
+    {"symbol": "ADAUSDT", "win_rate": 51.5, "best_timeframe": "1d", "best_session": "London/NY Close"},
+    {"symbol": "XRPUSDT", "win_rate": 52.5, "best_timeframe": "1d", "best_session": "Daily Candle Close"},
+    {"symbol": "MATICUSDT", "win_rate": 52.5, "best_timeframe": "1d", "best_session": "New York Open"},
+    {"symbol": "DOTUSDT", "win_rate": 53.0, "best_timeframe": "1d", "best_session": "London Open"},
+    {"symbol": "UNIUSDT", "win_rate": 50.5, "best_timeframe": "1d", "best_session": "Asian-European Transition"},
+    {"symbol": "ICPUSDT", "win_rate": 48.5, "best_timeframe": "1d", "best_session": "New York Open"},
+    {"symbol": "DOGEUSDT", "win_rate": 48.5, "best_timeframe": "4h", "best_session": "London/NY Close"}
 ]
 
 # Mẫu giao dịch thành công (từ phân tích lịch sử giao dịch)
