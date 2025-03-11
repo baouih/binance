@@ -296,8 +296,7 @@ def test_telegram():
     try:
         # Gửi tin nhắn test đến Telegram
         result = telegram_notifier.send_message(
-            message=f"<b>Kiểm tra kết nối</b>\n\nĐây là tin nhắn kiểm tra kết nối từ BinanceTrader Bot. Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            category="system"
+            message=f"<b>Kiểm tra kết nối</b>\n\nĐây là tin nhắn kiểm tra kết nối từ BinanceTrader Bot. Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         )
         
         if result:
@@ -446,8 +445,7 @@ def get_account():
                 telegram_notifier.send_message(
                     message=f"<b>Hệ thống đã kết nối API Binance {api_mode.capitalize()}</b>\n\n"
                             f"Số dư: {account_data['balance']} USDT\n"
-                            f"PnL chưa thực hiện: {account_data['pnl']} USDT",
-                    category="system"
+                            f"PnL chưa thực hiện: {account_data['pnl']} USDT"
                 )
                 logger.info(f"Đã gửi thông báo khởi động hệ thống với dữ liệu tài khoản: số dư={account_data['balance']}, PNL chưa thực hiện={account_data['pnl']}")
     except Exception as e:
