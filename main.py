@@ -692,8 +692,7 @@ def control_bot(bot_id):
             # Gửi thông báo qua Telegram
             try:
                 telegram_notifier.send_message(
-                    message=f"<b>Bot đã được khởi động</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
+                    message=f"<b>Bot đã được khởi động</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 )
             except Exception as e:
                 app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
@@ -712,8 +711,7 @@ def control_bot(bot_id):
             # Gửi thông báo qua Telegram
             try:
                 telegram_notifier.send_message(
-                    message=f"<b>Bot đã được dừng lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
+                    message=f"<b>Bot đã được dừng lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 )
             except Exception as e:
                 app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")
@@ -741,8 +739,7 @@ def control_bot(bot_id):
             # Gửi thông báo qua Telegram
             try:
                 telegram_notifier.send_message(
-                    message=f"<b>Bot đang được khởi động lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    category="system"
+                    message=f"<b>Bot đang được khởi động lại</b>\nThời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 )
             except Exception as e:
                 app.logger.warning(f"Không thể gửi thông báo Telegram: {str(e)}")

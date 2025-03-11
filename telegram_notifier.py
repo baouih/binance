@@ -324,6 +324,61 @@ class TelegramNotifier:
                 "message": f"Lỗi khi gửi thông báo cơ hội giao dịch: {str(e)}"
             }
     
+    def send_bot_status(self, status: str, mode: str, uptime: str, stats: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Gửi trạng thái bot
+        
+        :param status: Trạng thái bot ("running", "stopped", "restarting")
+        :param mode: Chế độ bot ("testnet", "live")
+        :param uptime: Thời gian hoạt động
+        :param stats: Dữ liệu thống kê
+        :return: Kết quả gửi tin nhắn
+        """
+        
+        # Xử lý với API mới
+        try:
+            # Xác định emoji dựa trên trạng thái
+            if status.lower() == "running":
+                emoji = "✅"
+                title = "BOT ĐANG CHẠY"
+            elif status.lower() == "stopped":
+                emoji = "⛔"
+                title = "BOT ĐÃ DỪNG"
+            elif status.lower() == "restarting":
+                emoji = "🔄"
+                title = "BOT ĐANG KHỞI ĐỘNG LẠI"
+            else:
+                emoji = "ℹ️"
+                title = "TRẠNG THÁI BOT"
+            
+            # Định dạng thống kê
+            stats_str = ""
+            for key, value in stats.items():
+                stats_str += f"• {key}: {value}\n"
+            
+            # Định dạng chế độ
+            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
+            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"{emoji} <b>{title}</b>\n\n"
+                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
+                f"⏱️ <b>Uptime:</b> {uptime}\n\n"
+                f"📊 <b>Thống kê:</b>\n{stats_str}\n"
+                f"🕒 <b>Thời gian:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi trạng thái bot: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi trạng thái bot: {str(e)}"
+            }
+    
     def notify_bot_status(self, status: str, details: Optional[str] = None) -> Dict[str, Any]:
         """
         Thông báo trạng thái bot
@@ -430,6 +485,75 @@ class TelegramNotifier:
                 "message": f"Lỗi khi gửi thông báo cập nhật hệ thống: {str(e)}"
             }
     
+    def send_system_status(self, account_balance: float, positions: List[Dict[str, Any]], 
+                      unrealized_pnl: float, market_data: Dict[str, Any], mode: str) -> Dict[str, Any]:
+        """
+        Gửi trạng thái hệ thống
+        
+        :param account_balance: Số dư tài khoản
+        :param positions: Danh sách vị thế
+        :param unrealized_pnl: PnL chưa thực hiện
+        :param market_data: Dữ liệu thị trường
+        :param mode: Chế độ API (testnet/live)
+        :return: Kết quả gửi tin nhắn
+        """
+        try:
+            # Định dạng chế độ API
+            mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
+            mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
+            
+            # Lấy giá BTC hiện tại
+            btc_price = market_data.get('btc_price', 0)
+            
+            # Định dạng danh sách vị thế
+            positions_str = ""
+            total_profit = 0
+            
+            if positions:
+                for i, pos in enumerate(positions, 1):
+                    symbol = pos.get('symbol', 'Unknown')
+                    position_type = pos.get('type', 'Unknown')
+                    size = pos.get('size', 0)
+                    entry_price = pos.get('entry_price', 0)
+                    current_price = pos.get('current_price', 0)
+                    pnl = pos.get('pnl', 0)
+                    pnl_percent = pos.get('pnl_percent', 0)
+                    
+                    # Xác định emoji dựa trên loại vị thế và PnL
+                    type_emoji = "📈" if position_type.upper() == "LONG" else "📉"
+                    pnl_emoji = "🟢" if pnl > 0 else "🔴"
+                    
+                    positions_str += (
+                        f"  {i}. {type_emoji} <b>{symbol}</b>: "
+                        f"{size} @ {entry_price}\n"
+                        f"     {pnl_emoji} PnL: {pnl:.2f} USDT ({pnl_percent:.2f}%)\n"
+                    )
+                    
+                    total_profit += pnl
+            else:
+                positions_str = "  Không có vị thế đang mở\n"
+            
+            # Định dạng tin nhắn
+            message = (
+                f"🖥️ <b>TRẠNG THÁI HỆ THỐNG</b>\n\n"
+                f"{mode_emoji} <b>Chế độ:</b> {mode_text}\n"
+                f"💰 <b>Số dư tài khoản:</b> {account_balance:.2f} USDT\n"
+                f"📊 <b>BTC/USDT:</b> ${btc_price:.2f}\n"
+                f"💵 <b>PnL chưa thực hiện:</b> {unrealized_pnl:.2f} USDT\n\n"
+                f"📋 <b>Vị thế đang mở:</b>\n{positions_str}\n"
+                f"⏱️ <b>Cập nhật lúc:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            # Gửi tin nhắn
+            return self.send_message(message)
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi trạng thái hệ thống: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": f"Lỗi khi gửi trạng thái hệ thống: {str(e)}"
+            }
+            
     def notify_daily_summary(self, summary_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Gửi báo cáo tổng kết hàng ngày
