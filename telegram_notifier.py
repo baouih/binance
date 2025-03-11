@@ -118,14 +118,19 @@ class TelegramNotifier:
                 "message": f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}"
             }
     
-    def _is_duplicate_message(self, message: str, notification_type: str) -> bool:
+    def _is_duplicate_message(self, message: str, notification_type: str, bypass_duplicate: bool = False) -> bool:
         """
         Kiểm tra tin nhắn đã gửi gần đây để tránh spam
         
         :param message: Nội dung tin nhắn
         :param notification_type: Loại thông báo
+        :param bypass_duplicate: Nếu True, luôn cho phép gửi tin nhắn (bỏ qua kiểm tra trùng lặp)
         :return: True nếu tin nhắn là trùng lặp trong khoảng thời gian cho phép
         """
+        # Nếu bypass_duplicate = True, luôn cho phép gửi tin nhắn
+        if bypass_duplicate:
+            return False
+            
         # Tạo mã hash đơn giản cho tin nhắn
         msg_hash = hashlib.md5(message.encode('utf-8')).hexdigest()
         
@@ -148,13 +153,14 @@ class TelegramNotifier:
         self.recent_messages[notification_type][msg_hash] = current_time
         return False
         
-    def send_message(self, message: str, parse_mode: str = "HTML", notification_type: str = "general") -> Dict[str, Any]:
+    def send_message(self, message: str, parse_mode: str = "HTML", notification_type: str = "general", bypass_duplicate: bool = False) -> Dict[str, Any]:
         """
         Gửi tin nhắn đến Telegram
         
         :param message: Nội dung tin nhắn
         :param parse_mode: Chế độ định dạng (HTML, Markdown, MarkdownV2)
         :param notification_type: Loại thông báo để kiểm tra trùng lặp
+        :param bypass_duplicate: Nếu True, luôn gửi tin nhắn ngay cả khi trùng lặp
         :return: Kết quả gửi tin nhắn
         """
         if not self.enabled:
@@ -165,7 +171,7 @@ class TelegramNotifier:
             }
         
         # Kiểm tra xem có phải là thông báo trùng lặp không
-        if self._is_duplicate_message(message, notification_type):
+        if self._is_duplicate_message(message, notification_type, bypass_duplicate):
             return {
                 "status": "skipped",
                 "message": "Bỏ qua tin nhắn trùng lặp để tránh spam"
@@ -633,8 +639,8 @@ class TelegramNotifier:
                     timeframe = rec.get('timeframe', 'Unknown')
                     message += f"  • {signal_emoji} <b>{symbol}:</b> {signal.upper()} (Độ mạnh: {strength}, TF: {timeframe})\n"
             
-            # Gửi tin nhắn
-            return self.send_message(message, notification_type='startup_notification')
+            # Gửi tin nhắn với bypass_duplicate=True để đảm bảo luôn gửi khi khởi động
+            return self.send_message(message, notification_type='startup_notification', bypass_duplicate=True)
         
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo khởi động hệ thống: {str(e)}", exc_info=True)
