@@ -1,47 +1,41 @@
 #!/bin/bash
+# Script để khởi động dịch vụ hợp nhất
+# Tác giả: BinanceTrader Bot
 
-# Script khởi động Dịch vụ hợp nhất
-# ----------------------------------
-# Script này khởi động unified_trading_service.py trong nền,
-# ghi log vào một file riêng.
-
-# Đặt biến môi trường cần thiết
-export PYTHONIOENCODING=utf-8
-export PYTHONUNBUFFERED=1
-
-# Đường dẫn đến các file
+# Đường dẫn tới file log
 LOG_FILE="unified_service.log"
-SERVICE_SCRIPT="unified_trading_service.py"
-PID_FILE="unified_trading_service.pid"
 
 # Kiểm tra xem dịch vụ đã chạy chưa
-if [ -f "$PID_FILE" ]; then
-    PID=$(cat "$PID_FILE")
+if [ -f "unified_trading_service.pid" ]; then
+    PID=$(cat unified_trading_service.pid)
     if ps -p $PID > /dev/null; then
         echo "Dịch vụ hợp nhất đã đang chạy với PID $PID"
-        exit 0
+        exit 1
     else
-        echo "File PID tồn tại nhưng process không còn chạy. Xóa file PID cũ."
-        rm -f "$PID_FILE"
+        echo "Tìm thấy file PID nhưng process không tồn tại, xóa file PID cũ..."
+        rm unified_trading_service.pid
     fi
 fi
 
-# Đảm bảo script có quyền thực thi
-chmod +x $SERVICE_SCRIPT
-
-# Khởi động dịch vụ trong nền
-echo "Khởi động dịch vụ hợp nhất..."
-nohup python $SERVICE_SCRIPT > $LOG_FILE 2>&1 &
-
-# Đợi một chút để đảm bảo service đã khởi động và tạo PID file
-sleep 2
-
-# Kiểm tra xem có file PID được tạo không
-if [ -f "$PID_FILE" ]; then
-    PID=$(cat "$PID_FILE")
-    echo "Dịch vụ hợp nhất đã khởi động với PID $PID"
-    exit 0
-else
-    echo "Không thể khởi động dịch vụ hợp nhất. Kiểm tra log: $LOG_FILE"
-    exit 1
+# Tạo file log mới nếu chưa tồn tại
+if [ ! -f "$LOG_FILE" ]; then
+    touch "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - Tạo file log mới" >> "$LOG_FILE"
 fi
+
+# Khởi động dịch vụ trong background
+echo "Đang khởi động dịch vụ hợp nhất..."
+nohup python unified_trading_service.py >> "$LOG_FILE" 2>&1 &
+
+# Đợi một chút và kiểm tra xem dịch vụ đã chạy chưa
+sleep 2
+if [ -f "unified_trading_service.pid" ]; then
+    PID=$(cat unified_trading_service.pid)
+    if ps -p $PID > /dev/null; then
+        echo "Dịch vụ hợp nhất đã được khởi động thành công với PID $PID"
+        exit 0
+    fi
+fi
+
+echo "Không thể khởi động dịch vụ hợp nhất, kiểm tra file log để biết chi tiết"
+exit 1

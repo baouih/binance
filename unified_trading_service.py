@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
-Unified Trading Service
------------------------
-Dịch vụ hợp nhất quản lý các chức năng giao dịch để tối ưu tài nguyên.
-Kết hợp các dịch vụ:
-1. Auto SLTP Manager (Quản lý Stop Loss và Take Profit tự động)
-2. Trailing Stop Manager (Quản lý Trailing Stop)
-3. Market Monitor (Theo dõi thị trường và cảnh báo)
+Dịch vụ hợp nhất - Quản lý nhiều dịch vụ nhỏ trong một tiến trình chính
+để tối ưu hóa tài nguyên và đơn giản hóa quản lý
 
-Tác giả: Trading Bot Team
-Phát triển: 2025
+Các dịch vụ bao gồm:
+1. Auto SLTP: Tự động đặt Stop Loss và Take Profit
+2. Trailing Stop: Theo dõi và điều chỉnh Stop Loss theo giá
+3. Market Monitor: Theo dõi thị trường và gửi thông báo khi có biến động
+
+Tác giả: BinanceTrader Bot
 """
 
 import os
@@ -21,11 +19,17 @@ import json
 import signal
 import logging
 import threading
-import schedule
+from typing import Dict, List, Optional, Any, Tuple, Union
 from datetime import datetime, timedelta
-import importlib
 
-# Thiết lập logging
+try:
+    import schedule
+except ImportError:
+    print("Thư viện schedule chưa được cài đặt. Đang cài đặt...")
+    os.system("pip install schedule")
+    import schedule
+
+# Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -34,555 +38,601 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+# Tạo logger riêng cho dịch vụ hợp nhất
 logger = logging.getLogger("unified_service")
 
-# Thông tin phiên bản
-VERSION = "1.0.0"
-
-# Đường dẫn file cấu hình
-CONFIG_FILE = 'account_config.json'
+# Đường dẫn tới file cấu hình tài khoản
+ACCOUNT_CONFIG_PATH = 'account_config.json'
 PID_FILE = 'unified_trading_service.pid'
-ACTIVE_POSITIONS_FILE = 'active_positions.json'
 
-# Biến điều khiển
+# Biến toàn cục để theo dõi trạng thái dịch vụ
 running = True
-services = {}
-scheduler = None
-api_client = None
+services = {
+    'auto_sltp': {'active': False, 'thread': None, 'last_run': None},
+    'trailing_stop': {'active': False, 'thread': None, 'last_run': None},
+    'market_monitor': {'active': False, 'thread': None, 'last_run': None}
+}
 
-def load_config():
-    """Tải cấu hình từ file"""
+
+def load_config() -> Dict[str, Any]:
+    """Tải cấu hình từ file account_config.json"""
     try:
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+        with open(ACCOUNT_CONFIG_PATH, 'r', encoding='utf-8') as f:
             config = json.load(f)
         return config
     except Exception as e:
-        logger.error(f"Không thể tải cấu hình: {str(e)}")
+        logger.error(f"Lỗi khi tải cấu hình: {e}")
         return {}
 
-def save_pid():
-    """Lưu PID của process hiện tại"""
+
+def save_pid() -> None:
+    """Lưu PID của tiến trình hiện tại vào file"""
     try:
         with open(PID_FILE, 'w') as f:
             f.write(str(os.getpid()))
-        logger.info(f"Đã lưu PID: {os.getpid()}")
+        logger.info(f"Đã lưu PID {os.getpid()} vào {PID_FILE}")
     except Exception as e:
-        logger.error(f"Không thể lưu PID: {str(e)}")
+        logger.error(f"Lỗi khi lưu PID: {e}")
 
-def signal_handler(sig, frame):
-    """Xử lý tín hiệu thoát"""
-    global running
-    logger.info(f"Đã nhận tín hiệu {sig}, đang dừng dịch vụ...")
-    running = False
 
-def import_module_dynamically(module_name):
-    """Import mô-đun một cách động"""
+def remove_pid() -> None:
+    """Xóa file PID khi thoát"""
     try:
-        if module_name in sys.modules:
-            # Nếu module đã được import trước đó, reload để cập nhật
-            module = importlib.import_module(module_name)
-            module = importlib.reload(module)
-        else:
-            # Import module mới
-            module = importlib.import_module(module_name)
-        logger.info(f"Đã import mô-đun: {module_name}")
-        return module
+        if os.path.exists(PID_FILE):
+            os.remove(PID_FILE)
+            logger.info(f"Đã xóa file PID {PID_FILE}")
     except Exception as e:
-        logger.error(f"Không thể import mô-đun {module_name}: {str(e)}")
+        logger.error(f"Lỗi khi xóa file PID: {e}")
+
+
+def signal_handler(sig, frame) -> None:
+    """Xử lý tín hiệu khi nhận SIGTERM hoặc SIGINT"""
+    global running
+    logger.info(f"Đã nhận tín hiệu {sig}, dừng dịch vụ...")
+    running = False
+    
+    # Dừng tất cả các dịch vụ con
+    stop_all_services()
+    
+    # Xóa file PID
+    remove_pid()
+    
+    # Xóa tất cả các công việc định kỳ
+    schedule.clear()
+    
+    # Thoát khỏi tiến trình sau 2 giây
+    logger.info("Đang thoát dịch vụ hợp nhất...")
+    time.sleep(2)
+    sys.exit(0)
+
+
+def initialize_binance_client():
+    """Khởi tạo Binance API client"""
+    try:
+        from binance_api import BinanceAPI
+        
+        # Tải cấu hình từ file
+        config = load_config()
+        api_mode = config.get('api_mode', 'testnet')
+        
+        # Đọc keys từ biến môi trường hoặc từ file cấu hình
+        api_keys = config.get('api_keys', {})
+        keys_for_mode = api_keys.get(api_mode, {})
+        
+        api_key = os.environ.get("BINANCE_TESTNET_API_KEY", keys_for_mode.get('api_key', ''))
+        api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET", keys_for_mode.get('api_secret', ''))
+        
+        # Khởi tạo client với chế độ phù hợp
+        use_testnet = api_mode != 'live'
+        client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
+        
+        logger.info(f"Đã khởi tạo Binance API client với chế độ: {api_mode}")
+        return client
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi tạo Binance API client: {e}")
         return None
 
-def initialize_api_client():
-    """Khởi tạo API client"""
-    global api_client
+
+def initialize_position_manager():
+    """Khởi tạo Position Manager"""
+    try:
+        from position_manager import PositionManager
+        client = initialize_binance_client()
+        if client:
+            position_manager = PositionManager(client)
+            logger.info("Đã khởi tạo Position Manager")
+            return position_manager
+        return None
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi tạo Position Manager: {e}")
+        return None
+
+
+def check_positions(position_manager=None):
+    """Kiểm tra các vị thế hiện có"""
+    if position_manager is None:
+        position_manager = initialize_position_manager()
     
-    try:
-        # Import mô-đun BinanceAPI
-        binance_api_module = import_module_dynamically('binance_api')
-        if not binance_api_module:
-            logger.error("Không thể import binance_api module")
-            return False
-        
-        # Lấy API key và secret từ biến môi trường
-        api_key = os.environ.get("BINANCE_TESTNET_API_KEY", "")
-        api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET", "")
-        
-        # Khởi tạo đối tượng BinanceAPI
-        BinanceAPI = getattr(binance_api_module, 'BinanceAPI')
-        api_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=True)
-        
-        # Kiểm tra kết nối
-        if api_client.test_connection():
-            logger.info("Kết nối API thành công")
-            return True
-        else:
-            logger.error("Kết nối API thất bại")
-            return False
-    except Exception as e:
-        logger.error(f"Lỗi khi khởi tạo API client: {str(e)}")
-        return False
-
-def initialize_telegram():
-    """Khởi tạo Telegram notifier"""
-    try:
-        telegram_module = import_module_dynamically('telegram_notifier')
-        if telegram_module:
-            # Gửi thông báo khởi động
-            telegram_module.send_message(
-                message=f"<b>🤖 Dịch vụ hợp nhất đã khởi động</b>\n\n"
-                f"<i>Phiên bản:</i> {VERSION}\n"
-                f"<i>Thời gian:</i> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                f"<i>PID:</i> {os.getpid()}"
-            )
-            logger.info("Đã khởi tạo Telegram notifier")
-            return True
-        return False
-    except Exception as e:
-        logger.error(f"Không thể khởi tạo Telegram notifier: {str(e)}")
-        return False
-
-def start_sltp_manager():
-    """Khởi động và quản lý dịch vụ Auto SLTP Manager"""
-    try:
-        # Tải cấu hình
-        config = load_config()
-        sltp_config = config.get('auto_sltp_settings', {})
-        enabled = sltp_config.get('enabled', False)
-        check_interval = sltp_config.get('check_interval', 30)
-        
-        if not enabled:
-            logger.info("Auto SLTP Manager đã bị tắt trong cấu hình")
-            return False
-        
-        # Thiết lập lên lịch kiểm tra
-        def check_and_update_sltp():
-            """Kiểm tra và cập nhật SL/TP cho các vị thế"""
-            try:
-                # Lấy danh sách vị thế đang mở
-                positions = api_client.get_positions()
-                active_positions = [p for p in positions if abs(float(p.get('positionAmt', 0))) > 0]
-                
-                if not active_positions:
-                    logger.info("Không có vị thế đang mở để cập nhật SL/TP")
-                    return
-                
-                # Lưu vị thế active
-                try:
-                    with open(ACTIVE_POSITIONS_FILE, 'w') as f:
-                        json.dump(active_positions, f, indent=2)
-                except Exception as e:
-                    logger.error(f"Không thể lưu active positions: {str(e)}")
-                
-                # Xử lý từng vị thế
-                for position in active_positions:
-                    symbol = position.get('symbol', '')
-                    position_amt = float(position.get('positionAmt', 0))
-                    entry_price = float(position.get('entryPrice', 0))
-                    
-                    if position_amt == 0 or entry_price == 0:
-                        continue
-                    
-                    # Xác định hướng vị thế
-                    position_side = 'LONG' if position_amt > 0 else 'SHORT'
-                    
-                    # Tính Stop Loss và Take Profit dựa trên cấu hình
-                    risk_reward_ratio = sltp_config.get('risk_reward_ratio', 2.0)
-                    stop_loss_percent = sltp_config.get('stop_loss_percent', 1.0)
-                    
-                    # Tính giá SL và TP
-                    if position_side == 'LONG':
-                        stop_loss = entry_price * (1 - stop_loss_percent / 100)
-                        take_profit = entry_price * (1 + (stop_loss_percent * risk_reward_ratio) / 100)
-                    else:  # SHORT
-                        stop_loss = entry_price * (1 + stop_loss_percent / 100)
-                        take_profit = entry_price * (1 - (stop_loss_percent * risk_reward_ratio) / 100)
-                    
-                    # Đặt SL và TP
-                    result = api_client.set_stop_loss_take_profit(
-                        symbol=symbol,
-                        position_side=position_side,
-                        stop_loss_price=stop_loss,
-                        take_profit_price=take_profit
-                    )
-                    
-                    if result:
-                        logger.info(f"Đã cập nhật SL/TP cho {symbol} {position_side}: SL={stop_loss}, TP={take_profit}")
-                    else:
-                        logger.warning(f"Không thể cập nhật SL/TP cho {symbol} {position_side}")
+    if position_manager:
+        try:
+            positions = position_manager.get_positions()
+            active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
             
-            except Exception as e:
-                logger.error(f"Lỗi khi kiểm tra và cập nhật SL/TP: {str(e)}")
-        
-        # Thực hiện ngay lập tức một lần
-        check_and_update_sltp()
-        
-        # Lên lịch thực hiện định kỳ
-        schedule.every(check_interval).seconds.do(check_and_update_sltp)
-        logger.info(f"Auto SLTP được cấu hình với khoảng thời gian kiểm tra {check_interval} giây")
-        
-        return True
-    
-    except Exception as e:
-        logger.error(f"Không thể khởi động Auto SLTP Manager: {str(e)}")
-        return False
-
-def start_trailing_stop_manager():
-    """Khởi động và quản lý dịch vụ Trailing Stop Manager"""
-    try:
-        # Tải cấu hình
-        config = load_config()
-        trailing_config = config.get('trailing_stop_settings', {})
-        enabled = trailing_config.get('enabled', False)
-        check_interval = trailing_config.get('check_interval', 15)
-        activation_percent = trailing_config.get('activation_percent', 0.5)
-        trailing_percent = trailing_config.get('trailing_percent', 0.2)
-        
-        if not enabled:
-            logger.info("Trailing Stop Manager đã bị tắt trong cấu hình")
-            return False
-        
-        # Lưu trữ trailing stops cho mỗi vị thế
-        trailing_stops = {}
-        
-        # Thiết lập lên lịch kiểm tra
-        def check_and_update_trailing_stop():
-            """Kiểm tra và cập nhật trailing stop cho các vị thế"""
-            try:
-                # Lấy danh sách vị thế đang mở
-                positions = api_client.get_positions()
-                active_positions = [p for p in positions if abs(float(p.get('positionAmt', 0))) > 0]
-                
-                if not active_positions:
-                    logger.debug("Không có vị thế đang mở để cập nhật trailing stop")
-                    return
-                
-                # Xử lý từng vị thế
-                for position in active_positions:
-                    symbol = position.get('symbol', '')
-                    position_amt = float(position.get('positionAmt', 0))
-                    entry_price = float(position.get('entryPrice', 0))
-                    mark_price = float(position.get('markPrice', 0))
-                    
-                    if position_amt == 0 or entry_price == 0:
-                        continue
-                    
-                    # Xác định hướng vị thế
-                    position_side = 'LONG' if position_amt > 0 else 'SHORT'
-                    
-                    # Lấy giá thị trường hiện tại
-                    current_price = api_client.get_symbol_price(symbol)
-                    if not current_price:
-                        logger.warning(f"Không thể lấy giá hiện tại cho {symbol}")
-                        continue
-                    
-                    # Kiểm tra xem vị thế có trong trailing_stops chưa
-                    position_key = f"{symbol}_{position_side}"
-                    if position_key not in trailing_stops:
-                        trailing_stops[position_key] = {
-                            'activated': False,
-                            'trailing_stop': None
-                        }
-                    
-                    # Kiểm tra nếu đã đạt ngưỡng kích hoạt
-                    is_activated = trailing_stops[position_key]['activated']
-                    current_trailing_stop = trailing_stops[position_key]['trailing_stop']
-                    
-                    # Tính toán mức lợi nhuận hiện tại
-                    profit_percent = 0
-                    if position_side == 'LONG':
-                        profit_percent = (current_price - entry_price) / entry_price * 100
-                    else:  # SHORT
-                        profit_percent = (entry_price - current_price) / entry_price * 100
-                    
-                    # Nếu chưa kích hoạt, kiểm tra xem đã đạt ngưỡng chưa
-                    if not is_activated:
-                        if profit_percent >= activation_percent:
-                            trailing_stops[position_key]['activated'] = True
-                            # Đặt trailing stop ban đầu
-                            if position_side == 'LONG':
-                                trailing_stop = current_price * (1 - trailing_percent / 100)
-                            else:  # SHORT
-                                trailing_stop = current_price * (1 + trailing_percent / 100)
-                            
-                            trailing_stops[position_key]['trailing_stop'] = trailing_stop
-                            logger.info(f"Đã kích hoạt trailing stop cho {symbol} {position_side} tại {trailing_stop}")
-                    
-                    # Nếu đã kích hoạt, cập nhật trailing stop theo giá thị trường
-                    elif is_activated and current_trailing_stop is not None:
-                        # Cập nhật trailing stop theo giá mới
-                        if position_side == 'LONG':
-                            # Nếu giá tăng, cập nhật trailing stop
-                            new_trailing_stop = current_price * (1 - trailing_percent / 100)
-                            if new_trailing_stop > current_trailing_stop:
-                                trailing_stops[position_key]['trailing_stop'] = new_trailing_stop
-                                logger.info(f"Đã cập nhật trailing stop cho {symbol} {position_side} lên {new_trailing_stop}")
-                            
-                            # Kiểm tra nếu giá giảm xuống dưới trailing stop, đóng vị thế
-                            if current_price <= current_trailing_stop:
-                                # Đóng vị thế
-                                result = api_client.close_position(symbol=symbol, position_side=position_side)
-                                if result:
-                                    logger.info(f"Đã đóng vị thế {symbol} {position_side} theo trailing stop tại {current_price}")
-                                    # Xóa khỏi danh sách theo dõi
-                                    trailing_stops.pop(position_key, None)
-                                else:
-                                    logger.warning(f"Không thể đóng vị thế {symbol} {position_side} theo trailing stop")
-                        
-                        else:  # SHORT
-                            # Nếu giá giảm, cập nhật trailing stop
-                            new_trailing_stop = current_price * (1 + trailing_percent / 100)
-                            if new_trailing_stop < current_trailing_stop:
-                                trailing_stops[position_key]['trailing_stop'] = new_trailing_stop
-                                logger.info(f"Đã cập nhật trailing stop cho {symbol} {position_side} xuống {new_trailing_stop}")
-                            
-                            # Kiểm tra nếu giá tăng lên trên trailing stop, đóng vị thế
-                            if current_price >= current_trailing_stop:
-                                # Đóng vị thế
-                                result = api_client.close_position(symbol=symbol, position_side=position_side)
-                                if result:
-                                    logger.info(f"Đã đóng vị thế {symbol} {position_side} theo trailing stop tại {current_price}")
-                                    # Xóa khỏi danh sách theo dõi
-                                    trailing_stops.pop(position_key, None)
-                                else:
-                                    logger.warning(f"Không thể đóng vị thế {symbol} {position_side} theo trailing stop")
+            if active_positions:
+                logger.info(f"Đang có {len(active_positions)} vị thế hoạt động:")
+                for pos in active_positions:
+                    symbol = pos.get('symbol', '')
+                    side = 'LONG' if float(pos.get('positionAmt', 0)) > 0 else 'SHORT'
+                    amt = abs(float(pos.get('positionAmt', 0)))
+                    entry = float(pos.get('entryPrice', 0))
+                    pnl = float(pos.get('unRealizedProfit', 0))
+                    logger.info(f"  - {symbol}: {side}, Số lượng: {amt}, Giá vào: {entry}, PnL: {pnl} USDT")
+            else:
+                logger.info("Không có vị thế nào đang hoạt động")
             
+            return active_positions
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra vị thế: {e}")
+    
+    return []
+
+
+def set_stop_loss_take_profit_for_positions(position_manager=None):
+    """Đặt Stop Loss và Take Profit cho các vị thế hiện có"""
+    if position_manager is None:
+        position_manager = initialize_position_manager()
+    
+    if not position_manager:
+        logger.error("Không thể thiết lập SLTP: Position Manager không được khởi tạo")
+        return
+    
+    # Tải cấu hình
+    config = load_config()
+    auto_sltp_settings = config.get('auto_sltp_settings', {})
+    
+    # Lấy các thiết lập
+    risk_reward_ratio = auto_sltp_settings.get('risk_reward_ratio', 2.0)
+    stop_loss_percent = auto_sltp_settings.get('stop_loss_percent', 2.0)
+    take_profit_percent = auto_sltp_settings.get('take_profit_percent', stop_loss_percent * risk_reward_ratio)
+    
+    logger.info(f"Auto SLTP được cấu hình với: SL={stop_loss_percent}%, TP={take_profit_percent}%, R:R={risk_reward_ratio}")
+    
+    # Lấy danh sách vị thế
+    try:
+        positions = position_manager.get_positions()
+        active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
+        
+        if not active_positions:
+            logger.info("Không có vị thế nào cần thiết lập SLTP")
+            return
+        
+        # Xử lý từng vị thế
+        for pos in active_positions:
+            symbol = pos.get('symbol', '')
+            position_amt = float(pos.get('positionAmt', 0))
+            
+            if position_amt == 0:
+                continue
+                
+            entry_price = float(pos.get('entryPrice', 0))
+            is_long = position_amt > 0
+            
+            # Tính SL và TP
+            if is_long:
+                sl_price = entry_price * (1 - stop_loss_percent / 100)
+                tp_price = entry_price * (1 + take_profit_percent / 100)
+            else:
+                sl_price = entry_price * (1 + stop_loss_percent / 100)
+                tp_price = entry_price * (1 - take_profit_percent / 100)
+            
+            # Làm tròn giá
+            sl_price = round(sl_price, 2)
+            tp_price = round(tp_price, 2)
+            
+            logger.info(f"Thiết lập SLTP cho {symbol}: Entry={entry_price}, SL={sl_price}, TP={tp_price}")
+            
+            # Gọi API để đặt SL và TP
+            try:
+                position_manager.set_stop_loss_take_profit(
+                    symbol=symbol,
+                    stop_loss=sl_price,
+                    take_profit=tp_price,
+                    position_side="LONG" if is_long else "SHORT"
+                )
+                logger.info(f"Đã đặt SLTP thành công cho {symbol}")
             except Exception as e:
-                logger.error(f"Lỗi khi kiểm tra và cập nhật trailing stop: {str(e)}")
-        
-        # Thực hiện ngay lập tức một lần
-        check_and_update_trailing_stop()
-        
-        # Lên lịch thực hiện định kỳ
-        schedule.every(check_interval).seconds.do(check_and_update_trailing_stop)
-        logger.info(f"Trailing Stop cấu hình với kích hoạt {activation_percent}%, duy trì {trailing_percent}%, kiểm tra mỗi {check_interval}s")
-        
-        return True
+                logger.error(f"Lỗi khi đặt SLTP cho {symbol}: {e}")
     
     except Exception as e:
-        logger.error(f"Không thể khởi động Trailing Stop Manager: {str(e)}")
-        return False
+        logger.error(f"Lỗi khi thiết lập SLTP: {e}")
 
-def start_market_monitor():
-    """Khởi động và quản lý dịch vụ Market Monitor"""
+
+def auto_sltp_service():
+    """Dịch vụ tự động đặt Stop Loss và Take Profit"""
+    if not services['auto_sltp']['active']:
+        return
+    
+    logger.info("Đang chạy dịch vụ Auto SLTP...")
+    position_manager = initialize_position_manager()
+    
     try:
-        # Tải cấu hình
-        config = load_config()
-        market_monitor_config = config.get('market_monitor_settings', {})
-        enabled = market_monitor_config.get('enabled', False)
-        check_interval = market_monitor_config.get('check_interval', 60)
-        symbols = market_monitor_config.get('symbols', ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'])
-        volatility_threshold = market_monitor_config.get('volatility_threshold', 3.0)
+        # Kiểm tra vị thế
+        active_positions = check_positions(position_manager)
         
-        if not enabled:
-            logger.info("Market Monitor đã bị tắt trong cấu hình")
-            return False
+        # Đặt SLTP cho các vị thế
+        if active_positions:
+            set_stop_loss_take_profit_for_positions(position_manager)
         
-        # Lưu trữ giá trước đó
-        previous_prices = {}
+        # Cập nhật thời gian chạy cuối cùng
+        services['auto_sltp']['last_run'] = datetime.now()
+    except Exception as e:
+        logger.error(f"Lỗi khi chạy dịch vụ Auto SLTP: {e}")
+
+
+def check_and_update_trailing_stops(position_manager=None):
+    """Kiểm tra và cập nhật Trailing Stop cho các vị thế"""
+    if position_manager is None:
+        position_manager = initialize_position_manager()
+    
+    if not position_manager:
+        logger.error("Không thể cập nhật Trailing Stop: Position Manager không được khởi tạo")
+        return
+    
+    # Tải cấu hình
+    config = load_config()
+    trailing_stop_settings = config.get('trailing_stop_settings', {})
+    
+    # Lấy các thiết lập
+    activation_percent = trailing_stop_settings.get('activation_percent', 1.0)
+    trailing_percent = trailing_stop_settings.get('trailing_percent', 0.5)
+    
+    logger.info(f"Trailing Stop cấu hình với: Kích hoạt={activation_percent}%, Theo sau={trailing_percent}%")
+    
+    # Lấy danh sách vị thế
+    try:
+        positions = position_manager.get_positions()
+        active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
         
-        # Thiết lập lên lịch kiểm tra
-        def check_market_conditions():
-            """Kiểm tra điều kiện thị trường và gửi cảnh báo"""
-            try:
-                nonlocal previous_prices
+        if not active_positions:
+            logger.info("Không có vị thế nào cần cập nhật Trailing Stop")
+            return
+        
+        # Xử lý từng vị thế
+        for pos in active_positions:
+            symbol = pos.get('symbol', '')
+            position_amt = float(pos.get('positionAmt', 0))
+            
+            if position_amt == 0:
+                continue
                 
-                for symbol in symbols:
-                    # Lấy giá hiện tại
-                    current_price = api_client.get_symbol_price(symbol)
-                    if not current_price:
-                        logger.warning(f"Không thể lấy giá hiện tại cho {symbol}")
-                        continue
+            entry_price = float(pos.get('entryPrice', 0))
+            is_long = position_amt > 0
+            
+            # Lấy giá hiện tại
+            current_price = get_symbol_price(symbol, position_manager)
+            
+            if not current_price:
+                logger.warning(f"Không thể lấy giá hiện tại cho {symbol}, bỏ qua cập nhật Trailing Stop")
+                continue
+            
+            # Tính lợi nhuận hiện tại (%)
+            if is_long:
+                profit_percent = ((current_price / entry_price) - 1) * 100
+            else:
+                profit_percent = ((entry_price / current_price) - 1) * 100
+            
+            # Kiểm tra điều kiện kích hoạt Trailing Stop
+            if profit_percent >= activation_percent:
+                # Tính toán giá Stop Loss mới
+                if is_long:
+                    new_sl_price = current_price * (1 - trailing_percent / 100)
                     
-                    # Nếu không có giá trước đó, lưu lại và tiếp tục
-                    if symbol not in previous_prices:
-                        previous_prices[symbol] = current_price
-                        continue
+                    # Lấy Stop Loss hiện tại
+                    current_sl = get_current_stop_loss(symbol, "LONG", position_manager)
                     
-                    # Tính toán % thay đổi
-                    previous_price = previous_prices[symbol]
-                    price_change_percent = ((current_price - previous_price) / previous_price) * 100
-                    
-                    # Kiểm tra ngưỡng biến động
-                    if abs(price_change_percent) >= volatility_threshold:
-                        # Xác định hướng
-                        direction = "TĂNG" if price_change_percent > 0 else "GIẢM"
+                    # Nếu Stop Loss mới cao hơn Stop Loss hiện tại
+                    if not current_sl or new_sl_price > current_sl:
+                        logger.info(f"{symbol} (LONG): Cập nhật Trailing Stop từ {current_sl} lên {new_sl_price}, lợi nhuận: {profit_percent:.2f}%")
                         
-                        # Gửi cảnh báo
-                        message = (
-                            f"<b>⚠️ Cảnh báo biến động {symbol}</b>\n\n"
-                            f"Giá {direction} mạnh: <b>{abs(price_change_percent):.2f}%</b>\n"
-                            f"Giá trước: {previous_price:.2f}\n"
-                            f"Giá hiện tại: {current_price:.2f}\n\n"
-                            f"<i>Thời gian: {datetime.now().strftime('%H:%M:%S')}</i>"
-                        )
-                        
-                        # Import mô-đun Telegram và gửi thông báo
                         try:
-                            telegram_module = import_module_dynamically('telegram_notifier')
-                            if telegram_module:
-                                telegram_module.send_message(message=message)
-                                logger.info(f"Đã gửi cảnh báo biến động cho {symbol}: {price_change_percent:.2f}%")
+                            # Hủy Stop Loss cũ nếu có
+                            if current_sl:
+                                position_manager.close_position(
+                                    symbol=symbol,
+                                    side="BUY",  # Đối với vị thế LONG, đóng = BUY
+                                    quantity=0,  # Chỉ hủy đơn hàng SL, không đóng vị thế
+                                    close_type="STOP_MARKET",
+                                    cancel_orders=True
+                                )
+                            
+                            # Đặt Stop Loss mới
+                            position_manager.set_stop_loss_take_profit(
+                                symbol=symbol,
+                                stop_loss=new_sl_price,
+                                position_side="LONG"
+                            )
+                            logger.info(f"Đã cập nhật Trailing Stop cho {symbol} (LONG)")
                         except Exception as e:
-                            logger.error(f"Không thể gửi cảnh báo Telegram: {str(e)}")
+                            logger.error(f"Lỗi khi cập nhật Trailing Stop cho {symbol} (LONG): {e}")
+                else:
+                    new_sl_price = current_price * (1 + trailing_percent / 100)
                     
-                    # Cập nhật giá trước đó
-                    previous_prices[symbol] = current_price
-            
-            except Exception as e:
-                logger.error(f"Lỗi khi kiểm tra điều kiện thị trường: {str(e)}")
-        
-        # Thực hiện ngay lập tức một lần
-        check_market_conditions()
-        
-        # Lên lịch thực hiện định kỳ
-        schedule.every(check_interval).seconds.do(check_market_conditions)
-        logger.info(f"Market Monitor theo dõi các cặp {', '.join(symbols)} với ngưỡng biến động {volatility_threshold}%")
-        
-        return True
+                    # Lấy Stop Loss hiện tại
+                    current_sl = get_current_stop_loss(symbol, "SHORT", position_manager)
+                    
+                    # Nếu Stop Loss mới thấp hơn Stop Loss hiện tại
+                    if not current_sl or new_sl_price < current_sl:
+                        logger.info(f"{symbol} (SHORT): Cập nhật Trailing Stop từ {current_sl} xuống {new_sl_price}, lợi nhuận: {profit_percent:.2f}%")
+                        
+                        try:
+                            # Hủy Stop Loss cũ nếu có
+                            if current_sl:
+                                position_manager.close_position(
+                                    symbol=symbol,
+                                    side="SELL",  # Đối với vị thế SHORT, đóng = SELL
+                                    quantity=0,  # Chỉ hủy đơn hàng SL, không đóng vị thế
+                                    close_type="STOP_MARKET",
+                                    cancel_orders=True
+                                )
+                            
+                            # Đặt Stop Loss mới
+                            position_manager.set_stop_loss_take_profit(
+                                symbol=symbol,
+                                stop_loss=new_sl_price,
+                                position_side="SHORT"
+                            )
+                            logger.info(f"Đã cập nhật Trailing Stop cho {symbol} (SHORT)")
+                        except Exception as e:
+                            logger.error(f"Lỗi khi cập nhật Trailing Stop cho {symbol} (SHORT): {e}")
+            else:
+                logger.debug(f"{symbol}: Lợi nhuận {profit_percent:.2f}% chưa đạt ngưỡng kích hoạt Trailing Stop ({activation_percent}%)")
     
     except Exception as e:
-        logger.error(f"Không thể khởi động Market Monitor: {str(e)}")
-        return False
+        logger.error(f"Lỗi khi cập nhật Trailing Stop: {e}")
 
-def scheduler_thread():
-    """Thread quản lý lên lịch thực hiện"""
+
+def get_current_stop_loss(symbol, position_side, position_manager):
+    """Lấy giá Stop Loss hiện tại từ các đơn hàng đang mở"""
+    try:
+        # TODO: Implement logic to get current stop loss orders
+        # This is a placeholder, actual implementation would depend on Binance API
+        return None
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy Stop Loss hiện tại cho {symbol}: {e}")
+        return None
+
+
+def get_symbol_price(symbol, position_manager=None):
+    """Lấy giá hiện tại của một cặp tiền tệ"""
+    if position_manager is None:
+        position_manager = initialize_position_manager()
+    
+    if not position_manager:
+        logger.error("Position Manager không được khởi tạo")
+        return None
+    
+    try:
+        # Sử dụng client của position_manager để lấy giá
+        price_info = position_manager.client.futures_symbol_ticker(symbol=symbol)
+        if price_info and 'price' in price_info:
+            return float(price_info['price'])
+        
+        logger.warning(f"Không thể lấy giá cho {symbol}: Dữ liệu không đúng định dạng")
+        return None
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy giá {symbol}: {e}")
+        return None
+
+
+def trailing_stop_service():
+    """Dịch vụ Trailing Stop"""
+    if not services['trailing_stop']['active']:
+        return
+    
+    logger.info("Đang chạy dịch vụ Trailing Stop...")
+    position_manager = initialize_position_manager()
+    
+    try:
+        # Kiểm tra vị thế
+        active_positions = check_positions(position_manager)
+        
+        # Cập nhật Trailing Stop cho các vị thế
+        if active_positions:
+            check_and_update_trailing_stops(position_manager)
+        
+        # Cập nhật thời gian chạy cuối cùng
+        services['trailing_stop']['last_run'] = datetime.now()
+    except Exception as e:
+        logger.error(f"Lỗi khi chạy dịch vụ Trailing Stop: {e}")
+
+
+def monitor_market_volatility():
+    """Theo dõi biến động thị trường và gửi thông báo khi vượt ngưỡng"""
+    # Tải cấu hình
+    config = load_config()
+    market_settings = config.get('market_monitor_settings', {})
+    
+    # Lấy các thiết lập
+    symbols = market_settings.get('symbols', ["BTCUSDT", "ETHUSDT", "SOLUSDT"])
+    volatility_threshold = market_settings.get('volatility_threshold', 3.0)
+    
+    logger.info(f"Market Monitor theo dõi các cặp: {', '.join(symbols)}")
+    
+    # Khởi tạo client
+    client = initialize_binance_client()
+    if not client:
+        logger.error("Không thể kết nối đến Binance API")
+        return
+    
+    try:
+        # Lấy dữ liệu thị trường
+        tickers = client.futures_ticker_24hr()
+        
+        if not tickers:
+            logger.warning("Không thể lấy dữ liệu thị trường")
+            return
+        
+        # Lọc các cặp tiền quan tâm
+        for ticker in tickers:
+            symbol = ticker.get('symbol', '')
+            
+            if symbol not in symbols:
+                continue
+            
+            price_change = float(ticker.get('priceChangePercent', 0))
+            current_price = float(ticker.get('lastPrice', 0))
+            
+            # Kiểm tra biến động
+            if abs(price_change) >= volatility_threshold:
+                direction = "tăng" if price_change > 0 else "giảm"
+                message = f"⚠️ {symbol} đang {direction} mạnh {abs(price_change):.2f}%, giá hiện tại: {current_price} USDT"
+                logger.warning(message)
+                
+                # Gửi thông báo
+                try:
+                    from telegram_notifier import TelegramNotifier
+                    notifier = TelegramNotifier()
+                    notifier.send_message(message)
+                except Exception as e:
+                    logger.error(f"Lỗi khi gửi thông báo Telegram: {e}")
+    
+    except Exception as e:
+        logger.error(f"Lỗi khi theo dõi biến động thị trường: {e}")
+
+
+def market_monitor_service():
+    """Dịch vụ giám sát thị trường"""
+    if not services['market_monitor']['active']:
+        return
+    
+    logger.info("Đang chạy dịch vụ Market Monitor...")
+    
+    try:
+        # Theo dõi biến động thị trường
+        monitor_market_volatility()
+        
+        # Cập nhật thời gian chạy cuối cùng
+        services['market_monitor']['last_run'] = datetime.now()
+    except Exception as e:
+        logger.error(f"Lỗi khi chạy dịch vụ Market Monitor: {e}")
+
+
+def setup_services():
+    """Thiết lập các dịch vụ theo cấu hình"""
+    # Tải cấu hình
+    config = load_config()
+    
+    # Thiết lập Auto SLTP service
+    auto_sltp_settings = config.get('auto_sltp_settings', {})
+    if auto_sltp_settings.get('enabled', True):
+        services['auto_sltp']['active'] = True
+        interval = auto_sltp_settings.get('check_interval', 30)
+        schedule.every(interval).seconds.do(auto_sltp_service)
+        logger.info(f"Đã kích hoạt dịch vụ Auto SLTP với chu kỳ {interval} giây")
+    
+    # Thiết lập Trailing Stop service
+    trailing_stop_settings = config.get('trailing_stop_settings', {})
+    if trailing_stop_settings.get('enabled', True):
+        services['trailing_stop']['active'] = True
+        interval = trailing_stop_settings.get('check_interval', 15)
+        schedule.every(interval).seconds.do(trailing_stop_service)
+        logger.info(f"Đã kích hoạt dịch vụ Trailing Stop với chu kỳ {interval} giây")
+    
+    # Thiết lập Market Monitor service
+    market_monitor_settings = config.get('market_monitor_settings', {})
+    if market_monitor_settings.get('enabled', True):
+        services['market_monitor']['active'] = True
+        interval = market_monitor_settings.get('check_interval', 60)
+        schedule.every(interval).seconds.do(market_monitor_service)
+        logger.info(f"Đã kích hoạt dịch vụ Market Monitor với chu kỳ {interval} giây")
+
+
+def stop_all_services():
+    """Dừng tất cả các dịch vụ"""
+    logger.info("Đang dừng tất cả các dịch vụ...")
+    
+    for service_name, service_info in services.items():
+        service_info['active'] = False
+        logger.info(f"Đã dừng dịch vụ {service_name}")
+
+
+def run_scheduler():
+    """Chạy bộ lập lịch để thực hiện các công việc định kỳ"""
     global running
-    logger.info("Đã khởi động thread lên lịch thực hiện")
+    
+    logger.info("Bắt đầu chạy bộ lập lịch...")
     
     while running:
-        schedule.run_pending()
-        time.sleep(1)
-    
-    logger.info("Thread lên lịch thực hiện đã dừng")
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except Exception as e:
+            logger.error(f"Lỗi khi chạy bộ lập lịch: {e}")
+            time.sleep(5)  # Đợi 5 giây trước khi thử lại
 
-def start_services():
-    """Khởi động tất cả các dịch vụ"""
-    global services
-    
-    try:
-        # Khởi động Auto SLTP Manager
-        sltp_manager_started = start_sltp_manager()
-        services['sltp_manager'] = {
-            'active': sltp_manager_started,
-            'started_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S') if sltp_manager_started else None
-        }
-        
-        # Khởi động Trailing Stop Manager
-        trailing_stop_manager_started = start_trailing_stop_manager()
-        services['trailing_stop_manager'] = {
-            'active': trailing_stop_manager_started,
-            'started_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S') if trailing_stop_manager_started else None
-        }
-        
-        # Khởi động Market Monitor
-        market_monitor_started = start_market_monitor()
-        services['market_monitor'] = {
-            'active': market_monitor_started,
-            'started_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S') if market_monitor_started else None
-        }
-        
-        # Gửi thông báo trạng thái dịch vụ
-        active_services = [name for name, info in services.items() if info['active']]
-        inactive_services = [name for name, info in services.items() if not info['active']]
-        
-        logger.info(f"Dịch vụ đang hoạt động: {', '.join(active_services) if active_services else 'Không có'}")
-        logger.info(f"Dịch vụ không hoạt động: {', '.join(inactive_services) if inactive_services else 'Không có'}")
-        
-        return len(active_services) > 0
-    
-    except Exception as e:
-        logger.error(f"Lỗi khi khởi động dịch vụ: {str(e)}")
-        return False
-
-def check_services_status():
-    """Kiểm tra trạng thái các dịch vụ và khởi động lại nếu cần"""
-    global services
-    
-    try:
-        # Kiểm tra từng dịch vụ
-        for service_name, service_info in services.items():
-            if not service_info['active']:
-                logger.warning(f"Dịch vụ {service_name} không hoạt động, thử khởi động lại...")
-                
-                # Thử khởi động lại dịch vụ
-                if service_name == 'sltp_manager':
-                    started = start_sltp_manager()
-                elif service_name == 'trailing_stop_manager':
-                    started = start_trailing_stop_manager()
-                elif service_name == 'market_monitor':
-                    started = start_market_monitor()
-                else:
-                    started = False
-                
-                # Cập nhật trạng thái
-                services[service_name]['active'] = started
-                if started:
-                    services[service_name]['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    logger.info(f"Đã khởi động lại dịch vụ {service_name}")
-                else:
-                    logger.error(f"Không thể khởi động lại dịch vụ {service_name}")
-    
-    except Exception as e:
-        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ: {str(e)}")
 
 def main():
-    """Hàm chính của dịch vụ hợp nhất"""
-    global running, scheduler
+    """Hàm chính để chạy dịch vụ hợp nhất"""
+    logger.info("===== Khởi động dịch vụ hợp nhất =====")
     
+    # Đăng ký handler xử lý tín hiệu
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Lưu PID
+    save_pid()
+    
+    # Kiểm tra kết nối đến Binance API
+    client = initialize_binance_client()
+    if not client:
+        logger.error("Không thể kết nối đến Binance API, dừng dịch vụ")
+        return
+    
+    # Thiết lập các dịch vụ
+    setup_services()
+    
+    # Kiểm tra vị thế ban đầu
+    position_manager = initialize_position_manager()
+    if position_manager:
+        check_positions(position_manager)
+    
+    # Chạy bộ lập lịch trong một thread riêng
+    scheduler_thread = threading.Thread(target=run_scheduler)
+    scheduler_thread.daemon = True
+    scheduler_thread.start()
+    
+    # Kiểm tra trạng thái các dịch vụ định kỳ
     try:
-        # Đăng ký bộ xử lý tín hiệu
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-        
-        # Lưu PID
-        save_pid()
-        
-        logger.info(f"Khởi động Dịch vụ hợp nhất v{VERSION}")
-        
-        # Khởi tạo API client
-        if not initialize_api_client():
-            logger.error("Không thể khởi tạo API client, dừng dịch vụ")
-            return 1
-        
-        # Khởi tạo Telegram
-        initialize_telegram()
-        
-        # Khởi động các dịch vụ
-        if not start_services():
-            logger.warning("Không có dịch vụ nào được khởi động thành công")
-        
-        # Lên lịch kiểm tra trạng thái dịch vụ
-        schedule.every(5).minutes.do(check_services_status)
-        
-        # Khởi động thread lên lịch
-        scheduler = threading.Thread(target=scheduler_thread)
-        scheduler.daemon = True
-        scheduler.start()
-        
-        # Vòng lặp chính
         while running:
-            # Đơn giản chỉ chờ thread lên lịch thực hiện công việc
-            time.sleep(1)
-        
-        logger.info("Dịch vụ hợp nhất đang thoát...")
-        return 0
-    
+            # Kiểm tra trạng thái các dịch vụ
+            for service_name, service_info in services.items():
+                if service_info['active']:
+                    last_run = service_info['last_run']
+                    if last_run:
+                        elapsed = datetime.now() - last_run
+                        status = f"Hoạt động (Lần chạy cuối: {elapsed.seconds} giây trước)"
+                    else:
+                        status = "Đang khởi động..."
+                else:
+                    status = "Không hoạt động"
+                
+                logger.debug(f"Dịch vụ {service_name}: {status}")
+            
+            # Đợi 30 giây trước khi kiểm tra lại
+            time.sleep(30)
     except KeyboardInterrupt:
-        logger.info("Đã nhận KeyboardInterrupt, đang thoát...")
+        logger.info("Nhận được tín hiệu thoát từ bàn phím")
         running = False
-        return 0
-    
-    except Exception as e:
-        logger.error(f"Lỗi không xử lý được trong dịch vụ hợp nhất: {str(e)}")
-        return 1
-    
     finally:
-        # Đảm bảo xóa file PID khi thoát
-        try:
-            if os.path.exists(PID_FILE):
-                os.remove(PID_FILE)
-                logger.info(f"Đã xóa file PID")
-        except:
-            pass
+        # Dừng tất cả các dịch vụ
+        stop_all_services()
+        
+        # Xóa file PID
+        remove_pid()
+        
+        logger.info("===== Đã dừng dịch vụ hợp nhất =====")
+
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
