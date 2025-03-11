@@ -953,6 +953,20 @@ def get_market_data():
             }
         ]
         
+        # Thêm xu hướng thị trường cho thông báo Telegram
+        market_data['market_trends'] = {
+            'BTC': market_data['btc_change_24h'],
+            'ETH': market_data['eth_change_24h'],
+            'SOL': market_data['sol_change_24h']
+        }
+        
+        # Thêm thông tin khối lượng giao dịch
+        market_data['market_volumes'] = {
+            'BTC': btc_24h.get('volume', 0) if isinstance(btc_24h, dict) else 0,
+            'ETH': eth_24h.get('volume', 0) if isinstance(eth_24h, dict) else 0,
+            'SOL': sol_24h.get('volume', 0) if isinstance(sol_24h, dict) else 0
+        }
+        
         # Thêm chế độ thị trường và dữ liệu khác
         market_data['market_regime'] = {
             'BTC': 'neutral',

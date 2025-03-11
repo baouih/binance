@@ -11,6 +11,8 @@ import logging
 import datetime
 import traceback
 import requests
+import time
+import hashlib
 from typing import Dict, List, Any, Optional, Union
 
 # Thiết lập logging
@@ -40,6 +42,14 @@ class TelegramNotifier:
         self.chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID")
         self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else ""
         self.enabled = bool(self.token and self.chat_id)
+        
+        # Cache lưu trữ thông báo gần đây để tránh spam
+        self.recent_messages = {}
+        self.message_cooldown = 300  # 5 phút (300 giây)
+        
+        # Lưu trữ dữ liệu thông báo trước đó để so sánh
+        self.previous_system_status = None
+        self.last_notification_time = {}
         
         # Kiểm tra cài đặt
         if not self.token:
@@ -108,12 +118,43 @@ class TelegramNotifier:
                 "message": f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}"
             }
     
-    def send_message(self, message: str, parse_mode: str = "HTML") -> Dict[str, Any]:
+    def _is_duplicate_message(self, message: str, notification_type: str) -> bool:
+        """
+        Kiểm tra tin nhắn đã gửi gần đây để tránh spam
+        
+        :param message: Nội dung tin nhắn
+        :param notification_type: Loại thông báo
+        :return: True nếu tin nhắn là trùng lặp trong khoảng thời gian cho phép
+        """
+        # Tạo mã hash đơn giản cho tin nhắn
+        msg_hash = hashlib.md5(message.encode('utf-8')).hexdigest()
+        
+        # Lấy thời gian hiện tại
+        current_time = time.time()
+        
+        # Kiểm tra trong cache tin nhắn gần đây
+        if notification_type in self.recent_messages and msg_hash in self.recent_messages[notification_type]:
+            last_time = self.recent_messages[notification_type][msg_hash]
+            
+            # Nếu tin nhắn đã gửi trong khoảng thời gian cooldown
+            if current_time - last_time < self.message_cooldown:
+                logger.info(f"Bỏ qua tin nhắn trùng lặp loại '{notification_type}' (gửi gần đây trong vòng {self.message_cooldown}s)")
+                return True
+        
+        # Lưu tin nhắn vào cache
+        if notification_type not in self.recent_messages:
+            self.recent_messages[notification_type] = {}
+            
+        self.recent_messages[notification_type][msg_hash] = current_time
+        return False
+        
+    def send_message(self, message: str, parse_mode: str = "HTML", notification_type: str = "general") -> Dict[str, Any]:
         """
         Gửi tin nhắn đến Telegram
         
         :param message: Nội dung tin nhắn
         :param parse_mode: Chế độ định dạng (HTML, Markdown, MarkdownV2)
+        :param notification_type: Loại thông báo để kiểm tra trùng lặp
         :return: Kết quả gửi tin nhắn
         """
         if not self.enabled:
@@ -121,6 +162,13 @@ class TelegramNotifier:
             return {
                 "status": "error",
                 "message": "Thiếu cấu hình Telegram (Bot Token hoặc Chat ID)"
+            }
+        
+        # Kiểm tra xem có phải là thông báo trùng lặp không
+        if self._is_duplicate_message(message, notification_type):
+            return {
+                "status": "skipped",
+                "message": "Bỏ qua tin nhắn trùng lặp để tránh spam"
             }
         
         try:
@@ -498,16 +546,31 @@ class TelegramNotifier:
         :return: Kết quả gửi tin nhắn
         """
         try:
+            # Kiểm tra thời gian kể từ thông báo trạng thái cuối cùng
+            current_time = time.time()
+            last_status_time = self.last_notification_time.get('system_status', 0)
+            
+            # Nếu chưa đến thời gian để gửi lại thông báo mới (5 phút)
+            if current_time - last_status_time < self.message_cooldown:
+                logger.info(f"Bỏ qua thông báo trạng thái hệ thống (đã gửi trong vòng {self.message_cooldown}s)")
+                return {
+                    "status": "skipped",
+                    "message": "Bỏ qua thông báo trạng thái hệ thống (quá sớm)"
+                }
+                
             # Định dạng chế độ API
             mode_emoji = "🧪" if mode.lower() == "testnet" else "🔴"
             mode_text = "TESTNET" if mode.lower() == "testnet" else "LIVE"
             
-            # Lấy giá BTC hiện tại
+            # Lấy giá BTC và các coin khác từ market_data
             btc_price = market_data.get('btc_price', 0)
+            market_trends = market_data.get('market_trends', {})
+            market_volumes = market_data.get('market_volumes', {})
             
             # Định dạng danh sách vị thế
             positions_str = ""
             total_profit = 0
+            active_position_count = 0
             
             if positions:
                 for i, pos in enumerate(positions, 1):
@@ -518,6 +581,10 @@ class TelegramNotifier:
                     current_price = pos.get('current_price', 0)
                     pnl = pos.get('pnl', 0)
                     pnl_percent = pos.get('pnl_percent', 0)
+                    stop_loss = pos.get('stop_loss', 0)
+                    take_profit = pos.get('take_profit', 0)
+                    
+                    active_position_count += 1
                     
                     # Xác định emoji dựa trên loại vị thế và PnL
                     type_emoji = "📈" if position_type.upper() == "LONG" else "📉"
@@ -527,11 +594,20 @@ class TelegramNotifier:
                         f"  {i}. {type_emoji} <b>{symbol}</b>: "
                         f"{size} @ {entry_price}\n"
                         f"     {pnl_emoji} PnL: {pnl:.2f} USDT ({pnl_percent:.2f}%)\n"
+                        f"     🛑 SL: {stop_loss} | 🎯 TP: {take_profit}\n"
                     )
                     
                     total_profit += pnl
             else:
                 positions_str = "  Không có vị thế đang mở\n"
+            
+            # Lấy thông tin xu hướng thị trường
+            market_trend_str = ""
+            if market_trends:
+                for symbol, change in market_trends.items():
+                    if isinstance(change, (int, float)):
+                        trend_emoji = "🟢" if change > 0 else "🔴"
+                        market_trend_str += f"  • {symbol}: {trend_emoji} {change:.2f}%\n"
             
             # Định dạng tin nhắn
             message = (
@@ -540,12 +616,36 @@ class TelegramNotifier:
                 f"💰 <b>Số dư tài khoản:</b> {account_balance:.2f} USDT\n"
                 f"📊 <b>BTC/USDT:</b> ${btc_price:.2f}\n"
                 f"💵 <b>PnL chưa thực hiện:</b> {unrealized_pnl:.2f} USDT\n\n"
-                f"📋 <b>Vị thế đang mở:</b>\n{positions_str}\n"
-                f"⏱️ <b>Cập nhật lúc:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             )
             
+            # Thêm thông tin vị thế
+            message += f"📋 <b>Vị thế đang mở ({active_position_count}):</b>\n{positions_str}\n"
+            
+            # Thêm thông tin xu hướng thị trường nếu có
+            if market_trend_str:
+                message += f"📈 <b>Xu hướng thị trường (24h):</b>\n{market_trend_str}\n"
+            
+            # Thêm khuyến nghị nếu có từ bot
+            if market_data.get('recommendations'):
+                rec_str = ""
+                for rec in market_data.get('recommendations', []):
+                    symbol = rec.get('symbol', 'Unknown')
+                    signal = rec.get('signal', 'Unknown')
+                    signal_emoji = "📈" if signal.upper() == "LONG" else "📉"
+                    strength = rec.get('strength', 'Unknown')
+                    rec_str += f"  • {signal_emoji} {symbol}: {signal.upper()} (Độ mạnh: {strength})\n"
+                
+                if rec_str:
+                    message += f"🔍 <b>Khuyến nghị giao dịch:</b>\n{rec_str}\n"
+            
+            # Thêm thời gian cập nhật
+            message += f"⏱️ <b>Cập nhật lúc:</b> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            
+            # Cập nhật thời gian thông báo cuối cùng
+            self.last_notification_time['system_status'] = current_time
+            
             # Gửi tin nhắn
-            return self.send_message(message)
+            return self.send_message(message, notification_type='system_status')
         
         except Exception as e:
             logger.error(f"Lỗi khi gửi trạng thái hệ thống: {str(e)}", exc_info=True)
