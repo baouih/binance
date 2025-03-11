@@ -1,5 +1,5 @@
 {
   "enabled": true,
-  "bot_token": "${TELEGRAM_BOT_TOKEN}",
-  "chat_id": "${TELEGRAM_CHAT_ID}"
+  "bot_token": "8069189803:AAF3PJc3BNQgZmpQ2Oj7o0-ySJGmi2AQ9OM",
+  "chat_id": "1834332146"
 }
