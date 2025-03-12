@@ -153,17 +153,21 @@ def initialize_market_analyzer():
     """Khởi tạo Market Analyzer"""
     try:
         from market_analyzer import MarketAnalyzer
-        client = initialize_binance_client()
-        if client:
-            # Tải cấu hình
-            config = load_config()
-            symbols = config.get('symbols', ["BTCUSDT", "ETHUSDT"])
-            timeframes = config.get('timeframes', ["1h", "4h"])
-            
-            market_analyzer = MarketAnalyzer(client, symbols=symbols, timeframes=timeframes)
-            logger.info(f"Đã khởi tạo Market Analyzer với {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
-            return market_analyzer
-        return None
+        
+        # Tải cấu hình để ghi log
+        config = load_config()
+        symbols = config.get('symbols', ["BTCUSDT", "ETHUSDT"])
+        timeframes = config.get('timeframes', ["1h", "4h"])
+        
+        # MarketAnalyzer chỉ nhận tham số testnet
+        market_analyzer = MarketAnalyzer(testnet=True)
+        logger.info(f"Đã khởi tạo Market Analyzer với chế độ testnet")
+        
+        # Ghi log các cặp tiền và khung thời gian sẽ phân tích
+        logger.info(f"Sẽ phân tích {len(symbols)} cặp tiền: {', '.join(symbols)}")
+        logger.info(f"Sẽ phân tích {len(timeframes)} khung thời gian: {', '.join(timeframes)}")
+        
+        return market_analyzer
     except Exception as e:
         logger.error(f"Lỗi khi khởi tạo Market Analyzer: {e}")
         return None
