@@ -178,6 +178,97 @@ class DetailedTradeNotifications:
         """
         self.market_data = market_data
         logger.info(f"Đã cập nhật dữ liệu thị trường cho {len(market_data)} cặp giao dịch")
+        
+    def send_multi_symbol_analysis(self, symbols: List[str]) -> bool:
+        """
+        Gửi phân tích đa symbol
+        
+        Args:
+            symbols: Danh sách các symbols cần phân tích
+            
+        Returns:
+            bool: True nếu gửi thành công, False nếu không
+        """
+        try:
+            logger.info(f"Đang gửi phân tích đa symbol: {symbols}")
+            
+            # Thu thập dữ liệu phân tích cho từng symbol
+            analysis_data = {}
+            
+            for symbol in symbols:
+                # Lấy phân tích từ market_analyzer
+                result = self.market_analyzer.analyze_symbol(symbol)
+                if result:
+                    analysis_data[symbol] = result
+            
+            if not analysis_data:
+                logger.warning("Không có dữ liệu phân tích nào để gửi")
+                return False
+            
+            # Tạo thông báo
+            message = "<b>📊 PHÂN TÍCH ĐA COIN</b>\n\n"
+            
+            # Thêm thông tin cho từng symbol
+            for symbol, data in analysis_data.items():
+                symbol_name = symbol.replace("USDT", "")
+                current_price = data.get("current_price", 0)
+                
+                # Lấy thông tin tín hiệu
+                summary = data.get("summary", {})
+                signal = summary.get("overall_signal", "NEUTRAL")
+                confidence = summary.get("confidence", 0)
+                
+                signal_emoji = "⚪"
+                if signal in ["STRONG_BUY", "BUY", "Mua"]:
+                    signal_emoji = "🟢"
+                elif signal in ["STRONG_SELL", "SELL", "Bán"]:
+                    signal_emoji = "🔴"
+                
+                message += f"{signal_emoji} <b>{symbol_name} (${current_price:,.2f}):</b>\n"
+                message += f"• Tín hiệu: {signal}\n"
+                message += f"• Độ tin cậy: {confidence:.2f}%\n"
+                
+                # Thêm thông tin hỗ trợ/kháng cự
+                support_resistance = data.get("support_resistance", [])
+                support = None
+                resistance = None
+                
+                for level in support_resistance:
+                    if level.get("type") == "Hỗ trợ" and (support is None or level.get("value", 0) > support):
+                        support = level.get("value", 0)
+                    elif level.get("type") == "Kháng cự" and (resistance is None or level.get("value", 0) < resistance):
+                        resistance = level.get("value", 0)
+                
+                if support:
+                    message += f"• Hỗ trợ gần nhất: ${support:,.2f}\n"
+                if resistance:
+                    message += f"• Kháng cự gần nhất: ${resistance:,.2f}\n"
+                
+                # Thêm xu hướng
+                if "short_term_trend" in data:
+                    message += f"• Xu hướng ngắn hạn: {data.get('short_term_trend', 'N/A')}\n"
+                if "mid_term_trend" in data:
+                    message += f"• Xu hướng trung hạn: {data.get('mid_term_trend', 'N/A')}\n"
+                
+                message += "\n"
+            
+            # Thêm thời gian
+            message += f"⏱ <i>Thời gian: {datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
+            
+            # Gửi thông báo
+            result = self.telegram.send_notification("info", message)
+            
+            if result:
+                logger.info(f"Đã gửi phân tích đa symbol ({', '.join(symbols)}) thành công")
+                return True
+            else:
+                logger.error(f"Lỗi khi gửi phân tích đa symbol")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi phân tích đa symbol: {str(e)}")
+            logger.error(traceback.format_exc())
+            return False
     
     def update_positions(self, positions: Dict) -> None:
         """

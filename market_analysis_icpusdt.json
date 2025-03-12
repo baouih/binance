@@ -1,0 +1,137 @@
+{
+    "symbol": "ICPUSDT",
+    "current_price": 0,
+    "timeframe": "1h",
+    "timestamp": "2025-03-12T07:24:08.890525",
+    "summary": {
+        "overall_signal": "BUY",
+        "confidence": 70,
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 70%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (gi\u1ea3m), trung h\u1ea1n (gi\u1ea3m). ",
+        "time_horizons": {
+            "short_term": "SELL",
+            "medium_term": "SELL",
+            "long_term": "NEUTRAL"
+        },
+        "price_prediction": {
+            "support": 0,
+            "resistance": 0,
+            "target": 0
+        }
+    },
+    "detailed_analysis": {
+        "1h": {
+            "current_price": 0,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "NEUTRAL",
+                "trend_strength": 2.0,
+                "support_levels": [],
+                "resistance_levels": [],
+                "key_level": 21.98
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.0,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 0.0,
+                "atr_percent": 0.0,
+                "bollinger_width": 0.0,
+                "volatility_score": 2.0
+            },
+            "momentum_analysis": {
+                "primary_momentum": "STRONG_BEARISH",
+                "momentum_strength": 2.0,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": 0.0,
+                "stochastic": NaN,
+                "momentum_score": -2.0
+            },
+            "volume_analysis": {
+                "volume_state": "NORMAL",
+                "volume_trend": "NEUTRAL",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 0.0,
+                "volume_change": 0,
+                "volume_score": -0.5
+            },
+            "pattern_analysis": {}
+        },
+        "5m": {
+            "current_price": 0,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "NEUTRAL",
+                "trend_strength": 2.0,
+                "support_levels": [],
+                "resistance_levels": [],
+                "key_level": 21.98
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.0,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 0.0,
+                "atr_percent": 0.0,
+                "bollinger_width": 0.0,
+                "volatility_score": 2.0
+            },
+            "momentum_analysis": {
+                "primary_momentum": "STRONG_BEARISH",
+                "momentum_strength": 2.0,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": 0.0,
+                "stochastic": NaN,
+                "momentum_score": -2.0
+            },
+            "volume_analysis": {
+                "volume_state": "NORMAL",
+                "volume_trend": "NEUTRAL",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 0.0,
+                "volume_change": 0,
+                "volume_score": -0.5
+            },
+            "pattern_analysis": {}
+        },
+        "15m": {
+            "current_price": 0,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "NEUTRAL",
+                "trend_strength": 2.0,
+                "support_levels": [],
+                "resistance_levels": [],
+                "key_level": 21.98
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.0,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 0.0,
+                "atr_percent": 0.0,
+                "bollinger_width": 0.0,
+                "volatility_score": 2.0
+            },
+            "momentum_analysis": {
+                "primary_momentum": "STRONG_BEARISH",
+                "momentum_strength": 2.0,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": 0.0,
+                "stochastic": NaN,
+                "momentum_score": -2.0
+            },
+            "volume_analysis": {
+                "volume_state": "NORMAL",
+                "volume_trend": "NEUTRAL",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 0.0,
+                "volume_change": 0,
+                "volume_score": -0.5
+            },
+            "pattern_analysis": {}
+        }
+    }
+}
