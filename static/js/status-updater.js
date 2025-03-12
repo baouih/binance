@@ -7,7 +7,7 @@
 
 // Định nghĩa URL API
 const STATUS_API_URL = '/api/status';
-const SERVICE_API_URL = '/api/services/market-notifier/status';
+const SERVICE_API_URL = '/api/services/market-notifier/status'; // API endpoint chính cho market notifier
 
 // Biến lưu trạng thái update timer
 let statusUpdateTimer = null;
@@ -86,18 +86,24 @@ function updateServiceStatus(showLoading = false) {
     }
     
     // Gọi API lấy trạng thái
+    console.log('Đang gọi API endpoint:', SERVICE_API_URL);
     fetch(SERVICE_API_URL)
         .then(response => {
+            console.log('Nhận được phản hồi từ API:', response.status, response.statusText);
             if (!response.ok) {
-                throw new Error(`Không thể kết nối tới API: ${response.status}`);
+                throw new Error(`Không thể kết nối tới API: ${response.status} ${response.statusText}`);
             }
             return response.json();
         })
         .then(data => {
+            console.log('Dữ liệu nhận được:', data);
             updateStatusUI(data);
         })
         .catch(error => {
             console.error('Lỗi khi cập nhật trạng thái:', error);
+            // Hiển thị lỗi chi tiết hơn
+            console.error('Chi tiết:', error.message, error.stack);
+            
             // Hiển thị lỗi trong UI
             const statusItems = document.querySelectorAll('.status-item');
             statusItems.forEach(item => {
@@ -105,6 +111,12 @@ function updateServiceStatus(showLoading = false) {
                 if (statusIndicator) {
                     statusIndicator.className = 'status-indicator error';
                     statusIndicator.setAttribute('data-status', 'error');
+                }
+                
+                // Cập nhật text cho trạng thái
+                const statusText = item.querySelector('.status-text');
+                if (statusText) {
+                    statusText.textContent = 'Lỗi kết nối';
                 }
             });
         });

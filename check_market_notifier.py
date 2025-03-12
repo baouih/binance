@@ -114,7 +114,8 @@ def main():
         'started_at': None,
         'last_check': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'status_detail': 'Không xác định',
-        'log_activity': None
+        'log_activity': None,
+        'status': 'stopped'  # Thêm trường status để phù hợp với JavaScript
     }
     
     # Kiểm tra file PID
@@ -128,6 +129,7 @@ def main():
         
         if is_running:
             result['status_detail'] = 'Đang chạy'
+            result['status'] = 'running'  # Cập nhật trạng thái để phù hợp với JavaScript
             
             # Kiểm tra thời gian khởi động
             try:
@@ -138,8 +140,10 @@ def main():
                 pass
         else:
             result['status_detail'] = 'Process không tồn tại hoặc không phải là market_notifier'
+            result['status'] = 'stopped'  # Cập nhật trạng thái để phù hợp với JavaScript
     else:
         result['status_detail'] = 'Không tìm thấy file PID'
+        result['status'] = 'stopped'  # Cập nhật trạng thái để phù hợp với JavaScript
     
     # Kiểm tra hoạt động log gần đây
     log_info = check_log_file()
