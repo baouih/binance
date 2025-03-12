@@ -63,6 +63,29 @@ market_notifier_status = {
     'last_notification': None
 }
 
+# Kiểm tra dịch vụ thông báo thị trường khi khởi động
+def check_existing_market_notifier():
+    """Kiểm tra dịch vụ thông báo thị trường đã chạy khi khởi động"""
+    global market_notifier_status
+    try:
+        pid_file = 'market_notifier.pid'
+        if os.path.exists(pid_file):
+            with open(pid_file, 'r') as f:
+                pid = int(f.read().strip())
+                if psutil.pid_exists(pid):
+                    logger.info(f"Phát hiện dịch vụ thông báo thị trường đang chạy với PID {pid}")
+                    market_notifier_status['running'] = True
+                    market_notifier_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    market_notifier_status['pid'] = pid
+                    market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    return True
+                else:
+                    logger.warning(f"Tìm thấy file PID nhưng process {pid} không tồn tại, xóa file PID")
+                    os.remove(pid_file)
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra dịch vụ thông báo thị trường hiện có: {str(e)}")
+    return False
+
 # Kiểm tra dịch vụ hợp nhất khi khởi động
 def check_existing_unified_service():
     """Kiểm tra dịch vụ hợp nhất đã chạy khi khởi động"""
@@ -87,7 +110,7 @@ def check_existing_unified_service():
         logger.error(f"Lỗi khi kiểm tra dịch vụ hợp nhất hiện có: {str(e)}")
     return False
 
-# Kiểm tra dịch vụ hiện có khi ứng dụng khởi động
+# Kiểm tra dịch vụ hợp nhất khi ứng dụng khởi động
 check_existing_unified_service()
 
 # Khởi tạo Telegram Notifier
@@ -1515,7 +1538,6 @@ def background_tasks():
     schedule.every(30).seconds.do(update_account_data)
     schedule.every(15).seconds.do(check_bot_status)
     schedule.every(60).seconds.do(check_unified_service_status)
-    schedule.every(60).seconds.do(check_market_notifier_status)
     
     while True:
         schedule.run_pending()
