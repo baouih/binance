@@ -1,0 +1,192 @@
+{
+    "timestamp": "2025-03-12T05:55:09.065873",
+    "market_status": "BULLISH",
+    "btc_price": 81643.7,
+    "btc_price_change_24h": 2.166,
+    "top_gainers": [
+        {
+            "symbol": "RDNTUSDT",
+            "price": 0.0233,
+            "price_change_24h": 39.521,
+            "volume_24h": 13.9334,
+            "high_24h": 0.05,
+            "low_24h": 0.0167
+        },
+        {
+            "symbol": "1000CHEEMSUSDT",
+            "price": 0.001,
+            "price_change_24h": 37.363,
+            "volume_24h": 824.066,
+            "high_24h": 0.001,
+            "low_24h": 0.000728
+        },
+        {
+            "symbol": "IOSTUSDT",
+            "price": 0.005001,
+            "price_change_24h": 25.025,
+            "volume_24h": 270.001,
+            "high_24h": 0.005001,
+            "low_24h": 0.00369
+        },
+        {
+            "symbol": "AUCTIONUSDT",
+            "price": 21.0,
+            "price_change_24h": 22.235,
+            "volume_24h": 4935.5302,
+            "high_24h": 21.0,
+            "low_24h": 17.18
+        },
+        {
+            "symbol": "BANUSDT",
+            "price": 0.0739,
+            "price_change_24h": 20.163,
+            "volume_24h": 68681.9109,
+            "high_24h": 0.0739,
+            "low_24h": 0.0558
+        },
+        {
+            "symbol": "MELANIAUSDT",
+            "price": 0.89,
+            "price_change_24h": 18.667,
+            "volume_24h": 849.95,
+            "high_24h": 0.89,
+            "low_24h": 0.75
+        },
+        {
+            "symbol": "MOVEUSDT",
+            "price": 0.48,
+            "price_change_24h": 17.734,
+            "volume_24h": 2844.14,
+            "high_24h": 0.519,
+            "low_24h": 0.4075
+        },
+        {
+            "symbol": "SWELLUSDT",
+            "price": 0.01348,
+            "price_change_24h": 17.217,
+            "volume_24h": 65.53036,
+            "high_24h": 0.01348,
+            "low_24h": 0.0115
+        },
+        {
+            "symbol": "1000BONKUSDT",
+            "price": 0.011668,
+            "price_change_24h": 16.68,
+            "volume_24h": 25.634596,
+            "high_24h": 0.011668,
+            "low_24h": 0.01
+        },
+        {
+            "symbol": "SCRTUSDT",
+            "price": 0.1961,
+            "price_change_24h": 14.012,
+            "volume_24h": 7260326725.251477,
+            "high_24h": 0.2032,
+            "low_24h": 0.1698
+        }
+    ],
+    "top_losers": [
+        {
+            "symbol": "DEGENUSDT",
+            "price": 0.003971,
+            "price_change_24h": -47.053,
+            "volume_24h": 77.512124,
+            "high_24h": 0.0075,
+            "low_24h": 0.0034
+        },
+        {
+            "symbol": "TNSRUSDT",
+            "price": 0.2347,
+            "price_change_24h": -43.932,
+            "volume_24h": 12.69727,
+            "high_24h": 0.4186,
+            "low_24h": 0.2347
+        },
+        {
+            "symbol": "CFXUSDT",
+            "price": 0.0704,
+            "price_change_24h": -42.671,
+            "volume_24h": 4374796.6176,
+            "high_24h": 0.1228,
+            "low_24h": 0.0704
+        },
+        {
+            "symbol": "BADGERUSDT",
+            "price": 1.921,
+            "price_change_24h": -40.434,
+            "volume_24h": 59.551,
+            "high_24h": 3.225,
+            "low_24h": 1.921
+        },
+        {
+            "symbol": "BRETTUSDT",
+            "price": 0.027,
+            "price_change_24h": -38.483,
+            "volume_24h": 2108.20307,
+            "high_24h": 0.04389,
+            "low_24h": 0.025
+        },
+        {
+            "symbol": "BBUSDT",
+            "price": 0.113,
+            "price_change_24h": -36.302,
+            "volume_24h": 136.4768,
+            "high_24h": 0.1774,
+            "low_24h": 0.113
+        },
+        {
+            "symbol": "VIDTUSDT",
+            "price": 0.00903,
+            "price_change_24h": -35.454,
+            "volume_24h": 5.00262,
+            "high_24h": 0.01399,
+            "low_24h": 0.00903
+        },
+        {
+            "symbol": "KOMAUSDT",
+            "price": 0.03362,
+            "price_change_24h": -34.323,
+            "volume_24h": 7.89999,
+            "high_24h": 0.05119,
+            "low_24h": 0.03362
+        },
+        {
+            "symbol": "RENDERUSDT",
+            "price": 2.494,
+            "price_change_24h": -33.19,
+            "volume_24h": 18.9544,
+            "high_24h": 3.733,
+            "low_24h": 2.494
+        },
+        {
+            "symbol": "SUPERUSDT",
+            "price": 0.3355,
+            "price_change_24h": -32.9,
+            "volume_24h": 203.6904,
+            "high_24h": 0.585,
+            "low_24h": 0.3355
+        }
+    ],
+    "market_regime": {
+        "primary": "RANGE_BOUND",
+        "volatility": "NORMAL",
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 63%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (gi\u1ea3m). M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 81457.30 (-0.23%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 81797.43 (0.19%). Gi\u00e1 m\u1ee5c ti\u00eau 81797.43 (t\u0103ng 0.19%). Ph\u00e1t hi\u1ec7n m\u1eabu n\u1ebfn: Doji. "
+    },
+    "btc_analysis": {
+        "overall_signal": "BUY",
+        "confidence": 63,
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 63%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (gi\u1ea3m). M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 81457.30 (-0.23%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 81797.43 (0.19%). Gi\u00e1 m\u1ee5c ti\u00eau 81797.43 (t\u0103ng 0.19%). Ph\u00e1t hi\u1ec7n m\u1eabu n\u1ebfn: Doji. ",
+        "time_horizons": {
+            "short_term": "SELL",
+            "medium_term": "NEUTRAL",
+            "long_term": "NEUTRAL"
+        },
+        "price_prediction": {
+            "support": 81457.3,
+            "resistance": 81797.4258,
+            "target": 81797.4258
+        }
+    },
+    "total_market_cap": 1105985058796.3604,
+    "btc_dominance": 71.16442065406048
+}

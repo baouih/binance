@@ -126,6 +126,22 @@ class ServiceGuardian:
                             "max_age": 900  # 15 phút
                         },
                         "dependencies": []
+                    },
+                    "unified_trading_service": {
+                        "enabled": True,
+                        "command": "python unified_trading_service.py",
+                        "description": "Dịch vụ giao dịch hợp nhất - Auto SLTP, Trailing Stop, Market Monitor",
+                        "autostart": True,
+                        "auto_restart": True,
+                        "check_interval": 60,
+                        "restart_delay": 10,
+                        "max_restart_attempts": 5,
+                        "health_check": {
+                            "type": "file",
+                            "path": "unified_service.log",
+                            "max_age": 600  # 10 phút
+                        },
+                        "dependencies": []
                     }
                 },
                 "system": {

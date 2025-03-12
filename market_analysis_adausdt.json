@@ -1,0 +1,153 @@
+{
+    "symbol": "ADAUSDT",
+    "current_price": 0.8783,
+    "timeframe": "1h",
+    "timestamp": "2025-03-12T05:55:13.086723",
+    "summary": {
+        "overall_signal": "BUY",
+        "confidence": 59,
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 59%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 0.87 (-0.64%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 0.88 (0.03%). Gi\u00e1 m\u1ee5c ti\u00eau 0.88 (t\u0103ng 0.03%). Bi\u1ebfn \u0111\u1ed9ng th\u1ecb tr\u01b0\u1eddng th\u1ea5p. ",
+        "time_horizons": {
+            "short_term": "NEUTRAL",
+            "medium_term": "NEUTRAL",
+            "long_term": "NEUTRAL"
+        },
+        "price_prediction": {
+            "support": 0.8727149999999999,
+            "resistance": 0.8785901776133602,
+            "target": 0.8785901776133602
+        }
+    },
+    "detailed_analysis": {
+        "1h": {
+            "current_price": 0.8783,
+            "trend_analysis": {
+                "primary_trend": "DOWNTREND",
+                "secondary_trend": "UPTREND",
+                "trend_strength": 1.7,
+                "support_levels": [
+                    0.8727149999999999,
+                    0.8506,
+                    0.80957
+                ],
+                "resistance_levels": [
+                    0.8785901776133602,
+                    0.87869,
+                    0.9
+                ],
+                "key_level": 0.8727149999999999
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.1764772856654906,
+                "volatility_state": "LOW",
+                "volatility_change": "STABLE",
+                "atr": 0.0015500000000000038,
+                "atr_percent": 0.1764772856654906,
+                "bollinger_width": 0.01190690264904651,
+                "volatility_score": 1.3
+            },
+            "momentum_analysis": {
+                "primary_momentum": "NEUTRAL",
+                "momentum_strength": 0.5,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": -0.00037128348987092163,
+                "stochastic": 0.0,
+                "momentum_score": 0.5
+            },
+            "volume_analysis": {
+                "volume_state": "BELOW_AVERAGE",
+                "volume_trend": "INCREASING",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 20450.05,
+                "volume_change": -100.0,
+                "volume_score": -1
+            },
+            "pattern_analysis": {}
+        },
+        "5m": {
+            "current_price": 0.8783,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "NEUTRAL",
+                "trend_strength": 2.0,
+                "support_levels": [],
+                "resistance_levels": [
+                    0.88915,
+                    0.8917106,
+                    0.8953562
+                ],
+                "key_level": 0.8783
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.0,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 0.0,
+                "atr_percent": 0.0,
+                "bollinger_width": 0.0,
+                "volatility_score": 2.0
+            },
+            "momentum_analysis": {
+                "primary_momentum": "STRONG_BEARISH",
+                "momentum_strength": 2.0,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": 0.0,
+                "stochastic": NaN,
+                "momentum_score": -2.0
+            },
+            "volume_analysis": {
+                "volume_state": "BELOW_AVERAGE",
+                "volume_trend": "NEUTRAL",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 563.55,
+                "volume_change": -100.0,
+                "volume_score": -2.5
+            },
+            "pattern_analysis": {}
+        },
+        "15m": {
+            "current_price": 0.8783,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "UPTREND",
+                "trend_strength": 0,
+                "support_levels": [],
+                "resistance_levels": [
+                    0.9,
+                    0.91415,
+                    0.9226106
+                ],
+                "key_level": 0.8783
+            },
+            "volatility_analysis": {
+                "current_volatility": 0.0,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 0.0,
+                "atr_percent": 0.0,
+                "bollinger_width": 0.0,
+                "volatility_score": 2.0
+            },
+            "momentum_analysis": {
+                "primary_momentum": "NEUTRAL",
+                "momentum_strength": 0.0,
+                "momentum_change": "STABLE",
+                "rsi": NaN,
+                "macd": -7.262669690755175e-06,
+                "stochastic": NaN,
+                "momentum_score": 0.0
+            },
+            "volume_analysis": {
+                "volume_state": "BELOW_AVERAGE",
+                "volume_trend": "NEUTRAL",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 3008.65,
+                "volume_change": -100.0,
+                "volume_score": -2.5
+            },
+            "pattern_analysis": {}
+        }
+    }
+}

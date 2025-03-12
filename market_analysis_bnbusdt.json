@@ -1,0 +1,68 @@
+{
+    "symbol": "BNBUSDT",
+    "current_price": 602.342,
+    "timeframe": "1h",
+    "timestamp": "2025-03-12T05:55:12.097108",
+    "summary": {
+        "overall_signal": "BUY",
+        "confidence": 76,
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 76%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (t\u0103ng), trung h\u1ea1n (t\u0103ng). M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 598.49 (-0.64%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 602.34 (0.00%). Gi\u00e1 m\u1ee5c ti\u00eau 602.34 (t\u0103ng 0.00%). Ph\u00e1t hi\u1ec7n m\u1eabu n\u1ebfn: Doji. ",
+        "time_horizons": {
+            "short_term": "BUY",
+            "medium_term": "BUY",
+            "long_term": "NEUTRAL"
+        },
+        "price_prediction": {
+            "support": 598.491624,
+            "resistance": 602.343,
+            "target": 602.343
+        }
+    },
+    "detailed_analysis": {
+        "1h": {
+            "current_price": 602.342,
+            "trend_analysis": {
+                "primary_trend": "NEUTRAL",
+                "secondary_trend": "UPTREND",
+                "trend_strength": 0,
+                "support_levels": [
+                    598.491624,
+                    597.5817519999999,
+                    596.111
+                ],
+                "resistance_levels": [
+                    602.343,
+                    602.343
+                ],
+                "key_level": 602.342
+            },
+            "volatility_analysis": {
+                "current_volatility": 1.034462149410135,
+                "volatility_state": "NORMAL",
+                "volatility_change": "STABLE",
+                "atr": 6.2309999999999945,
+                "atr_percent": 1.034462149410135,
+                "bollinger_width": 0.019596508967345324,
+                "volatility_score": 1.7
+            },
+            "momentum_analysis": {
+                "primary_momentum": "STRONG_BULLISH",
+                "momentum_strength": 2.0,
+                "momentum_change": "INCREASING",
+                "rsi": 57.14285714285714,
+                "macd": -0.17371316721948915,
+                "stochastic": 33.33333333333332,
+                "momentum_score": 2.0
+            },
+            "volume_analysis": {
+                "volume_state": "HIGH",
+                "volume_trend": "INCREASING",
+                "money_flow": "NEUTRAL",
+                "volume_avg": 129.6405,
+                "volume_change": 259.3090122299744,
+                "volume_score": 4
+            },
+            "pattern_analysis": {
+                "doji": {
+                    "detected": true,
+                    "index": 
