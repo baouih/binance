@@ -590,6 +590,7 @@ def market_monitor_service():
         monitor_market_volatility()
         
         # Quét cơ hội giao dịch
+        logger.info("Bắt đầu quét cơ hội giao dịch từ Market Monitor...")
         scan_trading_opportunities()
         
         # Cập nhật thời gian chạy cuối cùng
@@ -679,6 +680,13 @@ def main():
     position_manager = initialize_position_manager()
     if position_manager:
         check_positions(position_manager)
+    
+    # Quét cơ hội giao dịch ngay khi khởi động
+    try:
+        logger.info("Quét cơ hội giao dịch ban đầu khi khởi động...")
+        scan_trading_opportunities()
+    except Exception as e:
+        logger.error(f"Lỗi khi quét cơ hội giao dịch ban đầu: {e}")
     
     # Chạy bộ lập lịch trong một thread riêng
     scheduler_thread = threading.Thread(target=run_scheduler)
