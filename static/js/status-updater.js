@@ -6,7 +6,6 @@
  */
 
 // Định nghĩa URL API
-const STATUS_API_URL = '/api/status';
 const SERVICE_API_URL = '/api/services/market-notifier/status'; // API endpoint chính cho market notifier
 
 // Biến lưu trạng thái update timer
@@ -67,59 +66,103 @@ function stopPeriodicUpdates() {
  * @param {boolean} showLoading - Hiển thị biểu tượng loading
  */
 function updateServiceStatus(showLoading = false) {
-    // Kiểm tra xem có cần hiển thị UI của status không
-    const statusPanel = document.querySelector('.status-panel');
-    if (!statusPanel) {
-        return;
-    }
+    // Hardcoded fallback data to ensure UI displays correctly even if API fails
+    const fallbackData = {
+        status: 'unknown',
+        pid: null,
+        running: false,
+        last_check: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        status_detail: 'Chưa kết nối được với máy chủ'
+    };
     
-    // Hiển thị trạng thái đang tải nếu yêu cầu
-    if (showLoading) {
-        const statusItems = document.querySelectorAll('.status-item');
-        statusItems.forEach(item => {
-            const statusIndicator = item.querySelector('.status-indicator');
-            if (statusIndicator) {
-                statusIndicator.className = 'status-indicator loading';
-                statusIndicator.setAttribute('data-status', 'loading');
-            }
-        });
-    }
-    
-    // Gọi API lấy trạng thái
-    console.log('Đang gọi API endpoint:', SERVICE_API_URL);
-    fetch(SERVICE_API_URL)
-        .then(response => {
-            console.log('Nhận được phản hồi từ API:', response.status, response.statusText);
-            if (!response.ok) {
-                throw new Error(`Không thể kết nối tới API: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Dữ liệu nhận được:', data);
-            updateStatusUI(data);
-        })
-        .catch(error => {
-            console.error('Lỗi khi cập nhật trạng thái:', error);
-            // Hiển thị lỗi chi tiết hơn
-            console.error('Chi tiết:', error.message, error.stack);
-            
-            // Hiển thị lỗi trong UI
-            const statusItems = document.querySelectorAll('.status-item');
-            statusItems.forEach(item => {
-                const statusIndicator = item.querySelector('.status-indicator');
-                if (statusIndicator) {
-                    statusIndicator.className = 'status-indicator error';
-                    statusIndicator.setAttribute('data-status', 'error');
+    try {
+        // Gọi API lấy trạng thái
+        console.log('Đang gọi API endpoint:', SERVICE_API_URL);
+        
+        // Thử dùng fetch với URL
+        fetch(SERVICE_API_URL)
+            .then(response => {
+                console.log('Nhận được phản hồi từ API:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error(`Không thể kết nối tới API: ${response.status} ${response.statusText}`);
                 }
-                
-                // Cập nhật text cho trạng thái
-                const statusText = item.querySelector('.status-text');
-                if (statusText) {
-                    statusText.textContent = 'Lỗi kết nối';
-                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dữ liệu nhận được:', data);
+                updateUI(data); // Cập nhật UI với dữ liệu thật
+            })
+            .catch(error => {
+                console.error('Lỗi khi gọi API:', error);
+                // Cập nhật UI với dữ liệu fallback khi có lỗi
+                updateUI(fallbackData); 
             });
-        });
+    } catch (error) {
+        console.error('Lỗi ngoại lệ:', error);
+        updateUI(fallbackData);
+    }
+    
+    // Function nội bộ để cập nhật UI
+    function updateUI(data) {
+        const statusPanel = document.querySelector('.status-panel');
+        if (!statusPanel) return;
+        
+        // Tìm phần tử hiển thị trạng thái
+        const notifierItem = document.querySelector('.status-item[data-service="market_notifier"]');
+        if (!notifierItem) return;
+        
+        // Cập nhật indicator
+        const indicator = notifierItem.querySelector('.status-indicator');
+        if (indicator) {
+            indicator.className = 'status-indicator';
+            indicator.classList.add(data.status || 'unknown');
+            indicator.setAttribute('data-status', data.status || 'unknown');
+        }
+        
+        // Cập nhật text
+        const statusText = notifierItem.querySelector('.status-text');
+        if (statusText) {
+            let text = 'Không xác định';
+            if (data.status === 'running') text = 'Đang chạy';
+            else if (data.status === 'stopped') text = 'Đã dừng';
+            else if (data.status === 'error') text = 'Lỗi';
+            
+            statusText.textContent = text;
+        }
+        
+        // Cập nhật thời gian
+        const timeElement = notifierItem.querySelector('.status-time');
+        if (timeElement && data.last_check) {
+            timeElement.textContent = data.last_check;
+        }
+        
+        // Cập nhật chi tiết
+        const detailsElement = notifierItem.querySelector('.service-details');
+        if (detailsElement) {
+            // Xóa nội dung cũ
+            detailsElement.innerHTML = '';
+            
+            // Thêm chi tiết mới
+            if (data.pid) {
+                addDetailItem(detailsElement, 'PID', data.pid);
+            }
+            
+            if (data.status_detail) {
+                addDetailItem(detailsElement, 'Chi tiết', data.status_detail);
+            }
+        }
+        
+        // Cập nhật thời gian cập nhật cuối
+        const lastUpdate = document.getElementById('last-status-update');
+        if (lastUpdate) {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            lastUpdate.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+}
 }
 
 /**
@@ -129,6 +172,12 @@ function updateServiceStatus(showLoading = false) {
 function updateStatusUI(statusData) {
     // Debug - ghi ra console để xem dữ liệu
     console.log('Dữ liệu trạng thái nhận được:', statusData);
+    
+    // Kiểm tra xem dữ liệu có hợp lệ không
+    if (!statusData || typeof statusData !== 'object') {
+        console.error('Dữ liệu trạng thái không hợp lệ:', statusData);
+        return;
+    }
     
     // Cập nhật trạng thái dịch vụ thông báo thị trường
     const marketNotifierElement = document.querySelector('.status-item[data-service="market_notifier"]');
@@ -148,7 +197,7 @@ function updateStatusUI(statusData) {
             else if (statusData.status === 'error') statusClass = 'error';
             
             statusIndicator.classList.add(statusClass);
-            statusIndicator.setAttribute('data-status', statusData.status);
+            statusIndicator.setAttribute('data-status', statusData.status || 'unknown');
         }
         
         if (statusText) {
@@ -161,9 +210,14 @@ function updateStatusUI(statusData) {
         }
         
         if (statusTime && statusData.last_check) {
-            // Định dạng thời gian
-            const updateTime = new Date(statusData.last_check);
-            statusTime.textContent = formatTime(updateTime);
+            try {
+                // Định dạng thời gian
+                const updateTime = new Date(statusData.last_check);
+                statusTime.textContent = formatTime(updateTime);
+            } catch (e) {
+                console.error('Lỗi khi định dạng thời gian:', e);
+                statusTime.textContent = statusData.last_check || '--:--:--';
+            }
         }
         
         // Cập nhật thông tin bổ sung
@@ -180,7 +234,7 @@ function updateStatusUI(statusData) {
                 addDetailItem(detailsElement, 'Thời gian khởi động', statusData.started_at);
             }
             
-            if (statusData.monitored_coins && statusData.monitored_coins.length > 0) {
+            if (statusData.monitored_coins && Array.isArray(statusData.monitored_coins) && statusData.monitored_coins.length > 0) {
                 addDetailItem(detailsElement, 'Coin theo dõi', statusData.monitored_coins.join(', '));
             }
         }
@@ -213,14 +267,6 @@ function addDetailItem(parentElement, key, value) {
     detailItem.appendChild(valueElement);
     parentElement.appendChild(detailItem);
 }
-    
-    // Cập nhật thời gian cập nhật cuối cùng
-    const lastUpdateElement = document.getElementById('last-status-update');
-    if (lastUpdateElement) {
-        const now = new Date();
-        lastUpdateElement.textContent = formatTime(now);
-    }
-}
 
 /**
  * Định dạng khóa chi tiết để hiển thị
@@ -252,9 +298,9 @@ function formatTime(date) {
 // Khởi tạo khi trang đã tải xong
 document.addEventListener('DOMContentLoaded', initStatusUpdater);
 
-// Export các hàm để có thể sử dụng ở nơi khác
-export { 
-    updateServiceStatus, 
-    startPeriodicUpdates, 
-    stopPeriodicUpdates 
+// Gắn các hàm vào đối tượng window để có thể sử dụng ở nơi khác
+window.statusUpdater = {
+    updateServiceStatus,
+    startPeriodicUpdates,
+    stopPeriodicUpdates
 };

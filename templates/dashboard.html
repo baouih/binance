@@ -248,6 +248,9 @@
         </div>
         
         <div class="col-md-4">
+            <!-- Service Status Panel -->
+            {% include 'includes/service_status_panel.html' %}
+            
             <div class="card shadow-sm">
                 <div class="card-header">
                     <h5 class="mb-0">Thống kê hiệu suất</h5>
@@ -333,6 +336,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/status-updater.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize Account Chart
@@ -739,4 +743,7 @@
         });
     });
 </script>
+
+<!-- Import Status Updater Script -->
+<script src="{{ url_for('static', filename='js/status-updater-new.js') }}"></script>
 {% endblock %}

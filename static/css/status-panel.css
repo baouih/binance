@@ -1,0 +1,85 @@
+/**
+ * CSS styles for service status panel
+ */
+
+/* Status indicator colors */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-indicator[data-status="running"] {
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
+}
+
+.status-indicator[data-status="stopped"] {
+    background-color: #dc3545;
+    box-shadow: 0 0 5px #dc3545;
+}
+
+.status-indicator[data-status="unknown"] {
+    background-color: #6c757d;
+    box-shadow: 0 0 5px #6c757d;
+}
+
+.status-indicator[data-status="error"] {
+    background-color: #fd7e14;
+    box-shadow: 0 0 5px #fd7e14;
+}
+
+.status-indicator[data-status="loading"] {
+    background-color: #0dcaf0;
+    box-shadow: 0 0 5px #0dcaf0;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Service details styling */
+.detail-item {
+    display: flex;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.detail-key {
+    font-weight: 500;
+    margin-right: 6px;
+    color: #adb5bd;
+}
+
+.detail-value {
+    color: #e9ecef;
+}
+
+/* Status name labels */
+.status-text {
+    font-weight: 500;
+}
+
+/* Service item */
+.status-item {
+    padding: 12px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 10px;
+}
+
+/* Add border when active */
+.status-item[data-active="true"] {
+    border-left: 3px solid #28a745;
+}
