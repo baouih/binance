@@ -86,6 +86,44 @@ def check_existing_market_notifier():
         logger.error(f"Lỗi khi kiểm tra dịch vụ thông báo thị trường hiện có: {str(e)}")
     return False
 
+# Kiểm tra trạng thái dịch vụ thông báo thị trường
+def check_market_notifier_status():
+    """Kiểm tra trạng thái dịch vụ thông báo thị trường"""
+    global market_notifier_status
+    try:
+        # Sử dụng script kiểm tra riêng biệt
+        result = subprocess.run(['python', 'check_market_notifier.py'], capture_output=True, text=True)
+        if result.returncode == 0:
+            try:
+                status_data = json.loads(result.stdout)
+                # Cập nhật trạng thái toàn cục
+                market_notifier_status.update(status_data)
+                market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # Log thông tin
+                if market_notifier_status['running']:
+                    logger.info(f"Dịch vụ thông báo thị trường đang hoạt động (PID: {market_notifier_status['pid']})")
+                else:
+                    logger.warning("Dịch vụ thông báo thị trường không hoạt động!")
+                
+                # Kiểm tra và thực hiện khôi phục nếu cần
+                if not market_notifier_status['running']:
+                    logger.warning("Phát hiện dịch vụ thông báo thị trường đã dừng, thử khởi động lại...")
+                    restart_notifier = subprocess.run(['./start_market_notifier.sh'], shell=True, capture_output=True, text=True)
+                    if restart_notifier.returncode == 0:
+                        logger.info("Đã khởi động lại dịch vụ thông báo thị trường thành công")
+                    else:
+                        logger.error(f"Không thể khởi động lại dịch vụ thông báo thị trường: {restart_notifier.stderr}")
+            except json.JSONDecodeError:
+                logger.error("Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py")
+        else:
+            logger.error(f"Lỗi khi chạy check_market_notifier.py: {result.stderr}")
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ thông báo thị trường: {str(e)}")
+    
+    # Trả về trạng thái hiện tại
+    return market_notifier_status
+
 # Kiểm tra dịch vụ hợp nhất khi khởi động
 def check_existing_unified_service():
     """Kiểm tra dịch vụ hợp nhất đã chạy khi khởi động"""
@@ -1538,6 +1576,7 @@ def background_tasks():
     schedule.every(30).seconds.do(update_account_data)
     schedule.every(15).seconds.do(check_bot_status)
     schedule.every(60).seconds.do(check_unified_service_status)
+    schedule.every(60).seconds.do(check_market_notifier_status)
     
     while True:
         schedule.run_pending()
@@ -1671,6 +1710,196 @@ else:
     logger.info("Background tasks not auto-started. Use API to start them manually.")
     
 # Không chạy ứng dụng ở đây - được quản lý bởi gunicorn
+# API endpoints để quản lý dịch vụ thông báo thị trường
+@app.route('/api/services/market-notifier/status')
+def get_market_notifier_status_api():
+    """Lấy trạng thái dịch vụ thông báo thị trường"""
+    global market_notifier_status
+    
+    # Kiểm tra trạng thái thông qua script riêng biệt
+    try:
+        result = subprocess.run(['python', 'check_market_notifier.py'], capture_output=True, text=True)
+        if result.returncode == 0:
+            try:
+                # Cập nhật status tức thì từ script kiểm tra
+                status_data = json.loads(result.stdout)
+                market_notifier_status.update(status_data)
+                market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            except json.JSONDecodeError:
+                logger.error("Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py")
+        else:
+            logger.error(f"Lỗi khi thực thi check_market_notifier.py: {result.stderr}")
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ thông báo thị trường: {str(e)}")
+    
+    return jsonify(market_notifier_status)
+
+@app.route('/api/services/market-notifier/start', methods=['POST'])
+def start_market_notifier_api():
+    """Khởi động dịch vụ thông báo thị trường"""
+    global market_notifier_status
+    
+    try:
+        # Kiểm tra xem dịch vụ đã chạy chưa
+        if market_notifier_status['running'] and market_notifier_status['pid'] is not None:
+            # Kiểm tra xem process còn sống không
+            if psutil.pid_exists(market_notifier_status['pid']):
+                return jsonify({
+                    'success': False,
+                    'message': f"Dịch vụ thông báo thị trường đã đang chạy với PID {market_notifier_status['pid']}"
+                })
+        
+        # Khởi động dịch vụ thông báo thị trường
+        result = subprocess.run(
+            ['./start_market_notifier.sh'],
+            shell=True,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            # Đọc PID từ file
+            pid_file = 'market_notifier.pid'
+            if os.path.exists(pid_file):
+                with open(pid_file, 'r') as f:
+                    pid = int(f.read().strip())
+                
+                market_notifier_status['running'] = True
+                market_notifier_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                market_notifier_status['pid'] = pid
+                market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ thông báo thị trường đã được khởi động với PID {pid}"
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': "Không thể xác định PID của dịch vụ thông báo thị trường"
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f"Không thể khởi động dịch vụ thông báo thị trường: {result.stderr}"
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động dịch vụ thông báo thị trường: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/services/market-notifier/stop', methods=['POST'])
+def stop_market_notifier_api():
+    """Dừng dịch vụ thông báo thị trường"""
+    global market_notifier_status
+    
+    try:
+        # Kiểm tra xem dịch vụ đang chạy không
+        if not market_notifier_status['running'] or market_notifier_status['pid'] is None:
+            return jsonify({
+                'success': False,
+                'message': "Dịch vụ thông báo thị trường không hoạt động"
+            })
+        
+        # Lấy PID và gửi tín hiệu thoát
+        pid = market_notifier_status['pid']
+        if psutil.pid_exists(pid):
+            # Gửi tín hiệu Terminate (SIGTERM)
+            os.kill(pid, signal.SIGTERM)
+            
+            # Đợi process thoát
+            try:
+                process = psutil.Process(pid)
+                process.wait(timeout=5)  # Đợi tối đa 5 giây
+            except (psutil.NoSuchProcess, psutil.TimeoutExpired):
+                pass
+            
+            # Kiểm tra lại xem process đã thoát chưa
+            if not psutil.pid_exists(pid):
+                # Reset trạng thái
+                market_notifier_status['running'] = False
+                market_notifier_status['pid'] = None
+                market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                # Xóa file PID nếu tồn tại
+                pid_file = 'market_notifier.pid'
+                if os.path.exists(pid_file):
+                    os.remove(pid_file)
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ thông báo thị trường với PID {pid} đã được dừng"
+                })
+            else:
+                # Process vẫn còn chạy, thử Force Kill (SIGKILL)
+                os.kill(pid, signal.SIGKILL)
+                
+                # Xóa file PID nếu tồn tại
+                pid_file = 'market_notifier.pid'
+                if os.path.exists(pid_file):
+                    os.remove(pid_file)
+                
+                return jsonify({
+                    'success': True,
+                    'message': f"Dịch vụ thông báo thị trường với PID {pid} đã được buộc dừng"
+                })
+        else:
+            # Process không còn chạy
+            market_notifier_status['running'] = False
+            market_notifier_status['pid'] = None
+            market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Xóa file PID nếu tồn tại
+            pid_file = 'market_notifier.pid'
+            if os.path.exists(pid_file):
+                os.remove(pid_file)
+            
+            return jsonify({
+                'success': False,
+                'message': f"Không tìm thấy process với PID {pid}"
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi dừng dịch vụ thông báo thị trường: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}"
+        })
+
+@app.route('/api/services/market-notifier/logs', methods=['GET'])
+def get_market_notifier_logs():
+    """Lấy nhật ký hoạt động của dịch vụ thông báo thị trường"""
+    log_file = 'market_notifier.log'
+    lines_count = int(request.args.get('lines', 50))  # Số dòng nhật ký muốn lấy
+    
+    try:
+        if os.path.exists(log_file):
+            with open(log_file, 'r', encoding='utf-8') as f:
+                logs = f.readlines()
+                # Lấy n dòng cuối
+                logs = logs[-lines_count:] if lines_count < len(logs) else logs
+                # Làm sạch dữ liệu
+                logs = [log.strip() for log in logs]
+                
+                return jsonify({
+                    'success': True,
+                    'logs': logs
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f"Không tìm thấy file nhật ký: {log_file}",
+                'logs': []
+            })
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc nhật ký dịch vụ thông báo thị trường: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Lỗi: {str(e)}",
+            'logs': []
+        })
+
 # API endpoints để quản lý dịch vụ hợp nhất
 @app.route('/api/services/unified/status')
 def get_unified_service_status():

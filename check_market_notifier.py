@@ -1,152 +1,158 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tiện ích kiểm tra và khởi động dịch vụ thông báo thị trường tự động
-Tác giả: BinanceTrader Bot
+Kiểm tra trạng thái dịch vụ thông báo thị trường
 """
 
 import os
-import sys
-import time
-import logging
-import subprocess
 import json
+import logging
 import psutil
-from datetime import datetime
+import datetime
 
-# Thiết lập logging
+# Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    filename='market_notifier_checker.log'
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("market_notifier_check.log")
+    ]
 )
-logger = logging.getLogger('market_notifier_checker')
+logger = logging.getLogger("market_notifier_check")
 
-# File PID cho market notifier
-PID_FILE = 'market_notifier.pid'
-LOG_FILE = 'market_notifier.log'
+def check_pid_file():
+    """Kiểm tra file PID của market_notifier"""
+    pid_file = 'market_notifier.pid'
+    
+    # Kiểm tra xem file PID có tồn tại không
+    if not os.path.exists(pid_file):
+        logger.warning("File PID không tồn tại")
+        return None
+    
+    # Đọc PID từ file
+    try:
+        with open(pid_file, 'r') as f:
+            pid = int(f.read().strip())
+            logger.info(f"Đã đọc PID {pid} từ file")
+            return pid
+    except Exception as e:
+        logger.error(f"Lỗi khi đọc file PID: {str(e)}")
+        return None
 
-def check_market_notifier_status():
-    """
-    Kiểm tra trạng thái của dịch vụ thông báo thị trường
-    Returns:
-        dict: Thông tin trạng thái dịch vụ
-    """
-    status = {
+def check_process_running(pid):
+    """Kiểm tra xem process có đang chạy không dựa trên PID"""
+    if pid is None:
+        return False
+    
+    try:
+        process = psutil.Process(pid)
+        process_status = process.status()
+        
+        # Kiểm tra tên process có phải là Python không
+        process_name = process.name().lower()
+        if "python" not in process_name:
+            logger.warning(f"Process {pid} không phải là Python process ({process_name})")
+            return False
+        
+        # Kiểm tra command line có chứa auto_market_notifier.py không
+        cmd_line = " ".join(process.cmdline()).lower()
+        if "auto_market_notifier.py" not in cmd_line:
+            logger.warning(f"Process {pid} không phải là auto_market_notifier process ({cmd_line})")
+            return False
+            
+        logger.info(f"Process {pid} đang chạy với trạng thái: {process_status}")
+        return process_status in ['running', 'sleeping']
+    except psutil.NoSuchProcess:
+        logger.warning(f"Process với PID {pid} không tồn tại")
+        return False
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra process {pid}: {str(e)}")
+        return False
+
+def check_log_file():
+    """Kiểm tra log file của market_notifier để xem hoạt động gần đây"""
+    log_file = 'market_notifier.log'
+    
+    # Kiểm tra xem file log có tồn tại không
+    if not os.path.exists(log_file):
+        logger.warning("File log của market_notifier không tồn tại")
+        return None
+    
+    # Kiểm tra thời gian sửa đổi cuối cùng của file log
+    try:
+        mtime = os.path.getmtime(log_file)
+        last_modified = datetime.datetime.fromtimestamp(mtime)
+        logger.info(f"File log được cập nhật lần cuối vào: {last_modified}")
+        
+        # Nếu file log đã được cập nhật trong 5 phút gần đây thì có vẻ dịch vụ đang hoạt động
+        now = datetime.datetime.now()
+        time_diff = now - last_modified
+        recent_activity = time_diff.total_seconds() < 300  # 5 phút
+        
+        # Đọc các dòng log cuối cùng
+        with open(log_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            last_lines = lines[-5:] if len(lines) >= 5 else lines
+            
+        return {
+            'last_modified': last_modified.strftime('%Y-%m-%d %H:%M:%S'),
+            'recent_activity': recent_activity,
+            'last_lines': [line.strip() for line in last_lines]
+        }
+    except Exception as e:
+        logger.error(f"Lỗi khi kiểm tra file log: {str(e)}")
+        return None
+
+def main():
+    """Chức năng chính để kiểm tra và báo cáo trạng thái"""
+    # Kết quả mặc định
+    result = {
         'running': False,
         'pid': None,
         'started_at': None,
-        'last_check': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'monitored_coins': [],
-        'last_notification': None
+        'last_check': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'status_detail': 'Không xác định',
+        'log_activity': None
     }
     
-    try:
-        # Kiểm tra file PID
-        if os.path.exists(PID_FILE):
-            with open(PID_FILE, 'r') as f:
-                pid = int(f.read().strip())
-                
-                # Kiểm tra xem process còn sống không
-                if psutil.pid_exists(pid):
-                    status['running'] = True
-                    status['pid'] = pid
-                    
-                    # Lấy thời gian process đã chạy
-                    try:
-                        process = psutil.Process(pid)
-                        create_time = datetime.fromtimestamp(process.create_time())
-                        status['started_at'] = create_time.strftime('%Y-%m-%d %H:%M:%S')
-                    except (psutil.NoSuchProcess, psutil.AccessDenied):
-                        pass
-                    
-                    logger.info(f"Dịch vụ thông báo thị trường đang chạy với PID {pid}")
-                else:
-                    # Process không tồn tại, xóa file PID
-                    logger.warning(f"Process {pid} không tồn tại, xóa file PID")
-                    os.remove(PID_FILE)
-        
-        # Kiểm tra file log để lấy thông tin gần đây
-        if os.path.exists(LOG_FILE):
-            try:
-                with open(LOG_FILE, 'r', encoding='utf-8') as f:
-                    # Đọc 10 dòng cuối
-                    lines = f.readlines()[-10:]
-                    
-                    for line in lines:
-                        # Tìm thông tin về coin được giám sát
-                        if "Đang giám sát coin" in line:
-                            parts = line.split("Đang giám sát coin")
-                            if len(parts) > 1:
-                                coins = parts[1].strip()
-                                status['monitored_coins'] = [c.strip() for c in coins.split(',')]
-                        
-                        # Tìm thông tin về thông báo gần đây
-                        if "Đã gửi thông báo thị trường" in line:
-                            parts = line.split(" - ")
-                            if len(parts) > 0:
-                                timestamp = parts[0].strip()
-                                status['last_notification'] = timestamp
-            except Exception as e:
-                logger.error(f"Lỗi khi đọc file log: {e}")
-        
-        return status
-    except Exception as e:
-        logger.error(f"Lỗi khi kiểm tra trạng thái dịch vụ thông báo thị trường: {e}")
-        return status
-
-def start_market_notifier():
-    """
-    Khởi động dịch vụ thông báo thị trường
-    Returns:
-        bool: True nếu khởi động thành công, False nếu thất bại
-    """
-    logger.info("Đang khởi động dịch vụ thông báo thị trường...")
+    # Kiểm tra file PID
+    pid = check_pid_file()
+    result['pid'] = pid
     
-    try:
-        # Kiểm tra xem dịch vụ đã chạy chưa
-        status = check_market_notifier_status()
-        if status['running']:
-            logger.info(f"Dịch vụ thông báo thị trường đã đang chạy với PID {status['pid']}")
-            return True
+    # Nếu có PID, kiểm tra xem process có đang chạy không
+    if pid is not None:
+        is_running = check_process_running(pid)
+        result['running'] = is_running
         
-        # Khởi động script
-        result = subprocess.run(
-            ['./start_market_notifier.sh'],
-            shell=True,
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode == 0:
-            logger.info("Dịch vụ thông báo thị trường đã được khởi động thành công")
+        if is_running:
+            result['status_detail'] = 'Đang chạy'
             
-            # Đợi một lúc để file PID được tạo
-            time.sleep(2)
-            
-            # Kiểm tra lại trạng thái
-            new_status = check_market_notifier_status()
-            if new_status['running']:
-                logger.info(f"Xác nhận dịch vụ thông báo thị trường đang chạy với PID {new_status['pid']}")
-                return True
-            else:
-                logger.warning("Khởi động thành công nhưng không tìm thấy PID")
-                return False
+            # Kiểm tra thời gian khởi động
+            try:
+                process = psutil.Process(pid)
+                create_time = datetime.datetime.fromtimestamp(process.create_time())
+                result['started_at'] = create_time.strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                pass
         else:
-            logger.error(f"Không thể khởi động dịch vụ thông báo thị trường: {result.stderr}")
-            return False
-    except Exception as e:
-        logger.error(f"Lỗi khi khởi động dịch vụ thông báo thị trường: {e}")
-        return False
+            result['status_detail'] = 'Process không tồn tại hoặc không phải là market_notifier'
+    else:
+        result['status_detail'] = 'Không tìm thấy file PID'
+    
+    # Kiểm tra hoạt động log gần đây
+    log_info = check_log_file()
+    if log_info:
+        result['log_activity'] = log_info
+        
+        # Nếu PID check thất bại nhưng log có hoạt động gần đây, vẫn có thể service đang chạy
+        if not result['running'] and log_info['recent_activity']:
+            logger.warning("PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy")
+            # Không đặt running = True vì không xác định được PID
+    
+    # In kết quả dưới dạng JSON
+    print(json.dumps(result, ensure_ascii=False))
+    return result
 
 if __name__ == "__main__":
-    # Kiểm tra trạng thái
-    status = check_market_notifier_status()
-    print(json.dumps(status, indent=2))
-    
-    # Khởi động lại nếu cần
-    if not status['running'] and len(sys.argv) > 1 and sys.argv[1] == '--start':
-        if start_market_notifier():
-            print("Dịch vụ thông báo thị trường đã được khởi động")
-        else:
-            print("Không thể khởi động dịch vụ thông báo thị trường")
+    main()
