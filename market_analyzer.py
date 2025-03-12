@@ -630,19 +630,29 @@ class MarketAnalyzer:
             # Xác định độ mạnh tín hiệu
             strength = ""
             total_signals = buy_signals + sell_signals + neutral_signals
+            signal_strength = 0.0
+            confidence = 0.5
+            
             if total_signals > 0:
-                if buy_signals / total_signals > 0.7:
+                # Tính độ mạnh tín hiệu (0-10)
+                if overall_signal == "Mua":
+                    signal_strength = buy_signals / total_signals * 10
+                    confidence = buy_signals / total_signals
+                elif overall_signal == "Bán":
+                    signal_strength = sell_signals / total_signals * 10
+                    confidence = sell_signals / total_signals
+                
+                # Xác định độ mạnh bằng chữ
+                if buy_signals / total_signals > 0.7 or sell_signals / total_signals > 0.7:
                     strength = "Rất mạnh"
-                elif buy_signals / total_signals > 0.5:
-                    strength = "Mạnh"
-                elif sell_signals / total_signals > 0.7:
-                    strength = "Rất mạnh"
-                elif sell_signals / total_signals > 0.5:
+                elif buy_signals / total_signals > 0.5 or sell_signals / total_signals > 0.5:
                     strength = "Mạnh"
                 else:
                     strength = "Trung bình"
             else:
                 strength = "Trung bình"
+                signal_strength = 0.0
+                confidence = 0.5
             
             # Tính khối lượng trung bình
             avg_volume = df["volume"].mean()
@@ -672,6 +682,8 @@ class MarketAnalyzer:
                 "price": current_price,
                 "overall_signal": overall_signal,
                 "strength": strength,
+                "signal_strength": signal_strength,
+                "confidence": confidence,
                 "short_term_trend": short_term_trend,
                 "mid_term_trend": mid_term_trend,
                 "long_term_trend": long_term_trend,
@@ -864,25 +876,41 @@ class MarketAnalyzer:
                 short_term_trend = analysis.get("short_term_trend", "")
                 mid_term_trend = analysis.get("mid_term_trend", "")
                 
-                # Xác định cơ hội giao dịch
+                # Kiểm tra thêm các chỉ báo cụ thể
+                rsi = analysis.get("rsi", 50)
+                macd_signal = analysis.get("macd_signal", "")
+                
+                logger.info(f"Phân tích {symbol}: Tín hiệu={overall_signal}, Mạnh={strength}, Trend={short_term_trend}, RSI={rsi}")
+                
+                # Xác định cơ hội giao dịch với điều kiện nới lỏng hơn
                 opportunity = None
                 
-                if overall_signal == "Mua" and strength in ["Mạnh", "Rất mạnh"] and short_term_trend == "Tăng":
-                    # Cơ hội LONG
+                # Cơ hội LONG
+                if (overall_signal == "Mua" and strength in ["Mạnh", "Rất mạnh", "Trung bình"] and 
+                    (short_term_trend == "Tăng" or (mid_term_trend == "Tăng" and short_term_trend != "Giảm"))):
                     opportunity = {
                         "symbol": symbol,
                         "signal": "LONG",
+                        "side": "BUY",
                         "strength": strength,
                         "price": analysis.get("price", 0),
+                        "signal_strength": float(analysis.get("signal_strength", 0)),
+                        "confidence": float(analysis.get("confidence", 0.7)),
+                        "entry_price": float(analysis.get("price", 0)),
                         "reason": f"Tín hiệu {overall_signal} {strength}, xu hướng ngắn hạn {short_term_trend}"
                     }
-                elif overall_signal == "Bán" and strength in ["Mạnh", "Rất mạnh"] and short_term_trend == "Giảm":
-                    # Cơ hội SHORT
+                # Cơ hội SHORT
+                elif (overall_signal == "Bán" and strength in ["Mạnh", "Rất mạnh", "Trung bình"] and 
+                      (short_term_trend == "Giảm" or (mid_term_trend == "Giảm" and short_term_trend != "Tăng"))):
                     opportunity = {
                         "symbol": symbol,
                         "signal": "SHORT",
-                        "strength": strength,
+                        "side": "SELL",
+                        "strength": strength, 
                         "price": analysis.get("price", 0),
+                        "signal_strength": float(analysis.get("signal_strength", 0)),
+                        "confidence": float(analysis.get("confidence", 0.7)),
+                        "entry_price": float(analysis.get("price", 0)),
                         "reason": f"Tín hiệu {overall_signal} {strength}, xu hướng ngắn hạn {short_term_trend}"
                     }
                 
