@@ -53,6 +53,16 @@ unified_service_status = {
     'pid': None
 }
 
+# Biến toàn cục cho trạng thái dịch vụ thông báo thị trường
+market_notifier_status = {
+    'running': False,
+    'pid': None,
+    'started_at': None,
+    'last_check': None,
+    'monitored_coins': [],
+    'last_notification': None
+}
+
 # Kiểm tra dịch vụ hợp nhất khi khởi động
 def check_existing_unified_service():
     """Kiểm tra dịch vụ hợp nhất đã chạy khi khởi động"""
@@ -1505,6 +1515,7 @@ def background_tasks():
     schedule.every(30).seconds.do(update_account_data)
     schedule.every(15).seconds.do(check_bot_status)
     schedule.every(60).seconds.do(check_unified_service_status)
+    schedule.every(60).seconds.do(check_market_notifier_status)
     
     while True:
         schedule.run_pending()
