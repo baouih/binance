@@ -147,6 +147,26 @@ def initialize_position_manager():
     except Exception as e:
         logger.error(f"Lỗi khi khởi tạo Position Manager: {e}")
         return None
+        
+        
+def initialize_market_analyzer():
+    """Khởi tạo Market Analyzer"""
+    try:
+        from market_analyzer import MarketAnalyzer
+        client = initialize_binance_client()
+        if client:
+            # Tải cấu hình
+            config = load_config()
+            symbols = config.get('symbols', ["BTCUSDT", "ETHUSDT"])
+            timeframes = config.get('timeframes', ["1h", "4h"])
+            
+            market_analyzer = MarketAnalyzer(client, symbols=symbols, timeframes=timeframes)
+            logger.info(f"Đã khởi tạo Market Analyzer với {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+            return market_analyzer
+        return None
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi tạo Market Analyzer: {e}")
+        return None
 
 
 def check_positions(position_manager=None):
@@ -501,6 +521,63 @@ def monitor_market_volatility():
         logger.error(f"Lỗi khi theo dõi biến động thị trường: {e}")
 
 
+def scan_trading_opportunities():
+    """Quét cơ hội giao dịch trên các cặp tiền"""
+    logger.info("Đang quét cơ hội giao dịch...")
+    
+    # Khởi tạo Market Analyzer
+    market_analyzer = initialize_market_analyzer()
+    if not market_analyzer:
+        logger.error("Không thể khởi tạo Market Analyzer")
+        return
+    
+    try:
+        # Gọi hàm quét cơ hội giao dịch từ Market Analyzer
+        opportunities = market_analyzer.scan_trading_opportunities()
+        
+        if not opportunities or not opportunities.get('opportunities', []):
+            logger.info("Không tìm thấy cơ hội giao dịch nào")
+            return
+        
+        # Lấy danh sách cơ hội
+        found_opportunities = opportunities.get('opportunities', [])
+        logger.info(f"Đã tìm thấy {len(found_opportunities)} cơ hội giao dịch")
+        
+        # Gửi thông báo về các cơ hội giao dịch
+        try:
+            from telegram_notifier import TelegramNotifier
+            notifier = TelegramNotifier()
+            
+            message = "🔍 *Cơ hội giao dịch mới*\n\n"
+            
+            for opp in found_opportunities:
+                symbol = opp.get('symbol', 'N/A')
+                side = opp.get('side', 'N/A')
+                signal_strength = opp.get('signal_strength', 0)
+                confidence = opp.get('confidence', 0) * 100
+                entry_price = opp.get('entry_price', 0)
+                stop_loss = opp.get('stop_loss', 0)
+                take_profit = opp.get('take_profit', 0)
+                
+                emoji = "🟢" if side == "BUY" else "🔴"
+                side_text = "MUA" if side == "BUY" else "BÁN"
+                
+                message += f"{emoji} *{symbol}* - {side_text}\n"
+                message += f"Giá vào: {entry_price}\n"
+                message += f"Stoploss: {stop_loss}\n"
+                message += f"Target: {take_profit}\n"
+                message += f"Độ tin cậy: {confidence:.1f}%\n"
+                message += f"Sức mạnh tín hiệu: {signal_strength:.1f}\n\n"
+            
+            notifier.send_message(message)
+            logger.info("Đã gửi thông báo Telegram về cơ hội giao dịch")
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi thông báo cơ hội giao dịch: {e}")
+        
+    except Exception as e:
+        logger.error(f"Lỗi khi quét cơ hội giao dịch: {e}")
+
+
 def market_monitor_service():
     """Dịch vụ giám sát thị trường"""
     if not services['market_monitor']['active']:
@@ -511,6 +588,9 @@ def market_monitor_service():
     try:
         # Theo dõi biến động thị trường
         monitor_market_volatility()
+        
+        # Quét cơ hội giao dịch
+        scan_trading_opportunities()
         
         # Cập nhật thời gian chạy cuối cùng
         services['market_monitor']['last_run'] = datetime.now()
