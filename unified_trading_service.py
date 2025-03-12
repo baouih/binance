@@ -200,7 +200,7 @@ def set_stop_loss_take_profit_for_positions(position_manager=None):
     
     # Lấy danh sách vị thế
     try:
-        positions = position_manager.get_positions()
+        positions = position_manager.get_all_positions()
         active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
         
         if not active_positions:
@@ -291,7 +291,7 @@ def check_and_update_trailing_stops(position_manager=None):
     
     # Lấy danh sách vị thế
     try:
-        positions = position_manager.get_positions()
+        positions = position_manager.get_all_positions()
         active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
         
         if not active_positions:
@@ -574,6 +574,9 @@ def run_scheduler():
 
 def main():
     """Hàm chính để chạy dịch vụ hợp nhất"""
+    global running
+    running = True
+    
     logger.info("===== Khởi động dịch vụ hợp nhất =====")
     
     # Đăng ký handler xử lý tín hiệu
