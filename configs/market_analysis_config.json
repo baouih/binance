@@ -1,14 +1,16 @@
 {
-    "account_config": "account_config.json",
     "testnet": true,
     "primary_timeframe": "1h",
     "timeframes": ["5m", "15m", "1h", "4h", "1d"],
-    "symbols_to_analyze": [
-        "BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT", 
-        "XRPUSDT", "DOTUSDT", "SOLUSDT", "LTCUSDT", "LINKUSDT", 
-        "MATICUSDT", "AVAXUSDT", "TRXUSDT", "UNIUSDT"
-    ],
+    "symbols_to_analyze": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "DOGEUSDT", "XRPUSDT"],
     "analysis_interval": 1800,
+    "notification_settings": {
+        "send_market_summary": true,
+        "send_trading_signals": true,
+        "signal_confidence_threshold": 70,
+        "notification_interval": 7200,
+        "quiet_hours": [0, 5]
+    },
     "indicators": {
         "sma": [20, 50, 100, 200],
         "ema": [9, 21, 55, 100],
@@ -24,31 +26,7 @@
         "trend_strength_threshold": 3.0,
         "volume_surge_threshold": 2.0
     },
-    "patterns": [
-        "engulfing", "doji", "hammer", "shooting_star", 
-        "morning_star", "evening_star", "three_white_soldiers", 
-        "three_black_crows", "piercing_line", "dark_cloud_cover"
-    ],
     "data_window": 200,
-    "notifications": {
-        "enable": true,
-        "only_strong_signals": true,
-        "min_confidence": 70,
-        "notification_interval": 3600,
-        "detailed_reports": true
-    },
-    "telegram": {
-        "enable": true,
-        "send_charts": true,
-        "send_market_updates": true,
-        "send_signal_alerts": true
-    },
-    "risk_management": {
-        "max_positions": 5,
-        "max_risk_per_trade": 1.0,
-        "max_daily_drawdown": 5.0,
-        "correlation_threshold": 0.7
-    },
     "system_settings": {
         "debug_mode": true,
         "cache_data": true,

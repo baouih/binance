@@ -4,287 +4,289 @@
 """
 Activate Market Analyzer
 -----------------------
-Script khởi động hệ thống phân tích thị trường tự động với cảnh báo qua Telegram
+Script để kích hoạt hệ thống phân tích thị trường và gửi thông báo qua Telegram
 """
 
 import os
 import sys
-import json
 import time
+import json
 import logging
 import argparse
-import threading
-from datetime import datetime
-import schedule
+from datetime import datetime, timedelta
+import traceback
+try:
+    import schedule
+except ImportError:
+    print("Không thể import module 'schedule'. Đang cài đặt...")
+    os.system("pip install schedule")
+    import schedule
 
 from market_analysis_system import MarketAnalysisSystem
-from enhanced_telegram_notifications import EnhancedTelegramNotifications
+from telegram_notifier import TelegramNotifier
+from enhanced_binance_api import EnhancedBinanceAPI
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("market_analyzer.log"),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(),
+        logging.FileHandler('market_analyzer.log')
     ]
 )
 
-logger = logging.getLogger("activate_market_analyzer")
+logger = logging.getLogger("market_analyzer")
 
 class MarketAnalyzerActivator:
     """
-    Kích hoạt hệ thống phân tích thị trường tự động
+    Lớp kích hoạt hệ thống phân tích thị trường
     """
     
-    def __init__(self, 
-                 config_path: str = "configs/market_analysis_config.json",
-                 notification_interval: int = 60,
-                 run_immediately: bool = True):
+    def __init__(self, config_path: str = "configs/market_analysis_config.json"):
         """
         Khởi tạo activator
         
         Args:
-            config_path: Đường dẫn đến file cấu hình
-            notification_interval: Khoảng thời gian giữa các thông báo (phút)
-            run_immediately: Chạy phân tích ngay lập tức sau khi khởi tạo
+            config_path: Đường dẫn tới file cấu hình
         """
         self.config_path = config_path
-        self.notification_interval = notification_interval
-        self.analyzer = MarketAnalysisSystem(config_path)
-        self.notifier = EnhancedTelegramNotifications(config_path, notification_interval)
+        self.config = self._load_config()
         
-        # Chạy phân tích ngay lập tức nếu được yêu cầu
-        if run_immediately:
-            self.run_analysis()
+        # Khởi tạo các thành phần
+        self.analyzer = MarketAnalysisSystem(config_path=config_path)
+        self.notifier = TelegramNotifier()
+        self.api = EnhancedBinanceAPI(testnet=self.config.get('testnet', True))
         
-        # Bắt đầu lịch trình thông báo
-        self.start_schedule()
+        # Trạng thái
+        self.running = False
+        self.last_analysis_time = None
+        self.last_notification_time = None
+        
+        logger.info("Đã khởi tạo Market Analyzer Activator")
     
-    def run_analysis(self):
-        """Chạy phân tích thị trường và lưu kết quả"""
+    def _load_config(self):
+        """
+        Tải cấu hình từ file
+        
+        Returns:
+            dict: Cấu hình
+        """
+        if os.path.exists(self.config_path):
+            try:
+                with open(self.config_path, 'r') as f:
+                    config = json.load(f)
+                logger.info(f"Đã tải cấu hình từ {self.config_path}")
+                return config
+            except Exception as e:
+                logger.error(f"Lỗi khi tải cấu hình: {e}")
+        
+        logger.warning("Không tìm thấy file cấu hình. Sử dụng cấu hình mặc định")
+        return {
+            "testnet": True,
+            "symbols_to_analyze": ["BTCUSDT", "ETHUSDT", "BNBUSDT"],
+            "analysis_interval": 1800,  # 30 phút
+            "notification_settings": {
+                "send_market_summary": True,
+                "send_trading_signals": True,
+                "signal_confidence_threshold": 70,
+                "notification_interval": 7200,  # 2 giờ
+                "quiet_hours": [0, 5]  # 0h - 5h
+            }
+        }
+    
+    def run_market_analysis(self):
+        """
+        Chạy phân tích thị trường
+        """
         try:
             logger.info("Bắt đầu phân tích thị trường...")
-            start_time = time.time()
             
-            # Lấy cấu hình phân tích
-            symbols = self.analyzer.config.get('symbols_to_analyze', ["BTCUSDT", "ETHUSDT"])
+            # Phân tích tổng quan thị trường
+            market_analysis = self.analyzer.analyze_market()
             
-            # Phân tích thị trường tổng thể
-            market_data = self.analyzer.analyze_market()
+            if not market_analysis:
+                logger.warning("Không thể phân tích thị trường")
+                return
             
-            # Lưu kết quả phân tích thị trường
-            with open('market_overview.json', 'w') as f:
-                json.dump(market_data, f, indent=4)
+            logger.info(f"Đã phân tích thị trường: BTC = ${market_analysis.get('btc_price', 0):,.2f}")
             
-            logger.info(f"Đã hoàn thành phân tích thị trường tổng thể")
+            # Phân tích cơ hội giao dịch
+            symbols = self.config.get('symbols_to_analyze', ["BTCUSDT", "ETHUSDT", "BNBUSDT"])
+            opportunities = self.analyzer.scan_opportunities(symbols)
             
-            # Phân tích từng symbol
-            all_analysis = {}
-            primary_tf = self.analyzer.config.get('primary_timeframe', "1h")
+            logger.info(f"Đã tìm thấy {len(opportunities)} cơ hội giao dịch")
             
-            for symbol in symbols:
-                logger.info(f"Đang phân tích {symbol}...")
-                analysis = self.analyzer.analyze_symbol(symbol, primary_tf)
-                all_analysis[symbol] = analysis
-                
-                # Lưu kết quả phân tích cho từng symbol
-                with open(f'market_analysis_{symbol.lower()}.json', 'w') as f:
-                    json.dump(analysis, f, indent=4)
-            
-            # Lưu tất cả kết quả phân tích
-            with open('market_analysis.json', 'w') as f:
-                json.dump(all_analysis, f, indent=4)
-            
-            # Tạo đề xuất giao dịch
-            recommendations = self.analyzer.generate_trading_recommendations(symbols)
-            
-            # Lưu đề xuất giao dịch
-            with open('all_recommendations.json', 'w') as f:
-                json.dump(recommendations, f, indent=4)
-            
-            # Tạo báo cáo thị trường
+            # Tạo báo cáo
             market_report = self.analyzer.generate_market_report()
             
-            # Lưu báo cáo thị trường
-            with open('market_report.json', 'w') as f:
-                json.dump(market_report, f, indent=4)
+            # Gửi thông báo
+            self._send_notifications(market_analysis, opportunities, market_report)
             
-            elapsed_time = time.time() - start_time
-            logger.info(f"Đã hoàn thành phân tích tất cả ({elapsed_time:.2f} giây)")
+            # Cập nhật thời gian
+            self.last_analysis_time = datetime.now()
             
-            return all_analysis, recommendations, market_report
+            logger.info("Đã hoàn thành phân tích thị trường")
+            
+            return market_analysis, opportunities, market_report
             
         except Exception as e:
-            logger.error(f"Lỗi khi chạy phân tích thị trường: {e}")
+            logger.error(f"Lỗi khi phân tích thị trường: {e}")
+            logger.debug(traceback.format_exc())
             return None, None, None
     
-    def start_schedule(self):
-        """Bắt đầu lịch trình phân tích và thông báo"""
-        try:
-            # Lấy khoảng thời gian phân tích từ cấu hình
-            analysis_interval = self.analyzer.config.get('analysis_interval', 1800)  # Mặc định 30 phút
-            analysis_interval_minutes = max(1, analysis_interval // 60)  # Chuyển đổi giây sang phút
-            
-            logger.info(f"Thiết lập phân tích thị trường mỗi {analysis_interval_minutes} phút")
-            
-            # Lịch trình phân tích
-            schedule.every(analysis_interval_minutes).minutes.do(self.run_and_notify)
-            
-            # Bắt đầu thông báo Telegram
-            self.notifier.start_scheduled_notifications()
-            
-            # Bắt đầu thread để chạy lịch trình
-            self.scheduler_thread = threading.Thread(target=self._run_schedule, daemon=True)
-            self.scheduler_thread.start()
-            
-            logger.info("Đã bắt đầu lịch trình phân tích thị trường")
-            
-            # Gửi thông báo khởi động
-            self.send_startup_notification()
-            
-            return True
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi bắt đầu lịch trình: {e}")
+    def _should_send_notification(self):
+        """
+        Kiểm tra xem có nên gửi thông báo không
+        
+        Returns:
+            bool: True nếu nên gửi thông báo
+        """
+        # Kiểm tra thời gian yên lặng
+        current_hour = datetime.now().hour
+        quiet_hours = self.config.get('notification_settings', {}).get('quiet_hours', [0, 5])
+        
+        if len(quiet_hours) >= 2 and quiet_hours[0] <= current_hour < quiet_hours[1]:
+            logger.info(f"Đang trong thời gian yên lặng ({quiet_hours[0]}h - {quiet_hours[1]}h). Không gửi thông báo")
             return False
+        
+        # Kiểm tra khoảng thời gian thông báo
+        if self.last_notification_time:
+            notification_interval = self.config.get('notification_settings', {}).get('notification_interval', 7200)
+            time_since_last = (datetime.now() - self.last_notification_time).total_seconds()
+            
+            if time_since_last < notification_interval:
+                logger.info(f"Chưa đến thời gian gửi thông báo (cần {notification_interval}s, đã qua {time_since_last:.0f}s)")
+                return False
+        
+        return True
     
-    def _run_schedule(self):
-        """Hàm chạy lịch trình trong thread riêng"""
-        logger.info("Thread lịch trình phân tích đã bắt đầu")
+    def _send_notifications(self, market_analysis, opportunities, market_report):
+        """
+        Gửi thông báo phân tích thị trường
+        
+        Args:
+            market_analysis: Kết quả phân tích thị trường
+            opportunities: Cơ hội giao dịch
+            market_report: Báo cáo thị trường
+        """
+        if not self._should_send_notification():
+            return
+        
+        notification_settings = self.config.get('notification_settings', {})
+        send_market_summary = notification_settings.get('send_market_summary', True)
+        send_trading_signals = notification_settings.get('send_trading_signals', True)
+        signal_confidence_threshold = notification_settings.get('signal_confidence_threshold', 70)
+        
+        # Gửi tổng quan thị trường
+        if send_market_summary and market_analysis:
+            logger.info("Gửi thông báo tổng quan thị trường...")
+            self.notifier.send_market_analysis(market_analysis)
+        
+        # Gửi tín hiệu giao dịch
+        if send_trading_signals and opportunities:
+            # Lọc các cơ hội có độ tin cậy cao
+            high_confidence_ops = [op for op in opportunities if op.get('confidence', 0) >= signal_confidence_threshold]
+            
+            if high_confidence_ops:
+                logger.info(f"Gửi thông báo {len(high_confidence_ops)} tín hiệu giao dịch độ tin cậy cao...")
+                
+                # Gửi tối đa 3 tín hiệu
+                for op in high_confidence_ops[:3]:
+                    self.notifier.send_signal_alert(op)
+                    time.sleep(1)  # Tránh gửi quá nhanh
+        
+        self.last_notification_time = datetime.now()
+        logger.info("Đã gửi tất cả thông báo")
+    
+    def start(self):
+        """
+        Bắt đầu chạy hệ thống phân tích theo lịch
+        """
+        if self.running:
+            logger.warning("Hệ thống phân tích đã đang chạy")
+            return
+        
+        self.running = True
+        
+        # Chạy phân tích ngay lập tức khi khởi động
+        self.run_market_analysis()
+        
+        # Thiết lập lịch chạy định kỳ
+        analysis_interval = self.config.get('analysis_interval', 1800)  # Mặc định 30 phút
+        minutes = analysis_interval // 60
+        
+        if minutes < 1:
+            minutes = 1
+        
+        schedule.every(minutes).minutes.do(self.run_market_analysis)
+        logger.info(f"Đã thiết lập lịch chạy phân tích thị trường mỗi {minutes} phút")
         
         try:
-            while True:
+            while self.running:
                 schedule.run_pending()
                 time.sleep(1)
+        except KeyboardInterrupt:
+            logger.info("Đã nhận lệnh dừng từ người dùng")
+            self.running = False
         except Exception as e:
-            logger.error(f"Lỗi trong thread lịch trình: {e}")
-        
-        logger.info("Thread lịch trình phân tích đã kết thúc")
+            logger.error(f"Lỗi khi chạy hệ thống phân tích: {e}")
+            logger.debug(traceback.format_exc())
+            self.running = False
     
-    def run_and_notify(self):
-        """Chạy phân tích và gửi thông báo"""
-        analysis, recommendations, market_report = self.run_analysis()
-        
-        if analysis and recommendations:
-            # Gửi thông báo thị trường
-            self.notifier.send_market_update()
-            
-            # Tìm các tín hiệu mạnh để gửi cảnh báo
-            for symbol, data in analysis.items():
-                summary = data.get('summary', {})
-                signal = summary.get('overall_signal', 'NEUTRAL')
-                confidence = summary.get('confidence', 0)
-                
-                if signal != 'NEUTRAL' and confidence >= 70:
-                    # Tạo dữ liệu tín hiệu
-                    signal_data = {
-                        'symbol': symbol,
-                        'signal': signal,
-                        'confidence': confidence,
-                        'price': data.get('current_price', 0),
-                        'description': summary.get('description', ''),
-                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    }
-                    
-                    # Thêm thông tin giá mục tiêu và stop loss
-                    price_prediction = summary.get('price_prediction', {})
-                    if signal in ['STRONG_BUY', 'BUY']:
-                        signal_data['target_price'] = price_prediction.get('resistance', 0)
-                        signal_data['stop_loss'] = price_prediction.get('support', 0)
-                    elif signal in ['STRONG_SELL', 'SELL']:
-                        signal_data['target_price'] = price_prediction.get('support', 0)
-                        signal_data['stop_loss'] = price_prediction.get('resistance', 0)
-                    
-                    # Gửi cảnh báo tín hiệu
-                    self.notifier.send_signal_alert(symbol, signal_data)
-            
-            # Gửi đề xuất giao dịch tốt nhất nếu có
-            top_opportunities = recommendations.get('top_opportunities', [])
-            if top_opportunities:
-                for opportunity in top_opportunities[:1]:  # Chỉ lấy cơ hội tốt nhất
-                    symbol = opportunity.get('symbol', '')
-                    
-                    # Chỉ gửi thông báo nếu có tín hiệu mạnh
-                    if opportunity.get('action') in ['BUY', 'SELL'] and opportunity.get('confidence', 0) >= 75:
-                        # Tạo dữ liệu trade
-                        trade_data = {
-                            'symbol': symbol,
-                            'side': 'BUY' if opportunity.get('action') == 'BUY' else 'SELL',
-                            'entry_price': opportunity.get('current_price', 0),
-                            'quantity': 0.1,  # Giá trị mẫu
-                            'take_profit': opportunity.get('target_price', 0),
-                            'stop_loss': opportunity.get('stop_loss', 0),
-                            'reason': opportunity.get('description', ''),
-                            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        }
-                        
-                        # Gửi thông báo giao dịch
-                        self.notifier.send_trade_notification(trade_data)
+    def stop(self):
+        """
+        Dừng hệ thống phân tích
+        """
+        self.running = False
+        logger.info("Đã dừng hệ thống phân tích thị trường")
+
+def run_once():
+    """
+    Chạy phân tích một lần
+    """
+    activator = MarketAnalyzerActivator()
+    market_analysis, opportunities, market_report = activator.run_market_analysis()
     
-    def send_startup_notification(self):
-        """Gửi thông báo khởi động hệ thống"""
-        message = "<b>🚀 HỆ THỐNG PHÂN TÍCH THỊ TRƯỜNG ĐÃ KHỞI ĐỘNG</b>\n\n"
+    if market_analysis:
+        print("\n=== TỔNG QUAN THỊ TRƯỜNG ===")
+        print(f"Giá BTC: ${market_analysis.get('btc_price', 0):,.2f}")
+        print(f"Thay đổi 24h: {market_analysis.get('btc_price_change_24h', 0):+.2f}%")
+        print(f"Trạng thái thị trường: {market_analysis.get('market_status', 'UNKNOWN')}")
         
-        # Thêm thông tin cấu hình
-        symbols = self.analyzer.config.get('symbols_to_analyze', [])
-        timeframes = self.analyzer.config.get('timeframes', [])
-        
-        message += f"<b>Đang theo dõi:</b> {', '.join(symbols)}\n"
-        message += f"<b>Khung thời gian:</b> {', '.join(timeframes)}\n"
-        message += f"<b>Khung thời gian chính:</b> {self.analyzer.config.get('primary_timeframe', '1h')}\n"
-        
-        # Thêm thông tin lịch trình
-        analysis_interval = self.analyzer.config.get('analysis_interval', 1800)
-        analysis_interval_minutes = max(1, analysis_interval // 60)
-        
-        message += f"\n<b>Lịch trình:</b>\n"
-        message += f"• Phân tích thị trường: Mỗi {analysis_interval_minutes} phút\n"
-        message += f"• Thông báo thị trường: Mỗi {self.notification_interval} phút\n"
-        
-        # Thêm thông tin về độ tin cậy tối thiểu
-        min_confidence = self.notifier.config.get('min_signal_confidence', 70)
-        message += f"\n<b>Cấu hình thông báo:</b>\n"
-        message += f"• Độ tin cậy tối thiểu: {min_confidence}%\n"
-        
-        # Thêm thông tin về giờ yên tĩnh
-        quiet_hours = self.notifier.config.get('quiet_hours', {})
-        if quiet_hours.get('enabled', False):
-            start_hour = quiet_hours.get('start_hour', 0)
-            end_hour = quiet_hours.get('end_hour', 7)
-            message += f"• Giờ yên tĩnh: {start_hour}:00 - {end_hour}:00\n"
-        
-        # Thêm thời gian
-        message += f"\n⏱ <i>Khởi động lúc: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
-        
-        # Gửi thông báo
-        self.notifier.telegram.send_notification("info", message)
+        if 'market_regime' in market_analysis:
+            regime = market_analysis['market_regime']
+            print(f"Chế độ thị trường: {regime.get('primary', 'RANGE_BOUND')}")
+            print(f"Biến động: {regime.get('volatility', 'NORMAL')}")
+    
+    if opportunities:
+        print("\n=== CƠ HỘI GIAO DỊCH ===")
+        for i, op in enumerate(opportunities[:5], 1):
+            symbol = op.get('symbol', 'UNKNOWN')
+            action = op.get('action', 'UNKNOWN')
+            confidence = op.get('confidence', 0)
+            price = op.get('current_price', 0)
+            target = op.get('target_price', 0)
+            
+            target_pct = ((target - price) / price * 100) if price > 0 and target > 0 else 0
+            
+            print(f"{i}. {symbol}: {action} (Độ tin cậy: {confidence}%)")
+            print(f"   Giá hiện tại: ${price:,.2f}")
+            print(f"   Giá mục tiêu: ${target:,.2f} ({target_pct:+.2f}%)")
+            print("")
 
 def main():
-    """Hàm chính"""
-    parser = argparse.ArgumentParser(description='Kích hoạt hệ thống phân tích thị trường tự động')
-    parser.add_argument('--config', type=str, default="configs/market_analysis_config.json", help='Đường dẫn đến file cấu hình')
-    parser.add_argument('--interval', type=int, default=60, help='Khoảng thời gian giữa các thông báo (phút)')
-    parser.add_argument('--no-immediate', action='store_false', dest='run_immediately', help='Không chạy phân tích ngay lập tức')
+    parser = argparse.ArgumentParser(description="Kích hoạt hệ thống phân tích thị trường")
+    parser.add_argument('--once', action='store_true', help='Chạy phân tích một lần và hiển thị kết quả')
+    parser.add_argument('--config', type=str, default='configs/market_analysis_config.json', help='Đường dẫn tới file cấu hình')
     
     args = parser.parse_args()
     
-    activator = MarketAnalyzerActivator(
-        config_path=args.config,
-        notification_interval=args.interval,
-        run_immediately=args.run_immediately
-    )
-    
-    try:
-        # Giữ thread chính chạy
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("Đã nhận tín hiệu thoát. Dừng hệ thống...")
-    except Exception as e:
-        logger.error(f"Lỗi không mong muốn: {e}")
-    
-    logger.info("Hệ thống phân tích thị trường đã dừng")
+    if args.once:
+        run_once()
+    else:
+        activator = MarketAnalyzerActivator(config_path=args.config)
+        activator.start()
 
 if __name__ == "__main__":
     main()

@@ -23,11 +23,11 @@
                 </div>
                 <div class="status-label">Giá BTC</div>
                 <div class="status-value" id="btcPrice">
-                    {% for item in status.market_data if item.symbol == 'BTCUSDT' %}
-                        {{ item.price }}
+                    {% if market_data and market_data.btc_price %}
+                        {{ market_data.btc_price }}
                     {% else %}
                         N/A
-                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -467,7 +467,7 @@ def monitor_market_volatility():
     
     try:
         # Lấy dữ liệu thị trường
-        tickers = client.futures_ticker_24hr()
+        tickers = client.futures_ticker()
         
         if not tickers:
             logger.warning("Không thể lấy dữ liệu thị trường")

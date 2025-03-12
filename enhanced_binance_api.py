@@ -447,10 +447,10 @@ class EnhancedBinanceAPI:
                 if self.testnet:
                     # Sử dụng futures API cho testnet
                     if symbol:
-                        ticker = self.client.futures_ticker_24hr(symbol=symbol)
+                        ticker = self.client.futures_ticker(symbol=symbol)
                         return ticker
                     else:
-                        tickers = self.client.futures_ticker_24hr()
+                        tickers = self.client.futures_ticker()
                         return tickers
                 else:
                     # Sử dụng spot API cho mainnet
