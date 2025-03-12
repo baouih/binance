@@ -9,6 +9,7 @@ import json
 import logging
 import psutil
 import datetime
+import traceback
 
 # Cấu hình logging
 logging.basicConfig(
