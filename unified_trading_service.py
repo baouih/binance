@@ -156,7 +156,7 @@ def check_positions(position_manager=None):
     
     if position_manager:
         try:
-            positions = position_manager.get_positions()
+            positions = position_manager.get_all_positions()
             active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
             
             if active_positions:
