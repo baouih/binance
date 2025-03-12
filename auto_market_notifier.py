@@ -12,6 +12,7 @@ import requests
 import logging
 import json
 import sys
+import traceback
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from telegram_notifier import TelegramNotifier
@@ -33,9 +34,29 @@ logging.basicConfig(
 logger = logging.getLogger("market_notifier")
 
 # Khởi tạo các thành phần
-telegram = TelegramNotifier()
-market_system = MarketAnalysisSystem()
-binance_api = BinanceAPI()
+try:
+    telegram = TelegramNotifier()
+    logger.info("Khởi tạo TelegramNotifier thành công")
+except Exception as e:
+    logger.error(f"Lỗi khi khởi tạo TelegramNotifier: {str(e)}")
+    logger.debug(traceback.format_exc())
+    telegram = None
+
+try:
+    market_system = MarketAnalysisSystem()
+    logger.info("Khởi tạo MarketAnalysisSystem thành công")
+except Exception as e:
+    logger.error(f"Lỗi khi khởi tạo MarketAnalysisSystem: {str(e)}")
+    logger.debug(traceback.format_exc())
+    market_system = None
+
+try:
+    binance_api = BinanceAPI()
+    logger.info("Khởi tạo BinanceAPI thành công")
+except Exception as e:
+    logger.error(f"Lỗi khi khởi tạo BinanceAPI: {str(e)}")
+    logger.debug(traceback.format_exc())
+    binance_api = None
 
 # Danh sách các coin cần theo dõi
 MONITORED_COINS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "MATIC"]
@@ -54,15 +75,22 @@ last_signals = {}
 
 def initialize():
     """Khởi tạo dịch vụ thông báo thị trường"""
-    global last_notification_time, last_signals
+    global last_notification_time, last_signals, telegram, binance_api, market_system
     
     logger.info("Khởi tạo dịch vụ thông báo thị trường")
     
     # Kiểm tra kết nối Telegram
-    if telegram.test_connection():
-        logger.info("Kết nối Telegram thành công")
-    else:
-        logger.error("Không thể kết nối Telegram. Vui lòng kiểm tra cấu hình.")
+    try:
+        # Gửi tin nhắn test để kiểm tra kết nối
+        test_result = telegram.send_message(
+            message="🔄 <b>Kiểm tra kết nối</b>\n\nDịch vụ thông báo thị trường đang khởi động..."
+        )
+        if test_result:
+            logger.info("Kết nối Telegram thành công")
+        else:
+            logger.error("Không thể gửi tin nhắn đến Telegram, dịch vụ sẽ chạy nhưng không gửi thông báo")
+    except Exception as e:
+        logger.error(f"Lỗi khi kết nối đến Telegram: {str(e)}")
     
     # Kiểm tra kết nối Binance
     try:
@@ -77,19 +105,30 @@ def initialize():
         last_signals[coin] = None
     
     # Gửi thông báo khởi động
-    telegram.send_message(
-        message=f"<b>🤖 Dịch vụ thông báo thị trường đã được khởi động</b>\n\n"
-                f"🕒 Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                f"🔍 Giám sát: {', '.join(MONITORED_COINS)}\n"
-                f"⏱️ Cooldown: {NOTIFICATION_COOLDOWN} phút\n"
-                f"🎯 Độ tự tin tối thiểu: {CONFIDENCE_THRESHOLD}%"
-    )
+    try:
+        if telegram:
+            telegram.send_message(
+                message=f"<b>🤖 Dịch vụ thông báo thị trường đã được khởi động</b>\n\n"
+                        f"🕒 Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                        f"🔍 Giám sát: {', '.join(MONITORED_COINS)}\n"
+                        f"⏱️ Cooldown: {NOTIFICATION_COOLDOWN} phút\n"
+                        f"🎯 Độ tự tin tối thiểu: {CONFIDENCE_THRESHOLD}%"
+            )
+    except Exception as e:
+        logger.error(f"Lỗi khi gửi thông báo khởi động: {str(e)}")
+        logger.debug(traceback.format_exc())
     
     logger.info(f"Đang giám sát coin {', '.join(MONITORED_COINS)}")
 
 def analyze_market():
     """Phân tích thị trường và gửi thông báo"""
     logger.info("Bắt đầu phân tích thị trường")
+    
+    # Kiểm tra xem các dependency có sẵn sàng không
+    if market_system is None or binance_api is None or telegram is None:
+        logger.error("Không thể phân tích thị trường vì một trong các thành phần cần thiết chưa được khởi tạo")
+        return
+    
     current_time = datetime.now()
     
     try:
@@ -104,6 +143,7 @@ def analyze_market():
                     logger.debug(f"Chế độ thị trường {coin}: {regime}")
             except Exception as e:
                 logger.error(f"Lỗi khi phân tích chế độ thị trường {coin}: {str(e)}")
+                logger.debug(traceback.format_exc())
         
         # Lấy tín hiệu giao dịch
         for coin in MONITORED_COINS:
@@ -118,6 +158,7 @@ def analyze_market():
                 signal = market_system.analyze_and_get_signal(symbol)
                 
                 if not signal:
+                    logger.debug(f"Không có tín hiệu cho {coin}")
                     continue
                 
                 # Lấy thông tin tín hiệu
@@ -145,31 +186,46 @@ def analyze_market():
                 # Tạo emoji phù hợp
                 emoji = "🔴" if signal_type == "SELL" else "🟢" if signal_type == "BUY" else "⚪"
                 
-                # Lấy giá hiện tại
-                current_price = binance_api.get_latest_price(symbol)
+                try:
+                    # Lấy giá hiện tại
+                    current_price = binance_api.get_latest_price(symbol)
                 
-                # Tạo thông báo
-                message = f"<b>{emoji} Tín hiệu giao dịch: {coin}</b>\n\n"
-                message += f"<b>Loại tín hiệu:</b> {signal_type}\n"
-                message += f"<b>Độ tự tin:</b> {confidence}%\n"
-                message += f"<b>Giá hiện tại:</b> ${current_price}\n"
-                message += f"<b>Chiến lược:</b> {strategy}\n"
-                message += f"<b>Chế độ thị trường:</b> {market_regimes.get(coin, 'Unknown')}\n"
-                message += f"<b>Thời gian:</b> {current_time.strftime('%Y-%m-%d %H:%M:%S')}"
+                    # Tạo thông báo
+                    message = f"<b>{emoji} Tín hiệu giao dịch: {coin}</b>\n\n"
+                    message += f"<b>Loại tín hiệu:</b> {signal_type}\n"
+                    message += f"<b>Độ tự tin:</b> {confidence}%\n"
+                    message += f"<b>Giá hiện tại:</b> ${current_price}\n"
+                    message += f"<b>Chiến lược:</b> {strategy}\n"
+                    message += f"<b>Chế độ thị trường:</b> {market_regimes.get(coin, 'Unknown')}\n"
+                    message += f"<b>Thời gian:</b> {current_time.strftime('%Y-%m-%d %H:%M:%S')}"
                 
-                # Gửi thông báo
-                telegram.send_message(message=message)
-                logger.info(f"Đã gửi thông báo tín hiệu {signal_type} cho {coin} với độ tự tin {confidence}%")
+                    # Gửi thông báo
+                    if telegram:
+                        try:
+                            telegram.send_message(message=message)
+                            logger.info(f"Đã gửi thông báo tín hiệu {signal_type} cho {coin} với độ tự tin {confidence}%")
+                        except Exception as e:
+                            logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
+                            logger.debug(traceback.format_exc())
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy giá hoặc gửi thông báo: {str(e)}")
+                    logger.debug(traceback.format_exc())
                 
             except Exception as e:
                 logger.error(f"Lỗi khi phân tích và gửi tín hiệu cho {coin}: {str(e)}")
+                logger.debug(traceback.format_exc())
         
         # Gửi báo cáo tổng quan thị trường mỗi 4 giờ
-        if current_time.hour % 4 == 0 and current_time.minute < 5:
-            send_market_overview()
+        try:
+            if current_time.hour % 4 == 0 and current_time.minute < 5:
+                send_market_overview()
+        except Exception as e:
+            logger.error(f"Lỗi khi gửi báo cáo tổng quan: {str(e)}")
+            logger.debug(traceback.format_exc())
             
     except Exception as e:
         logger.error(f"Lỗi khi phân tích thị trường: {str(e)}")
+        logger.debug(traceback.format_exc())
 
 def send_market_overview():
     """Gửi báo cáo tổng quan thị trường"""
@@ -236,30 +292,88 @@ def run_service():
     """Chạy dịch vụ thông báo thị trường"""
     logger.info("Dịch vụ thông báo thị trường đang chạy")
     
-    # Khởi tạo dịch vụ
-    initialize()
+    # Kiểm tra trước khi khởi động
+    if telegram is None:
+        logger.error("Không thể chạy dịch vụ vì TelegramNotifier chưa được khởi tạo thành công")
+        return
     
-    # Lên lịch các công việc
-    schedule_jobs()
+    if market_system is None:
+        logger.error("Không thể chạy dịch vụ vì MarketAnalysisSystem chưa được khởi tạo thành công")
+        return
     
-    # Phân tích thị trường ngay lập tức
-    analyze_market()
+    if binance_api is None:
+        logger.error("Không thể chạy dịch vụ vì BinanceAPI chưa được khởi tạo thành công")
+        return
     
-    # Vòng lặp chính
     try:
+        # Khởi tạo dịch vụ
+        initialize()
+        
+        # Lên lịch các công việc
+        schedule_jobs()
+        
+        # Phân tích thị trường ngay lập tức
+        try:
+            analyze_market()
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích thị trường lần đầu: {str(e)}")
+            logger.debug(traceback.format_exc())
+        
+        # Ghi nhật ký để xác nhận dịch vụ đã sẵn sàng
+        logger.info("Dịch vụ thông báo thị trường đã sẵn sàng và đang chạy vòng lặp chính")
+        
+        # Thêm heartbeat job 
+        schedule.every(5).minutes.do(lambda: logger.info("Heartbeat: Dịch vụ thông báo thị trường đang hoạt động"))
+        
+        # Vòng lặp chính
+        errors_count = 0
+        max_errors = 5
         while True:
-            schedule.run_pending()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("Dịch vụ đã bị dừng bởi người dùng")
+            try:
+                schedule.run_pending()
+                time.sleep(1)
+                errors_count = 0  # Reset lỗi nếu chạy thành công
+            except KeyboardInterrupt:
+                logger.info("Dịch vụ đã bị dừng bởi người dùng")
+                break
+            except Exception as e:
+                errors_count += 1
+                logger.error(f"Lỗi trong vòng lặp chính ({errors_count}/{max_errors}): {str(e)}")
+                logger.debug(traceback.format_exc())
+                
+                # Nếu lỗi nhiều lần liên tiếp, thông báo và thoát
+                if errors_count >= max_errors:
+                    logger.critical(f"Đã xảy ra quá nhiều lỗi ({max_errors}), dịch vụ sẽ dừng để tránh lỗi nghiêm trọng hơn")
+                    
+                    # Gửi thông báo lỗi
+                    try:
+                        telegram.send_message(
+                            message=f"<b>❌ Lỗi nghiêm trọng - dịch vụ thông báo thị trường dừng</b>\n\n"
+                                    f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                                    f"Lỗi: Quá nhiều lỗi liên tiếp trong vòng lặp chính"
+                        )
+                    except Exception:
+                        pass
+                    
+                    break
+                
+                # Nếu có lỗi nhưng chưa đến ngưỡng tối đa, chờ một lúc
+                time.sleep(10)
+                
     except Exception as e:
-        logger.error(f"Lỗi không xác định: {str(e)}")
+        logger.error(f"Lỗi không xác định trong run_service: {str(e)}")
+        logger.debug(traceback.format_exc())
+        
         # Gửi thông báo lỗi
-        telegram.send_message(
-            message=f"<b>❌ Lỗi dịch vụ thông báo thị trường</b>\n\n"
-                    f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                    f"Lỗi: {str(e)}"
-        )
+        try:
+            if telegram:
+                telegram.send_message(
+                    message=f"<b>❌ Lỗi dịch vụ thông báo thị trường</b>\n\n"
+                            f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                            f"Lỗi: {str(e)}"
+                )
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     # Lưu PID vào file

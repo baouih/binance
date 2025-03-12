@@ -547,6 +547,62 @@ class TelegramNotifier:
             logger.debug(traceback.format_exc())
             return False
     
+    def test_connection(self) -> bool:
+        """
+        Kiểm tra kết nối đến Telegram Bot API
+        
+        Returns:
+            bool: True nếu kết nối thành công, False nếu không
+        """
+        if not self.token or not self.chat_id:
+            logger.warning("Không thể kiểm tra kết nối Telegram vì thiếu token hoặc chat_id")
+            return False
+            
+        try:
+            url = f"{self.api_url}/getMe"
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok', False):
+                    bot_info = data.get('result', {})
+                    bot_name = bot_info.get('first_name', 'Unknown')
+                    logger.info(f"Kết nối Telegram thành công. Bot: {bot_name}")
+                    
+                    # Kiểm tra thêm chat_id bằng cách gửi tin nhắn test
+                    try:
+                        test_message = f"<b>🔄 Kiểm tra kết nối</b>\n\n<i>Tin nhắn này xác nhận bot {bot_name} có thể gửi thông báo.</i>"
+                        test_url = f"{self.api_url}/sendMessage"
+                        test_data = {
+                            "chat_id": self.chat_id,
+                            "text": test_message,
+                            "parse_mode": "HTML"
+                        }
+                        
+                        test_response = requests.post(test_url, data=test_data, timeout=10)
+                        if test_response.status_code == 200:
+                            logger.info("Đã gửi tin nhắn kiểm tra thành công")
+                            self.enabled = True
+                            return True
+                        else:
+                            logger.error(f"Gửi tin nhắn kiểm tra thất bại. Mã trạng thái: {test_response.status_code}, Chi tiết: {test_response.text}")
+                            self.enabled = False
+                            return False
+                    except Exception as e:
+                        logger.error(f"Lỗi khi gửi tin nhắn kiểm tra: {str(e)}")
+                        logger.debug(traceback.format_exc())
+                        self.enabled = False
+                        return False
+                
+            logger.error(f"Kiểm tra kết nối Telegram thất bại. Mã trạng thái: {response.status_code}, Phản hồi: {response.text}")
+            self.enabled = False
+            return False
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra kết nối Telegram: {str(e)}")
+            logger.debug(traceback.format_exc())
+            self.enabled = False
+            return False
+    
     def send_startup_notification(self) -> bool:
         """
         Gửi thông báo khởi động hệ thống
