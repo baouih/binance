@@ -7,7 +7,7 @@
 
 // Định nghĩa URL API
 const STATUS_API_URL = '/api/status';
-const SERVICE_API_URL = '/api/services/status';
+const SERVICE_API_URL = '/api/services/market-notifier/status';
 
 // Biến lưu trạng thái update timer
 let statusUpdateTimer = null;
@@ -115,70 +115,92 @@ function updateServiceStatus(showLoading = false) {
  * @param {Object} statusData - Dữ liệu trạng thái từ API
  */
 function updateStatusUI(statusData) {
-    // Cập nhật từng dịch vụ
-    Object.keys(statusData).forEach(service => {
-        const serviceData = statusData[service];
-        const serviceElement = document.querySelector(`.status-item[data-service="${service}"]`);
+    // Debug - ghi ra console để xem dữ liệu
+    console.log('Dữ liệu trạng thái nhận được:', statusData);
+    
+    // Cập nhật trạng thái dịch vụ thông báo thị trường
+    const marketNotifierElement = document.querySelector('.status-item[data-service="market_notifier"]');
+    if (marketNotifierElement) {
+        const statusIndicator = marketNotifierElement.querySelector('.status-indicator');
+        const statusText = marketNotifierElement.querySelector('.status-text');
+        const statusTime = marketNotifierElement.querySelector('.status-time');
         
-        if (serviceElement) {
-            const statusIndicator = serviceElement.querySelector('.status-indicator');
-            const statusText = serviceElement.querySelector('.status-text');
-            const statusTime = serviceElement.querySelector('.status-time');
+        if (statusIndicator) {
+            // Xóa tất cả các lớp trạng thái
+            statusIndicator.className = 'status-indicator';
             
-            if (statusIndicator) {
-                // Xóa tất cả các lớp trạng thái
-                statusIndicator.className = 'status-indicator';
-                
-                // Thêm lớp dựa trên trạng thái
-                let statusClass = 'unknown';
-                if (serviceData.status === 'running') statusClass = 'running';
-                else if (serviceData.status === 'stopped') statusClass = 'stopped';
-                else if (serviceData.status === 'error') statusClass = 'error';
-                
-                statusIndicator.classList.add(statusClass);
-                statusIndicator.setAttribute('data-status', serviceData.status);
+            // Thêm lớp dựa trên trạng thái
+            let statusClass = 'unknown';
+            if (statusData.status === 'running') statusClass = 'running';
+            else if (statusData.status === 'stopped') statusClass = 'stopped';
+            else if (statusData.status === 'error') statusClass = 'error';
+            
+            statusIndicator.classList.add(statusClass);
+            statusIndicator.setAttribute('data-status', statusData.status);
+        }
+        
+        if (statusText) {
+            let statusMessage = 'Không xác định';
+            if (statusData.status === 'running') statusMessage = 'Đang chạy';
+            else if (statusData.status === 'stopped') statusMessage = 'Đã dừng';
+            else if (statusData.status === 'error') statusMessage = 'Lỗi';
+            
+            statusText.textContent = statusMessage;
+        }
+        
+        if (statusTime && statusData.last_check) {
+            // Định dạng thời gian
+            const updateTime = new Date(statusData.last_check);
+            statusTime.textContent = formatTime(updateTime);
+        }
+        
+        // Cập nhật thông tin bổ sung
+        const detailsElement = marketNotifierElement.querySelector('.service-details');
+        if (detailsElement) {
+            detailsElement.innerHTML = ''; // Xóa nội dung cũ
+            
+            // Thêm các chi tiết mới
+            if (statusData.pid) {
+                addDetailItem(detailsElement, 'PID', statusData.pid);
             }
             
-            if (statusText) {
-                let statusMessage = 'Không xác định';
-                if (serviceData.status === 'running') statusMessage = 'Đang chạy';
-                else if (serviceData.status === 'stopped') statusMessage = 'Đã dừng';
-                else if (serviceData.status === 'error') statusMessage = 'Lỗi';
-                
-                statusText.textContent = statusMessage;
+            if (statusData.started_at) {
+                addDetailItem(detailsElement, 'Thời gian khởi động', statusData.started_at);
             }
             
-            if (statusTime && serviceData.last_update) {
-                // Định dạng thời gian
-                const updateTime = new Date(serviceData.last_update);
-                statusTime.textContent = formatTime(updateTime);
-            }
-            
-            // Cập nhật thông tin bổ sung
-            const detailsElement = serviceElement.querySelector('.service-details');
-            if (detailsElement && serviceData.details) {
-                detailsElement.innerHTML = ''; // Xóa nội dung cũ
-                
-                // Thêm các chi tiết mới
-                for (const [key, value] of Object.entries(serviceData.details)) {
-                    const detailItem = document.createElement('div');
-                    detailItem.className = 'detail-item';
-                    
-                    const keyElement = document.createElement('span');
-                    keyElement.className = 'detail-key';
-                    keyElement.textContent = formatDetailKey(key) + ':';
-                    
-                    const valueElement = document.createElement('span');
-                    valueElement.className = 'detail-value';
-                    valueElement.textContent = value;
-                    
-                    detailItem.appendChild(keyElement);
-                    detailItem.appendChild(valueElement);
-                    detailsElement.appendChild(detailItem);
-                }
+            if (statusData.monitored_coins && statusData.monitored_coins.length > 0) {
+                addDetailItem(detailsElement, 'Coin theo dõi', statusData.monitored_coins.join(', '));
             }
         }
-    });
+    }
+
+    // Cập nhật thời gian cập nhật cuối cùng
+    const lastUpdateElement = document.getElementById('last-status-update');
+    if (lastUpdateElement) {
+        const now = new Date();
+        lastUpdateElement.textContent = formatTime(now);
+    }
+}
+
+/**
+ * Thêm một mục chi tiết vào phần tử cha
+ */
+function addDetailItem(parentElement, key, value) {
+    const detailItem = document.createElement('div');
+    detailItem.className = 'detail-item';
+    
+    const keyElement = document.createElement('span');
+    keyElement.className = 'detail-key';
+    keyElement.textContent = formatDetailKey(key) + ':';
+    
+    const valueElement = document.createElement('span');
+    valueElement.className = 'detail-value';
+    valueElement.textContent = value;
+    
+    detailItem.appendChild(keyElement);
+    detailItem.appendChild(valueElement);
+    parentElement.appendChild(detailItem);
+}
     
     // Cập nhật thời gian cập nhật cuối cùng
     const lastUpdateElement = document.getElementById('last-status-update');

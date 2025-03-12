@@ -60,7 +60,8 @@ market_notifier_status = {
     'started_at': None,
     'last_check': None,
     'monitored_coins': [],
-    'last_notification': None
+    'last_notification': None,
+    'status': 'stopped'  # Thêm trường status cho JavaScript
 }
 
 # Kiểm tra dịch vụ thông báo thị trường khi khởi động
@@ -75,6 +76,7 @@ def check_existing_market_notifier():
                 if psutil.pid_exists(pid):
                     logger.info(f"Phát hiện dịch vụ thông báo thị trường đang chạy với PID {pid}")
                     market_notifier_status['running'] = True
+                    market_notifier_status['status'] = 'running'
                     market_notifier_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     market_notifier_status['pid'] = pid
                     market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -100,6 +102,12 @@ def check_market_notifier_status():
                 market_notifier_status.update(status_data)
                 market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
+                # Cập nhật trạng thái status (cho JavaScript)
+                if market_notifier_status['running']:
+                    market_notifier_status['status'] = 'running'
+                else:
+                    market_notifier_status['status'] = 'stopped'
+                
                 # Log thông tin
                 if market_notifier_status['running']:
                     logger.info(f"Dịch vụ thông báo thị trường đang hoạt động (PID: {market_notifier_status['pid']})")
@@ -112,10 +120,19 @@ def check_market_notifier_status():
                     restart_notifier = subprocess.run(['./start_market_notifier.sh'], shell=True, capture_output=True, text=True)
                     if restart_notifier.returncode == 0:
                         logger.info("Đã khởi động lại dịch vụ thông báo thị trường thành công")
+                        # Cập nhật trạng thái sau khi khởi động thành công
+                        market_notifier_status['running'] = True
+                        market_notifier_status['status'] = 'running'
+                        # Đọc PID mới từ file
+                        if os.path.exists('market_notifier.pid'):
+                            with open('market_notifier.pid', 'r') as f:
+                                new_pid = int(f.read().strip())
+                                market_notifier_status['pid'] = new_pid
+                                market_notifier_status['started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     else:
                         logger.error(f"Không thể khởi động lại dịch vụ thông báo thị trường: {restart_notifier.stderr}")
-            except json.JSONDecodeError:
-                logger.error("Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py")
+            except json.JSONDecodeError as e:
+                logger.error(f"Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py: {str(e)}")
         else:
             logger.error(f"Lỗi khi chạy check_market_notifier.py: {result.stderr}")
     except Exception as e:
@@ -1725,8 +1742,9 @@ def get_market_notifier_status_api():
                 status_data = json.loads(result.stdout)
                 market_notifier_status.update(status_data)
                 market_notifier_status['last_check'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            except json.JSONDecodeError:
-                logger.error("Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py")
+                logger.debug(f"Cập nhật thành công trạng thái dịch vụ thông báo thị trường: {status_data}")
+            except json.JSONDecodeError as e:
+                logger.error(f"Không thể phân tích dữ liệu trạng thái từ check_market_notifier.py: {str(e)}")
         else:
             logger.error(f"Lỗi khi thực thi check_market_notifier.py: {result.stderr}")
     except Exception as e:
