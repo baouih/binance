@@ -536,10 +536,25 @@ def scan_trading_opportunities():
         return
     
     try:
+        # Kiểm tra xem MarketAnalyzer có phương thức scan_trading_opportunities không
+        if not hasattr(market_analyzer, 'scan_trading_opportunities'):
+            logger.error("Market Analyzer không có phương thức scan_trading_opportunities")
+            # Hiển thị các thuộc tính và phương thức của đối tượng
+            logger.info(f"Các phương thức của Market Analyzer: {dir(market_analyzer)}")
+            return
+            
+        logger.info("Bắt đầu quét cơ hội giao dịch với Market Analyzer...")
+        
         # Gọi hàm quét cơ hội giao dịch từ Market Analyzer
         opportunities = market_analyzer.scan_trading_opportunities()
         
-        if not opportunities or not opportunities.get('opportunities', []):
+        logger.info(f"Kết quả quét cơ hội: {opportunities}")
+        
+        if not opportunities:
+            logger.info("Không có kết quả từ quét cơ hội giao dịch")
+            return
+            
+        if not opportunities.get('opportunities', []):
             logger.info("Không tìm thấy cơ hội giao dịch nào")
             return
         
