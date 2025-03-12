@@ -22,6 +22,7 @@ import logging
 import datetime
 import threading
 import traceback
+import random
 from typing import Dict, List, Any, Optional, Union, Tuple
 from collections import defaultdict
 
@@ -70,13 +71,14 @@ class DetailedTradeNotifications:
         # Thông tin theo dõi
         self.last_notification_time = defaultdict(lambda: datetime.datetime.min)
         self.notification_cooldowns = {
-            'trade_signal': 60,  # giây
+            'trade_signal': 60 * 15,  # 15 phút giữa các tín hiệu giao dịch
             'market_alert': 300,  # giây
             'system_status': 1800,  # giây
             'trailing_stop': 300,  # giây
             'position_update': 600,  # giây
             'no_trade_reasons': 1800,  # giây
             'strategy_change': 300,  # giây
+            'trade_decision': 60 * 15,  # 15 phút giữa các quyết định giao dịch
         }
         
         # Thông tin các vị thế đang mở
@@ -85,6 +87,13 @@ class DetailedTradeNotifications:
         
         # Dữ liệu thị trường
         self.market_data = {}
+        
+        # Lưu trữ tín hiệu và quyết định giao dịch gần nhất
+        self.last_signals = {}  # {symbol: {'signal': signal, 'timestamp': timestamp, 'timeframe': timeframe}}
+        self.last_decisions = {}  # {symbol: {'decision': decision, 'timestamp': timestamp, 'reason': reason}}
+        
+        # Ngưỡng độ tin cậy tối thiểu cho tín hiệu
+        self.min_signal_confidence = 70  # Chỉ thông báo và quyết định với tín hiệu có độ tin cậy >= 70%
         
         logger.info("Đã khởi tạo hệ thống thông báo chi tiết")
     
@@ -618,6 +627,227 @@ class DetailedTradeNotifications:
                 return False
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo đóng vị thế: {str(e)}")
+            return False
+    
+    def notify_trade_decision(self, symbol: str, signal: str, price: float, analysis: Dict) -> bool:
+        """
+        Gửi thông báo quyết định giao dịch
+        
+        Args:
+            symbol (str): Ký hiệu cặp giao dịch
+            signal (str): Tín hiệu giao dịch (BUY/SELL/NEUTRAL)
+            price (float): Giá hiện tại
+            analysis (Dict): Kết quả phân tích
+            
+        Returns:
+            bool: True nếu thành công, False nếu không
+        """
+        try:
+            if not self._check_notification_enabled('trade_signal'):
+                return False
+                
+            # Kiểm tra cooldown và ngăn chặn thông báo mâu thuẫn
+            if not self._check_cooldown('trade_decision'):
+                logger.info(f"Bỏ qua thông báo quyết định giao dịch cho {symbol} do đang trong thời gian chờ")
+                return False
+            
+            # Kiểm tra xem signal có đủ mạnh để xem xét không
+            current_signal_strength = analysis.get('signal_strength', 0)
+            if not current_signal_strength or current_signal_strength < self.min_signal_confidence:
+                if signal in ["BUY", "STRONG_BUY", "SELL", "STRONG_SELL"]:
+                    logger.info(f"Bỏ qua thông báo quyết định giao dịch cho {symbol} do tín hiệu yếu ({current_signal_strength})")
+                    return False
+            
+            # Kiểm tra quyết định trước đó để đảm bảo tính nhất quán
+            now = datetime.datetime.now()
+            if symbol in self.last_decisions:
+                last_decision = self.last_decisions[symbol]
+                last_time = last_decision.get('timestamp')
+                last_decision_type = last_decision.get('decision')
+                
+                # Nếu quyết định trước đó trong vòng 30 phút và trái ngược với hiện tại, 
+                # thì bỏ qua để tránh gửi tín hiệu mâu thuẫn
+                if last_time and (now - last_time).total_seconds() < 30 * 60:  # 30 phút
+                    should_trade = signal in ["BUY", "STRONG_BUY", "SELL", "STRONG_SELL"]
+                    was_trade = last_decision_type == "TRADE"
+                    
+                    if should_trade != was_trade:
+                        logger.warning(
+                            f"Phát hiện quyết định mâu thuẫn cho {symbol}: "
+                            f"trước đó {last_decision_type} ({last_time.strftime('%H:%M:%S')}), "
+                            f"hiện tại {'TRADE' if should_trade else 'NO_TRADE'}"
+                        )
+                        return False
+            
+            logger.info(f"Đang gửi thông báo quyết định giao dịch cho {symbol}")
+            
+            # Tính toán các thông số giao dịch
+            current_signal_strength = analysis.get('signal_strength', 0) 
+            if not current_signal_strength:  # Nếu không có, sử dụng giá trị mặc định
+                current_signal_strength = 65  # Giá trị mặc định trung bình
+            
+            volatility = analysis.get('volatility', 2.0)  # Giá trị volatility mặc định
+            market_condition = analysis.get('market_condition', 'NORMAL')
+            
+            risk_reward = analysis.get('risk_reward', 0.0)
+            if not risk_reward:
+                if signal in ["BUY", "STRONG_BUY"]:
+                    # Tính toán risk/reward cho lệnh mua
+                    potential_profit = analysis.get('resistance', price * 1.05) - price
+                    potential_loss = price - analysis.get('support', price * 0.95)
+                    risk_reward = potential_profit / potential_loss if potential_loss > 0 else 0
+                elif signal in ["SELL", "STRONG_SELL"]:
+                    # Tính toán risk/reward cho lệnh bán
+                    potential_profit = price - analysis.get('support', price * 0.95)
+                    potential_loss = analysis.get('resistance', price * 1.05) - price
+                    risk_reward = potential_profit / potential_loss if potential_loss > 0 else 0
+                else:
+                    risk_reward = 0.8  # Giá trị thấp cho tín hiệu trung lập
+            
+            # Xác định có nên vào lệnh hay không
+            min_signal_strength = 70  # Điểm tối thiểu để vào lệnh
+            min_risk_reward = 1.5  # Tỷ lệ risk/reward tối thiểu
+            
+            should_trade = False
+            trade_reason = None
+            no_trade_reason = None
+            
+            if signal in ["BUY", "STRONG_BUY", "SELL", "STRONG_SELL"]:
+                # Kiểm tra đủ điều kiện vào lệnh
+                if current_signal_strength >= min_signal_strength and risk_reward >= min_risk_reward:
+                    should_trade = True
+                    trade_reason = "Tín hiệu mạnh và tỷ lệ R/R tốt"
+                elif current_signal_strength < min_signal_strength:
+                    no_trade_reason = f"Độ mạnh tín hiệu thấp ({current_signal_strength}/100, cần ≥ {min_signal_strength})"
+                elif risk_reward < min_risk_reward:
+                    no_trade_reason = f"Tỷ lệ Risk/Reward thấp ({risk_reward:.2f}, cần ≥ {min_risk_reward})"
+            else:
+                no_trade_reason = "Tín hiệu không rõ ràng hoặc trung lập"
+            
+            # Xác định biểu tượng cho tín hiệu
+            if signal in ["BUY", "STRONG_BUY"]:
+                signal_emoji = "🟢"
+                signal_text = "LONG"
+                direction = "LONG"
+            elif signal in ["SELL", "STRONG_SELL"]:
+                signal_emoji = "🔴"
+                signal_text = "SHORT"
+                direction = "SHORT"
+            else:
+                signal_emoji = "⚪"
+                signal_text = "TRUNG LẬP"
+                direction = "NEUTRAL"
+                
+            # Lưu quyết định vào bộ nhớ để theo dõi mâu thuẫn
+            self.last_decisions[symbol] = {
+                'decision': "TRADE" if should_trade else "NO_TRADE",
+                'timestamp': now,
+                'signal': signal,
+                'signal_strength': current_signal_strength,
+                'risk_reward': risk_reward,
+                'reason': trade_reason if should_trade else no_trade_reason
+            }
+            
+            # Tạo nội dung thông báo
+            message = f"{signal_emoji} <b>QUYẾT ĐỊNH GIAO DỊCH - {symbol}</b> {signal_emoji}\n\n"
+            
+            if should_trade:
+                message += f"✅ <b>QUYẾT ĐỊNH:</b> VÀO LỆNH {signal_text}\n\n"
+                
+                message += "<b>CHI TIẾT LỆNH</b>\n"
+                message += f"💰 <b>Giá vào lệnh:</b> {price:.4f}\n"
+                message += f"📊 <b>Độ mạnh tín hiệu:</b> {current_signal_strength}/100\n"
+                message += f"⚖️ <b>Risk/Reward:</b> {risk_reward:.2f}\n"
+                
+                # Thêm ngưỡng TP/SL nếu có
+                take_profit = 0.0
+                stop_loss = 0.0
+                
+                if direction == "LONG":
+                    take_profit = price * (1 + 0.05)  # Mẫu: 5% lợi nhuận
+                    stop_loss = price * (1 - 0.03)    # Mẫu: 3% lỗ
+                elif direction == "SHORT":
+                    take_profit = price * (1 - 0.05)  # Mẫu: 5% lợi nhuận
+                    stop_loss = price * (1 + 0.03)    # Mẫu: 3% lỗ
+                
+                if take_profit > 0 and stop_loss > 0:
+                    message += f"🎯 <b>Take Profit:</b> {take_profit:.4f}\n"
+                    message += f"🛑 <b>Stop Loss:</b> {stop_loss:.4f}\n\n"
+                
+                message += f"<b>LÝ DO VÀO LỆNH</b>\n"
+                
+                # Thêm các lý do vào lệnh
+                reasons = []
+                if current_signal_strength >= 80:
+                    reasons.append("Tín hiệu kỹ thuật mạnh")
+                    
+                if risk_reward >= 2.0:
+                    reasons.append(f"Tỷ lệ Risk/Reward tốt ({risk_reward:.2f})")
+                    
+                if "trend" in analysis and analysis["trend"] == "UPTREND" and direction == "LONG":
+                    reasons.append("Xu hướng tăng đang mạnh")
+                elif "trend" in analysis and analysis["trend"] == "DOWNTREND" and direction == "SHORT":
+                    reasons.append("Xu hướng giảm đang mạnh")
+                
+                if "volume" in analysis and analysis["volume"] > 1.5:
+                    reasons.append(f"Khối lượng giao dịch cao (x{analysis['volume']:.1f})")
+                
+                # Thêm các lý do vào thông báo
+                if reasons:
+                    for i, reason in enumerate(reasons, 1):
+                        message += f"{i}. {reason}\n"
+                else:
+                    message += "• Tín hiệu kỹ thuật\n"
+                    
+            else:
+                message += f"❌ <b>QUYẾT ĐỊNH:</b> KHÔNG VÀO LỆNH\n\n"
+                
+                message += "<b>LÝ DO KHÔNG VÀO LỆNH</b>\n"
+                
+                # Thêm các lý do không vào lệnh
+                reasons = []
+                if current_signal_strength < min_signal_strength:
+                    reasons.append(f"Độ mạnh tín hiệu thấp ({current_signal_strength}/100, cần ≥ {min_signal_strength})")
+                    
+                if risk_reward < min_risk_reward:
+                    reasons.append(f"Tỷ lệ Risk/Reward thấp ({risk_reward:.2f}, cần ≥ {min_risk_reward})")
+                    
+                if volatility > 3.0:
+                    reasons.append(f"Độ biến động quá cao ({volatility:.2f}%)")
+                    
+                if market_condition != "NORMAL":
+                    reasons.append(f"Điều kiện thị trường bất thường ({market_condition})")
+                    
+                if signal not in ["BUY", "STRONG_BUY", "SELL", "STRONG_SELL"]:
+                    reasons.append("Tín hiệu không rõ ràng hoặc trung lập")
+                
+                # Thêm các lý do vào thông báo
+                if reasons:
+                    for i, reason in enumerate(reasons, 1):
+                        message += f"{i}. {reason}\n"
+                else:
+                    message += "• Không đáp ứng tiêu chí vào lệnh\n"
+            
+            # Thêm thông tin thêm
+            message += "\n<b>THÔNG TIN THÊM</b>\n"
+            message += f"💵 <b>Giá hiện tại:</b> {price:.4f}\n"
+            message += f"📈 <b>Xu hướng:</b> {analysis.get('trend', 'N/A')}\n"
+            message += f"⏱️ <b>Khung thời gian:</b> {analysis.get('timeframe', '4h')}\n\n"
+            
+            # Thêm thông tin thời gian
+            message += f"<i>⏱️ {datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y')}</i>"
+            
+            # Gửi thông báo
+            result = self.telegram.send_message(message, parse_mode="HTML")
+            
+            if result:
+                logger.info(f"Đã gửi thông báo quyết định giao dịch cho {symbol}")
+                return True
+            else:
+                logger.error(f"Lỗi khi gửi thông báo quyết định giao dịch cho {symbol}")
+                return False
+        except Exception as e:
+            logger.error(f"Lỗi khi xử lý thông báo quyết định giao dịch: {str(e)}")
             return False
     
     def _create_position_closed_message(self, symbol: str, position: Dict) -> str:
@@ -1921,6 +2151,53 @@ class DetailedTradeNotifications:
             
             if result:
                 logger.info(f"Đã gửi thông báo phân tích thị trường cho {symbol}")
+                
+                # Gửi thêm thông báo quyết định giao dịch
+                try:
+                    # Chuẩn bị dữ liệu cho quyết định giao dịch
+                    signal_for_decision = signal
+                    price_for_decision = price
+                    
+                    # Phân tích thêm các thành phần cần thiết cho quyết định giao dịch
+                    analysis_for_decision = {
+                        'trend': trend,
+                        'signal': signal_for_decision,
+                        'timeframe': analysis_data.get('timeframe', '4h'),
+                        'current_price': price_for_decision,
+                        'signal_strength': analysis_data.get('confidence', 0),
+                        'volatility': analysis_data.get('volatility', 2.0),
+                        'market_condition': analysis_data.get('market_regime', 'NORMAL')
+                    }
+                    
+                    # Thêm các ngưỡng hỗ trợ/kháng cự nếu có
+                    if 'support' in analysis_data:
+                        analysis_for_decision['support'] = analysis_data['support']
+                    if 'resistance' in analysis_data:
+                        analysis_for_decision['resistance'] = analysis_data['resistance']
+                    
+                    # Tính toán Risk/Reward
+                    support = analysis_data.get('support', price_for_decision * 0.95)
+                    resistance = analysis_data.get('resistance', price_for_decision * 1.05)
+                    
+                    if signal_for_decision in ["BUY", "STRONG_BUY"]:
+                        potential_profit = resistance - price_for_decision
+                        potential_loss = price_for_decision - support
+                        risk_reward = potential_profit / potential_loss if potential_loss > 0 else 0
+                    elif signal_for_decision in ["SELL", "STRONG_SELL"]:
+                        potential_profit = price_for_decision - support
+                        potential_loss = resistance - price_for_decision
+                        risk_reward = potential_profit / potential_loss if potential_loss > 0 else 0
+                    else:
+                        risk_reward = 0.8
+                    
+                    analysis_for_decision['risk_reward'] = risk_reward
+                    
+                    # Gửi thông báo quyết định giao dịch
+                    logger.info(f"Gửi thông báo quyết định giao dịch cho {symbol}")
+                    self.notify_trade_decision(symbol, signal_for_decision, price_for_decision, analysis_for_decision)
+                except Exception as decision_error:
+                    logger.error(f"Lỗi khi gửi thông báo quyết định giao dịch: {str(decision_error)}")
+                
                 return True
             else:
                 logger.error(f"Lỗi khi gửi thông báo phân tích thị trường cho {symbol}")

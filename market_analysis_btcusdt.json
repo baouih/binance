@@ -1,67 +1,67 @@
 {
     "symbol": "BTCUSDT",
-    "current_price": 81547.5,
+    "current_price": 82252.2,
     "timeframe": "1h",
-    "timestamp": "2025-03-12T07:24:25.689896",
+    "timestamp": "2025-03-12T08:39:11.839872",
     "summary": {
         "overall_signal": "BUY",
-        "confidence": 85,
-        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 85%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (gi\u1ea3m), trung h\u1ea1n (gi\u1ea3m). M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 81168.50 (-0.46%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 81673.00 (0.15%). Gi\u00e1 m\u1ee5c ti\u00eau 81673.00 (t\u0103ng 0.15%). Ph\u00e1t hi\u1ec7n m\u1eabu n\u1ebfn: Doji, Shooting Star. ",
+        "confidence": 76,
+        "description": "T\u00edn hi\u1ec7u MUA v\u1edbi \u0111\u1ed9 tin c\u1eady 76%. C\u00e1c ch\u1ec9 b\u00e1o k\u1ef9 thu\u1eadt cho th\u1ea5y xu h\u01b0\u1edbng t\u0103ng. Xu h\u01b0\u1edbng ng\u1eafn h\u1ea1n (t\u0103ng). M\u1ee9c h\u1ed7 tr\u1ee3 g\u1ea7n nh\u1ea5t \u1edf 82178.00 (-0.09%). M\u1ee9c kh\u00e1ng c\u1ef1 g\u1ea7n nh\u1ea5t \u1edf 82299.72 (0.06%). Gi\u00e1 m\u1ee5c ti\u00eau 82299.72 (t\u0103ng 0.06%). Ph\u00e1t hi\u1ec7n m\u1eabu n\u1ebfn: Doji. ",
         "time_horizons": {
-            "short_term": "STRONG_SELL",
-            "medium_term": "SELL",
+            "short_term": "STRONG_BUY",
+            "medium_term": "NEUTRAL",
             "long_term": "NEUTRAL"
         },
         "price_prediction": {
-            "support": 81168.5,
-            "resistance": 81673.0,
-            "target": 81673.0
+            "support": 82178.0,
+            "resistance": 82299.7176,
+            "target": 82299.7176
         }
     },
     "detailed_analysis": {
         "1h": {
-            "current_price": 81547.5,
+            "current_price": 82252.2,
             "trend_analysis": {
                 "primary_trend": "NEUTRAL",
                 "secondary_trend": "DOWNTREND",
                 "trend_strength": 0,
                 "support_levels": [
-                    80273.8,
-                    79450.2,
-                    78000.0
+                    82159.2,
+                    81457.3,
+                    81362.5
                 ],
                 "resistance_levels": [
-                    81673.0,
                     82585.6,
-                    83134.6
+                    83134.6,
+                    83192.0
                 ],
-                "key_level": 81258.9
+                "key_level": 82261.6
             },
             "volatility_analysis": {
-                "current_volatility": 0.801019949814731,
+                "current_volatility": 0.7684717326883304,
                 "volatility_state": "NORMAL",
                 "volatility_change": "STABLE",
-                "atr": 650.9000000000025,
-                "atr_percent": 0.801019949814731,
-                "bollinger_width": 0.04645444012153338,
+                "atr": 632.1571428571436,
+                "atr_percent": 0.7684717326883304,
+                "bollinger_width": 0.044874259287082385,
                 "volatility_score": 1.7
             },
             "momentum_analysis": {
-                "primary_momentum": "BEARISH",
-                "momentum_strength": 1.5,
+                "primary_momentum": "NEUTRAL",
+                "momentum_strength": 0.5,
                 "momentum_change": "DECREASING",
-                "rsi": 50.22794749906705,
-                "macd": 236.8850514487276,
-                "stochastic": 26.354452168479895,
-                "momentum_score": -1.5
+                "rsi": 44.16145605161498,
+                "macd": 285.77274626720464,
+                "stochastic": 38.89771887713088,
+                "momentum_score": -0.5
             },
             "volume_analysis": {
                 "volume_state": "BELOW_AVERAGE",
                 "volume_trend": "DECREASING",
                 "money_flow": "INFLOW",
-                "volume_avg": 398338.42929999996,
-                "volume_change": -64.16486974383919,
-                "volume_score": -1.5
+                "volume_avg": 407400.89369999996,
+                "volume_change": -34.70340440738212,
+                "volume_score": 0.5
             },
             "pattern_analysis": {
                 "doji": {
