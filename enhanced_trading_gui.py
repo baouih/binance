@@ -245,6 +245,7 @@ class EnhancedTradingGUI(QMainWindow):
         self.create_positions_tab()
         self.create_market_analysis_tab()
         self.create_settings_tab()
+        self.create_system_management_tab()
         
         # Tạo thanh trạng thái
         self.create_status_bar()
@@ -870,6 +871,156 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thêm tab vào container
         self.tab_widget.addTab(settings_tab, "Cài đặt")
+    
+    def create_system_management_tab(self):
+        """Tạo tab quản lý hệ thống"""
+        system_tab = QWidget()
+        layout = QVBoxLayout(system_tab)
+        
+        # Khởi tạo trạng thái các dịch vụ nếu chưa có
+        if not hasattr(self, 'service_status'):
+            self.service_status = {
+                "market_analyzer": False,
+                "trading_system": False,
+                "auto_sltp": False,
+                "telegram_notifier": True
+            }
+        
+        # Tạo phần quản lý các dịch vụ
+        services_group = QGroupBox("Quản lý dịch vụ")
+        services_layout = QVBoxLayout(services_group)
+        
+        # Market Analyzer Service
+        market_analyzer_layout = QHBoxLayout()
+        market_analyzer_label = QLabel("Market Analyzer:")
+        self.market_analyzer_status = QLabel("Chưa khởi động")
+        self.market_analyzer_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_market_analyzer_button = QPushButton("Khởi động")
+        self.start_market_analyzer_button.clicked.connect(lambda: self.start_service("market_analyzer"))
+        self.start_market_analyzer_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_market_analyzer_button = QPushButton("Dừng")
+        self.stop_market_analyzer_button.clicked.connect(lambda: self.stop_service("market_analyzer"))
+        self.stop_market_analyzer_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_market_analyzer_button.setEnabled(False)
+        
+        market_analyzer_layout.addWidget(market_analyzer_label)
+        market_analyzer_layout.addWidget(self.market_analyzer_status)
+        market_analyzer_layout.addWidget(self.start_market_analyzer_button)
+        market_analyzer_layout.addWidget(self.stop_market_analyzer_button)
+        
+        services_layout.addLayout(market_analyzer_layout)
+        
+        # Trading System Service
+        trading_system_layout = QHBoxLayout()
+        trading_system_label = QLabel("Trading System:")
+        self.trading_system_status = QLabel("Chưa khởi động")
+        self.trading_system_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_trading_system_button = QPushButton("Khởi động")
+        self.start_trading_system_button.clicked.connect(lambda: self.start_service("trading_system"))
+        self.start_trading_system_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_trading_system_button = QPushButton("Dừng")
+        self.stop_trading_system_button.clicked.connect(lambda: self.stop_service("trading_system"))
+        self.stop_trading_system_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_trading_system_button.setEnabled(False)
+        
+        trading_system_layout.addWidget(trading_system_label)
+        trading_system_layout.addWidget(self.trading_system_status)
+        trading_system_layout.addWidget(self.start_trading_system_button)
+        trading_system_layout.addWidget(self.stop_trading_system_button)
+        
+        services_layout.addLayout(trading_system_layout)
+        
+        # Auto SLTP Service
+        auto_sltp_layout = QHBoxLayout()
+        auto_sltp_label = QLabel("Auto SLTP:")
+        self.auto_sltp_status = QLabel("Chưa khởi động")
+        self.auto_sltp_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_auto_sltp_button = QPushButton("Khởi động")
+        self.start_auto_sltp_button.clicked.connect(lambda: self.start_service("auto_sltp"))
+        self.start_auto_sltp_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_auto_sltp_button = QPushButton("Dừng")
+        self.stop_auto_sltp_button.clicked.connect(lambda: self.stop_service("auto_sltp"))
+        self.stop_auto_sltp_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_auto_sltp_button.setEnabled(False)
+        
+        auto_sltp_layout.addWidget(auto_sltp_label)
+        auto_sltp_layout.addWidget(self.auto_sltp_status)
+        auto_sltp_layout.addWidget(self.start_auto_sltp_button)
+        auto_sltp_layout.addWidget(self.stop_auto_sltp_button)
+        
+        services_layout.addLayout(auto_sltp_layout)
+        
+        # Telegram Notifier Service
+        telegram_notifier_layout = QHBoxLayout()
+        telegram_notifier_label = QLabel("Telegram Notifier:")
+        self.telegram_notifier_status = QLabel("Đang chạy")
+        self.telegram_notifier_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+        
+        self.start_telegram_notifier_button = QPushButton("Khởi động")
+        self.start_telegram_notifier_button.clicked.connect(lambda: self.start_service("telegram_notifier"))
+        self.start_telegram_notifier_button.setStyleSheet("background-color: #22C55E; color: white;")
+        self.start_telegram_notifier_button.setEnabled(False)
+        
+        self.stop_telegram_notifier_button = QPushButton("Dừng")
+        self.stop_telegram_notifier_button.clicked.connect(lambda: self.stop_service("telegram_notifier"))
+        self.stop_telegram_notifier_button.setStyleSheet("background-color: #EF4444; color: white;")
+        
+        telegram_notifier_layout.addWidget(telegram_notifier_label)
+        telegram_notifier_layout.addWidget(self.telegram_notifier_status)
+        telegram_notifier_layout.addWidget(self.start_telegram_notifier_button)
+        telegram_notifier_layout.addWidget(self.stop_telegram_notifier_button)
+        
+        services_layout.addLayout(telegram_notifier_layout)
+        
+        # Nút khởi động tất cả dịch vụ
+        start_all_layout = QHBoxLayout()
+        
+        self.start_all_services_button = QPushButton("Khởi động tất cả dịch vụ")
+        self.start_all_services_button.clicked.connect(self.start_all_services)
+        self.start_all_services_button.setStyleSheet("background-color: #22C55E; color: white; font-weight: bold; padding: 8px;")
+        
+        self.stop_all_services_button = QPushButton("Dừng tất cả dịch vụ")
+        self.stop_all_services_button.clicked.connect(self.stop_all_services)
+        self.stop_all_services_button.setStyleSheet("background-color: #EF4444; color: white; font-weight: bold; padding: 8px;")
+        
+        start_all_layout.addWidget(self.start_all_services_button)
+        start_all_layout.addWidget(self.stop_all_services_button)
+        
+        services_layout.addLayout(start_all_layout)
+        
+        layout.addWidget(services_group)
+        
+        # Tạo phần nhật ký hệ thống
+        logs_group = QGroupBox("Nhật ký hệ thống")
+        logs_layout = QVBoxLayout(logs_group)
+        
+        self.system_logs = QTextEdit()
+        self.system_logs.setReadOnly(True)
+        self.system_logs.setMinimumHeight(200)
+        logs_layout.addWidget(self.system_logs)
+        
+        refresh_logs_layout = QHBoxLayout()
+        self.refresh_logs_button = QPushButton("Cập nhật nhật ký")
+        self.refresh_logs_button.clicked.connect(self.refresh_system_logs)
+        
+        self.clear_logs_button = QPushButton("Xóa nhật ký")
+        self.clear_logs_button.clicked.connect(self.clear_system_logs)
+        
+        refresh_logs_layout.addWidget(self.refresh_logs_button)
+        refresh_logs_layout.addWidget(self.clear_logs_button)
+        
+        logs_layout.addLayout(refresh_logs_layout)
+        
+        layout.addWidget(logs_group)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(system_tab, "Quản lý hệ thống")
     
     def create_status_bar(self):
         """Tạo thanh trạng thái"""
