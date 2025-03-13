@@ -1,0 +1,12 @@
+{
+    "api_mode": "testnet",
+    "risk_percentage": 1.0,
+    "max_leverage": 5,
+    "auto_trading": false,
+    "market_analysis": true,
+    "sltp_management": true,
+    "trailing_stop": true,
+    "telegram_notifications": true,
+    "update_interval": 30,
+    "last_check_update": null
+}
