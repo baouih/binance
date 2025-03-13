@@ -341,21 +341,63 @@ def run_service():
                 logger.error(f"Lỗi trong vòng lặp chính ({errors_count}/{max_errors}): {str(e)}")
                 logger.debug(traceback.format_exc())
                 
-                # Nếu lỗi nhiều lần liên tiếp, thông báo và thoát
+                # Nếu lỗi nhiều lần liên tiếp, thử khởi động lại dịch vụ
                 if errors_count >= max_errors:
-                    logger.critical(f"Đã xảy ra quá nhiều lỗi ({max_errors}), dịch vụ sẽ dừng để tránh lỗi nghiêm trọng hơn")
+                    logger.critical(f"Đã xảy ra quá nhiều lỗi ({max_errors}), đang thử khởi động lại dịch vụ thông báo thị trường")
                     
                     # Gửi thông báo lỗi
                     try:
                         telegram.send_message(
-                            message=f"<b>❌ Lỗi nghiêm trọng - dịch vụ thông báo thị trường dừng</b>\n\n"
+                            message=f"<b>⚠️ Cảnh báo - Đang khởi động lại dịch vụ thông báo thị trường</b>\n\n"
                                     f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                                    f"Lỗi: Quá nhiều lỗi liên tiếp trong vòng lặp chính"
+                                    f"Lý do: Quá nhiều lỗi liên tiếp trong vòng lặp chính\n"
+                                    f"Hành động: Đang thử khởi động lại các tác vụ theo lịch"
                         )
                     except Exception:
                         pass
                     
-                    break
+                    try:
+                        # Xóa tất cả công việc theo lịch hiện tại
+                        schedule.clear()
+                        
+                        # Khởi tạo lại dịch vụ
+                        initialize()
+                        
+                        # Lên lịch lại các công việc
+                        schedule_jobs()
+                        
+                        # Thêm lại heartbeat
+                        schedule.every(5).minutes.do(lambda: logger.info("Heartbeat: Dịch vụ thông báo thị trường đã được khởi động lại và đang hoạt động"))
+                        
+                        # Reset bộ đếm lỗi
+                        errors_count = 0
+                        
+                        logger.info("Đã khởi động lại dịch vụ thông báo thị trường thành công")
+                        
+                        # Thông báo khởi động lại thành công
+                        try:
+                            telegram.send_message(
+                                message=f"<b>✅ Thành công - Dịch vụ thông báo thị trường đã được khởi động lại</b>\n\n"
+                                        f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                            )
+                        except Exception:
+                            pass
+                            
+                    except Exception as restart_error:
+                        logger.critical(f"Không thể khởi động lại dịch vụ: {restart_error}", exc_info=True)
+                        
+                        # Gửi thông báo lỗi khởi động lại
+                        try:
+                            telegram.send_message(
+                                message=f"<b>❌ Lỗi nghiêm trọng - Không thể khởi động lại dịch vụ thông báo thị trường</b>\n\n"
+                                        f"Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                                        f"Lỗi: {str(restart_error)}\n"
+                                        f"Hành động: Dịch vụ sẽ dừng để tránh lỗi nghiêm trọng hơn"
+                            )
+                        except Exception:
+                            pass
+                        
+                        break
                 
                 # Nếu có lỗi nhưng chưa đến ngưỡng tối đa, chờ một lúc
                 time.sleep(10)

@@ -663,13 +663,49 @@ def run_scheduler():
     
     logger.info("Bắt đầu chạy bộ lập lịch...")
     
+    # Thêm tác vụ heartbeat để kiểm tra trạng thái scheduler
+    schedule.every(2).minutes.do(lambda: logger.info("Heartbeat: Scheduler đang hoạt động bình thường"))
+    
+    # Biến theo dõi lỗi liên tiếp
+    consecutive_errors = 0
+    max_consecutive_errors = 5
+    
     while running:
         try:
             schedule.run_pending()
             time.sleep(1)
+            
+            # Reset bộ đếm lỗi nếu chạy thành công
+            if consecutive_errors > 0:
+                consecutive_errors = 0
+                logger.info("Scheduler đã phục hồi sau lỗi trước đó")
+                
         except Exception as e:
-            logger.error(f"Lỗi khi chạy bộ lập lịch: {e}")
-            time.sleep(5)  # Đợi 5 giây trước khi thử lại
+            consecutive_errors += 1
+            logger.error(f"Lỗi khi chạy bộ lập lịch ({consecutive_errors}/{max_consecutive_errors}): {e}", exc_info=True)
+            
+            # Nếu quá nhiều lỗi liên tiếp, thử khởi động lại scheduler
+            if consecutive_errors >= max_consecutive_errors:
+                logger.warning("Quá nhiều lỗi liên tiếp, đang thử khởi động lại scheduler...")
+                try:
+                    # Xóa tất cả công việc hiện tại
+                    schedule.clear()
+                    
+                    # Khởi tạo lại các dịch vụ
+                    setup_services()
+                    
+                    # Thêm lại heartbeat
+                    schedule.every(2).minutes.do(lambda: logger.info("Heartbeat: Scheduler đã được khởi động lại"))
+                    
+                    # Reset bộ đếm lỗi
+                    consecutive_errors = 0
+                    logger.info("Đã khởi động lại scheduler thành công")
+                    
+                except Exception as restart_error:
+                    logger.critical(f"Không thể khởi động lại scheduler: {restart_error}", exc_info=True)
+            
+            # Đợi trước khi thử lại để tránh sử dụng quá nhiều CPU
+            time.sleep(5)
 
 
 def main():
