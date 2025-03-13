@@ -26,6 +26,14 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
 
+# Import các modules cấu hình
+try:
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from configs.load_configs import load_all_configs, verify_configs, get_config_status_text
+    logger.info("Đã import thành công module cấu hình")
+except ImportError as e:
+    logger.error(f"Lỗi khi import module cấu hình: {str(e)}")
+
 # Thiết lập logging
 logger = logging.getLogger("enhanced_trading_gui")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1886,6 +1894,22 @@ class EnhancedTradingGUI(QMainWindow):
             os.environ["BINANCE_TESTNET_API_KEY"] = api_key
             os.environ["BINANCE_TESTNET_API_SECRET"] = api_secret
             
+            # Lưu vào file cấu hình
+            api_config = {
+                "api_key": api_key,
+                "api_secret": api_secret,
+                "testnet": testnet
+            }
+            
+            # Tạo thư mục configs nếu chưa tồn tại
+            os.makedirs("configs", exist_ok=True)
+            
+            # Lưu cấu hình API vào file
+            with open("configs/api_config.json", "w") as f:
+                json.dump(api_config, f, indent=4)
+            
+            logger.info("Đã lưu cấu hình API vào file configs/api_config.json")
+            
             # Khởi tạo lại các đối tượng
             self.market_analyzer = MarketAnalyzer(testnet=testnet)
             self.position_manager = PositionManager(testnet=testnet)
@@ -1902,10 +1926,79 @@ class EnhancedTradingGUI(QMainWindow):
             
             # Cập nhật dữ liệu
             self.refresh_data()
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"✅ Đã lưu cài đặt API thành công (Testnet: {testnet})")
         
         except Exception as e:
             logger.error(f"Lỗi khi lưu cài đặt API: {str(e)}", exc_info=True)
             self.show_error("Lỗi khi lưu cài đặt API", str(e))
+            
+    def test_api_connection(self):
+        """Kiểm tra kết nối API"""
+        try:
+            # Lấy thông tin API
+            api_key = self.api_key_edit.text()
+            api_secret = self.api_secret_edit.text()
+            testnet = self.testnet_checkbox.isChecked()
+            
+            # Kiểm tra thông tin API
+            if not api_key or not api_secret:
+                self.show_error("Thông tin API không hợp lệ", "API Key và API Secret không được để trống")
+                return
+            
+            # Tạm thời lưu API key và secret vào biến môi trường
+            os.environ["BINANCE_TESTNET_API_KEY"] = api_key
+            os.environ["BINANCE_TESTNET_API_SECRET"] = api_secret
+            
+            # Hiển thị đang kiểm tra
+            self.status_label.setText("Đang kiểm tra kết nối API...")
+            QApplication.processEvents()
+            
+            # Tạo client tạm thời để kiểm tra
+            from binance.client import Client
+            from binance.exceptions import BinanceAPIException
+            
+            # Sử dụng testnet nếu được chọn
+            if testnet:
+                client = Client(api_key, api_secret, testnet=True)
+            else:
+                client = Client(api_key, api_secret)
+            
+            # Thử lấy thông tin tài khoản
+            account_info = client.futures_account() if testnet else client.get_account()
+            
+            # Nếu không có lỗi, kết nối thành công
+            self.show_info("Kết nối API thành công", "Đã kết nối thành công đến API Binance")
+            self.status_label.setText("Kết nối API thành công")
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"✅ Kiểm tra kết nối API thành công (Testnet: {testnet})")
+            
+            # Trả về true nếu thành công
+            return True
+        
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi API Binance: {str(e)}", exc_info=True)
+            self.show_error("Lỗi kết nối API", f"Mã lỗi: {e.code}, Thông báo: {e.message}")
+            self.status_label.setText("Lỗi kết nối API")
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"❌ Lỗi kết nối API: {e.message}")
+            
+            # Trả về false nếu có lỗi
+            return False
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra kết nối API: {str(e)}", exc_info=True)
+            self.show_error("Lỗi kết nối API", str(e))
+            self.status_label.setText("Lỗi kết nối API")
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"❌ Lỗi kết nối API: {str(e)}")
+            
+            # Trả về false nếu có lỗi
+            return False
             
     def save_telegram_settings(self):
         """Lưu cài đặt Telegram"""
@@ -1923,13 +2016,18 @@ class EnhancedTradingGUI(QMainWindow):
             os.environ["TELEGRAM_BOT_TOKEN"] = telegram_token
             os.environ["TELEGRAM_CHAT_ID"] = telegram_chat_id
             
-            # Lưu cài đặt thông báo
-            telegram_notify_config = {
-                "notify_position": self.notify_position_checkbox.isChecked(),
-                "notify_sltp": self.notify_sltp_checkbox.isChecked(),
-                "notify_opportunity": self.notify_opportunity_checkbox.isChecked(),
-                "notify_error": self.notify_error_checkbox.isChecked(),
-                "notify_summary": self.notify_summary_checkbox.isChecked()
+            # Tạo cấu hình đầy đủ
+            telegram_config = {
+                "bot_token": telegram_token,
+                "chat_id": telegram_chat_id,
+                "enabled": True,
+                "notifications": {
+                    "notify_position": self.notify_position_checkbox.isChecked(),
+                    "notify_sltp": self.notify_sltp_checkbox.isChecked(),
+                    "notify_opportunity": self.notify_opportunity_checkbox.isChecked(),
+                    "notify_error": self.notify_error_checkbox.isChecked(),
+                    "notify_summary": self.notify_summary_checkbox.isChecked()
+                }
             }
             
             # Lưu cấu hình vào file
@@ -1937,7 +2035,16 @@ class EnhancedTradingGUI(QMainWindow):
             os.makedirs(os.path.dirname(config_file), exist_ok=True)
             
             with open(config_file, "w") as f:
-                json.dump(telegram_notify_config, f, indent=4)
+                json.dump(telegram_config, f, indent=4)
+            
+            logger.info(f"Đã lưu cấu hình Telegram vào file {config_file}")
+            
+            # Thông báo thành công
+            self.show_info("Lưu cài đặt Telegram thành công", "Đã lưu thông tin Telegram vào cấu hình")
+            self.status_label.setText("Đã lưu cài đặt Telegram")
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"✅ Đã lưu cài đặt Telegram thành công")
             
             # Khởi tạo và kiểm tra kết nối Telegram
             self.test_telegram_connection()
@@ -1945,6 +2052,9 @@ class EnhancedTradingGUI(QMainWindow):
         except Exception as e:
             logger.error(f"Lỗi khi lưu cài đặt Telegram: {str(e)}", exc_info=True)
             self.show_error("Lỗi khi lưu cài đặt Telegram", str(e))
+            
+            # Thêm thông báo vào nhật ký hệ thống
+            self.add_to_system_log(f"❌ Lỗi khi lưu cài đặt Telegram: {str(e)}")
             
     def test_telegram_connection(self):
         """Kiểm tra kết nối Telegram"""
@@ -2108,6 +2218,339 @@ class EnhancedTradingGUI(QMainWindow):
         else:
             # Khôi phục bảng màu mặc định
             self.setPalette(self.style().standardPalette())
+    
+    def start_service(self, service_name):
+        """
+        Khởi động một dịch vụ cụ thể
+        
+        :param service_name: Tên dịch vụ cần khởi động
+        """
+        try:
+            logger.info(f"Đang khởi động dịch vụ {service_name}...")
+            
+            # Ánh xạ tên dịch vụ đến script tương ứng
+            service_scripts = {
+                "market_analyzer": "auto_market_notifier.py",
+                "trading_system": "unified_trading_service.py",
+                "auto_sltp": "auto_btc_sltp.py",
+                "telegram_notifier": "advanced_telegram_notifier.py"
+            }
+            
+            # Lấy tên script dựa trên service_name
+            script = service_scripts.get(service_name)
+            if not script:
+                logger.error(f"Không tìm thấy script cho dịch vụ {service_name}")
+                QMessageBox.critical(self, "Lỗi", f"Không tìm thấy script cho dịch vụ {service_name}")
+                return False
+            
+            # Kiểm tra xem script có tồn tại không
+            if not os.path.exists(script):
+                logger.error(f"Không tìm thấy file {script}")
+                QMessageBox.critical(self, "Lỗi", f"Không tìm thấy file {script}")
+                return False
+            
+            # Khởi động dịch vụ
+            pid_file = f"{service_name}.pid"
+            log_file = f"{service_name}.log"
+            
+            # Sử dụng python để khởi động script
+            cmd = f"python {script} > {log_file} 2>&1 & echo $! > {pid_file}"
+            
+            # Thực thi lệnh
+            import subprocess
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                # Cập nhật trạng thái dịch vụ
+                self.service_status[service_name] = True
+                
+                # Cập nhật UI
+                self.update_service_status(service_name)
+                
+                # Thêm thông báo vào nhật ký
+                self.add_to_system_log(f"✅ Đã khởi động dịch vụ {service_name}")
+                QMessageBox.information(self, "Thông báo", f"Đã khởi động dịch vụ {service_name} thành công")
+                
+                return True
+            else:
+                logger.error(f"Lỗi khi khởi động {service_name}: {result.stderr}")
+                QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động {service_name}: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi động dịch vụ {service_name}: {str(e)}", exc_info=True)
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động dịch vụ {service_name}: {str(e)}")
+            return False
+    
+    def stop_service(self, service_name):
+        """
+        Dừng một dịch vụ cụ thể
+        
+        :param service_name: Tên dịch vụ cần dừng
+        """
+        try:
+            logger.info(f"Đang dừng dịch vụ {service_name}...")
+            
+            # Kiểm tra xem có file pid không
+            pid_file = f"{service_name}.pid"
+            
+            if not os.path.exists(pid_file):
+                logger.warning(f"Không tìm thấy file PID cho dịch vụ {service_name}")
+                QMessageBox.warning(self, "Cảnh báo", f"Không tìm thấy thông tin PID của dịch vụ {service_name}")
+                return False
+            
+            # Đọc PID từ file
+            with open(pid_file, "r") as f:
+                pid = f.read().strip()
+            
+            if not pid:
+                logger.warning(f"PID không hợp lệ cho dịch vụ {service_name}")
+                QMessageBox.warning(self, "Cảnh báo", f"PID không hợp lệ cho dịch vụ {service_name}")
+                return False
+            
+            # Dừng process bằng PID
+            import subprocess
+            result = subprocess.run(f"kill {pid}", shell=True, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                # Xóa file PID
+                os.remove(pid_file)
+                
+                # Cập nhật trạng thái dịch vụ
+                self.service_status[service_name] = False
+                
+                # Cập nhật UI
+                self.update_service_status(service_name)
+                
+                # Thêm thông báo vào nhật ký
+                self.add_to_system_log(f"🛑 Đã dừng dịch vụ {service_name}")
+                QMessageBox.information(self, "Thông báo", f"Đã dừng dịch vụ {service_name} thành công")
+                
+                return True
+            else:
+                logger.error(f"Lỗi khi dừng {service_name}: {result.stderr}")
+                QMessageBox.critical(self, "Lỗi", f"Lỗi khi dừng {service_name}: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Lỗi khi dừng dịch vụ {service_name}: {str(e)}", exc_info=True)
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi dừng dịch vụ {service_name}: {str(e)}")
+            return False
+    
+    def start_all_services(self):
+        """Khởi động tất cả các dịch vụ"""
+        try:
+            logger.info("Đang khởi động tất cả các dịch vụ...")
+            
+            # Hiển thị thông báo đang khởi động
+            self.status_label.setText("Đang khởi động dịch vụ...")
+            
+            # Kịch bản 1: Sử dụng start_all_services.py
+            if os.path.exists("start_all_services.py"):
+                self.add_to_system_log("🚀 Đang khởi động tất cả dịch vụ qua start_all_services.py")
+                
+                # Sử dụng subprocess để chạy script
+                import subprocess
+                result = subprocess.run("python start_all_services.py", shell=True, capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    # Cập nhật trạng thái tất cả dịch vụ
+                    for service in self.service_status:
+                        self.service_status[service] = True
+                    
+                    # Cập nhật UI
+                    self.update_all_service_status()
+                    
+                    # Thêm thông báo vào nhật ký
+                    self.add_to_system_log("✅ Đã khởi động tất cả dịch vụ thành công")
+                    QMessageBox.information(self, "Thông báo", "Đã khởi động tất cả dịch vụ thành công")
+                    
+                    # Cập nhật trạng thái
+                    self.status_label.setText("Tất cả dịch vụ đang chạy")
+                    
+                else:
+                    logger.error(f"Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
+                    self.add_to_system_log(f"❌ Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
+                    QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
+                    
+                    # Cập nhật trạng thái
+                    self.status_label.setText("Lỗi khi khởi động dịch vụ")
+                
+            # Kịch bản 2: Khởi động từng dịch vụ riêng biệt
+            else:
+                success = True
+                for service in self.service_status:
+                    if not self.service_status[service]:  # Chỉ khởi động dịch vụ chưa chạy
+                        if not self.start_service(service):
+                            success = False
+                
+                if success:
+                    self.add_to_system_log("✅ Đã khởi động tất cả dịch vụ thành công")
+                    QMessageBox.information(self, "Thông báo", "Đã khởi động tất cả dịch vụ thành công")
+                    self.status_label.setText("Tất cả dịch vụ đang chạy")
+                else:
+                    self.add_to_system_log("⚠️ Một số dịch vụ không thể khởi động")
+                    QMessageBox.warning(self, "Cảnh báo", "Một số dịch vụ không thể khởi động")
+                    self.status_label.setText("Một số dịch vụ không hoạt động")
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi khởi động tất cả dịch vụ: {str(e)}", exc_info=True)
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động tất cả dịch vụ: {str(e)}")
+            self.status_label.setText("Lỗi khi khởi động dịch vụ")
+    
+    def stop_all_services(self):
+        """Dừng tất cả các dịch vụ"""
+        try:
+            logger.info("Đang dừng tất cả các dịch vụ...")
+            
+            # Hiển thị thông báo đang dừng
+            self.status_label.setText("Đang dừng dịch vụ...")
+            
+            # Dừng từng dịch vụ
+            success = True
+            for service in self.service_status:
+                if self.service_status[service]:  # Chỉ dừng dịch vụ đang chạy
+                    if not self.stop_service(service):
+                        success = False
+            
+            if success:
+                self.add_to_system_log("✅ Đã dừng tất cả dịch vụ thành công")
+                QMessageBox.information(self, "Thông báo", "Đã dừng tất cả dịch vụ thành công")
+                self.status_label.setText("Tất cả dịch vụ đã dừng")
+            else:
+                self.add_to_system_log("⚠️ Một số dịch vụ không thể dừng")
+                QMessageBox.warning(self, "Cảnh báo", "Một số dịch vụ không thể dừng")
+                self.status_label.setText("Một số dịch vụ vẫn đang chạy")
+                
+        except Exception as e:
+            logger.error(f"Lỗi khi dừng tất cả dịch vụ: {str(e)}", exc_info=True)
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi dừng tất cả dịch vụ: {str(e)}")
+            self.status_label.setText("Lỗi khi dừng dịch vụ")
+    
+    def update_service_status(self, service_name):
+        """
+        Cập nhật hiển thị trạng thái dịch vụ
+        
+        :param service_name: Tên dịch vụ cần cập nhật
+        """
+        # Lấy trạng thái dịch vụ
+        is_running = self.service_status.get(service_name, False)
+        
+        # Cập nhật label và button
+        if service_name == "market_analyzer":
+            if is_running:
+                self.market_analyzer_status.setText("Đang chạy")
+                self.market_analyzer_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_market_analyzer_button.setEnabled(False)
+                self.stop_market_analyzer_button.setEnabled(True)
+            else:
+                self.market_analyzer_status.setText("Chưa khởi động")
+                self.market_analyzer_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_market_analyzer_button.setEnabled(True)
+                self.stop_market_analyzer_button.setEnabled(False)
+                
+        elif service_name == "trading_system":
+            if is_running:
+                self.trading_system_status.setText("Đang chạy")
+                self.trading_system_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_trading_system_button.setEnabled(False)
+                self.stop_trading_system_button.setEnabled(True)
+            else:
+                self.trading_system_status.setText("Chưa khởi động")
+                self.trading_system_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_trading_system_button.setEnabled(True)
+                self.stop_trading_system_button.setEnabled(False)
+                
+        elif service_name == "auto_sltp":
+            if is_running:
+                self.auto_sltp_status.setText("Đang chạy")
+                self.auto_sltp_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_auto_sltp_button.setEnabled(False)
+                self.stop_auto_sltp_button.setEnabled(True)
+            else:
+                self.auto_sltp_status.setText("Chưa khởi động")
+                self.auto_sltp_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_auto_sltp_button.setEnabled(True)
+                self.stop_auto_sltp_button.setEnabled(False)
+                
+        elif service_name == "telegram_notifier":
+            if is_running:
+                self.telegram_notifier_status.setText("Đang chạy")
+                self.telegram_notifier_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_telegram_notifier_button.setEnabled(False)
+                self.stop_telegram_notifier_button.setEnabled(True)
+            else:
+                self.telegram_notifier_status.setText("Chưa khởi động")
+                self.telegram_notifier_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_telegram_notifier_button.setEnabled(True)
+                self.stop_telegram_notifier_button.setEnabled(False)
+    
+    def update_all_service_status(self):
+        """Cập nhật hiển thị trạng thái tất cả dịch vụ"""
+        for service in self.service_status:
+            self.update_service_status(service)
+    
+    def refresh_system_logs(self):
+        """Cập nhật nhật ký hệ thống"""
+        try:
+            logs = []
+            
+            # Đọc log từ start_all_services.log nếu có
+            if os.path.exists("start_all_services.log"):
+                with open("start_all_services.log", "r") as f:
+                    logs.append("=== START_ALL_SERVICES LOG ===")
+                    # Lấy 50 dòng cuối
+                    lines = f.readlines()
+                    for line in lines[-50:]:
+                        logs.append(line.strip())
+            
+            # Đọc log từ các file log dịch vụ
+            for service in self.service_status:
+                log_file = f"{service}.log"
+                if os.path.exists(log_file):
+                    with open(log_file, "r") as f:
+                        logs.append(f"\n=== {service.upper()} LOG ===")
+                        # Lấy 20 dòng cuối
+                        lines = f.readlines()
+                        for line in lines[-20:]:
+                            logs.append(line.strip())
+            
+            # Hiển thị log
+            self.system_logs.setText("\n".join(logs))
+            
+            # Cuộn xuống cuối
+            scrollbar = self.system_logs.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật nhật ký hệ thống: {str(e)}", exc_info=True)
+            QMessageBox.critical(self, "Lỗi", f"Lỗi khi cập nhật nhật ký hệ thống: {str(e)}")
+    
+    def clear_system_logs(self):
+        """Xóa nhật ký hệ thống"""
+        self.system_logs.clear()
+    
+    def add_to_system_log(self, message):
+        """
+        Thêm thông báo vào nhật ký hệ thống
+        
+        :param message: Thông báo cần thêm
+        """
+        current_time = datetime.now().strftime("%H:%M:%S")
+        log_message = f"[{current_time}] {message}"
+        
+        # Thêm vào QTextEdit
+        current_text = self.system_logs.toPlainText()
+        if current_text:
+            new_text = current_text + "\n" + log_message
+        else:
+            new_text = log_message
+        
+        self.system_logs.setText(new_text)
+        
+        # Cuộn xuống cuối
+        scrollbar = self.system_logs.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
     
     def refresh_data(self):
         """Cập nhật dữ liệu"""
