@@ -902,9 +902,10 @@ class EnhancedTradingGUI(QMainWindow):
         # Khởi tạo trạng thái các dịch vụ nếu chưa có
         if not hasattr(self, 'service_status'):
             self.service_status = {
-                "market_analyzer": False,
-                "trading_system": False,
-                "auto_sltp": False,
+                "market_notifier": False,
+                "unified_trading_service": False,
+                "service_manager": False,
+                "watchdog": False,
                 "telegram_notifier": True
             }
         
@@ -2582,12 +2583,19 @@ class EnhancedTradingGUI(QMainWindow):
                     for line in lines[-50:]:
                         logs.append(line.strip())
             
+            # Danh sách các file log cần kiểm tra
+            log_files = {
+                "market_notifier": "market_notifier.log",
+                "unified_trading_service": "unified_trading_service.log",
+                "service_manager": "service_manager.log",
+                "watchdog": "watchdog.log"
+            }
+            
             # Đọc log từ các file log dịch vụ
-            for service in self.service_status:
-                log_file = f"{service}.log"
+            for service_name, log_file in log_files.items():
                 if os.path.exists(log_file):
                     with open(log_file, "r") as f:
-                        logs.append(f"\n=== {service.upper()} LOG ===")
+                        logs.append(f"\n=== {service_name.upper()} LOG ===")
                         # Lấy 20 dòng cuối
                         lines = f.readlines()
                         for line in lines[-20:]:
