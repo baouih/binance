@@ -913,71 +913,93 @@ class EnhancedTradingGUI(QMainWindow):
         services_group = QGroupBox("Quản lý dịch vụ")
         services_layout = QVBoxLayout(services_group)
         
-        # Market Analyzer Service
-        market_analyzer_layout = QHBoxLayout()
-        market_analyzer_label = QLabel("Market Analyzer:")
-        self.market_analyzer_status = QLabel("Chưa khởi động")
-        self.market_analyzer_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        # Market Notifier Service
+        market_notifier_layout = QHBoxLayout()
+        market_notifier_label = QLabel("Market Notifier:")
+        self.market_notifier_status = QLabel("Chưa khởi động")
+        self.market_notifier_status.setStyleSheet("color: #EF4444; font-weight: bold;")
         
-        self.start_market_analyzer_button = QPushButton("Khởi động")
-        self.start_market_analyzer_button.clicked.connect(lambda: self.start_service("market_analyzer"))
-        self.start_market_analyzer_button.setStyleSheet("background-color: #22C55E; color: white;")
+        self.start_market_notifier_button = QPushButton("Khởi động")
+        self.start_market_notifier_button.clicked.connect(lambda: self.start_service("market_notifier"))
+        self.start_market_notifier_button.setStyleSheet("background-color: #22C55E; color: white;")
         
-        self.stop_market_analyzer_button = QPushButton("Dừng")
-        self.stop_market_analyzer_button.clicked.connect(lambda: self.stop_service("market_analyzer"))
-        self.stop_market_analyzer_button.setStyleSheet("background-color: #EF4444; color: white;")
-        self.stop_market_analyzer_button.setEnabled(False)
+        self.stop_market_notifier_button = QPushButton("Dừng")
+        self.stop_market_notifier_button.clicked.connect(lambda: self.stop_service("market_notifier"))
+        self.stop_market_notifier_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_market_notifier_button.setEnabled(False)
         
-        market_analyzer_layout.addWidget(market_analyzer_label)
-        market_analyzer_layout.addWidget(self.market_analyzer_status)
-        market_analyzer_layout.addWidget(self.start_market_analyzer_button)
-        market_analyzer_layout.addWidget(self.stop_market_analyzer_button)
+        market_notifier_layout.addWidget(market_notifier_label)
+        market_notifier_layout.addWidget(self.market_notifier_status)
+        market_notifier_layout.addWidget(self.start_market_notifier_button)
+        market_notifier_layout.addWidget(self.stop_market_notifier_button)
         
-        services_layout.addLayout(market_analyzer_layout)
+        services_layout.addLayout(market_notifier_layout)
         
-        # Trading System Service
-        trading_system_layout = QHBoxLayout()
-        trading_system_label = QLabel("Trading System:")
-        self.trading_system_status = QLabel("Chưa khởi động")
-        self.trading_system_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        # Unified Trading Service
+        unified_trading_service_layout = QHBoxLayout()
+        unified_trading_service_label = QLabel("Unified Trading Service:")
+        self.unified_trading_service_status = QLabel("Chưa khởi động")
+        self.unified_trading_service_status.setStyleSheet("color: #EF4444; font-weight: bold;")
         
-        self.start_trading_system_button = QPushButton("Khởi động")
-        self.start_trading_system_button.clicked.connect(lambda: self.start_service("trading_system"))
-        self.start_trading_system_button.setStyleSheet("background-color: #22C55E; color: white;")
+        self.start_unified_trading_service_button = QPushButton("Khởi động")
+        self.start_unified_trading_service_button.clicked.connect(lambda: self.start_service("unified_trading_service"))
+        self.start_unified_trading_service_button.setStyleSheet("background-color: #22C55E; color: white;")
         
-        self.stop_trading_system_button = QPushButton("Dừng")
-        self.stop_trading_system_button.clicked.connect(lambda: self.stop_service("trading_system"))
-        self.stop_trading_system_button.setStyleSheet("background-color: #EF4444; color: white;")
-        self.stop_trading_system_button.setEnabled(False)
+        self.stop_unified_trading_service_button = QPushButton("Dừng")
+        self.stop_unified_trading_service_button.clicked.connect(lambda: self.stop_service("unified_trading_service"))
+        self.stop_unified_trading_service_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_unified_trading_service_button.setEnabled(False)
         
-        trading_system_layout.addWidget(trading_system_label)
-        trading_system_layout.addWidget(self.trading_system_status)
-        trading_system_layout.addWidget(self.start_trading_system_button)
-        trading_system_layout.addWidget(self.stop_trading_system_button)
+        unified_trading_service_layout.addWidget(unified_trading_service_label)
+        unified_trading_service_layout.addWidget(self.unified_trading_service_status)
+        unified_trading_service_layout.addWidget(self.start_unified_trading_service_button)
+        unified_trading_service_layout.addWidget(self.stop_unified_trading_service_button)
         
-        services_layout.addLayout(trading_system_layout)
+        services_layout.addLayout(unified_trading_service_layout)
         
-        # Auto SLTP Service
-        auto_sltp_layout = QHBoxLayout()
-        auto_sltp_label = QLabel("Auto SLTP:")
-        self.auto_sltp_status = QLabel("Chưa khởi động")
-        self.auto_sltp_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        # Service Manager
+        service_manager_layout = QHBoxLayout()
+        service_manager_label = QLabel("Service Manager:")
+        self.service_manager_status = QLabel("Chưa khởi động")
+        self.service_manager_status.setStyleSheet("color: #EF4444; font-weight: bold;")
         
-        self.start_auto_sltp_button = QPushButton("Khởi động")
-        self.start_auto_sltp_button.clicked.connect(lambda: self.start_service("auto_sltp"))
-        self.start_auto_sltp_button.setStyleSheet("background-color: #22C55E; color: white;")
+        self.start_service_manager_button = QPushButton("Khởi động")
+        self.start_service_manager_button.clicked.connect(lambda: self.start_service("service_manager"))
+        self.start_service_manager_button.setStyleSheet("background-color: #22C55E; color: white;")
         
-        self.stop_auto_sltp_button = QPushButton("Dừng")
-        self.stop_auto_sltp_button.clicked.connect(lambda: self.stop_service("auto_sltp"))
-        self.stop_auto_sltp_button.setStyleSheet("background-color: #EF4444; color: white;")
-        self.stop_auto_sltp_button.setEnabled(False)
+        self.stop_service_manager_button = QPushButton("Dừng")
+        self.stop_service_manager_button.clicked.connect(lambda: self.stop_service("service_manager"))
+        self.stop_service_manager_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_service_manager_button.setEnabled(False)
         
-        auto_sltp_layout.addWidget(auto_sltp_label)
-        auto_sltp_layout.addWidget(self.auto_sltp_status)
-        auto_sltp_layout.addWidget(self.start_auto_sltp_button)
-        auto_sltp_layout.addWidget(self.stop_auto_sltp_button)
+        service_manager_layout.addWidget(service_manager_label)
+        service_manager_layout.addWidget(self.service_manager_status)
+        service_manager_layout.addWidget(self.start_service_manager_button)
+        service_manager_layout.addWidget(self.stop_service_manager_button)
         
-        services_layout.addLayout(auto_sltp_layout)
+        services_layout.addLayout(service_manager_layout)
+        
+        # Watchdog Service
+        watchdog_layout = QHBoxLayout()
+        watchdog_label = QLabel("Watchdog Service:")
+        self.watchdog_status = QLabel("Chưa khởi động")
+        self.watchdog_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_watchdog_button = QPushButton("Khởi động")
+        self.start_watchdog_button.clicked.connect(lambda: self.start_service("watchdog"))
+        self.start_watchdog_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_watchdog_button = QPushButton("Dừng")
+        self.stop_watchdog_button.clicked.connect(lambda: self.stop_service("watchdog"))
+        self.stop_watchdog_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_watchdog_button.setEnabled(False)
+        
+        watchdog_layout.addWidget(watchdog_label)
+        watchdog_layout.addWidget(self.watchdog_status)
+        watchdog_layout.addWidget(self.start_watchdog_button)
+        watchdog_layout.addWidget(self.stop_watchdog_button)
+        
+        services_layout.addLayout(watchdog_layout)
         
         # Telegram Notifier Service
         telegram_notifier_layout = QHBoxLayout()
@@ -2245,9 +2267,10 @@ class EnhancedTradingGUI(QMainWindow):
             
             # Ánh xạ tên dịch vụ đến script tương ứng
             service_scripts = {
-                "market_analyzer": "auto_market_notifier.py",
-                "trading_system": "unified_trading_service.py",
-                "auto_sltp": "auto_btc_sltp.py",
+                "market_notifier": "auto_market_notifier.py",
+                "unified_trading_service": "unified_trading_service.py",
+                "service_manager": "enhanced_service_manager.py",
+                "watchdog": "service_watchdog.py",
                 "telegram_notifier": "advanced_telegram_notifier.py"
             }
             
@@ -2452,41 +2475,53 @@ class EnhancedTradingGUI(QMainWindow):
         is_running = self.service_status.get(service_name, False)
         
         # Cập nhật label và button
-        if service_name == "market_analyzer":
+        if service_name == "market_notifier":
             if is_running:
-                self.market_analyzer_status.setText("Đang chạy")
-                self.market_analyzer_status.setStyleSheet("color: #22C55E; font-weight: bold;")
-                self.start_market_analyzer_button.setEnabled(False)
-                self.stop_market_analyzer_button.setEnabled(True)
+                self.market_notifier_status.setText("Đang chạy")
+                self.market_notifier_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_market_notifier_button.setEnabled(False)
+                self.stop_market_notifier_button.setEnabled(True)
             else:
-                self.market_analyzer_status.setText("Chưa khởi động")
-                self.market_analyzer_status.setStyleSheet("color: #EF4444; font-weight: bold;")
-                self.start_market_analyzer_button.setEnabled(True)
-                self.stop_market_analyzer_button.setEnabled(False)
+                self.market_notifier_status.setText("Chưa khởi động")
+                self.market_notifier_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_market_notifier_button.setEnabled(True)
+                self.stop_market_notifier_button.setEnabled(False)
                 
-        elif service_name == "trading_system":
+        elif service_name == "unified_trading_service":
             if is_running:
-                self.trading_system_status.setText("Đang chạy")
-                self.trading_system_status.setStyleSheet("color: #22C55E; font-weight: bold;")
-                self.start_trading_system_button.setEnabled(False)
-                self.stop_trading_system_button.setEnabled(True)
+                self.unified_trading_service_status.setText("Đang chạy")
+                self.unified_trading_service_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_unified_trading_service_button.setEnabled(False)
+                self.stop_unified_trading_service_button.setEnabled(True)
             else:
-                self.trading_system_status.setText("Chưa khởi động")
-                self.trading_system_status.setStyleSheet("color: #EF4444; font-weight: bold;")
-                self.start_trading_system_button.setEnabled(True)
-                self.stop_trading_system_button.setEnabled(False)
+                self.unified_trading_service_status.setText("Chưa khởi động")
+                self.unified_trading_service_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_unified_trading_service_button.setEnabled(True)
+                self.stop_unified_trading_service_button.setEnabled(False)
                 
-        elif service_name == "auto_sltp":
+        elif service_name == "service_manager":
             if is_running:
-                self.auto_sltp_status.setText("Đang chạy")
-                self.auto_sltp_status.setStyleSheet("color: #22C55E; font-weight: bold;")
-                self.start_auto_sltp_button.setEnabled(False)
-                self.stop_auto_sltp_button.setEnabled(True)
+                self.service_manager_status.setText("Đang chạy")
+                self.service_manager_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_service_manager_button.setEnabled(False)
+                self.stop_service_manager_button.setEnabled(True)
             else:
-                self.auto_sltp_status.setText("Chưa khởi động")
-                self.auto_sltp_status.setStyleSheet("color: #EF4444; font-weight: bold;")
-                self.start_auto_sltp_button.setEnabled(True)
-                self.stop_auto_sltp_button.setEnabled(False)
+                self.service_manager_status.setText("Chưa khởi động")
+                self.service_manager_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_service_manager_button.setEnabled(True)
+                self.stop_service_manager_button.setEnabled(False)
+        
+        elif service_name == "watchdog":
+            if is_running:
+                self.watchdog_status.setText("Đang chạy")
+                self.watchdog_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_watchdog_button.setEnabled(False)
+                self.stop_watchdog_button.setEnabled(True)
+            else:
+                self.watchdog_status.setText("Chưa khởi động")
+                self.watchdog_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_watchdog_button.setEnabled(True)
+                self.stop_watchdog_button.setEnabled(False)
                 
         elif service_name == "telegram_notifier":
             if is_running:
