@@ -15,6 +15,10 @@ from datetime import datetime, timedelta
 from functools import partial
 from typing import Dict, List, Tuple, Union, Any, Optional
 
+# Thiết lập logging
+logger = logging.getLogger("enhanced_trading_gui")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 # PyQt5 imports
 from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -33,10 +37,6 @@ try:
     logger.info("Đã import thành công module cấu hình")
 except ImportError as e:
     logger.error(f"Lỗi khi import module cấu hình: {str(e)}")
-
-# Thiết lập logging
-logger = logging.getLogger("enhanced_trading_gui")
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Import các module từ dự án
 try:
@@ -281,6 +281,11 @@ class EnhancedTradingGUI(QMainWindow):
         settings_action.triggered.connect(lambda: self.tab_widget.setCurrentIndex(4))  # Chuyển đến tab cài đặt
         toolbar.addAction(settings_action)
         
+        # Nút cập nhật phần mềm
+        update_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_ArrowUp)), "Cập nhật phần mềm", self)
+        update_action.triggered.connect(self.check_software_update)
+        toolbar.addAction(update_action)
+        
         # Nút trợ giúp
         help_action = QAction(QIcon(self.style().standardIcon(QStyle.SP_MessageBoxQuestion)), "Trợ giúp", self)
         help_action.triggered.connect(self.show_help)
@@ -291,9 +296,18 @@ class EnhancedTradingGUI(QMainWindow):
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         toolbar.addWidget(spacer)
         
+        # Đọc phiên bản từ file
+        try:
+            version = "1.0.0"
+            if os.path.exists("version.txt"):
+                with open("version.txt", "r") as f:
+                    version = f.read().strip()
+        except:
+            version = "1.0.0"
+        
         # Hiển thị thông tin phiên bản
-        version_label = QLabel("Phiên bản 1.0.0")
-        toolbar.addWidget(version_label)
+        self.version_label = QLabel(f"Phiên bản {version}")
+        toolbar.addWidget(self.version_label)
     
     def create_dashboard_tab(self):
         """Tạo tab tổng quan"""
@@ -2485,6 +2499,70 @@ class EnhancedTradingGUI(QMainWindow):
                 self.start_telegram_notifier_button.setEnabled(True)
                 self.stop_telegram_notifier_button.setEnabled(False)
     
+    def check_software_update(self):
+        """Kiểm tra cập nhật phần mềm"""
+        try:
+            self.status_label.setText("Đang kiểm tra cập nhật...")
+            
+            # Import mô-đun cập nhật
+            try:
+                from auto_updater import check_for_updates, install_update
+            except ImportError as e:
+                self.show_error("Lỗi khi kiểm tra cập nhật", f"Không thể tải mô-đun cập nhật: {str(e)}")
+                self.status_label.setText("Lỗi khi kiểm tra cập nhật")
+                return
+            
+            # Kiểm tra cập nhật
+            result = check_for_updates()
+            
+            if result["success"]:
+                if result["has_update"]:
+                    # Có cập nhật mới
+                    current_version = result["current_version"]
+                    new_version = result["new_version"]
+                    
+                    # Hiển thị thông báo cập nhật
+                    message = (
+                        f"Đã có phiên bản mới!\n\n"
+                        f"Phiên bản hiện tại: {current_version}\n"
+                        f"Phiên bản mới: {new_version}\n\n"
+                        f"Bạn có muốn cập nhật lên phiên bản mới không?"
+                    )
+                    
+                    answer = QMessageBox.question(
+                        self, 
+                        "Có bản cập nhật mới", 
+                        message,
+                        QMessageBox.Yes | QMessageBox.No,
+                        QMessageBox.Yes
+                    )
+                    
+                    if answer == QMessageBox.Yes:
+                        # Thực hiện cập nhật
+                        self.status_label.setText("Đang cập nhật...")
+                        install_result = install_update(result["update_info"])
+                        
+                        if install_result["success"]:
+                            self.show_info("Cập nhật", "Đang cài đặt bản cập nhật. Ứng dụng sẽ khởi động lại.")
+                        else:
+                            self.show_error("Lỗi cập nhật", install_result["message"])
+                            self.status_label.setText("Lỗi cập nhật")
+                    else:
+                        self.status_label.setText("Đã bỏ qua cập nhật")
+                else:
+                    # Không có cập nhật mới
+                    self.show_info("Kiểm tra cập nhật", f"Không có phiên bản mới. Phiên bản hiện tại: {result['current_version']}")
+                    self.status_label.setText("Không có cập nhật mới")
+            else:
+                # Có lỗi khi kiểm tra cập nhật
+                self.show_error("Lỗi kiểm tra cập nhật", result["message"])
+                self.status_label.setText("Lỗi kiểm tra cập nhật")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi kiểm tra cập nhật phần mềm: {str(e)}", exc_info=True)
+            self.show_error("Lỗi kiểm tra cập nhật", str(e))
+            self.status_label.setText("Lỗi kiểm tra cập nhật")
+
     def update_all_service_status(self):
         """Cập nhật hiển thị trạng thái tất cả dịch vụ"""
         for service in self.service_status:
