@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import (
     QTabWidget, QComboBox, QLineEdit, QFormLayout, QGroupBox, QMessageBox, QGridLayout,
     QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QCheckBox, QDoubleSpinBox,
     QSpinBox, QTextEdit, QSizePolicy, QSplitter, QStatusBar, QToolBar, QAction, QMenu,
-    QSystemTrayIcon, QStyle
+    QSystemTrayIcon, QStyle, QDesktopWidget
 )
 from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
@@ -2070,6 +2070,46 @@ class EnhancedTradingGUI(QMainWindow):
             logger.error(f"Lỗi khi tính toán kích thước vị thế: {str(e)}", exc_info=True)
             self.show_error("Lỗi khi tính toán kích thước vị thế", str(e))
     
+    def calculate_coin_score(self, symbol):
+        """
+        Tính điểm coin dựa trên phân tích kỹ thuật và cơ bản
+        
+        :param symbol: Mã coin cần tính điểm
+        :return: Điểm số (0-100)
+        """
+        try:
+            if not self.market_analyzer:
+                return 0
+            
+            # Thực hiện phân tích kỹ thuật trên nhiều khung thời gian
+            intervals = ["1h", "4h", "1d"]
+            total_score = 0
+            valid_intervals = 0
+            
+            for interval in intervals:
+                analysis = self.market_analyzer.analyze_technical(symbol, interval)
+                
+                if analysis.get("status") == "success":
+                    # Lấy điểm từ phân tích nếu có
+                    score = analysis.get("score", 0)
+                    if isinstance(score, (int, float)):
+                        total_score += score
+                        valid_intervals += 1
+            
+            # Tính điểm trung bình từ các khung thời gian
+            if valid_intervals > 0:
+                final_score = total_score / valid_intervals
+            else:
+                final_score = 0
+                
+            # Ghi log điểm số
+            logger.info(f"Điểm của coin {symbol}: {final_score:.2f}/100")
+            
+            return final_score
+        except Exception as e:
+            logger.error(f"Lỗi khi tính điểm coin: {str(e)}", exc_info=True)
+            return 0
+            
     def open_position(self, side_override=None):
         """
         Mở vị thế mới
@@ -2095,6 +2135,16 @@ class EnhancedTradingGUI(QMainWindow):
             symbol = self.symbol_combo.currentText()
             if not symbol:
                 self.show_error("Không thể mở vị thế", "Chưa chọn symbol")
+                return
+                
+            # Kiểm tra điểm coin (yêu cầu tối thiểu 60 điểm)
+            coin_score = self.calculate_coin_score(symbol)
+            if coin_score < 60:
+                self.show_error(
+                    "Coin không đạt ngưỡng giao dịch", 
+                    f"Điểm của {symbol} chỉ là {coin_score:.2f}/100, cần tối thiểu 60 điểm để giao dịch"
+                )
+                self.add_to_system_log(f"❌ Từ chối giao dịch coin {symbol} - Điểm thấp: {coin_score:.2f}/100")
                 return
             
             # Kiểm tra và lấy side
