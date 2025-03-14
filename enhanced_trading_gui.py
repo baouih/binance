@@ -265,7 +265,18 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
-        self.setGeometry(100, 100, 1024, 600)  # Kích thước có tỷ lệ 16:9, nhỏ gọn hơn
+        
+        # Lấy kích thước màn hình và tính toán kích thước cửa sổ bằng 1/4 màn hình
+        desktop = QDesktopWidget().availableGeometry()
+        screen_width = desktop.width()
+        screen_height = desktop.height()
+        
+        # Tính kích thước cửa sổ (1/4 màn hình)
+        window_width = int(screen_width / 2)
+        window_height = int(screen_height / 2)
+        
+        # Đặt kích thước và vị trí cửa sổ
+        self.setGeometry(100, 100, window_width, window_height)
         
         # Thiết lập icon
         self.setWindowIcon(QIcon("static/icons/app_icon.png"))
