@@ -1943,16 +1943,51 @@ class EnhancedTradingGUI(QMainWindow):
                 self.analysis_result_text.setHtml(content)
                 
                 # Cập nhật các label tín hiệu
-                self.signal_label.setText(analysis.get("overall_signal", "N/A"))
-                if analysis.get("overall_signal") == "Mua":
+                signal = analysis.get("overall_signal", "N/A")
+                self.signal_label.setText(signal)
+                
+                # Tính mức độ tin cậy (dựa vào score nếu có)
+                confidence = analysis.get("score", 0)
+                if isinstance(confidence, (int, float)):
+                    confidence_text = f"{confidence:.0f}%"
+                else:
+                    confidence_text = "N/A"
+                
+                # Xác định màu và lời khuyên
+                if signal == "Mua":
                     self.signal_label.setStyleSheet("color: #22C55E; font-size: 16px; font-weight: bold;")
-                elif analysis.get("overall_signal") == "Bán":
+                    recommendation = "NÊN VÀO LỆNH" if confidence >= 65 else "THEO DÕI"
+                elif signal == "Bán":
                     self.signal_label.setStyleSheet("color: #EF4444; font-size: 16px; font-weight: bold;")
+                    recommendation = "NÊN VÀO LỆNH" if confidence >= 65 else "THEO DÕI"
                 else:
                     self.signal_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+                    recommendation = "KHÔNG VÀO LỆNH"
                 
-                self.strength_label.setText(analysis.get("strength", "N/A"))
-                self.trend_label.setText(analysis.get("short_term_trend", "N/A"))
+                # Xác định chiến thuật dựa trên điều kiện thị trường
+                market_regime = analysis.get("market_regime", "")
+                long_term_trend = analysis.get("long_term_trend", "")
+                strength = analysis.get("strength", "N/A")
+                strategy = "Chưa xác định"
+                
+                if long_term_trend == "Tăng" or long_term_trend == "Giảm":
+                    strategy = "Theo xu hướng (Trend Following)"
+                elif long_term_trend == "Sideway":
+                    if market_regime == "volatile":
+                        strategy = "Giao dịch biên độ cao (Volatility Range)"
+                    else:
+                        strategy = "Giao dịch biên (Range Trading)"
+                
+                # Cập nhật các label
+                self.strength_label.setText(f"{strength} (Tin cậy: {confidence_text})")
+                self.trend_label.setText(f"{analysis.get('short_term_trend', 'N/A')} - {recommendation}")
+                
+                # Tạo hoặc cập nhật label Chiến thuật
+                if not hasattr(self, 'strategy_label'):
+                    self.strategy_label = QLabel(strategy, self.market_analysis_tab)
+                    self.market_analysis_layout.addRow("Chiến thuật đề xuất:", self.strategy_label)
+                else:
+                    self.strategy_label.setText(strategy)
                 
                 self.status_label.setText(f"Đã phân tích thị trường cho {symbol} ({interval})")
             else:
@@ -2027,15 +2062,80 @@ class EnhancedTradingGUI(QMainWindow):
                 content += f"<p><b>{analysis.get('long_term_trend', 'N/A')}</b></p>"
                 
                 content += "<h4>Gợi ý giao dịch</h4>"
+                confidence = analysis.get("score", 0)
+                confidence_text = f"{confidence:.0f}%" if isinstance(confidence, (int, float)) else "N/A"
+                
+                # Xác định chiến thuật dựa trên điều kiện thị trường
+                market_regime = analysis.get("market_regime", "")
+                long_term_trend = analysis.get("long_term_trend", "")
+                strategy = "Chưa xác định"
+                
+                if long_term_trend == "Tăng" or long_term_trend == "Giảm":
+                    strategy = "Theo xu hướng (Trend Following)"
+                elif long_term_trend == "Sideway":
+                    if market_regime == "volatile":
+                        strategy = "Giao dịch biên độ cao (Volatility Range)"
+                    else:
+                        strategy = "Giao dịch biên (Range Trading)"
+                
+                # Thêm thông tin về độ tin cậy và chiến thuật
+                content += f"<p><b>Mức độ tin cậy:</b> {confidence_text}</p>"
+                content += f"<p><b>Chiến thuật đề xuất:</b> {strategy}</p>"
+                
                 if analysis.get("overall_signal") == "Mua":
+                    recommendation = "NÊN VÀO LỆNH" if confidence >= 65 else "THEO DÕI"
+                    content += f"<p style='color: #22C55E;'><b>Khuyến nghị: {recommendation}</b></p>"
+                    
+                    # Lấy các thông tin giá
+                    current_price = analysis.get("price", 0)
+                    support_prices = [sr.get("value", 0) for sr in analysis.get("support_resistance", []) if sr.get("type", "").lower() == "support"]
+                    nearest_support = max(support_prices) if support_prices else current_price * 0.985
+                    
+                    # Tính toán mức giá vào lệnh
+                    entry_price = current_price
+                    entry_zone_low = nearest_support
+                    entry_zone_high = current_price
+                    
+                    # Mức giá Stop Loss và Take Profit
+                    stop_loss = nearest_support * 0.99
+                    take_profit_1 = current_price * 1.02  # TP mục tiêu 1
+                    take_profit_2 = current_price * 1.05  # TP mục tiêu 2
+                    
+                    # Hiển thị lời khuyên cụ thể về vị thế
                     content += "<p style='color: #22C55E;'><b>Mua:</b> Xem xét mở vị thế LONG khi có dấu hiệu xác nhận xu hướng.</p>"
-                    content += "<p>Stop Loss: Đặt dưới mức hỗ trợ gần nhất hoặc dưới mức giá hiện tại 1.5%.</p>"
-                    content += "<p>Take Profit: Đặt tại mức kháng cự gần nhất hoặc trên mức giá hiện tại 3%.</p>"
+                    content += f"<p><b>Giá vào lệnh đề xuất:</b> {entry_price:.2f} USDT</p>"
+                    content += f"<p><b>Vùng giá vào lệnh:</b> {entry_zone_low:.2f} - {entry_zone_high:.2f} USDT</p>"
+                    content += f"<p><b>Stop Loss:</b> {stop_loss:.2f} USDT (dưới mức hỗ trợ gần nhất)</p>"
+                    content += f"<p><b>Take Profit 1:</b> {take_profit_1:.2f} USDT (2% lợi nhuận)</p>"
+                    content += f"<p><b>Take Profit 2:</b> {take_profit_2:.2f} USDT (5% lợi nhuận)</p>"
                 elif analysis.get("overall_signal") == "Bán":
+                    recommendation = "NÊN VÀO LỆNH" if confidence >= 65 else "THEO DÕI"
+                    content += f"<p style='color: #EF4444;'><b>Khuyến nghị: {recommendation}</b></p>"
+                    
+                    # Lấy các thông tin giá
+                    current_price = analysis.get("price", 0)
+                    resistance_prices = [sr.get("value", 0) for sr in analysis.get("support_resistance", []) if sr.get("type", "").lower() == "resistance"]
+                    nearest_resistance = min(resistance_prices) if resistance_prices else current_price * 1.015
+                    
+                    # Tính toán mức giá vào lệnh
+                    entry_price = current_price
+                    entry_zone_low = current_price
+                    entry_zone_high = nearest_resistance
+                    
+                    # Mức giá Stop Loss và Take Profit
+                    stop_loss = nearest_resistance * 1.01
+                    take_profit_1 = current_price * 0.98  # TP mục tiêu 1
+                    take_profit_2 = current_price * 0.95  # TP mục tiêu 2
+                    
+                    # Hiển thị lời khuyên cụ thể về vị thế
                     content += "<p style='color: #EF4444;'><b>Bán:</b> Xem xét mở vị thế SHORT khi có dấu hiệu xác nhận xu hướng.</p>"
-                    content += "<p>Stop Loss: Đặt trên mức kháng cự gần nhất hoặc trên mức giá hiện tại 1.5%.</p>"
-                    content += "<p>Take Profit: Đặt tại mức hỗ trợ gần nhất hoặc dưới mức giá hiện tại 3%.</p>"
+                    content += f"<p><b>Giá vào lệnh đề xuất:</b> {entry_price:.2f} USDT</p>"
+                    content += f"<p><b>Vùng giá vào lệnh:</b> {entry_zone_low:.2f} - {entry_zone_high:.2f} USDT</p>"
+                    content += f"<p><b>Stop Loss:</b> {stop_loss:.2f} USDT (trên mức kháng cự gần nhất)</p>"
+                    content += f"<p><b>Take Profit 1:</b> {take_profit_1:.2f} USDT (2% lợi nhuận)</p>"
+                    content += f"<p><b>Take Profit 2:</b> {take_profit_2:.2f} USDT (5% lợi nhuận)</p>"
                 else:
+                    content += "<p><b>Khuyến nghị: KHÔNG VÀO LỆNH</b></p>"
                     content += "<p><b>Chờ đợi:</b> Thị trường đang sideway, chờ tín hiệu rõ ràng hơn.</p>"
                 
                 self.market_detail_text.setHtml(content)

@@ -321,11 +321,12 @@ class PositionManager:
             current_price = float(symbol_ticker["price"])
             
             # Xác định hướng giao dịch
-            if side == "LONG":
+            side = side.upper()
+            if side in ["LONG", "BUY", "MUA"]:
                 binance_side = SIDE_BUY
                 sl_side = SIDE_SELL
                 tp_side = SIDE_SELL
-            elif side == "SHORT":
+            elif side in ["SHORT", "SELL", "BÁN"]:
                 binance_side = SIDE_SELL
                 sl_side = SIDE_BUY
                 tp_side = SIDE_BUY
