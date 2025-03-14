@@ -417,46 +417,69 @@ class EnhancedTradingGUI(QMainWindow):
     def init_objects(self):
         """Khởi tạo các đối tượng cần thiết"""
         try:
-            # Kiểm tra các khóa API
-            api_key = os.environ.get("BINANCE_TESTNET_API_KEY")
-            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET")
+            # Lấy API keys từ biến môi trường
+            api_key = os.environ.get("BINANCE_API_KEY")
+            api_secret = os.environ.get("BINANCE_API_SECRET")
             
             if not api_key or not api_secret:
-                self.show_missing_api_keys_error()
+                self.show_error("Lỗi API Keys", "Không tìm thấy API key hoặc secret key. Vui lòng kiểm tra lại cấu hình.")
+                logger.error("Thiếu API key hoặc secret key")
+                return
             
             # Tải cấu hình rủi ro từ file
             risk_config = self.load_risk_config()
             
-            # Khởi tạo các đối tượng thực (không sử dụng lớp giả)
             try:
+                # Khởi tạo MarketAnalyzer với API keys
                 from market_analyzer import MarketAnalyzer as RealMarketAnalyzer
-                self.market_analyzer = RealMarketAnalyzer(testnet=True)
-                logger.info("Đã khởi tạo MarketAnalyzer thực")
-            except Exception as e:
-                logger.error(f"Lỗi khi khởi tạo Market Analyzer thực: {str(e)}")
-                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
-                self.market_analyzer = self.create_mock_market_analyzer()
-                logger.warning("Sử dụng lớp MarketAnalyzer giả")
-            
-            try:
+                self.market_analyzer = RealMarketAnalyzer(
+                    api_key=api_key,
+                    api_secret=api_secret,
+                    testnet=True
+                )
+                logger.info("Đã khởi tạo MarketAnalyzer với API keys")
+                
+                # Kiểm tra kết nối
+                if not self.market_analyzer.test_connection():
+                    raise Exception("Không thể kết nối với Binance API")
+                
+                # Khởi tạo PositionManager với API keys
                 from position_manager import PositionManager as RealPositionManager
-                self.position_manager = RealPositionManager(testnet=True)
-                logger.info("Đã khởi tạo PositionManager thực")
-            except Exception as e:
-                logger.error(f"Lỗi khi khởi tạo Position Manager thực: {str(e)}")
-                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
-                self.position_manager = self.create_mock_position_manager()
-                logger.warning("Sử dụng lớp PositionManager giả")
-            
-            try:
+                self.position_manager = RealPositionManager(
+                    api_key=api_key,
+                    api_secret=api_secret,
+                    testnet=True
+                )
+                logger.info("Đã khởi tạo PositionManager với API keys")
+                
+                # Kiểm tra kết nối của PositionManager
+                if not self.position_manager.test_connection():
+                    raise Exception("Không thể kết nối với Binance Futures API")
+                
+                # Khởi tạo RiskManager
                 from risk_manager import RiskManager as RealRiskManager
-                self.risk_manager = RealRiskManager(self.position_manager, risk_config)
-                logger.info("Đã khởi tạo RiskManager thực")
+                self.risk_manager = RealRiskManager(
+                    position_manager=self.position_manager,
+                    risk_config=risk_config
+                )
+                logger.info("Đã khởi tạo RiskManager")
+                
+                # Hiển thị thông báo thành công
+                self.show_info(
+                    "Kết nối thành công",
+                    "Đã kết nối thành công với Binance API và khởi tạo các thành phần hệ thống"
+                )
+                
             except Exception as e:
-                logger.error(f"Lỗi khi khởi tạo Risk Manager thực: {str(e)}")
-                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
+                error_msg = f"Lỗi khi khởi tạo hệ thống: {str(e)}"
+                logger.error(error_msg, exc_info=True)
+                self.show_error("Lỗi khởi tạo", error_msg)
+                
+                # Sử dụng các lớp giả trong trường hợp lỗi
+                self.market_analyzer = self.create_mock_market_analyzer()
+                self.position_manager = self.create_mock_position_manager()
                 self.risk_manager = self.create_mock_risk_manager(risk_config)
-                logger.warning("Sử dụng lớp RiskManager giả")
+                logger.warning("Đã chuyển sang sử dụng các lớp giả do lỗi kết nối")
             
             # Khởi tạo Scanner thị trường
             try:

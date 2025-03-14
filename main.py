@@ -14,9 +14,119 @@ import json
 import glob
 import subprocess
 import psutil
+import pandas as pd
+import numpy as np
+from binance.um_futures import UMFutures
+from binance.error import ClientError
 
-# Thêm module Telegram Notifier
+# Thêm các module tự tạo
 from telegram_notifier import TelegramNotifier
+from market_analyzer import MarketAnalyzer
+from position_manager import PositionManager
+from risk_manager import RiskManager
+
+# Khởi tạo các đối tượng global
+market_analyzer = None
+position_manager = None
+risk_manager = None
+
+def init_trading_components():
+    """Khởi tạo các thành phần giao dịch"""
+    global market_analyzer, position_manager, risk_manager
+    
+    api_key = os.environ.get("BINANCE_API_KEY")
+    api_secret = os.environ.get("BINANCE_API_SECRET")
+    
+    if not api_key or not api_secret:
+        logging.error("Thiếu API key hoặc secret!")
+        return False
+        
+    try:
+        market_analyzer = MarketAnalyzer(api_key=api_key, api_secret=api_secret)
+        position_manager = PositionManager(api_key=api_key, api_secret=api_secret)
+        risk_manager = RiskManager()
+        return True
+    except Exception as e:
+        logging.error(f"Lỗi khởi tạo các thành phần: {str(e)}")
+        return False
+
+def get_market_sentiment():
+    """Lấy chỉ số tâm lý thị trường"""
+    if not market_analyzer:
+        return {'value': 50, 'state': 'warning', 'text': 'Chưa sẵn sàng'}
+    return market_analyzer.get_market_sentiment()
+
+def get_technical_indicators():
+    """Lấy các chỉ báo kỹ thuật"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_technical_indicators()
+
+def get_market_regime():
+    """Lấy chế độ thị trường"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_market_regime()
+
+def get_market_forecast():
+    """Lấy dự báo thị trường"""
+    if not market_analyzer:
+        return {'text': 'Chưa sẵn sàng'}
+    return market_analyzer.get_market_forecast()
+
+def get_trading_recommendation():
+    """Lấy khuyến nghị giao dịch"""
+    if not market_analyzer:
+        return {'action': 'hold', 'text': 'Chưa sẵn sàng'}
+    return market_analyzer.get_trading_recommendation()
+
+def get_trading_signals():
+    """Lấy tín hiệu giao dịch"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_trading_signals()
+
+def get_market_trends():
+    """Lấy xu hướng thị trường"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_market_trends()
+
+def get_market_volumes():
+    """Lấy khối lượng giao dịch"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_market_volumes()
+
+def get_24h_volumes():
+    """Lấy khối lượng giao dịch 24h"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_24h_volumes()
+
+def get_market_summary():
+    """Lấy tóm tắt thị trường"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_market_summary()
+
+def get_btc_levels():
+    """Lấy các mức giá quan trọng của BTC"""
+    if not market_analyzer:
+        return {}
+    return market_analyzer.get_btc_levels()
+
+def get_signal(symbol):
+    """Lấy tín hiệu cho một cặp giao dịch"""
+    if not market_analyzer:
+        return 'Chờ tín hiệu'
+    return market_analyzer.get_signal(symbol)
+
+def get_trend(symbol):
+    """Lấy xu hướng cho một cặp giao dịch"""
+    if not market_analyzer:
+        return 'Trung tính'
+    return market_analyzer.get_trend(symbol)
 
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -288,9 +398,51 @@ def inject_global_vars():
 def index():
     """Trang chủ Dashboard"""
     try:
-        # Lấy dữ liệu tài khoản và thị trường để hiển thị trên dashboard
-        account_data = get_account().json
-        market_data = get_market_data()
+        # Lấy dữ liệu tài khoản từ Binance API
+        from binance_api import BinanceAPI
+        client = BinanceAPI(
+            api_key=os.environ.get("BINANCE_API_KEY"),
+            api_secret=os.environ.get("BINANCE_API_SECRET"),
+            testnet=True
+        )
+        
+        # Lấy số dư và vị thế
+        account_data = client.get_futures_account()
+        positions = client.get_positions()
+        
+        # Lấy dữ liệu thị trường từ Binance
+        btc_ticker = client.get_futures_ticker(symbol="BTCUSDT")
+        eth_ticker = client.get_futures_ticker(symbol="ETHUSDT")
+        sol_ticker = client.get_futures_ticker(symbol="SOLUSDT")
+        
+        # Tạo market data từ dữ liệu thực
+        market_data = {
+            'btc_price': float(btc_ticker['lastPrice']),
+            'btc_change_24h': float(btc_ticker['priceChangePercent']),
+            'eth_price': float(eth_ticker['lastPrice']),
+            'eth_change_24h': float(eth_ticker['priceChangePercent']),
+            'sol_price': float(sol_ticker['lastPrice']),
+            'sol_change_24h': float(sol_ticker['priceChangePercent']),
+            'sentiment': get_market_sentiment(),
+            'indicators': get_technical_indicators(),
+            'market_regime': get_market_regime(),
+            'forecast': get_market_forecast(),
+            'recommendation': get_trading_recommendation(),
+            'signals': get_trading_signals(),
+            'pairs': client.get_trading_pairs(),
+            'bnb_price': float(client.get_futures_ticker(symbol="BNBUSDT")['lastPrice']),
+            'bnb_change_24h': float(client.get_futures_ticker(symbol="BNBUSDT")['priceChangePercent']),
+            'doge_price': float(client.get_futures_ticker(symbol="DOGEUSDT")['lastPrice']),
+            'doge_change_24h': float(client.get_futures_ticker(symbol="DOGEUSDT")['priceChangePercent']),
+            'link_price': float(client.get_futures_ticker(symbol="LINKUSDT")['lastPrice']),
+            'link_change_24h': float(client.get_futures_ticker(symbol="LINKUSDT")['priceChangePercent']),
+            'market_trends': get_market_trends(),
+            'market_volumes': get_market_volumes(),
+            'volume_24h': get_24h_volumes(),
+            'market_summary': get_market_summary(),
+            'btc_levels': get_btc_levels()
+        }
+        
         app.logger.info(f"Dashboard loaded successfully: BTC price = ${market_data['btc_price']}")
         
         # Log các thuộc tính của market_data để debug
@@ -302,19 +454,19 @@ def index():
                 app.logger.info(f"  - {key}: None")
             else:
                 app.logger.info(f"  - {key}: {type(value).__name__}")
-                
+        
         # Tạo dữ liệu trạng thái cho template
         status = {
             'running': bot_status['status'] == 'running',
-            'account_balance': account_data.get('balance', 0),
-            'positions': account_data.get('positions', []),
+            'account_balance': float(account_data['totalWalletBalance']),
+            'positions': positions,
             'logs': [
                 {'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'type': 'INFO', 'message': 'Hệ thống đã được khởi động'}
             ],
             'market_data': [
-                {'symbol': 'BTCUSDT', 'price': f"${market_data['btc_price']}", 'change_24h': f"{market_data['btc_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
-                {'symbol': 'ETHUSDT', 'price': f"${market_data['eth_price']}", 'change_24h': f"{market_data['eth_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
-                {'symbol': 'SOLUSDT', 'price': f"${market_data['sol_price']}", 'change_24h': f"{market_data['sol_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'}
+                {'symbol': 'BTCUSDT', 'price': f"${market_data['btc_price']:.2f}", 'change_24h': f"{market_data['btc_change_24h']:.2f}%", 'signal': get_signal('BTCUSDT'), 'trend': get_trend('BTCUSDT')},
+                {'symbol': 'ETHUSDT', 'price': f"${market_data['eth_price']:.2f}", 'change_24h': f"{market_data['eth_change_24h']:.2f}%", 'signal': get_signal('ETHUSDT'), 'trend': get_trend('ETHUSDT')},
+                {'symbol': 'SOLUSDT', 'price': f"${market_data['sol_price']:.2f}", 'change_24h': f"{market_data['sol_change_24h']:.2f}%", 'signal': get_signal('SOLUSDT'), 'trend': get_trend('SOLUSDT')}
             ]
         }
         
