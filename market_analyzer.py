@@ -299,8 +299,8 @@ class MarketAnalyzer:
                 logger.error("Chưa kết nối với Binance API")
                 return pd.DataFrame()
             
-            # Lấy dữ liệu lịch sử
-            candles = self.client.get_klines(
+            # Lấy dữ liệu lịch sử - sử dụng futures API thay vì spot API
+            candles = self.client.futures_klines(
                 symbol=symbol,
                 interval=interval,
                 limit=limit

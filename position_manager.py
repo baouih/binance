@@ -316,6 +316,15 @@ class PositionManager:
             # Thiết lập đòn bẩy
             self.client.futures_change_leverage(symbol=symbol, leverage=leverage)
             
+            # Chắc chắn tài khoản đang ở Hedge Mode
+            try:
+                self.client.futures_change_position_mode(dualSidePosition=True)
+                logger.info("Đã thiết lập tài khoản sang chế độ Hedge Mode")
+            except Exception as e:
+                # Nếu đã ở chế độ hedge mode, sẽ xuất hiện lỗi
+                if "No need to change position side" not in str(e):
+                    logger.warning(f"Lỗi khi chuyển sang Hedge Mode: {str(e)}")
+            
             # Lấy giá hiện tại
             symbol_ticker = self.client.futures_symbol_ticker(symbol=symbol)
             current_price = float(symbol_ticker["price"])
@@ -326,19 +335,22 @@ class PositionManager:
                 binance_side = SIDE_BUY
                 sl_side = SIDE_SELL
                 tp_side = SIDE_SELL
+                position_side = "LONG"
             elif side in ["SHORT", "SELL", "BÁN"]:
                 binance_side = SIDE_SELL
                 sl_side = SIDE_BUY
                 tp_side = SIDE_BUY
+                position_side = "SHORT"
             else:
                 return {"status": "error", "message": f"Hướng giao dịch không hợp lệ: {side}"}
             
-            # Đặt lệnh mở vị thế
+            # Đặt lệnh mở vị thế với positionSide để đảm bảo lệnh SHORT hoạt động đúng
             order = self.client.futures_create_order(
                 symbol=symbol,
                 side=binance_side,
                 type=ORDER_TYPE_MARKET,
-                quantity=amount
+                quantity=amount,
+                positionSide=position_side
             )
             
             # Nếu có Stop Loss, đặt lệnh Stop Loss
@@ -402,12 +414,21 @@ class PositionManager:
             # Lấy thông tin vị thế
             position_info = self.get_position_info(symbol)
             
-            # Đặt lệnh đóng vị thế
+            # Xác định hướng giao dịch và position side
+            if position_info["side"] == "LONG":
+                binance_side = SIDE_SELL
+                position_side = "LONG"
+            else:  # SHORT
+                binance_side = SIDE_BUY
+                position_side = "SHORT"
+            
+            # Đặt lệnh đóng vị thế với positionSide để hỗ trợ hedge mode
             order = self.client.futures_create_order(
                 symbol=symbol,
-                side=SIDE_SELL if position_info["side"] == "LONG" else SIDE_BUY,
+                side=binance_side,
                 type=ORDER_TYPE_MARKET,
                 quantity=abs(position_info["size"]),
+                positionSide=position_side,
                 reduceOnly=True
             )
             
@@ -453,14 +474,16 @@ class PositionManager:
             if position_info["size"] == 0:
                 return {"status": "error", "message": f"Không có vị thế mở trên {symbol}"}
             
-            # Xác định hướng giao dịch
+            # Xác định hướng giao dịch và position side
             side = position_info["side"]
             if side == "LONG":
                 sl_side = SIDE_SELL
                 tp_side = SIDE_SELL
+                position_side = "LONG"
             else:  # SHORT
                 sl_side = SIDE_BUY
                 tp_side = SIDE_BUY
+                position_side = "SHORT"
             
             # Hủy các lệnh SL/TP hiện tại
             open_orders = self.client.futures_get_open_orders(symbol=symbol)
@@ -481,6 +504,7 @@ class PositionManager:
                     type=ORDER_TYPE_STOP_MARKET,
                     stopPrice=stop_loss,
                     closePosition=True,
+                    positionSide=position_side,
                     timeInForce="GTE_GTC"
                 )
             
@@ -492,6 +516,7 @@ class PositionManager:
                     type=ORDER_TYPE_TAKE_PROFIT_MARKET,
                     stopPrice=take_profit,
                     closePosition=True,
+                    positionSide=position_side,
                     timeInForce="GTE_GTC"
                 )
             
