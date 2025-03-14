@@ -1855,27 +1855,70 @@ class EnhancedTradingGUI(QMainWindow):
     
     def update_trading_info(self):
         """Cập nhật thông tin giao dịch"""
-        symbol = self.symbol_combo.currentText()
-        # Lấy hướng giao dịch hiện tại từ combobox trước mọi thao tác
-        side = self.side_combo.currentText()
-        
         try:
+            # Kiểm tra xem các thành phần UI có tồn tại không
+            if not hasattr(self, 'symbol_combo') or not self.symbol_combo:
+                logging.error("Thành phần symbol_combo chưa được khởi tạo")
+                return
+            
+            symbol = self.symbol_combo.currentText()
+            if not symbol:
+                logging.warning("Chưa chọn symbol")
+                return
+            
+            # Kiểm tra và lấy hướng giao dịch hiện tại từ combobox
+            if not hasattr(self, 'side_combo') or not self.side_combo:
+                logging.warning("Thành phần side_combo chưa được khởi tạo")
+                side = "LONG"  # Giá trị mặc định an toàn
+            else:
+                side = self.side_combo.currentText()
+                if not side:
+                    side = "LONG"  # Giá trị mặc định nếu không có lựa chọn
+            
+            # Kiểm tra kết nối market analyzer
+            if not hasattr(self, 'market_analyzer') or not self.market_analyzer:
+                logging.error("Market analyzer chưa được khởi tạo")
+                return
+                
+            if not hasattr(self.market_analyzer, 'client') or not self.market_analyzer.client:
+                logging.error("Chưa kết nối với Binance API")
+                return
+            
             # Lấy giá hiện tại
-            if self.market_analyzer and self.market_analyzer.client:
+            try:
                 symbol_ticker = self.market_analyzer.client.futures_symbol_ticker(symbol=symbol)
                 current_price = float(symbol_ticker["price"])
+            except Exception as e:
+                logging.error(f"Lỗi khi lấy giá hiện tại: {str(e)}")
+                return
                 
-                # Cập nhật giá hiện tại
+            # Cập nhật giá hiện tại
+            if hasattr(self, 'current_price_label') and self.current_price_label:
                 self.current_price_label.setText(f"{current_price:.2f} USDT")
-                
-                # Tính toán giá trị vị thế
+            
+            # Kiểm tra và lấy giá trị amount
+            if not hasattr(self, 'amount_spin') or not self.amount_spin:
+                logging.warning("Thành phần amount_spin chưa được khởi tạo")
+                amount = 0
+            else:
                 amount = self.amount_spin.value()
-                position_value = amount * current_price
+            
+            # Tính toán giá trị vị thế
+            position_value = amount * current_price
+            if hasattr(self, 'position_value_label') and self.position_value_label:
                 self.position_value_label.setText(f"{position_value:.2f} USDT")
-                
-                # Tính toán margin yêu cầu
-                leverage = self.leverage_spin.value()
-                margin_required = position_value / leverage
+            
+            # Kiểm tra và lấy giá trị leverage
+            if not hasattr(self, 'leverage_spin') or not self.leverage_spin:
+                logging.warning("Thành phần leverage_spin chưa được khởi tạo")
+                leverage = 1  # Giá trị mặc định an toàn
+            else:
+                leverage = max(1, self.leverage_spin.value())  # Đảm bảo leverage tối thiểu là 1
+            
+            # Tính toán margin yêu cầu
+            margin_required = position_value / leverage
+            if hasattr(self, 'margin_required_label') and self.margin_required_label:
+                self.margin_required_label.setText(f"{margin_required:.2f} USDT")
                 self.margin_required_label.setText(f"{margin_required:.2f} USDT")
                 
                 # Tính toán phần trăm rủi ro
@@ -2000,21 +2043,67 @@ class EnhancedTradingGUI(QMainWindow):
         :param side_override: Ghi đè hướng giao dịch (tùy chọn)
         """
         try:
-            if not self.position_manager:
+            # Kiểm tra PositionManager
+            if not hasattr(self, 'position_manager') or not self.position_manager:
                 self.show_error("Không thể mở vị thế", "Chưa khởi tạo PositionManager")
                 return
+                
+            # Kiểm tra kết nối
+            if not hasattr(self.position_manager, 'client') or not self.position_manager.client:
+                self.show_error("Không thể mở vị thế", "Chưa kết nối với Binance API")
+                return
             
-            # Lấy thông tin giao dịch
+            # Kiểm tra và lấy thông tin giao dịch
+            if not hasattr(self, 'symbol_combo') or not self.symbol_combo:
+                self.show_error("Không thể mở vị thế", "Thành phần symbol_combo chưa được khởi tạo")
+                return
+                
             symbol = self.symbol_combo.currentText()
-            side = side_override if side_override else self.side_combo.currentText()
+            if not symbol:
+                self.show_error("Không thể mở vị thế", "Chưa chọn symbol")
+                return
+            
+            # Kiểm tra và lấy side
+            if side_override:
+                side = side_override
+            else:
+                if not hasattr(self, 'side_combo') or not self.side_combo:
+                    self.show_error("Không thể mở vị thế", "Thành phần side_combo chưa được khởi tạo")
+                    return
+                side = self.side_combo.currentText()
+                if not side:
+                    self.show_error("Không thể mở vị thế", "Chưa chọn hướng giao dịch")
+                    return
+            
+            # Kiểm tra và lấy amount
+            if not hasattr(self, 'amount_spin') or not self.amount_spin:
+                self.show_error("Không thể mở vị thế", "Thành phần amount_spin chưa được khởi tạo")
+                return
             amount = self.amount_spin.value()
-            leverage = self.leverage_spin.value()
+            if amount <= 0:
+                self.show_error("Không thể mở vị thế", "Kích thước vị thế phải lớn hơn 0")
+                return
             
-            stop_loss = None if self.stop_loss_checkbox.isChecked() else self.stop_loss_spin.value()
-            take_profit = None if self.take_profit_checkbox.isChecked() else self.take_profit_spin.value()
+            # Kiểm tra và lấy leverage
+            if not hasattr(self, 'leverage_spin') or not self.leverage_spin:
+                self.show_error("Không thể mở vị thế", "Thành phần leverage_spin chưa được khởi tạo")
+                return
+            leverage = max(1, self.leverage_spin.value())  # Đảm bảo leverage tối thiểu là 1
             
-            # Kiểm tra tính hợp lệ của vị thế
-            if self.risk_manager:
+            # Kiểm tra và lấy stop loss
+            if not hasattr(self, 'stop_loss_checkbox') or not self.stop_loss_checkbox:
+                stop_loss = None
+            else:
+                stop_loss = None if self.stop_loss_checkbox.isChecked() else self.stop_loss_spin.value()
+            
+            # Kiểm tra và lấy take profit
+            if not hasattr(self, 'take_profit_checkbox') or not self.take_profit_checkbox:
+                take_profit = None
+            else:
+                take_profit = None if self.take_profit_checkbox.isChecked() else self.take_profit_spin.value()
+            
+            # Kiểm tra tính hợp lệ của vị thế với RiskManager
+            if hasattr(self, 'risk_manager') and self.risk_manager:
                 is_valid, reason = self.risk_manager.validate_new_position(symbol, side, amount)
                 if not is_valid:
                     self.show_error("Vị thế không hợp lệ", reason)
