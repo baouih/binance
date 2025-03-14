@@ -36,10 +36,12 @@ class PriceCache:
         
         # Thiết lập giá mặc định cho một số cặp phổ biến (chỉ sử dụng khi không có nguồn khác)
         self.default_prices = {
-            "BTCUSDT": 86133.1, "ETHUSDT": 2169.41, "BNBUSDT": 596.128, 
-            "SOLUSDT": 175.0, "ADAUSDT": 0.9, "DOGEUSDT": 0.191,
-            "LTCUSDT": 104.0, "DOTUSDT": 5.0, "XRPUSDT": 2.5044,
-            "AVAXUSDT": 22.0, "LINKUSDT": 15.286, "ATOMUSDT": 3.501
+            "BTCUSDT": 81932.3, "ETHUSDT": 1895.32, "BNBUSDT": 596.111, 
+            "SOLUSDT": 135.3, "ADAUSDT": 0.55, "DOGEUSDT": 0.19,
+            "LTCUSDT": 86.0, "DOTUSDT": 8.7, "XRPUSDT": 0.56,
+            "AVAXUSDT": 37.6, "LINKUSDT": 14.067, "ATOMUSDT": 10.4,
+            "MATICUSDT": 0.95, "UNIUSDT": 8.5, "FILUSDT": 7.02,
+            "AAVEUSDT": 100.2, "ICPUSDT": 12.8, "ETCUSDT": 26.3
         }
         
         # Tải cache từ file nếu có

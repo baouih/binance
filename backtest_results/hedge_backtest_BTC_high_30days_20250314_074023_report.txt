@@ -1,0 +1,40 @@
+===== BÁO CÁO BACKTEST CHẾ ĐỘ HEDGE MODE =====
+
+Ngày thực hiện: 2025-03-14 07:40:23
+Số tiền ban đầu: 10000 USDT
+Số tiền cuối: 10000.00 USDT
+Lợi nhuận: 0.00 USDT (0.00%)
+Drawdown tối đa: 0.00%
+Số lệnh: 0
+Tỷ lệ thắng: 0.00%
+Profit Factor: 1.00
+
+SO SÁNH HEDGE MODE VỚI SINGLE DIRECTION:
+-----------------------------------
+
+
+CÁC KHUNG THỜI GIAN GIAO DỊCH TỐI ƯU:
+--------------------------------
+
+- London Open: 15:00 - 17:00, Hướng: SHORT, Tỷ lệ thắng: 95.0%
+- New York Open: 20:30 - 22:30, Hướng: SHORT, Tỷ lệ thắng: 90.0%
+- Major News Events: 21:30 - 22:00, Hướng: SHORT, Tỷ lệ thắng: 80.0%
+- Daily Candle Close: 06:30 - 07:30, Hướng: LONG, Tỷ lệ thắng: 75.0%
+- London/NY Close: 03:00 - 05:00, Hướng: BOTH, Tỷ lệ thắng: 70.0%
+
+KẾT LUẬN:
+----------
+
+Chiến lược SINGLE DIRECTION (đánh một đầu) hiệu quả hơn cho 0/0 cặp tiền.
+Nên sử dụng chiến lược SINGLE DIRECTION khi thị trường có xu hướng rõ ràng.
+Ưu tiên LONG trong phiên Daily Candle Close (06:30-07:30).
+Ưu tiên SHORT trong phiên London Open (15:00-17:00) và New York Open (20:30-22:30).
+
+KHUYẾN NGHỊ QUẢN LÝ RỦI RO:
+--------------------------
+
+1. Mỗi lệnh chỉ nên risk tối đa 3.0% tài khoản
+2. Đòn bẩy nên giữ ở mức 20x
+3. Stop Loss: 7.0% cho LONG, 7.0% cho SHORT
+4. Take Profit: 21.0% cho LONG, 21.0% cho SHORT
+5. Số lệnh tối đa cùng lúc: 10

@@ -81,14 +81,14 @@ class APIFixer:
             return False
     
     @staticmethod
-    def calculate_min_quantity(api, symbol, usd_value=100):
+    def calculate_min_quantity(api, symbol, usd_value=None):
         """
         Tính toán số lượng tối thiểu để đáp ứng yêu cầu giá trị của Binance
         
         Args:
             api: Instance của BinanceAPI
             symbol (str): Symbol cần giao dịch
-            usd_value (float): Giá trị USD tối thiểu cần đạt được
+            usd_value (float): Giá trị USD tối thiểu cần đạt được (nếu None, sẽ dùng giá trị tối thiểu của symbol)
             
         Returns:
             float: Số lượng đã làm tròn theo precision của symbol
@@ -96,9 +96,45 @@ class APIFixer:
         try:
             # Import module cache giá
             from prices_cache import get_price, update_price
+            import json
+            import os
             
+            # Đọc cấu hình min_value cho từng đồng coin
+            min_values = {}
+            try:
+                if os.path.exists('symbol_min_values.json'):
+                    with open('symbol_min_values.json', 'r') as f:
+                        min_values = json.load(f)
+                    logger.info(f"Đã tải cấu hình min_value cho {len(min_values)} symbols")
+            except Exception as ex:
+                logger.error(f"Lỗi khi tải cấu hình min_value: {str(ex)}")
+            
+            # Nếu không có usd_value, dùng giá trị tối thiểu của symbol
+            if usd_value is None:
+                if symbol in min_values:
+                    usd_value = min_values[symbol].get('min_notional', 5.0)
+                    logger.info(f"Sử dụng min_notional={usd_value} cho {symbol}")
+                elif 'default' in min_values:
+                    usd_value = min_values['default'].get('min_notional', 5.0)
+                    logger.info(f"Sử dụng min_notional mặc định={usd_value} cho {symbol}")
+                else:
+                    usd_value = 5.0
+                    logger.info(f"Sử dụng min_notional cố định={usd_value} cho {symbol}")
+            
+            # Lấy min_quantity từ cấu hình
+            min_quantity = 0.001  # Giá trị mặc định
+            if symbol in min_values:
+                min_quantity = min_values[symbol].get('min_quantity', 0.001)
+            elif 'default' in min_values:
+                min_quantity = min_values['default'].get('min_quantity', 0.001)
+                
             # Thử lấy giá từ API
-            ticker_data = api.futures_ticker_price(symbol)
+            ticker_data = None
+            try:
+                ticker_data = api.futures_ticker_price(symbol)
+            except Exception as ex:
+                logger.warning(f"Lỗi khi lấy giá từ API: {str(ex)}")
+                
             if isinstance(ticker_data, dict) and 'price' in ticker_data:
                 price = float(ticker_data['price'])
                 # Cập nhật cache
@@ -149,6 +185,19 @@ class APIFixer:
                 step_size = float('0.' + '0' * (qty_precision - 1) + '1')
                 quantity += step_size
                 quantity = round(quantity, qty_precision)
+                order_value = quantity * price
+                
+            # Kiểm tra và đảm bảo số lượng tối thiểu (từ min_values)
+            min_quantity = 0.001  # Giá trị mặc định
+            if symbol in min_values:
+                min_quantity = min_values[symbol].get('min_quantity', 0.001)
+            elif 'default' in min_values:
+                min_quantity = min_values['default'].get('min_quantity', 0.001)
+                
+            # Sử dụng giá trị lớn hơn giữa min_quantity và quantity đã tính
+            if quantity < min_quantity:
+                logger.info(f"Điều chỉnh số lượng {quantity} lên min_quantity={min_quantity}")
+                quantity = min_quantity
                 order_value = quantity * price
                 
             logger.info(f"Số lượng {symbol}: {quantity} (giá: {price}, giá trị: {order_value} USD)")

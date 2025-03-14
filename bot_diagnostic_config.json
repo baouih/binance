@@ -1,0 +1,55 @@
+{
+  "test_duration": 3600,
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "SOLUSDT",
+    "DOGEUSDT"
+  ],
+  "timeframes": [
+    "1m",
+    "5m",
+    "15m",
+    "1h",
+    "4h",
+    "1d"
+  ],
+  "strategies_to_test": [
+    "ema_crossover",
+    "macd_divergence",
+    "rsi_extreme",
+    "supertrend",
+    "bollinger_bands_squeeze",
+    "hedge_mode"
+  ],
+  "risk_levels": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "use_testnet": true,
+  "max_concurrent_positions": 10,
+  "max_api_calls_per_minute": 1000,
+  "check_intervals": {
+    "strategy_consistency": 5,
+    "position_overlap": 1,
+    "api_reliability": 30,
+    "algorithm_accuracy": 15
+  },
+  "simulation": {
+    "enable": true,
+    "use_real_market_data": true,
+    "simulation_speed": 1.0,
+    "delay_variance": 0.1
+  },
+  "modules_to_test": [
+    "market_analyzer",
+    "position_manager",
+    "risk_manager",
+    "adaptive_mode_selector",
+    "adaptive_mode_trader",
+    "hedge_mode_backtest",
+    "trade_error_handler"
+  ]
+}

@@ -1,0 +1,60 @@
+===== BÁO CÁO BACKTEST CHẾ ĐỘ HEDGE MODE =====
+
+Ngày thực hiện: 2025-03-14 07:07:41
+Số tiền ban đầu: 10000 USDT
+Số tiền cuối: 11983.88 USDT
+Lợi nhuận: 1983.88 USDT (19.84%)
+Drawdown tối đa: 1.47%
+Số lệnh: 996
+Tỷ lệ thắng: 27.21%
+Profit Factor: 1.12
+
+SO SÁNH HEDGE MODE VỚI SINGLE DIRECTION:
+-----------------------------------
+
+Symbol: BTCUSDT
+- Hedge Mode: 10333.89 USDT (3.34%)
+- Single Direction: 11617.27 USDT (16.17%)
+- Chênh lệch: -1283.38 USDT (SINGLE DIRECTION TỐT HƠN)
+
+Symbol: ETHUSDT
+- Hedge Mode: 10300.42 USDT (3.00%)
+- Single Direction: 11328.77 USDT (13.29%)
+- Chênh lệch: -1028.35 USDT (SINGLE DIRECTION TỐT HƠN)
+
+Symbol: BNBUSDT
+- Hedge Mode: 10470.55 USDT (4.71%)
+- Single Direction: 11376.20 USDT (13.76%)
+- Chênh lệch: -905.65 USDT (SINGLE DIRECTION TỐT HƠN)
+
+Symbol: SOLUSDT
+- Hedge Mode: 10491.73 USDT (4.92%)
+- Single Direction: 11617.27 USDT (16.17%)
+- Chênh lệch: -1125.54 USDT (SINGLE DIRECTION TỐT HƠN)
+
+Symbol: DOGEUSDT
+- Hedge Mode: 10387.30 USDT (3.87%)
+- Single Direction: 11471.96 USDT (14.72%)
+- Chênh lệch: -1084.66 USDT (SINGLE DIRECTION TỐT HƠN)
+
+
+CÁC KHUNG THỜI GIAN GIAO DỊCH TỐI ƯU:
+--------------------------------
+
+- London Open: 15:00 - 17:00, Hướng: SHORT, Tỷ lệ thắng: 95.0%
+- New York Open: 20:30 - 22:30, Hướng: SHORT, Tỷ lệ thắng: 90.0%
+- Major News Events: 21:30 - 22:00, Hướng: SHORT, Tỷ lệ thắng: 80.0%
+- Daily Candle Close: 06:30 - 07:30, Hướng: LONG, Tỷ lệ thắng: 75.0%
+- London/NY Close: 03:00 - 05:00, Hướng: BOTH, Tỷ lệ thắng: 70.0%
+
+KẾT LUẬN:
+----------
+
+Chiến lược SINGLE DIRECTION (đánh một đầu) hiệu quả hơn cho 5/5 cặp tiền.
+Nên sử dụng chiến lược SINGLE DIRECTION khi thị trường có xu hướng rõ ràng.
+Ưu tiên LONG trong phiên Daily Candle Close (06:30-07:30).
+Ưu tiên SHORT trong phiên London Open (15:00-17:00) và New York Open (20:30-22:30).
+
+KHUYẾN NGHỊ QUẢN LÝ RỦI RO:
+--------------------------
+

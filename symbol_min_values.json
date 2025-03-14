@@ -1,0 +1,122 @@
+{
+    "BTCUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.001
+    },
+    "ETHUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.001
+    },
+    "BNBUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.01
+    },
+    "SOLUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "ADAUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "XRPUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "DOGEUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "DOTUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "AVAXUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "LINKUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "LTCUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.01
+    },
+    "UNIUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "ATOMUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "MATICUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "ICPUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "EOSUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "ETCUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.01
+    },
+    "VETUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 10.0
+    },
+    "ALGOUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "TRXUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 10.0
+    },
+    "AAVEUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.01
+    },
+    "SANDUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "MANAUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "AXSUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "LUNAUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "CRVUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 1.0
+    },
+    "NEARUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "FILUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "APEUSDT": {
+        "min_notional": 5.0,
+        "min_quantity": 0.1
+    },
+    "default": {
+        "min_notional": 5.0,
+        "min_quantity": 0.001
+    }
+}
