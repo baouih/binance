@@ -424,32 +424,61 @@ class EnhancedTradingGUI(QMainWindow):
             if not api_key or not api_secret:
                 self.show_missing_api_keys_error()
             
-            # Khởi tạo các đối tượng
-            self.market_analyzer = MarketAnalyzer(testnet=True)
-            self.position_manager = PositionManager(testnet=True)
-            
             # Tải cấu hình rủi ro từ file
             risk_config = self.load_risk_config()
             
-            # Khởi tạo Risk Manager
-            self.risk_manager = RiskManager(self.position_manager, risk_config)
+            # Khởi tạo các đối tượng thực (không sử dụng lớp giả)
+            try:
+                from market_analyzer import MarketAnalyzer as RealMarketAnalyzer
+                self.market_analyzer = RealMarketAnalyzer(testnet=True)
+                logger.info("Đã khởi tạo MarketAnalyzer thực")
+            except Exception as e:
+                logger.error(f"Lỗi khi khởi tạo Market Analyzer thực: {str(e)}")
+                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
+                self.market_analyzer = self.create_mock_market_analyzer()
+                logger.warning("Sử dụng lớp MarketAnalyzer giả")
+            
+            try:
+                from position_manager import PositionManager as RealPositionManager
+                self.position_manager = RealPositionManager(testnet=True)
+                logger.info("Đã khởi tạo PositionManager thực")
+            except Exception as e:
+                logger.error(f"Lỗi khi khởi tạo Position Manager thực: {str(e)}")
+                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
+                self.position_manager = self.create_mock_position_manager()
+                logger.warning("Sử dụng lớp PositionManager giả")
+            
+            try:
+                from risk_manager import RiskManager as RealRiskManager
+                self.risk_manager = RealRiskManager(self.position_manager, risk_config)
+                logger.info("Đã khởi tạo RiskManager thực")
+            except Exception as e:
+                logger.error(f"Lỗi khi khởi tạo Risk Manager thực: {str(e)}")
+                # Sử dụng lớp giả chỉ khi lớp thực không hoạt động
+                self.risk_manager = self.create_mock_risk_manager(risk_config)
+                logger.warning("Sử dụng lớp RiskManager giả")
             
             # Khởi tạo Scanner thị trường
             try:
                 from market_scanner import get_scanner
                 self.market_scanner = get_scanner(testnet=True)
-                logger.info("Đã khởi tạo Market Scanner")
+                logger.info("Đã khởi tạo Market Scanner thực")
             except Exception as e:
                 logger.error(f"Lỗi khi khởi tạo market_scanner: {str(e)}")
                 self.market_scanner = None
+                logger.warning("Market Scanner không khả dụng")
+            
+            # Thử kết nối API
+            self.test_api_connection()
             
             logger.info("Đã khởi tạo các đối tượng")
         
         except Exception as e:
             logger.error(f"Lỗi khi khởi tạo các đối tượng: {str(e)}", exc_info=True)
-            self.market_analyzer = None
-            self.position_manager = None
-            self.risk_manager = None
+            # Khởi tạo các lớp giả nếu có lỗi
+            self.market_analyzer = self.create_mock_market_analyzer()
+            self.position_manager = self.create_mock_position_manager()
+            self.risk_manager = self.create_mock_risk_manager({})
             self.market_scanner = None
     
     def load_risk_config(self) -> Dict[str, Any]:
@@ -1993,9 +2022,13 @@ class EnhancedTradingGUI(QMainWindow):
                 
                 # Tính toán SL và TP tự động nếu cần
                 if self.stop_loss_checkbox.isChecked() or self.take_profit_checkbox.isChecked():
-                    # Lấy giá hiện tại
-                    symbol_ticker = self.position_manager.client.futures_symbol_ticker(symbol=symbol)
-                    current_price = float(symbol_ticker["price"])
+                    # Lấy giá hiện tại - Xử lý an toàn
+                    try:
+                        symbol_ticker = self.position_manager.get_current_price(symbol)
+                        current_price = float(symbol_ticker)
+                    except Exception as e:
+                        logger.error(f"Lỗi khi lấy giá hiện tại: {str(e)}")
+                        current_price = 0.0
                     
                     sl_tp = self.risk_manager.calculate_sl_tp(symbol, side, current_price)
                     
@@ -2007,8 +2040,13 @@ class EnhancedTradingGUI(QMainWindow):
                 
                 # Kiểm tra tính hợp lệ của SL và TP
                 if stop_loss is not None and take_profit is not None:
-                    symbol_ticker = self.position_manager.client.futures_symbol_ticker(symbol=symbol)
-                    current_price = float(symbol_ticker["price"])
+                    # Lấy giá hiện tại - Xử lý an toàn
+                    try:
+                        symbol_ticker = self.position_manager.get_current_price(symbol)
+                        current_price = float(symbol_ticker)
+                    except Exception as e:
+                        logger.error(f"Lỗi khi lấy giá hiện tại: {str(e)}")
+                        current_price = 0.0
                     
                     is_valid_sltp, reason_sltp = self.risk_manager.validate_sl_tp(symbol, side, current_price, stop_loss, take_profit)
                     if not is_valid_sltp:
