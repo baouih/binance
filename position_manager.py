@@ -221,6 +221,33 @@ class PositionManager:
             self._log_connection_failure("unknown_error", str(e))
             return None
     
+    def get_current_price(self, symbol: str) -> float:
+        """
+        Lấy giá hiện tại của một cặp giao dịch
+        
+        :param symbol: Cặp giao dịch
+        :return: Giá hiện tại
+        """
+        try:
+            if not self.client:
+                logger.error("Chưa kết nối với Binance API")
+                return 0.0
+            
+            # Lấy giá từ ticker
+            ticker = self.client.futures_symbol_ticker(symbol=symbol)
+            if ticker and "price" in ticker:
+                return float(ticker["price"])
+            
+            return 0.0
+            
+        except BinanceAPIException as e:
+            logger.error(f"Lỗi khi lấy giá hiện tại: {str(e)}")
+            return 0.0
+        
+        except Exception as e:
+            logger.error(f"Lỗi không xác định khi lấy giá hiện tại: {str(e)}", exc_info=True)
+            return 0.0
+    
     def get_account_balance(self) -> Dict[str, Any]:
         """
         Lấy thông tin số dư tài khoản

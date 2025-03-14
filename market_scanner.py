@@ -350,8 +350,9 @@ _scanner_instance = None
 def get_scanner(testnet=True):
     """Lấy singleton instance của MarketScanner"""
     global _scanner_instance
-    if _scanner_instance is None:
-        _scanner_instance = MarketScanner(testnet=testnet)
+    # Tạo một instance mới (force refresh) để sử dụng API thực thay vì mock
+    _scanner_instance = MarketScanner(testnet=testnet)
+    logger.info("Đã tạo MarketScanner mới với API thực")
     return _scanner_instance
 
 
