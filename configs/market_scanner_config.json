@@ -7,5 +7,5 @@
     ],
     "timeframes": ["5m", "15m", "1h", "4h", "1d"],
     "scan_interval": 180,
-    "min_score_threshold": 65
+    "min_score_threshold": 60
 }
