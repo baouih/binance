@@ -55,7 +55,7 @@
                 </div>
                 <div class="status-label">Tín Hiệu Mua</div>
                 <div class="status-value" id="buySignals">
-                    {% set buy_count = status.market_data|selectattr('signal', 'search', 'Mua')|list|length %}
+                    {% set buy_count = status.market_data|selectattr('signal', 'contains', 'Mua')|list|length if status.market_data else 0 %}
                     {{ buy_count }}
                 </div>
             </div>
@@ -68,7 +68,7 @@
                 </div>
                 <div class="status-label">Tín Hiệu Bán</div>
                 <div class="status-value" id="sellSignals">
-                    {% set sell_count = status.market_data|selectattr('signal', 'search', 'Bán')|list|length %}
+                    {% set sell_count = status.market_data|selectattr('signal', 'contains', 'Bán')|list|length if status.market_data else 0 %}
                     {{ sell_count }}
                 </div>
             </div>
@@ -187,7 +187,7 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="upTrendList">
-                                        {% set up_trend = status.market_data|selectattr('trend', 'search', 'Tăng')|list %}
+                                        {% set up_trend = status.market_data|selectattr('trend', 'contains', 'Tăng')|list if status.market_data else [] %}
                                         {% for item in up_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
@@ -211,7 +211,7 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="sidewayTrendList">
-                                        {% set sideway_trend = status.market_data|selectattr('trend', 'search', 'Sideway')|list %}
+                                        {% set sideway_trend = status.market_data|selectattr('trend', 'contains', 'Sideway')|list if status.market_data else [] %}
                                         {% for item in sideway_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
@@ -235,7 +235,7 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="downTrendList">
-                                        {% set down_trend = status.market_data|selectattr('trend', 'search', 'Giảm')|list %}
+                                        {% set down_trend = status.market_data|selectattr('trend', 'contains', 'Giảm')|list if status.market_data else [] %}
                                         {% for item in down_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
