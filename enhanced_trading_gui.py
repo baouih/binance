@@ -411,6 +411,29 @@ class EnhancedTradingGUI(QMainWindow):
         balance_layout.addWidget(QLabel("Lợi nhuận chưa thực hiện:"), 2, 0)
         balance_layout.addWidget(self.unrealized_pnl_label, 2, 1)
         
+        # Thêm thông tin tổng quan thị trường
+        balance_layout.addWidget(QLabel("BTC/USDT:"), 0, 2)
+        self.btc_price_label = QLabel("0.00 USDT")
+        self.btc_price_label.setStyleSheet("font-weight: bold;")
+        balance_layout.addWidget(self.btc_price_label, 0, 3)
+        
+        balance_layout.addWidget(QLabel("ETH/USDT:"), 1, 2)
+        self.eth_price_label = QLabel("0.00 USDT")
+        self.eth_price_label.setStyleSheet("font-weight: bold;")
+        balance_layout.addWidget(self.eth_price_label, 1, 3)
+        
+        # Thêm nút Auto Trading
+        auto_trading_button = QPushButton("Kích hoạt Auto Trading")
+        auto_trading_button.setStyleSheet("""
+            background-color: #22C55E;
+            color: white;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+        """)
+        auto_trading_button.clicked.connect(lambda: self.start_service("auto_trade"))
+        balance_layout.addWidget(auto_trading_button, 2, 2, 1, 2)
+        
         layout.addWidget(balance_group)
         
         # Tạo phần hiển thị các vị thế đang mở
@@ -1440,6 +1463,16 @@ class EnhancedTradingGUI(QMainWindow):
         """
         self.market_table.setRowCount(len(market_overview))
         
+        # Cập nhật giá BTC và ETH trên dashboard
+        for market_data in market_overview:
+            symbol = market_data.get("symbol", "")
+            price = market_data.get("price", 0)
+            
+            if symbol == "BTCUSDT":
+                self.btc_price_label.setText(f"{price:.2f} USDT")
+            elif symbol == "ETHUSDT":
+                self.eth_price_label.setText(f"{price:.2f} USDT")
+        
         for row, market_data in enumerate(market_overview):
             symbol = market_data.get("symbol", "")
             price = market_data.get("price", 0)
@@ -1501,6 +1534,9 @@ class EnhancedTradingGUI(QMainWindow):
                             risk_percentage = margin_required / total_balance * 100
                             self.risk_percentage_label.setText(f"{risk_percentage:.2f}%")
                 
+                # Lấy hướng giao dịch hiện tại từ combobox
+                side = self.side_combo.currentText()
+                
                 # Tính toán giá thanh lý (giả sử)
                 if side == "LONG":
                     liquidation_price = current_price * (1 - (1 / leverage) * 0.9)  # 90% margin
@@ -1512,7 +1548,7 @@ class EnhancedTradingGUI(QMainWindow):
                 # Tính toán SL và TP tự động
                 if self.stop_loss_checkbox.isChecked() or self.take_profit_checkbox.isChecked():
                     if self.risk_manager:
-                        side = self.side_combo.currentText()
+                        # Đã lấy side ở trên, không cần lấy lại
                         sl_tp = self.risk_manager.calculate_sl_tp(symbol, side, current_price)
                         
                         if self.stop_loss_checkbox.isChecked():
