@@ -1,11 +1,5 @@
 [
     {
-        "timestamp": "2025-03-14 02:51:32",
-        "status": "success",
-        "api_type": "binance",
-        "mode": "testnet"
-    },
-    {
         "timestamp": "2025-03-14 03:05:27",
         "status": "success",
         "api_type": "binance",
@@ -595,6 +589,12 @@
     },
     {
         "timestamp": "2025-03-14 15:03:30",
+        "status": "success",
+        "api_type": "binance",
+        "mode": "testnet"
+    },
+    {
+        "timestamp": "2025-03-14 15:19:25",
         "status": "success",
         "api_type": "binance",
         "mode": "testnet"
