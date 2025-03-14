@@ -126,10 +126,89 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
-        self.setGeometry(100, 100, 1280, 800)
+        self.setGeometry(100, 100, 900, 600)  # Thu nhỏ kích thước xuống khoảng 40%
         
         # Thiết lập icon
         self.setWindowIcon(QIcon("static/icons/app_icon.png"))
+        
+        # Tạo stylesheet chung cho ứng dụng
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1F2937;
+                color: white;
+            }
+            QTabWidget {
+                background-color: #1F2937;
+                color: white;
+            }
+            QTabWidget::pane {
+                border: 1px solid #3B4252;
+                background-color: #1F2937;
+            }
+            QTabBar::tab {
+                background-color: #2D3748;
+                color: white;
+                padding: 8px 16px;
+                margin-right: 2px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+            QTabBar::tab:selected {
+                background-color: #4B5563;
+                font-weight: bold;
+            }
+            QPushButton {
+                background-color: #3B82F6;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #2563EB;
+            }
+            QPushButton:pressed {
+                background-color: #1D4ED8;
+            }
+            QTableWidget {
+                background-color: #1F2937;
+                color: white;
+                gridline-color: #4B5563;
+                border: 1px solid #4B5563;
+                border-radius: 4px;
+            }
+            QHeaderView::section {
+                background-color: #2D3748;
+                color: white;
+                padding: 4px;
+                border: 1px solid #4B5563;
+            }
+            QTableWidget QTableCornerButton::section {
+                background-color: #2D3748;
+                border: 1px solid #4B5563;
+            }
+            QLabel {
+                color: white;
+            }
+            QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+                background-color: #374151;
+                color: white;
+                border: 1px solid #4B5563;
+                border-radius: 4px;
+                padding: 4px;
+            }
+            QGroupBox {
+                border: 1px solid #4B5563;
+                border-radius: 4px;
+                margin-top: 8px;
+                color: white;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 8px;
+                padding: 0 5px;
+            }
+        """)
         
         # Khởi tạo các đối tượng
         self.init_objects()
