@@ -293,6 +293,16 @@ def index():
         market_data = get_market_data()
         app.logger.info(f"Dashboard loaded successfully: BTC price = ${market_data['btc_price']}")
         
+        # Log các thuộc tính của market_data để debug
+        app.logger.info("Kiểm tra thuộc tính market_data:")
+        for key, value in market_data.items():
+            if isinstance(value, (int, float, str, bool)):
+                app.logger.info(f"  - {key}: {value} (type: {type(value).__name__})")
+            elif value is None:
+                app.logger.info(f"  - {key}: None")
+            else:
+                app.logger.info(f"  - {key}: {type(value).__name__}")
+                
         # Tạo dữ liệu trạng thái cho template
         status = {
             'running': bot_status['status'] == 'running',
@@ -308,22 +318,45 @@ def index():
             ]
         }
         
+        # Thêm kiểm tra cuối cùng cho các thuộc tính iterable
+        # Đảm bảo các thuộc tính quan trọng là list hoặc dict
+        for key in ['indicators', 'market_regime', 'signals', 'pairs']:
+            if key in market_data:
+                if not isinstance(market_data[key], (list, dict)):
+                    app.logger.warning(f"Thuộc tính {key} không phải list hoặc dict, mà là {type(market_data[key]).__name__}")
+                    # Sửa lỗi
+                    if key == 'pairs':
+                        market_data[key] = []
+                    elif key in ['indicators', 'market_regime', 'signals']:
+                        market_data[key] = {}
+        
         return render_template('index.html', account_data=account_data, market_data=market_data, status=status)
     except Exception as e:
         app.logger.error(f"Error loading dashboard: {str(e)}")
+        import traceback
+        app.logger.error(traceback.format_exc())
+        
         # Fallback to default empty data
+        empty_market_data = EMPTY_MARKET_DATA.copy()
+        
+        # Tạo trạng thái mặc định khi gặp lỗi
         empty_status = {
             'running': False,
             'account_balance': 0,
             'positions': [],
             'logs': [
-                {'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'type': 'WARNING', 'message': 'Không thể tải dữ liệu'}
+                {'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'type': 'WARNING', 'message': f'Không thể tải dữ liệu: {str(e)}'}
             ],
-            'market_data': []
+            'market_data': [
+                {'symbol': 'BTCUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'ETHUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'SOLUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'}
+            ]
         }
+        
         return render_template('index.html', 
                               account_data={'balance': 0, 'equity': 0, 'available': 0, 'pnl': 0, 'mode': 'demo'},
-                              market_data=EMPTY_MARKET_DATA.copy(),
+                              market_data=empty_market_data,
                               status=empty_status)
 
 @app.route('/strategies')
@@ -352,13 +385,65 @@ def trades():
 def market():
     """Trang phân tích thị trường"""
     try:
+        # Lấy dữ liệu thị trường
         market_data = get_market_data()
         app.logger.info(f"Market data loaded successfully: BTC price = ${market_data['btc_price']}")
-        return render_template('market.html', market_data=market_data)
+        
+        # Thêm kiểm tra cho các thuộc tính iterable
+        # Đảm bảo các thuộc tính quan trọng là list hoặc dict
+        for key in ['indicators', 'market_regime', 'signals', 'pairs']:
+            if key in market_data:
+                if not isinstance(market_data[key], (list, dict)):
+                    app.logger.warning(f"Thuộc tính {key} không phải list hoặc dict, mà là {type(market_data[key]).__name__}")
+                    # Sửa lỗi
+                    if key == 'pairs':
+                        market_data[key] = []
+                    elif key in ['indicators', 'market_regime', 'signals']:
+                        market_data[key] = {}
+        
+        # Tạo dữ liệu trạng thái cho template, tương tự như trong route index()
+        status = {
+            'running': bot_status['status'] == 'running',
+            'logs': [
+                {'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'type': 'INFO', 'message': 'Đã tải dữ liệu thị trường'}
+            ],
+            'market_data': [
+                {'symbol': 'BTCUSDT', 'price': f"${market_data['btc_price']}", 'change_24h': f"{market_data['btc_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'ETHUSDT', 'price': f"${market_data['eth_price']}", 'change_24h': f"{market_data['eth_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'SOLUSDT', 'price': f"${market_data['sol_price']}", 'change_24h': f"{market_data['sol_change_24h']}%", 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'}
+            ]
+        }
+        
+        return render_template('market.html', market_data=market_data, status=status)
     except Exception as e:
         app.logger.error(f"Error loading market page: {str(e)}")
+        import traceback
+        app.logger.error(traceback.format_exc())
+        
         # Fallback to default data if API fails
-        return render_template('market.html', market_data=EMPTY_MARKET_DATA.copy())
+        empty_market_data = EMPTY_MARKET_DATA.copy()
+        # Đảm bảo các thuộc tính trong empty_market_data là đúng kiểu dữ liệu
+        for key in ['indicators', 'market_regime', 'signals', 'pairs']:
+            if key in empty_market_data:
+                if not isinstance(empty_market_data[key], (list, dict)):
+                    app.logger.warning(f"Thuộc tính {key} trong empty_market_data không phải list hoặc dict")
+                    if key == 'pairs':
+                        empty_market_data[key] = []
+                    elif key in ['indicators', 'market_regime', 'signals']:
+                        empty_market_data[key] = {}
+                        
+        empty_status = {
+            'running': False,
+            'logs': [
+                {'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'type': 'WARNING', 'message': f'Không thể tải dữ liệu thị trường: {str(e)}'}
+            ],
+            'market_data': [
+                {'symbol': 'BTCUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'ETHUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'},
+                {'symbol': 'SOLUSDT', 'price': '$0', 'change_24h': '0%', 'signal': 'Chờ tín hiệu', 'trend': 'Trung tính'}
+            ]
+        }
+        return render_template('market.html', market_data=empty_market_data, status=empty_status)
 
 @app.route('/position')
 def position():
@@ -1066,8 +1151,8 @@ def get_market_data():
             market_data['sol_change_24h'] = float(sol_24h['priceChangePercent'])
         else:
             market_data['sol_change_24h'] = 0
-            
-        # Tạo danh sách các cặp giao dịch từ dữ liệu thực
+        
+        # Đảm bảo 'pairs' luôn là danh sách, không phải giá trị khác
         market_data['pairs'] = [
             {
                 'symbol': 'BTCUSDT',
@@ -1143,15 +1228,16 @@ def get_market_data():
             'LINK': link_24h.get('volume', 0) if isinstance(link_24h, dict) else 0
         }
         
-        # Thêm chế độ thị trường và dữ liệu khác
-        market_data['market_regime'] = {
-            'BTC': 'neutral',
-            'ETH': 'neutral',
-            'SOL': 'neutral',
-            'BNB': 'neutral',
-            'DOGE': 'neutral',
-            'LINK': 'neutral'
-        }
+        # Thêm chế độ thị trường và dữ liệu khác - đảm bảo là dict
+        if not isinstance(market_data.get('market_regime'), dict):
+            market_data['market_regime'] = {
+                'BTC': 'neutral',
+                'ETH': 'neutral',
+                'SOL': 'neutral',
+                'BNB': 'neutral',
+                'DOGE': 'neutral',
+                'LINK': 'neutral'
+            }
         
         # Thêm sentiment cho chỉ số sợ hãi/tham lam
         # Trong thực tế, điều này nên được tính toán dựa trên dữ liệu phân tích
@@ -1190,24 +1276,55 @@ def get_market_data():
                 {'price': market_data['btc_price'] * 1.05, 'strength': 'strong'}
             ]
         }
+        
+        # Đảm bảo các trường chính đã được khởi tạo đúng cách
+        if not isinstance(market_data.get('indicators'), dict):
+            market_data['indicators'] = {}
+            
+        if not isinstance(market_data.get('signals'), dict):
+            market_data['signals'] = {}
             
         logger.info(f"Đã lấy dữ liệu thị trường thực từ Binance API: BTC=${market_data['btc_price']}")
     except Exception as e:
         logger.error(f"Lỗi khi lấy dữ liệu thị trường từ Binance API: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         # Sử dụng dữ liệu trống nếu không lấy được dữ liệu thực
         market_data = EMPTY_MARKET_DATA.copy()
     
-    # Cập nhật danh sách cặp giao dịch
-    for pair in market_data['pairs']:
-        if pair['symbol'] == 'BTCUSDT':
-            pair['price'] = market_data['btc_price']
-            pair['change'] = market_data['btc_change_24h']
-        elif pair['symbol'] == 'ETHUSDT':
-            pair['price'] = market_data['eth_price']
-            pair['change'] = market_data['eth_change_24h']
-        elif pair['symbol'] == 'SOLUSDT':
-            pair['price'] = market_data['sol_price']
-            pair['change'] = market_data['sol_change_24h']
+    # Kiểm tra cuối cùng - đảm bảo các thuộc tính là đúng kiểu dữ liệu
+    # Đảm bảo pairs luôn là list
+    if not isinstance(market_data.get('pairs'), list):
+        market_data['pairs'] = [
+            {
+                'symbol': 'BTCUSDT',
+                'price': market_data.get('btc_price', 0),
+                'change': market_data.get('btc_change_24h', 0),
+                'volume': 0
+            },
+            {
+                'symbol': 'ETHUSDT',
+                'price': market_data.get('eth_price', 0),
+                'change': market_data.get('eth_change_24h', 0),
+                'volume': 0
+            },
+            {
+                'symbol': 'SOLUSDT',
+                'price': market_data.get('sol_price', 0),
+                'change': market_data.get('sol_change_24h', 0),
+                'volume': 0
+            }
+        ]
+    
+    # Đảm bảo indicators, market_regime, signals đều là dict
+    if not isinstance(market_data.get('indicators'), dict):
+        market_data['indicators'] = {}
+    
+    if not isinstance(market_data.get('market_regime'), dict):
+        market_data['market_regime'] = {}
+    
+    if not isinstance(market_data.get('signals'), dict):
+        market_data['signals'] = {}
     
     # Trả về dữ liệu thị trường đã được cập nhật
     return market_data

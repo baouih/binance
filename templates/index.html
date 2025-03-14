@@ -164,7 +164,7 @@
                                     <td>{{ position.entry_price }}</td>
                                     <td>{{ position.current_price }}</td>
                                     <td>{{ position.size }}</td>
-                                    <td class="{{ 'profit' if '+' in position.pnl else 'loss' }}">
+                                    <td class="{{ 'profit' if position.pnl > 0 else 'loss' }}">
                                         {{ position.pnl }}
                                     </td>
                                     <td>{{ position.time }}</td>

@@ -380,34 +380,100 @@ class PositionManager:
             else:
                 return {"status": "error", "message": f"Hướng giao dịch không hợp lệ: {side}"}
             
+            # Kiểm tra giá trị tối thiểu (100 USDT)
+            import math
+            MIN_NOTIONAL = 100  # Giá trị tối thiểu 100 USDT cho Binance Futures
+            
+            # Tính toán số lượng tối thiểu để đạt được giá trị 100 USDT
+            quantity = amount
+            notional_value = quantity * current_price
+            
+            if notional_value < MIN_NOTIONAL:
+                logger.warning(f"Giá trị lệnh {notional_value} USDT nhỏ hơn giá trị tối thiểu {MIN_NOTIONAL} USDT")
+                # Tính lại số lượng để đạt giá trị tối thiểu
+                min_required_qty = MIN_NOTIONAL / current_price
+                
+                # Lấy thông tin tùy chỉnh về symbol
+                symbol_info = self.client.futures_exchange_info()
+                step_size = None
+                for s in symbol_info['symbols']:
+                    if s['symbol'] == symbol:
+                        for f in s['filters']:
+                            if f['filterType'] == 'LOT_SIZE':
+                                step_size = float(f['stepSize'])
+                                break
+                        break
+                
+                # Làm tròn số lượng theo step_size
+                if step_size:
+                    precision = int(round(-math.log10(step_size)))
+                    # Làm tròn lên để đảm bảo đạt giá trị tối thiểu
+                    quantity = math.ceil(min_required_qty * 10**precision) / 10**precision
+                    logger.info(f"Đã điều chỉnh số lượng từ {amount} lên {quantity} để đạt giá trị tối thiểu {MIN_NOTIONAL} USDT")
+                else:
+                    # Nếu không tìm thấy step_size, làm tròn 3 chữ số và tăng lên một chút
+                    quantity = math.ceil(min_required_qty * 1000) / 1000
+                    logger.info(f"Đã điều chỉnh số lượng từ {amount} lên {quantity} BTC để đạt giá trị tối thiểu")
+            
             # Đặt lệnh mở vị thế với positionSide để đảm bảo lệnh SHORT hoạt động đúng
             try:
                 order = self.client.futures_create_order(
                     symbol=symbol,
                     side=binance_side,
                     type=ORDER_TYPE_MARKET,
-                    quantity=amount,
+                    quantity=quantity,
                     positionSide=position_side
                 )
             except BinanceAPIException as e:
-                if "Unknown error" in str(e):
-                    # Thử lại với số lượng được làm tròn
-                    import math
-                    # Lấy thông tin tùy chỉnh về symbol
-                    symbol_info = self.client.futures_exchange_info()
-                    step_size = None
-                    for s in symbol_info['symbols']:
-                        if s['symbol'] == symbol:
-                            for f in s['filters']:
-                                if f['filterType'] == 'LOT_SIZE':
-                                    step_size = float(f['stepSize'])
-                                    break
-                            break
+                if "Order's notional must be no smaller than" in str(e):
+                    # Lỗi giá trị lệnh quá nhỏ, thử lại với giá trị lớn hơn
+                    logger.warning(f"Lỗi giá trị lệnh quá nhỏ: {str(e)}")
+                    # Tính lại với biên an toàn 1% để tránh biến động giá
+                    safe_min_qty = (MIN_NOTIONAL * 1.01) / current_price
                     
-                    # Làm tròn số lượng nếu tìm thấy step_size
+                    # Lấy thông tin step_size nếu chưa có
+                    if not 'step_size' in locals() or step_size is None:
+                        symbol_info = self.client.futures_exchange_info()
+                        for s in symbol_info['symbols']:
+                            if s['symbol'] == symbol:
+                                for f in s['filters']:
+                                    if f['filterType'] == 'LOT_SIZE':
+                                        step_size = float(f['stepSize'])
+                                        break
+                                break
+                    
                     if step_size:
                         precision = int(round(-math.log10(step_size)))
-                        rounded_amount = round(amount, precision)
+                        safe_quantity = math.ceil(safe_min_qty * 10**precision) / 10**precision
+                    else:
+                        safe_quantity = math.ceil(safe_min_qty * 1000) / 1000
+                    
+                    logger.info(f"Thử lại với số lượng lớn hơn: {safe_quantity}")
+                    order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=binance_side,
+                        type=ORDER_TYPE_MARKET,
+                        quantity=safe_quantity,
+                        positionSide=position_side
+                    )
+                elif "Unknown error" in str(e):
+                    # Thử lại với số lượng được làm tròn
+                    logger.warning(f"Lỗi không xác định: {str(e)}")
+                    
+                    # Lấy thông tin step_size nếu chưa có
+                    if not 'step_size' in locals() or step_size is None:
+                        symbol_info = self.client.futures_exchange_info()
+                        for s in symbol_info['symbols']:
+                            if s['symbol'] == symbol:
+                                for f in s['filters']:
+                                    if f['filterType'] == 'LOT_SIZE':
+                                        step_size = float(f['stepSize'])
+                                        break
+                                break
+                    
+                    if step_size:
+                        precision = int(round(-math.log10(step_size)))
+                        rounded_amount = round(quantity, precision)
                         logger.info(f"Thử lại đặt lệnh với số lượng được làm tròn: {rounded_amount}")
                         order = self.client.futures_create_order(
                             symbol=symbol,
@@ -417,9 +483,9 @@ class PositionManager:
                             positionSide=position_side
                         )
                     else:
-                        # Nếu không tìm thấy step_size, thử với số lượng làm tròn 4 chữ số
-                        rounded_amount = round(amount, 4)
-                        logger.info(f"Thử lại đặt lệnh với số lượng làm tròn 4 chữ số: {rounded_amount}")
+                        # Nếu không tìm thấy step_size, thử với số lượng làm tròn 3 chữ số
+                        rounded_amount = round(quantity, 3)
+                        logger.info(f"Thử lại đặt lệnh với số lượng làm tròn 3 chữ số: {rounded_amount}")
                         order = self.client.futures_create_order(
                             symbol=symbol,
                             side=binance_side,
@@ -428,7 +494,7 @@ class PositionManager:
                             positionSide=position_side
                         )
                 else:
-                    # Truyền lại lỗi ban đầu nếu không phải lỗi unknown
+                    # Truyền lại lỗi ban đầu nếu không phải lỗi đã biết
                     raise
             
             # Nếu có Stop Loss, đặt lệnh Stop Loss
