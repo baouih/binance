@@ -34,14 +34,15 @@ class MarketScanner:
         self.testnet = testnet
         self.active = False
         self.scan_thread = None
-        self.scan_interval = 300  # Quét mỗi 5 phút
+        self.scan_interval = 180  # Quét mỗi 3 phút
         self.pairs_to_scan = [
             "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT", 
             "ADAUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "AVAXUSDT",
-            "MATICUSDT", "LINKUSDT", "UNIUSDT", "ATOMUSDT", "VETUSDT"
+            "MATICUSDT", "LINKUSDT", "UNIUSDT", "ATOMUSDT", "VETUSDT",
+            "AAVEUSDT", "ALGOUSDT", "TRXUSDT", "ICPUSDT", "FTMUSDT"
         ]
-        self.timeframes = ["15m", "1h", "4h"]  # Các khung thời gian cần quét
-        self.min_score_threshold = 65  # Điểm số tối thiểu để gửi thông báo
+        self.timeframes = ["5m", "15m", "1h", "4h", "1d"]  # Các khung thời gian cần quét
+        self.min_score_threshold = 60  # Điểm số tối thiểu để gửi thông báo
         
         try:
             # Khởi tạo các đối tượng phân tích

@@ -2742,8 +2742,9 @@ class EnhancedTradingGUI(QMainWindow):
                 "service_manager",
                 "watchdog_service", 
                 "telegram_notifier",
-                "auto_trading",
-                "ml_training"
+                "auto_trade",
+                "ml_training",
+                "market_scanner"
             ]
             
             # Đếm số lượng dịch vụ khởi động thành công
@@ -3014,7 +3015,8 @@ class EnhancedTradingGUI(QMainWindow):
                 "market_notifier": "market_notifier.log",
                 "unified_trading_service": "unified_trading_service.log",
                 "service_manager": "service_manager.log",
-                "watchdog": "watchdog.log"
+                "watchdog": "watchdog.log",
+                "market_scanner": "market_scanner.log"
             }
             
             # Đọc log từ các file log dịch vụ
