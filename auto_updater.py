@@ -30,7 +30,10 @@ logging.basicConfig(
 logger = logging.getLogger("auto_updater")
 
 # URL cơ sở cho máy chủ cập nhật
-UPDATE_SERVER_URL = "https://api.github.com/repos/yourusername/tradingbot/releases/latest"
+# Cấu hình URL thực tế của bạn ở đây
+UPDATE_SERVER_URL = "https://api.github.com/repos/trading-bot-project/tradingbot/releases/latest"
+# Flag để bỏ qua kiểm tra trực tuyến và luôn trả về không có cập nhật mới 
+SKIP_ONLINE_CHECK = True
 
 class AutoUpdater:
     """Lớp xử lý cập nhật tự động"""
@@ -88,6 +91,11 @@ class AutoUpdater:
         """
         try:
             logger.info("Đang kiểm tra cập nhật từ máy chủ...")
+            
+            # Nếu được cấu hình để bỏ qua kiểm tra trực tuyến
+            if SKIP_ONLINE_CHECK:
+                logger.info("SKIP_ONLINE_CHECK đang bật, bỏ qua kiểm tra trực tuyến.")
+                return False, self.current_version, {}
             
             # Thực hiện kiểm tra cập nhật từ máy chủ
             # Mẫu: Sử dụng GitHub API để kiểm tra phiên bản mới nhất
