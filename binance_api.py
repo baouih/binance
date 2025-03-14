@@ -779,6 +779,26 @@ class BinanceAPI:
             logger.error(f"Exception khi lấy thông tin giá Futures: {str(e)}")
             return []
             
+    def get_trading_pairs(self) -> List[Dict]:
+        """
+        Lấy danh sách tất cả các cặp giao dịch hỗ trợ trên Binance
+        
+        Returns:
+            List[Dict]: Danh sách các cặp giao dịch với thông tin giá
+        """
+        try:
+            logger.info("Lấy danh sách cặp giao dịch...")
+            if self.account_type == 'futures':
+                # Sử dụng endpoint futures cho tài khoản futures
+                return self.futures_ticker_price()
+            else:
+                # Sử dụng endpoint spot cho tài khoản spot
+                params = {}
+                return self._request('GET', 'ticker/price', params)
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy danh sách cặp giao dịch: {str(e)}")
+            return []
+            
     def get_futures_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
         """
         Lấy thông tin ticker của Futures (24h price change + price)
