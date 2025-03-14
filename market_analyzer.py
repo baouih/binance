@@ -219,16 +219,32 @@ class MarketAnalyzer:
                 logger.error("Chưa kết nối với Binance API")
                 return {"status": "error", "message": "Chưa kết nối với Binance API"}
             
-            # Lấy giá hiện tại
-            ticker = self.client.get_ticker(symbol=symbol)
-            
-            # Kết quả
-            result = {
-                "status": "success",
-                "price": float(ticker["lastPrice"]),
-                "change_24h": float(ticker["priceChangePercent"]),
-                "volume": float(ticker["volume"])
-            }
+            # Kiểm tra xem đang ở môi trường testnet hay mainnet
+            if hasattr(self, "testnet") and self.testnet:
+                # Lấy giá hiện tại từ Future API cho testnet
+                ticker = self.client.futures_symbol_ticker(symbol=symbol)
+                
+                # Lấy thông tin thay đổi 24h
+                ticker_24h = self.client.futures_ticker(symbol=symbol)
+                
+                # Kết quả
+                result = {
+                    "status": "success",
+                    "price": float(ticker["price"]),
+                    "change_24h": float(ticker_24h["priceChangePercent"]) if "priceChangePercent" in ticker_24h else 0.0,
+                    "volume": float(ticker_24h["volume"]) if "volume" in ticker_24h else 0.0
+                }
+            else:
+                # Lấy giá hiện tại từ Spot API 
+                ticker = self.client.get_ticker(symbol=symbol)
+                
+                # Kết quả
+                result = {
+                    "status": "success",
+                    "price": float(ticker["lastPrice"]),
+                    "change_24h": float(ticker["priceChangePercent"]),
+                    "volume": float(ticker["volume"])
+                }
             
             return result
         

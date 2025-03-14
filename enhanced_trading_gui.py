@@ -126,7 +126,7 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
-        self.setGeometry(100, 100, 750, 500)  # Thu nhỏ kích thước xuống 40%
+        self.setGeometry(100, 100, 450, 290)  # Thu nhỏ kích thước, giảm chiều cao
         
         # Thiết lập icon
         self.setWindowIcon(QIcon("static/icons/app_icon.png"))
@@ -207,6 +207,56 @@ class EnhancedTradingGUI(QMainWindow):
                 subcontrol-origin: margin;
                 left: 8px;
                 padding: 0 5px;
+            }
+            QDialog {
+                background-color: #1F2937;
+                color: white;
+            }
+            QMessageBox {
+                background-color: #1F2937;
+                color: white;
+            }
+            QMessageBox QLabel {
+                color: white;
+                background-color: transparent;
+            }
+            QTextEdit {
+                background-color: #374151;
+                color: white;
+                border: 1px solid #4B5563;
+                border-radius: 4px;
+            }
+            QCheckBox {
+                color: white;
+            }
+            QRadioButton {
+                color: white;
+            }
+            QScrollBar:vertical {
+                background-color: #1F2937;
+                width: 14px;
+                margin: 14px 0px 14px 0px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #4B5563;
+                min-height: 30px;
+                border-radius: 7px;
+            }
+            QScrollBar::add-line:vertical {
+                background-color: #2D3748;
+                height: 14px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            QScrollBar::sub-line:vertical {
+                background-color: #2D3748;
+                height: 14px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            /* Thêm màu chữ cho tất cả các widget con */
+            * {
+                color: white;
             }
         """)
         
@@ -393,50 +443,56 @@ class EnhancedTradingGUI(QMainWindow):
         dashboard_tab = QWidget()
         layout = QVBoxLayout(dashboard_tab)
         
-        # Tạo phần hiển thị số dư tài khoản
+        # Tạo phần hiển thị số dư tài khoản - Phần này được làm to hơn
         balance_group = QGroupBox("Số dư tài khoản")
+        balance_group.setStyleSheet("QGroupBox { font-size: 14px; font-weight: bold; }")
         balance_layout = QGridLayout(balance_group)
+        balance_layout.setVerticalSpacing(12)  # Tăng khoảng cách dọc
         
-        # Các thành phần hiển thị số dư
+        # Các thành phần hiển thị số dư - Font lớn hơn
         self.total_balance_label = QLabel("0.00 USDT")
-        self.total_balance_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.total_balance_label.setStyleSheet("font-size: 20px; font-weight: bold;")
         balance_layout.addWidget(QLabel("Tổng số dư:"), 0, 0)
         balance_layout.addWidget(self.total_balance_label, 0, 1)
         
         self.available_balance_label = QLabel("0.00 USDT")
+        self.available_balance_label.setStyleSheet("font-size: 16px;")
         balance_layout.addWidget(QLabel("Số dư khả dụng:"), 1, 0)
         balance_layout.addWidget(self.available_balance_label, 1, 1)
         
         self.unrealized_pnl_label = QLabel("0.00 USDT")
+        self.unrealized_pnl_label.setStyleSheet("font-size: 16px;")
         balance_layout.addWidget(QLabel("Lợi nhuận chưa thực hiện:"), 2, 0)
         balance_layout.addWidget(self.unrealized_pnl_label, 2, 1)
         
-        # Thêm thông tin tổng quan thị trường
+        # Thêm thông tin tổng quan thị trường - Font lớn hơn
         balance_layout.addWidget(QLabel("BTC/USDT:"), 0, 2)
         self.btc_price_label = QLabel("0.00 USDT")
-        self.btc_price_label.setStyleSheet("font-weight: bold;")
+        self.btc_price_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         balance_layout.addWidget(self.btc_price_label, 0, 3)
         
         balance_layout.addWidget(QLabel("ETH/USDT:"), 1, 2)
         self.eth_price_label = QLabel("0.00 USDT")
-        self.eth_price_label.setStyleSheet("font-weight: bold;")
+        self.eth_price_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         balance_layout.addWidget(self.eth_price_label, 1, 3)
         
-        # Thêm nút Auto Trading
+        # Thêm nút Auto Trading - Nút lớn hơn
         auto_trading_button = QPushButton("Kích hoạt Auto Trading")
         auto_trading_button.setStyleSheet("""
             background-color: #22C55E;
             color: white;
             font-weight: bold;
-            padding: 8px 12px;
+            font-size: 14px;
+            padding: 10px 16px;
             border-radius: 4px;
         """)
-        auto_trading_button.clicked.connect(lambda: self.start_service("auto_trade"))
+        auto_trading_button.clicked.connect(lambda: self.start_service("unified_trading_service"))
         balance_layout.addWidget(auto_trading_button, 2, 2, 1, 2)
         
-        layout.addWidget(balance_group)
+        # Tăng tỷ lệ kích thước cho phần đầu
+        layout.addWidget(balance_group, 3)  # Tỷ lệ 3 cho phần đầu
         
-        # Tạo phần hiển thị các vị thế đang mở
+        # Tạo phần hiển thị các vị thế đang mở - Phần này nhỏ hơn
         positions_group = QGroupBox("Vị thế đang mở")
         positions_layout = QVBoxLayout(positions_group)
         
@@ -447,9 +503,10 @@ class EnhancedTradingGUI(QMainWindow):
         self.positions_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         positions_layout.addWidget(self.positions_table)
         
-        layout.addWidget(positions_group)
+        # Tăng tỷ lệ kích thước cho phần vị thế
+        layout.addWidget(positions_group, 2)  # Tỷ lệ 2 cho phần vị thế
         
-        # Tạo phần hiển thị thị trường
+        # Tạo phần hiển thị thị trường - Phần này nhỏ hơn nữa
         market_group = QGroupBox("Thị trường")
         market_layout = QVBoxLayout(market_group)
         
@@ -460,7 +517,8 @@ class EnhancedTradingGUI(QMainWindow):
         self.market_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         market_layout.addWidget(self.market_table)
         
-        layout.addWidget(market_group)
+        # Tăng tỷ lệ kích thước cho phần thị trường 
+        layout.addWidget(market_group, 1)  # Tỷ lệ 1 cho phần thị trường
         
         # Thêm tab vào container
         self.tab_widget.addTab(dashboard_tab, "Tổng quan")
@@ -2531,7 +2589,9 @@ class EnhancedTradingGUI(QMainWindow):
                 "unified_trading_service": "unified_trading_service.py",
                 "service_manager": "enhanced_service_manager.py",
                 "watchdog": "service_watchdog.py",
-                "telegram_notifier": "advanced_telegram_notifier.py"
+                "telegram_notifier": "advanced_telegram_notifier.py",
+                "auto_trade": "auto_trade.py",
+                "ml_training": "train_ml_model.py"
             }
             
             # Lấy tên script dựa trên service_name
@@ -2794,6 +2854,30 @@ class EnhancedTradingGUI(QMainWindow):
                 self.telegram_notifier_status.setStyleSheet("color: #EF4444; font-weight: bold;")
                 self.start_telegram_notifier_button.setEnabled(True)
                 self.stop_telegram_notifier_button.setEnabled(False)
+                
+        elif service_name == "auto_trade":
+            if is_running:
+                self.auto_trade_status.setText("Đang chạy")
+                self.auto_trade_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_auto_trade_button.setEnabled(False)
+                self.stop_auto_trade_button.setEnabled(True)
+            else:
+                self.auto_trade_status.setText("Chưa khởi động")
+                self.auto_trade_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_auto_trade_button.setEnabled(True)
+                self.stop_auto_trade_button.setEnabled(False)
+                
+        elif service_name == "ml_training":
+            if is_running:
+                self.ml_training_status.setText("Đang chạy")
+                self.ml_training_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_ml_training_button.setEnabled(False)
+                self.stop_ml_training_button.setEnabled(True)
+            else:
+                self.ml_training_status.setText("Chưa khởi động")
+                self.ml_training_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_ml_training_button.setEnabled(True)
+                self.stop_ml_training_button.setEnabled(False)
     
     def check_software_update(self):
         """Kiểm tra cập nhật phần mềm"""

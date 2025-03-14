@@ -345,13 +345,55 @@ class PositionManager:
                 return {"status": "error", "message": f"Hướng giao dịch không hợp lệ: {side}"}
             
             # Đặt lệnh mở vị thế với positionSide để đảm bảo lệnh SHORT hoạt động đúng
-            order = self.client.futures_create_order(
-                symbol=symbol,
-                side=binance_side,
-                type=ORDER_TYPE_MARKET,
-                quantity=amount,
-                positionSide=position_side
-            )
+            try:
+                order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=binance_side,
+                    type=ORDER_TYPE_MARKET,
+                    quantity=amount,
+                    positionSide=position_side
+                )
+            except BinanceAPIException as e:
+                if "Unknown error" in str(e):
+                    # Thử lại với số lượng được làm tròn
+                    import math
+                    # Lấy thông tin tùy chỉnh về symbol
+                    symbol_info = self.client.futures_exchange_info()
+                    step_size = None
+                    for s in symbol_info['symbols']:
+                        if s['symbol'] == symbol:
+                            for f in s['filters']:
+                                if f['filterType'] == 'LOT_SIZE':
+                                    step_size = float(f['stepSize'])
+                                    break
+                            break
+                    
+                    # Làm tròn số lượng nếu tìm thấy step_size
+                    if step_size:
+                        precision = int(round(-math.log10(step_size)))
+                        rounded_amount = round(amount, precision)
+                        logger.info(f"Thử lại đặt lệnh với số lượng được làm tròn: {rounded_amount}")
+                        order = self.client.futures_create_order(
+                            symbol=symbol,
+                            side=binance_side,
+                            type=ORDER_TYPE_MARKET,
+                            quantity=rounded_amount,
+                            positionSide=position_side
+                        )
+                    else:
+                        # Nếu không tìm thấy step_size, thử với số lượng làm tròn 4 chữ số
+                        rounded_amount = round(amount, 4)
+                        logger.info(f"Thử lại đặt lệnh với số lượng làm tròn 4 chữ số: {rounded_amount}")
+                        order = self.client.futures_create_order(
+                            symbol=symbol,
+                            side=binance_side,
+                            type=ORDER_TYPE_MARKET,
+                            quantity=rounded_amount,
+                            positionSide=position_side
+                        )
+                else:
+                    # Truyền lại lỗi ban đầu nếu không phải lỗi unknown
+                    raise
             
             # Nếu có Stop Loss, đặt lệnh Stop Loss
             if stop_loss:
