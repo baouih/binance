@@ -749,7 +749,35 @@ class BinanceAPI:
         """
         if self.account_type != 'futures':
             logger.warning("Phương thức futures_ticker_price chỉ khả dụng với tài khoản futures")
-            return
+            return []
+            
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
+            
+        try:
+            # Tạo URL cho API endpoint
+            base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+            url = f"{base_url}/fapi/v1/ticker/price"
+            
+            headers = {'X-MBX-APIKEY': self.api_key} if self.api_key else {}
+            response = requests.get(url, params=params, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Nếu là một cặp cụ thể và kết quả không phải là list
+                if symbol and not isinstance(data, list):
+                    return [data]  # Bọc trong list để đảm bảo tính nhất quán
+                
+                return data
+            else:
+                logger.error(f"Lỗi khi lấy thông tin giá Futures: {response.status_code} - {response.text}")
+                return []
+                
+        except Exception as e:
+            logger.error(f"Exception khi lấy thông tin giá Futures: {str(e)}")
+            return []
             
     def get_futures_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
         """
@@ -768,51 +796,35 @@ class BinanceAPI:
         try:
             # Sử dụng ticker endpoint cho futures
             if self.testnet:
-                base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+                base_url = 'https://testnet.binancefuture.com'
                 url = f"{base_url}/fapi/v1/ticker/24hr"
                 
-                response = requests.get(url, params=params)
+                headers = {'X-MBX-APIKEY': self.api_key} if self.api_key else {}
+                response = requests.get(url, params=params, headers=headers)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    return data
+                    
+                    # Nếu là một cặp cụ thể và kết quả không phải là list
+                    if symbol and not isinstance(data, list):
+                        return data  # Trả về dữ liệu một cặp
+                    
+                    return data  # Trả về danh sách dữ liệu
                 else:
                     logger.error(f"Lỗi khi lấy ticker futures: {response.status_code} - {response.text}")
                     return {} if symbol else []
             else:
                 # Mainnet API
-                return self._request('GET', 'ticker/24hr', params, version='v1')
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy futures ticker: {str(e)}")
-            return {} if symbol else [] []
-            
-        try:
-            # Tạo URL cho API endpoint
-            base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
-            url = f"{base_url}/fapi/v1/ticker/price"
-            
-            # Thêm tham số symbol nếu được chỉ định
-            params = {}
-            if symbol:
-                params['symbol'] = symbol
-                
-            response = requests.get(url, params=params)
-            
-            if response.status_code == 200:
-                data = response.json()
+                result = self._request('GET', 'ticker/24hr', params, version='v1')
                 
                 # Nếu là một cặp cụ thể và kết quả không phải là list
-                if symbol and not isinstance(data, list):
-                    return [data]  # Bọc trong list để đảm bảo tính nhất quán
+                if symbol and not isinstance(result, list):
+                    return result  # Trả về dữ liệu một cặp
                 
-                return data
-            else:
-                logger.error(f"Lỗi khi lấy thông tin giá Futures: {response.status_code} - {response.text}")
-                return []
-                
+                return result  # Trả về danh sách dữ liệu
         except Exception as e:
-            logger.error(f"Exception khi lấy thông tin giá Futures: {str(e)}")
-            return []
+            logger.error(f"Lỗi khi lấy futures ticker: {str(e)}")
+            return {} if symbol else []
         
     def futures_klines(self, symbol: str, interval: str, limit: int = 500, 
                   startTime: int = None, endTime: int = None) -> List[List]:
