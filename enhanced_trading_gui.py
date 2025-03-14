@@ -1073,7 +1073,8 @@ class EnhancedTradingGUI(QMainWindow):
                 "watchdog": False,
                 "telegram_notifier": True,
                 "auto_trade": False,
-                "ml_training": False
+                "ml_training": False,
+                "market_scanner": False
             }
         
         # Tạo phần quản lý các dịch vụ
@@ -1233,6 +1234,28 @@ class EnhancedTradingGUI(QMainWindow):
         ml_training_layout.addWidget(self.stop_ml_training_button)
         
         services_layout.addLayout(ml_training_layout)
+        
+        # Market Scanner Service
+        market_scanner_layout = QHBoxLayout()
+        market_scanner_label = QLabel("Multi-Coin Scanner:")
+        self.market_scanner_status = QLabel("Chưa khởi động")
+        self.market_scanner_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_market_scanner_button = QPushButton("Khởi động")
+        self.start_market_scanner_button.clicked.connect(lambda: self.start_service("market_scanner"))
+        self.start_market_scanner_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_market_scanner_button = QPushButton("Dừng")
+        self.stop_market_scanner_button.clicked.connect(lambda: self.stop_service("market_scanner"))
+        self.stop_market_scanner_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_market_scanner_button.setEnabled(False)
+        
+        market_scanner_layout.addWidget(market_scanner_label)
+        market_scanner_layout.addWidget(self.market_scanner_status)
+        market_scanner_layout.addWidget(self.start_market_scanner_button)
+        market_scanner_layout.addWidget(self.stop_market_scanner_button)
+        
+        services_layout.addLayout(market_scanner_layout)
         
         # Nút khởi động tất cả dịch vụ
         start_all_layout = QHBoxLayout()
@@ -2596,7 +2619,8 @@ class EnhancedTradingGUI(QMainWindow):
                 "watchdog": "service_watchdog.py",
                 "telegram_notifier": "advanced_telegram_notifier.py",
                 "auto_trade": "auto_trade.py",
-                "ml_training": "train_ml_model.py"
+                "ml_training": "train_ml_model.py",
+                "market_scanner": "market_scanner.py"
             }
             
             # Lấy tên script dựa trên service_name
@@ -2889,6 +2913,18 @@ class EnhancedTradingGUI(QMainWindow):
                 self.ml_training_status.setStyleSheet("color: #EF4444; font-weight: bold;")
                 self.start_ml_training_button.setEnabled(True)
                 self.stop_ml_training_button.setEnabled(False)
+                
+        elif service_name == "market_scanner":
+            if is_running:
+                self.market_scanner_status.setText("Đang chạy")
+                self.market_scanner_status.setStyleSheet("color: #22C55E; font-weight: bold;")
+                self.start_market_scanner_button.setEnabled(False)
+                self.stop_market_scanner_button.setEnabled(True)
+            else:
+                self.market_scanner_status.setText("Chưa khởi động")
+                self.market_scanner_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+                self.start_market_scanner_button.setEnabled(True)
+                self.stop_market_scanner_button.setEnabled(False)
     
     def check_software_update(self):
         """Kiểm tra cập nhật phần mềm"""
