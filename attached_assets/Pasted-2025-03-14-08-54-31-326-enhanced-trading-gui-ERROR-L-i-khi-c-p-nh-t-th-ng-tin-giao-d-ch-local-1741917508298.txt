@@ -1,0 +1,200 @@
+2025-03-14 08:54:31,326 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:54:40,704 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:40,704 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:40,704 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:40,953 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:54:50,711 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:50,711 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:50,713 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:54:51,353 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:00,729 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:00,729 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:00,729 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:01,362 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:10,742 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:10,742 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:10,742 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:11,371 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:20,755 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:20,755 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:20,755 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:21,195 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:30,765 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:30,765 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:30,766 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:31,407 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:40,772 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:40,772 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:40,773 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:41,407 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:55:50,781 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:50,781 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:50,781 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:55:51,223 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:00,789 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:00,789 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:00,789 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:01,422 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:10,804 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:10,804 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:10,804 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:11,240 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:20,811 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:20,811 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:20,811 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:21,073 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:30,815 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:30,816 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:30,816 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:31,442 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:40,825 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:40,825 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:40,828 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:41,112 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:50,834 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:50,834 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:50,834 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:56:51,084 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:56:57,958 - enhanced_trading_gui - INFO - Đang dừng tất cả các dịch vụ...
+2025-03-14 08:56:57,958 - enhanced_trading_gui - INFO - Đang dừng dịch vụ market_notifier...
+2025-03-14 08:56:57,974 - enhanced_trading_gui - ERROR - Lỗi khi dừng market_notifier: 'kill' is not recognized as an internal or external command,
+operable program or batch file.
+
+2025-03-14 08:57:00,841 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:00,841 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:00,841 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:01,294 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:10,854 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:10,854 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:10,854 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:11,290 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:20,857 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:20,858 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:20,859 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:21,490 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:30,864 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:30,864 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:30,865 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:31,517 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:40,872 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:40,872 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:40,873 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:41,599 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:50,875 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:50,875 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:50,876 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:57:51,506 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+2025-03-14 08:57:54,083 - enhanced_trading_gui - INFO - Đang dừng dịch vụ unified_trading_service...
+2025-03-14 08:57:54,092 - enhanced_trading_gui - ERROR - Lỗi khi dừng unified_trading_service: 'kill' is not recognized as an internal or external command,
+operable program or batch file.
+
+2025-03-14 08:57:54,878 - enhanced_trading_gui - INFO - Đang dừng dịch vụ service_manager...
+2025-03-14 08:57:54,893 - enhanced_trading_gui - ERROR - Lỗi khi dừng service_manager: 'kill' is not recognized as an internal or external command,
+operable program or batch file.
+
+2025-03-14 08:57:55,301 - enhanced_trading_gui - INFO - Đang dừng dịch vụ watchdog...
+2025-03-14 08:57:55,317 - enhanced_trading_gui - ERROR - Lỗi khi dừng watchdog: 'kill' is not recognized as an internal or external command,
+operable program or batch file.
+
+2025-03-14 08:57:55,792 - enhanced_trading_gui - INFO - Đang dừng dịch vụ telegram_notifier...
+2025-03-14 08:57:55,793 - enhanced_trading_gui - WARNING - Không tìm thấy file PID cho dịch vụ telegram_notifier
+2025-03-14 08:58:00,892 - market_analyzer - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:58:00,892 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:58:00,892 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-14 08:58:01,351 - enhanced_trading_gui - ERROR - Lỗi khi cập nhật thông tin giao dịch: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 1380, in update_trading_info
+    if side == "LONG":
+UnboundLocalError: local variable 'side' referenced before assignment
+Traceback (most recent call last):
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 2833, in closeEvent
+    self.refresh_thread.stop()
+  File "E:\BinanceTradeMaster\enhanced_trading_gui.py", line 118, in stop
+    self.wait()
+KeyboardInterrupt
+
+E:\BinanceTradeMaster>

@@ -126,7 +126,7 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
-        self.setGeometry(100, 100, 900, 600)  # Thu nhỏ kích thước xuống khoảng 40%
+        self.setGeometry(100, 100, 750, 500)  # Thu nhỏ kích thước xuống 40%
         
         # Thiết lập icon
         self.setWindowIcon(QIcon("static/icons/app_icon.png"))
@@ -985,7 +985,9 @@ class EnhancedTradingGUI(QMainWindow):
                 "unified_trading_service": False,
                 "service_manager": False,
                 "watchdog": False,
-                "telegram_notifier": True
+                "telegram_notifier": True,
+                "auto_trade": False,
+                "ml_training": False
             }
         
         # Tạo phần quản lý các dịch vụ
