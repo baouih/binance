@@ -198,12 +198,34 @@ class MarketScanner:
         :param opportunities: Danh sách cơ hội giao dịch
         """
         if not opportunities:
+            # Gửi thông báo khi không có cơ hội giao dịch nào
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            message = f"📊 BÁO CÁO TÌNH HÌNH THỊ TRƯỜNG ({now})\n\n"
+            message += "Hiện tại chưa phát hiện cơ hội giao dịch nào đạt tiêu chuẩn.\n\n"
+            message += f"▫️ Ngưỡng điểm tối thiểu: {self.min_score_threshold}%\n"
+            message += f"▫️ Số cặp tiền được theo dõi: {len(self.pairs_to_scan)}\n"
+            message += f"▫️ Khung thời gian phân tích: {', '.join(self.timeframes)}\n\n"
+            message += "🔄 Hệ thống sẽ tiếp tục theo dõi và thông báo khi có tín hiệu mạnh.\n"
+            message += "💡 Gợi ý: Kiểm tra các điều kiện thị trường hoặc điều chỉnh ngưỡng điểm tối thiểu để có thêm tín hiệu."
+            
+            # Gửi thông báo qua Telegram
+            try:
+                telegram = TelegramNotifier()
+                telegram.send_message(message)
+                logger.info("Đã gửi thông báo về tình hình thị trường không có cơ hội giao dịch")
+            except Exception as e:
+                logger.error(f"Lỗi khi gửi thông báo: {str(e)}", exc_info=True)
             return
         
-        # Tạo nội dung thông báo
+        # Tạo nội dung thông báo khi có cơ hội giao dịch
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         message = f"🔍 PHÁT HIỆN CƠ HỘI GIAO DỊCH ({now})\n\n"
         
+        # Thêm thông tin tổng quan
+        message += f"📈 Tổng số tín hiệu giao dịch: {len(opportunities)}\n"
+        message += f"⚠️ Ngưỡng điểm lọc: {self.min_score_threshold}%+\n\n"
+        
+        # Thêm thông tin chi tiết về từng cơ hội
         for i, opportunity in enumerate(opportunities, 1):
             symbol = opportunity.get("symbol", "N/A")
             interval = opportunity.get("interval", "N/A")
@@ -211,10 +233,11 @@ class MarketScanner:
             score = opportunity.get("score", 0)
             price = opportunity.get("price", 0)
             
-            # Xác định emoji dựa trên tín hiệu
+            # Xác định emoji dựa trên tín hiệu và điểm số
             emoji = "🟢" if signal == "Mua" else "🔴" if signal == "Bán" else "⚪"
+            strength = "Rất mạnh" if score >= 80 else "Mạnh" if score >= 70 else "Trung bình"
             
-            message += f"{emoji} {i}. {symbol} ({interval})\n"
+            message += f"{emoji} {i}. {symbol} ({interval}) - {strength}\n"
             message += f"   • Tín hiệu: {signal}\n"
             message += f"   • Độ tin cậy: {score:.0f}%\n"
             message += f"   • Giá hiện tại: {price:.2f} USDT\n"
@@ -230,13 +253,32 @@ class MarketScanner:
             if resistances:
                 message += f"   • Kháng cự: {max(resistances):.2f}\n"
             
+            # Thêm thông tin về nguyên nhân tín hiệu và gợi ý hành động
+            indicators = opportunity.get("indicators", {})
+            if indicators:
+                positive_indicators = [name for name, data in indicators.items() if data.get("signal") == signal]
+                if positive_indicators:
+                    message += f"   • Chỉ báo hỗ trợ: {', '.join(positive_indicators[:3])}\n"
+            
+            # Thêm phương hướng hành động
+            if signal == "Mua" and score >= 70:
+                message += f"   • Gợi ý: Xem xét mở vị thế LONG với SL dưới mức hỗ trợ\n"
+            elif signal == "Bán" and score >= 70:
+                message += f"   • Gợi ý: Xem xét mở vị thế SHORT với SL trên mức kháng cự\n"
+            else:
+                message += f"   • Gợi ý: Theo dõi thêm và chờ tín hiệu mạnh hơn\n"
+            
             message += "\n"
+        
+        # Thêm thông tin về hành động tiếp theo của hệ thống
+        message += "🤖 Bot sẽ tiếp tục theo dõi thị trường và thực hiện phân tích liên tục.\n"
+        message += f"⏱️ Quét lại sau: {self.scan_interval//60} phút\n"
         
         # Gửi thông báo qua Telegram
         try:
             telegram = TelegramNotifier()
             telegram.send_message(message)
-            logger.info(f"Đã gửi thông báo về {len(opportunities)} cơ hội giao dịch")
+            logger.info(f"Đã gửi thông báo chi tiết về {len(opportunities)} cơ hội giao dịch")
         except Exception as e:
             logger.error(f"Lỗi khi gửi thông báo: {str(e)}", exc_info=True)
     

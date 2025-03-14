@@ -49,17 +49,155 @@ except ImportError as e:
     logger.error(f"Lỗi khi import module: {str(e)}")
     from typing import Any
     # Tạo các class giả trong trường hợp import thất bại
-    class MarketAnalyzer:
-        def __init__(self, *args, **kwargs):
-            pass
+
+# CSS cho dark theme độ tương phản cao
+HIGH_CONTRAST_DARK_THEME_CSS = """
+    QMainWindow {
+        background-color: #1F2937;
+        color: #FFFFFF;
+    }
+    QTabWidget {
+        background-color: #1F2937;
+        color: #FFFFFF;
+    }
+    QTabWidget::pane {
+        border: 1px solid #3B4252;
+        background-color: #1F2937;
+    }
+    QTabBar::tab {
+        background-color: #2D3748;
+        color: white;
+        padding: 8px 16px;
+        margin-right: 2px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    QTabBar::tab:selected {
+        background-color: #4B5563;
+        font-weight: bold;
+        border-bottom: 2px solid #63B3ED;
+    }
+    QPushButton {
+        background-color: #3B82F6;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #2563EB;
+    }
+    QPushButton:pressed {
+        background-color: #1D4ED8;
+    }
+    QMenuBar {
+        background-color: #2D3748;
+        color: #FFFFFF;
+        padding: 4px;
+        font-weight: bold;
+        border-bottom: 1px solid #4A5568;
+    }
+    QMenuBar::item {
+        background-color: transparent;
+        padding: 6px 12px;
+        color: #FFFFFF;
+        font-weight: bold;
+        border-radius: 4px;
+        margin: 1px;
+    }
+    QMenuBar::item:selected {
+        background-color: #4A5568;
+        color: #FFFFFF;
+        border: 1px solid #63B3ED;
+    }
+    QMenu {
+        background-color: #2D3748;
+        color: #FFFFFF;
+        border: 1px solid #4A5568;
+        padding: 4px;
+    }
+    QMenu::item {
+        padding: 8px 24px;
+        color: #FFFFFF;
+        font-weight: bold;
+        border-radius: 4px;
+        margin: 2px;
+    }
+    QMenu::item:selected {
+        background-color: #4A5568;
+        color: #FFFFFF;
+        border-left: 3px solid #63B3ED;
+    }
+    QMenu::separator {
+        height: 1px;
+        background-color: #4A5568;
+        margin: 6px 0px;
+    }
+"""
+
+# Tạo các class giả trong trường hợp import thất bại
+class MarketAnalyzer:
+    def __init__(self, *args, **kwargs):
+        self.client = None
+        logger.warning("Sử dụng lớp MarketAnalyzer giả")
     
-    class PositionManager:
-        def __init__(self, *args, **kwargs):
-            pass
+    def get_market_overview(self):
+        logger.warning("Gọi phương thức get_market_overview trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động", "data": []}
     
-    class RiskManager:
-        def __init__(self, *args, **kwargs):
-            pass
+    def analyze_technical(self, *args, **kwargs):
+        logger.warning("Gọi phương thức analyze_technical trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động", "data": {}}
+    
+class PositionManager:
+    def __init__(self, *args, **kwargs):
+        self.client = None
+        logger.warning("Sử dụng lớp PositionManager giả")
+    
+    def get_all_positions(self):
+        logger.warning("Gọi phương thức get_all_positions trong lớp giả")
+        return []
+    
+    def get_account_balance(self):
+        logger.warning("Gọi phương thức get_account_balance trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động", "balance": {}}
+    
+    def get_position_history(self):
+        logger.warning("Gọi phương thức get_position_history trong lớp giả")
+        return []
+    
+    def open_position(self, *args, **kwargs):
+        logger.warning("Gọi phương thức open_position trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động"}
+    
+    def close_position(self, *args, **kwargs):
+        logger.warning("Gọi phương thức close_position trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động"}
+    
+    def update_sl_tp(self, *args, **kwargs):
+        logger.warning("Gọi phương thức update_sl_tp trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động"}
+    
+class RiskManager:
+    def __init__(self, *args, **kwargs):
+        self.risk_config = {}
+        logger.warning("Sử dụng lớp RiskManager giả")
+    
+    def calculate_sl_tp(self, *args, **kwargs):
+        logger.warning("Gọi phương thức calculate_sl_tp trong lớp giả")
+        return {"stop_loss": 0, "take_profit": 0}
+    
+    def validate_sl_tp(self, *args, **kwargs):
+        logger.warning("Gọi phương thức validate_sl_tp trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động"}
+    
+    def validate_new_position(self, *args, **kwargs):
+        logger.warning("Gọi phương thức validate_new_position trong lớp giả")
+        return {"status": "error", "message": "Chức năng không hoạt động"}
+    
+    def calculate_position_size(self, *args, **kwargs):
+        logger.warning("Gọi phương thức calculate_position_size trong lớp giả")
+        return 0.0
 
 class RefreshThread(QThread):
     """Thread cập nhật dữ liệu theo thời gian thực"""
@@ -127,7 +265,7 @@ class EnhancedTradingGUI(QMainWindow):
         
         # Thiết lập thuộc tính cửa sổ
         self.setWindowTitle("Bot Giao Dịch Crypto - Phiên Bản Desktop")
-        self.setGeometry(100, 100, 450, 290)  # Thu nhỏ kích thước, giảm chiều cao
+        self.setGeometry(100, 100, 1024, 600)  # Kích thước có tỷ lệ 16:9, nhỏ gọn hơn
         
         # Thiết lập icon
         self.setWindowIcon(QIcon("static/icons/app_icon.png"))
@@ -297,7 +435,13 @@ class EnhancedTradingGUI(QMainWindow):
             self.risk_manager = RiskManager(self.position_manager, risk_config)
             
             # Khởi tạo Scanner thị trường
-            self.market_scanner = get_scanner(testnet=True)
+            try:
+                from market_scanner import get_scanner
+                self.market_scanner = get_scanner(testnet=True)
+                logger.info("Đã khởi tạo Market Scanner")
+            except Exception as e:
+                logger.error(f"Lỗi khi khởi tạo market_scanner: {str(e)}")
+                self.market_scanner = None
             
             logger.info("Đã khởi tạo các đối tượng")
         
@@ -448,82 +592,174 @@ class EnhancedTradingGUI(QMainWindow):
         dashboard_tab = QWidget()
         layout = QVBoxLayout(dashboard_tab)
         
-        # Tạo phần hiển thị số dư tài khoản - Phần này gọn hơn
-        balance_group = QGroupBox("Số dư tài khoản")
-        balance_group.setStyleSheet("QGroupBox { font-size: 13px; font-weight: bold; }")
-        balance_layout = QGridLayout(balance_group)
-        balance_layout.setVerticalSpacing(8)  # Thu hẹp khoảng cách dọc
+        # Tạo layout tổng quát compact hơn
+        layout.setContentsMargins(3, 3, 3, 3)
+        layout.setSpacing(5)
         
-        # Các thành phần hiển thị số dư - Thu gọn hơn
-        balance_layout.addWidget(QLabel("Tổng số dư:"), 0, 0)
+        # Tạo phần trên hiển thị số dư tài khoản và thị trường (compact hơn)
+        top_widget = QWidget()
+        top_layout = QHBoxLayout(top_widget)
+        top_layout.setContentsMargins(5, 5, 5, 5)
+        top_layout.setSpacing(10)
+        
+        # PHẦN TÀI KHOẢN - Thông tin chi tiết hơn
+        account_widget = QWidget()
+        account_layout = QGridLayout(account_widget)
+        account_layout.setContentsMargins(2, 2, 2, 2)
+        account_layout.setVerticalSpacing(2)
+        account_layout.setHorizontalSpacing(10)
+        
+        # Tiêu đề tài khoản
+        account_title = QLabel("Số dư tài khoản")
+        account_title.setStyleSheet("font-weight: bold; font-size: 11px; color: #63B3ED;")
+        account_layout.addWidget(account_title, 0, 0, 1, 2)
+        
+        # Các thành phần hiển thị số dư - Gọn hơn và chi tiết hơn
+        account_layout.addWidget(QLabel("Tổng số dư:"), 1, 0)
         self.total_balance_label = QLabel("0.00 USDT")
-        self.total_balance_label.setStyleSheet("font-size: 14px; font-weight: bold;")
-        balance_layout.addWidget(self.total_balance_label, 0, 1)
+        self.total_balance_label.setStyleSheet("font-weight: bold; font-size: 11px;")
+        account_layout.addWidget(self.total_balance_label, 1, 1)
         
-        balance_layout.addWidget(QLabel("Số dư khả dụng:"), 1, 0)
+        account_layout.addWidget(QLabel("Số dư khả dụng:"), 2, 0)
         self.available_balance_label = QLabel("0.00 USDT")
-        self.available_balance_label.setStyleSheet("font-size: 12px;")
-        balance_layout.addWidget(self.available_balance_label, 1, 1)
+        self.available_balance_label.setStyleSheet("font-size: 10px;")
+        account_layout.addWidget(self.available_balance_label, 2, 1)
         
-        balance_layout.addWidget(QLabel("Lợi nhuận:"), 2, 0)
+        account_layout.addWidget(QLabel("Lợi nhuận:"), 3, 0)
         self.unrealized_pnl_label = QLabel("0.00 USDT")
-        self.unrealized_pnl_label.setStyleSheet("font-size: 12px;")
-        balance_layout.addWidget(self.unrealized_pnl_label, 2, 1)
+        self.unrealized_pnl_label.setStyleSheet("font-size: 10px;")
+        account_layout.addWidget(self.unrealized_pnl_label, 3, 1)
         
-        # Thêm thông tin tổng quan thị trường - Thu gọn
-        balance_layout.addWidget(QLabel("BTC:"), 0, 2)
+        account_layout.addWidget(QLabel("Tỷ lệ ROE:"), 4, 0)
+        self.roe_label = QLabel("0.00%")
+        self.roe_label.setStyleSheet("font-size: 10px;")
+        account_layout.addWidget(self.roe_label, 4, 1)
+        
+        account_layout.addWidget(QLabel("Tổng vốn:"), 5, 0)
+        self.total_margin_label = QLabel("0.00 USDT")
+        self.total_margin_label.setStyleSheet("font-size: 10px;")
+        account_layout.addWidget(self.total_margin_label, 5, 1)
+        
+        # PHẦN THỊ TRƯỜNG - Hiển thị nhiều thông tin xu hướng
+        market_widget = QWidget()
+        market_layout = QGridLayout(market_widget)
+        market_layout.setContentsMargins(2, 2, 2, 2)
+        market_layout.setVerticalSpacing(2)
+        market_layout.setHorizontalSpacing(10)
+        
+        # Tiêu đề thị trường
+        market_title = QLabel("Thông tin thị trường")
+        market_title.setStyleSheet("font-weight: bold; font-size: 11px; color: #63B3ED;")
+        market_layout.addWidget(market_title, 0, 0, 1, 2)
+        
+        # Thông tin chi tiết hơn về thị trường chính
+        market_layout.addWidget(QLabel("BTC:"), 1, 0)
         self.btc_price_label = QLabel("0.00 USDT")
-        self.btc_price_label.setStyleSheet("font-size: 14px; font-weight: bold;")
-        balance_layout.addWidget(self.btc_price_label, 0, 3)
+        self.btc_price_label.setStyleSheet("font-weight: bold; font-size: 11px;")
+        market_layout.addWidget(self.btc_price_label, 1, 1)
         
-        balance_layout.addWidget(QLabel("ETH:"), 1, 2)
+        market_layout.addWidget(QLabel("24h:"), 2, 0)
+        self.btc_change_label = QLabel("0.00%")
+        self.btc_change_label.setStyleSheet("font-size: 10px;")
+        market_layout.addWidget(self.btc_change_label, 2, 1)
+        
+        market_layout.addWidget(QLabel("ETH:"), 3, 0)
         self.eth_price_label = QLabel("0.00 USDT")
-        self.eth_price_label.setStyleSheet("font-size: 12px;")
-        balance_layout.addWidget(self.eth_price_label, 1, 3)
+        self.eth_price_label.setStyleSheet("font-size: 10px;")
+        market_layout.addWidget(self.eth_price_label, 3, 1)
         
-        # Thêm nút Auto Trading - Nút lớn hơn và kiểm tra trạng thái dịch vụ
+        market_layout.addWidget(QLabel("SOL:"), 4, 0)
+        self.sol_price_label = QLabel("0.00 USDT")
+        self.sol_price_label.setStyleSheet("font-size: 10px;")
+        market_layout.addWidget(self.sol_price_label, 4, 1)
+        
+        market_layout.addWidget(QLabel("Dominance:"), 5, 0)
+        self.btc_dominance_label = QLabel("0.00%")
+        self.btc_dominance_label.setStyleSheet("font-size: 10px;")
+        market_layout.addWidget(self.btc_dominance_label, 5, 1)
+        
+        # PHẦN ĐIỀU KHIỂN - Đặt nút ở phần riêng
+        control_widget = QWidget()
+        control_layout = QVBoxLayout(control_widget)
+        control_layout.setContentsMargins(2, 2, 2, 2)
+        control_layout.setSpacing(5)
+        
+        # Tiêu đề điều khiển
+        control_title = QLabel("Điều khiển")
+        control_title.setStyleSheet("font-weight: bold; font-size: 11px; color: #63B3ED;")
+        control_layout.addWidget(control_title)
+        
+        # Nút Auto Trading nhỏ gọn hơn
         self.auto_trading_button = QPushButton("Kích hoạt Auto Trading")
         self.auto_trading_button.setStyleSheet("""
             background-color: #22C55E;
             color: white;
             font-weight: bold;
-            font-size: 14px;
-            padding: 10px 16px;
+            font-size: 11px;
+            padding: 6px 10px;
             border-radius: 4px;
         """)
         self.auto_trading_button.clicked.connect(lambda: self.start_service("unified_trading_service"))
-        balance_layout.addWidget(self.auto_trading_button, 2, 2, 1, 2)
+        control_layout.addWidget(self.auto_trading_button)
         
-        # Tăng tỷ lệ kích thước cho phần đầu
-        layout.addWidget(balance_group, 3)  # Tỷ lệ 3 cho phần đầu
+        # Nút quét thị trường
+        self.scan_market_button = QPushButton("Quét thị trường")
+        self.scan_market_button.setStyleSheet("""
+            background-color: #3B82F6;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 4px;
+        """)
+        self.scan_market_button.clicked.connect(lambda: self.start_service("market_scanner"))
+        control_layout.addWidget(self.scan_market_button)
         
-        # Tạo phần hiển thị các vị thế đang mở - Phần này nhỏ hơn
+        # Thêm các widget vào layout trên
+        top_layout.addWidget(account_widget, 3) # Tỷ lệ 3
+        top_layout.addWidget(market_widget, 3)  # Tỷ lệ 3
+        top_layout.addWidget(control_widget, 2) # Tỷ lệ 2
+        
+        # Thêm widget trên vào layout chính
+        layout.addWidget(top_widget, 1)
+        
+        # Tạo phần hiển thị các vị thế đang mở - Phần này nhỏ gọn hơn
         positions_group = QGroupBox("Vị thế đang mở")
+        positions_group.setStyleSheet("QGroupBox { font-size: 11px; font-weight: bold; }")
         positions_layout = QVBoxLayout(positions_group)
+        positions_layout.setContentsMargins(3, 10, 3, 3)
+        positions_layout.setSpacing(2)
         
         self.positions_table = QTableWidget(0, 8)
         self.positions_table.setHorizontalHeaderLabels([
-            "Cặp", "Hướng", "Kích thước", "Giá vào", "Giá hiện tại", "SL", "TP", "Lợi nhuận"
+            "Cặp", "Hướng", "Size", "Giá vào", "Giá hiện tại", "SL", "TP", "P/L"
         ])
         self.positions_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.positions_table.setStyleSheet("font-size: 10px;")
+        self.positions_table.verticalHeader().setDefaultSectionSize(20) # Giảm chiều cao các dòng
         positions_layout.addWidget(self.positions_table)
         
-        # Tăng tỷ lệ kích thước cho phần vị thế
-        layout.addWidget(positions_group, 2)  # Tỷ lệ 2 cho phần vị thế
+        # Thêm phần vị thế vào layout chính
+        layout.addWidget(positions_group, 2)
         
-        # Tạo phần hiển thị thị trường - Phần này nhỏ hơn nữa
-        market_group = QGroupBox("Thị trường")
+        # Tạo phần hiển thị thị trường - Hiển thị nhiều cặp hơn
+        market_group = QGroupBox("Top 10 cặp tiền")
+        market_group.setStyleSheet("QGroupBox { font-size: 11px; font-weight: bold; }")
         market_layout = QVBoxLayout(market_group)
+        market_layout.setContentsMargins(3, 10, 3, 3)
+        market_layout.setSpacing(2)
         
-        self.market_table = QTableWidget(0, 4)
+        self.market_table = QTableWidget(0, 5)
         self.market_table.setHorizontalHeaderLabels([
-            "Cặp", "Giá", "Thay đổi 24h", "Khối lượng"
+            "Cặp", "Giá", "Thay đổi 24h", "Vol 24h (USDT)", "Tín hiệu"
         ])
         self.market_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.market_table.setStyleSheet("font-size: 10px;")
+        self.market_table.verticalHeader().setDefaultSectionSize(20) # Giảm chiều cao các dòng
         market_layout.addWidget(self.market_table)
         
-        # Tăng tỷ lệ kích thước cho phần thị trường 
-        layout.addWidget(market_group, 1)  # Tỷ lệ 1 cho phần thị trường
+        # Thêm phần thị trường vào layout chính
+        layout.addWidget(market_group, 2)
         
         # Thêm tab vào container
         self.tab_widget.addTab(dashboard_tab, "Tổng quan")
@@ -3001,36 +3237,78 @@ class EnhancedTradingGUI(QMainWindow):
         try:
             logs = []
             
+            # Đọc log từ telegram_notification.log (thông báo Telegram) nếu có
+            if os.path.exists("telegram_notification.log"):
+                with open("telegram_notification.log", "r", encoding="utf-8", errors="ignore") as f:
+                    logs.append("\n=== THÔNG BÁO GIAO DỊCH ===")
+                    # Lấy 30 dòng cuối chứa các thông báo quan trọng
+                    lines = f.readlines()
+                    notification_lines = []
+                    for line in lines[-100:]:
+                        if "PHÁT HIỆN CƠ HỘI GIAO DỊCH" in line or "BÁO CÁO TÌNH HÌNH THỊ TRƯỜNG" in line:
+                            notification_lines.append(line.strip())
+                    # Hiển thị 5 thông báo gần nhất
+                    for line in notification_lines[-5:]:
+                        logs.append(line.strip())
+            
+            # Đọc log từ thông tin vị thế và lệnh giao dịch
+            if os.path.exists("auto_trade.log"):
+                with open("auto_trade.log", "r", encoding="utf-8", errors="ignore") as f:
+                    logs.append("\n=== NHẬT KÝ GIAO DỊCH ===")
+                    lines = f.readlines()
+                    trade_lines = []
+                    for line in lines[-100:]:
+                        if "Mở vị thế" in line or "Đóng vị thế" in line or "Stop loss" in line or "Take profit" in line:
+                            trade_lines.append(line.strip())
+                    # Hiển thị 5 thông báo gần nhất
+                    for line in trade_lines[-5:]:
+                        logs.append(line.strip())
+            
             # Đọc log từ start_all_services.log nếu có
             if os.path.exists("start_all_services.log"):
-                with open("start_all_services.log", "r") as f:
-                    logs.append("=== START_ALL_SERVICES LOG ===")
-                    # Lấy 50 dòng cuối
+                with open("start_all_services.log", "r", encoding="utf-8", errors="ignore") as f:
+                    logs.append("\n=== TRẠNG THÁI HỆ THỐNG ===")
+                    # Lấy 10 dòng cuối
                     lines = f.readlines()
-                    for line in lines[-50:]:
+                    for line in lines[-10:]:
                         logs.append(line.strip())
             
             # Danh sách các file log cần kiểm tra
             log_files = {
+                "market_scanner": "market_scanner.log",
                 "market_notifier": "market_notifier.log",
                 "unified_trading_service": "unified_trading_service.log",
                 "service_manager": "service_manager.log",
-                "watchdog": "watchdog.log",
-                "market_scanner": "market_scanner.log"
+                "watchdog": "watchdog.log"
             }
             
-            # Đọc log từ các file log dịch vụ
+            # Đọc log từ các file log dịch vụ - ưu tiên market_scanner
             for service_name, log_file in log_files.items():
                 if os.path.exists(log_file):
-                    with open(log_file, "r") as f:
-                        logs.append(f"\n=== {service_name.upper()} LOG ===")
-                        # Lấy 20 dòng cuối
+                    with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                        logs.append(f"\n=== {service_name.upper()} ===")
+                        # Lấy 15 dòng cuối
                         lines = f.readlines()
-                        for line in lines[-20:]:
+                        filtered_lines = []
+                        for line in lines[-100:]:
+                            # Lọc thông tin hữu ích
+                            if "ERROR" in line or "CẢNH BÁO" in line or "Phát hiện cơ hội" in line or "Đã phân tích" in line:
+                                filtered_lines.append(line.strip())
+                        # Hiển thị các dòng lọc được, tối đa 15 dòng
+                        for line in filtered_lines[-15:]:
                             logs.append(line.strip())
             
-            # Hiển thị log
-            self.system_logs.setText("\n".join(logs))
+            # Hiển thị log với định dạng dễ đọc hơn
+            formatted_logs = []
+            for line in logs:
+                if line.startswith("\n==="):
+                    # Định dạng tiêu đề phần
+                    formatted_logs.append(f"\n{line.strip('=').strip()}")
+                else:
+                    # Định dạng thông thường
+                    formatted_logs.append(line)
+            
+            self.system_logs.setText("\n".join(formatted_logs))
             
             # Cuộn xuống cuối
             scrollbar = self.system_logs.verticalScrollBar()
