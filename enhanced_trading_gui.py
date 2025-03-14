@@ -272,8 +272,8 @@ class EnhancedTradingGUI(QMainWindow):
         screen_height = desktop.height()
         
         # Tính kích thước cửa sổ (1/4 màn hình)
-        window_width = int(screen_width / 2)
-        window_height = int(screen_height / 2)
+        window_width = int(screen_width / 4)
+        window_height = int(screen_height / 4)
         
         # Đặt kích thước và vị trí cửa sổ
         self.setGeometry(100, 100, window_width, window_height)
