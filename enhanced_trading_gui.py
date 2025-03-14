@@ -443,37 +443,37 @@ class EnhancedTradingGUI(QMainWindow):
         dashboard_tab = QWidget()
         layout = QVBoxLayout(dashboard_tab)
         
-        # Tạo phần hiển thị số dư tài khoản - Phần này được làm to hơn
+        # Tạo phần hiển thị số dư tài khoản - Phần này gọn hơn
         balance_group = QGroupBox("Số dư tài khoản")
-        balance_group.setStyleSheet("QGroupBox { font-size: 14px; font-weight: bold; }")
+        balance_group.setStyleSheet("QGroupBox { font-size: 13px; font-weight: bold; }")
         balance_layout = QGridLayout(balance_group)
-        balance_layout.setVerticalSpacing(12)  # Tăng khoảng cách dọc
+        balance_layout.setVerticalSpacing(8)  # Thu hẹp khoảng cách dọc
         
-        # Các thành phần hiển thị số dư - Font lớn hơn
-        self.total_balance_label = QLabel("0.00 USDT")
-        self.total_balance_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        # Các thành phần hiển thị số dư - Thu gọn hơn
         balance_layout.addWidget(QLabel("Tổng số dư:"), 0, 0)
+        self.total_balance_label = QLabel("0.00 USDT")
+        self.total_balance_label.setStyleSheet("font-size: 14px; font-weight: bold;")
         balance_layout.addWidget(self.total_balance_label, 0, 1)
         
-        self.available_balance_label = QLabel("0.00 USDT")
-        self.available_balance_label.setStyleSheet("font-size: 16px;")
         balance_layout.addWidget(QLabel("Số dư khả dụng:"), 1, 0)
+        self.available_balance_label = QLabel("0.00 USDT")
+        self.available_balance_label.setStyleSheet("font-size: 12px;")
         balance_layout.addWidget(self.available_balance_label, 1, 1)
         
+        balance_layout.addWidget(QLabel("Lợi nhuận:"), 2, 0)
         self.unrealized_pnl_label = QLabel("0.00 USDT")
-        self.unrealized_pnl_label.setStyleSheet("font-size: 16px;")
-        balance_layout.addWidget(QLabel("Lợi nhuận chưa thực hiện:"), 2, 0)
+        self.unrealized_pnl_label.setStyleSheet("font-size: 12px;")
         balance_layout.addWidget(self.unrealized_pnl_label, 2, 1)
         
-        # Thêm thông tin tổng quan thị trường - Font lớn hơn
-        balance_layout.addWidget(QLabel("BTC/USDT:"), 0, 2)
+        # Thêm thông tin tổng quan thị trường - Thu gọn
+        balance_layout.addWidget(QLabel("BTC:"), 0, 2)
         self.btc_price_label = QLabel("0.00 USDT")
-        self.btc_price_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.btc_price_label.setStyleSheet("font-size: 14px; font-weight: bold;")
         balance_layout.addWidget(self.btc_price_label, 0, 3)
         
-        balance_layout.addWidget(QLabel("ETH/USDT:"), 1, 2)
+        balance_layout.addWidget(QLabel("ETH:"), 1, 2)
         self.eth_price_label = QLabel("0.00 USDT")
-        self.eth_price_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.eth_price_label.setStyleSheet("font-size: 12px;")
         balance_layout.addWidget(self.eth_price_label, 1, 3)
         
         # Thêm nút Auto Trading - Nút lớn hơn và kiểm tra trạng thái dịch vụ
@@ -2039,12 +2039,12 @@ class EnhancedTradingGUI(QMainWindow):
                 self.strength_label.setText(f"{strength} (Tin cậy: {confidence_text})")
                 self.trend_label.setText(f"{analysis.get('short_term_trend', 'N/A')} - {recommendation}")
                 
-                # Tạo hoặc cập nhật label Chiến thuật
-                if not hasattr(self, 'strategy_label'):
-                    self.strategy_label = QLabel(strategy, self.market_analysis_tab)
-                    self.market_analysis_layout.addRow("Chiến thuật đề xuất:", self.strategy_label)
-                else:
-                    self.strategy_label.setText(strategy)
+                # Chỉ hiển thị chiến thuật trong kết quả phân tích mà không tạo label mới
+                content += f"<h4>Chiến thuật đề xuất</h4>"
+                content += f"<p>{strategy}</p>"
+                
+                # Cập nhật kết quả phân tích với chiến thuật đề xuất
+                self.analysis_result_text.setHtml(content)
                 
                 self.status_label.setText(f"Đã phân tích thị trường cho {symbol} ({interval})")
             else:
