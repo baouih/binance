@@ -476,9 +476,9 @@ class EnhancedTradingGUI(QMainWindow):
         self.eth_price_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         balance_layout.addWidget(self.eth_price_label, 1, 3)
         
-        # Thêm nút Auto Trading - Nút lớn hơn
-        auto_trading_button = QPushButton("Kích hoạt Auto Trading")
-        auto_trading_button.setStyleSheet("""
+        # Thêm nút Auto Trading - Nút lớn hơn và kiểm tra trạng thái dịch vụ
+        self.auto_trading_button = QPushButton("Kích hoạt Auto Trading")
+        self.auto_trading_button.setStyleSheet("""
             background-color: #22C55E;
             color: white;
             font-weight: bold;
@@ -486,8 +486,8 @@ class EnhancedTradingGUI(QMainWindow):
             padding: 10px 16px;
             border-radius: 4px;
         """)
-        auto_trading_button.clicked.connect(lambda: self.start_service("unified_trading_service"))
-        balance_layout.addWidget(auto_trading_button, 2, 2, 1, 2)
+        self.auto_trading_button.clicked.connect(lambda: self.start_service("unified_trading_service"))
+        balance_layout.addWidget(self.auto_trading_button, 2, 2, 1, 2)
         
         # Tăng tỷ lệ kích thước cho phần đầu
         layout.addWidget(balance_group, 3)  # Tỷ lệ 3 cho phần đầu
@@ -2703,53 +2703,59 @@ class EnhancedTradingGUI(QMainWindow):
             # Hiển thị thông báo đang khởi động
             self.status_label.setText("Đang khởi động dịch vụ...")
             
-            # Kịch bản 1: Sử dụng start_all_services.py
-            if os.path.exists("start_all_services.py"):
-                self.add_to_system_log("🚀 Đang khởi động tất cả dịch vụ qua start_all_services.py")
-                
-                # Sử dụng subprocess để chạy script
-                import subprocess
-                result = subprocess.run("python start_all_services.py", shell=True, capture_output=True, text=True)
-                
-                if result.returncode == 0:
-                    # Cập nhật trạng thái tất cả dịch vụ
-                    for service in self.service_status:
-                        self.service_status[service] = True
+            # Phương pháp an toàn: khởi động từng dịch vụ riêng biệt
+            self.add_to_system_log("🚀 Đang lần lượt khởi động các dịch vụ...")
+            
+            # Danh sách các dịch vụ cần khởi động
+            services_to_start = [
+                "market_notifier",
+                "unified_trading_service",
+                "service_manager",
+                "watchdog_service", 
+                "telegram_notifier",
+                "auto_trading",
+                "ml_training"
+            ]
+            
+            # Đếm số lượng dịch vụ khởi động thành công
+            success_count = 0
+            total_services = len(services_to_start)
+            
+            # Khởi động từng dịch vụ
+            for service in services_to_start:
+                if service in self.service_status and not self.service_status[service]:  # Chỉ khởi động dịch vụ chưa chạy
+                    # Thêm try-except cho từng dịch vụ để một dịch vụ lỗi không ảnh hưởng đến các dịch vụ khác
+                    try:
+                        self.add_to_system_log(f"Đang khởi động dịch vụ {service}...")
+                        if self.start_service(service):
+                            success_count += 1
+                            self.add_to_system_log(f"✅ Đã khởi động dịch vụ {service}")
+                        else:
+                            self.add_to_system_log(f"❌ Không thể khởi động dịch vụ {service}")
+                    except Exception as e:
+                        logger.error(f"Lỗi khi khởi động dịch vụ {service}: {str(e)}", exc_info=True)
+                        self.add_to_system_log(f"❌ Lỗi khi khởi động dịch vụ {service}: {str(e)}")
+                elif service in self.service_status:
+                    # Dịch vụ đã chạy
+                    success_count += 1
                     
-                    # Cập nhật UI
-                    self.update_all_service_status()
-                    
-                    # Thêm thông báo vào nhật ký
-                    self.add_to_system_log("✅ Đã khởi động tất cả dịch vụ thành công")
-                    QMessageBox.information(self, "Thông báo", "Đã khởi động tất cả dịch vụ thành công")
-                    
-                    # Cập nhật trạng thái
-                    self.status_label.setText("Tất cả dịch vụ đang chạy")
-                    
-                else:
-                    logger.error(f"Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
-                    self.add_to_system_log(f"❌ Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
-                    QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động tất cả dịch vụ: {result.stderr}")
-                    
-                    # Cập nhật trạng thái
-                    self.status_label.setText("Lỗi khi khởi động dịch vụ")
-                
-            # Kịch bản 2: Khởi động từng dịch vụ riêng biệt
+                # Cập nhật UI trong khi đợi
+                QApplication.processEvents()
+                time.sleep(0.5)
+            
+            # Thông báo kết quả
+            if success_count == total_services:
+                self.add_to_system_log("✅ Đã khởi động tất cả dịch vụ thành công")
+                QMessageBox.information(self, "Thông báo", "Đã khởi động tất cả dịch vụ thành công")
+                self.status_label.setText("Tất cả dịch vụ đang chạy")
+            elif success_count > 0:
+                self.add_to_system_log(f"⚠️ Đã khởi động {success_count}/{total_services} dịch vụ")
+                QMessageBox.warning(self, "Cảnh báo", f"Đã khởi động {success_count}/{total_services} dịch vụ")
+                self.status_label.setText("Một số dịch vụ đang chạy")
             else:
-                success = True
-                for service in self.service_status:
-                    if not self.service_status[service]:  # Chỉ khởi động dịch vụ chưa chạy
-                        if not self.start_service(service):
-                            success = False
-                
-                if success:
-                    self.add_to_system_log("✅ Đã khởi động tất cả dịch vụ thành công")
-                    QMessageBox.information(self, "Thông báo", "Đã khởi động tất cả dịch vụ thành công")
-                    self.status_label.setText("Tất cả dịch vụ đang chạy")
-                else:
-                    self.add_to_system_log("⚠️ Một số dịch vụ không thể khởi động")
-                    QMessageBox.warning(self, "Cảnh báo", "Một số dịch vụ không thể khởi động")
-                    self.status_label.setText("Một số dịch vụ không hoạt động")
+                self.add_to_system_log("❌ Không thể khởi động bất kỳ dịch vụ nào")
+                QMessageBox.critical(self, "Lỗi", "Không thể khởi động bất kỳ dịch vụ nào")
+                self.status_label.setText("Không có dịch vụ nào đang chạy")
             
         except Exception as e:
             logger.error(f"Lỗi khi khởi động tất cả dịch vụ: {str(e)}", exc_info=True)
