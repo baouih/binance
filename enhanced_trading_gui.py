@@ -1505,6 +1505,8 @@ class EnhancedTradingGUI(QMainWindow):
     def update_trading_info(self):
         """Cập nhật thông tin giao dịch"""
         symbol = self.symbol_combo.currentText()
+        # Lấy hướng giao dịch hiện tại từ combobox trước mọi thao tác
+        side = self.side_combo.currentText()
         
         try:
             # Lấy giá hiện tại
@@ -1534,11 +1536,8 @@ class EnhancedTradingGUI(QMainWindow):
                             risk_percentage = margin_required / total_balance * 100
                             self.risk_percentage_label.setText(f"{risk_percentage:.2f}%")
                 
-                # Lấy hướng giao dịch hiện tại từ combobox
-                side = self.side_combo.currentText()
-                
                 # Tính toán giá thanh lý (giả sử)
-                if side == "LONG":
+                if side.upper() in ["LONG", "BUY", "MUA"]:
                     liquidation_price = current_price * (1 - (1 / leverage) * 0.9)  # 90% margin
                 else:
                     liquidation_price = current_price * (1 + (1 / leverage) * 0.9)  # 90% margin

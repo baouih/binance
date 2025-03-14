@@ -260,8 +260,8 @@ class MarketAnalyzer:
             # Lấy dữ liệu cho từng cặp
             for symbol in self.symbols:
                 try:
-                    # Lấy giá hiện tại
-                    ticker = self.client.get_ticker(symbol=symbol)
+                    # Lấy giá hiện tại - sử dụng futures API thay vì spot API
+                    ticker = self.client.futures_ticker(symbol=symbol)
                     
                     # Thêm vào danh sách
                     market_data.append({
