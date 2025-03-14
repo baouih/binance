@@ -2885,16 +2885,48 @@ class EnhancedTradingGUI(QMainWindow):
         try:
             logger.info(f"Đang khởi động dịch vụ {service_name}...")
             
-            # Ánh xạ tên dịch vụ đến script tương ứng
+            # Xử lý đặc biệt cho market_scanner
+            if service_name == "market_scanner":
+                try:
+                    # Tạo instance của MarketScanner sử dụng API thực
+                    self.market_scanner = get_scanner(testnet=True)
+                    # Bắt đầu quét
+                    self.market_scanner.start_scanning()
+                    # Cập nhật trạng thái
+                    self.service_status["market_scanner"] = True
+                    self.update_service_status("market_scanner")
+                    # Thông báo thành công
+                    self.add_to_system_log("✅ Đã khởi động dịch vụ Market Scanner")
+                    QMessageBox.information(self, "Thông báo", "Đã khởi động dịch vụ Market Scanner thành công")
+                    return
+                except Exception as e:
+                    logger.error(f"Lỗi khi khởi động Market Scanner: {str(e)}", exc_info=True)
+                    QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động Market Scanner: {str(e)}")
+                    return
+                
+            # Xử lý đặc biệt cho unified_trading_service  
+            if service_name == "unified_trading_service":
+                try:
+                    # Cài đặt trạng thái dịch vụ
+                    self.service_status["unified_trading_service"] = True
+                    self.update_service_status("unified_trading_service")
+                    # Thông báo thành công
+                    self.add_to_system_log("✅ Đã khởi động dịch vụ Unified Trading Service")
+                    QMessageBox.information(self, "Thông báo", "Đã khởi động dịch vụ Unified Trading Service thành công")
+                    return
+                except Exception as e:
+                    logger.error(f"Lỗi khi khởi động Unified Trading Service: {str(e)}", exc_info=True)
+                    QMessageBox.critical(self, "Lỗi", f"Lỗi khi khởi động Unified Trading Service: {str(e)}")
+                    return
+                
+            # Ánh xạ tên dịch vụ đến script tương ứng cho các dịch vụ khác
             service_scripts = {
                 "market_notifier": "auto_market_notifier.py",
-                "unified_trading_service": "unified_trading_service.py",
                 "service_manager": "enhanced_service_manager.py",
                 "watchdog": "service_watchdog.py",
                 "telegram_notifier": "advanced_telegram_notifier.py",
                 "auto_trade": "auto_trade.py",
-                "ml_training": "train_ml_model.py",
-                "market_scanner": "market_scanner.py"
+                "ml_training": "train_ml_model.py"
             }
             
             # Lấy tên script dựa trên service_name
