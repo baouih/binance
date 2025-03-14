@@ -749,7 +749,42 @@ class BinanceAPI:
         """
         if self.account_type != 'futures':
             logger.warning("Phương thức futures_ticker_price chỉ khả dụng với tài khoản futures")
-            return []
+            return
+            
+    def get_futures_ticker(self, symbol: str = None) -> Union[Dict, List[Dict]]:
+        """
+        Lấy thông tin ticker của Futures (24h price change + price)
+        
+        Args:
+            symbol (str, optional): Symbol để lấy thông tin. Nếu None, lấy tất cả các symbol.
+            
+        Returns:
+            Union[Dict, List[Dict]]: Thông tin ticker của một hoặc nhiều symbol
+        """
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
+            
+        try:
+            # Sử dụng ticker endpoint cho futures
+            if self.testnet:
+                base_url = 'https://testnet.binancefuture.com' if self.testnet else 'https://fapi.binance.com'
+                url = f"{base_url}/fapi/v1/ticker/24hr"
+                
+                response = requests.get(url, params=params)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    return data
+                else:
+                    logger.error(f"Lỗi khi lấy ticker futures: {response.status_code} - {response.text}")
+                    return {} if symbol else []
+            else:
+                # Mainnet API
+                return self._request('GET', 'ticker/24hr', params, version='v1')
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy futures ticker: {str(e)}")
+            return {} if symbol else [] []
             
         try:
             # Tạo URL cho API endpoint
@@ -926,6 +961,34 @@ class BinanceAPI:
             
         return klines
         
+    def get_positions(self) -> List[Dict]:
+        """
+        Lấy danh sách các vị thế đang mở
+        
+        Returns:
+            List[Dict]: Danh sách các vị thế đang mở
+        """
+        if not self.api_key or not self.api_secret:
+            logger.warning("Không có API keys, sử dụng dữ liệu giả lập cho vị thế")
+            return []
+            
+        try:
+            # Sử dụng v2 API cho positionRisk
+            endpoint = 'positionRisk'
+            params = {}
+            
+            # Gọi API để lấy vị thế
+            positions = self._request('GET', endpoint, params, signed=True, version='v2')
+            
+            # Lọc các vị thế có positionAmt != 0
+            active_positions = [p for p in positions if float(p.get('positionAmt', 0)) != 0]
+            logger.info(f"Tìm thấy {len(active_positions)} vị thế đang mở")
+            return active_positions
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy danh sách vị thế: {str(e)}")
+            return []
+            
     def get_futures_account(self) -> Dict:
         """
         Lấy thông tin tài khoản futures
