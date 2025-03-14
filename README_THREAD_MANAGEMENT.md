@@ -1,126 +1,97 @@
-# Hướng Dẫn Quản Lý Thread & Dịch Vụ Hệ Thống
+# HỆ THỐNG QUẢN LÝ THREAD VÀ DỊCH VỤ
 
-## Tổng Quan
+Tài liệu này mô tả cách thức hoạt động của hệ thống quản lý thread và dịch vụ mới được triển khai trong phiên bản gần đây của phần mềm.
 
-Hệ thống trading của chúng ta hoạt động với nhiều dịch vụ chạy đồng thời. Việc quản lý thread và đảm bảo các dịch vụ hoạt động liên tục là rất quan trọng. Tài liệu này cung cấp hướng dẫn chi tiết về cách quản lý thread và dịch vụ trong hệ thống.
+## Kiến trúc hệ thống quản lý 3 lớp
 
-## Kiến Trúc Hệ Thống
+Hệ thống được thiết kế với 3 lớp quản lý và giám sát để đảm bảo tính liên tục và tự động phục hồi:
 
-Hệ thống gồm các thành phần chính:
+1. **Lớp tự phục hồi cơ bản**: Mỗi dịch vụ có cơ chế phát hiện và khôi phục lỗi nội bộ
+2. **Service Manager**: Giám sát và quản lý tất cả các dịch vụ từ bên ngoài
+3. **Watchdog**: Giám sát toàn bộ hệ thống kể cả Service Manager, đảm bảo hệ thống luôn hoạt động
 
-1. **Market Notifier**: Phân tích thị trường và gửi thông báo
-2. **Unified Trading Service**: Hợp nhất nhiều dịch vụ nhỏ (Auto SLTP, Trailing Stop)
-3. **Service Manager**: Giám sát và khởi động lại dịch vụ khi cần thiết 
-4. **Watchdog**: Theo dõi tất cả các dịch vụ, bao gồm cả Service Manager
+### Các dịch vụ chính
 
-## Cơ Chế Tự Phục Hồi
+1. **Market Notifier (`auto_market_notifier.py`)**: 
+   - Phân tích thị trường và gửi thông báo
+   - Theo dõi cơ hội giao dịch
+   - Cập nhật phân tích theo chu kỳ
 
-Hệ thống sử dụng cấu trúc giám sát đa tầng:
+2. **Unified Trading Service (`unified_trading_service.py`)**: 
+   - Xử lý giao dịch tự động
+   - Quản lý đặt lệnh và vị thế
+   - Tự động thực hiện SL/TP theo cấu hình
 
-1. **Dịch vụ tự phục hồi**: Mỗi dịch vụ có thể tự khởi động lại khi phát hiện lỗi
-2. **Service Manager**: Giám sát trạng thái các dịch vụ và khởi động lại khi cần
-3. **Watchdog**: Đảm bảo tất cả các dịch vụ (kể cả Service Manager) luôn hoạt động
+3. **Service Manager (`enhanced_service_manager.py`)**: 
+   - Giám sát tình trạng hoạt động của tất cả dịch vụ
+   - Khôi phục dịch vụ bị lỗi
+   - Ghi nhật ký hoạt động
 
-## Tín Hiệu Heartbeat
+4. **Watchdog (`service_watchdog.py`)**: 
+   - Giám sát Service Manager
+   - Phát hiện lỗi toàn hệ thống
+   - Khởi động lại toàn bộ dịch vụ nếu cần
 
-Để phát hiện khi một dịch vụ bị treo:
+5. **Telegram Notifier (`advanced_telegram_notifier.py`)**: 
+   - Gửi thông báo qua Telegram
+   - Thông báo sự cố và trạng thái
 
-1. Mỗi dịch vụ định kỳ ghi log "Heartbeat" vào file log
-2. Service Manager kiểm tra log để xác định xem dịch vụ có còn hoạt động không
-3. Nếu không tìm thấy heartbeat trong khoảng thời gian nhất định, dịch vụ sẽ được khởi động lại
+## Cơ chế Heartbeat
 
-## Khởi Động Dịch Vụ
+Hệ thống sử dụng cơ chế heartbeat để theo dõi tình trạng hoạt động:
 
-### Khởi động thủ công
+1. Mỗi dịch vụ ghi timestamp định kỳ vào file heartbeat
+2. Service Manager đọc các file heartbeat để đánh giá tình trạng
+3. Watchdog giám sát heartbeat của Service Manager
 
-Để khởi động tất cả dịch vụ thủ công:
+## Cơ chế phục hồi tự động
+
+Hệ thống phục hồi theo thứ bậc:
+
+1. **Cấp dịch vụ**: Thread bị lỗi được khởi động lại
+2. **Cấp Service Manager**: Dịch vụ bị lỗi được khởi động lại
+3. **Cấp Watchdog**: Toàn bộ hệ thống bao gồm Service Manager được khởi động lại
+
+## Giao diện quản lý
+
+Giao diện desktop (`enhanced_trading_gui.py`) cung cấp khả năng:
+
+1. Theo dõi tình trạng dịch vụ theo thời gian thực
+2. Khởi động/dừng dịch vụ thủ công
+3. Xem nhật ký hoạt động
+4. Kiểm tra sự cố
+
+## Cài đặt và khởi động
+
+### Khởi động tự động toàn bộ hệ thống:
 
 ```bash
 python start_all_services.py
 ```
 
-### Khởi động Watchdog
-
-Để khởi động Watchdog (đảm bảo tất cả dịch vụ luôn chạy):
+### Khởi động riêng từng dịch vụ:
 
 ```bash
-python service_watchdog.py
+python service_watchdog.py         # Khởi động Watchdog
+python enhanced_service_manager.py  # Khởi động Service Manager
+python unified_trading_service.py   # Khởi động Trading Service
+python auto_market_notifier.py      # Khởi động Market Notifier
 ```
 
-### Sử dụng giao diện desktop
-
-1. Mở ứng dụng desktop: `python run_desktop_app.py`
-2. Chuyển đến tab "Quản lý hệ thống"
-3. Sử dụng các nút để khởi động/dừng các dịch vụ
-
-## Giám Sát Dịch Vụ
-
-### Kiểm tra trạng thái
+### Kiểm tra tình trạng:
 
 ```bash
-python check_service_status.py
+python check_service_status.py      # Kiểm tra trạng thái các dịch vụ
 ```
 
-### Xem log của dịch vụ
+## Giải quyết sự cố
 
-```bash
-# Market Notifier
-tail -f market_notifier.log
+1. Kiểm tra nhật ký trong các file `.log`
+2. Sử dụng tab "Quản lý hệ thống" trong giao diện desktop
+3. Khởi động lại dịch vụ cụ thể hoặc toàn bộ hệ thống
 
-# Unified Trading Service
-tail -f unified_trading_service.log
+## Lưu ý quan trọng
 
-# Service Manager
-tail -f service_manager.log
-
-# Watchdog
-tail -f watchdog.log
-```
-
-## Xử Lý Sự Cố Thread
-
-### Thread bị treo
-
-Các thread có thể bị treo vì nhiều lý do:
-
-1. **Deadlock**: Các thread chờ đợi tài nguyên của nhau
-2. **Timeout API**: Thread bị treo khi gọi API bên ngoài không phản hồi
-3. **Lỗi không xử lý**: Exception không được bắt đúng cách
-
-### Giải pháp
-
-Hệ thống sử dụng nhiều giải pháp:
-
-1. **Timeout cho API calls**: Tất cả API calls đều có timeout
-2. **Cơ chế retry**: Tự động thử lại khi gặp lỗi tạm thời
-3. **Exception handling**: Xử lý toàn diện tất cả ngoại lệ
-4. **Heartbeat**: Phát hiện thread bị treo và khởi động lại
-5. **Phân cấp giám sát**: Nhiều lớp giám sát để đảm bảo phục hồi
-
-## Hiệu Suất Và Tài Nguyên
-
-### Giám sát tài nguyên
-
-Service Manager giám sát mức sử dụng tài nguyên:
-
-1. **Bộ nhớ**: Giới hạn bộ nhớ cho mỗi dịch vụ
-2. **CPU**: Giới hạn % sử dụng CPU
-
-### Tối ưu hóa
-
-1. **Hợp nhất dịch vụ**: Unified Trading Service nhóm nhiều dịch vụ nhỏ
-2. **Làm việc theo lịch**: Các tác vụ được lên lịch với khoảng thời gian hợp lý
-3. **Sử dụng các biện pháp nhẹ**: Tránh polling liên tục
-
-## Lời Khuyên
-
-1. **Luôn kiểm tra log**: Khi gặp vấn đề, đọc file log là bước đầu tiên
-2. **Không khởi động lại thủ công quá nhiều**: Để hệ thống tự phục hồi
-3. **Cập nhật cấu hình**: Điều chỉnh các thông số trong file cấu hình khi cần thiết
-4. **Theo dõi tài nguyên hệ thống**: Sử dụng `htop` hoặc công cụ tương tự để theo dõi
-
-## Tài Nguyên Bổ Sung
-
-- **auto_restart.py**: Script tự động khởi động lại dịch vụ nếu hệ thống gặp lỗi nghiêm trọng
-- **enhanced_service_manager.py**: Service Manager với khả năng giám sát tài nguyên
-- **service_watchdog.py**: Ứng dụng theo dõi toàn bộ hệ thống và đảm bảo hoạt động liên tục
+- **Không tắt Watchdog trừ khi bạn muốn dừng toàn bộ hệ thống**
+- Đảm bảo cài đặt đúng các biến môi trường (API keys, cấu hình)
+- Kiểm tra thường xuyên các file nhật ký để phát hiện sự cố
