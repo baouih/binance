@@ -14,6 +14,15 @@ import traceback
 from decimal import Decimal, ROUND_DOWN
 from typing import Dict, List, Union, Tuple, Any, Optional
 
+# Tạo hằng số cho các loại mã lỗi
+ERROR_NO_CLIENT = "no_client"
+ERROR_API_CONNECTION = "api_connection_error"
+ERROR_SYMBOL_NOT_FOUND = "symbol_not_found"
+ERROR_INSUFFICIENT_BALANCE = "insufficient_balance"
+ERROR_INVALID_PARAMETERS = "invalid_parameters"
+ERROR_ORDER_REJECTED = "order_rejected"
+ERROR_UNKNOWN = "unknown_error"
+
 # Thiết lập logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("position_manager")
