@@ -43,6 +43,7 @@ try:
     from market_analyzer import MarketAnalyzer
     from position_manager import PositionManager
     from risk_manager import RiskManager
+    from market_scanner import get_scanner, MarketScanner
     logger.info("Đã import thành công các module từ dự án")
 except ImportError as e:
     logger.error(f"Lỗi khi import module: {str(e)}")
@@ -295,6 +296,9 @@ class EnhancedTradingGUI(QMainWindow):
             # Khởi tạo Risk Manager
             self.risk_manager = RiskManager(self.position_manager, risk_config)
             
+            # Khởi tạo Scanner thị trường
+            self.market_scanner = get_scanner(testnet=True)
+            
             logger.info("Đã khởi tạo các đối tượng")
         
         except Exception as e:
@@ -302,6 +306,7 @@ class EnhancedTradingGUI(QMainWindow):
             self.market_analyzer = None
             self.position_manager = None
             self.risk_manager = None
+            self.market_scanner = None
     
     def load_risk_config(self) -> Dict[str, Any]:
         """
