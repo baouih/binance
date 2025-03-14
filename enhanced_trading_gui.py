@@ -1104,6 +1104,50 @@ class EnhancedTradingGUI(QMainWindow):
         
         services_layout.addLayout(telegram_notifier_layout)
         
+        # Auto Trading Service
+        auto_trade_layout = QHBoxLayout()
+        auto_trade_label = QLabel("Auto Trading:")
+        self.auto_trade_status = QLabel("Chưa khởi động")
+        self.auto_trade_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_auto_trade_button = QPushButton("Khởi động")
+        self.start_auto_trade_button.clicked.connect(lambda: self.start_service("auto_trade"))
+        self.start_auto_trade_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_auto_trade_button = QPushButton("Dừng")
+        self.stop_auto_trade_button.clicked.connect(lambda: self.stop_service("auto_trade"))
+        self.stop_auto_trade_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_auto_trade_button.setEnabled(False)
+        
+        auto_trade_layout.addWidget(auto_trade_label)
+        auto_trade_layout.addWidget(self.auto_trade_status)
+        auto_trade_layout.addWidget(self.start_auto_trade_button)
+        auto_trade_layout.addWidget(self.stop_auto_trade_button)
+        
+        services_layout.addLayout(auto_trade_layout)
+        
+        # ML Training Service
+        ml_training_layout = QHBoxLayout()
+        ml_training_label = QLabel("ML Training:")
+        self.ml_training_status = QLabel("Chưa khởi động")
+        self.ml_training_status.setStyleSheet("color: #EF4444; font-weight: bold;")
+        
+        self.start_ml_training_button = QPushButton("Khởi động")
+        self.start_ml_training_button.clicked.connect(lambda: self.start_service("ml_training"))
+        self.start_ml_training_button.setStyleSheet("background-color: #22C55E; color: white;")
+        
+        self.stop_ml_training_button = QPushButton("Dừng")
+        self.stop_ml_training_button.clicked.connect(lambda: self.stop_service("ml_training"))
+        self.stop_ml_training_button.setStyleSheet("background-color: #EF4444; color: white;")
+        self.stop_ml_training_button.setEnabled(False)
+        
+        ml_training_layout.addWidget(ml_training_label)
+        ml_training_layout.addWidget(self.ml_training_status)
+        ml_training_layout.addWidget(self.start_ml_training_button)
+        ml_training_layout.addWidget(self.stop_ml_training_button)
+        
+        services_layout.addLayout(ml_training_layout)
+        
         # Nút khởi động tất cả dịch vụ
         start_all_layout = QHBoxLayout()
         
