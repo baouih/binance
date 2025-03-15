@@ -418,25 +418,16 @@ class PositionManager:
                     quantity = math.ceil(min_required_qty * 1000) / 1000
                     logger.info(f"Đã điều chỉnh số lượng từ {amount} lên {quantity} BTC để đạt giá trị tối thiểu")
             
-            # Đặt lệnh mở vị thế, với/không với positionSide tùy theo chế độ tài khoản
+            # Đặt lệnh mở vị thế - Luôn gửi tham số positionSide bất kể chế độ tài khoản
             try:
-                if is_hedge_mode:
-                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=binance_side,
-                        type=ORDER_TYPE_MARKET,
-                        quantity=quantity,
-                        positionSide=position_side
-                    )
-                else:
-                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=binance_side,
-                        type=ORDER_TYPE_MARKET,
-                        quantity=quantity
-                    )
+                # Trên Binance Futures, tham số positionSide luôn cần thiết khi dualSidePosition=True
+                order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=binance_side,
+                    type=ORDER_TYPE_MARKET,
+                    quantity=quantity,
+                    positionSide=position_side
+                )
             except BinanceAPIException as e:
                 if "Order's notional must be no smaller than" in str(e):
                     # Lỗi giá trị lệnh quá nhỏ, thử lại với giá trị lớn hơn
@@ -462,23 +453,14 @@ class PositionManager:
                         safe_quantity = math.ceil(safe_min_qty * 1000) / 1000
                     
                     logger.info(f"Thử lại với số lượng lớn hơn: {safe_quantity}")
-                    if is_hedge_mode:
-                        # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
-                        order = self.client.futures_create_order(
-                            symbol=symbol,
-                            side=binance_side,
-                            type=ORDER_TYPE_MARKET,
-                            quantity=safe_quantity,
-                            positionSide=position_side
-                        )
-                    else:
-                        # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
-                        order = self.client.futures_create_order(
-                            symbol=symbol,
-                            side=binance_side,
-                            type=ORDER_TYPE_MARKET,
-                            quantity=safe_quantity
-                        )
+                    # Luôn gửi với tham số positionSide
+                    order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=binance_side,
+                        type=ORDER_TYPE_MARKET,
+                        quantity=safe_quantity,
+                        positionSide=position_side
+                    )
                 elif "Unknown error" in str(e):
                     # Thử lại với số lượng được làm tròn
                     logger.warning(f"Lỗi không xác định: {str(e)}")
@@ -698,26 +680,15 @@ class PositionManager:
                 logger.warning(f"Không thể xác định chế độ vị thế: {str(e)}")
                 is_hedge_mode = False
             
-            # Đặt lệnh đóng vị thế với positionSide nếu đang ở Hedge Mode
-            if is_hedge_mode:
-                # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
-                order = self.client.futures_create_order(
-                    symbol=symbol,
-                    side=binance_side,
-                    type=ORDER_TYPE_MARKET,
-                    quantity=abs(position_info["size"]),
-                    positionSide=position_side,
-                    reduceOnly=True
-                )
-            else:
-                # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
-                order = self.client.futures_create_order(
-                    symbol=symbol,
-                    side=binance_side,
-                    type=ORDER_TYPE_MARKET,
-                    quantity=abs(position_info["size"]),
-                    reduceOnly=True
-                )
+            # Đặt lệnh đóng vị thế - luôn gửi positionSide
+            order = self.client.futures_create_order(
+                symbol=symbol,
+                side=binance_side,
+                type=ORDER_TYPE_MARKET,
+                quantity=abs(position_info["size"]),
+                positionSide=position_side,
+                reduceOnly=True
+            )
             
             # Kết quả
             result = {
