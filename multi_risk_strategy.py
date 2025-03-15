@@ -1,396 +1,564 @@
 import os
 import sys
 import logging
-import json
-import threading
-import time
-from datetime import datetime, timedelta
-from pathlib import Path
+import numpy as np
+import pandas as pd
+from datetime import datetime
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('adaptive_multi_risk.log'),
+        logging.FileHandler('multi_risk_strategy.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
-logger = logging.getLogger('adaptive_multi_risk')
+logger = logging.getLogger('multi_risk_strategy')
 
-class AdaptiveMultiRiskManager:
+class MultiRiskStrategy:
     """
-    Quản lý nhiều chiến lược với các mức rủi ro khác nhau
-    Tự động chuyển đổi giữa các mức rủi ro dựa trên điều kiện thị trường và hiệu suất
+    Chiến lược giao dịch đa mức rủi ro với khả năng thích ứng theo điều kiện thị trường
     """
     
-    def __init__(self, account_size=10000, risk_levels=None):
-        self.account_size = account_size
-        # Thiết lập mặc định các mức rủi ro từ phân tích backtest
-        self.risk_levels = risk_levels or {
-            'ultra_conservative': 0.03,  # 3% - Mức an toàn nhất, lợi nhuận thấp, drawdown thấp
-            'conservative': 0.05,        # 5% - Mức an toàn, lợi nhuận ổn định
-            'moderate': 0.07,            # 7% - Mức cân bằng
-            'aggressive': 0.09,          # 9% - Lợi nhuận khá, rủi ro vừa phải, RR tốt nhất
-            'high_risk': 0.15,           # 15% - Lợi nhuận cao, rủi ro cao
-            'extreme_risk': 0.20,        # 20% - Lợi nhuận rất cao, rủi ro vẫn chấp nhận được
-            'ultra_high_risk': 0.25,     # 25% - Lợi nhuận cao nhất với RR tốt
-            'super_high_risk': 0.30,     # 30% - Lợi nhuận rất cao, nhưng rủi ro cao
-            'max_risk': 0.40             # 40% - Lợi nhuận cực cao, rủi ro rất cao
-        }
+    def __init__(self, risk_level=0.15, lookback_period=14):
+        """
+        Khởi tạo chiến lược giao dịch
         
-        # Khởi tạo chiến lược mặc định
-        self.current_risk_level = 'moderate'  # Mặc định bắt đầu với mức cân bằng
-        self.current_risk_percentage = self.risk_levels[self.current_risk_level]
-        
-        # Thiết lập phân bổ vốn giữa các mức rủi ro
-        self.allocation = {
-            'ultra_conservative': 0.20,  # 20% vốn cho mức an toàn nhất
-            'conservative': 0.20,        # 20% vốn cho mức an toàn
-            'moderate': 0.20,            # 20% vốn cho mức cân bằng
-            'aggressive': 0.20,          # 20% vốn cho mức tấn công
-            'high_risk': 0.10,           # 10% vốn cho mức rủi ro cao
-            'extreme_risk': 0.05,        # 5% vốn cho mức rủi ro cực cao
-            'ultra_high_risk': 0.03,     # 3% vốn cho mức rủi ro rất cao
-            'super_high_risk': 0.02,     # 2% vốn cho mức rủi ro siêu cao
-            'max_risk': 0.00             # 0% vốn cho mức rủi ro tối đa (mặc định không sử dụng)
-        }
-        
-        # Hiệu suất của từng mức rủi ro
-        self.performance = {level: {'profit': 0, 'drawdown': 0, 'trades': 0, 'win_rate': 0} 
-                           for level in self.risk_levels}
-        
-        # Trạng thái thị trường hiện tại
-        self.market_state = {
-            'regime': 'NEUTRAL',  # BULL, BEAR, SIDEWAYS, VOLATILE
-            'volatility': 'NORMAL',  # LOW, NORMAL, HIGH
-            'trend_strength': 'NEUTRAL',  # STRONG, NEUTRAL, WEAK
-        }
-        
-        # Lưu lịch sử chuyển đổi
-        self.transition_history = []
-        
-        # Trạng thái hoạt động
-        self.is_running = False
-        self.lock = threading.RLock()
-        
-        logger.info(f"Khởi tạo AdaptiveMultiRiskManager với account_size={account_size}")
-        logger.info(f"Mức rủi ro mặc định: {self.current_risk_level} ({self.current_risk_percentage*100:.0f}%)")
+        Args:
+            risk_level (float): Mức rủi ro (0.1-0.25)
+            lookback_period (int): Số nến quá khứ để xem xét
+        """
+        self.risk_level = risk_level
+        self.lookback_period = lookback_period
+        logger.info(f"Khởi tạo MultiRiskStrategy với risk_level={risk_level}, lookback_period={lookback_period}")
     
-    def update_market_state(self, regime, volatility, trend_strength):
-        """Cập nhật trạng thái thị trường hiện tại"""
-        with self.lock:
-            old_state = self.market_state.copy()
-            self.market_state = {
-                'regime': regime,
-                'volatility': volatility,
-                'trend_strength': trend_strength
-            }
+    def calculate_indicators(self, data):
+        """
+        Tính toán các chỉ báo kỹ thuật
+        
+        Args:
+            data (pd.DataFrame): DataFrame chứa dữ liệu giá
             
-            if old_state != self.market_state:
-                logger.info(f"Cập nhật trạng thái thị trường: {old_state} -> {self.market_state}")
-                # Kiểm tra xem có cần điều chỉnh mức rủi ro không
-                self._adapt_risk_level()
-    
-    def update_performance(self, risk_level, profit_change, drawdown=None):
-        """Cập nhật hiệu suất cho một mức rủi ro cụ thể"""
-        with self.lock:
-            if risk_level not in self.performance:
-                logger.warning(f"Mức rủi ro không tồn tại: {risk_level}")
-                return
-            
-            self.performance[risk_level]['profit'] += profit_change
-            
-            if drawdown is not None:
-                # Chỉ cập nhật drawdown nếu giá trị mới lớn hơn
-                self.performance[risk_level]['drawdown'] = max(
-                    self.performance[risk_level]['drawdown'], 
-                    drawdown
-                )
-            
-            # Tăng số lệnh
-            self.performance[risk_level]['trades'] += 1
-            
-            # Cập nhật win_rate nếu là lệnh thắng
-            if profit_change > 0:
-                wins = self.performance[risk_level].get('wins', 0) + 1
-                self.performance[risk_level]['wins'] = wins
-                self.performance[risk_level]['win_rate'] = wins / self.performance[risk_level]['trades'] * 100
-            
-            logger.info(f"Cập nhật hiệu suất {risk_level}: profit={self.performance[risk_level]['profit']:.2f}, "
-                        f"drawdown={self.performance[risk_level]['drawdown']:.2f}, "
-                        f"win_rate={self.performance[risk_level]['win_rate']:.2f}%")
-            
-            # Kiểm tra xem có cần điều chỉnh mức rủi ro không
-            self._adapt_risk_level()
-    
-    def _adapt_risk_level(self):
-        """Tự động điều chỉnh mức rủi ro dựa trên trạng thái thị trường và hiệu suất"""
-        with self.lock:
-            old_risk_level = self.current_risk_level
-            market_regime = self.market_state['regime']
-            volatility = self.market_state['volatility']
-            trend_strength = self.market_state['trend_strength']
-            
-            # Điều chỉnh dựa trên trạng thái thị trường
-            if market_regime == 'BULL' and trend_strength == 'STRONG':
-                if volatility == 'LOW':
-                    # Thị trường tăng mạnh, ít biến động -> tăng rủi ro
-                    suggested_level = 'high_risk'
-                elif volatility == 'NORMAL':
-                    # Thị trường tăng mạnh, biến động vừa phải -> tăng rủi ro vừa phải
-                    suggested_level = 'aggressive'
-                else:  # HIGH volatility
-                    # Thị trường tăng mạnh nhưng biến động cao -> thận trọng
-                    suggested_level = 'moderate'
-            
-            elif market_regime == 'BEAR' and trend_strength == 'STRONG':
-                if volatility == 'LOW':
-                    # Thị trường giảm mạnh, ít biến động -> giảm rủi ro
-                    suggested_level = 'conservative'
-                elif volatility == 'NORMAL':
-                    # Thị trường giảm mạnh, biến động vừa phải -> thận trọng cao
-                    suggested_level = 'ultra_conservative'
-                else:  # HIGH volatility
-                    # Thị trường giảm mạnh và biến động cao -> rủi ro tối thiểu
-                    suggested_level = 'ultra_conservative'
-            
-            elif market_regime == 'SIDEWAYS':
-                if volatility == 'LOW':
-                    # Thị trường đi ngang, ít biến động -> rủi ro vừa phải
-                    suggested_level = 'moderate'
-                elif volatility == 'NORMAL':
-                    # Thị trường đi ngang, biến động vừa phải -> thận trọng
-                    suggested_level = 'conservative'
-                else:  # HIGH volatility
-                    # Thị trường đi ngang nhưng biến động cao -> thận trọng cao
-                    suggested_level = 'ultra_conservative'
-            
-            elif market_regime == 'VOLATILE':
-                # Thị trường biến động mạnh -> giảm rủi ro
-                suggested_level = 'ultra_conservative'
-            
-            else:  # NEUTRAL và các trường hợp khác
-                # Mặc định sử dụng mức cân bằng
-                suggested_level = 'moderate'
-            
-            # Chỉ thay đổi nếu mức đề xuất khác với mức hiện tại
-            if suggested_level != self.current_risk_level:
-                # Lưu lại lịch sử chuyển đổi
-                transition = {
-                    'timestamp': datetime.now().isoformat(),
-                    'from_level': self.current_risk_level,
-                    'to_level': suggested_level,
-                    'market_state': self.market_state.copy(),
-                    'reason': f"Tự động điều chỉnh dựa trên trạng thái thị trường: {self.market_state}"
-                }
-                self.transition_history.append(transition)
-                
-                # Cập nhật mức rủi ro mới
-                self.current_risk_level = suggested_level
-                self.current_risk_percentage = self.risk_levels[self.current_risk_level]
-                
-                logger.info(f"Điều chỉnh mức rủi ro: {old_risk_level} -> {self.current_risk_level} "
-                           f"({self.current_risk_percentage*100:.0f}%) dựa trên trạng thái thị trường")
-    
-    def get_risk_level(self, account_type=None):
-        """Lấy mức rủi ro hiện tại và phần trăm rủi ro"""
-        with self.lock:
-            # Nếu có chỉ định loại tài khoản, có thể điều chỉnh mức rủi ro phù hợp
-            if account_type == 'small':
-                # Tài khoản nhỏ thường không nên sử dụng mức rủi ro quá cao
-                if self.current_risk_level in ['extreme_risk', 'ultra_high_risk', 'super_high_risk', 'max_risk']:
-                    adjusted_level = 'high_risk'
-                    logger.info(f"Điều chỉnh mức rủi ro cho tài khoản nhỏ: {self.current_risk_level} -> {adjusted_level}")
-                    return adjusted_level, self.risk_levels[adjusted_level]
-            
-            # Trả về mức mặc định
-            return self.current_risk_level, self.current_risk_percentage
-    
-    def get_position_size(self, symbol, entry_price, stop_loss_price=None, account_type=None):
-        """Tính toán kích thước vị thế dựa trên mức rủi ro hiện tại"""
-        with self.lock:
-            risk_level, risk_percentage = self.get_risk_level(account_type)
-            
-            # Tính risk amount (số tiền chấp nhận rủi ro)
-            risk_amount = self.account_size * risk_percentage
-            
-            # Nếu có stop loss, tính position size dựa trên khoảng cách stop loss
-            if stop_loss_price is not None and stop_loss_price > 0:
-                if entry_price > stop_loss_price:  # LONG position
-                    sl_distance_pct = (entry_price - stop_loss_price) / entry_price
-                else:  # SHORT position
-                    sl_distance_pct = (stop_loss_price - entry_price) / entry_price
-                
-                # Đảm bảo sl_distance_pct không quá nhỏ dẫn đến position size quá lớn
-                sl_distance_pct = max(sl_distance_pct, 0.005)  # Tối thiểu 0.5%
-                
-                # Tính position size
-                position_size = risk_amount / (entry_price * sl_distance_pct)
+        Returns:
+            pd.DataFrame: DataFrame với các chỉ báo đã tính
+        """
+        # Kiểm tra dữ liệu đầu vào
+        required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+        if not all(col in data.columns for col in required_columns):
+            # Thử chuyển đổi từ chữ thường sang chữ hoa
+            lowercase_cols = ['open', 'high', 'low', 'close', 'volume']
+            if all(col in data.columns for col in lowercase_cols):
+                data = data.rename(columns={
+                    'open': 'Open',
+                    'high': 'High',
+                    'low': 'Low',
+                    'close': 'Close',
+                    'volume': 'Volume'
+                })
             else:
-                # Không có stop loss cụ thể, sử dụng mức % mặc định
-                default_sl_pct = 0.02  # 2% mặc định
-                position_size = risk_amount / (entry_price * default_sl_pct)
-            
-            logger.info(f"Tính position size cho {symbol} tại mức rủi ro {risk_level} ({risk_percentage*100:.0f}%): "
-                       f"size={position_size:.6f}, entry={entry_price:.2f}, risk_amount=${risk_amount:.2f}")
-            
-            return position_size, risk_level, risk_percentage
-    
-    def allocate_capital(self):
-        """Phân bổ vốn giữa các mức rủi ro khác nhau"""
-        with self.lock:
-            allocation_result = {}
-            for level, percentage in self.allocation.items():
-                if percentage > 0:
-                    allocation_result[level] = {
-                        'risk_percentage': self.risk_levels[level],
-                        'capital_allocation': percentage,
-                        'allocated_amount': self.account_size * percentage
-                    }
-            
-            logger.info(f"Phân bổ vốn: {json.dumps(allocation_result, indent=2)}")
-            return allocation_result
-    
-    def get_performance_stats(self):
-        """Trả về thống kê hiệu suất của các mức rủi ro"""
-        with self.lock:
-            return self.performance
-    
-    def save_state(self, file_path='multi_risk_state.json'):
-        """Lưu trạng thái hiện tại ra file"""
-        with self.lock:
-            state = {
-                'account_size': self.account_size,
-                'current_risk_level': self.current_risk_level,
-                'current_risk_percentage': self.current_risk_percentage,
-                'risk_levels': self.risk_levels,
-                'allocation': self.allocation,
-                'performance': self.performance,
-                'market_state': self.market_state,
-                'transition_history': self.transition_history,
-                'timestamp': datetime.now().isoformat()
-            }
-            
-            with open(file_path, 'w') as f:
-                json.dump(state, f, indent=4)
-            
-            logger.info(f"Đã lưu trạng thái vào {file_path}")
-    
-    def load_state(self, file_path='multi_risk_state.json'):
-        """Tải trạng thái từ file"""
-        if not os.path.exists(file_path):
-            logger.warning(f"Không tìm thấy file {file_path}")
-            return False
+                logger.error(f"Thiếu các cột dữ liệu cần thiết. Yêu cầu: {required_columns}, Hiện có: {data.columns.tolist()}")
+                return None
         
-        with self.lock:
-            try:
-                with open(file_path, 'r') as f:
-                    state = json.load(f)
-                
-                self.account_size = state.get('account_size', self.account_size)
-                self.current_risk_level = state.get('current_risk_level', self.current_risk_level)
-                self.current_risk_percentage = state.get('current_risk_percentage', self.current_risk_percentage)
-                self.risk_levels = state.get('risk_levels', self.risk_levels)
-                self.allocation = state.get('allocation', self.allocation)
-                self.performance = state.get('performance', self.performance)
-                self.market_state = state.get('market_state', self.market_state)
-                self.transition_history = state.get('transition_history', self.transition_history)
-                
-                logger.info(f"Đã tải trạng thái từ {file_path}")
-                logger.info(f"Mức rủi ro hiện tại: {self.current_risk_level} ({self.current_risk_percentage*100:.0f}%)")
-                return True
-            
-            except Exception as e:
-                logger.error(f"Lỗi khi tải trạng thái: {str(e)}")
-                return False
+        # Copy dữ liệu để tránh ảnh hưởng đến dữ liệu gốc
+        df = data.copy()
+        
+        # 1. Tính RSI
+        delta = df['Close'].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        
+        avg_gain = gain.rolling(window=self.lookback_period).mean()
+        avg_loss = loss.rolling(window=self.lookback_period).mean()
+        
+        rs = avg_gain / avg_loss
+        df['rsi'] = 100 - (100 / (1 + rs))
+        
+        # 2. Tính MACD
+        ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+        ema26 = df['Close'].ewm(span=26, adjust=False).mean()
+        df['macd'] = ema12 - ema26
+        df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
+        df['macd_hist'] = df['macd'] - df['macd_signal']
+        
+        # 3. Tính Bollinger Bands
+        df['sma20'] = df['Close'].rolling(window=20).mean()
+        df['std20'] = df['Close'].rolling(window=20).std()
+        df['upper_band'] = df['sma20'] + (df['std20'] * 2)
+        df['lower_band'] = df['sma20'] - (df['std20'] * 2)
+        
+        # 4. Tính ATR (Average True Range)
+        tr1 = df['High'] - df['Low']
+        tr2 = abs(df['High'] - df['Close'].shift())
+        tr3 = abs(df['Low'] - df['Close'].shift())
+        df['tr'] = pd.DataFrame({'tr1': tr1, 'tr2': tr2, 'tr3': tr3}).max(axis=1)
+        df['atr'] = df['tr'].rolling(window=14).mean()
+        
+        # 5. Tính Stochastic Oscillator
+        df['lowest_14'] = df['Low'].rolling(window=14).min()
+        df['highest_14'] = df['High'].rolling(window=14).max()
+        df['%K'] = (df['Close'] - df['lowest_14']) / (df['highest_14'] - df['lowest_14']) * 100
+        df['%D'] = df['%K'].rolling(window=3).mean()
+        
+        # 6. Detect Market Condition
+        df['market_condition'] = self._detect_market_condition(df)
+        
+        # Loại bỏ dữ liệu NaN
+        return df.dropna()
     
-    def start(self):
-        """Bắt đầu quản lý rủi ro thích ứng"""
-        with self.lock:
-            if self.is_running:
-                logger.warning("AdaptiveMultiRiskManager đã đang chạy")
-                return
+    def _detect_market_condition(self, df):
+        """
+        Phát hiện điều kiện thị trường dựa trên dữ liệu giá
+        
+        Args:
+            df (pd.DataFrame): DataFrame đã có các chỉ báo
             
-            self.is_running = True
-            logger.info("Đã bắt đầu AdaptiveMultiRiskManager")
+        Returns:
+            pd.Series: Series chứa điều kiện thị trường cho mỗi điểm dữ liệu
+        """
+        # Tạo mảng để lưu kết quả
+        conditions = np.full(len(df), 'NEUTRAL', dtype=object)
+        
+        # Số nến để xác định xu hướng
+        trend_period = min(50, len(df) // 2)
+        
+        # Tính phần trăm thay đổi giá trong giai đoạn xu hướng
+        for i in range(trend_period, len(df)):
+            # Tính % thay đổi từ đầu kỳ
+            price_change = (df['Close'].iloc[i] - df['Close'].iloc[i - trend_period]) / df['Close'].iloc[i - trend_period] * 100
+            
+            # Biến động (dựa trên ATR so với giá)
+            if 'atr' in df.columns and not pd.isna(df['atr'].iloc[i]):
+                volatility = df['atr'].iloc[i] / df['Close'].iloc[i] * 100
+            else:
+                volatility = 0
+            
+            # Xác định điều kiện thị trường
+            if price_change > 5:  # Tăng > 5%
+                if volatility > 3:
+                    conditions[i] = 'VOLATILE'
+                else:
+                    conditions[i] = 'BULL'
+            elif price_change < -5:  # Giảm > 5%
+                if volatility > 3:
+                    conditions[i] = 'VOLATILE'
+                else:
+                    conditions[i] = 'BEAR'
+            else:  # Đi ngang
+                if volatility > 2:
+                    conditions[i] = 'VOLATILE'
+                else:
+                    conditions[i] = 'SIDEWAYS'
+        
+        return pd.Series(conditions, index=df.index)
     
-    def stop(self):
-        """Dừng quản lý rủi ro thích ứng"""
-        with self.lock:
-            if not self.is_running:
-                logger.warning("AdaptiveMultiRiskManager đã dừng")
-                return
+    def generate_signals(self, data):
+        """
+        Tạo tín hiệu giao dịch
+        
+        Args:
+            data (pd.DataFrame): DataFrame đã có các chỉ báo
             
-            self.is_running = False
-            logger.info("Đã dừng AdaptiveMultiRiskManager")
+        Returns:
+            dict: Dictionary chứa các tín hiệu giao dịch
+        """
+        signals = {}
+        
+        # Điều chỉnh tín hiệu dựa trên mức rủi ro
+        for i in range(1, len(data)):
+            # Xác định điều kiện thị trường
+            market_condition = data['market_condition'].iloc[i]
+            
+            # Tín hiệu RSI
+            rsi = data['rsi'].iloc[i]
+            prev_rsi = data['rsi'].iloc[i-1]
+            
+            # Tín hiệu MACD
+            macd = data['macd'].iloc[i]
+            macd_signal = data['macd_signal'].iloc[i]
+            prev_macd = data['macd'].iloc[i-1]
+            prev_macd_signal = data['macd_signal'].iloc[i-1]
+            
+            # Tín hiệu Bollinger Bands
+            close = data['Close'].iloc[i]
+            upper_band = data['upper_band'].iloc[i]
+            lower_band = data['lower_band'].iloc[i]
+            
+            # Tính SL và TP dựa trên ATR và mức rủi ro
+            atr = data['atr'].iloc[i]
+            
+            # Điều chỉnh hệ số ATR dựa trên mức rủi ro
+            sl_factor = 1.5  # Mặc định
+            tp_factor = 2.0  # Mặc định
+            
+            if self.risk_level <= 0.10:  # Rủi ro thấp
+                sl_factor = 2.0  # Stop loss xa hơn
+                tp_factor = 1.5  # Take profit gần hơn
+            elif self.risk_level <= 0.15:  # Rủi ro trung bình
+                sl_factor = 1.5
+                tp_factor = 2.0
+            elif self.risk_level <= 0.20:  # Rủi ro cao
+                sl_factor = 1.0  # Stop loss gần hơn
+                tp_factor = 2.5  # Take profit xa hơn
+            else:  # Rủi ro rất cao (> 0.20)
+                sl_factor = 0.8
+                tp_factor = 3.0
+            
+            # Tín hiệu mua (LONG)
+            long_signal = False
+            long_reason = []
+            
+            # RSI vượt lên từ vùng quá bán
+            if prev_rsi < 30 and rsi >= 30:
+                long_signal = True
+                long_reason.append(f"RSI vượt lên từ vùng quá bán ({rsi:.2f})")
+            
+            # MACD cắt lên đường tín hiệu
+            if prev_macd < prev_macd_signal and macd >= macd_signal and macd < 0:
+                long_signal = True
+                long_reason.append(f"MACD cắt lên đường tín hiệu (histogram: {macd - macd_signal:.6f})")
+            
+            # Giá chạm Bollinger Bands dưới
+            if close <= lower_band:
+                long_signal = True
+                long_reason.append(f"Giá chạm Bollinger Band dưới ({close:.2f} <= {lower_band:.2f})")
+            
+            # Chỉ tạo tín hiệu nếu có điều kiện thoả mãn
+            if long_signal:
+                # Tính SL và TP
+                stop_loss = close - (atr * sl_factor)
+                take_profit = close + (atr * tp_factor)
+                
+                signals[i] = {
+                    'index': i,
+                    'timestamp': data.index[i],
+                    'price': close,
+                    'type': 'LONG',
+                    'stop_loss': stop_loss,
+                    'take_profit': take_profit,
+                    'reason': long_reason,
+                    'market_condition': market_condition
+                }
+            
+            # Tín hiệu bán (SHORT)
+            short_signal = False
+            short_reason = []
+            
+            # RSI vượt xuống từ vùng quá mua
+            if prev_rsi > 70 and rsi <= 70:
+                short_signal = True
+                short_reason.append(f"RSI vượt xuống từ vùng quá mua ({rsi:.2f})")
+            
+            # MACD cắt xuống đường tín hiệu
+            if prev_macd > prev_macd_signal and macd <= macd_signal and macd > 0:
+                short_signal = True
+                short_reason.append(f"MACD cắt xuống đường tín hiệu (histogram: {macd - macd_signal:.6f})")
+            
+            # Giá chạm Bollinger Bands trên
+            if close >= upper_band:
+                short_signal = True
+                short_reason.append(f"Giá chạm Bollinger Band trên ({close:.2f} >= {upper_band:.2f})")
+            
+            # Chỉ tạo tín hiệu nếu có điều kiện thoả mãn
+            if short_signal:
+                # Tính SL và TP
+                stop_loss = close + (atr * sl_factor)
+                take_profit = close - (atr * tp_factor)
+                
+                signals[i] = {
+                    'index': i,
+                    'timestamp': data.index[i],
+                    'price': close,
+                    'type': 'SHORT',
+                    'stop_loss': stop_loss,
+                    'take_profit': take_profit,
+                    'reason': short_reason,
+                    'market_condition': market_condition
+                }
+        
+        logger.info(f"Đã tạo {len(signals)} tín hiệu giao dịch")
+        return signals
+    
+    def apply_strategy(self, data):
+        """
+        Áp dụng chiến lược vào dữ liệu
+        
+        Args:
+            data (pd.DataFrame): DataFrame chứa dữ liệu giá
+            
+        Returns:
+            dict: Dictionary chứa các tín hiệu giao dịch
+        """
+        # Tính toán các chỉ báo
+        df_indicators = self.calculate_indicators(data)
+        if df_indicators is None:
+            logger.error("Không thể tính toán các chỉ báo")
+            return {}
+        
+        # Tạo tín hiệu giao dịch
+        signals = self.generate_signals(df_indicators)
+        
+        return signals
+    
+    def backtest(self, data, balance=10000, position_size=None):
+        """
+        Chạy backtest chiến lược
+        
+        Args:
+            data (pd.DataFrame): DataFrame chứa dữ liệu giá
+            balance (float): Số dư ban đầu
+            position_size (float, optional): Kích thước vị thế cố định, nếu None sẽ tính dựa trên % rủi ro
+            
+        Returns:
+            dict: Kết quả backtest
+        """
+        # Tính toán các chỉ báo
+        df = self.calculate_indicators(data)
+        if df is None:
+            logger.error("Không thể tính toán các chỉ báo")
+            return None
+        
+        # Tạo tín hiệu giao dịch
+        signals = self.generate_signals(df)
+        
+        # Thực hiện backtest
+        initial_balance = balance
+        current_balance = balance
+        position = None
+        trades = []
+        equity_curve = [balance]
+        
+        for i in range(1, len(df)):
+            current_price = df['Close'].iloc[i]
+            
+            # Xử lý vị thế đang mở
+            if position is not None:
+                # Kiểm tra điều kiện chốt lời
+                if (position['type'] == 'LONG' and current_price >= position['take_profit']) or \
+                   (position['type'] == 'SHORT' and current_price <= position['take_profit']):
+                    # Tính lợi nhuận
+                    if position['type'] == 'LONG':
+                        profit = position['qty'] * (current_price - position['entry_price'])
+                    else:
+                        profit = position['qty'] * (position['entry_price'] - current_price)
+                    
+                    # Cập nhật số dư
+                    current_balance += profit
+                    
+                    # Lưu thông tin giao dịch
+                    trade = {
+                        'entry_time': position['time'],
+                        'exit_time': df.index[i],
+                        'type': position['type'],
+                        'entry_price': position['entry_price'],
+                        'exit_price': current_price,
+                        'qty': position['qty'],
+                        'profit': profit,
+                        'profit_pct': (profit / (position['entry_price'] * position['qty'])) * 100,
+                        'exit_reason': 'take_profit',
+                        'market_condition': position['market_condition']
+                    }
+                    trades.append(trade)
+                    
+                    # Đóng vị thế
+                    position = None
+                
+                # Kiểm tra điều kiện cắt lỗ
+                elif (position['type'] == 'LONG' and current_price <= position['stop_loss']) or \
+                     (position['type'] == 'SHORT' and current_price >= position['stop_loss']):
+                    # Tính lỗ
+                    if position['type'] == 'LONG':
+                        loss = position['qty'] * (current_price - position['entry_price'])
+                    else:
+                        loss = position['qty'] * (position['entry_price'] - current_price)
+                    
+                    # Cập nhật số dư
+                    current_balance += loss
+                    
+                    # Lưu thông tin giao dịch
+                    trade = {
+                        'entry_time': position['time'],
+                        'exit_time': df.index[i],
+                        'type': position['type'],
+                        'entry_price': position['entry_price'],
+                        'exit_price': current_price,
+                        'qty': position['qty'],
+                        'profit': loss,
+                        'profit_pct': (loss / (position['entry_price'] * position['qty'])) * 100,
+                        'exit_reason': 'stop_loss',
+                        'market_condition': position['market_condition']
+                    }
+                    trades.append(trade)
+                    
+                    # Đóng vị thế
+                    position = None
+            
+            # Mở vị thế mới nếu có tín hiệu và không có vị thế đang mở
+            if i in signals and position is None:
+                signal = signals[i]
+                
+                # Tính kích thước vị thế
+                if position_size is not None:
+                    qty = position_size
+                else:
+                    risk_amount = current_balance * self.risk_level
+                    
+                    if signal['type'] == 'LONG':
+                        sl_distance = signal['price'] - signal['stop_loss']
+                    else:
+                        sl_distance = signal['stop_loss'] - signal['price']
+                    
+                    # Đảm bảo sl_distance > 0
+                    sl_distance = max(sl_distance, signal['price'] * 0.005)
+                    qty = risk_amount / sl_distance
+                
+                # Mở vị thế
+                position = {
+                    'time': signal['timestamp'],
+                    'type': signal['type'],
+                    'entry_price': signal['price'],
+                    'qty': qty,
+                    'stop_loss': signal['stop_loss'],
+                    'take_profit': signal['take_profit'],
+                    'market_condition': signal['market_condition']
+                }
+            
+            # Cập nhật equity curve
+            equity_curve.append(current_balance)
+        
+        # Đóng vị thế cuối cùng nếu còn
+        if position is not None:
+            # Đóng ở giá cuối cùng
+            final_price = df['Close'].iloc[-1]
+            
+            # Tính lãi/lỗ
+            if position['type'] == 'LONG':
+                profit = position['qty'] * (final_price - position['entry_price'])
+            else:
+                profit = position['qty'] * (position['entry_price'] - final_price)
+            
+            # Cập nhật số dư
+            current_balance += profit
+            
+            # Lưu thông tin giao dịch
+            trade = {
+                'entry_time': position['time'],
+                'exit_time': df.index[-1],
+                'type': position['type'],
+                'entry_price': position['entry_price'],
+                'exit_price': final_price,
+                'qty': position['qty'],
+                'profit': profit,
+                'profit_pct': (profit / (position['entry_price'] * position['qty'])) * 100,
+                'exit_reason': 'end_of_data',
+                'market_condition': position['market_condition']
+            }
+            trades.append(trade)
+            
+            # Cập nhật equity curve
+            equity_curve[-1] = current_balance
+        
+        # Tính các chỉ số hiệu suất
+        profit_loss = current_balance - initial_balance
+        profit_loss_pct = (profit_loss / initial_balance) * 100
+        
+        # Tính drawdown
+        peak = initial_balance
+        drawdowns = []
+        max_drawdown = 0
+        max_drawdown_pct = 0
+        
+        for balance in equity_curve:
+            if balance > peak:
+                peak = balance
+            drawdown = peak - balance
+            drawdown_pct = (drawdown / peak) * 100
+            drawdowns.append(drawdown_pct)
+            
+            if drawdown_pct > max_drawdown_pct:
+                max_drawdown = drawdown
+                max_drawdown_pct = drawdown_pct
+        
+        # Tính win rate
+        winning_trades = [t for t in trades if t['profit'] > 0]
+        losing_trades = [t for t in trades if t['profit'] <= 0]
+        win_rate = len(winning_trades) / len(trades) * 100 if trades else 0
+        
+        # Tính profit factor
+        total_profit = sum([t['profit'] for t in winning_trades]) if winning_trades else 0
+        total_loss = sum([abs(t['profit']) for t in losing_trades]) if losing_trades else 0
+        profit_factor = total_profit / total_loss if total_loss > 0 else float('inf')
+        
+        # Phân tích theo điều kiện thị trường
+        trades_by_market = {}
+        for trade in trades:
+            condition = trade['market_condition']
+            if condition not in trades_by_market:
+                trades_by_market[condition] = []
+            trades_by_market[condition].append(trade)
+        
+        market_condition_performance = {}
+        for condition, condition_trades in trades_by_market.items():
+            winning = len([t for t in condition_trades if t['profit'] > 0])
+            win_rate_by_market = winning / len(condition_trades) * 100 if condition_trades else 0
+            avg_profit = sum([t['profit'] for t in condition_trades]) / len(condition_trades) if condition_trades else 0
+            
+            market_condition_performance[condition] = {
+                'trades': len(condition_trades),
+                'win_rate': win_rate_by_market,
+                'avg_profit': avg_profit
+            }
+        
+        # Kết quả backtest
+        backtest_result = {
+            'initial_balance': initial_balance,
+            'final_balance': current_balance,
+            'profit_loss': profit_loss,
+            'profit_loss_pct': profit_loss_pct,
+            'max_drawdown': max_drawdown,
+            'max_drawdown_pct': max_drawdown_pct,
+            'total_trades': len(trades),
+            'winning_trades': len(winning_trades),
+            'losing_trades': len(losing_trades),
+            'win_rate': win_rate,
+            'profit_factor': profit_factor,
+            'trades': trades,
+            'equity_curve': equity_curve,
+            'market_condition_performance': market_condition_performance
+        }
+        
+        logger.info(f"Kết quả backtest: Profit/Loss: {profit_loss_pct:.2f}%, Win Rate: {win_rate:.2f}%, "
+                  f"Max Drawdown: {max_drawdown_pct:.2f}%, Profit Factor: {profit_factor:.2f}")
+        
+        return backtest_result
 
 # Hàm test
-def test_adaptive_multi_risk():
-    """Kiểm tra chức năng của AdaptiveMultiRiskManager"""
-    risk_manager = AdaptiveMultiRiskManager(account_size=10000)
+def test_multi_risk_strategy():
+    """Test chiến lược đa mức rủi ro"""
+    # Tạo dữ liệu mẫu
+    import yfinance as yf
     
-    print("\n=== TEST ADAPTIVE MULTI-RISK MANAGER ===")
-    print(f"Mức rủi ro ban đầu: {risk_manager.current_risk_level} ({risk_manager.current_risk_percentage*100:.0f}%)")
+    # Tải dữ liệu BTC
+    data = yf.download("BTC-USD", start="2024-01-01", end="2024-03-01")
     
-    # Kiểm tra phản ứng với các trạng thái thị trường khác nhau
-    test_cases = [
-        # Thị trường tăng mạnh, ít biến động
-        {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'},
+    # Tạo chiến lược
+    strategy = MultiRiskStrategy(risk_level=0.15)
+    
+    # Chạy backtest
+    backtest_result = strategy.backtest(data)
+    
+    if backtest_result:
+        print("\n=== KẾT QUẢ BACKTEST ===")
+        print(f"Lợi nhuận: ${backtest_result['profit_loss']:.2f} ({backtest_result['profit_loss_pct']:.2f}%)")
+        print(f"Win Rate: {backtest_result['win_rate']:.2f}%")
+        print(f"Max Drawdown: {backtest_result['max_drawdown_pct']:.2f}%")
+        print(f"Profit Factor: {backtest_result['profit_factor']:.2f}")
+        print(f"Số lệnh: {backtest_result['total_trades']}")
         
-        # Thị trường tăng mạnh, biến động cao
-        {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'},
-        
-        # Thị trường giảm mạnh, biến động cao
-        {'regime': 'BEAR', 'volatility': 'HIGH', 'trend_strength': 'STRONG'},
-        
-        # Thị trường đi ngang, ít biến động
-        {'regime': 'SIDEWAYS', 'volatility': 'LOW', 'trend_strength': 'NEUTRAL'},
-        
-        # Thị trường biến động mạnh
-        {'regime': 'VOLATILE', 'volatility': 'HIGH', 'trend_strength': 'WEAK'},
-        
-        # Về trạng thái trung lập
-        {'regime': 'NEUTRAL', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'},
-    ]
-    
-    for i, case in enumerate(test_cases):
-        print(f"\nTest case {i+1}: {case}")
-        risk_manager.update_market_state(**case)
-        level, percentage = risk_manager.get_risk_level()
-        print(f"Mức rủi ro sau khi cập nhật: {level} ({percentage*100:.0f}%)")
-        
-        # Mô phỏng tính position size
-        symbol = 'BTCUSDT'
-        entry_price = 50000
-        stop_loss = entry_price * 0.98  # 2% stop loss
-        size, r_level, r_percentage = risk_manager.get_position_size(symbol, entry_price, stop_loss)
-        print(f"Position size: {size:.6f} BTC, Rủi ro: ${r_percentage*100:.0f}% của ${risk_manager.account_size:.0f} = ${risk_manager.account_size*r_percentage:.2f}")
-    
-    # Kiểm tra phân bổ vốn
-    print("\nPhân bổ vốn giữa các mức rủi ro:")
-    allocation = risk_manager.allocate_capital()
-    for level, data in allocation.items():
-        print(f"  - {level}: {data['capital_allocation']*100:.0f}% (${data['allocated_amount']:.0f}) với mức rủi ro {data['risk_percentage']*100:.0f}%")
-    
-    # Lưu và tải trạng thái
-    risk_manager.save_state('test_multi_risk_state.json')
-    
-    # Mô phỏng cập nhật hiệu suất
-    print("\nCập nhật hiệu suất:")
-    # Thắng ở mức rủi ro thấp
-    risk_manager.update_performance('conservative', 100, 1.2)
-    # Thua ở mức rủi ro cao
-    risk_manager.update_performance('high_risk', -200, 5.3)
-    
-    # Kiểm tra lại hiệu suất
-    performance = risk_manager.get_performance_stats()
-    print("Hiệu suất sau khi cập nhật:")
-    for level, stats in performance.items():
-        if stats['trades'] > 0:
-            print(f"  - {level}: profit=${stats['profit']:.2f}, drawdown={stats['drawdown']:.2f}%, trades={stats['trades']}, win_rate={stats['win_rate']:.2f}%")
-    
-    print("\n=== HOÀN THÀNH KIỂM TRA ===")
+        # Hiệu suất theo điều kiện thị trường
+        print("\n=== HIỆU SUẤT THEO ĐIỀU KIỆN THỊ TRƯỜNG ===")
+        for condition, perf in backtest_result['market_condition_performance'].items():
+            print(f"{condition}: {perf['trades']} lệnh, Win Rate: {perf['win_rate']:.2f}%, Lợi nhuận TB: ${perf['avg_profit']:.2f}")
 
 if __name__ == "__main__":
-    test_adaptive_multi_risk()
+    test_multi_risk_strategy()

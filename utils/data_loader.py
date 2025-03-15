@@ -2,10 +2,17 @@ import os
 import logging
 import pandas as pd
 from datetime import datetime, timedelta
-from binance.spot import Spot
-from binance.cm_futures import CMFutures
-from binance.um_futures import UMFutures
 import numpy as np
+
+# Xử lý import Binance API một cách an toàn
+try:
+    from binance.spot import Spot
+    from binance.cm_futures import CMFutures
+    from binance.um_futures import UMFutures
+    binance_api_available = True
+except ImportError:
+    binance_api_available = False
+    print("Thông báo: binance-futures-connector chưa được cài đặt hoặc không khả dụng. Sẽ sử dụng dữ liệu từ file cục bộ.")
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
