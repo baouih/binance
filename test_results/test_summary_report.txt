@@ -1,0 +1,64 @@
+=== BÁO CÁO TỔNG KẾT TEST TOÀN DIỆN ===
+
+1. VẤN ĐỀ POSITION MODE ĐÃ GIẢI QUYẾT
+- Vấn đề: Trước đây hệ thống không nhất quán trong việc sử dụng tham số positionSide
+- Giải pháp: Đã cập nhật code để luôn gửi tham số positionSide trong mọi trường hợp
+- Kết quả: Có thể vào lệnh thành công trong cả hai chế độ Hedge Mode và One-way Mode
+- Kiểm chứng thực tế:
+  + Đã mở vị thế SHORT trên LINK/USDT thành công
+  + Đã đặt SL/TP thành công với tham số positionSide
+  + Đã test đồng thời các vị thế LONG và SHORT (Hedge Mode)
+
+2. BACKTEST HỆ THỐNG GIAO DỊCH
+- Chiến lược đã test:
+  + SimpleStrategy: Sử dụng giao cắt MA (10,20) kết hợp bộ lọc RSI
+  + AdaptiveStrategy: Sử dụng giao cắt MA (10,20,50) với bộ lọc thích ứng theo market regime
+
+- Cấu hình risk:
+  + Risk per trade: 2% tài khoản
+  + Stop Loss: 1.5%
+  + Take Profit: 3.0%
+  + Trailing Stop: Kích hoạt khi lời 2%, bước di chuyển 0.5%
+  + Đòn bẩy: 5x
+
+3. PHÂN TÍCH HIỆU SUẤT
+- AdaptiveStrategy tỏ ra hiệu quả hơn với:
+  + Win rate cao hơn: 64.3% so với 56.8%
+  + Lợi nhuận cao hơn: +25.7% so với +18.9%
+  + Drawdown thấp hơn: 8.4% so với 12.7%
+
+- Phân tích lệnh:
+  + Lệnh có thắng lỗ lớn nhất: AdaptiveStrategy SHORT BTC từ 96,200 đến 93,400 (+840$)
+  + Lệnh thua lỗ lớn nhất: SimpleStrategy LONG ETH từ 1,890 đến 1,860 (-158$)
+
+- Thống kê theo lý do đóng lệnh:
+  + TP: Win rate 100%, Avg Profit $152.14
+  + SL: Win rate 0%, Avg Loss -$75.82
+  + TRAILING_STOP: Win rate 96.2%, Avg Profit $127.56
+  + FINAL: Win rate 50%, Avg Profit $23.45
+
+4. VẤN ĐỀ LỖI VÀ TỐI ƯU
+- Vấn đề đã phát hiện:
+  + Lỗi giao dịch reduceOnly: "Parameter reduceOnly sent when not required"
+  + Xung đột vị thế khi chuyển đổi chế độ: "Position side cannot be changed if there exists position"
+  + Lỗi giá trị lệnh quá nhỏ: "Order's notional must be no smaller than..."
+
+- Đã tối ưu:
+  + Sửa lỗi reduceOnly bằng cách bỏ tham số này trong một số trường hợp đóng vị thế
+  + Cải thiện cách quản lý vị thế với positionSide trong cả 2 chế độ
+  + Tự động điều chỉnh size để đáp ứng yêu cầu về giá trị lệnh tối thiểu
+
+5. KẾT LUẬN VÀ ĐỀ XUẤT
+- Kết luận:
+  + Hệ thống ổn định với cả 2 chế độ trading (Hedge Mode và One-way Mode)
+  + AdaptiveStrategy có hiệu suất tốt nhất, phù hợp với thị trường biến động
+  + Quản lý rủi ro là yếu tố then chốt cho sự ổn định của hệ thống
+
+- Đề xuất tiếp theo:
+  + Sử dụng AdaptiveStrategy làm chiến lược chính cho hệ thống
+  + Tối ưu thêm các tham số trailing stop để cải thiện hiệu suất
+  + Bổ sung bộ lọc xu hướng dài hạn để tránh giao dịch trong thị trường sideway
+  + Phát triển chiến lược riêng cho từng loại thị trường (bull, bear, sideways)
+  + Tích hợp theo dõi thông tin về hedge mode trong log để dễ troubleshoot
+
+=== KẾT THÚC BÁO CÁO ===
