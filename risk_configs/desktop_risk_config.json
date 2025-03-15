@@ -4,7 +4,7 @@
     "leverage": 5,
     "position_size_percentage": 0.1,
     "partial_take_profit": {
-        "enabled": false,
+        "enabled": true,
         "levels": [
             {"percentage": 30, "profit_percentage": 2},
             {"percentage": 30, "profit_percentage": 5},
