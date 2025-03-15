@@ -30,6 +30,14 @@ class RiskManager:
         self.risk_config = risk_config or self.load_default_config()
         
         logger.info("Đã khởi tạo Risk Manager")
+        
+    def get_risk_config(self) -> Dict[str, Any]:
+        """
+        Lấy cấu hình rủi ro hiện tại
+        
+        :return: Dict chứa cấu hình rủi ro
+        """
+        return self.risk_config
     
     def load_default_config(self) -> Dict[str, Any]:
         """

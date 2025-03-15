@@ -1053,7 +1053,7 @@ class AdaptiveExitStrategy:
     def _calculate_partial_take_profits(self, market_data: pd.DataFrame, position_data: Dict, 
                                       strategy_config: Dict) -> List[Dict]:
         """
-        Tính toán các điểm chốt lời từng phần.
+        Tính toán các điểm chốt lời từng phần dựa trên cấu hình từ risk_manager.
         
         Args:
             market_data (pd.DataFrame): DataFrame chứa dữ liệu thị trường
@@ -1063,25 +1063,58 @@ class AdaptiveExitStrategy:
         Returns:
             List[Dict]: Danh sách các điểm chốt lời từng phần
         """
-        position_type = position_data.get('position_type', 'long')
+        position_type = position_data.get('position_type', 'long').upper()
         entry_price = position_data.get('entry_price', 0)
         
         # Lấy cấu hình
-        if 'partial_take_profit' in strategy_config:
-            config = strategy_config['partial_take_profit']
-        else:
-            config = self.DEFAULT_STRATEGY_CONFIGS['partial_take_profit']
+        tp_config = None
         
-        # Lấy các mức chốt lời
-        tp_levels = config.get('levels', [])
+        # Ưu tiên cấu hình từ risk_manager nếu có
+        if hasattr(self, 'risk_manager') and self.risk_manager:
+            risk_config = self.risk_manager.get_risk_config()
+            if risk_config and 'partial_take_profit' in risk_config:
+                ptp_config = risk_config['partial_take_profit']
+                if ptp_config.get('enabled', False):
+                    tp_config = ptp_config
+                    logger.info("Sử dụng cấu hình partial take profit từ risk_manager")
+        
+        # Nếu không có cấu hình từ risk_manager, sử dụng từ strategy_config
+        if not tp_config and 'partial_take_profit' in strategy_config:
+            tp_config = strategy_config['partial_take_profit']
+            logger.info("Sử dụng cấu hình partial take profit từ strategy_config")
+        
+        # Nếu không có cả 2, sử dụng mặc định
+        if not tp_config:
+            tp_config = self.DEFAULT_STRATEGY_CONFIGS['partial_take_profit']
+            logger.info("Sử dụng cấu hình partial take profit mặc định")
+        
+        # Xem cấu trúc của tp_config để có xử lý phù hợp
+        levels = []
+        if 'levels' in tp_config:
+            levels = tp_config['levels']
+        
+        if not levels:
+            logger.warning("Không tìm thấy cấu hình levels cho partial take profit")
+            return []
+        
+        logger.info(f"Đã tìm thấy {len(levels)} mức chốt lời từng phần")
         
         # Tính các mức chốt lời
         partial_tps = []
-        for level in tp_levels:
-            percent = level.get('percent', 1.0)
-            quantity = level.get('quantity', 0.25)
+        total_position = 1.0  # 100% vị thế
+        remaining_position = total_position
+        
+        for level in levels:
+            # Xử lý các cấu trúc khác nhau
+            percent = level.get('percent', level.get('profit_percentage', 0))
+            quantity_percent = level.get('quantity', level.get('percentage', 0)) / 100
             
-            if position_type == 'long':
+            # Đảm bảo số lượng hợp lệ
+            quantity = min(quantity_percent * total_position, remaining_position)
+            remaining_position -= quantity
+            
+            # Tính giá chốt lời
+            if position_type == 'LONG':
                 # Long position: chốt lời ở giá cao hơn
                 tp_price = entry_price * (1 + percent / 100)
             else:
@@ -1089,15 +1122,20 @@ class AdaptiveExitStrategy:
                 tp_price = entry_price * (1 - percent / 100)
             
             # Độ tin cậy tăng dần theo % chốt lời
-            confidence = min(0.9, 0.5 + percent / 10)
+            confidence = min(0.9, 0.5 + percent / 20)
             
-            partial_tps.append({
-                'price': tp_price,
-                'percent': percent,
-                'quantity': quantity,
-                'confidence': confidence,
-                'type': 'partial_take_profit'
-            })
+            # Thêm vào danh sách nếu tỷ lệ hợp lệ
+            if quantity > 0:
+                partial_tps.append({
+                    'price': tp_price,
+                    'percent': percent,
+                    'quantity': quantity,
+                    'quantity_percentage': quantity * 100,
+                    'confidence': confidence,
+                    'type': 'partial_take_profit'
+                })
+                
+                logger.info(f"Thêm mức partial TP: {percent}% lợi nhuận, đóng {quantity*100:.1f}% vị thế")
         
         return partial_tps
     
