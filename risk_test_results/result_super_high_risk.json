@@ -1,0 +1,92 @@
+{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "super_high_risk",
+    "risk_percentage": 0.3,
+    "balance": 13884.033047188272,
+    "total_trades": 17,
+    "winning_trades": 14,
+    "losing_trades": 3,
+    "breakeven_trades": 0,
+    "win_rate": 0.8375466973119399,
+    "profit_loss": 3884.033047188271,
+    "profit_loss_pct": 38.840330471882716,
+    "max_drawdown": 3635.955921974986,
+    "max_drawdown_pct": 36.35955921974986,
+    "max_consecutive_losses": 3,
+    "max_consecutive_wins": 4,
+    "profit_factor": 2.4884513892110505,
+    "largest_win": 1623.1042120901623,
+    "largest_loss": -1302.8331222259892,
+    "avg_trade_duration": 9.066901016252007,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 3,
+            "win": 0,
+            "loss": 3,
+            "total_pnl": -2735.949556674577
+        },
+        "TP1": {
+            "count": 14,
+            "win": 14,
+            "loss": 0,
+            "total_pnl": 1165.2099141564813
+        },
+        "TP2": {
+            "count": 13,
+            "win": 13,
+            "loss": 0,
+            "total_pnl": 1165.2099141564813
+        },
+        "TP3": {
+            "count": 12,
+            "win": 12,
+            "loss": 0,
+            "total_pnl": 1165.2099141564813
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 388.40330471882714
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 5,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 1942.0165235941356
+        },
+        "BEAR": {
+            "count": 2,
+            "win": 1,
+            "loss": 0,
+            "total_pnl": 1165.2099141564813
+        },
+        "SIDEWAYS": {
+            "count": 5,
+            "win": 1,
+            "loss": 5,
+            "total_pnl": 776.8066094376543
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}

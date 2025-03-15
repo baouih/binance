@@ -13,13 +13,13 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('extreme_risk_test.log'),
+        logging.FileHandler('aggressive_test.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger('risk_test')
 
-print('=== BẮT ĐẦU BACKTEST CHO MỨC RỦI RO extreme_risk (5%) ===')
+print('=== BẮT ĐẦU BACKTEST CHO MỨC RỦI RO aggressive (5%) ===')
 
 # Thiết lập thư mục dữ liệu và kết quả
 data_dir = Path('./backtest_data')
@@ -269,7 +269,7 @@ class AdaptiveStrategy:
 
 # Định nghĩa BacktestEngine với hỗ trợ nhiều cấp độ rủi ro
 class BacktestEngine:
-    def __init__(self, data, symbol, initial_balance=10000, leverage=5, risk_percentage=0.20):
+    def __init__(self, data, symbol, initial_balance=10000, leverage=5, risk_percentage=0.09):
         self.data = data.copy()
         self.symbol = symbol
         self.balance = initial_balance
@@ -318,8 +318,8 @@ class BacktestEngine:
             'VOLATILE': {'count': 0, 'win': 0, 'loss': 0, 'total_pnl': 0}
         }
         
-        # Cấu hình rủi ro - mức extreme_risk (5%)
-        self.risk_level = 'extreme_risk'
+        # Cấu hình rủi ro - mức aggressive (5%)
+        self.risk_level = 'aggressive'
         self.risk_percentage = risk_percentage
         logger.info(f'Sử dụng mức rủi ro: {self.risk_level} ({self.risk_percentage*100}%)')
         
@@ -928,11 +928,11 @@ class BacktestEngine:
         plt.close()
 
 # Tiến hành backtest
-print("\n2. TIẾN HÀNH BACKTEST CHO MỨC RỦI RO extreme_risk (5%)")
+print("\n2. TIẾN HÀNH BACKTEST CHO MỨC RỦI RO aggressive (5%)")
 
 try:
-    # Khởi tạo engine với mức rủi ro extreme_risk (5%)
-    engine = BacktestEngine(data, 'BTCUSDT', initial_balance=10000, leverage=5, risk_percentage=0.20)
+    # Khởi tạo engine với mức rủi ro aggressive (5%)
+    engine = BacktestEngine(data, 'BTCUSDT', initial_balance=10000, leverage=5, risk_percentage=0.09)
     
     # Khởi tạo strategy
     strategy = AdaptiveStrategy(fast_period=10, medium_period=20, slow_period=50)
@@ -941,7 +941,7 @@ try:
     result = engine.run(strategy, debug_level=1)
     
     # Lưu kết quả
-    result_path = result_dir / 'result_extreme_risk.json'
+    result_path = result_dir / 'result_aggressive.json'
     with open(result_path, 'w') as f:
         # Chỉ lưu các dữ liệu không phải danh sách lớn
         save_result = {
@@ -951,8 +951,8 @@ try:
         json.dump(save_result, f, indent=4, default=str)
     
     # Vẽ và lưu biểu đồ
-    engine.plot_equity_curve(chart_dir / 'equity_extreme_risk.png')
-    engine.plot_trade_distribution(chart_dir / 'distribution_extreme_risk.png')
+    engine.plot_equity_curve(chart_dir / 'equity_aggressive.png')
+    engine.plot_trade_distribution(chart_dir / 'distribution_aggressive.png')
     
     # Hiển thị kết quả
     print(f"\n3. KẾT QUẢ BACKTEST:")

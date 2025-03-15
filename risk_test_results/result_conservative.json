@@ -3,22 +3,22 @@
     "strategy": "AdaptiveStrategy",
     "risk_level": "conservative",
     "risk_percentage": 0.05,
-    "balance": 10449.510771556268,
-    "total_trades": 14,
-    "winning_trades": 1,
-    "losing_trades": 12,
-    "breakeven_trades": 1,
-    "win_rate": 0.07142857142857142,
-    "profit_loss": 449.5107715562681,
-    "profit_loss_pct": 4.495107715562681,
-    "max_drawdown": 214.37677859733412,
-    "max_drawdown_pct": 2.101451898309852,
-    "max_consecutive_losses": 10,
-    "max_consecutive_wins": 1,
-    "profit_factor": 0.06097262567093081,
-    "largest_win": 47.01539982511502,
-    "largest_loss": -121.76419443429113,
-    "avg_trade_duration": 0.9285714285714286,
+    "balance": 10574.72798524746,
+    "total_trades": 15,
+    "winning_trades": 5,
+    "losing_trades": 10,
+    "breakeven_trades": 0,
+    "win_rate": 0.3838626086782758,
+    "profit_loss": 574.7279852474612,
+    "profit_loss_pct": 5.7472798524746125,
+    "max_drawdown": 394.86124979036146,
+    "max_drawdown_pct": 3.948612497903615,
+    "max_consecutive_losses": 2,
+    "max_consecutive_wins": 5,
+    "profit_factor": 1.6554312472959682,
+    "largest_win": 306.2414128745004,
+    "largest_loss": -197.32759937167245,
+    "avg_trade_duration": 14.908209308067056,
     "exit_stats": {
         "TP": {
             "count": 0,
@@ -27,60 +27,60 @@
             "total_pnl": 0
         },
         "SL": {
-            "count": 12,
+            "count": 10,
             "win": 0,
-            "loss": 12,
-            "total_pnl": -771.0902935172429
+            "loss": 10,
+            "total_pnl": -1381.293195601707
         },
         "TP1": {
-            "count": 10,
-            "win": 10,
+            "count": 5,
+            "win": 5,
             "loss": 0,
-            "total_pnl": 247.68808809644145
+            "total_pnl": 172.41839557423836
         },
         "TP2": {
-            "count": 9,
-            "win": 9,
+            "count": 4,
+            "win": 4,
             "loss": 0,
-            "total_pnl": 434.7604736230889
+            "total_pnl": 172.41839557423836
         },
         "TP3": {
-            "count": 8,
-            "win": 8,
+            "count": 3,
+            "win": 3,
             "loss": 0,
-            "total_pnl": 491.13710352886136
+            "total_pnl": 172.41839557423836
         },
         "TRAILING_STOP": {
-            "count": 1,
-            "win": 1,
+            "count": 2,
+            "win": 2,
             "loss": 0,
-            "total_pnl": 47.01539982511502
+            "total_pnl": 57.472798524746125
         },
         "FINAL": {
-            "count": 1,
+            "count": 0,
             "win": 0,
-            "loss": 1,
-            "total_pnl": 0.0
+            "loss": 0,
+            "total_pnl": 0
         }
     },
     "market_stats": {
         "BULL": {
-            "count": 1,
-            "win": 0,
+            "count": 4,
+            "win": 3,
             "loss": 1,
-            "total_pnl": -113.65444231836764
+            "total_pnl": 287.3639926237306
         },
         "BEAR": {
-            "count": 4,
-            "win": 0,
-            "loss": 3,
-            "total_pnl": -114.46982398107298
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 172.41839557423836
         },
         "SIDEWAYS": {
-            "count": 9,
-            "win": 1,
-            "loss": 8,
-            "total_pnl": -495.9506273926873
+            "count": 8,
+            "win": 2,
+            "loss": 6,
+            "total_pnl": 114.94559704949225
         },
         "VOLATILE": {
             "count": 0,

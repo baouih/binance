@@ -1,0 +1,547 @@
+{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "ultra_conservative",
+    "risk_percentage": 0.03,
+    "balance": 10329.571918792699,
+    "total_trades": 14,
+    "winning_trades": 5,
+    "losing_trades": 9,
+    "breakeven_trades": 0,
+    "win_rate": 0.4212174640032973,
+    "profit_loss": 329.57191879269965,
+    "profit_loss_pct": 3.2957191879269967,
+    "max_drawdown": 108.19928718078239,
+    "max_drawdown_pct": 1.081992871807824,
+    "max_consecutive_losses": 3,
+    "max_consecutive_wins": 3,
+    "profit_factor": 1.7118867192775782,
+    "largest_win": 123.37464155707772,
+    "largest_loss": -64.87568844012279,
+    "avg_trade_duration": 7.478882972260355,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 9,
+            "win": 0,
+            "loss": 9,
+            "total_pnl": -408.7168371727735
+        },
+        "TP1": {
+            "count": 5,
+            "win": 5,
+            "loss": 0,
+            "total_pnl": 98.8715756378099
+        },
+        "TP2": {
+            "count": 4,
+            "win": 4,
+            "loss": 0,
+            "total_pnl": 98.8715756378099
+        },
+        "TP3": {
+            "count": 3,
+            "win": 3,
+            "loss": 0,
+            "total_pnl": 98.8715756378099
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 32.95719187926996
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 5,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 164.78595939634982
+        },
+        "BEAR": {
+            "count": 2,
+            "win": 2,
+            "loss": 1,
+            "total_pnl": 98.8715756378099
+        },
+        "SIDEWAYS": {
+            "count": 5,
+            "win": 1,
+            "loss": 4,
+            "total_pnl": 65.91438375853993
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "conservative",
+    "risk_percentage": 0.05,
+    "balance": 10545.103251469558,
+    "total_trades": 15,
+    "winning_trades": 6,
+    "losing_trades": 9,
+    "breakeven_trades": 0,
+    "win_rate": 0.4165540371926106,
+    "profit_loss": 545.1032514695571,
+    "profit_loss_pct": 5.451032514695571,
+    "max_drawdown": 240.93422427514736,
+    "max_drawdown_pct": 2.4093422427514737,
+    "max_consecutive_losses": 3,
+    "max_consecutive_wins": 2,
+    "profit_factor": 1.2257494528326496,
+    "largest_win": 319.02098156342174,
+    "largest_loss": -170.82760858300028,
+    "avg_trade_duration": 9.86637996858362,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 9,
+            "win": 0,
+            "loss": 9,
+            "total_pnl": -1076.2139340729018
+        },
+        "TP1": {
+            "count": 6,
+            "win": 6,
+            "loss": 0,
+            "total_pnl": 163.53097544086714
+        },
+        "TP2": {
+            "count": 5,
+            "win": 5,
+            "loss": 0,
+            "total_pnl": 163.53097544086714
+        },
+        "TP3": {
+            "count": 4,
+            "win": 4,
+            "loss": 0,
+            "total_pnl": 163.53097544086714
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 54.510325146955715
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 3,
+            "win": 3,
+            "loss": 1,
+            "total_pnl": 272.55162573477855
+        },
+        "BEAR": {
+            "count": 3,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 163.53097544086714
+        },
+        "SIDEWAYS": {
+            "count": 8,
+            "win": 1,
+            "loss": 4,
+            "total_pnl": 109.02065029391143
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "moderate",
+    "risk_percentage": 0.07,
+    "balance": 10600.0,
+    "total_trades": 19,
+    "winning_trades": 8,
+    "losing_trades": 11,
+    "breakeven_trades": 0,
+    "win_rate": 0.4682017239479396,
+    "profit_loss": 600.0,
+    "profit_loss_pct": 6.0,
+    "max_drawdown": 552.3780139775039,
+    "max_drawdown_pct": 5.523780139775039,
+    "max_consecutive_losses": 2,
+    "max_consecutive_wins": 3,
+    "profit_factor": 1.8538942185746072,
+    "largest_win": 490.4705947371739,
+    "largest_loss": -160.1743173407332,
+    "avg_trade_duration": 7.684389801018712,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 11,
+            "win": 0,
+            "loss": 11,
+            "total_pnl": -1233.3422435236457
+        },
+        "TP1": {
+            "count": 8,
+            "win": 8,
+            "loss": 0,
+            "total_pnl": 180.0
+        },
+        "TP2": {
+            "count": 7,
+            "win": 7,
+            "loss": 0,
+            "total_pnl": 180.0
+        },
+        "TP3": {
+            "count": 6,
+            "win": 6,
+            "loss": 0,
+            "total_pnl": 180.0
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 60.0
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 5,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 300.0
+        },
+        "BEAR": {
+            "count": 2,
+            "win": 1,
+            "loss": 1,
+            "total_pnl": 180.0
+        },
+        "SIDEWAYS": {
+            "count": 7,
+            "win": 1,
+            "loss": 6,
+            "total_pnl": 120.0
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "aggressive",
+    "risk_percentage": 0.09,
+    "balance": 10813.654367775398,
+    "total_trades": 18,
+    "winning_trades": 9,
+    "losing_trades": 9,
+    "breakeven_trades": 0,
+    "win_rate": 0.5093383070123373,
+    "profit_loss": 813.6543677753974,
+    "profit_loss_pct": 8.136543677753973,
+    "max_drawdown": 273.3943929539866,
+    "max_drawdown_pct": 2.7339439295398655,
+    "max_consecutive_losses": 4,
+    "max_consecutive_wins": 3,
+    "profit_factor": 1.1186508171706062,
+    "largest_win": 833.6994520276369,
+    "largest_loss": -229.50965500858734,
+    "avg_trade_duration": 6.3861327680989834,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 9,
+            "win": 0,
+            "loss": 9,
+            "total_pnl": -1445.9108265541001
+        },
+        "TP1": {
+            "count": 9,
+            "win": 9,
+            "loss": 0,
+            "total_pnl": 244.09631033261923
+        },
+        "TP2": {
+            "count": 8,
+            "win": 8,
+            "loss": 0,
+            "total_pnl": 244.09631033261923
+        },
+        "TP3": {
+            "count": 7,
+            "win": 7,
+            "loss": 0,
+            "total_pnl": 244.09631033261923
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 81.36543677753974
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 4,
+            "win": 3,
+            "loss": 1,
+            "total_pnl": 406.8271838876987
+        },
+        "BEAR": {
+            "count": 3,
+            "win": 1,
+            "loss": 0,
+            "total_pnl": 244.09631033261923
+        },
+        "SIDEWAYS": {
+            "count": 9,
+            "win": 1,
+            "loss": 6,
+            "total_pnl": 162.73087355507948
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "high_risk",
+    "risk_percentage": 0.15,
+    "balance": 11553.978346827127,
+    "total_trades": 12,
+    "winning_trades": 7,
+    "losing_trades": 5,
+    "breakeven_trades": 0,
+    "win_rate": 0.6440741341834424,
+    "profit_loss": 1553.9783468271269,
+    "profit_loss_pct": 15.539783468271267,
+    "max_drawdown": 533.2397436436551,
+    "max_drawdown_pct": 5.332397436436551,
+    "max_consecutive_losses": 3,
+    "max_consecutive_wins": 4,
+    "profit_factor": 1.5282864820302824,
+    "largest_win": 874.0269232387286,
+    "largest_loss": -367.0447657053568,
+    "avg_trade_duration": 7.498990138801145,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 5,
+            "win": 0,
+            "loss": 5,
+            "total_pnl": -1284.6566799687487
+        },
+        "TP1": {
+            "count": 7,
+            "win": 7,
+            "loss": 0,
+            "total_pnl": 466.19350404813804
+        },
+        "TP2": {
+            "count": 6,
+            "win": 6,
+            "loss": 0,
+            "total_pnl": 466.19350404813804
+        },
+        "TP3": {
+            "count": 5,
+            "win": 5,
+            "loss": 0,
+            "total_pnl": 466.19350404813804
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 155.3978346827127
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 5,
+            "win": 3,
+            "loss": 0,
+            "total_pnl": 776.9891734135634
+        },
+        "BEAR": {
+            "count": 3,
+            "win": 2,
+            "loss": 1,
+            "total_pnl": 466.19350404813804
+        },
+        "SIDEWAYS": {
+            "count": 8,
+            "win": 1,
+            "loss": 4,
+            "total_pnl": 310.7956693654254
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}{
+    "symbol": "BTCUSDT",
+    "strategy": "AdaptiveStrategy",
+    "risk_level": "extreme_risk",
+    "risk_percentage": 0.2,
+    "balance": 12602.40069417251,
+    "total_trades": 15,
+    "winning_trades": 9,
+    "losing_trades": 6,
+    "breakeven_trades": 0,
+    "win_rate": 0.6662235116162458,
+    "profit_loss": 2602.4006941725097,
+    "profit_loss_pct": 26.024006941725098,
+    "max_drawdown": 1552.2779495703985,
+    "max_drawdown_pct": 15.522779495703984,
+    "max_consecutive_losses": 2,
+    "max_consecutive_wins": 5,
+    "profit_factor": 1.9964977455769524,
+    "largest_win": 1940.541983056196,
+    "largest_loss": -938.292524328893,
+    "avg_trade_duration": 5.411733288910349,
+    "exit_stats": {
+        "TP": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        },
+        "SL": {
+            "count": 6,
+            "win": 0,
+            "loss": 6,
+            "total_pnl": -3940.8286021813506
+        },
+        "TP1": {
+            "count": 9,
+            "win": 9,
+            "loss": 0,
+            "total_pnl": 780.7202082517529
+        },
+        "TP2": {
+            "count": 8,
+            "win": 8,
+            "loss": 0,
+            "total_pnl": 780.7202082517529
+        },
+        "TP3": {
+            "count": 7,
+            "win": 7,
+            "loss": 0,
+            "total_pnl": 780.7202082517529
+        },
+        "TRAILING_STOP": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 260.240069417251
+        },
+        "FINAL": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    },
+    "market_stats": {
+        "BULL": {
+            "count": 5,
+            "win": 3,
+            "loss": 1,
+            "total_pnl": 1301.2003470862549
+        },
+        "BEAR": {
+            "count": 2,
+            "win": 2,
+            "loss": 0,
+            "total_pnl": 780.7202082517529
+        },
+        "SIDEWAYS": {
+            "count": 5,
+            "win": 2,
+            "loss": 4,
+            "total_pnl": 520.480138834502
+        },
+        "VOLATILE": {
+            "count": 0,
+            "win": 0,
+            "loss": 0,
+            "total_pnl": 0
+        }
+    }
+}
