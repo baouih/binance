@@ -768,51 +768,29 @@ class PositionManager:
             
             # Đặt lệnh Stop Loss mới nếu có
             if stop_loss is not None:
-                if is_hedge_mode:
-                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
-                    sl_order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=sl_side,
-                        type=ORDER_TYPE_STOP_MARKET,
-                        stopPrice=stop_loss,
-                        closePosition=True,
-                        positionSide=position_side,
-                        timeInForce="GTE_GTC"
-                    )
-                else:
-                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
-                    sl_order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=sl_side,
-                        type=ORDER_TYPE_STOP_MARKET,
-                        stopPrice=stop_loss,
-                        closePosition=True,
-                        timeInForce="GTE_GTC"
-                    )
+                # Luôn gửi với tham số positionSide
+                sl_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=sl_side,
+                    type=ORDER_TYPE_STOP_MARKET,
+                    stopPrice=stop_loss,
+                    closePosition=True,
+                    positionSide=position_side,
+                    timeInForce="GTE_GTC"
+                )
             
             # Đặt lệnh Take Profit mới nếu có
             if take_profit is not None:
-                if is_hedge_mode:
-                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
-                    tp_order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=tp_side,
-                        type=ORDER_TYPE_TAKE_PROFIT_MARKET,
-                        stopPrice=take_profit,
-                        closePosition=True,
-                        positionSide=position_side,
-                        timeInForce="GTE_GTC"
-                    )
-                else:
-                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
-                    tp_order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=tp_side,
-                        type=ORDER_TYPE_TAKE_PROFIT_MARKET,
-                        stopPrice=take_profit,
-                        closePosition=True,
-                        timeInForce="GTE_GTC"
-                    )
+                # Luôn gửi với tham số positionSide
+                tp_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=tp_side,
+                    type=ORDER_TYPE_TAKE_PROFIT_MARKET,
+                    stopPrice=take_profit,
+                    closePosition=True,
+                    positionSide=position_side,
+                    timeInForce="GTE_GTC"
+                )
             
             # Kết quả
             result = {
