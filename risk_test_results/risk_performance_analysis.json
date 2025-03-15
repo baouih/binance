@@ -1,0 +1,90 @@
+{
+    "scores": {
+        "high_moderate": {
+            "avg_profit_pct": 238.29398846784844,
+            "avg_drawdown_pct": 32.24987614458432,
+            "avg_win_rate": 54.285714285714285,
+            "avg_profit_factor": 1.7330945698777902,
+            "avg_expectancy": 0.30080811108310196,
+            "rr_ratio": 7.388989259974719,
+            "profit_score": 1191.4699423392422,
+            "risk_score": -61.249380722921615,
+            "stability_score": 25.87760740205141,
+            "total_score": 465.97644493943585
+        },
+        "high_risk": {
+            "avg_profit_pct": 744.5154680174231,
+            "avg_drawdown_pct": 40.24168498747441,
+            "avg_win_rate": 62.14285714285714,
+            "avg_profit_factor": 1.9746112887350489,
+            "avg_expectancy": 0.3371201129241348,
+            "rr_ratio": 18.501100742902796,
+            "profit_score": 3722.5773400871158,
+            "risk_score": -101.20842493737203,
+            "stability_score": 29.543790762896776,
+            "total_score": 1467.5315457825038
+        },
+        "extreme_risk": {
+            "avg_profit_pct": 759.6925614589225,
+            "avg_drawdown_pct": 27.765410880380628,
+            "avg_win_rate": 60.0,
+            "avg_profit_factor": 2.1956497631487144,
+            "avg_expectancy": 0.31003070054121007,
+            "rr_ratio": 27.361113607568843,
+            "profit_score": 3798.4628072946125,
+            "risk_score": -38.827054401903126,
+            "stability_score": 29.385703880770446,
+            "total_score": 1516.5527177615052
+        },
+        "ultra_high_risk": {
+            "avg_profit_pct": 874.4214794557747,
+            "avg_drawdown_pct": 33.156308743750024,
+            "avg_win_rate": 64.28571428571429,
+            "avg_profit_factor": 2.9291654848441437,
+            "avg_expectancy": 0.4003658261151083,
+            "rr_ratio": 26.37270289083683,
+            "profit_score": 4372.107397278874,
+            "risk_score": -65.78154371875013,
+            "stability_score": 33.86156188548596,
+            "total_score": 1739.2669643615702
+        }
+    },
+    "ranked_risk_levels": [
+        [
+            "ultra_high_risk",
+            0.25,
+            1739.2669643615702
+        ],
+        [
+            "extreme_risk",
+            0.2,
+            1516.5527177615052
+        ],
+        [
+            "high_risk",
+            0.15,
+            1467.5315457825038
+        ],
+        [
+            "high_moderate",
+            0.1,
+            465.97644493943585
+        ]
+    ],
+    "best_profit": {
+        "level": "ultra_high_risk",
+        "percentage": 0.25
+    },
+    "best_drawdown": {
+        "level": "extreme_risk",
+        "percentage": 0.2
+    },
+    "best_rr_ratio": {
+        "level": "extreme_risk",
+        "percentage": 0.2
+    },
+    "best_overall": {
+        "level": "ultra_high_risk",
+        "percentage": 0.25
+    }
+}

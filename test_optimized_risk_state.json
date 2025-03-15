@@ -1,0 +1,100 @@
+{
+    "account_size": 10000,
+    "current_risk_level": "ultra_high_risk",
+    "current_risk_percentage": 0.25,
+    "risk_levels": {
+        "high_moderate": 0.1,
+        "high_risk": 0.15,
+        "extreme_risk": 0.2,
+        "ultra_high_risk": 0.25
+    },
+    "performance": {
+        "high_moderate": {
+            "profit": 0,
+            "drawdown": 0,
+            "trades": 0,
+            "win_rate": 0
+        },
+        "high_risk": {
+            "profit": 0,
+            "drawdown": 0,
+            "trades": 0,
+            "win_rate": 0
+        },
+        "extreme_risk": {
+            "profit": 0,
+            "drawdown": 0,
+            "trades": 0,
+            "win_rate": 0
+        },
+        "ultra_high_risk": {
+            "profit": 0,
+            "drawdown": 0,
+            "trades": 0,
+            "win_rate": 0
+        }
+    },
+    "market_state": {
+        "regime": "BULL",
+        "volatility": "LOW",
+        "trend_strength": "STRONG"
+    },
+    "transition_history": [
+        {
+            "timestamp": "2025-03-15T12:11:23.767240",
+            "from_level": "extreme_risk",
+            "to_level": "ultra_high_risk",
+            "market_state": {
+                "regime": "BULL",
+                "volatility": "LOW",
+                "trend_strength": "STRONG"
+            },
+            "reason": "T\u1ef1 \u0111\u1ed9ng \u0111i\u1ec1u ch\u1ec9nh d\u1ef1a tr\u00ean tr\u1ea1ng th\u00e1i th\u1ecb tr\u01b0\u1eddng: {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'}"
+        },
+        {
+            "timestamp": "2025-03-15T12:11:23.767693",
+            "from_level": "ultra_high_risk",
+            "to_level": "extreme_risk",
+            "market_state": {
+                "regime": "BULL",
+                "volatility": "HIGH",
+                "trend_strength": "STRONG"
+            },
+            "reason": "T\u1ef1 \u0111\u1ed9ng \u0111i\u1ec1u ch\u1ec9nh d\u1ef1a tr\u00ean tr\u1ea1ng th\u00e1i th\u1ecb tr\u01b0\u1eddng: {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'}"
+        },
+        {
+            "timestamp": "2025-03-15T12:11:23.768113",
+            "from_level": "extreme_risk",
+            "to_level": "high_risk",
+            "market_state": {
+                "regime": "SIDEWAYS",
+                "volatility": "NORMAL",
+                "trend_strength": "NEUTRAL"
+            },
+            "reason": "T\u1ef1 \u0111\u1ed9ng \u0111i\u1ec1u ch\u1ec9nh d\u1ef1a tr\u00ean tr\u1ea1ng th\u00e1i th\u1ecb tr\u01b0\u1eddng: {'regime': 'SIDEWAYS', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'}"
+        },
+        {
+            "timestamp": "2025-03-15T12:11:23.768506",
+            "from_level": "high_risk",
+            "to_level": "high_moderate",
+            "market_state": {
+                "regime": "BEAR",
+                "volatility": "NORMAL",
+                "trend_strength": "STRONG"
+            },
+            "reason": "T\u1ef1 \u0111\u1ed9ng \u0111i\u1ec1u ch\u1ec9nh d\u1ef1a tr\u00ean tr\u1ea1ng th\u00e1i th\u1ecb tr\u01b0\u1eddng: {'regime': 'BEAR', 'volatility': 'NORMAL', 'trend_strength': 'STRONG'}"
+        },
+        {
+            "timestamp": "2025-03-15T12:11:23.768795",
+            "from_level": "high_moderate",
+            "to_level": "ultra_high_risk",
+            "market_state": {
+                "regime": "BULL",
+                "volatility": "LOW",
+                "trend_strength": "STRONG"
+            },
+            "reason": "T\u1ef1 \u0111\u1ed9ng \u0111i\u1ec1u ch\u1ec9nh d\u1ef1a tr\u00ean tr\u1ea1ng th\u00e1i th\u1ecb tr\u01b0\u1eddng: {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'}"
+        }
+    ],
+    "timestamp": "2025-03-15T12:11:23.769014"
+}
