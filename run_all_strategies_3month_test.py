@@ -584,8 +584,9 @@ class AllStrategiesBacktest:
             plt.xlabel('Candle Index')
             plt.ylabel('Equity (starting at 1.0)')
             plt.grid(True)
-            plt.savefig(self.result_dir / f"{symbol}_{self.timeframe}_{result['strategy']}_equity.png")
-            logger.info(f"Đã lưu biểu đồ {result['strategy']} tại {self.result_dir / f'{symbol}_{self.timeframe}_{result['strategy']}_equity.png'}")
+            file_path = f"{symbol}_{self.timeframe}_{result['strategy']}_equity.png"
+            plt.savefig(self.result_dir / file_path)
+            logger.info(f"Đã lưu biểu đồ {result['strategy']} tại {self.result_dir / file_path}")
     
     def save_results(self, symbol, results):
         """
@@ -615,13 +616,15 @@ class AllStrategiesBacktest:
             
             # Lưu danh sách giao dịch
             trades_df = pd.DataFrame(result['trades'])
-            trades_df.to_csv(self.result_dir / f"{symbol}_{self.timeframe}_{result['strategy']}_trades.csv", index=False)
-            logger.info(f"Đã lưu danh sách giao dịch tại {self.result_dir / f'{symbol}_{self.timeframe}_{result['strategy']}_trades.csv'}")
+            trade_file = f"{symbol}_{self.timeframe}_{result['strategy']}_trades.csv"
+            trades_df.to_csv(self.result_dir / trade_file, index=False)
+            logger.info(f"Đã lưu danh sách giao dịch tại {self.result_dir / trade_file}")
         
         # Lưu summary
-        with open(self.result_dir / f"{symbol}_{self.timeframe}_summary.json", 'w') as f:
+        summary_file = f"{symbol}_{self.timeframe}_summary.json"
+        with open(self.result_dir / summary_file, 'w') as f:
             json.dump(summary, f, indent=4)
-        logger.info(f"Đã lưu tóm tắt kết quả tại {self.result_dir / f'{symbol}_{self.timeframe}_summary.json'}")
+        logger.info(f"Đã lưu tóm tắt kết quả tại {self.result_dir / summary_file}")
     
     def run_backtest(self):
         """
