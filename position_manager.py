@@ -352,14 +352,17 @@ class PositionManager:
             # Thiết lập đòn bẩy
             self.client.futures_change_leverage(symbol=symbol, leverage=leverage)
             
-            # Chắc chắn tài khoản đang ở Hedge Mode
+            # Kiểm tra chế độ vị thế hiện tại
             try:
-                self.client.futures_change_position_mode(dualSidePosition=True)
-                logger.info("Đã thiết lập tài khoản sang chế độ Hedge Mode")
+                account_info = self.client.futures_account()
+                is_hedge_mode = account_info.get("dualSidePosition", False)
+                if is_hedge_mode:
+                    logger.info("Tài khoản đang ở chế độ Hedge Mode")
+                else:
+                    logger.info("Tài khoản đang ở chế độ One-way Mode")
             except Exception as e:
-                # Nếu đã ở chế độ hedge mode, sẽ xuất hiện lỗi
-                if "No need to change position side" not in str(e):
-                    logger.warning(f"Lỗi khi chuyển sang Hedge Mode: {str(e)}")
+                logger.warning(f"Không thể xác định chế độ vị thế: {str(e)}")
+                is_hedge_mode = False
             
             # Lấy giá hiện tại
             symbol_ticker = self.client.futures_symbol_ticker(symbol=symbol)
@@ -415,15 +418,25 @@ class PositionManager:
                     quantity = math.ceil(min_required_qty * 1000) / 1000
                     logger.info(f"Đã điều chỉnh số lượng từ {amount} lên {quantity} BTC để đạt giá trị tối thiểu")
             
-            # Đặt lệnh mở vị thế với positionSide để đảm bảo lệnh SHORT hoạt động đúng
+            # Đặt lệnh mở vị thế, với/không với positionSide tùy theo chế độ tài khoản
             try:
-                order = self.client.futures_create_order(
-                    symbol=symbol,
-                    side=binance_side,
-                    type=ORDER_TYPE_MARKET,
-                    quantity=quantity,
-                    positionSide=position_side
-                )
+                if is_hedge_mode:
+                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                    order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=binance_side,
+                        type=ORDER_TYPE_MARKET,
+                        quantity=quantity,
+                        positionSide=position_side
+                    )
+                else:
+                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                    order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=binance_side,
+                        type=ORDER_TYPE_MARKET,
+                        quantity=quantity
+                    )
             except BinanceAPIException as e:
                 if "Order's notional must be no smaller than" in str(e):
                     # Lỗi giá trị lệnh quá nhỏ, thử lại với giá trị lớn hơn
@@ -449,13 +462,23 @@ class PositionManager:
                         safe_quantity = math.ceil(safe_min_qty * 1000) / 1000
                     
                     logger.info(f"Thử lại với số lượng lớn hơn: {safe_quantity}")
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=binance_side,
-                        type=ORDER_TYPE_MARKET,
-                        quantity=safe_quantity,
-                        positionSide=position_side
-                    )
+                    if is_hedge_mode:
+                        # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                        order = self.client.futures_create_order(
+                            symbol=symbol,
+                            side=binance_side,
+                            type=ORDER_TYPE_MARKET,
+                            quantity=safe_quantity,
+                            positionSide=position_side
+                        )
+                    else:
+                        # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                        order = self.client.futures_create_order(
+                            symbol=symbol,
+                            side=binance_side,
+                            type=ORDER_TYPE_MARKET,
+                            quantity=safe_quantity
+                        )
                 elif "Unknown error" in str(e):
                     # Thử lại với số lượng được làm tròn
                     logger.warning(f"Lỗi không xác định: {str(e)}")
@@ -475,24 +498,44 @@ class PositionManager:
                         precision = int(round(-math.log10(step_size)))
                         rounded_amount = round(quantity, precision)
                         logger.info(f"Thử lại đặt lệnh với số lượng được làm tròn: {rounded_amount}")
-                        order = self.client.futures_create_order(
-                            symbol=symbol,
-                            side=binance_side,
-                            type=ORDER_TYPE_MARKET,
-                            quantity=rounded_amount,
-                            positionSide=position_side
-                        )
+                        if is_hedge_mode:
+                            # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                            order = self.client.futures_create_order(
+                                symbol=symbol,
+                                side=binance_side,
+                                type=ORDER_TYPE_MARKET,
+                                quantity=rounded_amount,
+                                positionSide=position_side
+                            )
+                        else:
+                            # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                            order = self.client.futures_create_order(
+                                symbol=symbol,
+                                side=binance_side,
+                                type=ORDER_TYPE_MARKET,
+                                quantity=rounded_amount
+                            )
                     else:
                         # Nếu không tìm thấy step_size, thử với số lượng làm tròn 3 chữ số
                         rounded_amount = round(quantity, 3)
                         logger.info(f"Thử lại đặt lệnh với số lượng làm tròn 3 chữ số: {rounded_amount}")
-                        order = self.client.futures_create_order(
-                            symbol=symbol,
-                            side=binance_side,
-                            type=ORDER_TYPE_MARKET,
-                            quantity=rounded_amount,
-                            positionSide=position_side
-                        )
+                        if is_hedge_mode:
+                            # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                            order = self.client.futures_create_order(
+                                symbol=symbol,
+                                side=binance_side,
+                                type=ORDER_TYPE_MARKET,
+                                quantity=rounded_amount,
+                                positionSide=position_side
+                            )
+                        else:
+                            # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                            order = self.client.futures_create_order(
+                                symbol=symbol,
+                                side=binance_side,
+                                type=ORDER_TYPE_MARKET,
+                                quantity=rounded_amount
+                            )
                 else:
                     # Truyền lại lỗi ban đầu nếu không phải lỗi đã biết
                     raise
@@ -643,15 +686,38 @@ class PositionManager:
                 binance_side = SIDE_BUY
                 position_side = "SHORT"
             
-            # Đặt lệnh đóng vị thế với positionSide để hỗ trợ hedge mode
-            order = self.client.futures_create_order(
-                symbol=symbol,
-                side=binance_side,
-                type=ORDER_TYPE_MARKET,
-                quantity=abs(position_info["size"]),
-                positionSide=position_side,
-                reduceOnly=True
-            )
+            # Kiểm tra chế độ vị thế hiện tại
+            try:
+                account_info = self.client.futures_account()
+                is_hedge_mode = account_info.get("dualSidePosition", False)
+                if is_hedge_mode:
+                    logger.info("Tài khoản đang ở chế độ Hedge Mode")
+                else:
+                    logger.info("Tài khoản đang ở chế độ One-way Mode")
+            except Exception as e:
+                logger.warning(f"Không thể xác định chế độ vị thế: {str(e)}")
+                is_hedge_mode = False
+            
+            # Đặt lệnh đóng vị thế với positionSide nếu đang ở Hedge Mode
+            if is_hedge_mode:
+                # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=binance_side,
+                    type=ORDER_TYPE_MARKET,
+                    quantity=abs(position_info["size"]),
+                    positionSide=position_side,
+                    reduceOnly=True
+                )
+            else:
+                # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=binance_side,
+                    type=ORDER_TYPE_MARKET,
+                    quantity=abs(position_info["size"]),
+                    reduceOnly=True
+                )
             
             # Kết quả
             result = {
@@ -717,29 +783,65 @@ class PositionManager:
                         orderId=order.get("orderId")
                     )
             
+            # Kiểm tra chế độ vị thế hiện tại
+            try:
+                account_info = self.client.futures_account()
+                is_hedge_mode = account_info.get("dualSidePosition", False)
+                if is_hedge_mode:
+                    logger.info("Tài khoản đang ở chế độ Hedge Mode")
+                else:
+                    logger.info("Tài khoản đang ở chế độ One-way Mode")
+            except Exception as e:
+                logger.warning(f"Không thể xác định chế độ vị thế: {str(e)}")
+                is_hedge_mode = False
+            
             # Đặt lệnh Stop Loss mới nếu có
             if stop_loss is not None:
-                sl_order = self.client.futures_create_order(
-                    symbol=symbol,
-                    side=sl_side,
-                    type=ORDER_TYPE_STOP_MARKET,
-                    stopPrice=stop_loss,
-                    closePosition=True,
-                    positionSide=position_side,
-                    timeInForce="GTE_GTC"
-                )
+                if is_hedge_mode:
+                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                    sl_order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=sl_side,
+                        type=ORDER_TYPE_STOP_MARKET,
+                        stopPrice=stop_loss,
+                        closePosition=True,
+                        positionSide=position_side,
+                        timeInForce="GTE_GTC"
+                    )
+                else:
+                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                    sl_order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=sl_side,
+                        type=ORDER_TYPE_STOP_MARKET,
+                        stopPrice=stop_loss,
+                        closePosition=True,
+                        timeInForce="GTE_GTC"
+                    )
             
             # Đặt lệnh Take Profit mới nếu có
             if take_profit is not None:
-                tp_order = self.client.futures_create_order(
-                    symbol=symbol,
-                    side=tp_side,
-                    type=ORDER_TYPE_TAKE_PROFIT_MARKET,
-                    stopPrice=take_profit,
-                    closePosition=True,
-                    positionSide=position_side,
-                    timeInForce="GTE_GTC"
-                )
+                if is_hedge_mode:
+                    # Nếu đang ở chế độ Hedge Mode, gửi với tham số positionSide
+                    tp_order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=tp_side,
+                        type=ORDER_TYPE_TAKE_PROFIT_MARKET,
+                        stopPrice=take_profit,
+                        closePosition=True,
+                        positionSide=position_side,
+                        timeInForce="GTE_GTC"
+                    )
+                else:
+                    # Nếu đang ở chế độ One-way Mode, không gửi tham số positionSide
+                    tp_order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=tp_side,
+                        type=ORDER_TYPE_TAKE_PROFIT_MARKET,
+                        stopPrice=take_profit,
+                        closePosition=True,
+                        timeInForce="GTE_GTC"
+                    )
             
             # Kết quả
             result = {
