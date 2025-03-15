@@ -519,6 +519,59 @@ class PositionManager:
                     timeInForce="GTE_GTC"
                 )
             
+            # Cập nhật thông tin vị thế sau khi đặt lệnh
+            position_risk = {}
+            risk_info = {}
+            try:
+                # Lấy thông tin số dư tài khoản
+                account_info = self.get_account_balance()
+                available_balance = float(account_info.get('available', 0))
+                
+                # Tính toán thông tin rủi ro
+                position_value = current_price * quantity
+                account_risk_percentage = (position_value / available_balance) * 100
+                
+                # Tính SL/TP phần trăm
+                sl_percentage = 0
+                tp_percentage = 0
+                
+                if stop_loss and current_price:
+                    if side == "LONG":
+                        sl_percentage = abs((stop_loss - current_price) / current_price) * 100
+                    else:  # SHORT
+                        sl_percentage = abs((stop_loss - current_price) / current_price) * 100
+                
+                if take_profit and current_price:
+                    if side == "LONG":
+                        tp_percentage = abs((take_profit - current_price) / current_price) * 100
+                    else:  # SHORT
+                        tp_percentage = abs((take_profit - current_price) / current_price) * 100
+                
+                # Tính R:R
+                risk_reward = "N/A"
+                if sl_percentage > 0 and tp_percentage > 0:
+                    risk_reward = f"{tp_percentage/sl_percentage:.2f}"
+                
+                position_risk = {
+                    "account_percentage": f"{account_risk_percentage:.2f}%",
+                    "position_value": f"{position_value:.2f} USDT",
+                    "leverage": leverage,
+                    "stop_loss_percentage": f"{sl_percentage:.2f}%",
+                    "take_profit_percentage": f"{tp_percentage:.2f}%",
+                    "risk_reward_ratio": risk_reward
+                }
+                
+                risk_info = {
+                    "position_risk": position_risk,
+                    "market_conditions": {
+                        "current_price": current_price,
+                        "daily_change": "N/A",  # Cần cập nhật từ dữ liệu thị trường
+                        "volatility": "N/A"  # Cần cập nhật từ dữ liệu thị trường
+                    }
+                }
+            except Exception as e:
+                logger.warning(f"Không thể tính toán đầy đủ thông tin rủi ro: {str(e)}")
+                
             # Kết quả
             result = {
                 "status": "success",
@@ -526,10 +579,34 @@ class PositionManager:
                 "order": order,
                 "stop_loss": stop_loss,
                 "take_profit": take_profit,
-                "entry_price": current_price
+                "entry_price": current_price,
+                "risk_analysis": risk_info
             }
             
-            logger.info(f"Đã mở vị thế {side} trên {symbol} với giá {current_price}")
+            # Log chi tiết hơn về vị thế
+            risk_message = ""
+            if position_risk:
+                risk_message = f" | Rủi ro: {position_risk.get('account_percentage', 'N/A')} tài khoản, R:R = {position_risk.get('risk_reward_ratio', 'N/A')}"
+            
+            logger.info(f"Đã mở vị thế {side} trên {symbol} với giá {current_price}{risk_message}")
+            
+            # Gửi thông báo Telegram nếu có
+            if hasattr(self, 'telegram_notifier') and self.telegram_notifier:
+                try:
+                    message = (f"🔔 *MỞ VỊ THẾ MỚI*\n"
+                              f"Cặp: {symbol}\n"
+                              f"Hướng: {'🟢 LONG' if side == 'LONG' else '🔴 SHORT'}\n"
+                              f"Giá vào: {current_price}\n"
+                              f"Khối lượng: {quantity}\n"
+                              f"Đòn bẩy: {leverage}x\n"
+                              f"SL: {stop_loss if stop_loss else 'Không đặt'}\n"
+                              f"TP: {take_profit if take_profit else 'Không đặt'}\n"
+                              f"Rủi ro: {position_risk.get('account_percentage', 'N/A')} tài khoản\n"
+                              f"R:R = {position_risk.get('risk_reward_ratio', 'N/A')}")
+                    self.telegram_notifier.send_message(message)
+                except Exception as e:
+                    logger.error(f"Lỗi khi gửi thông báo Telegram: {str(e)}")
+            
             return result
         
         except BinanceAPIException as e:

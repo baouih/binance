@@ -2186,6 +2186,30 @@ class EnhancedTradingGUI(QMainWindow):
             else:
                 take_profit = None if self.take_profit_checkbox.isChecked() else self.take_profit_spin.value()
             
+            # Kiểm tra số dư tài khoản trước khi vào lệnh
+            account_info = None
+            if hasattr(self, 'position_manager') and self.position_manager:
+                account_info = self.position_manager.get_account_balance()
+            
+            if not account_info or not account_info.get('available', 0):
+                self.show_error("Không thể mở vị thế", "Không thể lấy thông tin số dư tài khoản")
+                return
+                
+            available_balance = float(account_info.get('available', 0))
+            estimated_cost = amount * leverage  # Ước tính chi phí vào lệnh
+            
+            if estimated_cost > available_balance:
+                self.show_error(
+                    "Số dư không đủ", 
+                    f"Số dư khả dụng: {available_balance:.2f} USDT\nChi phí ước tính: {estimated_cost:.2f} USDT"
+                )
+                self.add_to_system_log(f"❌ Từ chối giao dịch - Số dư không đủ: {available_balance:.2f}/{estimated_cost:.2f} USDT")
+                return
+                
+            # Thông báo tỷ lệ vị thế so với tài khoản
+            position_percentage = (estimated_cost / available_balance) * 100
+            self.add_to_system_log(f"ℹ️ Tỷ lệ vị thế/số dư: {position_percentage:.2f}% ({estimated_cost:.2f}/{available_balance:.2f} USDT)")
+            
             # Kiểm tra tính hợp lệ của vị thế với RiskManager
             if hasattr(self, 'risk_manager') and self.risk_manager:
                 is_valid, reason = self.risk_manager.validate_new_position(symbol, side, amount)
@@ -2270,21 +2294,83 @@ class EnhancedTradingGUI(QMainWindow):
             stop_loss = self.manage_sl_spin.value()
             take_profit = self.manage_tp_spin.value()
             
+            # Lấy thông tin về vị thế hiện tại
+            position_info = None
+            try:
+                positions = self.position_manager.get_open_positions()
+                for pos in positions:
+                    if pos.get("symbol") == symbol:
+                        position_info = pos
+                        break
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy thông tin vị thế: {str(e)}", exc_info=True)
+                self.show_error("Không thể lấy thông tin vị thế", str(e))
+                return
+                
+            if not position_info:
+                self.show_error("Không thể cập nhật SL/TP", f"Không tìm thấy vị thế mở cho {symbol}")
+                return
+                
+            # Kiểm tra tính hợp lệ của SL/TP
+            side = position_info.get("side", "")
+            entry_price = float(position_info.get("entry_price", 0))
+            
+            if hasattr(self, 'risk_manager') and self.risk_manager:
+                is_valid_sltp, reason_sltp = self.risk_manager.validate_sl_tp(
+                    symbol, side, entry_price, stop_loss, take_profit
+                )
+                if not is_valid_sltp:
+                    self.show_error("SL và TP không hợp lệ", reason_sltp)
+                    return
+            
+            # Thêm thông báo phân tích rủi ro
+            risk_message = ""
+            if side == "LONG":
+                risk_price = entry_price - stop_loss
+                reward_price = take_profit - entry_price
+                if reward_price > 0 and risk_price > 0:
+                    risk_reward_ratio = reward_price / risk_price
+                    risk_message = f"Tỷ lệ R/R: {risk_reward_ratio:.2f} (SL: {(stop_loss-entry_price)/entry_price*100:.2f}%, TP: {(take_profit-entry_price)/entry_price*100:.2f}%)"
+            else:  # SHORT
+                risk_price = stop_loss - entry_price
+                reward_price = entry_price - take_profit
+                if reward_price > 0 and risk_price > 0:
+                    risk_reward_ratio = reward_price / risk_price
+                    risk_message = f"Tỷ lệ R/R: {risk_reward_ratio:.2f} (SL: {(stop_loss-entry_price)/entry_price*100:.2f}%, TP: {(entry_price-take_profit)/entry_price*100:.2f}%)"
+            
+            # Log thông tin phân tích
+            if risk_message:
+                self.add_to_system_log(f"ℹ️ {symbol}: {risk_message}")
+            
             # Cập nhật SL và TP
             result = self.position_manager.update_sl_tp(symbol, None, stop_loss, take_profit)
             
             if result.get("status") == "success":
-                self.show_info("Cập nhật thành công", f"Đã cập nhật SL/TP cho {symbol}")
+                success_message = f"Đã cập nhật SL/TP cho {symbol}"
+                if risk_message:
+                    success_message += f"\n{risk_message}"
+                self.show_info("Cập nhật thành công", success_message)
                 self.status_label.setText(f"Đã cập nhật SL/TP cho {symbol}")
                 
                 # Cập nhật dữ liệu
                 self.refresh_data()
             else:
-                self.show_error("Lỗi khi cập nhật SL/TP", result.get("message", "Lỗi không xác định"))
+                error_message = result.get("message", "Lỗi không xác định")
+                retry_message = ""
+                
+                # Phân tích lỗi và đề xuất cách khắc phục
+                if "Price" in error_message and "invalid" in error_message:
+                    retry_message = "\n\nGợi ý: Giá SL/TP có thể không hợp lệ, hãy thử chỉnh lại theo giá thị trường hiện tại."
+                elif "Filter failure" in error_message:
+                    retry_message = "\n\nGợi ý: SL/TP có thể quá gần giá hiện tại, hãy thử đặt xa hơn."
+                
+                self.show_error("Lỗi khi cập nhật SL/TP", error_message + retry_message)
+                self.add_to_system_log(f"❌ Lỗi SL/TP {symbol}: {error_message}")
         
         except Exception as e:
             logger.error(f"Lỗi khi cập nhật SL/TP: {str(e)}", exc_info=True)
             self.show_error("Lỗi khi cập nhật SL/TP", str(e))
+            self.add_to_system_log(f"❌ Lỗi hệ thống khi cập nhật SL/TP: {str(e)}")
     
     def close_position(self):
         """Đóng vị thế được chọn"""
