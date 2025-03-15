@@ -1,0 +1,16 @@
+{
+    "risk_levels": {
+        "ultra_conservative": 0.03,
+        "conservative": 0.05,
+        "moderate": 0.07,
+        "aggressive": 0.09,
+        "high_risk": 0.15,
+        "extreme_risk": 0.2
+    },
+    "current_risk_level": "moderate",
+    "win_streak": 0,
+    "loss_streak": 4,
+    "total_trades": 10,
+    "winning_trades": 6,
+    "last_update": "2025-03-15T09:56:19.335442"
+}
