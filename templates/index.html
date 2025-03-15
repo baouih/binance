@@ -157,17 +157,17 @@
                             <tbody>
                                 {% for position in status.positions %}
                                 <tr>
-                                    <td>{{ position.symbol }}</td>
-                                    <td class="{{ 'position-long' if position.type == 'LONG' else 'position-short' }}">
-                                        {{ position.type }}
+                                    <td>{{ position.get('symbol', 'N/A') }}</td>
+                                    <td class="{{ 'position-long' if position.get('type', '') == 'LONG' else 'position-short' }}">
+                                        {{ position.get('type', 'N/A') }}
                                     </td>
-                                    <td>{{ position.entry_price }}</td>
-                                    <td>{{ position.current_price }}</td>
-                                    <td>{{ position.size }}</td>
-                                    <td class="{{ 'profit' if position.pnl > 0 else 'loss' }}">
-                                        {{ position.pnl }}
+                                    <td>{{ position.get('entry_price', 0) }}</td>
+                                    <td>{{ position.get('current_price', 0) }}</td>
+                                    <td>{{ position.get('size', 0) }}</td>
+                                    <td class="{{ 'profit' if position.get('pnl', 0) > 0 else 'loss' }}">
+                                        {{ position.get('pnl', 0) }}
                                     </td>
-                                    <td>{{ position.time }}</td>
+                                    <td>{{ position.get('time', 'N/A') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
