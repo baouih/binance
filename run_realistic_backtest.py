@@ -354,10 +354,17 @@ class AdaptiveRiskManager:
             bool: True nếu nên mở vị thế, False nếu không
         """
         # Đếm số vị thế đang mở cho mức rủi ro này
-        positions_at_risk = sum(1 for p in active_positions if p['risk_level'] == risk_level)
+        positions_at_risk = sum(1 for p in active_positions if p.get('risk_level') == risk_level)
         
         # Tính tổng phơi nhiễm rủi ro hiện tại
-        total_risk_exposure = sum(p['risk_level'] * p['position_value'] for p in active_positions) / account_balance
+        total_risk_exposure = 0
+        for p in active_positions:
+            if 'risk_level' in p and 'value' in p:
+                total_risk_exposure += p['risk_level'] * p['value']
+            elif 'risk_level' in p and 'position_value' in p:
+                total_risk_exposure += p['risk_level'] * p['position_value']
+        
+        total_risk_exposure = total_risk_exposure / account_balance if account_balance > 0 else 0
         
         # Tính drawdown hiện tại
         drawdown = (account_balance - account_equity) / account_balance if account_balance > 0 else 0
@@ -406,7 +413,8 @@ class AdaptiveRiskManager:
         # Nếu drawdown quá cao, bắt đầu đóng vị thế có rủi ro cao nhất
         if drawdown > self.account_protection['max_drawdown'] * 0.8:  # 80% ngưỡng bảo vệ
             # Sắp xếp vị thế theo mức rủi ro giảm dần
-            sorted_positions = sorted(active_positions, key=lambda p: p['risk_level'], reverse=True)
+            # Sử dụng get() để tránh KeyError nếu position không có risk_level
+            sorted_positions = sorted(active_positions, key=lambda p: p.get('risk_level', 0.05), reverse=True)
             
             # Đóng từng vị thế có rủi ro cao nhất cho đến khi đạt mức an toàn
             for pos in sorted_positions:
@@ -1219,11 +1227,14 @@ class RealisticBacktest:
             bool: True nếu tải thành công, False nếu thất bại
         """
         # Đường dẫn file dữ liệu
-        file_path = f"data/{self.symbol}_{self.timeframe}_data.csv"
+        file_path = f"data/{self.symbol}_{self.timeframe}_backtest.csv"
         
         if not os.path.exists(file_path):
-            logger.error(f"Không tìm thấy file dữ liệu: {file_path}")
-            return False
+            # Thử lại với file dữ liệu thay thế
+            file_path = f"data/{self.symbol}_{self.timeframe}.csv"
+            if not os.path.exists(file_path):
+                logger.error(f"Không tìm thấy file dữ liệu: {file_path}")
+                return False
         
         try:
             # Tải dữ liệu
@@ -1256,6 +1267,9 @@ class RealisticBacktest:
             if column_mapping:
                 df = df.rename(columns=column_mapping)
             
+            # Đảm bảo không có giá trị NaN
+            df = df.dropna()
+            
             # Lưu dữ liệu
             self.data = df
             
@@ -1287,12 +1301,18 @@ class RealisticBacktest:
         
         # Xác định vị trí bắt đầu và kết thúc
         if start_idx is None:
-            start_idx = 100  # Bỏ qua 100 nến đầu tiên để có đủ dữ liệu cho các chỉ báo
+            # Đảm bảo đủ dữ liệu cho các chỉ báo (tối thiểu 20 nến)
+            start_idx = min(20, len(self.data) // 3)
         
         if end_idx is None:
-            end_idx = len(self.data) - 1
+            # Giới hạn số lượng nến để tránh quá tải
+            max_candles = 300
+            if len(self.data) - start_idx > max_candles:
+                end_idx = start_idx + max_candles
+            else:
+                end_idx = len(self.data) - 1
         
-        logger.info(f"Bắt đầu backtest từ idx {start_idx} đến {end_idx}")
+        logger.info(f"Bắt đầu backtest từ idx {start_idx} đến {end_idx} (tổng {end_idx - start_idx + 1} nến)")
         
         # Thiết lập bộ mô phỏng
         self.simulator.reset()
@@ -1859,7 +1879,7 @@ def main():
     # Danh sách cặp tiền
     symbols = ["BTCUSDT"]
     timeframe = "1h"
-    test_period = 90
+    test_period = 20  # Giảm xuống để thử nghiệm nhanh
     initial_balance = 10000.0
     
     for symbol in symbols:

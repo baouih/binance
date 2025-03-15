@@ -1,0 +1,27 @@
+{
+    "total_trades": 25,
+    "winning_trades": 16,
+    "losing_trades": 9,
+    "break_even_trades": 0,
+    "long_trades": 8,
+    "short_trades": 17,
+    "max_drawdown": 5895.075687014465,
+    "max_drawdown_pct": 38.39107055237158,
+    "peak_balance": 15755.19469963886,
+    "final_balance": 14336.127399388035,
+    "total_profit": 4336.127399388035,
+    "total_profit_pct": 43.36127399388035,
+    "win_rate": 64.0,
+    "profit_factor": 1.4011709602800033,
+    "average_profit": 946.5502855466492,
+    "average_loss": -1200.9641299287057,
+    "strategy_stats": {
+        "counter_trend": {
+            "total": 25,
+            "win": 16,
+            "loss": 9,
+            "profit": 4336.127399388037,
+            "win_rate": 64.0
+        }
+    }
+}

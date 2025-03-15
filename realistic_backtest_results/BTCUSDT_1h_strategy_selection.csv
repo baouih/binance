@@ -1,0 +1,15 @@
+idx,date,market_condition,optimal_risk,selected_strategy
+20,2025-02-10 14:00:00,NEUTRAL,0.1,sideways
+24,2025-02-10 18:00:00,NEUTRAL,0.1,sideways
+48,2025-02-11 18:00:00,NEUTRAL,0.1,counter_trend
+72,2025-02-12 18:00:00,VOLATILE,0.05,range_trading
+96,2025-02-13 18:00:00,VOLATILE,0.05,range_trading
+120,2025-02-14 18:00:00,SIDEWAYS,0.1,counter_trend
+144,2025-02-15 18:00:00,SIDEWAYS,0.1,counter_trend
+168,2025-02-16 18:00:00,VOLATILE,0.05,range_trading
+192,2025-02-17 18:00:00,VOLATILE,0.05,range_trading
+216,2025-02-18 18:00:00,VOLATILE,0.05,range_trading
+240,2025-02-19 18:00:00,SIDEWAYS,0.1,counter_trend
+264,2025-02-20 18:00:00,SIDEWAYS,0.1,counter_trend
+288,2025-02-21 18:00:00,VOLATILE,0.05,range_trading
+312,2025-02-22 18:00:00,VOLATILE,0.05,range_trading
