@@ -1,0 +1,27 @@
+===== BÁO CÁO KIỂM THỬ LIVE MULTI-COIN =====
+
+Thời gian hiện tại: 2025-03-16 11:38:43
+Số dư ban đầu: 10000.00 USDT
+Số dư hiện tại: 10000.00 USDT
+Lợi nhuận: 0.00 USDT (0.00%)
+Số giao dịch: 0
+Thắng/Thua: 0/0
+Tỷ lệ thắng: 0.00%
+
+THỐNG KÊ THEO COIN:
+-----------------
+
+THỐNG KÊ THEO PHIÊN:
+-------------------
+
+DANH SÁCH GIAO DỊCH:
+------------------
+
+PHIÊN GIAO DỊCH TỐI ƯU:
+---------------------
+London Open: 15:00 - 17:00, Hướng: SHORT, Win Rate (Backtest): 95.00%
+New York Open: 20:30 - 22:30, Hướng: SHORT, Win Rate (Backtest): 90.00%
+Major News Events: 21:30 - 22:00, Hướng: SHORT, Win Rate (Backtest): 80.00%
+Daily Candle Close: 06:30 - 07:30, Hướng: LONG, Win Rate (Backtest): 75.00%
+London/NY Close: 03:00 - 05:00, Hướng: BOTH, Win Rate (Backtest): 70.00%
+
