@@ -74,14 +74,12 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
             'period': test_period,
             'initial_balance': initial_balance,
             'final_balance': results['final_balance'],
-            'profit_loss_pct': results['profit_loss_pct'],
+            'profit_loss_pct': results['total_profit_pct'],  # Sửa tên trường
             'win_rate': results['win_rate'],
             'total_trades': results['total_trades'],
             'winning_trades': results['winning_trades'],
             'losing_trades': results['losing_trades'],
-            'strategy_usage': results['strategy_usage'],
-            'market_conditions': results['market_conditions'],
-            'risk_levels': results['risk_levels']
+            'strategy_stats': results['strategy_stats']  # Sửa tên trường
         }
         
         # Lưu báo cáo chi tiết
@@ -92,12 +90,22 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
         
         logger.info(f"Đã lưu báo cáo chi tiết cho {symbol} {timeframe} tại {report_path}")
         
+        # Xác định chiến lược chính là chiến lược được sử dụng nhiều nhất
+        primary_strategy = "unknown"
+        max_trades = 0
+        
+        if 'strategy_stats' in results:
+            for strategy, stats in results['strategy_stats'].items():
+                if stats['total_trades'] > max_trades:
+                    max_trades = stats['total_trades']
+                    primary_strategy = strategy
+        
         # Lưu báo cáo tóm tắt cho khung thời gian này
         summary = {
-            'profit_loss_pct': results['profit_loss_pct'],
+            'profit_loss_pct': results['total_profit_pct'],
             'win_rate': results['win_rate'],
             'total_trades': results['total_trades'],
-            'primary_strategy': results['primary_strategy']
+            'primary_strategy': primary_strategy
         }
         
         return summary
@@ -169,7 +177,7 @@ def main():
             combined_results['by_symbol'][symbol][timeframe] = results
             
             # Cập nhật thông tin chiến lược
-            strategy = results['primary_strategy']
+            strategy = results['primary_strategy'] # Chúng ta đã xác định primary_strategy trong hàm run_backtest_for_timeframe
             if strategy not in combined_results['by_strategy']:
                 combined_results['by_strategy'][strategy] = {
                     'usage_count': 0,
@@ -181,13 +189,13 @@ def main():
             # Cập nhật thống kê chiến lược
             strat_data = combined_results['by_strategy'][strategy]
             strat_data['usage_count'] += 1
-            strat_data['avg_profit_loss_pct'] = (strat_data['avg_profit_loss_pct'] * (strat_data['usage_count'] - 1) + results['profit_loss_pct']) / strat_data['usage_count']
+            strat_data['avg_profit_loss_pct'] = (strat_data['avg_profit_loss_pct'] * (strat_data['usage_count'] - 1) + results['profit_loss_pct']) / strat_data['usage_count'] # Đang sử dụng profit_loss_pct đã được đặt trong tóm tắt
             strat_data['avg_win_rate'] = (strat_data['avg_win_rate'] * (strat_data['usage_count'] - 1) + results['win_rate']) / strat_data['usage_count']
             strat_data['total_trades'] += results['total_trades']
             
             # Cập nhật thống kê cho khung thời gian
             tf_data = combined_results['by_timeframe'][timeframe]
-            tf_data['avg_profit_loss_pct'] = sum([r['profit_loss_pct'] for r in tf_data['symbols'].values()]) / len(tf_data['symbols'])
+            tf_data['avg_profit_loss_pct'] = sum([r['profit_loss_pct'] for r in tf_data['symbols'].values()]) / len(tf_data['symbols']) # Đang sử dụng profit_loss_pct đã được đặt trong tóm tắt
             tf_data['avg_win_rate'] = sum([r['win_rate'] for r in tf_data['symbols'].values()]) / len(tf_data['symbols'])
             tf_data['total_trades'] = sum([r['total_trades'] for r in tf_data['symbols'].values()])
             
