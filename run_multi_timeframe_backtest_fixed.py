@@ -2,30 +2,21 @@
 # -*- coding: utf-8 -*-
 
 """
-BACKTEST ĐA KHUNG THỜI GIAN CHO HỆ THỐNG GIAO DỊCH TỰ ĐỘNG
-----------------------------------------------------------
-- Kiểm tra hiệu suất bot trên nhiều khung thời gian (30m, 1h, 4h, 1d)
-- Mô phỏng chính xác cách bot hoạt động trong thực tế
-- Tạo báo cáo so sánh hiệu suất giữa các khung thời gian
+Script chạy backtest trên nhiều khung thời gian (30m, 1h, 4h, 1d) 
+và so sánh hiệu suất của hệ thống
 """
 
 import os
-import sys
 import json
 import logging
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
 from pathlib import Path
 
-# Import từ script backtest đã có
-from run_realistic_backtest import (
-    MarketAnalyzer, AdaptiveRiskManager, StrategySelector,
-    SignalGenerator, TradingSimulator, RealisticBacktest
-)
+from run_realistic_backtest import RealisticBacktest
+from adaptive_risk_manager import AdaptiveRiskManager
+from adaptive_strategy_selector import AdaptiveStrategySelector
 
-# Thiết lập logging
+# Cấu hình logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,14 +28,14 @@ logging.basicConfig(
 
 logger = logging.getLogger('multi_timeframe_backtest')
 
-def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=10000):
+def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance):
     """
-    Chạy backtest trên một khung thời gian cụ thể
+    Chạy backtest cho một khung thời gian cụ thể
     
     Args:
-        symbol (str): Ký hiệu cặp tiền (VD: BTCUSDT)
-        timeframe (str): Khung thời gian (30m, 1h, 4h, 1d)
-        test_period (int): Số ngày backtest
+        symbol (str): Cặp tiền
+        timeframe (str): Khung thời gian
+        test_period (int): Số ngày test
         initial_balance (float): Số dư ban đầu
         
     Returns:
@@ -54,20 +45,22 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
     
     # Khởi tạo các thành phần
     risk_manager = AdaptiveRiskManager()
-    strategy_selector = StrategySelector()
-
+    strategy_selector = AdaptiveStrategySelector()
+    
     # Khởi tạo backtest
     try:
+        # Khởi tạo đối tượng backtest với các tham số
         backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
-        # Tải dữ liệu trước khi chạy backtest
+        
+        # Tải dữ liệu
         if not backtest.load_data():
             logger.error(f"Không tải được dữ liệu cho {symbol}_{timeframe}")
             raise Exception(f"Không tải được dữ liệu cho {symbol}_{timeframe}")
         
-        # Chạy backtest sau khi đã tải dữ liệu
+        # Chạy backtest
         results = backtest.run_backtest()
         
-        # Xác định chiến lược chính là chiến lược được sử dụng nhiều nhất
+        # Xác định chiến lược chính dựa trên số lượng giao dịch
         primary_strategy = "unknown"
         max_trades = 0
         
@@ -77,20 +70,19 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
                     max_trades = stats['total_trades']
                     primary_strategy = strategy
         
-        # Lưu báo cáo chi tiết cho khung thời gian này
+        # Tạo báo cáo chi tiết
         backtest_report = {
             'symbol': symbol,
             'timeframe': timeframe,
             'period': test_period,
             'initial_balance': initial_balance,
             'final_balance': results['final_balance'],
-            'profit_loss_pct': results['total_profit_pct'],  # Sử dụng total_profit_pct từ kết quả
+            'profit_loss_pct': results['total_profit_pct'],  # Sử dụng đúng tên trường
             'win_rate': results['win_rate'],
             'total_trades': results['total_trades'],
             'winning_trades': results['winning_trades'],
             'losing_trades': results['losing_trades'],
-            'strategy_stats': results['strategy_stats'],
-            'primary_strategy': primary_strategy
+            'strategy_stats': results['strategy_stats']
         }
         
         # Lưu báo cáo chi tiết
@@ -101,9 +93,9 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
         
         logger.info(f"Đã lưu báo cáo chi tiết cho {symbol} {timeframe} tại {report_path}")
         
-        # Lưu báo cáo tóm tắt cho khung thời gian này
+        # Tạo báo cáo tóm tắt
         summary = {
-            'profit_loss_pct': results['total_profit_pct'],  # Sử dụng total_profit_pct từ kết quả
+            'profit_loss_pct': results['total_profit_pct'],  # Sử dụng đúng tên trường
             'win_rate': results['win_rate'],
             'total_trades': results['total_trades'],
             'primary_strategy': primary_strategy
@@ -178,7 +170,7 @@ def main():
             combined_results['by_symbol'][symbol][timeframe] = results
             
             # Cập nhật thông tin chiến lược
-            strategy = results['primary_strategy'] 
+            strategy = results['primary_strategy']
             if strategy not in combined_results['by_strategy']:
                 combined_results['by_strategy'][strategy] = {
                     'usage_count': 0,
