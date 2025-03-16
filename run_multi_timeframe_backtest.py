@@ -59,7 +59,9 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance=1
     # Khởi tạo backtest
     try:
         backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
-        results = backtest.run()
+        # Cần tải dữ liệu trước khi chạy backtest
+        backtest.load_data(f"data/{symbol}_{timeframe}.csv")
+        results = backtest.run_backtest()
         
         # Lưu báo cáo chi tiết cho khung thời gian này
         backtest_report = {

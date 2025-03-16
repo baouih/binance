@@ -1936,13 +1936,13 @@ def main():
         }
         
         # Backtest trên mỗi khung thời gian
-        for timeframe in timeframes:
-            test_period = test_periods[timeframe]
+        for tf in timeframes:
+            test_period = test_periods[tf]
             
-            logger.info(f"=== KHUNG THỜI GIAN: {timeframe} ({test_period} ngày) ===")
+            logger.info(f"=== KHUNG THỜI GIAN: {tf} ({test_period} ngày) ===")
             
-            if timeframe not in combined_results['by_timeframe']:
-                combined_results['by_timeframe'][timeframe] = {
+            if tf not in combined_results['by_timeframe']:
+                combined_results['by_timeframe'][tf] = {
                     'total_trades': 0,
                     'winning_trades': 0,
                     'win_rate': 0,
@@ -1955,14 +1955,14 @@ def main():
             
             # Duyệt qua từng cặp tiền để backtest
             for symbol in symbols:
-                logger.info(f"Chạy backtest cho {symbol} {timeframe} với tài khoản ${initial_balance}")
+                logger.info(f"Chạy backtest cho {symbol} {tf} với tài khoản ${initial_balance}")
                 
                 # Tạo instance backtest
-                backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
+                backtest = RealisticBacktest(symbol, tf, test_period, initial_balance)
                 
                 # Tải dữ liệu
                 if not backtest.load_data():
-                    logger.error(f"Không thể tải dữ liệu cho {symbol} {timeframe}. Bỏ qua.")
+                    logger.error(f"Không thể tải dữ liệu cho {symbol} {tf}. Bỏ qua.")
                     continue
                 
                 # Chạy backtest và lấy thống kê chi tiết
@@ -1975,74 +1975,109 @@ def main():
                 if stats and 'strategy_stats' in stats:
                     for strategy, strategy_stats in stats['strategy_stats'].items():
                         # Lưu thông tin sử dụng chiến lược
-                        if strategy not in combined_results['by_timeframe'][timeframe]['strategy_usage']:
-                            combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy] = {
+                        if strategy not in combined_results['by_timeframe'][tf]['strategy_usage']:
+                            combined_results['by_timeframe'][tf]['strategy_usage'][strategy] = {
                                 'usage_count': 0,
                                 'win_count': 0,
                                 'profit': 0
                             }
                         
-                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['usage_count'] += strategy_stats['total']
-                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['win_count'] += strategy_stats['win']
-                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['profit'] += strategy_stats['profit']
+                        combined_results['by_timeframe'][tf]['strategy_usage'][strategy]['usage_count'] += strategy_stats['total']
+                        combined_results['by_timeframe'][tf]['strategy_usage'][strategy]['win_count'] += strategy_stats['win']
+                        combined_results['by_timeframe'][tf]['strategy_usage'][strategy]['profit'] += strategy_stats['profit']
                 
                 # Ghi lại phân loại thị trường
                 if stats and 'market_conditions' in stats:
                     for condition, count in stats['market_conditions'].items():
-                        if condition not in combined_results['by_timeframe'][timeframe]['market_conditions']:
-                            combined_results['by_timeframe'][timeframe]['market_conditions'][condition] = 0
-                        combined_results['by_timeframe'][timeframe]['market_conditions'][condition] += count
-            
-            # Thêm kết quả vào bảng tổng hợp
-            if stats:
-                # Lưu theo symbol
-                combined_results['by_symbol'][symbol] = {
-                    'total_trades': stats['total_trades'],
-                    'winning_trades': stats['winning_trades'],
-                    'win_rate': stats['win_rate'],
-                    'total_profit': stats['total_profit'],
-                    'profit_pct': stats['total_profit_pct'],
-                    'max_drawdown': stats['max_drawdown_pct'],
-                }
+                        if condition not in combined_results['by_timeframe'][tf]['market_conditions']:
+                            combined_results['by_timeframe'][tf]['market_conditions'][condition] = 0
+                        combined_results['by_timeframe'][tf]['market_conditions'][condition] += count
                 
-                # Cập nhật tổng theo balance
-                combined_results['by_balance'][initial_balance]['total_trades'] += stats['total_trades']
-                combined_results['by_balance'][initial_balance]['winning_trades'] += stats['winning_trades']
-                combined_results['by_balance'][initial_balance]['total_profit'] += stats['total_profit']
-                
-                # Cập nhật theo chiến lược
-                for strategy, strategy_stats in stats['strategy_stats'].items():
-                    if strategy not in combined_results['by_strategy']:
-                        combined_results['by_strategy'][strategy] = {
+                # Thêm kết quả vào bảng tổng hợp
+                if stats:
+                    # Lưu theo symbol
+                    if symbol not in combined_results['by_symbol']:
+                        combined_results['by_symbol'][symbol] = {
                             'total_trades': 0,
                             'winning_trades': 0,
                             'win_rate': 0,
                             'total_profit': 0,
+                            'profit_pct': 0,
+                            'max_drawdown': 0,
                         }
                     
-                    combined_results['by_strategy'][strategy]['total_trades'] += strategy_stats['total']
-                    combined_results['by_strategy'][strategy]['winning_trades'] += strategy_stats['win']
-                    combined_results['by_strategy'][strategy]['total_profit'] += strategy_stats['profit']
-                
-                # Cập nhật tổng thể
-                combined_results['overall']['total_trades'] += stats['total_trades']
-                combined_results['overall']['winning_trades'] += stats['winning_trades']
-                combined_results['overall']['total_profit'] += stats['total_profit']
-                combined_results['overall']['max_drawdown'] = max(combined_results['overall']['max_drawdown'], stats['max_drawdown_pct'])
+                    combined_results['by_symbol'][symbol]['total_trades'] += stats['total_trades']
+                    combined_results['by_symbol'][symbol]['winning_trades'] += stats['winning_trades']
+                    combined_results['by_symbol'][symbol]['total_profit'] += stats['total_profit']
+                    if 'max_drawdown_pct' in stats:
+                        combined_results['by_symbol'][symbol]['max_drawdown'] = max(
+                            combined_results['by_symbol'][symbol]['max_drawdown'], 
+                            stats['max_drawdown_pct']
+                        )
+                    
+                    # Cập nhật tổng theo balance
+                    combined_results['by_balance'][initial_balance]['total_trades'] += stats['total_trades']
+                    combined_results['by_balance'][initial_balance]['winning_trades'] += stats['winning_trades']
+                    combined_results['by_balance'][initial_balance]['total_profit'] += stats['total_profit']
+                    
+                    # Cập nhật theo chiến lược
+                    if 'strategy_stats' in stats:
+                        for strategy, strategy_stats in stats['strategy_stats'].items():
+                            if strategy not in combined_results['by_strategy']:
+                                combined_results['by_strategy'][strategy] = {
+                                    'total_trades': 0,
+                                    'winning_trades': 0,
+                                    'win_rate': 0,
+                                    'total_profit': 0,
+                                }
+                            
+                            combined_results['by_strategy'][strategy]['total_trades'] += strategy_stats['total']
+                            combined_results['by_strategy'][strategy]['winning_trades'] += strategy_stats['win']
+                            combined_results['by_strategy'][strategy]['total_profit'] += strategy_stats['profit']
+                    
+                    # Cập nhật tổng thể
+                    combined_results['overall']['total_trades'] += stats['total_trades']
+                    combined_results['overall']['winning_trades'] += stats['winning_trades']
+                    combined_results['overall']['total_profit'] += stats['total_profit']
+                    if 'max_drawdown_pct' in stats:
+                        combined_results['overall']['max_drawdown'] = max(
+                            combined_results['overall']['max_drawdown'], 
+                            stats['max_drawdown_pct']
+                        )
     
     # Tính tỷ lệ thắng tổng thể và các chỉ số tổng hợp khác
     if combined_results['overall']['total_trades'] > 0:
         combined_results['overall']['win_rate'] = combined_results['overall']['winning_trades'] / combined_results['overall']['total_trades'] * 100
         combined_results['overall']['profit_pct'] = combined_results['overall']['total_profit'] / (len(account_balances) * len(symbols) * account_balances[0]) * 100
     
+    # Tính tỷ lệ thắng và phần trăm lợi nhuận theo balance
     for balance in account_balances:
         if combined_results['by_balance'][balance]['total_trades'] > 0:
             combined_results['by_balance'][balance]['win_rate'] = combined_results['by_balance'][balance]['winning_trades'] / combined_results['by_balance'][balance]['total_trades'] * 100
             combined_results['by_balance'][balance]['profit_pct'] = combined_results['by_balance'][balance]['total_profit'] / (len(symbols) * balance) * 100
     
+    # Tính tỷ lệ thắng theo chiến lược
     for strategy in combined_results['by_strategy']:
         if combined_results['by_strategy'][strategy]['total_trades'] > 0:
             combined_results['by_strategy'][strategy]['win_rate'] = combined_results['by_strategy'][strategy]['winning_trades'] / combined_results['by_strategy'][strategy]['total_trades'] * 100
+    
+    # Tính tỷ lệ thắng và lợi nhuận theo từng symbol
+    for symbol in combined_results['by_symbol']:
+        if combined_results['by_symbol'][symbol]['total_trades'] > 0:
+            combined_results['by_symbol'][symbol]['win_rate'] = combined_results['by_symbol'][symbol]['winning_trades'] / combined_results['by_symbol'][symbol]['total_trades'] * 100
+            combined_results['by_symbol'][symbol]['profit_pct'] = combined_results['by_symbol'][symbol]['total_profit'] / account_balances[0] * 100
+            
+    # Tính tỷ lệ thắng và lợi nhuận theo khung thời gian
+    for tf in combined_results['by_timeframe']:
+        if combined_results['by_timeframe'][tf]['total_trades'] > 0:
+            combined_results['by_timeframe'][tf]['win_rate'] = combined_results['by_timeframe'][tf]['winning_trades'] / combined_results['by_timeframe'][tf]['total_trades'] * 100
+            combined_results['by_timeframe'][tf]['profit_pct'] = combined_results['by_timeframe'][tf]['total_profit'] / (len(symbols) * account_balances[0]) * 100
+            
+        # Tính tỷ lệ chiến thắng cho từng chiến lược theo khung thời gian
+        for strategy in combined_results['by_timeframe'][tf]['strategy_usage']:
+            usage = combined_results['by_timeframe'][tf]['strategy_usage'][strategy]
+            if usage['usage_count'] > 0:
+                usage['win_rate'] = usage['win_count'] / usage['usage_count'] * 100
     
     # Lưu kết quả tổng hợp vào file
     with open('realistic_backtest_results/combined_results.json', 'w') as f:

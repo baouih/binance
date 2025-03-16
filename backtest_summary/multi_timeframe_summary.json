@@ -1,0 +1,118 @@
+{
+  "by_timeframe": {
+    "30m": {
+      "symbols": {
+        "BTCUSDT": {
+          "profit_loss_pct": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "primary_strategy": "unknown"
+        }
+      },
+      "avg_profit_loss_pct": 0.0,
+      "avg_win_rate": 0.0,
+      "total_trades": 0
+    },
+    "1h": {
+      "symbols": {
+        "BTCUSDT": {
+          "profit_loss_pct": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "primary_strategy": "unknown"
+        }
+      },
+      "avg_profit_loss_pct": 0.0,
+      "avg_win_rate": 0.0,
+      "total_trades": 0
+    },
+    "4h": {
+      "symbols": {
+        "BTCUSDT": {
+          "profit_loss_pct": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "primary_strategy": "unknown"
+        }
+      },
+      "avg_profit_loss_pct": 0.0,
+      "avg_win_rate": 0.0,
+      "total_trades": 0
+    },
+    "1d": {
+      "symbols": {
+        "BTCUSDT": {
+          "profit_loss_pct": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "primary_strategy": "unknown"
+        }
+      },
+      "avg_profit_loss_pct": 0.0,
+      "avg_win_rate": 0.0,
+      "total_trades": 0
+    }
+  },
+  "by_symbol": {
+    "BTCUSDT": {
+      "30m": {
+        "profit_loss_pct": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "primary_strategy": "unknown"
+      },
+      "1h": {
+        "profit_loss_pct": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "primary_strategy": "unknown"
+      },
+      "4h": {
+        "profit_loss_pct": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "primary_strategy": "unknown"
+      },
+      "1d": {
+        "profit_loss_pct": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "primary_strategy": "unknown"
+      }
+    }
+  },
+  "by_strategy": {
+    "unknown": {
+      "usage_count": 4,
+      "avg_profit_loss_pct": 0.0,
+      "avg_win_rate": 0.0,
+      "total_trades": 0
+    }
+  },
+  "overall": {
+    "timeframes": {
+      "30m": {
+        "avg_profit_loss_pct": 0.0,
+        "avg_win_rate": 0.0,
+        "total_trades": 0
+      },
+      "1h": {
+        "avg_profit_loss_pct": 0.0,
+        "avg_win_rate": 0.0,
+        "total_trades": 0
+      },
+      "4h": {
+        "avg_profit_loss_pct": 0.0,
+        "avg_win_rate": 0.0,
+        "total_trades": 0
+      },
+      "1d": {
+        "avg_profit_loss_pct": 0.0,
+        "avg_win_rate": 0.0,
+        "total_trades": 0
+      }
+    },
+    "best_timeframe": "30m",
+    "best_pl": 0
+  }
+}
