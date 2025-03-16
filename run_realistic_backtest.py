@@ -1286,14 +1286,14 @@ class RealisticBacktest:
     
     def run_backtest(self, start_idx=None, end_idx=None):
         """
-        Chạy backtest
+        Chạy backtest và phân tích chi tiết hiệu suất các thuật toán
         
         Args:
             start_idx (int): Vị trí bắt đầu backtest
             end_idx (int): Vị trí kết thúc backtest
             
         Returns:
-            dict: Kết quả backtest
+            dict: Kết quả backtest với phân tích sâu về thuật toán
         """
         if self.data is None:
             logger.error("Chưa tải dữ liệu. Hãy gọi load_data() trước.")
@@ -1876,10 +1876,25 @@ def main():
     """
     logger.info("=== BẮT ĐẦU BACKTEST THỰC TẾ ===")
     
-    # Danh sách cặp tiền 
-    symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "AVAXUSDT", "DOGEUSDT", "XRPUSDT", "ADAUSDT", "LINKUSDT", "DOTUSDT"]
-    timeframe = "1h"
-    test_period = 30  # Test 30 ngày
+    # Danh sách cặp tiền có thanh khoản cao (Top 20 crypto)
+    symbols = [
+        "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", 
+        "AVAXUSDT", "DOGEUSDT", "XRPUSDT", "ADAUSDT", 
+        "LINKUSDT", "DOTUSDT", "MATICUSDT", "LTCUSDT", 
+        "UNIUSDT", "ATOMUSDT", "ETCUSDT", "TRXUSDT",
+        "AAVEUSDT", "NEARUSDT", "FILUSDT", "ALGOUSDT"
+    ]
+    
+    # Khung thời gian đa dạng để so sánh
+    timeframes = ["30m", "1h", "4h", "1d"]
+    
+    # Điều chỉnh thời gian test dựa trên khung thời gian
+    test_periods = {
+        "30m": 10,  # 10 ngày với nến 30m
+        "1h": 20,   # 20 ngày với nến 1h
+        "4h": 40,   # 40 ngày với nến 4h
+        "1d": 80    # 80 ngày với nến 1d
+    }
     
     # Các mức vốn để test
     account_balances = [300, 600]
@@ -1901,6 +1916,16 @@ def main():
         }
     }
     
+    # Thêm phân tích theo khung thời gian
+    combined_results['by_timeframe'] = {}
+    
+    # Tạo thư mục lưu kết quả
+    results_dir = Path('realistic_backtest_results')
+    if not results_dir.exists():
+        os.makedirs(results_dir)
+    
+    logger.info("=== PHÂN TÍCH THUẬT TOÁN TRÊN NHIỀU CẶP TIỀN VÀ KHUNG THỜI GIAN ===")
+    
     for initial_balance in account_balances:
         combined_results['by_balance'][initial_balance] = {
             'total_trades': 0,
@@ -1910,22 +1935,63 @@ def main():
             'profit_pct': 0,
         }
         
-        for symbol in symbols:
-            logger.info(f"Chạy backtest cho {symbol} với tài khoản ${initial_balance}")
+        # Backtest trên mỗi khung thời gian
+        for timeframe in timeframes:
+            test_period = test_periods[timeframe]
             
-            # Tạo instance backtest
-            backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
+            logger.info(f"=== KHUNG THỜI GIAN: {timeframe} ({test_period} ngày) ===")
             
-            # Tải dữ liệu
-            if not backtest.load_data():
-                logger.error(f"Không thể tải dữ liệu cho {symbol}. Bỏ qua.")
-                continue
+            if timeframe not in combined_results['by_timeframe']:
+                combined_results['by_timeframe'][timeframe] = {
+                    'total_trades': 0,
+                    'winning_trades': 0,
+                    'win_rate': 0,
+                    'total_profit': 0,
+                    'profit_pct': 0,
+                    'max_drawdown': 0,
+                    'strategy_usage': {},
+                    'market_conditions': {}
+                }
             
-            # Chạy backtest
-            stats = backtest.run_backtest()
-            
-            # Lưu kết quả
-            backtest.save_results()
+            # Duyệt qua từng cặp tiền để backtest
+            for symbol in symbols:
+                logger.info(f"Chạy backtest cho {symbol} {timeframe} với tài khoản ${initial_balance}")
+                
+                # Tạo instance backtest
+                backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
+                
+                # Tải dữ liệu
+                if not backtest.load_data():
+                    logger.error(f"Không thể tải dữ liệu cho {symbol} {timeframe}. Bỏ qua.")
+                    continue
+                
+                # Chạy backtest và lấy thống kê chi tiết
+                stats = backtest.run_backtest()
+                
+                # Lưu kết quả chi tiết
+                backtest.save_results()
+                
+                # Ghi lại thuật toán nào được sử dụng nhiều nhất và hiệu quả nhất
+                if stats and 'strategy_stats' in stats:
+                    for strategy, strategy_stats in stats['strategy_stats'].items():
+                        # Lưu thông tin sử dụng chiến lược
+                        if strategy not in combined_results['by_timeframe'][timeframe]['strategy_usage']:
+                            combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy] = {
+                                'usage_count': 0,
+                                'win_count': 0,
+                                'profit': 0
+                            }
+                        
+                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['usage_count'] += strategy_stats['total']
+                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['win_count'] += strategy_stats['win']
+                        combined_results['by_timeframe'][timeframe]['strategy_usage'][strategy]['profit'] += strategy_stats['profit']
+                
+                # Ghi lại phân loại thị trường
+                if stats and 'market_conditions' in stats:
+                    for condition, count in stats['market_conditions'].items():
+                        if condition not in combined_results['by_timeframe'][timeframe]['market_conditions']:
+                            combined_results['by_timeframe'][timeframe]['market_conditions'][condition] = 0
+                        combined_results['by_timeframe'][timeframe]['market_conditions'][condition] += count
             
             # Thêm kết quả vào bảng tổng hợp
             if stats:
