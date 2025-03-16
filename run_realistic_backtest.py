@@ -370,7 +370,11 @@ class AdaptiveRiskManager:
         drawdown = (account_balance - account_equity) / account_balance if account_balance > 0 else 0
         
         # Kiểm tra các điều kiện
-        max_positions_reached = positions_at_risk >= self.max_positions[risk_level]
+        # Tìm key gần nhất với risk_level trong max_positions
+        closest_risk_level = min(self.max_positions.keys(), key=lambda k: abs(k - risk_level))
+        logger.debug(f"Sử dụng mức rủi ro {closest_risk_level} thay vì {risk_level} vì không có trong cấu hình")
+        
+        max_positions_reached = positions_at_risk >= self.max_positions[closest_risk_level]
         risk_exposure_too_high = total_risk_exposure >= self.account_protection['max_risk_exposure']
         drawdown_too_high = drawdown >= self.account_protection['max_drawdown']
         total_positions_too_high = len(active_positions) >= self.account_protection['max_positions_total']
@@ -2079,9 +2083,84 @@ def main():
             if usage['usage_count'] > 0:
                 usage['win_rate'] = usage['win_count'] / usage['usage_count'] * 100
     
+    # Phân tích chuyên sâu về hiệu suất thuật toán trong từng điều kiện thị trường
+    algorithm_performance_by_market = {}
+    
+    # Phân tích hiệu suất của chiến lược/thuật toán trong từng điều kiện thị trường
+    for tf in combined_results['by_timeframe']:
+        tf_data = combined_results['by_timeframe'][tf]
+        market_conditions = tf_data.get('market_conditions', {})
+        strategy_usage = tf_data.get('strategy_usage', {})
+        
+        for strategy, usage in strategy_usage.items():
+            if strategy not in algorithm_performance_by_market:
+                algorithm_performance_by_market[strategy] = {
+                    'BULL': {'usage': 0, 'win': 0, 'profit': 0.0},
+                    'BEAR': {'usage': 0, 'win': 0, 'profit': 0.0},
+                    'SIDEWAYS': {'usage': 0, 'win': 0, 'profit': 0.0},
+                    'VOLATILE': {'usage': 0, 'win': 0, 'profit': 0.0},
+                    'NEUTRAL': {'usage': 0, 'win': 0, 'profit': 0.0},
+                    'total': {'usage': 0, 'win': 0, 'profit': 0.0}
+                }
+            
+            # Trong trường hợp này chúng ta không có dữ liệu chi tiết theo thị trường
+            # nên sẽ ghi nhận vào tổng thể
+            algorithm_performance_by_market[strategy]['total']['usage'] += usage.get('usage_count', 0)
+            algorithm_performance_by_market[strategy]['total']['win'] += usage.get('win_count', 0)
+            algorithm_performance_by_market[strategy]['total']['profit'] += usage.get('profit', 0)
+    
+    combined_results['algorithm_performance_by_market'] = algorithm_performance_by_market
+    
+    # Phân tích thích ứng theo khung thời gian
+    timeframe_adaptation = {}
+    for tf in combined_results['by_timeframe']:
+        if 'strategy_usage' in combined_results['by_timeframe'][tf]:
+            strategy_usage = combined_results['by_timeframe'][tf]['strategy_usage']
+            dominant_strategy = max(strategy_usage.items(), key=lambda x: x[1].get('usage_count', 0))[0] if strategy_usage else None
+            
+            timeframe_adaptation[tf] = {
+                'dominant_strategy': dominant_strategy,
+                'strategy_distribution': {k: v.get('usage_count', 0) for k, v in strategy_usage.items() if v.get('usage_count', 0) > 0},
+                'best_performing': max(strategy_usage.items(), key=lambda x: x[1].get('profit', 0))[0] if strategy_usage else None
+            }
+    
+    combined_results['timeframe_adaptation'] = timeframe_adaptation
+    
     # Lưu kết quả tổng hợp vào file
     with open('realistic_backtest_results/combined_results.json', 'w') as f:
         json.dump(combined_results, f, indent=4, default=str)
+    
+    # Lưu phân tích sâu vào file riêng
+    with open('realistic_backtest_results/algorithm_analysis.txt', 'w') as f:
+        f.write("=== PHÂN TÍCH SÂU HIỆU SUẤT THUẬT TOÁN ===\n\n")
+        
+        f.write("1. HIỆU SUẤT THUẬT TOÁN THEO KHUNG THỜI GIAN\n")
+        f.write("------------------------------------------\n\n")
+        
+        for tf, adaptation in timeframe_adaptation.items():
+            f.write(f"Khung thời gian: {tf}\n")
+            f.write(f"  - Chiến lược được sử dụng nhiều nhất: {adaptation['dominant_strategy']}\n")
+            f.write(f"  - Phân bố chiến lược: {adaptation['strategy_distribution']}\n")
+            f.write(f"  - Chiến lược hiệu quả nhất: {adaptation['best_performing']}\n\n")
+        
+        f.write("\n2. PHÂN TÍCH THUẬT TOÁN THEO ĐIỀU KIỆN THỊ TRƯỜNG\n")
+        f.write("---------------------------------------------\n\n")
+        
+        for strategy, market_data in algorithm_performance_by_market.items():
+            f.write(f"Thuật toán: {strategy}\n")
+            
+            total = market_data['total']
+            total_usage = total['usage']
+            
+            if total_usage > 0:
+                total_win_rate = (total['win'] / total_usage) * 100 if total_usage > 0 else 0
+                f.write(f"  - Hiệu suất tổng thể: {total_usage} lần sử dụng, Win rate: {total_win_rate:.2f}%, Profit: ${total['profit']:.2f}\n")
+                
+                # Thêm phân tích chi tiết theo điều kiện thị trường
+                # (Ghi chú: Trong mã hiện tại chúng ta không có dữ liệu chi tiết này)
+                f.write(f"  - Ghi chú: Phân tích chi tiết theo điều kiện thị trường cần log tỉ mỉ hơn trong cấu trúc thuật toán\n\n")
+            else:
+                f.write(f"  - Chưa có dữ liệu sử dụng cho thuật toán này\n\n")
     
     # Tạo báo cáo tổng hợp dạng text
     with open('realistic_backtest_results/summary_report.txt', 'w') as f:
@@ -2105,6 +2184,34 @@ def main():
         f.write("\n=== KẾT QUẢ THEO CHIẾN LƯỢC ===\n\n")
         for strategy, stats in combined_results['by_strategy'].items():
             f.write(f"{strategy}: {stats['total_trades']} giao dịch, Win rate: {stats['win_rate']:.2f}%, P/L: ${stats['total_profit']:.2f}\n")
+            
+        f.write("\n=== KẾT QUẢ THEO KHUNG THỜI GIAN ===\n\n")
+        for tf, stats in combined_results['by_timeframe'].items():
+            if 'win_rate' in stats and stats['total_trades'] > 0:
+                f.write(f"{tf}: {stats['total_trades']} giao dịch, Win rate: {stats['win_rate']:.2f}%, P/L: {stats['profit_pct']:.2f}%\n")
+                
+                # Chi tiết chiến lược theo khung thời gian
+                f.write(f"  Chiến lược được sử dụng trong {tf}:\n")
+                if 'strategy_usage' in stats:
+                    sorted_strategies = sorted(stats['strategy_usage'].items(), 
+                                              key=lambda x: x[1]['usage_count'], 
+                                              reverse=True)
+                    for strategy_name, usage in sorted_strategies:
+                        if 'usage_count' in usage and usage['usage_count'] > 0:
+                            f.write(f"    - {strategy_name}: {usage['usage_count']} lần, Win rate: {usage.get('win_rate', 0):.2f}%, Profit: ${usage['profit']:.2f}\n")
+                
+                # Phân loại thị trường theo khung thời gian
+                f.write(f"  Điều kiện thị trường trong {tf}:\n")
+                if 'market_conditions' in stats:
+                    total_candles = sum(stats['market_conditions'].values())
+                    sorted_conditions = sorted(stats['market_conditions'].items(), 
+                                              key=lambda x: x[1], 
+                                              reverse=True)
+                    for condition, count in sorted_conditions:
+                        if total_candles > 0:
+                            percentage = count / total_candles * 100
+                            f.write(f"    - {condition}: {count} nến ({percentage:.1f}%)\n")
+                f.write("\n")
     
     logger.info("=== KẾT THÚC BACKTEST THỰC TẾ ===")
     logger.info(f"Xem báo cáo chi tiết trong realistic_backtest_results/summary_report.txt")
