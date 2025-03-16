@@ -1,0 +1,56 @@
+{
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "SOLUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "XRPUSDT"
+  ],
+  "timeframes": [
+    "1h",
+    "4h",
+    "1d"
+  ],
+  "risk_levels": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "test_days": 30,
+  "strategies": [
+    "ema_crossover",
+    "macd_divergence",
+    "rsi_extreme",
+    "supertrend",
+    "bollinger_bands_squeeze",
+    "adaptive_mode",
+    "hedge_mode"
+  ],
+  "parallel_tests": 4,
+  "performance_metrics": {
+    "min_win_rate": 55,
+    "max_drawdown": 20,
+    "min_profit_factor": 1.5,
+    "min_sharpe_ratio": 1.0
+  },
+  "consistency_thresholds": {
+    "max_signal_conflict": 10,
+    "max_position_overlap": 5,
+    "min_strategy_agreement": 70
+  },
+  "report_formats": [
+    "json",
+    "html",
+    "md"
+  ],
+  "data_sources": {
+    "use_historical_data": true,
+    "historical_data_dir": "data",
+    "download_missing_data": true
+  },
+  "bot_diagnostic_config": "bot_diagnostic_config.json",
+  "strategy_conflict_config": "strategy_conflict_config.json",
+  "signal_analyzer_config": "signal_analyzer_config.json"
+}
