@@ -1,78 +1,29 @@
 {
-    "filter_settings": {
-        "multi_timeframe": {
-            "enabled": true,
-            "min_confirmations": 2,
-            "timeframes": ["1d", "4h", "1h", "30m"],
-            "weight": {
-                "1d": 0.4,
-                "4h": 0.3,
-                "1h": 0.2,
-                "30m": 0.1
-            }
+    "volume_min_threshold": 1.0,
+    "multi_timeframe_agreement": true,
+    "min_trend_strength": 0.005,
+    "max_risk_per_trade": 0.02,
+    "min_tf_agreement_count": 2,
+    "market_regime_filters": {
+        "trending": {
+            "volume_threshold": 1.2,
+            "trend_strength": 0.008
         },
-        "market_regime": {
-            "enabled": true,
-            "preferred_regimes": {
-                "LONG": ["BULL", "STRONG_BULL", "RECOVERY"],
-                "SHORT": ["BEAR", "STRONG_BEAR", "DISTRIBUTION"]
-            },
-            "avoid_regimes": ["CHOPPY", "EXTREME_VOLATILE"]
+        "ranging": {
+            "volume_threshold": 0.9,
+            "trend_strength": 0.003
         },
-        "time_based": {
-            "enabled": true,
-            "preferred_windows": {
-                "london_open": {
-                    "hours": [15, 16],
-                    "preferred_direction": "SHORT",
-                    "boost_factor": 1.25
-                },
-                "ny_open": {
-                    "hours": [20, 21, 22],
-                    "preferred_direction": "SHORT",
-                    "boost_factor": 1.25
-                },
-                "daily_close": {
-                    "hours": [6, 7],
-                    "preferred_direction": "LONG",
-                    "boost_factor": 1.0
-                }
-            },
-            "default_boost": 0.8
+        "volatile": {
+            "volume_threshold": 1.5,
+            "trend_strength": 0.01
         },
-        "volume_confirmation": {
-            "enabled": true,
-            "min_volume_ratio": 1.2,
-            "lookback_periods": 20
+        "bull": {
+            "volume_threshold": 1.1,
+            "trend_strength": 0.007
         },
-        "trend_alignment": {
-            "enabled": true,
-            "lookback_periods": 100,
-            "min_slope": 0.01
-        },
-        "sl_tp_optimizations": {
-            "dynamic_sl": {
-                "trending": {
-                    "sl_atr_mult": 2.0,
-                    "tp_atr_mult": 3.5
-                },
-                "ranging": {
-                    "sl_atr_mult": 1.7,
-                    "tp_atr_mult": 3.0
-                },
-                "volatile": {
-                    "sl_atr_mult": 1.9,
-                    "tp_atr_mult": 3.2
-                }
-            }
+        "bear": {
+            "volume_threshold": 1.3,
+            "trend_strength": 0.009
         }
-    },
-    "weights": {
-        "multi_timeframe": 0.3,
-        "market_regime": 0.25,
-        "time_based": 0.2,
-        "volume_confirmation": 0.15,
-        "trend_alignment": 0.1
-    },
-    "score_threshold": 0.65
+    }
 }

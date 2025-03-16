@@ -1,0 +1,22 @@
+{
+    "original": {
+        "win_rate": 100.0,
+        "profit_factor": 0,
+        "net_profit": 1.248810227030028,
+        "total_trades": 2
+    },
+    "improved": {
+        "win_rate": 100.0,
+        "profit_factor": 0,
+        "net_profit": 3.2000000000000064,
+        "total_trades": 1,
+        "filtered_signals": 1,
+        "filter_rate": 50.0
+    },
+    "comparison": {
+        "win_rate_change": 0.0,
+        "profit_factor_change": 0,
+        "net_profit_change": 1.9511897729699783
+    },
+    "timestamp": "2025-03-16 06:41:59"
+}

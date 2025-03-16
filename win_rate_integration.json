@@ -1,0 +1,25 @@
+{
+    "components": {
+        "signal_filter": {
+            "class": "EnhancedSignalFilter",
+            "config_path": "configs/enhanced_filter_config.json",
+            "enabled": true
+        },
+        "sltp_calculator": {
+            "class": "ImprovedSLTPCalculator",
+            "config_path": "configs/improved_win_rate_config.json",
+            "enabled": true
+        },
+        "win_rate_adapter": {
+            "class": "ImprovedWinRateAdapter",
+            "enabled": true
+        }
+    },
+    "integration_points": {
+        "signal_processing": "before_position_open",
+        "sltp_adjustment": "before_order_placement",
+        "filter_application": "before_signal_execution"
+    },
+    "status": "active",
+    "version": "1.0.0"
+}

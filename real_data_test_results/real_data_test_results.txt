@@ -1,0 +1,23 @@
+=== KẾT QUẢ BACKTEST VỚI DỮ LIỆU THỰC TẾ ===
+
+1. Hệ thống gốc (không có bộ lọc):
+   - Tổng số giao dịch: 2
+   - Win Rate: 100.00%
+   - Profit Factor: 0.00
+   - Lợi nhuận ròng: $1.25
+
+2. Hệ thống cải tiến (có bộ lọc):
+   - Tổng số giao dịch: 1
+   - Tín hiệu bị lọc: 1 (50.00%)
+   - Win Rate: 100.00%
+   - Profit Factor: 0.00
+   - Lợi nhuận ròng: $3.20
+
+3. So sánh:
+   - Thay đổi Win Rate: +0.00%
+   - Thay đổi Profit Factor: +0.00
+   - Thay đổi Lợi nhuận ròng: $+1.95
+
+4. Chi tiết mỗi cặp giao dịch:
+   - BTCUSDT: 1 giao dịch, Win Rate: 100.00%
+   - ETHUSDT: 1 giao dịch, Win Rate: 100.00%
