@@ -334,7 +334,11 @@ class AdaptiveRiskManager:
         position_value = position_size * entry_price
         
         # Giới hạn theo phân bổ vốn cho mức rủi ro này
-        max_allocation = account_balance * self.risk_allocation[risk_level]
+        # Tìm key gần nhất với risk_level trong risk_allocation
+        closest_risk_level = min(self.risk_allocation.keys(), key=lambda k: abs(k - risk_level))
+        logger.debug(f"Sử dụng mức phân bổ cho rủi ro {closest_risk_level} thay vì {risk_level} vì không có trong cấu hình")
+        
+        max_allocation = account_balance * self.risk_allocation[closest_risk_level]
         if position_value > max_allocation:
             position_size = max_allocation / entry_price
         
