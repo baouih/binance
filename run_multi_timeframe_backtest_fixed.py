@@ -60,6 +60,14 @@ def run_backtest_for_timeframe(symbol, timeframe, test_period, initial_balance):
         # Chạy backtest
         results = backtest.run_backtest()
         
+        # Log kết quả để debug
+        logger.info(f"Kết quả backtest cho {symbol} {timeframe}: {results}")
+        
+        # Kiểm tra kết quả hợp lệ
+        if not results or not isinstance(results, dict):
+            logger.error(f"Kết quả không hợp lệ cho {symbol} {timeframe}")
+            raise Exception("Kết quả backtest không hợp lệ")
+            
         # Xác định chiến lược chính dựa trên số lượng giao dịch
         primary_strategy = "unknown"
         max_trades = 0
