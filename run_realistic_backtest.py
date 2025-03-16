@@ -1872,34 +1872,141 @@ class RealisticBacktest:
 
 def main():
     """
-    Hàm chính
+    Hàm chính - Chạy backtest trên nhiều cặp tiền và mức vốn
     """
     logger.info("=== BẮT ĐẦU BACKTEST THỰC TẾ ===")
     
-    # Danh sách cặp tiền
-    symbols = ["BTCUSDT"]
+    # Danh sách cặp tiền 
+    symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "AVAXUSDT", "DOGEUSDT", "XRPUSDT", "ADAUSDT", "LINKUSDT", "DOTUSDT"]
     timeframe = "1h"
-    test_period = 20  # Giảm xuống để thử nghiệm nhanh
-    initial_balance = 10000.0
+    test_period = 30  # Test 30 ngày
     
-    for symbol in symbols:
-        logger.info(f"Chạy backtest cho {symbol}")
+    # Các mức vốn để test
+    account_balances = [300, 600]
+    
+    # Lưu kết quả tổng hợp
+    combined_results = {
+        'by_symbol': {},
+        'by_balance': {},
+        'by_strategy': {},
+        'by_risk': {},
+        'overall': {
+            'total_trades': 0,
+            'winning_trades': 0,
+            'losing_trades': 0,
+            'win_rate': 0,
+            'total_profit': 0,
+            'profit_pct': 0,
+            'max_drawdown': 0,
+        }
+    }
+    
+    for initial_balance in account_balances:
+        combined_results['by_balance'][initial_balance] = {
+            'total_trades': 0,
+            'winning_trades': 0,
+            'win_rate': 0,
+            'total_profit': 0,
+            'profit_pct': 0,
+        }
         
-        # Tạo instance backtest
-        backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
+        for symbol in symbols:
+            logger.info(f"Chạy backtest cho {symbol} với tài khoản ${initial_balance}")
+            
+            # Tạo instance backtest
+            backtest = RealisticBacktest(symbol, timeframe, test_period, initial_balance)
+            
+            # Tải dữ liệu
+            if not backtest.load_data():
+                logger.error(f"Không thể tải dữ liệu cho {symbol}. Bỏ qua.")
+                continue
+            
+            # Chạy backtest
+            stats = backtest.run_backtest()
+            
+            # Lưu kết quả
+            backtest.save_results()
+            
+            # Thêm kết quả vào bảng tổng hợp
+            if stats:
+                # Lưu theo symbol
+                combined_results['by_symbol'][symbol] = {
+                    'total_trades': stats['total_trades'],
+                    'winning_trades': stats['winning_trades'],
+                    'win_rate': stats['win_rate'],
+                    'total_profit': stats['total_profit'],
+                    'profit_pct': stats['total_profit_pct'],
+                    'max_drawdown': stats['max_drawdown_pct'],
+                }
+                
+                # Cập nhật tổng theo balance
+                combined_results['by_balance'][initial_balance]['total_trades'] += stats['total_trades']
+                combined_results['by_balance'][initial_balance]['winning_trades'] += stats['winning_trades']
+                combined_results['by_balance'][initial_balance]['total_profit'] += stats['total_profit']
+                
+                # Cập nhật theo chiến lược
+                for strategy, strategy_stats in stats['strategy_stats'].items():
+                    if strategy not in combined_results['by_strategy']:
+                        combined_results['by_strategy'][strategy] = {
+                            'total_trades': 0,
+                            'winning_trades': 0,
+                            'win_rate': 0,
+                            'total_profit': 0,
+                        }
+                    
+                    combined_results['by_strategy'][strategy]['total_trades'] += strategy_stats['total']
+                    combined_results['by_strategy'][strategy]['winning_trades'] += strategy_stats['win']
+                    combined_results['by_strategy'][strategy]['total_profit'] += strategy_stats['profit']
+                
+                # Cập nhật tổng thể
+                combined_results['overall']['total_trades'] += stats['total_trades']
+                combined_results['overall']['winning_trades'] += stats['winning_trades']
+                combined_results['overall']['total_profit'] += stats['total_profit']
+                combined_results['overall']['max_drawdown'] = max(combined_results['overall']['max_drawdown'], stats['max_drawdown_pct'])
+    
+    # Tính tỷ lệ thắng tổng thể và các chỉ số tổng hợp khác
+    if combined_results['overall']['total_trades'] > 0:
+        combined_results['overall']['win_rate'] = combined_results['overall']['winning_trades'] / combined_results['overall']['total_trades'] * 100
+        combined_results['overall']['profit_pct'] = combined_results['overall']['total_profit'] / (len(account_balances) * len(symbols) * account_balances[0]) * 100
+    
+    for balance in account_balances:
+        if combined_results['by_balance'][balance]['total_trades'] > 0:
+            combined_results['by_balance'][balance]['win_rate'] = combined_results['by_balance'][balance]['winning_trades'] / combined_results['by_balance'][balance]['total_trades'] * 100
+            combined_results['by_balance'][balance]['profit_pct'] = combined_results['by_balance'][balance]['total_profit'] / (len(symbols) * balance) * 100
+    
+    for strategy in combined_results['by_strategy']:
+        if combined_results['by_strategy'][strategy]['total_trades'] > 0:
+            combined_results['by_strategy'][strategy]['win_rate'] = combined_results['by_strategy'][strategy]['winning_trades'] / combined_results['by_strategy'][strategy]['total_trades'] * 100
+    
+    # Lưu kết quả tổng hợp vào file
+    with open('realistic_backtest_results/combined_results.json', 'w') as f:
+        json.dump(combined_results, f, indent=4, default=str)
+    
+    # Tạo báo cáo tổng hợp dạng text
+    with open('realistic_backtest_results/summary_report.txt', 'w') as f:
+        f.write("=== BÁO CÁO TỔNG HỢP BACKTEST ===\n\n")
         
-        # Tải dữ liệu
-        if not backtest.load_data():
-            logger.error(f"Không thể tải dữ liệu cho {symbol}. Bỏ qua.")
-            continue
+        f.write(f"Tổng số giao dịch: {combined_results['overall']['total_trades']}\n")
+        f.write(f"Số giao dịch thắng: {combined_results['overall']['winning_trades']}\n")
+        f.write(f"Tỷ lệ thắng: {combined_results['overall']['win_rate']:.2f}%\n")
+        f.write(f"Tổng lợi nhuận: ${combined_results['overall']['total_profit']:.2f}\n")
+        f.write(f"Tỷ lệ lợi nhuận trung bình: {combined_results['overall']['profit_pct']:.2f}%\n")
+        f.write(f"Drawdown tối đa: {combined_results['overall']['max_drawdown']:.2f}%\n\n")
         
-        # Chạy backtest
-        backtest.run_backtest()
+        f.write("=== KẾT QUẢ THEO COIN ===\n\n")
+        for symbol, stats in combined_results['by_symbol'].items():
+            f.write(f"{symbol}: {stats['total_trades']} giao dịch, Win rate: {stats['win_rate']:.2f}%, P/L: {stats['profit_pct']:.2f}%, Drawdown: {stats['max_drawdown']:.2f}%\n")
         
-        # Lưu kết quả
-        backtest.save_results()
+        f.write("\n=== KẾT QUẢ THEO KÍCH THƯỚC TÀI KHOẢN ===\n\n")
+        for balance, stats in combined_results['by_balance'].items():
+            f.write(f"${balance}: {stats['total_trades']} giao dịch, Win rate: {stats['win_rate']:.2f}%, P/L: {stats['profit_pct']:.2f}%\n")
+        
+        f.write("\n=== KẾT QUẢ THEO CHIẾN LƯỢC ===\n\n")
+        for strategy, stats in combined_results['by_strategy'].items():
+            f.write(f"{strategy}: {stats['total_trades']} giao dịch, Win rate: {stats['win_rate']:.2f}%, P/L: ${stats['total_profit']:.2f}\n")
     
     logger.info("=== KẾT THÚC BACKTEST THỰC TẾ ===")
+    logger.info(f"Xem báo cáo chi tiết trong realistic_backtest_results/summary_report.txt")
 
 if __name__ == "__main__":
     main()
