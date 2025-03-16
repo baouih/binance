@@ -27,11 +27,21 @@ MARKET_REGIME_STRONG_BEARISH = "strong_bearish"
 # Các thông số ATR theo chế độ thị trường
 ATR_MULTIPLIERS = {
     # (Stop Loss, Take Profit)
-    MARKET_REGIME_STRONG_BULLISH: (2.0, 3.0),
-    MARKET_REGIME_BULLISH: (2.5, 2.5),
-    MARKET_REGIME_NEUTRAL: (2.0, 2.0),
-    MARKET_REGIME_BEARISH: (2.5, 2.5),
-    MARKET_REGIME_STRONG_BEARISH: (2.0, 3.0)
+    MARKET_REGIME_STRONG_BULLISH: (2.0, 3.5),
+    MARKET_REGIME_BULLISH: (2.5, 3.0),
+    MARKET_REGIME_NEUTRAL: (2.0, 2.5),
+    MARKET_REGIME_BEARISH: (2.5, 3.0),
+    MARKET_REGIME_STRONG_BEARISH: (2.0, 3.5)
+}
+
+# Các thông số ATR theo chế độ thị trường với rủi ro cao (25-30%)
+HIGH_RISK_ATR_MULTIPLIERS = {
+    # (Stop Loss, Take Profit)
+    MARKET_REGIME_STRONG_BULLISH: (1.8, 4.0),
+    MARKET_REGIME_BULLISH: (2.0, 3.5),
+    MARKET_REGIME_NEUTRAL: (1.8, 3.0),
+    MARKET_REGIME_BEARISH: (2.0, 3.5),
+    MARKET_REGIME_STRONG_BEARISH: (1.8, 4.0)
 }
 
 class AdaptiveRiskManager:
@@ -106,13 +116,15 @@ class AdaptiveRiskManager:
             
         return volatility_ratio
     
-    def get_market_based_multipliers(self, market_regime: str, custom_multiplier: float = None) -> Tuple[float, float]:
+    def get_market_based_multipliers(self, market_regime: str, custom_multiplier: float = None,
+                                 risk_level: float = 15.0) -> Tuple[float, float]:
         """
-        Lấy bội số ATR dựa trên chế độ thị trường
+        Lấy bội số ATR dựa trên chế độ thị trường và mức độ rủi ro
         
         Args:
             market_regime: Chế độ thị trường hiện tại
             custom_multiplier: Bội số tùy chỉnh (nếu được cung cấp)
+            risk_level: Mức độ rủi ro (phần trăm)
             
         Returns:
             Tuple (sl_multiplier, tp_multiplier)
@@ -121,12 +133,19 @@ class AdaptiveRiskManager:
         if custom_multiplier is not None:
             return (custom_multiplier, custom_multiplier)
         
-        # Sử dụng bội số mặc định theo chế độ thị trường
-        if market_regime in ATR_MULTIPLIERS:
-            return ATR_MULTIPLIERS[market_regime]
-        
-        # Mặc định nếu không tìm thấy chế độ thị trường
-        return (2.0, 2.0)
+        # Sử dụng bội số dựa trên mức độ rủi ro
+        if risk_level >= 25.0:
+            # Sử dụng bội số HIGH_RISK cho rủi ro cao (25-30%)
+            if market_regime in HIGH_RISK_ATR_MULTIPLIERS:
+                return HIGH_RISK_ATR_MULTIPLIERS[market_regime]
+            # Mặc định cho rủi ro cao
+            return (1.8, 3.5)
+        else:
+            # Sử dụng bội số mặc định cho rủi ro thông thường
+            if market_regime in ATR_MULTIPLIERS:
+                return ATR_MULTIPLIERS[market_regime]
+            # Mặc định cho rủi ro thông thường
+            return (2.0, 2.5)
     
     def adjust_for_volatility(self, multiplier: float, volatility_ratio: float) -> float:
         """
@@ -151,7 +170,7 @@ class AdaptiveRiskManager:
     
     def calculate_adaptive_stoploss(self, df: pd.DataFrame, position_type: str, 
                                    entry_price: float, market_regime: str = "neutral",
-                                   custom_multiplier: float = None) -> float:
+                                   custom_multiplier: float = None, risk_level: float = 15.0) -> float:
         """
         Tính toán mức stop loss thích ứng dựa trên ATR
         
@@ -161,17 +180,23 @@ class AdaptiveRiskManager:
             entry_price: Giá entry
             market_regime: Chế độ thị trường hiện tại
             custom_multiplier: Bội số tùy chỉnh
+            risk_level: Mức độ rủi ro (phần trăm, mặc định 15%)
             
         Returns:
             Giá stop loss
         """
         # Kiểm tra xem có dữ liệu ATR không
         if 'atr' not in df.columns or df['atr'].iloc[-1] is None or np.isnan(df['atr'].iloc[-1]):
-            # Sử dụng % mặc định nếu không có ATR
+            # Điều chỉnh sl_pct theo mức rủi ro
+            adjusted_sl_pct = self.default_sl_pct
+            if risk_level >= 25.0:
+                adjusted_sl_pct = self.default_sl_pct * 0.9  # Gần hơn cho rủi ro cao
+            
+            # Sử dụng % đã điều chỉnh
             if position_type.lower() == 'long':
-                return entry_price * (1 - self.default_sl_pct)
+                return entry_price * (1 - adjusted_sl_pct)
             else:
-                return entry_price * (1 + self.default_sl_pct)
+                return entry_price * (1 + adjusted_sl_pct)
         
         # Lấy ATR hiện tại
         current_atr = df['atr'].iloc[-1]
@@ -179,8 +204,8 @@ class AdaptiveRiskManager:
         # Tính tỷ lệ biến động
         volatility_ratio = self.calculate_volatility_ratio(df)
         
-        # Lấy bội số theo chế độ thị trường
-        sl_multiplier, _ = self.get_market_based_multipliers(market_regime, custom_multiplier)
+        # Lấy bội số theo chế độ thị trường và mức rủi ro
+        sl_multiplier, _ = self.get_market_based_multipliers(market_regime, custom_multiplier, risk_level)
         
         # Điều chỉnh bội số theo biến động
         adjusted_multiplier = self.adjust_for_volatility(sl_multiplier, volatility_ratio)
@@ -195,7 +220,7 @@ class AdaptiveRiskManager:
     
     def calculate_adaptive_takeprofit(self, df: pd.DataFrame, position_type: str, 
                                      entry_price: float, market_regime: str = "neutral",
-                                     custom_multiplier: float = None) -> float:
+                                     custom_multiplier: float = None, risk_level: float = 15.0) -> float:
         """
         Tính toán mức take profit thích ứng dựa trên ATR
         
@@ -205,17 +230,23 @@ class AdaptiveRiskManager:
             entry_price: Giá entry
             market_regime: Chế độ thị trường hiện tại
             custom_multiplier: Bội số tùy chỉnh
+            risk_level: Mức độ rủi ro (phần trăm, mặc định 15%)
             
         Returns:
             Giá take profit
         """
         # Kiểm tra xem có dữ liệu ATR không
         if 'atr' not in df.columns or df['atr'].iloc[-1] is None or np.isnan(df['atr'].iloc[-1]):
-            # Sử dụng % mặc định nếu không có ATR
+            # Điều chỉnh tp_pct theo mức rủi ro
+            adjusted_tp_pct = self.default_tp_pct
+            if risk_level >= 25.0:
+                adjusted_tp_pct = self.default_tp_pct * 1.3  # Xa hơn cho rủi ro cao
+            
+            # Sử dụng % đã điều chỉnh
             if position_type.lower() == 'long':
-                return entry_price * (1 + self.default_tp_pct)
+                return entry_price * (1 + adjusted_tp_pct)
             else:
-                return entry_price * (1 - self.default_tp_pct)
+                return entry_price * (1 - adjusted_tp_pct)
         
         # Lấy ATR hiện tại
         current_atr = df['atr'].iloc[-1]
@@ -223,8 +254,8 @@ class AdaptiveRiskManager:
         # Tính tỷ lệ biến động
         volatility_ratio = self.calculate_volatility_ratio(df)
         
-        # Lấy bội số theo chế độ thị trường
-        _, tp_multiplier = self.get_market_based_multipliers(market_regime, custom_multiplier)
+        # Lấy bội số theo chế độ thị trường và mức rủi ro
+        _, tp_multiplier = self.get_market_based_multipliers(market_regime, custom_multiplier, risk_level)
         
         # Điều chỉnh bội số theo biến động
         adjusted_multiplier = self.adjust_for_volatility(tp_multiplier, volatility_ratio)

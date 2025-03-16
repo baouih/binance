@@ -1,0 +1,114 @@
+{
+  "version": "1.0.0",
+  "description": "Cấu hình chiến lược rủi ro cao (25-30%) và đa vị thế",
+  "risk_config": {
+    "risk_levels": {
+      "default": 25.0,
+      "high": 30.0,
+      "medium": 20.0,
+      "low": 15.0
+    },
+    "max_drawdown": {
+      "warning": 25.0,
+      "reduce_size": 30.0,
+      "stop_trading": 35.0
+    },
+    "position_limits": {
+      "max_positions": 10,
+      "max_positions_per_coin": 3,
+      "max_correlated_positions": 5
+    }
+  },
+  "capital_allocation": {
+    "btc": 0.4,
+    "eth": 0.3,
+    "tier1_alts": 0.2,
+    "opportunity": 0.1,
+    "tier1_coins": ["SOL", "BNB", "LINK"],
+    "tier2_coins": ["DOT", "ADA", "AVAX", "MATIC"],
+    "opportunity_coins": ["DOGE", "UNI", "XRP", "LTC", "ATOM"]
+  },
+  "timeframe_allocation": {
+    "1d": 0.4,
+    "4h": 0.4,
+    "1h": 0.2
+  },
+  "trading_windows": {
+    "london_open": {
+      "start_hour": 15,
+      "start_minute": 0,
+      "end_hour": 17,
+      "end_minute": 0,
+      "priority": "high",
+      "preferred_strategy": "counter_trend",
+      "preferred_direction": "short"
+    },
+    "ny_open": {
+      "start_hour": 20,
+      "start_minute": 30,
+      "end_hour": 22,
+      "end_minute": 30,
+      "priority": "high",
+      "preferred_strategy": "counter_trend",
+      "preferred_direction": "short"
+    },
+    "daily_close": {
+      "start_hour": 6,
+      "start_minute": 30,
+      "end_hour": 7,
+      "end_minute": 30,
+      "priority": "medium",
+      "preferred_strategy": "counter_trend",
+      "preferred_direction": "long"
+    }
+  },
+  "counter_trend_strategy": {
+    "entry_condition": {
+      "rsi_overbought": 75,
+      "rsi_oversold": 25,
+      "atr_multiplier": 2.5,
+      "volume_threshold": 1.5,
+      "confirmations_required": 2
+    },
+    "exit_condition": {
+      "trailing_stop_activation": 2.5,
+      "trailing_stop_distance": "dynamic",
+      "take_profit_atr_multiplier": 3.0,
+      "take_profit_adjustment": {
+        "bullish": 3.5,
+        "bearish": 3.0,
+        "neutral": 2.5
+      }
+    },
+    "filters": {
+      "adx_min": 20,
+      "volatility_min": 0.02,
+      "volume_percentile_min": 40
+    }
+  },
+  "risk_management": {
+    "correlation_threshold": 0.7,
+    "max_risk_per_market_regime": {
+      "trending": 1.0,
+      "ranging": 0.8,
+      "volatile": 0.6,
+      "quiet": 0.4
+    },
+    "dynamic_sizing": {
+      "enabled": true,
+      "performance_lookback": 20,
+      "adjustment_factor": 0.2
+    },
+    "trailing_stop": {
+      "activation_threshold": 2.5,
+      "step_percent": 0.5,
+      "acceleration_factor": 0.02,
+      "maximum_factor": 0.2
+    }
+  },
+  "market_hours_boost": {
+    "enabled": true,
+    "boost_factor": 1.25,
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "LINKUSDT"]
+  }
+}
