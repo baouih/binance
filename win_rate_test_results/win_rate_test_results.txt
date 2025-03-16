@@ -1,19 +1,19 @@
 === KẾT QUẢ BACKTEST ===
 
 1. Hệ thống gốc (không có bộ lọc):
-   - Tổng số giao dịch: 200
-   - Win Rate: 50.50%
-   - Profit Factor: 2.22
-   - Lợi nhuận ròng: $48.63
+   - Tổng số giao dịch: 300
+   - Win Rate: 56.00%
+   - Profit Factor: 2.79
+   - Lợi nhuận ròng: $112.10
 
 2. Hệ thống cải tiến (có bộ lọc):
-   - Tổng số giao dịch: 127
-   - Tín hiệu bị lọc: 73 (36.50%)
-   - Win Rate: 57.48%
-   - Profit Factor: 5.49
-   - Lợi nhuận ròng: $3512.22
+   - Tổng số giao dịch: 171
+   - Tín hiệu bị lọc: 129 (43.00%)
+   - Win Rate: 69.01%
+   - Profit Factor: 9.15
+   - Lợi nhuận ròng: $7094.62
 
 3. So sánh:
-   - Thay đổi Win Rate: +6.98%
-   - Thay đổi Profit Factor: +3.27
-   - Thay đổi Lợi nhuận ròng: $+3463.58
+   - Thay đổi Win Rate: +13.01%
+   - Thay đổi Profit Factor: +6.37
+   - Thay đổi Lợi nhuận ròng: $+6982.52
