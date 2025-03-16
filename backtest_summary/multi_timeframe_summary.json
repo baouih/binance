@@ -42,8 +42,8 @@
     "1d": {
       "symbols": {
         "BTCUSDT": {
-          "profit_loss_pct": 0,
-          "win_rate": 0,
+          "profit_loss_pct": 0.0,
+          "win_rate": 0.0,
           "total_trades": 0,
           "primary_strategy": "unknown"
         }
@@ -74,8 +74,8 @@
         "primary_strategy": "unknown"
       },
       "1d": {
-        "profit_loss_pct": 0,
-        "win_rate": 0,
+        "profit_loss_pct": 0.0,
+        "win_rate": 0.0,
         "total_trades": 0,
         "primary_strategy": "unknown"
       }

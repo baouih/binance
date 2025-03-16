@@ -1,0 +1,13 @@
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "1d",
+  "period": 80,
+  "initial_balance": 10000,
+  "final_balance": 10000,
+  "profit_loss_pct": 0.0,
+  "win_rate": 0.0,
+  "total_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "strategy_stats": {}
+}
