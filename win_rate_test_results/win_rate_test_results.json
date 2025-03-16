@@ -1,0 +1,22 @@
+{
+    "original": {
+        "win_rate": 50.5,
+        "profit_factor": 2.2219038067626493,
+        "net_profit": 48.633823229477954,
+        "total_trades": 200
+    },
+    "improved": {
+        "win_rate": 57.48031496062992,
+        "profit_factor": 5.487216758450811,
+        "net_profit": 3512.2181745773214,
+        "total_trades": 127,
+        "filtered_signals": 73,
+        "filter_rate": 36.5
+    },
+    "comparison": {
+        "win_rate_change": 6.980314960629919,
+        "profit_factor_change": 3.2653129516881614,
+        "net_profit_change": 3463.5843513478435
+    },
+    "timestamp": "2025-03-16 05:54:59"
+}

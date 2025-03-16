@@ -1,0 +1,32 @@
+{
+    "signal_filter": {
+        "volume_min_threshold": 1.0,
+        "multi_timeframe_agreement": true,
+        "min_trend_strength": 0.005,
+        "max_risk_per_trade": 0.02
+    },
+    "sl_tp_settings": {
+        "trending": {"sl_pct": 1.8, "tp_pct": 4.0},
+        "ranging": {"sl_pct": 1.3, "tp_pct": 2.5},
+        "volatile": {"sl_pct": 1.5, "tp_pct": 3.2},
+        "bull": {"sl_pct": 1.6, "tp_pct": 3.5},
+        "bear": {"sl_pct": 1.9, "tp_pct": 2.8},
+        "default": {"sl_pct": 1.5, "tp_pct": 3.0}
+    },
+    "market_conditions": {
+        "trending_threshold": 0.02,
+        "volatility_threshold": 0.015,
+        "volume_surge_threshold": 1.5
+    },
+    "timeframe_weights": {
+        "1d": 0.35,
+        "4h": 0.30,
+        "1h": 0.25,
+        "30m": 0.10
+    },
+    "backtest": {
+        "risk_level": 0.25,
+        "account_balance": 10000,
+        "test_periods": ["1m", "3m", "6m"]
+    }
+}
