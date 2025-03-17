@@ -1,0 +1,20 @@
+{
+    "volatility_threshold": 0.5,
+    "bollinger_squeeze_threshold": 0.1,
+    "keltner_factor": 1.5,
+    "adx_threshold": 25,
+    "position_size_reduction": 0.5,
+    "mean_reversion_enabled": true,
+    "squeeze_detection_enabled": true,
+    "volatility_filter_enabled": true,
+    "rsi_period": 14,
+    "divergence_window": 30,
+    "min_pivot_distance": 5,
+    "peak_threshold": 0.8,
+    "divergence_min_confidence": 0.5,
+    "sideways_tp_sl_ratio": 1.2,
+    "trending_tp_sl_ratio": 3.0,
+    "use_atr_targets": true,
+    "tp_atr_multiplier": 1.5,
+    "sl_atr_multiplier": 1.2
+}

@@ -500,6 +500,67 @@ class SidewaysMarketOptimizer:
         
         return current_squeeze_duration
     
+    def detect_rsi_divergence(self, df: pd.DataFrame) -> Dict:
+        """
+        Phát hiện RSI divergence để xác định xu hướng tiềm năng trong thị trường đi ngang
+        
+        Args:
+            df (pd.DataFrame): DataFrame với dữ liệu OHLC
+            
+        Returns:
+            Dict: Kết quả phát hiện divergence với thông tin chi tiết
+        """
+        # Kiểm tra cả hai loại divergence
+        bullish_result = self.divergence_detector.detect_divergence(df, is_bullish=True)
+        bearish_result = self.divergence_detector.detect_divergence(df, is_bullish=False)
+        
+        # Tạo đường dẫn biểu đồ nếu phát hiện divergence
+        chart_path = ""
+        if bullish_result["detected"] and bullish_result["confidence"] > 0.5:
+            chart_path = self.divergence_detector.visualize_divergence(
+                df, bullish_result, "BTC" if "btc" in str(df).lower() else "Symbol", 
+                save_path=f"charts/divergence/bullish_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
+            logger.info(f"Đã phát hiện bullish divergence với độ tin cậy {bullish_result['confidence']:.2f}")
+        elif bearish_result["detected"] and bearish_result["confidence"] > 0.5:
+            chart_path = self.divergence_detector.visualize_divergence(
+                df, bearish_result, "BTC" if "btc" in str(df).lower() else "Symbol",
+                save_path=f"charts/divergence/bearish_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
+            logger.info(f"Đã phát hiện bearish divergence với độ tin cậy {bearish_result['confidence']:.2f}")
+        
+        # Kết hợp divergence với đánh giá thị trường đi ngang
+        if self.is_sideways:
+            # Trong thị trường đi ngang, divergence có độ tin cậy cao hơn
+            confidence_multiplier = 1.2
+        else:
+            # Trong thị trường xu hướng, divergence ít tin cậy hơn
+            confidence_multiplier = 0.8
+        
+        # Tạo kết quả cuối cùng
+        if bullish_result["detected"] and bullish_result["confidence"] > bearish_result.get("confidence", 0):
+            signal = "buy"
+            confidence = bullish_result["confidence"] * confidence_multiplier
+            divergence_data = bullish_result
+        elif bearish_result["detected"] and bearish_result["confidence"] > bullish_result.get("confidence", 0):
+            signal = "sell"
+            confidence = bearish_result["confidence"] * confidence_multiplier
+            divergence_data = bearish_result
+        else:
+            signal = "neutral"
+            confidence = 0
+            divergence_data = {}
+        
+        return {
+            "signal": signal,
+            "confidence": min(confidence, 1.0),  # Giới hạn độ tin cậy tối đa là 1.0
+            "divergence_type": "bullish" if signal == "buy" else "bearish" if signal == "sell" else "none",
+            "chart_path": chart_path,
+            "details": divergence_data,
+            "price": df['close'].iloc[-1] if len(df) > 0 else None,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    
     def predict_breakout_direction(self, df: pd.DataFrame, window: int = 20) -> str:
         """
         Dự đoán hướng breakout từ sideways market
@@ -661,30 +722,25 @@ class SidewaysMarketOptimizer:
         # Phát hiện thị trường đi ngang
         is_sideways = self.detect_sideways_market(df, window)
         
-        # Tạo detector divergence
-        divergence_detector = RSIDivergenceDetector(
-            rsi_period=14,
-            divergence_window=30,
-            min_pivot_distance=5
-        )
+        # Sử dụng detector divergence đã khởi tạo
         
         # Phát hiện các loại divergence
-        bullish_divergence = divergence_detector.detect_divergence(df, is_bullish=True)
-        bearish_divergence = divergence_detector.detect_divergence(df, is_bullish=False)
+        bullish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=True)
+        bearish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=False)
         
         # Tạo tín hiệu giao dịch từ divergence
-        divergence_signal = divergence_detector.get_trading_signal(df)
+        divergence_signal = self.divergence_detector.get_trading_signal(df)
         
         # Tạo biểu đồ nếu có divergence
         chart_path = ""
         if bullish_divergence["detected"]:
-            chart_path = divergence_detector.visualize_divergence(
+            chart_path = self.divergence_detector.visualize_divergence(
                 df, bullish_divergence, symbol,
                 save_path=f"charts/divergence/{symbol}_bullish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             )
             logger.info(f"Phát hiện bullish divergence với độ tin cậy {bullish_divergence['confidence']:.2f}")
         elif bearish_divergence["detected"]:
-            chart_path = divergence_detector.visualize_divergence(
+            chart_path = self.divergence_detector.visualize_divergence(
                 df, bearish_divergence, symbol,
                 save_path=f"charts/divergence/{symbol}_bearish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             )
@@ -782,6 +838,24 @@ class SidewaysMarketOptimizer:
         chart_path = ""
         if is_sideways:
             chart_path = self.visualize_sideways_detection(df, symbol, window)
+            
+        # Phát hiện divergence
+        bullish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=True)
+        bearish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=False)
+        divergence_signal = self.divergence_detector.get_trading_signal(df)
+        
+        # Tạo biểu đồ divergence nếu phát hiện
+        divergence_chart_path = ""
+        if bullish_divergence["detected"]:
+            divergence_chart_path = self.divergence_detector.visualize_divergence(
+                df, bullish_divergence, symbol,
+                save_path=f"charts/divergence/{symbol}_bullish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
+        elif bearish_divergence["detected"]:
+            divergence_chart_path = self.divergence_detector.visualize_divergence(
+                df, bearish_divergence, symbol,
+                save_path=f"charts/divergence/{symbol}_bearish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
         
         # Tạo báo cáo
         report = {
@@ -798,6 +872,21 @@ class SidewaysMarketOptimizer:
             "suggested_tp_pct": tp_sl_adjustments.get("suggested_tp_pct", None),
             "suggested_sl_pct": tp_sl_adjustments.get("suggested_sl_pct", None),
             "chart_path": chart_path,
+            "divergence": {
+                "bullish": {
+                    "detected": bullish_divergence["detected"],
+                    "confidence": bullish_divergence["confidence"],
+                    "last_rsi": bullish_divergence.get("last_rsi", None)
+                },
+                "bearish": {
+                    "detected": bearish_divergence["detected"],
+                    "confidence": bearish_divergence["confidence"],
+                    "last_rsi": bearish_divergence.get("last_rsi", None)
+                },
+                "signal": divergence_signal["signal"],
+                "signal_confidence": divergence_signal["confidence"],
+                "chart_path": divergence_chart_path
+            },
             "recommendations": []
         }
         
@@ -806,6 +895,16 @@ class SidewaysMarketOptimizer:
             report["recommendations"].append("Giảm kích thước vị thế xuống {:.1f}% so với bình thường".format(
                 (1 - self.position_size_reduction * self.sideways_score) * 100
             ))
+            
+            # Thêm khuyến nghị từ divergence nếu có
+            if bullish_divergence["detected"]:
+                report["recommendations"].append("Phát hiện RSI bullish divergence - có thể cân nhắc mở vị thế LONG (độ tin cậy: {:.1f}%)".format(
+                    bullish_divergence["confidence"] * 100
+                ))
+            elif bearish_divergence["detected"]:
+                report["recommendations"].append("Phát hiện RSI bearish divergence - cân nhắc mở vị thế SHORT hoặc chốt lời vị thế LONG (độ tin cậy: {:.1f}%)".format(
+                    bearish_divergence["confidence"] * 100
+                ))
             
             report["recommendations"].append("Sử dụng chiến lược mean reversion thay vì trend following")
             
