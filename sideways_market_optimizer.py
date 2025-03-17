@@ -586,7 +586,9 @@ class SidewaysMarketOptimizer:
         if not self.is_sideways:
             return {
                 "tp_adjustment": 1.0,
-                "sl_adjustment": 1.0
+                "sl_adjustment": 1.0,
+                "tp_sl_ratio": 3.0,
+                "use_atr_based_targets": False
             }
         
         # Tính Bollinger Bands
@@ -596,18 +598,43 @@ class SidewaysMarketOptimizer:
         # Tính chiều rộng của BB tương đối với giá trung bình
         bb_width_percent = (2 * rolling_std) / rolling_mean
         
+        # Tính ATR để điều chỉnh mục tiêu giá
+        atr = self._calculate_atr(df, window)
+        current_price = df['close'].iloc[-1]
+        
         # Điều chỉnh TP và SL dựa trên độ rộng BB
         tp_adjustment = min(1.0, max(0.5, bb_width_percent / 0.02))  # Giả sử BB width bình thường là 2%
         sl_adjustment = max(1.0, min(1.5, 0.02 / bb_width_percent))
         
-        # Đối với thị trường sideway mạnh, giảm TP và tăng SL
+        # Đối với thị trường sideway, giảm đáng kể tỷ lệ TP:SL
+        # Sử dụng tỷ lệ 1.2 thay vì 3.0 thông thường
+        tp_sl_ratio = 1.2
+        
+        # Trong thị trường sideway rất mạnh, thậm chí có thể giảm xuống 1:1
         if self.sideways_score > 0.8:
-            tp_adjustment *= 0.8
-            sl_adjustment *= 1.2
+            tp_adjustment *= 0.6
+            sl_adjustment *= 1.3
+            tp_sl_ratio = 1.0
+        
+        # Điều chỉnh mức TP/SL dựa trên ATR thực tế
+        # Thường BTC di chuyển khoảng 3-4k USD, nên cần điều chỉnh phù hợp
+        use_atr_based_targets = True
+        
+        # Đề xuất giá trị TP/SL cụ thể dựa trên giá hiện tại và ATR
+        if current_price > 0 and atr > 0:
+            tp_distance_pct = (1.5 * atr / current_price) * 100  # Khoảng 1.5x ATR
+            sl_distance_pct = (1.2 * atr / current_price) * 100  # Khoảng 1.2x ATR
+        else:
+            tp_distance_pct = 3.0
+            sl_distance_pct = 2.5
         
         return {
             "tp_adjustment": tp_adjustment,
-            "sl_adjustment": sl_adjustment
+            "sl_adjustment": sl_adjustment,
+            "tp_sl_ratio": tp_sl_ratio,
+            "use_atr_based_targets": use_atr_based_targets,
+            "suggested_tp_pct": tp_distance_pct,
+            "suggested_sl_pct": sl_distance_pct
         }
     
     def generate_market_report(self, df: pd.DataFrame, symbol: str, window: int = 20) -> Dict:
@@ -649,6 +676,10 @@ class SidewaysMarketOptimizer:
             "squeeze_duration": squeeze_duration,
             "tp_adjustment_factor": tp_sl_adjustments["tp_adjustment"],
             "sl_adjustment_factor": tp_sl_adjustments["sl_adjustment"],
+            "tp_sl_ratio": tp_sl_adjustments.get("tp_sl_ratio", 3.0),
+            "use_atr_based_targets": tp_sl_adjustments.get("use_atr_based_targets", False),
+            "suggested_tp_pct": tp_sl_adjustments.get("suggested_tp_pct", None),
+            "suggested_sl_pct": tp_sl_adjustments.get("suggested_sl_pct", None),
             "chart_path": chart_path,
             "recommendations": []
         }
@@ -673,6 +704,28 @@ class SidewaysMarketOptimizer:
             report["recommendations"].append("Điều chỉnh stop loss lên {:.1f}% so với bình thường".format(
                 tp_sl_adjustments["sl_adjustment"] * 100
             ))
+            
+            # Thêm khuyến nghị về tỷ lệ TP/SL
+            report["recommendations"].append("Giảm tỷ lệ TP:SL xuống {:.1f}:1 (thường là 3:1)".format(
+                tp_sl_adjustments.get("tp_sl_ratio", 1.2)
+            ))
+            
+            # Thêm khuyến nghị về mục tiêu dựa trên ATR
+            if tp_sl_adjustments.get("use_atr_based_targets", False):
+                tp_pct = tp_sl_adjustments.get("suggested_tp_pct", 3.0)
+                sl_pct = tp_sl_adjustments.get("suggested_sl_pct", 2.5)
+                report["recommendations"].append("Sử dụng mục tiêu TP/SL cụ thể dựa trên ATR: TP {:.1f}%, SL {:.1f}%".format(
+                    tp_pct, sl_pct
+                ))
+                
+                # Thêm ví dụ thực tế với BTC
+                if "BTC" in symbol.upper():
+                    price = df['close'].iloc[-1]
+                    tp_move = price * tp_pct / 100
+                    sl_move = price * sl_pct / 100
+                    report["recommendations"].append("Với giá BTC hiện tại ${:.2f}: TP khoảng ${:.0f}, SL khoảng ${:.0f}".format(
+                        price, price + tp_move, price - sl_move
+                    ))
         else:
             report["recommendations"].append("Thị trường không ở trạng thái sideway, sử dụng chiến lược thông thường")
         
@@ -729,6 +782,15 @@ if __name__ == "__main__":
             tp_sl = optimizer.optimize_takeprofit_stoploss(btc)
             print(f"Điều chỉnh Take Profit: {tp_sl['tp_adjustment']:.2f}x")
             print(f"Điều chỉnh Stop Loss: {tp_sl['sl_adjustment']:.2f}x")
+            print(f"Tỷ lệ TP/SL: {tp_sl.get('tp_sl_ratio', 1.2):.1f}:1")
+            
+            if tp_sl.get('use_atr_based_targets', False):
+                price = btc['close'].iloc[-1]
+                tp_pct = tp_sl.get('suggested_tp_pct', 3.0)
+                sl_pct = tp_sl.get('suggested_sl_pct', 2.5)
+                tp_price = price * (1 + tp_pct/100)
+                sl_price = price * (1 - sl_pct/100)
+                print(f"Mục tiêu theo ATR: TP {tp_pct:.1f}% (${tp_price:.0f}), SL {sl_pct:.1f}% (${sl_price:.0f})")
         
         # Phân tích ETH
         print("\n=== Phân tích Ethereum ===")
@@ -752,6 +814,15 @@ if __name__ == "__main__":
             tp_sl = optimizer.optimize_takeprofit_stoploss(eth)
             print(f"Điều chỉnh Take Profit: {tp_sl['tp_adjustment']:.2f}x")
             print(f"Điều chỉnh Stop Loss: {tp_sl['sl_adjustment']:.2f}x")
+            print(f"Tỷ lệ TP/SL: {tp_sl.get('tp_sl_ratio', 1.2):.1f}:1")
+            
+            if tp_sl.get('use_atr_based_targets', False):
+                price = eth['close'].iloc[-1]
+                tp_pct = tp_sl.get('suggested_tp_pct', 3.0)
+                sl_pct = tp_sl.get('suggested_sl_pct', 2.5)
+                tp_price = price * (1 + tp_pct/100)
+                sl_price = price * (1 - sl_pct/100)
+                print(f"Mục tiêu theo ATR: TP {tp_pct:.1f}% (${tp_price:.0f}), SL {sl_pct:.1f}% (${sl_price:.0f})")
         
         print("\nHoàn thành demo SidewaysMarketOptimizer")
         
