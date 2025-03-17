@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Union
-import talib
+from ta_lib_easy import ta
 
 # Thiết lập logging
 logging.basicConfig(
@@ -116,7 +116,7 @@ class SidewaysMarketOptimizer:
         df_copy = df.copy()
         
         # Tạo Bollinger Bands
-        upper, middle, lower = talib.BBANDS(
+        upper, middle, lower = ta.BBANDS(
             df_copy['close'], 
             timeperiod=20, 
             nbdevup=2, 
@@ -133,10 +133,10 @@ class SidewaysMarketOptimizer:
         
         # Tạo Keltner Channels
         typical_price = (df_copy['high'] + df_copy['low'] + df_copy['close']) / 3
-        atr = talib.ATR(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=20)
+        atr = ta.ATR(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=20)
         keltner_factor = self.config.get('keltner_factor', 1.5)
         
-        ema = talib.EMA(typical_price, timeperiod=20)
+        ema = ta.EMA(typical_price, timeperiod=20)
         df_copy['kc_upper'] = ema + keltner_factor * atr
         df_copy['kc_middle'] = ema
         df_copy['kc_lower'] = ema - keltner_factor * atr
@@ -145,10 +145,10 @@ class SidewaysMarketOptimizer:
         df_copy['bb_squeeze'] = (df_copy['bb_upper'] - df_copy['bb_lower']) < (df_copy['kc_upper'] - df_copy['kc_lower'])
         
         # Tính ADX
-        df_copy['adx'] = talib.ADX(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=14)
+        df_copy['adx'] = ta.ADX(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=14)
         
         # Tính RSI
-        df_copy['rsi'] = talib.RSI(df_copy['close'], timeperiod=self.config.get('rsi_period', 14))
+        df_copy['rsi'] = ta.RSI(df_copy['close'], timeperiod=self.config.get('rsi_period', 14))
         
         # Thêm ATR
         df_copy['atr_20d'] = atr

@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Union
-import talib
+from ta_lib_easy import ta
 
 # Thiết lập logging
 logging.basicConfig(
@@ -127,7 +127,7 @@ class RSIDivergenceDetector:
         
         # Tính RSI nếu chưa có
         if 'rsi' not in df_copy.columns:
-            df_copy['rsi'] = talib.RSI(df_copy['close'], timeperiod=self.rsi_period)
+            df_copy['rsi'] = ta.RSI(df_copy['close'], timeperiod=self.rsi_period)
         
         return df_copy
     
