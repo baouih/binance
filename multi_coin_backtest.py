@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from binance_api import BinanceAPI
 from adaptive_strategy_selector import AdaptiveStrategySelector
+from adaptive_risk_manager import AdaptiveRiskManager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class MultiCoinBacktester:
@@ -21,19 +22,28 @@ class MultiCoinBacktester:
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         
-        # Khởi tạo API
+        # Khởi tạo API 
         self.api = BinanceAPI()
         
-        # Thông số
-        self.initial_balance = 10000.0  # Số dư ban đầu (USDT)
-        self.risk_per_trade = 10.0      # Phần trăm rủi ro mỗi lệnh
-        self.leverage = 20              # Đòn bẩy
-        self.backtest_days = 30         # Số ngày backtest
+        # Khởi tạo Adaptive Risk Manager
+        self.risk_manager = AdaptiveRiskManager()
+        self.active_risk_level = self.risk_manager.active_risk_level
+        self.risk_config = self.risk_manager.get_current_risk_config()
+        
+        # Thông số cơ bản
+        self.initial_balance = 10000.0
+        self.backtest_days = 90         # Backtest 3 tháng
         self.timeframe = '1h'           # Khung thời gian
         
-        # Danh sách các cặp tiền cần backtest (giới hạn cho kết quả nhanh)
+        # Đọc cấu hình rủi ro từ adaptive risk manager
+        risk_config = self.risk_manager.get_current_risk_config()
+        self.risk_per_trade = risk_config.get('risk_per_trade', 3.0)
+        self.leverage = risk_config.get('max_leverage', 3)
+        
+        # Danh sách các cặp tiền cần backtest
         self.coins = [
-            'BTCUSDT', 'ETHUSDT'
+            'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 
+            'DOGEUSDT', 'ADAUSDT', 'XRPUSDT'
         ]
         
         # Tạo thư mục lưu kết quả nếu chưa tồn tại
@@ -42,7 +52,10 @@ class MultiCoinBacktester:
         os.makedirs(self.results_dir, exist_ok=True)
         os.makedirs(self.charts_dir, exist_ok=True)
         
-        self.logger.info(f"Đã khởi tạo MultiCoinBacktester, rủi ro: {self.risk_per_trade}%, đòn bẩy: {self.leverage}x")
+        self.logger.info(f"Đã khởi tạo MultiCoinBacktester với Adaptive Risk Manager")
+        self.logger.info(f"Mức rủi ro: {self.active_risk_level}, Max vị thế: {risk_config.get('max_open_positions', 5)}")
+        self.logger.info(f"Risk per trade: {self.risk_per_trade}%, Leverage: {self.leverage}x")
+        self.logger.info(f"Số coin sẽ test: {len(self.coins)}, Backtest period: {self.backtest_days} ngày")
     
     def download_historical_data(self, symbol, days=30, timeframe='1h'):
         """Tải dữ liệu lịch sử từ Binance"""
@@ -128,13 +141,30 @@ class MultiCoinBacktester:
             self.logger.error(f"Lỗi khi thêm chỉ báo kỹ thuật: {str(e)}")
             return df
     
-    def apply_strategy(self, df):
-        """Áp dụng chiến lược đơn giản"""
+    def apply_strategy(self, df, symbol):
+        """Áp dụng chiến lược giao dịch với AdaptiveRiskManager"""
         try:
             # Tạo cột tín hiệu và stop loss/take profit
             df['trade_signal'] = 0
             df['stop_loss'] = 0.0
             df['take_profit'] = 0.0
+            df['atr'] = 0.0
+            df['volatility'] = 0.0
+            df['position_size_pct'] = 0.0
+            df['leverage'] = 0.0
+            
+            # Tính ATR (Average True Range)
+            df['tr0'] = df['high'] - df['low']
+            df['tr1'] = abs(df['high'] - df['close'].shift())
+            df['tr2'] = abs(df['low'] - df['close'].shift())
+            df['tr'] = df[['tr0', 'tr1', 'tr2']].max(axis=1)
+            
+            # Tính ATR với chu kỳ từ cấu hình
+            atr_period = self.risk_manager.config.get('atr_settings', {}).get('atr_period', 14)
+            df['atr'] = df['tr'].rolling(window=atr_period).mean()
+            
+            # Tính volatility (% so với giá)
+            df['volatility'] = (df['atr'] / df['close']) * 100
             
             # Chiến lược đơn giản: Bollinger Bands và RSI
             # Mua khi giá chạm dải dưới và RSI < 30
@@ -147,25 +177,38 @@ class MultiCoinBacktester:
             df.loc[buy_condition, 'trade_signal'] = 1
             df.loc[sell_condition, 'trade_signal'] = -1
             
-            # Tính Stop Loss và Take Profit
-            stop_percentage = 0.025  # 2.5%
-            take_percentage = 0.05   # 5%
-            
-            for i in range(len(df)):
-                if df.iloc[i]['trade_signal'] == 1:  # Tín hiệu mua
-                    entry_price = float(df.iloc[i]['close'])
-                    df.at[df.index[i], 'stop_loss'] = float(entry_price * (1 - stop_percentage))
-                    df.at[df.index[i], 'take_profit'] = float(entry_price * (1 + take_percentage))
+            # Sử dụng Adaptive Risk Manager để tính SL, TP và position size
+            for i in range(atr_period, len(df)):
+                if df.iloc[i]['trade_signal'] != 0:  # Nếu có tín hiệu mua hoặc bán
+                    trade_type = "BUY" if df.iloc[i]['trade_signal'] == 1 else "SELL"
                     
-                elif df.iloc[i]['trade_signal'] == -1:  # Tín hiệu bán
-                    entry_price = float(df.iloc[i]['close'])
-                    df.at[df.index[i], 'stop_loss'] = float(entry_price * (1 + stop_percentage))
-                    df.at[df.index[i], 'take_profit'] = float(entry_price * (1 - take_percentage))
+                    # Lấy dữ liệu đến vị trí hiện tại để tính toán
+                    current_data = df.iloc[:i+1].copy()
+                    
+                    # Xử lý cùng với adaptive risk manager
+                    trade_params = self.risk_manager.get_trade_parameters(current_data, symbol, trade_type)
+                    
+                    # Lưu các thông số
+                    df.at[df.index[i], 'stop_loss'] = float(trade_params['stop_loss'])
+                    df.at[df.index[i], 'take_profit'] = float(trade_params['take_profit'])
+                    df.at[df.index[i], 'position_size_pct'] = float(trade_params['position_size_percentage'])
+                    df.at[df.index[i], 'leverage'] = float(trade_params['leverage'])
+                    
+                    # Log chi tiết tại thời điểm tín hiệu
+                    self.logger.info(f"Tín hiệu {trade_type} cho {symbol} tại {df.index[i]}, "
+                                    f"Giá: {df.iloc[i]['close']:.2f}, "
+                                    f"Volatility: {df.iloc[i]['volatility']:.2f}%, "
+                                    f"Stop Loss: {df.at[df.index[i], 'stop_loss']:.2f}, "
+                                    f"Take Profit: {df.at[df.index[i], 'take_profit']:.2f}, "
+                                    f"Position Size: {df.at[df.index[i], 'position_size_pct']:.2f}%, "
+                                    f"Leverage: {df.at[df.index[i], 'leverage']:.1f}x")
             
             return df
             
         except Exception as e:
             self.logger.error(f"Lỗi khi áp dụng chiến lược: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             return df
     
     def run_backtest(self, df, symbol):
