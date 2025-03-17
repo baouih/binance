@@ -324,6 +324,54 @@ class APIDataValidator:
                 "details": comparison_results
             }
     
+    def check_data_folder(self, data_dir: str) -> Dict:
+        """
+        Kiểm tra thư mục dữ liệu và xác nhận dữ liệu có đầy đủ
+        
+        :param data_dir: Đường dẫn đến thư mục dữ liệu
+        :return: Dict kết quả kiểm tra
+        """
+        if not os.path.exists(data_dir):
+            return {
+                "status": "error",
+                "is_valid": False,
+                "message": f"Thư mục dữ liệu '{data_dir}' không tồn tại"
+            }
+            
+        files = os.listdir(data_dir)
+        csv_files = [f for f in files if f.endswith('.csv')]
+        
+        if not csv_files:
+            return {
+                "status": "error",
+                "is_valid": False,
+                "message": f"Không tìm thấy file CSV nào trong thư mục '{data_dir}'"
+            }
+            
+        # Phân tích tên file để tìm symbols và timeframes
+        symbols = set()
+        timeframes = set()
+        file_pattern = r'([A-Z]+)_(\w+)_.*\.csv'
+        
+        for file in csv_files:
+            import re
+            match = re.match(file_pattern, file)
+            if match:
+                symbol, timeframe = match.groups()
+                symbols.add(symbol)
+                timeframes.add(timeframe)
+        
+        return {
+            "status": "success",
+            "is_valid": True,
+            "message": f"Tìm thấy dữ liệu cho {len(symbols)} symbols và {len(timeframes)} khung thời gian",
+            "details": {
+                "symbols": list(symbols),
+                "timeframes": list(timeframes),
+                "files_count": len(csv_files)
+            }
+        }
+        
     def validate_market_data(self, symbols: List[str], timeframes: List[str], 
                            start_date: str, end_date: str, data_source: str = "api",
                            data_dir: Optional[str] = None) -> Dict:
