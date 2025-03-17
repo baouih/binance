@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from typing import Dict, List, Tuple, Optional, Union
 import json
 from datetime import datetime
+from rsi_divergence_detector import RSIDivergenceDetector
 
 # Thiết lập logging
 logging.basicConfig(
@@ -51,9 +52,17 @@ class SidewaysMarketOptimizer:
         self.adx_threshold = self.config.get('adx_threshold', 25)
         self.position_size_reduction = self.config.get('position_size_reduction', 0.5)
         
+        # Khởi tạo RSI Divergence Detector
+        self.divergence_detector = RSIDivergenceDetector(
+            rsi_period=self.config.get('rsi_period', 14),
+            divergence_window=self.config.get('divergence_window', 30),
+            min_pivot_distance=self.config.get('min_pivot_distance', 5),
+            peak_threshold=self.config.get('peak_threshold', 0.8)
+        )
+        
         # Đảm bảo thư mục đầu ra tồn tại
         os.makedirs('charts/sideways_analysis', exist_ok=True)
-        logger.info("Đã khởi tạo SidewaysMarketOptimizer")
+        logger.info("Đã khởi tạo SidewaysMarketOptimizer với RSI Divergence Detector")
         
     def _load_config(self, config_path: str) -> Dict:
         """
@@ -637,6 +646,114 @@ class SidewaysMarketOptimizer:
             "suggested_sl_pct": sl_distance_pct
         }
     
+    def analyze_market_with_divergence(self, df: pd.DataFrame, symbol: str, window: int = 20) -> Dict:
+        """
+        Phát hiện divergence RSI và kết hợp vào phân tích thị trường
+        
+        Args:
+            df (pd.DataFrame): DataFrame với dữ liệu OHLC
+            symbol (str): Ký hiệu tiền tệ
+            window (int): Cửa sổ tính toán
+            
+        Returns:
+            Dict: Kết quả phân tích với các tín hiệu divergence
+        """
+        # Phát hiện thị trường đi ngang
+        is_sideways = self.detect_sideways_market(df, window)
+        
+        # Tạo detector divergence
+        divergence_detector = RSIDivergenceDetector(
+            rsi_period=14,
+            divergence_window=30,
+            min_pivot_distance=5
+        )
+        
+        # Phát hiện các loại divergence
+        bullish_divergence = divergence_detector.detect_divergence(df, is_bullish=True)
+        bearish_divergence = divergence_detector.detect_divergence(df, is_bullish=False)
+        
+        # Tạo tín hiệu giao dịch từ divergence
+        divergence_signal = divergence_detector.get_trading_signal(df)
+        
+        # Tạo biểu đồ nếu có divergence
+        chart_path = ""
+        if bullish_divergence["detected"]:
+            chart_path = divergence_detector.visualize_divergence(
+                df, bullish_divergence, symbol,
+                save_path=f"charts/divergence/{symbol}_bullish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
+            logger.info(f"Phát hiện bullish divergence với độ tin cậy {bullish_divergence['confidence']:.2f}")
+        elif bearish_divergence["detected"]:
+            chart_path = divergence_detector.visualize_divergence(
+                df, bearish_divergence, symbol,
+                save_path=f"charts/divergence/{symbol}_bearish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
+            logger.info(f"Phát hiện bearish divergence với độ tin cậy {bearish_divergence['confidence']:.2f}")
+        
+        # Điều chỉnh chiến lược giao dịch nếu có divergence và thị trường đi ngang
+        strategy_adjustments = self.adjust_strategy_for_sideways(1.0)
+        breakout_direction = self.predict_breakout_direction(df, window)
+        tp_sl_adjustments = self.optimize_takeprofit_stoploss(df, window)
+        
+        # Kết hợp tất cả phân tích
+        result = {
+            "symbol": symbol,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "is_sideways_market": is_sideways,
+            "sideways_score": self.sideways_score,
+            "divergence": {
+                "bullish": {
+                    "detected": bullish_divergence["detected"],
+                    "confidence": bullish_divergence["confidence"],
+                    "last_rsi": bullish_divergence.get("last_rsi", None)
+                },
+                "bearish": {
+                    "detected": bearish_divergence["detected"],
+                    "confidence": bearish_divergence["confidence"],
+                    "last_rsi": bearish_divergence.get("last_rsi", None)
+                },
+                "signal": divergence_signal["signal"],
+                "signal_confidence": divergence_signal["confidence"],
+                "chart_path": chart_path
+            },
+            "position_sizing": {
+                "original": 1.0,
+                "adjusted": strategy_adjustments["position_size"],
+                "reduction_pct": (1 - strategy_adjustments["position_size"]) * 100
+            },
+            "strategy": {
+                "use_mean_reversion": strategy_adjustments["use_mean_reversion"],
+                "tp_adjustment": tp_sl_adjustments["tp_adjustment"],
+                "sl_adjustment": tp_sl_adjustments["sl_adjustment"],
+                "tp_sl_ratio": tp_sl_adjustments["tp_sl_ratio"],
+                "breakout_prediction": breakout_direction,
+                "suggested_tp_pct": tp_sl_adjustments.get("suggested_tp_pct", None),
+                "suggested_sl_pct": tp_sl_adjustments.get("suggested_sl_pct", None),
+                "use_atr_based_targets": tp_sl_adjustments.get("use_atr_based_targets", False)
+            },
+            "price_data": {
+                "current_price": df['close'].iloc[-1],
+                "high_20d": df['high'].iloc[-window:].max(),
+                "low_20d": df['low'].iloc[-window:].min(),
+                "atr_20d": self._calculate_atr(df, window)
+            }
+        }
+        
+        # Thêm thông tin mức giá TP/SL cụ thể nếu có
+        if tp_sl_adjustments.get("use_atr_based_targets", False):
+            current_price = df['close'].iloc[-1]
+            tp_pct = tp_sl_adjustments.get("suggested_tp_pct", 3.0)
+            sl_pct = tp_sl_adjustments.get("suggested_sl_pct", 2.5)
+            
+            result["price_targets"] = {
+                "tp_price": current_price * (1 + tp_pct/100),
+                "sl_price": current_price * (1 - sl_pct/100),
+                "tp_distance_pct": tp_pct,
+                "sl_distance_pct": sl_pct
+            }
+        
+        return result
+        
     def generate_market_report(self, df: pd.DataFrame, symbol: str, window: int = 20) -> Dict:
         """
         Tạo báo cáo phân tích thị trường đầy đủ
@@ -824,8 +941,32 @@ if __name__ == "__main__":
                 sl_price = price * (1 - sl_pct/100)
                 print(f"Mục tiêu theo ATR: TP {tp_pct:.1f}% (${tp_price:.0f}), SL {sl_pct:.1f}% (${sl_price:.0f})")
         
+        # Phân tích divergence và phân tích tích hợp
+        print("\n=== Phân tích Tích Hợp RSI Divergence ===")
+        print("Đang phân tích Bitcoin...")
+        btc_analysis = optimizer.analyze_market_with_divergence(btc, "BTC-USD")
+        
+        # Hiển thị kết quả divergence
+        print(f"Phát hiện RSI Divergence:")
+        print(f"  Bullish: {btc_analysis['divergence']['bullish']['detected']} (Độ tin cậy: {btc_analysis['divergence']['bullish']['confidence']:.2f})")
+        print(f"  Bearish: {btc_analysis['divergence']['bearish']['detected']} (Độ tin cậy: {btc_analysis['divergence']['bearish']['confidence']:.2f})")
+        print(f"  Tín hiệu: {btc_analysis['divergence']['signal']} (Độ tin cậy: {btc_analysis['divergence']['signal_confidence']:.2f})")
+        
+        if btc_analysis['divergence']['chart_path']:
+            print(f"  Đã lưu biểu đồ divergence tại: {btc_analysis['divergence']['chart_path']}")
+        
+        # Hiển thị mục tiêu giá chi tiết
+        if "price_targets" in btc_analysis:
+            print("\nMục tiêu giá cụ thể:")
+            print(f"  Giá hiện tại: ${btc_analysis['price_data']['current_price']:.2f}")
+            print(f"  Take Profit: ${btc_analysis['price_targets']['tp_price']:.2f} (+{btc_analysis['price_targets']['tp_distance_pct']:.2f}%)")
+            print(f"  Stop Loss: ${btc_analysis['price_targets']['sl_price']:.2f} (-{btc_analysis['price_targets']['sl_distance_pct']:.2f}%)")
+            print(f"  Tỷ lệ R:R: 1:{btc_analysis['strategy']['tp_sl_ratio']:.1f}")
+        
         print("\nHoàn thành demo SidewaysMarketOptimizer")
         
     except Exception as e:
         print(f"Lỗi khi chạy demo: {str(e)}")
         print("Bạn có thể cần cài đặt yfinance: pip install yfinance")
+        import traceback
+        traceback.print_exc()
