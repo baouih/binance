@@ -606,7 +606,11 @@ class MultiCoinBacktester:
             return None
     
     def run(self):
-        """Chạy backtest cho tất cả coin với quản lý rủi ro thích ứng"""
+        """Chạy backtest cho tất cả coin với quản lý rủi ro thích ứng
+        
+        Returns:
+            list: Danh sách kết quả tổng hợp các coin
+        """
         self.logger.info(f"=== Bắt đầu backtest cho {len(self.coins)} coins với Adaptive Risk Manager ===")
         self.logger.info(f"Risk Level: {self.active_risk_level}, Max Positions: {self.risk_config.get('max_open_positions', 5)}")
         self.logger.info(f"Risk/Trade: {self.risk_per_trade}%, Leverage: {self.leverage}x")
