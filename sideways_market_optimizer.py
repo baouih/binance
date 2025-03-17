@@ -2,30 +2,30 @@
 # -*- coding: utf-8 -*-
 
 """
-Module tối ưu hóa chiến lược cho thị trường sideway
+Sideways Market Optimizer
 
-Mô-đun này cung cấp các chức năng phát hiện và tối ưu hóa giao dịch trong
-môi trường thị trường sideway. Nó sử dụng các chỉ báo đặc biệt cho thị trường
-không có xu hướng rõ ràng và điều chỉnh chiến lược phù hợp.
+Module để phát hiện và tối ưu hóa chiến lược giao dịch cho thị trường đi ngang,
+với khả năng tích hợp RSI Divergence để cải thiện tín hiệu.
 """
 
 import os
-import logging
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from typing import Dict, List, Tuple, Optional, Union
 import json
+import logging
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from datetime import datetime
-from rsi_divergence_detector import RSIDivergenceDetector
+from typing import Dict, List, Tuple, Optional, Union
+import talib
 
 # Thiết lập logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('logs/sideways_optimizer.log')
+        logging.FileHandler('logs/sideways_optimizer.log'),
+        logging.StreamHandler()
     ]
 )
 
@@ -33,7 +33,7 @@ logger = logging.getLogger('sideways_optimizer')
 
 class SidewaysMarketOptimizer:
     """
-    Lớp cung cấp các phương pháp để phát hiện và tối ưu hóa giao dịch trong thị trường sideway
+    Lớp phát hiện thị trường đi ngang và tối ưu hóa chiến lược giao dịch
     """
     
     def __init__(self, config_path: str = 'configs/sideways_config.json'):
@@ -44,26 +44,23 @@ class SidewaysMarketOptimizer:
             config_path (str): Đường dẫn đến file cấu hình
         """
         self.config = self._load_config(config_path)
-        self.is_sideways = False
-        self.sideways_score = 0
-        self.volatility_threshold = self.config.get('volatility_threshold', 0.5)
-        self.bollinger_squeeze_threshold = self.config.get('bollinger_squeeze_threshold', 0.1)
-        self.keltner_factor = self.config.get('keltner_factor', 1.5)
-        self.adx_threshold = self.config.get('adx_threshold', 25)
-        self.position_size_reduction = self.config.get('position_size_reduction', 0.5)
         
-        # Khởi tạo RSI Divergence Detector
-        self.divergence_detector = RSIDivergenceDetector(
-            rsi_period=self.config.get('rsi_period', 14),
-            divergence_window=self.config.get('divergence_window', 30),
-            min_pivot_distance=self.config.get('min_pivot_distance', 5),
-            peak_threshold=self.config.get('peak_threshold', 0.8)
-        )
+        # Khởi tạo bộ phát hiện RSI Divergence nếu nằm trong cùng thư mục
+        try:
+            from rsi_divergence_detector import RSIDivergenceDetector
+            self.divergence_detector = RSIDivergenceDetector()
+            self.has_divergence_detector = True
+            logger.info("Đã tải RSI Divergence Detector")
+        except ImportError:
+            self.has_divergence_detector = False
+            logger.warning("Không thể tải RSI Divergence Detector, chức năng phát hiện phân kỳ không khả dụng")
         
-        # Đảm bảo thư mục đầu ra tồn tại
-        os.makedirs('charts/sideways_analysis', exist_ok=True)
-        logger.info("Đã khởi tạo SidewaysMarketOptimizer với RSI Divergence Detector")
+        # Tạo thư mục đầu ra
+        os.makedirs('charts', exist_ok=True)
+        os.makedirs('logs', exist_ok=True)
         
+        logger.info("Đã khởi tạo Sideways Market Optimizer")
+    
     def _load_config(self, config_path: str) -> Dict:
         """
         Tải cấu hình từ file JSON
@@ -74,998 +71,682 @@ class SidewaysMarketOptimizer:
         Returns:
             Dict: Cấu hình đã tải
         """
+        default_config = {
+            "volatility_threshold": 0.5,
+            "bollinger_squeeze_threshold": 0.1,
+            "keltner_factor": 1.5,
+            "adx_threshold": 25,
+            "position_size_reduction": 0.5,
+            "mean_reversion_enabled": True,
+            "squeeze_detection_enabled": True,
+            "volatility_filter_enabled": True,
+            "rsi_period": 14,
+            "sideways_tp_sl_ratio": 1.2,
+            "trending_tp_sl_ratio": 3.0,
+            "use_atr_targets": True,
+            "tp_atr_multiplier": 1.5,
+            "sl_atr_multiplier": 1.2
+        }
+        
         try:
             if os.path.exists(config_path):
                 with open(config_path, 'r') as f:
                     return json.load(f)
             else:
-                # Cấu hình mặc định nếu không tìm thấy file
-                default_config = {
-                    "volatility_threshold": 0.5,
-                    "bollinger_squeeze_threshold": 0.1,
-                    "keltner_factor": 1.5,
-                    "adx_threshold": 25,
-                    "position_size_reduction": 0.5,
-                    "mean_reversion_enabled": True,
-                    "squeeze_detection_enabled": True,
-                    "volatility_filter_enabled": True
-                }
-                
-                # Tạo thư mục configs nếu chưa tồn tại
-                os.makedirs(os.path.dirname(config_path), exist_ok=True)
-                
-                # Lưu cấu hình mặc định
-                with open(config_path, 'w') as f:
-                    json.dump(default_config, f, indent=4)
-                
-                logger.info(f"Đã tạo file cấu hình mặc định tại {config_path}")
+                logger.warning(f"Không tìm thấy file cấu hình: {config_path}")
+                logger.info("Sử dụng cấu hình mặc định")
                 return default_config
         except Exception as e:
             logger.error(f"Lỗi khi tải cấu hình: {str(e)}")
-            return {}
+            logger.info("Sử dụng cấu hình mặc định")
+            return default_config
     
-    def detect_sideways_market(self, df: pd.DataFrame, window: int = 20) -> bool:
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Phát hiện thị trường sideway dựa trên nhiều chỉ báo
-        
-        Args:
-            df (pd.DataFrame): DataFrame chứa dữ liệu giá
-            window (int): Cửa sổ thời gian cho tính toán
-            
-        Returns:
-            bool: True nếu phát hiện thị trường sideway
-        """
-        if len(df) < window * 2:
-            logger.warning("Không đủ dữ liệu để phát hiện thị trường sideway")
-            return False
-        
-        scores = []
-        
-        # 1. Kiểm tra biên độ dao động thấp
-        if self.config.get('volatility_filter_enabled', True):
-            atr = self._calculate_atr(df, window)
-            avg_price = df['close'].iloc[-window:].mean()
-            volatility_ratio = atr / avg_price
-            
-            volatility_score = 1 - min(volatility_ratio / self.volatility_threshold, 1)
-            scores.append(volatility_score)
-            
-            logger.debug(f"Volatility score: {volatility_score:.2f} (ATR/AvgPrice: {volatility_ratio:.4f})")
-        
-        # 2. Kiểm tra Bollinger Squeeze
-        if self.config.get('squeeze_detection_enabled', True):
-            bb_squeeze = self._detect_bollinger_squeeze(df, window)
-            scores.append(bb_squeeze)
-            
-            logger.debug(f"Bollinger squeeze score: {bb_squeeze:.2f}")
-        
-        # 3. Kiểm tra ADX thấp (không có xu hướng)
-        adx = self._calculate_adx(df, window)
-        adx_score = 1 - min(adx / self.adx_threshold, 1)
-        scores.append(adx_score)
-        
-        logger.debug(f"ADX score: {adx_score:.2f} (ADX: {adx:.2f})")
-        
-        # Tính điểm trung bình
-        self.sideways_score = sum(scores) / len(scores)
-        self.is_sideways = self.sideways_score > 0.6
-        
-        logger.info(f"Sideways market score: {self.sideways_score:.2f}, Is sideways: {self.is_sideways}")
-        return self.is_sideways
-    
-    def _calculate_atr(self, df: pd.DataFrame, window: int = 14) -> float:
-        """
-        Tính chỉ số Average True Range (ATR)
+        Tính toán các chỉ báo cần thiết cho phát hiện thị trường đi ngang
         
         Args:
             df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
             
         Returns:
-            float: Giá trị ATR
+            pd.DataFrame: DataFrame với các chỉ báo đã tính
         """
-        high = df['high'].values
-        low = df['low'].values
-        close = df['close'].values
+        # Chuyển đổi cột thành chữ thường
+        df.columns = [c.lower() for c in df.columns]
+        df_copy = df.copy()
         
-        tr1 = np.abs(high[1:] - low[1:])
-        tr2 = np.abs(high[1:] - close[:-1])
-        tr3 = np.abs(low[1:] - close[:-1])
+        # Tạo Bollinger Bands
+        upper, middle, lower = talib.BBANDS(
+            df_copy['close'], 
+            timeperiod=20, 
+            nbdevup=2, 
+            nbdevdn=2, 
+            matype=0
+        )
+        df_copy['bb_upper'] = upper
+        df_copy['bb_middle'] = middle
+        df_copy['bb_lower'] = lower
+        df_copy['bb_width'] = (upper - lower) / middle
         
-        tr = np.vstack([tr1, tr2, tr3]).max(axis=0)
-        atr = np.mean(tr[-window:])
+        # Tính %B (vị trí trong Bollinger Bands)
+        df_copy['pct_b'] = (df_copy['close'] - lower) / (upper - lower)
         
-        return atr
-    
-    def _detect_bollinger_squeeze(self, df: pd.DataFrame, window: int = 20) -> float:
-        """
-        Phát hiện Bollinger Squeeze (khi Bollinger Bands co lại hẹp hơn Keltner Channels)
+        # Tạo Keltner Channels
+        typical_price = (df_copy['high'] + df_copy['low'] + df_copy['close']) / 3
+        atr = talib.ATR(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=20)
+        keltner_factor = self.config.get('keltner_factor', 1.5)
         
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            float: Điểm squeeze (0-1), 1 là squeeze mạnh nhất
-        """
-        # Tính Bollinger Bands
-        rolling_mean = df['close'].rolling(window=window).mean()
-        rolling_std = df['close'].rolling(window=window).std()
+        ema = talib.EMA(typical_price, timeperiod=20)
+        df_copy['kc_upper'] = ema + keltner_factor * atr
+        df_copy['kc_middle'] = ema
+        df_copy['kc_lower'] = ema - keltner_factor * atr
         
-        # Tính ATR cho Keltner Channels
-        atr = self._calculate_atr(df, window)
-        
-        # Tính độ rộng của Bollinger Bands và Keltner Channels
-        bb_width = 2 * rolling_std.iloc[-1]
-        kc_width = 2 * self.keltner_factor * atr
-        
-        # Tính tỷ lệ
-        ratio = bb_width / kc_width if kc_width > 0 else 1
-        
-        # Điểm squeeze (giá trị càng gần 0, squeeze càng mạnh)
-        squeeze_score = max(0, 1 - (ratio / self.bollinger_squeeze_threshold))
-        
-        return squeeze_score
-    
-    def _calculate_adx(self, df: pd.DataFrame, window: int = 14) -> float:
-        """
-        Tính chỉ số Average Directional Index (ADX)
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            float: Giá trị ADX
-        """
-        # Tính +DM và -DM
-        high = df['high'].values
-        low = df['low'].values
-        close = df['close'].values
-        
-        up_move = high[1:] - high[:-1]
-        down_move = low[:-1] - low[1:]
-        
-        pos_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
-        neg_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
-        
-        # Tính TR (True Range)
-        tr1 = np.abs(high[1:] - low[1:])
-        tr2 = np.abs(high[1:] - close[:-1])
-        tr3 = np.abs(low[1:] - close[:-1])
-        tr = np.vstack([tr1, tr2, tr3]).max(axis=0)
-        
-        # Tính chỉ số đầu tiên
-        tr_period = tr[-window:]
-        pos_dm_period = pos_dm[-window:]
-        neg_dm_period = neg_dm[-window:]
-        
-        # Tính chỉ số
-        tr_sum = np.sum(tr_period)
-        pos_di = 100 * np.sum(pos_dm_period) / tr_sum if tr_sum > 0 else 0
-        neg_di = 100 * np.sum(neg_dm_period) / tr_sum if tr_sum > 0 else 0
-        
-        dx = 100 * np.abs(pos_di - neg_di) / (pos_di + neg_di) if (pos_di + neg_di) > 0 else 0
-        adx = dx  # Đơn giản hóa, thực tế ADX là trung bình 14 ngày của DX
-        
-        return adx
-    
-    def adjust_strategy_for_sideways(self, original_position_size: float) -> Dict:
-        """
-        Điều chỉnh chiến lược giao dịch cho thị trường sideway
-        
-        Args:
-            original_position_size (float): Kích thước vị thế theo chiến lược gốc
-            
-        Returns:
-            Dict: Các tham số chiến lược đã điều chỉnh
-        """
-        if not self.is_sideways:
-            return {
-                "position_size": original_position_size,
-                "use_mean_reversion": False,
-                "adjust_stop_loss": False,
-                "sideways_score": self.sideways_score
-            }
-        
-        # Giảm kích thước vị thế
-        adjusted_position_size = original_position_size * (1 - self.position_size_reduction * self.sideways_score)
-        
-        # Trả về chiến lược điều chỉnh
-        return {
-            "position_size": adjusted_position_size,
-            "use_mean_reversion": self.config.get('mean_reversion_enabled', True),
-            "adjust_stop_loss": True,
-            "sideways_score": self.sideways_score
-        }
-    
-    def generate_mean_reversion_signals(self, df: pd.DataFrame, window: int = 20) -> pd.DataFrame:
-        """
-        Tạo tín hiệu theo chiến lược mean reversion cho thị trường sideway
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            pd.DataFrame: DataFrame với tín hiệu giao dịch
-        """
-        if not self.is_sideways:
-            logger.info("Không phải thị trường sideway, không tạo tín hiệu mean reversion")
-            return df
-        
-        # Sao chép để không làm thay đổi dữ liệu gốc
-        result_df = df.copy()
-        
-        # Tính Bollinger Bands
-        result_df['middle_band'] = result_df['close'].rolling(window=window).mean()
-        rolling_std = result_df['close'].rolling(window=window).std()
-        result_df['upper_band'] = result_df['middle_band'] + 2 * rolling_std
-        result_df['lower_band'] = result_df['middle_band'] - 2 * rolling_std
-        
-        # Tính %B (vị trí tương đối trong Bollinger Bands)
-        result_df['pct_b'] = (result_df['close'] - result_df['lower_band']) / (result_df['upper_band'] - result_df['lower_band'])
-        
-        # Tín hiệu mua: Giá gần băng dưới (%B < 0.2)
-        # Tín hiệu bán: Giá gần băng trên (%B > 0.8)
-        result_df['buy_signal'] = (result_df['pct_b'] < 0.2).astype(int)
-        result_df['sell_signal'] = (result_df['pct_b'] > 0.8).astype(int)
-        
-        # RSI để xác nhận tín hiệu
-        result_df['rsi'] = self._calculate_rsi(result_df, window)
-        
-        # Lọc tín hiệu với RSI
-        result_df['buy_signal'] = ((result_df['buy_signal'] == 1) & (result_df['rsi'] < 30)).astype(int)
-        result_df['sell_signal'] = ((result_df['sell_signal'] == 1) & (result_df['rsi'] > 70)).astype(int)
-        
-        logger.info(f"Đã tạo tín hiệu mean reversion cho thị trường sideway với {result_df['buy_signal'].sum()} tín hiệu mua và {result_df['sell_signal'].sum()} tín hiệu bán")
-        
-        return result_df
-    
-    def _calculate_rsi(self, df: pd.DataFrame, window: int = 14) -> pd.Series:
-        """
-        Tính chỉ số Relative Strength Index (RSI)
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu giá
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            pd.Series: Chuỗi giá trị RSI
-        """
-        delta = df['close'].diff()
-        up, down = delta.copy(), delta.copy()
-        up[up < 0] = 0
-        down[down > 0] = 0
-        down = -down
-        
-        roll_up = up.rolling(window).mean()
-        roll_down = down.rolling(window).mean()
-        
-        rs = roll_up / roll_down
-        rsi = 100 - (100 / (1 + rs))
-        
-        return rsi
-    
-    def visualize_sideways_detection(self, df: pd.DataFrame, symbol: str, window: int = 20, custom_path: Optional[str] = None) -> str:
-        """
-        Tạo biểu đồ phân tích thị trường sideway
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            symbol (str): Ký hiệu tiền tệ
-            window (int): Cửa sổ tính toán
-            custom_path (str, optional): Đường dẫn tùy chỉnh để lưu biểu đồ
-            
-        Returns:
-            str: Đường dẫn tới biểu đồ đã tạo
-        """
-        if len(df) < window * 2:
-            logger.warning("Không đủ dữ liệu để tạo biểu đồ phân tích")
-            return ""
-        
-        # Sao chép để không làm thay đổi dữ liệu gốc
-        plot_df = df.copy()
-        
-        # Tính Bollinger Bands
-        plot_df['middle_band'] = plot_df['close'].rolling(window=window).mean()
-        rolling_std = plot_df['close'].rolling(window=window).std()
-        plot_df['upper_band'] = plot_df['middle_band'] + 2 * rolling_std
-        plot_df['lower_band'] = plot_df['middle_band'] - 2 * rolling_std
-        
-        # Tính Keltner Channels
-        atr = self._calculate_atr(plot_df, window)
-        plot_df['keltner_middle'] = plot_df['close'].rolling(window=window).mean()
-        plot_df['keltner_upper'] = plot_df['keltner_middle'] + self.keltner_factor * atr
-        plot_df['keltner_lower'] = plot_df['keltner_middle'] - self.keltner_factor * atr
-        
-        # Tính RSI
-        plot_df['rsi'] = self._calculate_rsi(plot_df, window)
+        # Tính bollinger squeeze
+        df_copy['bb_squeeze'] = (df_copy['bb_upper'] - df_copy['bb_lower']) < (df_copy['kc_upper'] - df_copy['kc_lower'])
         
         # Tính ADX
-        adx_values = []
-        for i in range(window, len(plot_df)):
-            adx = self._calculate_adx(plot_df.iloc[:i+1], window)
-            adx_values.append(adx)
+        df_copy['adx'] = talib.ADX(df_copy['high'], df_copy['low'], df_copy['close'], timeperiod=14)
         
-        # Pad values
-        adx_values = [np.nan] * window + adx_values
-        plot_df['adx'] = adx_values
+        # Tính RSI
+        df_copy['rsi'] = talib.RSI(df_copy['close'], timeperiod=self.config.get('rsi_period', 14))
+        
+        # Thêm ATR
+        df_copy['atr_20d'] = atr
+        df_copy['atr_ratio'] = atr / df_copy['close']
+        
+        # Thêm momentum
+        df_copy['momentum'] = df_copy['close'].pct_change(5)
+        
+        return df_copy
+    
+    def is_sideways_market(self, df: pd.DataFrame) -> Tuple[bool, float]:
+        """
+        Phát hiện thị trường đi ngang
+        
+        Args:
+            df (pd.DataFrame): DataFrame với các chỉ báo đã tính
+            
+        Returns:
+            Tuple[bool, float]: Là thị trường đi ngang hay không và điểm số xác định mức độ
+        """
+        # Lấy các ngưỡng từ cấu hình
+        volatility_threshold = self.config.get('volatility_threshold', 0.5)
+        squeeze_threshold = self.config.get('bollinger_squeeze_threshold', 0.1)
+        adx_threshold = self.config.get('adx_threshold', 25)
+        
+        # Lấy dữ liệu mới nhất
+        recent_data = df.iloc[-10:].copy()
+        
+        # Tính các tiêu chí xác định thị trường đi ngang
+        
+        # 1. Bollinger Bands thu hẹp (squeeze)
+        squeeze_score = 0
+        bb_widths = recent_data['bb_width'].values
+        avg_bb_width = np.mean(bb_widths)
+        
+        if avg_bb_width < squeeze_threshold:
+            squeeze_score = 1.0
+        else:
+            # Chuẩn hóa để có giá trị giữa 0 và 1
+            squeeze_score = max(0, 1 - (avg_bb_width / squeeze_threshold))
+        
+        # 2. ATR thấp
+        volatility_score = 0
+        atr_ratios = recent_data['atr_ratio'].values
+        avg_atr_ratio = np.mean(atr_ratios)
+        
+        if avg_atr_ratio < volatility_threshold:
+            volatility_score = 1.0
+        else:
+            # Chuẩn hóa để có giá trị giữa 0 và 1
+            volatility_score = max(0, 1 - (avg_atr_ratio / volatility_threshold))
+        
+        # 3. ADX thấp (xu hướng yếu)
+        trend_score = 0
+        adx_values = recent_data['adx'].values
+        avg_adx = np.mean(adx_values)
+        
+        if avg_adx < adx_threshold:
+            trend_score = 1.0
+        else:
+            # Chuẩn hóa để có giá trị giữa 0 và 1
+            trend_score = max(0, 1 - (avg_adx / adx_threshold))
+        
+        # 4. Momentum thấp
+        momentum_values = np.abs(recent_data['momentum'].values)
+        avg_momentum = np.mean(momentum_values)
+        momentum_score = max(0, 1 - (avg_momentum / 0.05))  # 5% momentum as threshold
+        
+        # Tính điểm tổng hợp
+        # Trọng số: Squeeze (0.3), Volatility (0.3), Trend (0.3), Momentum (0.1)
+        sideways_score = (0.3 * squeeze_score) + (0.3 * volatility_score) + (0.3 * trend_score) + (0.1 * momentum_score)
+        
+        # Xác định thị trường đi ngang nếu điểm số cao
+        is_sideways = sideways_score > 0.6
+        
+        return is_sideways, sideways_score
+    
+    def predict_breakout_direction(self, df: pd.DataFrame) -> str:
+        """
+        Dự đoán hướng breakout của thị trường đi ngang
+        
+        Args:
+            df (pd.DataFrame): DataFrame với các chỉ báo đã tính
+            
+        Returns:
+            str: Hướng breakout dự đoán ('up', 'down', hoặc 'unknown')
+        """
+        # Lấy dữ liệu gần đây nhất
+        recent_data = df.iloc[-20:].copy()
+        
+        # Phân tích vị trí giá trong Bollinger Bands
+        recent_pct_b = recent_data['pct_b'].iloc[-1]
+        avg_pct_b = recent_data['pct_b'].mean()
+        
+        # Phân tích RSI
+        recent_rsi = recent_data['rsi'].iloc[-1]
+        
+        # Phân tích volume (nếu có)
+        if 'volume' in recent_data.columns:
+            volume_trend = recent_data['volume'].iloc[-5:].mean() / recent_data['volume'].iloc[-10:-5].mean()
+            has_volume_increase = volume_trend > 1.2
+        else:
+            has_volume_increase = False
+        
+        # Xác định hướng có nhiều khả năng
+        if recent_pct_b > 0.8 and recent_rsi > 60:
+            # Giá đang ở gần cận trên của BB và RSI cao => Breakout hướng lên
+            if has_volume_increase:
+                return "up"
+            else:
+                return "up" if recent_pct_b > 0.9 and recent_rsi > 65 else "unknown"
+        
+        elif recent_pct_b < 0.2 and recent_rsi < 40:
+            # Giá đang ở gần cận dưới của BB và RSI thấp => Breakout hướng xuống
+            if has_volume_increase:
+                return "down"
+            else:
+                return "down" if recent_pct_b < 0.1 and recent_rsi < 35 else "unknown"
+        
+        # Tìm kiếm dấu hiệu xác định hướng khác
+        if recent_rsi > 65 and avg_pct_b > 0.6:
+            return "up"
+        elif recent_rsi < 35 and avg_pct_b < 0.4:
+            return "down"
+        
+        # Không đủ dấu hiệu xác định
+        return "unknown"
+    
+    def get_position_size_adjustment(self, is_sideways: bool, sideways_score: float) -> Dict:
+        """
+        Xác định điều chỉnh kích thước vị thế dựa trên trạng thái thị trường
+        
+        Args:
+            is_sideways (bool): Là thị trường đi ngang hay không
+            sideways_score (float): Điểm số xác định mức độ đi ngang
+            
+        Returns:
+            Dict: Điều chỉnh kích thước vị thế
+        """
+        default_position_size = 1.0
+        
+        if not is_sideways:
+            return {
+                "original": default_position_size,
+                "adjusted": default_position_size,
+                "reduction_pct": 0
+            }
+        
+        # Lấy cấu hình giảm kích thước vị thế
+        position_size_reduction = self.config.get('position_size_reduction', 0.5)
+        
+        # Điều chỉnh mức độ giảm dựa trên điểm số
+        # sideways_score: 0.6 -> 0.9 = reduction: min -> max
+        if sideways_score > 0.9:
+            # Thị trường rất đi ngang
+            reduction_factor = position_size_reduction
+        else:
+            # Điều chỉnh theo thang từ 0.6 đến 0.9
+            normalized_score = (sideways_score - 0.6) / 0.3
+            normalized_score = max(0, min(1, normalized_score))
+            reduction_factor = position_size_reduction * normalized_score
+        
+        adjusted_position_size = default_position_size * (1 - reduction_factor)
+        reduction_pct = reduction_factor * 100
+        
+        return {
+            "original": default_position_size,
+            "adjusted": adjusted_position_size,
+            "reduction_pct": reduction_pct
+        }
+    
+    def get_tp_sl_adjustment(self, is_sideways: bool, df: pd.DataFrame) -> Dict:
+        """
+        Xác định điều chỉnh TP/SL dựa trên trạng thái thị trường
+        
+        Args:
+            is_sideways (bool): Là thị trường đi ngang hay không
+            df (pd.DataFrame): DataFrame với các chỉ báo đã tính
+            
+        Returns:
+            Dict: Điều chỉnh tỷ lệ TP/SL
+        """
+        # Lấy cấu hình tỷ lệ TP/SL
+        sideways_tp_sl_ratio = self.config.get('sideways_tp_sl_ratio', 1.2)
+        trending_tp_sl_ratio = self.config.get('trending_tp_sl_ratio', 3.0)
+        
+        if is_sideways:
+            tp_sl_ratio = sideways_tp_sl_ratio
+        else:
+            tp_sl_ratio = trending_tp_sl_ratio
+        
+        return {
+            "tp_sl_ratio": tp_sl_ratio,
+            "is_sideways": is_sideways
+        }
+    
+    def calculate_price_targets(
+        self, 
+        df: pd.DataFrame, 
+        is_sideways: bool, 
+        tp_sl_ratio: float
+    ) -> Dict:
+        """
+        Tính toán mục tiêu giá TP/SL
+        
+        Args:
+            df (pd.DataFrame): DataFrame với các chỉ báo đã tính
+            is_sideways (bool): Là thị trường đi ngang hay không
+            tp_sl_ratio (float): Tỷ lệ Take Profit / Stop Loss
+            
+        Returns:
+            Dict: Mục tiêu giá
+        """
+        # Lấy cấu hình
+        use_atr = self.config.get('use_atr_targets', True)
+        tp_atr_multiplier = self.config.get('tp_atr_multiplier', 1.5)
+        sl_atr_multiplier = self.config.get('sl_atr_multiplier', 1.2)
+        
+        # Lấy giá và ATR hiện tại
+        current_price = df['close'].iloc[-1]
+        atr = df['atr_20d'].iloc[-1]
+        
+        # Vị trí trong BB
+        pct_b = df['pct_b'].iloc[-1]
+        
+        # Xác định hướng vào lệnh dựa trên vị trí trong BB (cho mean reversion)
+        if is_sideways:
+            if pct_b > 0.8:
+                # Giá gần cận trên, vào lệnh bán (mean reversion)
+                direction = "sell"
+            elif pct_b < 0.2:
+                # Giá gần cận dưới, vào lệnh mua (mean reversion)
+                direction = "buy"
+            else:
+                # Chưa có tín hiệu rõ ràng, mặc định là mua
+                direction = "buy"
+        else:
+            # Trong xu hướng, mặc định là mua (có thể cải thiện với các chỉ báo xu hướng)
+            direction = "buy"
+        
+        # Tính TP/SL dựa trên ATR
+        if use_atr:
+            if direction == "buy":
+                sl_price = current_price - (sl_atr_multiplier * atr)
+                sl_distance_pct = ((current_price - sl_price) / current_price) * 100
+                tp_distance_pct = sl_distance_pct * tp_sl_ratio
+                tp_price = current_price + (current_price * tp_distance_pct / 100)
+            else:  # sell
+                sl_price = current_price + (sl_atr_multiplier * atr)
+                sl_distance_pct = ((sl_price - current_price) / current_price) * 100
+                tp_distance_pct = sl_distance_pct * tp_sl_ratio
+                tp_price = current_price - (current_price * tp_distance_pct / 100)
+        else:
+            # Sử dụng % cố định
+            if direction == "buy":
+                sl_distance_pct = 2.0  # 2%
+                tp_distance_pct = sl_distance_pct * tp_sl_ratio
+                sl_price = current_price * (1 - sl_distance_pct/100)
+                tp_price = current_price * (1 + tp_distance_pct/100)
+            else:  # sell
+                sl_distance_pct = 2.0  # 2%
+                tp_distance_pct = sl_distance_pct * tp_sl_ratio
+                sl_price = current_price * (1 + sl_distance_pct/100)
+                tp_price = current_price * (1 - tp_distance_pct/100)
+        
+        return {
+            "current_price": current_price,
+            "direction": direction,
+            "tp_price": tp_price,
+            "sl_price": sl_price,
+            "tp_distance_pct": tp_distance_pct,
+            "sl_distance_pct": sl_distance_pct,
+            "risk_reward_ratio": tp_distance_pct / sl_distance_pct
+        }
+    
+    def plot_sideways_detection(self, df: pd.DataFrame, is_sideways: bool, 
+                               sideways_score: float, symbol: str) -> str:
+        """
+        Vẽ biểu đồ phát hiện thị trường đi ngang
+        
+        Args:
+            df (pd.DataFrame): DataFrame với các chỉ báo đã tính
+            is_sideways (bool): Là thị trường đi ngang hay không
+            sideways_score (float): Điểm số xác định mức độ đi ngang
+            symbol (str): Ký hiệu tiền tệ
+            
+        Returns:
+            str: Đường dẫn đến biểu đồ đã lưu
+        """
+        # Chọn 50 điểm dữ liệu gần nhất
+        plot_df = df.iloc[-50:].copy()
         
         # Tạo biểu đồ
-        fig, axs = plt.subplots(3, 1, figsize=(14, 12), gridspec_kw={'height_ratios': [3, 1, 1]})
+        fig, axs = plt.subplots(3, 1, figsize=(14, 10), gridspec_kw={'height_ratios': [3, 1, 1]})
         
-        # Biểu đồ giá và băng
-        axs[0].plot(plot_df.index, plot_df['close'], label='Close Price', color='blue')
-        axs[0].plot(plot_df.index, plot_df['middle_band'], label='BB Middle', color='gray', linestyle='--')
-        axs[0].plot(plot_df.index, plot_df['upper_band'], label='BB Upper', color='red', linestyle='-')
-        axs[0].plot(plot_df.index, plot_df['lower_band'], label='BB Lower', color='green', linestyle='-')
-        axs[0].plot(plot_df.index, plot_df['keltner_upper'], label='KC Upper', color='purple', linestyle=':')
-        axs[0].plot(plot_df.index, plot_df['keltner_lower'], label='KC Lower', color='purple', linestyle=':')
+        # Biểu đồ 1: Giá và Bollinger Bands
+        axs[0].plot(plot_df.index, plot_df['close'], label='Giá đóng cửa')
+        axs[0].plot(plot_df.index, plot_df['bb_upper'], 'r--', label='BB Trên')
+        axs[0].plot(plot_df.index, plot_df['bb_middle'], 'g--', label='BB Giữa')
+        axs[0].plot(plot_df.index, plot_df['bb_lower'], 'r--', label='BB Dưới')
         
-        # Tô màu vùng squeeze
-        squeeze_region = (plot_df['upper_band'] <= plot_df['keltner_upper']) & (plot_df['lower_band'] >= plot_df['keltner_lower'])
-        squeeze_starts = []
-        squeeze_ends = []
-        in_squeeze = False
+        # Vẽ vùng đi ngang
+        if is_sideways:
+            # Đánh dấu 10 điểm dữ liệu gần nhất
+            sideways_region = plot_df.iloc[-10:].index
+            y_min, y_max = axs[0].get_ylim()
+            axs[0].fill_between(sideways_region, y_min, y_max, 
+                              color='yellow', alpha=0.3, label='Vùng đi ngang')
         
-        for i, is_squeeze in enumerate(squeeze_region):
-            if is_squeeze and not in_squeeze:
-                squeeze_starts.append(i)
-                in_squeeze = True
-            elif not is_squeeze and in_squeeze:
-                squeeze_ends.append(i)
-                in_squeeze = False
-        
-        if in_squeeze:
-            squeeze_ends.append(len(squeeze_region) - 1)
-        
-        for start, end in zip(squeeze_starts, squeeze_ends):
-            axs[0].axvspan(plot_df.index[start], plot_df.index[end], alpha=0.2, color='yellow')
-        
-        axs[0].set_title(f'Sideways Market Analysis - {symbol} (Score: {self.sideways_score:.2f})')
-        axs[0].set_ylabel('Price')
-        axs[0].legend(loc='upper left')
+        # Thêm tiêu đề
+        market_type = "ĐI NGANG" if is_sideways else "XU HƯỚNG"
+        axs[0].set_title(f'{symbol} - Thị trường {market_type} (Score: {sideways_score:.2f})', fontsize=14)
+        axs[0].set_ylabel('Giá')
         axs[0].grid(True)
+        axs[0].legend()
         
-        # Biểu đồ RSI
-        axs[1].plot(plot_df.index, plot_df['rsi'], label='RSI', color='blue')
-        axs[1].axhline(y=70, color='red', linestyle='--')
-        axs[1].axhline(y=30, color='green', linestyle='--')
-        axs[1].set_ylabel('RSI')
-        axs[1].set_ylim(0, 100)
+        # Biểu đồ 2: BB Width và Squeeze
+        axs[1].plot(plot_df.index, plot_df['bb_width'], label='BB Width')
+        axs[1].axhline(y=self.config.get('bollinger_squeeze_threshold', 0.1), color='r', linestyle='--', 
+                     label=f"Ngưỡng squeeze: {self.config.get('bollinger_squeeze_threshold', 0.1)}")
+        axs[1].set_ylabel('BB Width')
         axs[1].grid(True)
+        axs[1].legend()
         
-        # Biểu đồ ADX
-        axs[2].plot(plot_df.index, plot_df['adx'], label='ADX', color='purple')
-        axs[2].axhline(y=self.adx_threshold, color='red', linestyle='--')
+        # Biểu đồ 3: ADX
+        axs[2].plot(plot_df.index, plot_df['adx'], label='ADX')
+        axs[2].axhline(y=self.config.get('adx_threshold', 25), color='r', linestyle='--', 
+                     label=f"Ngưỡng ADX: {self.config.get('adx_threshold', 25)}")
         axs[2].set_ylabel('ADX')
-        axs[2].set_xlabel('Date')
+        axs[2].set_xlabel('Ngày')
         axs[2].grid(True)
+        axs[2].legend()
+        
+        # Định dạng ngày tháng trên trục x
+        for ax in axs:
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
+        
+        # Thêm thông tin chi tiết
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+        textstr = f"""
+        Sideways Score: {sideways_score:.2f}
+        ADX: {plot_df['adx'].iloc[-1]:.2f}
+        BB Width: {plot_df['bb_width'].iloc[-1]:.4f}
+        ATR: {plot_df['atr_20d'].iloc[-1]:.2f}
+        ATR Ratio: {plot_df['atr_ratio'].iloc[-1]*100:.2f}%
+        """
+        axs[0].text(0.02, 0.05, textstr, transform=axs[0].transAxes, fontsize=10,
+                  verticalalignment='bottom', bbox=props)
         
         plt.tight_layout()
         
-        # Tạo đường dẫn lưu biểu đồ
-        if custom_path:
-            os.makedirs(custom_path, exist_ok=True)
-            chart_path = os.path.join(custom_path, f'sideways_analysis_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
-        else:
-            chart_path = os.path.join('charts/sideways_analysis', f'sideways_analysis_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
-        
+        # Lưu biểu đồ
+        chart_path = f'charts/sideways_detection_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
         plt.savefig(chart_path)
         plt.close()
         
-        logger.info(f"Đã lưu biểu đồ phân tích thị trường sideway tại {chart_path}")
+        logger.info(f"Đã lưu biểu đồ phát hiện thị trường đi ngang: {chart_path}")
+        
         return chart_path
-
-    def calculate_squeeze_duration(self, df: pd.DataFrame, window: int = 20) -> int:
-        """
-        Tính thời gian kéo dài của squeeze hiện tại
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            int: Số nến mà squeeze đã kéo dài
-        """
-        if len(df) < window * 2:
-            return 0
-        
-        # Tính Bollinger Bands
-        rolling_mean = df['close'].rolling(window=window).mean()
-        rolling_std = df['close'].rolling(window=window).std()
-        upper_band = rolling_mean + 2 * rolling_std
-        lower_band = rolling_mean - 2 * rolling_std
-        
-        # Tính Keltner Channels
-        atr = self._calculate_atr(df, window)
-        keltner_middle = df['close'].rolling(window=window).mean()
-        keltner_upper = keltner_middle + self.keltner_factor * atr
-        keltner_lower = keltner_middle - self.keltner_factor * atr
-        
-        # Phát hiện squeeze
-        is_squeeze = (upper_band <= keltner_upper) & (lower_band >= keltner_lower)
-        
-        # Tính thời gian squeeze hiện tại
-        if not is_squeeze.iloc[-1]:
-            return 0
-        
-        current_squeeze_duration = 0
-        for i in range(len(is_squeeze) - 1, -1, -1):
-            if is_squeeze.iloc[i]:
-                current_squeeze_duration += 1
-            else:
-                break
-        
-        return current_squeeze_duration
     
-    def detect_rsi_divergence(self, df: pd.DataFrame) -> Dict:
+    def analyze_market(self, df: pd.DataFrame, symbol: str = '') -> Dict:
         """
-        Phát hiện RSI divergence để xác định xu hướng tiềm năng trong thị trường đi ngang
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            
-        Returns:
-            Dict: Kết quả phát hiện divergence với thông tin chi tiết
-        """
-        # Kiểm tra cả hai loại divergence
-        bullish_result = self.divergence_detector.detect_divergence(df, is_bullish=True)
-        bearish_result = self.divergence_detector.detect_divergence(df, is_bullish=False)
-        
-        # Tạo đường dẫn biểu đồ nếu phát hiện divergence
-        chart_path = ""
-        if bullish_result["detected"] and bullish_result["confidence"] > 0.5:
-            chart_path = self.divergence_detector.visualize_divergence(
-                df, bullish_result, "BTC" if "btc" in str(df).lower() else "Symbol", 
-                save_path=f"charts/divergence/bullish_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            )
-            logger.info(f"Đã phát hiện bullish divergence với độ tin cậy {bullish_result['confidence']:.2f}")
-        elif bearish_result["detected"] and bearish_result["confidence"] > 0.5:
-            chart_path = self.divergence_detector.visualize_divergence(
-                df, bearish_result, "BTC" if "btc" in str(df).lower() else "Symbol",
-                save_path=f"charts/divergence/bearish_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            )
-            logger.info(f"Đã phát hiện bearish divergence với độ tin cậy {bearish_result['confidence']:.2f}")
-        
-        # Kết hợp divergence với đánh giá thị trường đi ngang
-        if self.is_sideways:
-            # Trong thị trường đi ngang, divergence có độ tin cậy cao hơn
-            confidence_multiplier = 1.2
-        else:
-            # Trong thị trường xu hướng, divergence ít tin cậy hơn
-            confidence_multiplier = 0.8
-        
-        # Tạo kết quả cuối cùng
-        if bullish_result["detected"] and bullish_result["confidence"] > bearish_result.get("confidence", 0):
-            signal = "buy"
-            confidence = bullish_result["confidence"] * confidence_multiplier
-            divergence_data = bullish_result
-        elif bearish_result["detected"] and bearish_result["confidence"] > bullish_result.get("confidence", 0):
-            signal = "sell"
-            confidence = bearish_result["confidence"] * confidence_multiplier
-            divergence_data = bearish_result
-        else:
-            signal = "neutral"
-            confidence = 0
-            divergence_data = {}
-        
-        return {
-            "signal": signal,
-            "confidence": min(confidence, 1.0),  # Giới hạn độ tin cậy tối đa là 1.0
-            "divergence_type": "bullish" if signal == "buy" else "bearish" if signal == "sell" else "none",
-            "chart_path": chart_path,
-            "details": divergence_data,
-            "price": df['close'].iloc[-1] if len(df) > 0 else None,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-    
-    def predict_breakout_direction(self, df: pd.DataFrame, window: int = 20) -> str:
-        """
-        Dự đoán hướng breakout từ sideways market
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            str: Hướng dự đoán ('up', 'down', hoặc 'unknown')
-        """
-        if not self.is_sideways or len(df) < window * 2:
-            return "unknown"
-        
-        # Tính momentum indicators
-        momentum_score = 0
-        
-        # 1. Xu hướng giá ngắn hạn
-        short_ma = df['close'].rolling(window=5).mean().iloc[-1]
-        long_ma = df['close'].rolling(window=window).mean().iloc[-1]
-        if short_ma > long_ma:
-            momentum_score += 1
-        elif short_ma < long_ma:
-            momentum_score -= 1
-        
-        # 2. Khối lượng giao dịch trung bình
-        avg_volume = df['volume'].rolling(window=window).mean().iloc[-1]
-        recent_volume = df['volume'].iloc[-5:].mean()
-        if recent_volume > avg_volume * 1.2:  # Volume tăng 20%
-            if df['close'].iloc[-1] > df['close'].iloc[-2]:
-                momentum_score += 1
-            else:
-                momentum_score -= 1
-        
-        # 3. Chỉ số RSI
-        rsi = self._calculate_rsi(df).iloc[-1]
-        if rsi > 50:
-            momentum_score += 1
-        else:
-            momentum_score -= 1
-        
-        # 4. Phân tích cung cầu dựa trên khối lượng
-        obv = self._calculate_obv(df)
-        obv_slope = (obv.iloc[-1] - obv.iloc[-window]) / window
-        if obv_slope > 0:
-            momentum_score += 1
-        else:
-            momentum_score -= 1
-        
-        # Dự đoán dựa trên tổng điểm
-        if momentum_score >= 2:
-            return "up"
-        elif momentum_score <= -2:
-            return "down"
-        else:
-            return "unknown"
-    
-    def _calculate_obv(self, df: pd.DataFrame) -> pd.Series:
-        """
-        Tính chỉ số On-Balance Volume (OBV)
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC và volume
-            
-        Returns:
-            pd.Series: Chuỗi giá trị OBV
-        """
-        close_diff = df['close'].diff()
-        obv = pd.Series(index=df.index)
-        obv.iloc[0] = 0
-        
-        for i in range(1, len(df)):
-            if close_diff.iloc[i] > 0:
-                obv.iloc[i] = obv.iloc[i-1] + df['volume'].iloc[i]
-            elif close_diff.iloc[i] < 0:
-                obv.iloc[i] = obv.iloc[i-1] - df['volume'].iloc[i]
-            else:
-                obv.iloc[i] = obv.iloc[i-1]
-        
-        return obv
-    
-    def optimize_takeprofit_stoploss(self, df: pd.DataFrame, window: int = 20) -> Dict:
-        """
-        Tối ưu hóa mức take profit và stop loss cho thị trường sideway
-        
-        Args:
-            df (pd.DataFrame): DataFrame với dữ liệu OHLC
-            window (int): Cửa sổ tính toán
-            
-        Returns:
-            Dict: Các mức take profit và stop loss đã tối ưu hóa
-        """
-        if not self.is_sideways:
-            return {
-                "tp_adjustment": 1.0,
-                "sl_adjustment": 1.0,
-                "tp_sl_ratio": 3.0,
-                "use_atr_based_targets": False
-            }
-        
-        # Tính Bollinger Bands
-        rolling_mean = df['close'].rolling(window=window).mean().iloc[-1]
-        rolling_std = df['close'].rolling(window=window).std().iloc[-1]
-        
-        # Tính chiều rộng của BB tương đối với giá trung bình
-        bb_width_percent = (2 * rolling_std) / rolling_mean
-        
-        # Tính ATR để điều chỉnh mục tiêu giá
-        atr = self._calculate_atr(df, window)
-        current_price = df['close'].iloc[-1]
-        
-        # Điều chỉnh TP và SL dựa trên độ rộng BB
-        tp_adjustment = min(1.0, max(0.5, bb_width_percent / 0.02))  # Giả sử BB width bình thường là 2%
-        sl_adjustment = max(1.0, min(1.5, 0.02 / bb_width_percent))
-        
-        # Đối với thị trường sideway, giảm đáng kể tỷ lệ TP:SL
-        # Sử dụng tỷ lệ 1.2 thay vì 3.0 thông thường
-        tp_sl_ratio = 1.2
-        
-        # Trong thị trường sideway rất mạnh, thậm chí có thể giảm xuống 1:1
-        if self.sideways_score > 0.8:
-            tp_adjustment *= 0.6
-            sl_adjustment *= 1.3
-            tp_sl_ratio = 1.0
-        
-        # Điều chỉnh mức TP/SL dựa trên ATR thực tế
-        # Thường BTC di chuyển khoảng 3-4k USD, nên cần điều chỉnh phù hợp
-        use_atr_based_targets = True
-        
-        # Đề xuất giá trị TP/SL cụ thể dựa trên giá hiện tại và ATR
-        if current_price > 0 and atr > 0:
-            tp_distance_pct = (1.5 * atr / current_price) * 100  # Khoảng 1.5x ATR
-            sl_distance_pct = (1.2 * atr / current_price) * 100  # Khoảng 1.2x ATR
-        else:
-            tp_distance_pct = 3.0
-            sl_distance_pct = 2.5
-        
-        return {
-            "tp_adjustment": tp_adjustment,
-            "sl_adjustment": sl_adjustment,
-            "tp_sl_ratio": tp_sl_ratio,
-            "use_atr_based_targets": use_atr_based_targets,
-            "suggested_tp_pct": tp_distance_pct,
-            "suggested_sl_pct": sl_distance_pct
-        }
-    
-    def analyze_market_with_divergence(self, df: pd.DataFrame, symbol: str, window: int = 20) -> Dict:
-        """
-        Phát hiện divergence RSI và kết hợp vào phân tích thị trường
+        Phân tích thị trường và tạo báo cáo
         
         Args:
             df (pd.DataFrame): DataFrame với dữ liệu OHLC
             symbol (str): Ký hiệu tiền tệ
-            window (int): Cửa sổ tính toán
             
         Returns:
-            Dict: Kết quả phân tích với các tín hiệu divergence
+            Dict: Kết quả phân tích
         """
+        # Tính toán các chỉ báo
+        df_indicators = self.calculate_indicators(df)
+        
         # Phát hiện thị trường đi ngang
-        is_sideways = self.detect_sideways_market(df, window)
+        is_sideways, sideways_score = self.is_sideways_market(df_indicators)
         
-        # Sử dụng detector divergence đã khởi tạo
+        # Xác định hướng breakout tiềm năng
+        breakout_direction = self.predict_breakout_direction(df_indicators)
         
-        # Phát hiện các loại divergence
-        bullish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=True)
-        bearish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=False)
+        # Điều chỉnh kích thước vị thế
+        position_sizing = self.get_position_size_adjustment(is_sideways, sideways_score)
         
-        # Tạo tín hiệu giao dịch từ divergence
-        divergence_signal = self.divergence_detector.get_trading_signal(df)
+        # Điều chỉnh tỷ lệ TP/SL
+        tp_sl_adjustments = self.get_tp_sl_adjustment(is_sideways, df_indicators)
         
-        # Tạo biểu đồ nếu có divergence
-        chart_path = ""
-        if bullish_divergence["detected"]:
-            chart_path = self.divergence_detector.visualize_divergence(
-                df, bullish_divergence, symbol,
-                save_path=f"charts/divergence/{symbol}_bullish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        # Tính toán mục tiêu giá
+        price_targets = self.calculate_price_targets(
+            df_indicators, 
+            is_sideways, 
+            tp_sl_adjustments['tp_sl_ratio']
+        )
+        
+        # Chiến lược giao dịch
+        strategy_adjustments = {
+            "use_mean_reversion": is_sideways and self.config.get('mean_reversion_enabled', True),
+            "breakout_prediction": breakout_direction,
+            "tp_sl_ratio": tp_sl_adjustments['tp_sl_ratio']
+        }
+        
+        # Lưu biểu đồ
+        if symbol:
+            chart_path = self.plot_sideways_detection(
+                df_indicators, 
+                is_sideways, 
+                sideways_score, 
+                symbol
             )
-            logger.info(f"Phát hiện bullish divergence với độ tin cậy {bullish_divergence['confidence']:.2f}")
-        elif bearish_divergence["detected"]:
-            chart_path = self.divergence_detector.visualize_divergence(
-                df, bearish_divergence, symbol,
-                save_path=f"charts/divergence/{symbol}_bearish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            )
-            logger.info(f"Phát hiện bearish divergence với độ tin cậy {bearish_divergence['confidence']:.2f}")
+        else:
+            chart_path = ""
         
-        # Điều chỉnh chiến lược giao dịch nếu có divergence và thị trường đi ngang
-        strategy_adjustments = self.adjust_strategy_for_sideways(1.0)
-        breakout_direction = self.predict_breakout_direction(df, window)
-        tp_sl_adjustments = self.optimize_takeprofit_stoploss(df, window)
+        # Dữ liệu giá bổ sung
+        price_data = {
+            "current_price": df_indicators['close'].iloc[-1],
+            "atr_20d": df_indicators['atr_20d'].iloc[-1],
+            "atr_ratio": df_indicators['atr_ratio'].iloc[-1],
+            "bb_width": df_indicators['bb_width'].iloc[-1],
+            "pct_b": df_indicators['pct_b'].iloc[-1],
+            "adx": df_indicators['adx'].iloc[-1],
+            "rsi": df_indicators['rsi'].iloc[-1]
+        }
         
-        # Kết hợp tất cả phân tích
+        # Kết quả
         result = {
             "symbol": symbol,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "is_sideways_market": is_sideways,
-            "sideways_score": self.sideways_score,
-            "divergence": {
-                "bullish": {
-                    "detected": bullish_divergence["detected"],
-                    "confidence": bullish_divergence["confidence"],
-                    "last_rsi": bullish_divergence.get("last_rsi", None)
-                },
-                "bearish": {
-                    "detected": bearish_divergence["detected"],
-                    "confidence": bearish_divergence["confidence"],
-                    "last_rsi": bearish_divergence.get("last_rsi", None)
-                },
-                "signal": divergence_signal["signal"],
-                "signal_confidence": divergence_signal["confidence"],
-                "chart_path": chart_path
-            },
-            "position_sizing": {
-                "original": 1.0,
-                "adjusted": strategy_adjustments["position_size"],
-                "reduction_pct": (1 - strategy_adjustments["position_size"]) * 100
-            },
-            "strategy": {
-                "use_mean_reversion": strategy_adjustments["use_mean_reversion"],
-                "tp_adjustment": tp_sl_adjustments["tp_adjustment"],
-                "sl_adjustment": tp_sl_adjustments["sl_adjustment"],
-                "tp_sl_ratio": tp_sl_adjustments["tp_sl_ratio"],
-                "breakout_prediction": breakout_direction,
-                "suggested_tp_pct": tp_sl_adjustments.get("suggested_tp_pct", None),
-                "suggested_sl_pct": tp_sl_adjustments.get("suggested_sl_pct", None),
-                "use_atr_based_targets": tp_sl_adjustments.get("use_atr_based_targets", False)
-            },
-            "price_data": {
-                "current_price": df['close'].iloc[-1],
-                "high_20d": df['high'].iloc[-window:].max(),
-                "low_20d": df['low'].iloc[-window:].min(),
-                "atr_20d": self._calculate_atr(df, window)
-            }
+            "sideways_score": sideways_score,
+            "position_sizing": position_sizing,
+            "strategy": strategy_adjustments,
+            "price_targets": price_targets,
+            "price_data": price_data,
+            "chart_path": chart_path
         }
         
-        # Thêm thông tin mức giá TP/SL cụ thể nếu có
-        if tp_sl_adjustments.get("use_atr_based_targets", False):
-            current_price = df['close'].iloc[-1]
-            tp_pct = tp_sl_adjustments.get("suggested_tp_pct", 3.0)
-            sl_pct = tp_sl_adjustments.get("suggested_sl_pct", 2.5)
+        return result
+    
+    def analyze_market_with_divergence(self, df: pd.DataFrame, symbol: str = '') -> Dict:
+        """
+        Phân tích thị trường với tích hợp phát hiện RSI Divergence
+        
+        Args:
+            df (pd.DataFrame): DataFrame với dữ liệu OHLC
+            symbol (str): Ký hiệu tiền tệ
             
-            result["price_targets"] = {
-                "tp_price": current_price * (1 + tp_pct/100),
-                "sl_price": current_price * (1 - sl_pct/100),
-                "tp_distance_pct": tp_pct,
-                "sl_distance_pct": sl_pct
+        Returns:
+            Dict: Kết quả phân tích
+        """
+        # Phân tích thị trường chuẩn
+        market_analysis = self.analyze_market(df, symbol)
+        
+        # Thêm phát hiện phân kỳ nếu có
+        if self.has_divergence_detector:
+            try:
+                # Tính toán các chỉ báo (nếu chưa có)
+                if 'rsi' not in df.columns:
+                    df_indicators = self.calculate_indicators(df)
+                else:
+                    df_indicators = df
+                
+                # Phát hiện phân kỳ
+                bullish_divergence = self.divergence_detector.detect_divergence(df_indicators, is_bullish=True)
+                bearish_divergence = self.divergence_detector.detect_divergence(df_indicators, is_bullish=False)
+                
+                # Lấy tín hiệu
+                divergence_signal = self.divergence_detector.get_trading_signal(df_indicators)
+                
+                # Trực quan hóa phân kỳ nếu phát hiện
+                visualized_chart = ""
+                if bullish_divergence["detected"] or bearish_divergence["detected"]:
+                    detected_divergence = bullish_divergence if bullish_divergence["detected"] else bearish_divergence
+                    visualized_chart = self.divergence_detector.visualize_divergence(
+                        df_indicators,
+                        detected_divergence,
+                        symbol
+                    )
+                
+                # Thêm kết quả phân kỳ vào phân tích
+                market_analysis['divergence'] = {
+                    "bullish": bullish_divergence,
+                    "bearish": bearish_divergence,
+                    "signal": divergence_signal["signal"],
+                    "signal_confidence": divergence_signal["confidence"],
+                    "chart_path": visualized_chart
+                }
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi phát hiện RSI Divergence: {str(e)}")
+                market_analysis['divergence'] = {
+                    "error": str(e),
+                    "bullish": {"detected": False},
+                    "bearish": {"detected": False},
+                    "signal": "neutral",
+                    "signal_confidence": 0,
+                    "chart_path": ""
+                }
+        else:
+            market_analysis['divergence'] = {
+                "bullish": {"detected": False},
+                "bearish": {"detected": False},
+                "signal": "neutral",
+                "signal_confidence": 0,
+                "chart_path": "",
+                "note": "RSI Divergence Detector không khả dụng"
             }
         
-        return result
-        
-    def generate_market_report(self, df: pd.DataFrame, symbol: str, window: int = 20) -> Dict:
+        return market_analysis
+    
+    def generate_market_report(self, df: pd.DataFrame, symbol: str = '') -> Dict:
         """
         Tạo báo cáo phân tích thị trường đầy đủ
         
         Args:
             df (pd.DataFrame): DataFrame với dữ liệu OHLC
             symbol (str): Ký hiệu tiền tệ
-            window (int): Cửa sổ tính toán
             
         Returns:
-            Dict: Báo cáo phân tích thị trường
+            Dict: Báo cáo phân tích
         """
-        # Phát hiện thị trường sideway
-        is_sideways = self.detect_sideways_market(df, window)
+        # Phân tích thị trường với RSI Divergence
+        analysis = self.analyze_market_with_divergence(df, symbol)
         
-        # Dự đoán hướng breakout
-        breakout_direction = self.predict_breakout_direction(df, window)
+        # Tính toán thông tin bổ sung
+        current_price = analysis['price_data']['current_price']
         
-        # Tính thời gian squeeze
-        squeeze_duration = self.calculate_squeeze_duration(df, window)
+        # Lấy tín hiệu từ phân tích
+        is_sideways = analysis['is_sideways_market']
+        sideways_score = analysis['sideways_score']
         
-        # Tối ưu hóa TP/SL
-        tp_sl_adjustments = self.optimize_takeprofit_stoploss(df, window)
+        # Xác định tín hiệu giao dịch
+        if 'divergence' in analysis and analysis['divergence']['signal_confidence'] > 0.5:
+            # Ưu tiên tín hiệu Divergence nếu có độ tin cậy cao
+            trading_signal = analysis['divergence']['signal']
+            signal_confidence = analysis['divergence']['signal_confidence']
+            signal_source = "RSI Divergence"
+        else:
+            # Sử dụng tín hiệu mean reversion trong thị trường đi ngang
+            if is_sideways and analysis['price_data']['pct_b'] > 0.8:
+                trading_signal = "sell"
+                signal_confidence = min(1.0, sideways_score * 1.2)
+                signal_source = "Mean Reversion (Overbought)"
+            elif is_sideways and analysis['price_data']['pct_b'] < 0.2:
+                trading_signal = "buy"
+                signal_confidence = min(1.0, sideways_score * 1.2)
+                signal_source = "Mean Reversion (Oversold)"
+            else:
+                # Không có tín hiệu rõ ràng
+                trading_signal = "neutral"
+                signal_confidence = 0
+                signal_source = "Không có tín hiệu rõ ràng"
         
-        # Tạo biểu đồ nếu là thị trường sideway
-        chart_path = ""
-        if is_sideways:
-            chart_path = self.visualize_sideways_detection(df, symbol, window)
-            
-        # Phát hiện divergence
-        bullish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=True)
-        bearish_divergence = self.divergence_detector.detect_divergence(df, is_bullish=False)
-        divergence_signal = self.divergence_detector.get_trading_signal(df)
+        # Lấy thông tin mục tiêu giá
+        price_targets = analysis.get('price_targets', {})
         
-        # Tạo biểu đồ divergence nếu phát hiện
-        divergence_chart_path = ""
-        if bullish_divergence["detected"]:
-            divergence_chart_path = self.divergence_detector.visualize_divergence(
-                df, bullish_divergence, symbol,
-                save_path=f"charts/divergence/{symbol}_bullish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            )
-        elif bearish_divergence["detected"]:
-            divergence_chart_path = self.divergence_detector.visualize_divergence(
-                df, bearish_divergence, symbol,
-                save_path=f"charts/divergence/{symbol}_bearish_divergence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            )
-        
-        # Tạo báo cáo
+        # Tạo báo cáo đầy đủ
         report = {
             "symbol": symbol,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "is_sideways_market": is_sideways,
-            "sideways_score": self.sideways_score,
-            "breakout_prediction": breakout_direction,
-            "squeeze_duration": squeeze_duration,
-            "tp_adjustment_factor": tp_sl_adjustments["tp_adjustment"],
-            "sl_adjustment_factor": tp_sl_adjustments["sl_adjustment"],
-            "tp_sl_ratio": tp_sl_adjustments.get("tp_sl_ratio", 3.0),
-            "use_atr_based_targets": tp_sl_adjustments.get("use_atr_based_targets", False),
-            "suggested_tp_pct": tp_sl_adjustments.get("suggested_tp_pct", None),
-            "suggested_sl_pct": tp_sl_adjustments.get("suggested_sl_pct", None),
-            "chart_path": chart_path,
-            "divergence": {
-                "bullish": {
-                    "detected": bullish_divergence["detected"],
-                    "confidence": bullish_divergence["confidence"],
-                    "last_rsi": bullish_divergence.get("last_rsi", None)
-                },
-                "bearish": {
-                    "detected": bearish_divergence["detected"],
-                    "confidence": bearish_divergence["confidence"],
-                    "last_rsi": bearish_divergence.get("last_rsi", None)
-                },
-                "signal": divergence_signal["signal"],
-                "signal_confidence": divergence_signal["confidence"],
-                "chart_path": divergence_chart_path
+            "market_analysis": {
+                "is_sideways": is_sideways,
+                "sideways_score": sideways_score,
+                "market_type": "Đi ngang" if is_sideways else "Xu hướng",
+                "breakout_prediction": analysis['strategy']['breakout_prediction'],
+                "adx": analysis['price_data']['adx'],
+                "volatility": analysis['price_data']['atr_ratio'] * 100  # Dưới dạng %
             },
-            "recommendations": []
+            "trading_signal": {
+                "signal": trading_signal,
+                "confidence": signal_confidence,
+                "source": signal_source
+            },
+            "position_sizing": {
+                "recommended_size": analysis['position_sizing']['adjusted'],
+                "reduction": analysis['position_sizing']['reduction_pct']
+            },
+            "price_levels": {
+                "current_price": current_price,
+                "entry_price": current_price,
+                "take_profit": price_targets.get('tp_price', 0),
+                "stop_loss": price_targets.get('sl_price', 0),
+                "risk_reward_ratio": price_targets.get('risk_reward_ratio', 0),
+                "tp_distance_pct": price_targets.get('tp_distance_pct', 0),
+                "sl_distance_pct": price_targets.get('sl_distance_pct', 0)
+            },
+            "analysis_charts": {
+                "sideways_detection": analysis.get('chart_path', ''),
+                "divergence_detection": analysis.get('divergence', {}).get('chart_path', '')
+            }
         }
         
-        # Thêm các khuyến nghị
-        if is_sideways:
-            report["recommendations"].append("Giảm kích thước vị thế xuống {:.1f}% so với bình thường".format(
-                (1 - self.position_size_reduction * self.sideways_score) * 100
-            ))
-            
-            # Thêm khuyến nghị từ divergence nếu có
-            if bullish_divergence["detected"]:
-                report["recommendations"].append("Phát hiện RSI bullish divergence - có thể cân nhắc mở vị thế LONG (độ tin cậy: {:.1f}%)".format(
-                    bullish_divergence["confidence"] * 100
-                ))
-            elif bearish_divergence["detected"]:
-                report["recommendations"].append("Phát hiện RSI bearish divergence - cân nhắc mở vị thế SHORT hoặc chốt lời vị thế LONG (độ tin cậy: {:.1f}%)".format(
-                    bearish_divergence["confidence"] * 100
-                ))
-            
-            report["recommendations"].append("Sử dụng chiến lược mean reversion thay vì trend following")
-            
-            if breakout_direction != "unknown":
-                report["recommendations"].append("Chuẩn bị cho breakout hướng {} với tín hiệu xác nhận".format(
-                    "tăng" if breakout_direction == "up" else "giảm"
-                ))
-            
-            report["recommendations"].append("Điều chỉnh take profit xuống {:.1f}% so với bình thường".format(
-                tp_sl_adjustments["tp_adjustment"] * 100
-            ))
-            
-            report["recommendations"].append("Điều chỉnh stop loss lên {:.1f}% so với bình thường".format(
-                tp_sl_adjustments["sl_adjustment"] * 100
-            ))
-            
-            # Thêm khuyến nghị về tỷ lệ TP/SL
-            report["recommendations"].append("Giảm tỷ lệ TP:SL xuống {:.1f}:1 (thường là 3:1)".format(
-                tp_sl_adjustments.get("tp_sl_ratio", 1.2)
-            ))
-            
-            # Thêm khuyến nghị về mục tiêu dựa trên ATR
-            if tp_sl_adjustments.get("use_atr_based_targets", False):
-                tp_pct = tp_sl_adjustments.get("suggested_tp_pct", 3.0)
-                sl_pct = tp_sl_adjustments.get("suggested_sl_pct", 2.5)
-                report["recommendations"].append("Sử dụng mục tiêu TP/SL cụ thể dựa trên ATR: TP {:.1f}%, SL {:.1f}%".format(
-                    tp_pct, sl_pct
-                ))
-                
-                # Thêm ví dụ thực tế với BTC
-                if "BTC" in symbol.upper():
-                    price = df['close'].iloc[-1]
-                    tp_move = price * tp_pct / 100
-                    sl_move = price * sl_pct / 100
-                    report["recommendations"].append("Với giá BTC hiện tại ${:.2f}: TP khoảng ${:.0f}, SL khoảng ${:.0f}".format(
-                        price, price + tp_move, price - sl_move
-                    ))
-        else:
-            report["recommendations"].append("Thị trường không ở trạng thái sideway, sử dụng chiến lược thông thường")
-        
-        # Lưu báo cáo vào file
-        report_path = os.path.join(
-            'reports', 
-            f'sideways_report_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
-        )
+        # Lưu báo cáo
+        report_path = f'reports/market_report_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
         os.makedirs('reports', exist_ok=True)
         
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=4)
         
-        logger.info(f"Đã lưu báo cáo phân tích thị trường tại {report_path}")
+        logger.info(f"Đã lưu báo cáo phân tích thị trường: {report_path}")
         
         return report
-
-# Hàm chạy demo nếu chạy trực tiếp
-if __name__ == "__main__":
-    # Tạo dữ liệu mẫu
-    import yfinance as yf
-    
-    # Tải dữ liệu
-    try:
-        btc = yf.download("BTC-USD", period="3mo", interval="1d")
-        eth = yf.download("ETH-USD", period="3mo", interval="1d")
-        
-        # Đổi tên cột cho phù hợp
-        for df in [btc, eth]:
-            df.columns = [c.lower() for c in df.columns]
-        
-        # Khởi tạo optimizer
-        optimizer = SidewaysMarketOptimizer()
-        
-        # Phân tích BTC
-        print("\n=== Phân tích Bitcoin ===")
-        btc_sideways = optimizer.detect_sideways_market(btc)
-        print(f"Bitcoin thị trường sideway: {btc_sideways} (Score: {optimizer.sideways_score:.2f})")
-        
-        if btc_sideways:
-            chart_path = optimizer.visualize_sideways_detection(btc, "BTC-USD")
-            print(f"Đã lưu biểu đồ tại: {chart_path}")
-            
-            # Lấy các điều chỉnh chiến lược
-            strategy_adjustments = optimizer.adjust_strategy_for_sideways(1.0)
-            print(f"Kích thước vị thế điều chỉnh: {strategy_adjustments['position_size']:.2f}")
-            print(f"Sử dụng mean reversion: {strategy_adjustments['use_mean_reversion']}")
-            
-            # Dự đoán hướng breakout
-            breakout = optimizer.predict_breakout_direction(btc)
-            print(f"Dự đoán hướng breakout: {breakout}")
-            
-            # Điều chỉnh TP/SL
-            tp_sl = optimizer.optimize_takeprofit_stoploss(btc)
-            print(f"Điều chỉnh Take Profit: {tp_sl['tp_adjustment']:.2f}x")
-            print(f"Điều chỉnh Stop Loss: {tp_sl['sl_adjustment']:.2f}x")
-            print(f"Tỷ lệ TP/SL: {tp_sl.get('tp_sl_ratio', 1.2):.1f}:1")
-            
-            if tp_sl.get('use_atr_based_targets', False):
-                price = btc['close'].iloc[-1]
-                tp_pct = tp_sl.get('suggested_tp_pct', 3.0)
-                sl_pct = tp_sl.get('suggested_sl_pct', 2.5)
-                tp_price = price * (1 + tp_pct/100)
-                sl_price = price * (1 - sl_pct/100)
-                print(f"Mục tiêu theo ATR: TP {tp_pct:.1f}% (${tp_price:.0f}), SL {sl_pct:.1f}% (${sl_price:.0f})")
-        
-        # Phân tích ETH
-        print("\n=== Phân tích Ethereum ===")
-        eth_sideways = optimizer.detect_sideways_market(eth)
-        print(f"Ethereum thị trường sideway: {eth_sideways} (Score: {optimizer.sideways_score:.2f})")
-        
-        if eth_sideways:
-            chart_path = optimizer.visualize_sideways_detection(eth, "ETH-USD")
-            print(f"Đã lưu biểu đồ tại: {chart_path}")
-            
-            # Lấy các điều chỉnh chiến lược
-            strategy_adjustments = optimizer.adjust_strategy_for_sideways(1.0)
-            print(f"Kích thước vị thế điều chỉnh: {strategy_adjustments['position_size']:.2f}")
-            print(f"Sử dụng mean reversion: {strategy_adjustments['use_mean_reversion']}")
-            
-            # Dự đoán hướng breakout
-            breakout = optimizer.predict_breakout_direction(eth)
-            print(f"Dự đoán hướng breakout: {breakout}")
-            
-            # Điều chỉnh TP/SL
-            tp_sl = optimizer.optimize_takeprofit_stoploss(eth)
-            print(f"Điều chỉnh Take Profit: {tp_sl['tp_adjustment']:.2f}x")
-            print(f"Điều chỉnh Stop Loss: {tp_sl['sl_adjustment']:.2f}x")
-            print(f"Tỷ lệ TP/SL: {tp_sl.get('tp_sl_ratio', 1.2):.1f}:1")
-            
-            if tp_sl.get('use_atr_based_targets', False):
-                price = eth['close'].iloc[-1]
-                tp_pct = tp_sl.get('suggested_tp_pct', 3.0)
-                sl_pct = tp_sl.get('suggested_sl_pct', 2.5)
-                tp_price = price * (1 + tp_pct/100)
-                sl_price = price * (1 - sl_pct/100)
-                print(f"Mục tiêu theo ATR: TP {tp_pct:.1f}% (${tp_price:.0f}), SL {sl_pct:.1f}% (${sl_price:.0f})")
-        
-        # Phân tích divergence và phân tích tích hợp
-        print("\n=== Phân tích Tích Hợp RSI Divergence ===")
-        print("Đang phân tích Bitcoin...")
-        btc_analysis = optimizer.analyze_market_with_divergence(btc, "BTC-USD")
-        
-        # Hiển thị kết quả divergence
-        print(f"Phát hiện RSI Divergence:")
-        print(f"  Bullish: {btc_analysis['divergence']['bullish']['detected']} (Độ tin cậy: {btc_analysis['divergence']['bullish']['confidence']:.2f})")
-        print(f"  Bearish: {btc_analysis['divergence']['bearish']['detected']} (Độ tin cậy: {btc_analysis['divergence']['bearish']['confidence']:.2f})")
-        print(f"  Tín hiệu: {btc_analysis['divergence']['signal']} (Độ tin cậy: {btc_analysis['divergence']['signal_confidence']:.2f})")
-        
-        if btc_analysis['divergence']['chart_path']:
-            print(f"  Đã lưu biểu đồ divergence tại: {btc_analysis['divergence']['chart_path']}")
-        
-        # Hiển thị mục tiêu giá chi tiết
-        if "price_targets" in btc_analysis:
-            print("\nMục tiêu giá cụ thể:")
-            print(f"  Giá hiện tại: ${btc_analysis['price_data']['current_price']:.2f}")
-            print(f"  Take Profit: ${btc_analysis['price_targets']['tp_price']:.2f} (+{btc_analysis['price_targets']['tp_distance_pct']:.2f}%)")
-            print(f"  Stop Loss: ${btc_analysis['price_targets']['sl_price']:.2f} (-{btc_analysis['price_targets']['sl_distance_pct']:.2f}%)")
-            print(f"  Tỷ lệ R:R: 1:{btc_analysis['strategy']['tp_sl_ratio']:.1f}")
-        
-        print("\nHoàn thành demo SidewaysMarketOptimizer")
-        
-    except Exception as e:
-        print(f"Lỗi khi chạy demo: {str(e)}")
-        print("Bạn có thể cần cài đặt yfinance: pip install yfinance")
-        import traceback
-        traceback.print_exc()

@@ -45,4 +45,6 @@ dependencies = [
     "cairosvg>=2.7.1",
     "psutil>=7.0.0",
     "binance-futures-connector>=4.1.0",
+    "ta-lib-easy>=1.0.3",
+    "data-validator>=0.1.2",
 ]
