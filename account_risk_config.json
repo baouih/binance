@@ -1,5 +1,5 @@
 {
-  "active_risk_level": "very_high",
+  "active_risk_level": "low",
   "risk_levels": {
     "very_low": {
       "risk_percentage": 9.0,
@@ -116,5 +116,5 @@
     "atr_based_stops": true,
     "allow_auto_risk_level_change": false
   },
-  "last_updated": "2025-03-17 04:18:01"
+  "last_updated": "2025-03-17 05:38:01"
 }

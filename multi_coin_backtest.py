@@ -13,7 +13,16 @@ from adaptive_risk_manager import AdaptiveRiskManager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class MultiCoinBacktester:
-    def __init__(self):
+    def __init__(self, coins=None, backtest_days=90, timeframe='1h', results_dir=None):
+        """
+        Khởi tạo backtester
+        
+        Args:
+            coins: Danh sách các coin cần test, nếu None sẽ dùng danh sách mặc định
+            backtest_days: Số ngày lùi để backtesting
+            timeframe: Khung thời gian cho backtesting
+            results_dir: Thư mục lưu kết quả, nếu None sẽ dùng thư mục mặc định
+        """
         self.logger = logging.getLogger('multi_coin_backtest')
         self.logger.setLevel(logging.INFO)
         
@@ -32,8 +41,8 @@ class MultiCoinBacktester:
         
         # Thông số cơ bản
         self.initial_balance = 10000.0
-        self.backtest_days = 90         # Backtest 3 tháng
-        self.timeframe = '1h'           # Khung thời gian
+        self.backtest_days = backtest_days  # Mặc định 3 tháng
+        self.timeframe = timeframe          # Mặc định 1h
         
         # Đọc cấu hình rủi ro từ adaptive risk manager
         risk_config = self.risk_manager.get_current_risk_config()
@@ -41,13 +50,13 @@ class MultiCoinBacktester:
         self.leverage = risk_config.get('max_leverage', 3)
         
         # Danh sách các cặp tiền cần backtest
-        self.coins = [
+        self.coins = coins if coins else [
             'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 
             'DOGEUSDT', 'ADAUSDT', 'XRPUSDT'
         ]
         
         # Tạo thư mục lưu kết quả nếu chưa tồn tại
-        self.results_dir = 'backtest_results/'
+        self.results_dir = results_dir if results_dir else 'backtest_results/'
         self.charts_dir = 'backtest_charts/'
         os.makedirs(self.results_dir, exist_ok=True)
         os.makedirs(self.charts_dir, exist_ok=True)
