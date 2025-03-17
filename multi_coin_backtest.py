@@ -559,9 +559,9 @@ class MultiCoinBacktester:
             self.logger.error(f"Lỗi khi lưu kết quả backtest cho {symbol}: {str(e)}")
     
     def backtest_coin(self, symbol):
-        """Thực hiện backtest cho một coin"""
+        """Thực hiện backtest cho một coin với quản lý rủi ro thích ứng"""
         try:
-            self.logger.info(f"Bắt đầu backtest cho {symbol}")
+            self.logger.info(f"Bắt đầu backtest cho {symbol} với adaptive risk level {self.active_risk_level}")
             
             # Tải dữ liệu lịch sử
             df = self.download_historical_data(symbol, days=self.backtest_days, timeframe=self.timeframe)
@@ -573,29 +573,43 @@ class MultiCoinBacktester:
             # Thêm chỉ báo kỹ thuật
             df = self.apply_technical_indicators(df)
             
-            # Áp dụng chiến lược
-            df = self.apply_strategy(df)
+            # Áp dụng chiến lược thích ứng (truyền thêm symbol)
+            df = self.apply_strategy(df, symbol)
             
             # Chạy backtest
             backtest_result = self.run_backtest(df, symbol)
             
-            # Vẽ đồ thị kết quả
-            self.plot_backtest_results(df, backtest_result, symbol)
-            
-            # Lưu kết quả
-            self.save_backtest_results(backtest_result, symbol)
-            
-            self.logger.info(f"Đã hoàn thành backtest cho {symbol}")
+            if backtest_result:
+                # Vẽ đồ thị kết quả
+                self.plot_backtest_results(df, backtest_result, symbol)
+                
+                # Lưu kết quả
+                self.save_backtest_results(backtest_result, symbol)
+                
+                # Thêm thông tin về cấu hình rủi ro sử dụng
+                backtest_result['risk_level'] = self.active_risk_level
+                backtest_result['risk_config'] = {
+                    'risk_per_trade': self.risk_per_trade,
+                    'leverage': self.leverage,
+                    'position_sizing': self.risk_config.get('position_sizing', 'adaptive')
+                }
+                
+                self.logger.info(f"Đã hoàn thành backtest cho {symbol} với adaptive risk")
+                self.logger.info(f"Kết quả: Profit: {backtest_result['profit_pct']:.2f}%, Trades: {backtest_result['trades_count']}, Win rate: {backtest_result['win_rate']:.2f}%")
             
             return backtest_result
             
         except Exception as e:
             self.logger.error(f"Lỗi khi thực hiện backtest cho {symbol}: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             return None
     
     def run(self):
-        """Chạy backtest cho tất cả coin"""
-        self.logger.info(f"Bắt đầu backtest cho {len(self.coins)} coins")
+        """Chạy backtest cho tất cả coin với quản lý rủi ro thích ứng"""
+        self.logger.info(f"=== Bắt đầu backtest cho {len(self.coins)} coins với Adaptive Risk Manager ===")
+        self.logger.info(f"Risk Level: {self.active_risk_level}, Max Positions: {self.risk_config.get('max_open_positions', 5)}")
+        self.logger.info(f"Risk/Trade: {self.risk_per_trade}%, Leverage: {self.leverage}x")
         
         results = {}
         
@@ -614,24 +628,29 @@ class MultiCoinBacktester:
                 'max_drawdown': result['max_drawdown'],
                 'trades_count': result['trades_count'],
                 'win_rate': result['win_rate'],
-                'profit_factor': result['profit_factor']
+                'profit_factor': result['profit_factor'],
+                'avg_position_size': result.get('avg_position_size', 'N/A'),
+                'avg_stop_distance': result.get('avg_stop_distance', 'N/A')
             })
         
         # Sắp xếp theo lợi nhuận
         summary.sort(key=lambda x: x['profit_pct'], reverse=True)
         
         # Lưu báo cáo tổng hợp
-        summary_filename = f"{self.results_dir}multi_coin_high_risk_summary.json"
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        summary_filename = f"{self.results_dir}adaptive_risk_{self.active_risk_level}_summary_{timestamp}.json"
         with open(summary_filename, 'w') as f:
             json.dump(summary, f, indent=4)
         
         # Tạo báo cáo text
-        text_report = "===== BÁO CÁO TỔNG HỢP BACKTEST CHIẾN LƯỢC RỦI RO CAO =====\n\n"
+        text_report = f"===== BÁO CÁO TỔNG HỢP BACKTEST VỚI QUẢN LÝ RỦI RO THÍCH ỨNG (LEVEL {self.active_risk_level}) =====\n\n"
         text_report += f"Ngày thực hiện: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
         text_report += f"Số ngày backtest: {self.backtest_days}\n"
         text_report += f"Khung thời gian: {self.timeframe}\n"
+        text_report += f"Mức rủi ro: {self.active_risk_level} - {self.risk_config.get('risk_level_description', 'Thích ứng')}\n"
         text_report += f"Rủi ro mỗi lệnh: {self.risk_per_trade}%\n"
-        text_report += f"Đòn bẩy: {self.leverage}x\n\n"
+        text_report += f"Đòn bẩy tối đa: {self.leverage}x\n"
+        text_report += f"Số vị thế tối đa: {self.risk_config.get('max_open_positions', 5)}\n\n"
         
         text_report += "XẾP HẠNG HIỆU SUẤT COINS:\n"
         for i, item in enumerate(summary):
@@ -651,19 +670,20 @@ class MultiCoinBacktester:
         text_report += f"Profit Factor: {avg_pf:.2f}\n"
         
         # Lưu báo cáo text
-        report_filename = f"{self.results_dir}multi_coin_high_risk_report.txt"
+        report_filename = f"{self.results_dir}adaptive_risk_{self.active_risk_level}_report_{timestamp}.txt"
         with open(report_filename, 'w') as f:
             f.write(text_report)
         
         self.logger.info(f"Đã lưu báo cáo tổng hợp tại {report_filename}")
         
         # In kết quả
-        print("\n===== KẾT QUẢ BACKTEST ĐA COIN =====")
+        print(f"\n===== KẾT QUẢ BACKTEST ĐA COIN VỚI QUẢN LÝ RỦI RO THÍCH ỨNG (LEVEL {self.active_risk_level}) =====")
         print("XẾP HẠNG HIỆU SUẤT COINS:")
         for i, item in enumerate(summary):
-            print(f"{i+1}. {item['symbol']}: {item['profit_pct']:.2f}%, Win rate: {item['win_rate']:.2f}%")
+            print(f"{i+1}. {item['symbol']}: {item['profit_pct']:.2f}%, Win rate: {item['win_rate']:.2f}%, PF: {item['profit_factor']:.2f}")
         
-        print(f"\nHIỆU SUẤT TRUNG BÌNH: {avg_profit:.2f}%, Win rate: {avg_win_rate:.2f}%")
+        print(f"\nHIỆU SUẤT TRUNG BÌNH: Lợi nhuận: {avg_profit:.2f}%, Win rate: {avg_win_rate:.2f}%, PF: {avg_pf:.2f}")
+        print(f"Max Drawdown TB: {avg_drawdown:.2f}%")
         print(f"Xem báo cáo chi tiết tại {report_filename}")
         
         return summary
