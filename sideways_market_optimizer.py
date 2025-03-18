@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Union
-from ta_lib_easy import ta
+import talib as ta
 
 # Thiết lập logging
 logging.basicConfig(

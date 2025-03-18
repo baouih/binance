@@ -12,11 +12,14 @@ import os
 import logging
 import pandas as pd
 import numpy as np
+import matplotlib
+# Thiết lập backend 'Agg' cho matplotlib để tránh lỗi Qt trong môi trường không có giao diện đồ họa
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Union
-from ta_lib_easy import ta
+import talib as ta
 
 # Thiết lập logging
 logging.basicConfig(
@@ -119,15 +122,69 @@ class RSIDivergenceDetector:
         Returns:
             pd.DataFrame: DataFrame đã được chuẩn bị
         """
-        # Đảm bảo cột là chữ thường
-        df.columns = [c.lower() for c in df.columns]
-        
         # Sao chép DataFrame
         df_copy = df.copy()
         
+        # Xử lý cho MultiIndex columns (từ yfinance) hoặc cột thông thường
+        if isinstance(df_copy.columns, pd.MultiIndex):
+            # Tìm cột 'Close' hoặc 'close' trong MultiIndex
+            close_cols_upper = [col for col in df_copy.columns if col[0] == 'Close']
+            close_cols_lower = [col for col in df_copy.columns if col[0] == 'close']
+            
+            if close_cols_upper:
+                close_col = close_cols_upper[0]
+                # Đổi tên các cột OHLC sang chữ thường
+                column_map = {
+                    'Open': 'open',
+                    'High': 'high',
+                    'Low': 'low',
+                    'Close': 'close',
+                    'Volume': 'volume',
+                    'Adj Close': 'adj_close'
+                }
+                
+                # Tạo từ điển mapping mới cho MultiIndex
+                new_columns = []
+                for col in df_copy.columns:
+                    # col[0] là tên cột (Open, High, ...), col[1] là ticker
+                    if col[0] in column_map:
+                        new_columns.append((column_map[col[0]], col[1]))
+                    else:
+                        new_columns.append(col)
+                
+                # Đổi tên cột
+                df_copy.columns = pd.MultiIndex.from_tuples(new_columns, names=df_copy.columns.names)
+                
+                # Cập nhật close_col sau khi đổi tên
+                ticker = close_col[1]
+                close_col = ('close', ticker)
+            elif close_cols_lower:
+                close_col = close_cols_lower[0]
+            else:
+                raise ValueError("Không tìm thấy cột 'close' hoặc 'Close' trong MultiIndex")
+        else:
+            # Với cột thông thường, tìm cột 'close' hoặc 'Close'
+            if 'close' in df_copy.columns:
+                close_col = 'close'
+            elif 'Close' in df_copy.columns:
+                close_col = 'Close'
+                # Đổi tên cột thành chữ thường
+                df_copy.rename(columns={'Close': 'close'}, inplace=True)
+                close_col = 'close'
+            else:
+                raise ValueError("Không tìm thấy cột 'close' trong DataFrame")
+        
         # Tính RSI nếu chưa có
-        if 'rsi' not in df_copy.columns:
-            df_copy['rsi'] = ta.RSI(df_copy['close'], timeperiod=self.rsi_period)
+        rsi_col = ('rsi', '') if isinstance(df_copy.columns, pd.MultiIndex) else 'rsi'
+        if rsi_col not in df_copy.columns:
+            # Lấy dữ liệu giá đóng cửa
+            series_to_use = df_copy[close_col]
+            # Tính RSI
+            rsi_values = ta.RSI(series_to_use.values, timeperiod=self.rsi_period)
+            # Thêm cột RSI
+            df_copy[rsi_col] = rsi_values
+            
+            logger.info(f"Đã tính RSI và thêm vào DataFrame. Cột RSI: {rsi_col}")
         
         return df_copy
     
@@ -148,9 +205,25 @@ class RSIDivergenceDetector:
         # Lấy dữ liệu gần đây theo cửa sổ
         window_df = df.iloc[-self.window_size:].copy()
         
-        # Lấy dữ liệu giá và RSI
-        prices = window_df['close'].values
-        rsi_values = window_df['rsi'].values
+        # Xác định cột close
+        if isinstance(window_df.columns, pd.MultiIndex):
+            # Tìm cột 'close' trong MultiIndex
+            close_cols = [col for col in window_df.columns if col[0] == 'close']
+            if not close_cols:
+                raise ValueError("Không tìm thấy cột 'close' trong MultiIndex")
+            close_col = close_cols[0]
+            prices = window_df[close_col].values
+        else:
+            prices = window_df['close'].values
+        
+        # Lấy dữ liệu RSI
+        if isinstance(window_df.columns, pd.MultiIndex):
+            rsi_col = ('rsi', '')
+            if rsi_col not in window_df.columns:
+                raise ValueError("Không tìm thấy cột RSI trong DataFrame")
+            rsi_values = window_df[rsi_col].values
+        else:
+            rsi_values = window_df['rsi'].values
         
         # Tìm các điểm pivot (đỉnh/đáy)
         if is_bullish:
@@ -327,10 +400,26 @@ class RSIDivergenceDetector:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), gridspec_kw={'height_ratios': [3, 1]})
         
         # Biểu đồ 1: Giá
-        ax1.plot(plot_df.index, plot_df['close'], label='Giá đóng cửa')
+        # Xác định cột close
+        if isinstance(plot_df.columns, pd.MultiIndex):
+            # Tìm cột 'close' trong MultiIndex
+            close_cols = [col for col in plot_df.columns if col[0] == 'close']
+            if not close_cols:
+                raise ValueError("Không tìm thấy cột 'close' trong MultiIndex")
+            close_col = close_cols[0]
+            ax1.plot(plot_df.index, plot_df[close_col], label='Giá đóng cửa')
+        else:
+            ax1.plot(plot_df.index, plot_df['close'], label='Giá đóng cửa')
         
         # Biểu đồ 2: RSI
-        ax2.plot(plot_df.index, plot_df['rsi'], label='RSI', color='purple')
+        if isinstance(plot_df.columns, pd.MultiIndex):
+            rsi_col = ('rsi', '')
+            if rsi_col not in plot_df.columns:
+                raise ValueError("Không tìm thấy cột RSI trong DataFrame")
+            ax2.plot(plot_df.index, plot_df[rsi_col], label='RSI', color='purple')
+        else:
+            ax2.plot(plot_df.index, plot_df['rsi'], label='RSI', color='purple')
+        
         ax2.axhline(y=70, color='r', linestyle='--', alpha=0.3)
         ax2.axhline(y=30, color='g', linestyle='--', alpha=0.3)
         ax2.set_ylim(0, 100)
@@ -372,7 +461,18 @@ class RSIDivergenceDetector:
         ax2.set_ylabel('RSI')
         
         # Thêm chú thích
-        ax1.text(plot_df.index[0], min(plot_df['close']), 
+        # Xác định giá trị thấp nhất 
+        if isinstance(plot_df.columns, pd.MultiIndex):
+            # Tìm cột 'close' trong MultiIndex
+            close_cols = [col for col in plot_df.columns if col[0] == 'close']
+            if not close_cols:
+                raise ValueError("Không tìm thấy cột 'close' trong MultiIndex")
+            close_col = close_cols[0]
+            min_close = min(plot_df[close_col])
+        else:
+            min_close = min(plot_df['close'])
+        
+        ax1.text(plot_df.index[0], min_close, 
                 f"{divergence_type} Divergence\nConfidence: {divergence_result['confidence']:.2f}", 
                 fontsize=12, color='red', 
                 bbox=dict(facecolor='white', alpha=0.7))

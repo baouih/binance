@@ -47,9 +47,40 @@ def load_data(symbol, period='3mo', interval='1d'):
         logger.info(f"Đang tải dữ liệu {symbol} ({interval}, {period})")
         df = yf.download(symbol, period=period, interval=interval)
         
-        # Đổi tên cột
-        df.columns = [c.lower() for c in df.columns]
+        # Kiểm tra xem df có phải là DataFrame không
+        if not isinstance(df, pd.DataFrame):
+            logger.error(f"yfinance không trả về DataFrame: {type(df)}")
+            return pd.DataFrame()
+            
+        # Kiểm tra xem DataFrame có dữ liệu không
+        if df.empty:
+            logger.warning(f"Không có dữ liệu cho {symbol}")
+            return pd.DataFrame()
+            
+        # In ra thông tin về DataFrame để debug
+        logger.info(f"Các cột trong DataFrame: {list(df.columns)}")
+        logger.info(f"Các dòng đầu tiên: \n{df.head(2)}")
         
+        # Kiểm tra xem các cột cần thiết có tồn tại không
+        required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            logger.error(f"Thiếu các cột cần thiết: {missing_columns}")
+            
+        # Chuẩn hóa tên cột
+        column_map = {
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume',
+            'Adj Close': 'adj_close'
+        }
+        
+        # Đổi tên cột
+        df = df.rename(columns=column_map)
+        
+        logger.info(f"Các cột sau khi đổi tên: {list(df.columns)}")
         logger.info(f"Đã tải {len(df)} dòng dữ liệu cho {symbol}")
         return df
     
