@@ -15,11 +15,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, Any
 import argparse
 
 # Import các module đã phát triển
-from integrated_sideways_trading_system import IntegratedSidewaysTrader
+from integrated_sideways_trading_system import (
+    IntegratedSidewaysTrader, 
+    json_serialize_pandas,
+    convert_timestamps_in_dict
+)
 from sideways_market_optimizer import SidewaysMarketOptimizer
 
 # Thiết lập logging
@@ -335,6 +339,9 @@ class BacktestEngine:
         result_serializable = result.copy()
         result_serializable['trades'] = trades_serializable
         result_serializable['equity_curve'] = equity_serializable
+        
+        # Chuyển đổi tất cả Timestamp và các kiểu dữ liệu numpy thành kiểu dữ liệu Python tiêu chuẩn
+        result_serializable = convert_timestamps_in_dict(result_serializable)
         
         with open(results_path, 'w') as f:
             json.dump(result_serializable, f, indent=4)

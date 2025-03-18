@@ -207,8 +207,11 @@ class IntegratedSidewaysTrader:
             f'market_analysis_{symbol}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
         )
         
+        # Chuyển đổi tất cả Timestamp trong kết quả phân tích trước khi lưu JSON
+        serializable_analysis = convert_timestamps_in_dict(market_analysis)
+        
         with open(report_path, 'w') as f:
-            json.dump(market_analysis, f, indent=4)
+            json.dump(serializable_analysis, f, indent=4)
         
         logger.info(f"Đã lưu báo cáo phân tích thị trường tại {report_path}")
         
