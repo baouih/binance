@@ -529,8 +529,11 @@ class BacktestEngine:
         # Lưu báo cáo
         summary_path = f'backtest_results/summary_{results[0]["period"]}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
         
+        # Chuyển đổi tất cả Timestamp và kiểu dữ liệu numpy trong summary
+        serializable_summary = convert_timestamps_in_dict(summary)
+        
         with open(summary_path, 'w') as f:
-            json.dump(summary, f, indent=4)
+            json.dump(serializable_summary, f, indent=4)
         
         logger.info(f"Đã lưu báo cáo tổng hợp tại {summary_path}")
         
