@@ -1,0 +1,56 @@
+{
+    "symbol": "BTC-USD",
+    "timestamp": "2025-03-18 06:11:14",
+    "is_sideways_market": false,
+    "sideways_score": 0.3,
+    "position_sizing": {
+        "original": 1.0,
+        "adjusted": 1.0,
+        "reduction_pct": 0
+    },
+    "strategy": {
+        "use_mean_reversion": false,
+        "breakout_prediction": "unknown",
+        "tp_sl_ratio": 3.0
+    },
+    "price_targets": {
+        "current_price": 82814.09375,
+        "direction": "buy",
+        "tp_price": 98292.13221279209,
+        "sl_price": 77654.74759573597,
+        "tp_distance_pct": 18.690101843675716,
+        "sl_distance_pct": 6.230033947891905,
+        "risk_reward_ratio": 3.0
+    },
+    "price_data": {
+        "current_price": 82814.09375,
+        "atr_20d": 4299.455128553356,
+        "atr_ratio": 0.05191694956576587,
+        "bb_width": 0.16599533236075942,
+        "pct_b": 0.34174601636045054,
+        "adx": 37.33566940519114,
+        "rsi": 42.33196911117359
+    },
+    "chart_path": "charts/sideways_detection_BTC-USD_20250318_061114.png",
+    "divergence": {
+        "bullish": {
+            "detected": true,
+            "type": "bullish",
+            "confidence": 1.0,
+            "price_pivots": [
+                10,
+                22
+            ],
+            "rsi_pivots": [
+                10,
+                22
+            ],
+            "price_pivot_values": [
+                84347.0234375,
+                78532.0
+            ],
+            "rsi_pivot_values": [
+                24.5281885788356,
+                32.19681089722731
+            ],
+            "divergence_start": 

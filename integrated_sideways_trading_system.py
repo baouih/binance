@@ -15,8 +15,60 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, Any
 import argparse
+
+
+def json_serialize_pandas(obj: Any) -> Any:
+    """
+    Hàm helper để chuyển đổi các đối tượng pandas (như Timestamp) thành định dạng có thể JSON serialize
+    
+    Args:
+        obj (Any): Đối tượng cần chuyển đổi
+        
+    Returns:
+        Any: Đối tượng đã được chuyển đổi
+    """
+    if isinstance(obj, pd.Timestamp):
+        return obj.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(obj, datetime):
+        return obj.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif pd.isna(obj):
+        return None
+    else:
+        return obj
+
+
+def convert_timestamps_in_dict(data: Dict) -> Dict:
+    """
+    Chuyển đổi tất cả giá trị Timestamp trong một dictionary
+    
+    Args:
+        data (Dict): Dictionary cần chuyển đổi
+        
+    Returns:
+        Dict: Dictionary đã được chuyển đổi
+    """
+    if not isinstance(data, dict):
+        return data
+        
+    result = {}
+    
+    for key, value in data.items():
+        if isinstance(value, dict):
+            result[key] = convert_timestamps_in_dict(value)
+        elif isinstance(value, list):
+            result[key] = [convert_timestamps_in_dict(item) if isinstance(item, dict) else json_serialize_pandas(item) for item in value]
+        else:
+            result[key] = json_serialize_pandas(value)
+            
+    return result
 
 # Import các module đã phát triển
 from sideways_market_optimizer import SidewaysMarketOptimizer
@@ -98,8 +150,27 @@ class IntegratedSidewaysTrader:
             logger.info(f"Đang tải dữ liệu {symbol} ({timeframe}, {period})")
             df = yf.download(symbol, period=period, interval=timeframe)
             
-            # Đổi tên cột
-            df.columns = [c.lower() for c in df.columns]
+            # Xử lý MultiIndex DataFrame từ yfinance
+            if isinstance(df.columns, pd.MultiIndex):
+                logger.info("Dữ liệu có cấu trúc MultiIndex, đang xử lý...")
+                # Lấy cấp đầu tiên của MultiIndex (tên cột)
+                df.columns = [col[0].lower() for col in df.columns]
+            else:
+                # Đổi tên cột nếu không phải MultiIndex
+                df.columns = [c.lower() if isinstance(c, str) else str(c).lower() for c in df.columns]
+            
+            # Kiểm tra xem có đủ các cột cần thiết không
+            required_columns = ['open', 'high', 'low', 'close', 'volume']
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            
+            if missing_columns:
+                logger.warning(f"Thiếu các cột dữ liệu: {missing_columns}")
+                # In các cột hiện có để debug
+                logger.info(f"Các cột hiện có: {df.columns.tolist()}")
+                
+                # Chuyển đổi các tên cột từ DataFrame.columns thành list strings để dễ debug
+                column_list = [str(col) for col in df.columns]
+                logger.info(f"Danh sách cột (dạng string): {column_list}")
             
             logger.info(f"Đã tải {len(df)} dòng dữ liệu cho {symbol}")
             return df
