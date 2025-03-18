@@ -262,11 +262,20 @@ class IntegratedSidewaysTrader:
                     logger.warning("Không tìm thấy thông tin 'strategy' trong kết quả phân tích")
                     breakout_prediction = 'unknown'
                 
+                # Ưu tiên tín hiệu divergence mạnh trong mọi thị trường
+                if divergence_confidence > 0.8:
+                    signal = divergence_signal
+                    confidence = divergence_confidence * 0.9  # Giảm nhẹ độ tin cậy nếu không phải thị trường đi ngang
+                    if sideways:
+                        reason = "RSI Divergence có độ tin cậy cao trong thị trường đi ngang"
+                    else:
+                        reason = "RSI Divergence có độ tin cậy cao"
+                
                 # Ưu tiên tín hiệu divergence trong thị trường đi ngang
-                if sideways and divergence_confidence > 0.6:
+                elif sideways and divergence_confidence > 0.6:
                     signal = divergence_signal
                     confidence = divergence_confidence
-                    reason = "RSI Divergence có độ tin cậy cao trong thị trường đi ngang"
+                    reason = "RSI Divergence có độ tin cậy khá trong thị trường đi ngang"
                 
                 # Trong thị trường đi ngang nhưng không có divergence mạnh, sử dụng dự đoán breakout
                 elif sideways and breakout_prediction != "unknown":
@@ -274,7 +283,7 @@ class IntegratedSidewaysTrader:
                     confidence = 0.5  # Độ tin cậy trung bình
                     reason = f"Dự đoán breakout hướng {breakout_prediction} trong thị trường đi ngang"
                 
-                # Trong tình huống khác, dựa vào tín hiệu mean reversion
+                # Trong tình huống đi ngang khác, dựa vào tín hiệu mean reversion
                 elif sideways:
                     # Lấy giá trị %B (vị trí trong Bollinger Bands)
                     if 'price_data' in analysis and 'pct_b' in analysis['price_data']:
@@ -292,6 +301,12 @@ class IntegratedSidewaysTrader:
                             reason = "Giá trong vùng trung tính của Bollinger Bands"
                     else:
                         reason = "Không đủ dữ liệu cho tín hiệu mean reversion"
+                
+                # Xem xét phân kỳ mức trung bình trong thị trường trending
+                elif divergence_confidence > 0.7:
+                    signal = divergence_signal
+                    confidence = divergence_confidence * 0.7  # Giảm độ tin cậy đáng kể trong thị trường trend
+                    reason = "RSI Divergence trong thị trường trending (độ tin cậy giảm)"
                 
                 # Trường hợp còn lại
                 else:

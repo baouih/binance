@@ -1,6 +1,6 @@
-# Tối Ưu Hóa Giao Dịch Cho Thị Trường Đi Ngang
+# Tối Ưu Hóa Giao Dịch Cho Thị Trường Đi Ngang và Phân Kỳ RSI
 
-Tài liệu này mô tả các chiến lược và kỹ thuật được triển khai để cải thiện hiệu suất giao dịch trong thị trường đi ngang (sideways market).
+Tài liệu này mô tả các chiến lược và kỹ thuật được triển khai để cải thiện hiệu suất giao dịch trong thị trường đi ngang (sideways market) và tận dụng tín hiệu phân kỳ RSI trong mọi điều kiện thị trường.
 
 ## Giới Thiệu
 
@@ -9,6 +9,8 @@ Thị trường đi ngang (hay thị trường tích lũy) là giai đoạn mà 
 1. Phát hiện chính xác các thị trường đi ngang
 2. Tự động điều chỉnh chiến lược giao dịch phù hợp
 3. Tối ưu hóa tỷ lệ thắng và quản lý rủi ro
+4. Tận dụng tín hiệu phân kỳ RSI mạnh trong mọi điều kiện thị trường
+5. Điều chỉnh độ tin cậy của tín hiệu dựa trên loại thị trường
 
 ## Phát Hiện Thị Trường Đi Ngang
 
@@ -96,10 +98,16 @@ if is_sideways:
 ### 4. Tích Hợp RSI Divergence Để Lọc Tín Hiệu
 
 ```python
+# Trong thị trường đi ngang
 if is_sideways and divergence_confidence > 0.6:
     # Ưu tiên tín hiệu divergence
     signal = divergence_signal
     confidence = divergence_confidence
+
+# Trong thị trường trending khi có phân kỳ mạnh
+elif divergence_confidence > 0.8:
+    signal = divergence_signal
+    confidence = divergence_confidence * 0.9  # Giảm nhẹ độ tin cậy trong thị trường trending
 ```
 
 ## Dự Đoán Breakout Từ Thị Trường Đi Ngang
@@ -246,6 +254,29 @@ Trên dữ liệu backtest 3 tháng với BTC-USD:
    - Profit Factor: 2.10
    - Lợi nhuận: +18.5%
 
+## Cải Tiến Mới: Phát Hiện Phân Kỳ RSI Trong Tất Cả Điều Kiện Thị Trường
+
+Một cải tiến quan trọng của hệ thống là khả năng tận dụng tín hiệu phân kỳ RSI trong cả thị trường trending (có xu hướng rõ ràng). Trước đây, hệ thống chỉ sử dụng tín hiệu phân kỳ trong các giai đoạn thị trường đi ngang.
+
+### Lợi ích của cải tiến:
+
+1. **Mở rộng phạm vi áp dụng**: Hệ thống giờ đây có thể phát hiện và tận dụng các tín hiệu phân kỳ mạnh trong mọi loại thị trường, không chỉ giới hạn trong thị trường đi ngang.
+
+2. **Điều chỉnh độ tin cậy thông minh**: Khi phát hiện phân kỳ trong thị trường trending, hệ thống giảm nhẹ độ tin cậy để thích ứng với đặc tính của thị trường xu hướng, nơi phân kỳ thường ít đáng tin cậy hơn.
+
+3. **Thống nhất mô hình giao dịch**: Cho phép hệ thống xử lý đồng nhất các mô hình kỹ thuật có giá trị dự báo cao, bất kể điều kiện thị trường.
+
+4. **Bắt cơ hội trong mọi thị trường**: Không bỏ lỡ các tín hiệu phân kỳ mạnh trong thị trường trending, đặc biệt là tín hiệu giao dịch ngược xu hướng đầy tiềm năng.
+
+### Ví dụ thực tế:
+
+Khi phân tích BTC-USD với phân kỳ RSI có độ tin cậy 1.0 trong thị trường trending, hệ thống sẽ:
+- Tạo tín hiệu MUA với độ tin cậy 0.9 (giảm 10% so với thị trường đi ngang)
+- Áp dụng tỷ lệ TP/SL 3.0 phù hợp với thị trường trending 
+- Giữ nguyên kích thước vị thế để tận dụng cơ hội
+
 ## Kết Luận
 
 Việc nhận diện và tối ưu hóa chiến lược cho thị trường đi ngang giúp cải thiện đáng kể hiệu suất giao dịch tổng thể. Sự kết hợp giữa phát hiện chính xác thị trường đi ngang, điều chỉnh chiến lược phù hợp, và tích hợp RSI Divergence đã tạo ra một hệ thống giao dịch thích ứng tốt hơn với các điều kiện thị trường khác nhau.
+
+Các cải tiến mới trong việc phát hiện và sử dụng tín hiệu phân kỳ RSI trong mọi điều kiện thị trường đã làm cho hệ thống toàn diện hơn và có khả năng khai thác cơ hội giao dịch trong cả thị trường đi ngang và có xu hướng. Điều này giúp nâng cao hiệu suất tổng thể và giảm sự phụ thuộc vào việc phân loại chính xác loại thị trường.
