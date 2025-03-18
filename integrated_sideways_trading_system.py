@@ -229,71 +229,108 @@ class IntegratedSidewaysTrader:
         Returns:
             Dict: Tín hiệu giao dịch
         """
-        # Phân tích thị trường
-        analysis = self.analyze_market(symbol, timeframe, period)
-        
-        if not analysis:
-            return {"signal": "neutral", "confidence": 0}
-        
-        # Xác định tín hiệu từ phân tích
-        sideways = analysis['is_sideways_market']
-        divergence_signal = analysis['divergence']['signal']
-        divergence_confidence = analysis['divergence']['signal_confidence']
-        breakout_prediction = analysis['strategy']['breakout_prediction']
-        
-        # Ưu tiên tín hiệu divergence trong thị trường đi ngang
-        if sideways and divergence_confidence > 0.6:
-            signal = divergence_signal
-            confidence = divergence_confidence
-            reason = "RSI Divergence có độ tin cậy cao trong thị trường đi ngang"
-        
-        # Trong thị trường đi ngang nhưng không có divergence mạnh, sử dụng dự đoán breakout
-        elif sideways and breakout_prediction != "unknown":
-            signal = "buy" if breakout_prediction == "up" else "sell"
-            confidence = 0.5  # Độ tin cậy trung bình
-            reason = f"Dự đoán breakout hướng {breakout_prediction} trong thị trường đi ngang"
-        
-        # Trong tình huống khác, dựa vào tín hiệu mean reversion
-        elif sideways:
-            # Lấy giá trị %B (vị trí trong Bollinger Bands)
-            if 'price_data' in analysis and 'pct_b' in analysis['price_data']:
-                pct_b = analysis['price_data']['pct_b']
-                
-                if pct_b > 0.8:
-                    signal = "sell"
-                    confidence = 0.6
-                    reason = "Giá ở cận trên Bollinger Bands trong thị trường đi ngang (mean reversion)"
-                elif pct_b < 0.2:
-                    signal = "buy"
-                    confidence = 0.6
-                    reason = "Giá ở cận dưới Bollinger Bands trong thị trường đi ngang (mean reversion)"
-                else:
-                    signal = "neutral"
-                    confidence = 0
-                    reason = "Giá trong vùng trung tính của Bollinger Bands"
-            else:
-                signal = "neutral"
-                confidence = 0
-                reason = "Không đủ dữ liệu cho tín hiệu mean reversion"
-        
-        # Trường hợp còn lại
-        else:
+        try:
+            logger.info(f"Bắt đầu lấy tín hiệu giao dịch cho {symbol}")
+            
+            # Phân tích thị trường
+            analysis = self.analyze_market(symbol, timeframe, period)
+            
+            if not analysis:
+                logger.warning(f"Không có dữ liệu phân tích cho {symbol}")
+                return {"signal": "neutral", "confidence": 0}
+            
+            # Mặc định là tín hiệu trung tính
             signal = "neutral"
             confidence = 0
             reason = "Không có tín hiệu rõ ràng"
-        
-        return {
-            "symbol": symbol,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "signal": signal,
-            "confidence": confidence,
-            "reason": reason,
-            "is_sideways": sideways,
-            "sideways_score": analysis['sideways_score'],
-            "position_size": analysis['position_sizing']['adjusted'],
-            "use_mean_reversion": analysis['strategy']['use_mean_reversion'],
-            "tp_sl_ratio": analysis['strategy']['tp_sl_ratio']
-        }
+            
+            try:
+                # Xác định tín hiệu từ phân tích
+                sideways = analysis.get('is_sideways_market', False)
+                
+                if 'divergence' in analysis:
+                    divergence_signal = analysis['divergence'].get('signal', 'neutral')
+                    divergence_confidence = analysis['divergence'].get('signal_confidence', 0)
+                else:
+                    logger.warning("Không tìm thấy thông tin 'divergence' trong kết quả phân tích")
+                    divergence_signal = 'neutral'
+                    divergence_confidence = 0
+                
+                if 'strategy' in analysis:
+                    breakout_prediction = analysis['strategy'].get('breakout_prediction', 'unknown')
+                else:
+                    logger.warning("Không tìm thấy thông tin 'strategy' trong kết quả phân tích")
+                    breakout_prediction = 'unknown'
+                
+                # Ưu tiên tín hiệu divergence trong thị trường đi ngang
+                if sideways and divergence_confidence > 0.6:
+                    signal = divergence_signal
+                    confidence = divergence_confidence
+                    reason = "RSI Divergence có độ tin cậy cao trong thị trường đi ngang"
+                
+                # Trong thị trường đi ngang nhưng không có divergence mạnh, sử dụng dự đoán breakout
+                elif sideways and breakout_prediction != "unknown":
+                    signal = "buy" if breakout_prediction == "up" else "sell"
+                    confidence = 0.5  # Độ tin cậy trung bình
+                    reason = f"Dự đoán breakout hướng {breakout_prediction} trong thị trường đi ngang"
+                
+                # Trong tình huống khác, dựa vào tín hiệu mean reversion
+                elif sideways:
+                    # Lấy giá trị %B (vị trí trong Bollinger Bands)
+                    if 'price_data' in analysis and 'pct_b' in analysis['price_data']:
+                        pct_b = analysis['price_data']['pct_b']
+                        
+                        if pct_b > 0.8:
+                            signal = "sell"
+                            confidence = 0.6
+                            reason = "Giá ở cận trên Bollinger Bands trong thị trường đi ngang (mean reversion)"
+                        elif pct_b < 0.2:
+                            signal = "buy"
+                            confidence = 0.6
+                            reason = "Giá ở cận dưới Bollinger Bands trong thị trường đi ngang (mean reversion)"
+                        else:
+                            reason = "Giá trong vùng trung tính của Bollinger Bands"
+                    else:
+                        reason = "Không đủ dữ liệu cho tín hiệu mean reversion"
+                
+                # Trường hợp còn lại
+                else:
+                    reason = "Không có tín hiệu rõ ràng trong thị trường trend"
+                
+            except KeyError as ke:
+                logger.error(f"Thiếu khóa trong dữ liệu phân tích: {str(ke)}")
+                logger.debug(f"Dữ liệu phân tích: {analysis.keys()}")
+            
+            # Đảm bảo tất cả các khóa bắt buộc có trong kết quả phân tích
+            result = {
+                "symbol": symbol,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "signal": signal,
+                "confidence": confidence,
+                "reason": reason,
+                "is_sideways": analysis.get('is_sideways_market', False),
+                "sideways_score": analysis.get('sideways_score', 0),
+            }
+            
+            # Thêm các trường không bắt buộc nếu có
+            if 'position_sizing' in analysis and 'adjusted' in analysis['position_sizing']:
+                result["position_size"] = analysis['position_sizing']['adjusted']
+            else:
+                result["position_size"] = 1.0
+                
+            if 'strategy' in analysis:
+                result["use_mean_reversion"] = analysis['strategy'].get('use_mean_reversion', False)
+                result["tp_sl_ratio"] = analysis['strategy'].get('tp_sl_ratio', 3.0)
+            else:
+                result["use_mean_reversion"] = False
+                result["tp_sl_ratio"] = 3.0
+            
+            logger.info(f"Đã tạo tín hiệu giao dịch: {signal} (Độ tin cậy: {confidence:.2f})")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy tín hiệu giao dịch: {str(e)}")
+            return {"signal": "neutral", "confidence": 0, "reason": f"Lỗi: {str(e)}"}
     
     def get_trade_parameters(self, symbol: str, timeframe: str = '1d', period: str = '3mo') -> Dict:
         """
@@ -307,72 +344,131 @@ class IntegratedSidewaysTrader:
         Returns:
             Dict: Thông số giao dịch
         """
-        # Phân tích thị trường
-        analysis = self.analyze_market(symbol, timeframe, period)
-        
-        if not analysis:
-            return {}
-        
-        # Lấy tín hiệu
-        signal_data = self.get_trading_signals(symbol, timeframe, period)
-        
-        # Nếu không có tín hiệu, không cần trả về thông số
-        if signal_data['signal'] == 'neutral' or signal_data['confidence'] < 0.5:
-            return {
-                "signal": "neutral",
-                "message": "Không có tín hiệu giao dịch đủ mạnh"
-            }
-        
-        # Lấy thông số từ phân tích
-        current_price = analysis['price_data']['current_price']
-        
-        # Xác định TP/SL
-        if 'price_targets' in analysis:
-            tp_price = analysis['price_targets']['tp_price']
-            sl_price = analysis['price_targets']['sl_price']
-            tp_pct = analysis['price_targets']['tp_distance_pct']
-            sl_pct = analysis['price_targets']['sl_distance_pct']
-        else:
-            # Nếu không có mục tiêu cụ thể, tính dựa trên tỷ lệ
-            tp_sl_ratio = analysis['strategy']['tp_sl_ratio']
-            atr = analysis['price_data']['atr_20d']
+        try:
+            logger.info(f"Bắt đầu lấy thông số giao dịch cho {symbol}")
             
-            # Với tín hiệu mua
-            if signal_data['signal'] == 'buy':
-                sl_pct = (1.2 * atr / current_price) * 100
-                tp_pct = sl_pct * tp_sl_ratio
-                sl_price = current_price * (1 - sl_pct/100)
-                tp_price = current_price * (1 + tp_pct/100)
-            # Với tín hiệu bán
-            else:
-                sl_pct = (1.2 * atr / current_price) * 100
-                tp_pct = sl_pct * tp_sl_ratio
-                sl_price = current_price * (1 + sl_pct/100)
-                tp_price = current_price * (1 - tp_pct/100)
-        
-        # Tính kích thước vị thế
-        position_size = analysis['position_sizing']['adjusted']
-        
-        # Tính risk/reward ratio
-        risk_reward_ratio = tp_pct / sl_pct if sl_pct > 0 else 0
-        
-        return {
-            "symbol": symbol,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "signal": signal_data['signal'],
-            "confidence": signal_data['confidence'],
-            "reason": signal_data['reason'],
-            "entry_price": current_price,
-            "take_profit": tp_price,
-            "stop_loss": sl_price,
-            "tp_distance_pct": tp_pct,
-            "sl_distance_pct": sl_pct,
-            "position_size": position_size,
-            "risk_reward_ratio": risk_reward_ratio,
-            "is_sideways_market": analysis['is_sideways_market'],
-            "use_mean_reversion": analysis['strategy']['use_mean_reversion'],
-            "notes": f"Tỷ lệ TP/SL: {analysis['strategy']['tp_sl_ratio']:.1f}:1"
-        }
+            # Phân tích thị trường
+            analysis = self.analyze_market(symbol, timeframe, period)
+            
+            if not analysis:
+                logger.warning(f"Không có dữ liệu phân tích cho {symbol}")
+                return {
+                    "signal": "neutral",
+                    "message": "Không có dữ liệu phân tích"
+                }
+            
+            # Lấy tín hiệu
+            signal_data = self.get_trading_signals(symbol, timeframe, period)
+            
+            # Nếu không có tín hiệu, không cần trả về thông số
+            if signal_data['signal'] == 'neutral' or signal_data['confidence'] < 0.5:
+                return {
+                    "signal": "neutral",
+                    "message": "Không có tín hiệu giao dịch đủ mạnh"
+                }
+            
+            # Xác định giá hiện tại và chỉ báo
+            if 'price_data' not in analysis:
+                logger.error("Thiếu dữ liệu giá trong phân tích")
+                return {
+                    "signal": "neutral",
+                    "message": "Thiếu dữ liệu giá trong phân tích"
+                }
+                
+            # Lấy giá hiện tại an toàn
+            current_price = analysis['price_data'].get('current_price', 0)
+            if current_price == 0:
+                logger.error("Giá hiện tại không hợp lệ")
+                return {
+                    "signal": "neutral",
+                    "message": "Giá hiện tại không hợp lệ"
+                }
+            
+            # Xác định TP/SL
+            tp_price = 0
+            sl_price = 0
+            tp_pct = 0
+            sl_pct = 0
+            
+            if 'price_targets' in analysis:
+                # Lấy giá trị từ price_targets nếu có
+                tp_price = analysis['price_targets'].get('tp_price', 0)
+                sl_price = analysis['price_targets'].get('sl_price', 0)
+                tp_pct = analysis['price_targets'].get('tp_distance_pct', 0)
+                sl_pct = analysis['price_targets'].get('sl_distance_pct', 0)
+            
+            # Nếu không có mục tiêu cụ thể hoặc không hợp lệ, tính toán lại
+            if tp_price == 0 or sl_price == 0:
+                logger.info("Tính toán lại TP/SL dựa trên ATR và tỷ lệ")
+                
+                # Lấy tỷ lệ và ATR
+                tp_sl_ratio = 3.0
+                atr = 0
+                
+                if 'strategy' in analysis:
+                    tp_sl_ratio = analysis['strategy'].get('tp_sl_ratio', 3.0)
+                
+                if 'price_data' in analysis:
+                    atr = analysis['price_data'].get('atr_20d', 0)
+                
+                # Nếu không có ATR, sử dụng 2% giá hiện tại
+                if atr == 0:
+                    atr = current_price * 0.02
+                
+                # Với tín hiệu mua
+                if signal_data['signal'] == 'buy':
+                    sl_pct = (1.2 * atr / current_price) * 100
+                    tp_pct = sl_pct * tp_sl_ratio
+                    sl_price = current_price * (1 - sl_pct/100)
+                    tp_price = current_price * (1 + tp_pct/100)
+                # Với tín hiệu bán
+                else:
+                    sl_pct = (1.2 * atr / current_price) * 100
+                    tp_pct = sl_pct * tp_sl_ratio
+                    sl_price = current_price * (1 + sl_pct/100)
+                    tp_price = current_price * (1 - tp_pct/100)
+            
+            # Tính kích thước vị thế
+            position_size = 1.0
+            if 'position_sizing' in analysis:
+                position_size = analysis['position_sizing'].get('adjusted', 1.0)
+            
+            # Tính risk/reward ratio
+            risk_reward_ratio = tp_pct / sl_pct if sl_pct > 0 else 0
+            
+            # Tạo thông số giao dịch
+            trade_params = {
+                "symbol": symbol,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "signal": signal_data['signal'],
+                "confidence": signal_data['confidence'],
+                "reason": signal_data['reason'],
+                "entry_price": current_price,
+                "take_profit": tp_price,
+                "stop_loss": sl_price,
+                "tp_distance_pct": tp_pct,
+                "sl_distance_pct": sl_pct,
+                "position_size": position_size,
+                "risk_reward_ratio": risk_reward_ratio,
+                "is_sideways_market": analysis.get('is_sideways_market', False),
+                "notes": "Tỷ lệ TP/SL"
+            }
+            
+            # Thêm chiến lược nếu có
+            if 'strategy' in analysis:
+                trade_params["use_mean_reversion"] = analysis['strategy'].get('use_mean_reversion', False)
+                tp_sl_ratio = analysis['strategy'].get('tp_sl_ratio', 3.0)
+                trade_params["notes"] = f"Tỷ lệ TP/SL: {tp_sl_ratio:.1f}:1"
+            
+            logger.info(f"Đã tạo thông số giao dịch cho {symbol}")
+            return trade_params
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi lấy thông số giao dịch: {str(e)}")
+            return {
+                "signal": "neutral", 
+                "message": f"Lỗi: {str(e)}"
+            }
 
 def main():
     """

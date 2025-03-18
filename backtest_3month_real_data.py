@@ -438,6 +438,14 @@ class BacktestEngine:
             ax2.bar(ret_dates, ret_values, color=['green' if r > 0 else 'red' for r in ret_values])
             ax2.axhline(y=0, color='black', linestyle='-')
             ax2.set_ylabel('Lợi nhuận %')
+        else:
+            # Nếu không có giao dịch, đặt nhãn phù hợp cho trục X của biểu đồ dưới
+            # Sử dụng cùng khoảng thời gian với biểu đồ chính
+            start_date = datetime.strptime(result['test_start_date'], '%Y-%m-%d') if isinstance(result['test_start_date'], str) else result['test_start_date']
+            end_date = datetime.strptime(result['test_end_date'], '%Y-%m-%d') if isinstance(result['test_end_date'], str) else result['test_end_date']
+            ax2.set_xlim(start_date, end_date)
+            ax2.set_ylabel('Lợi nhuận %')
+            ax2.text(0.5, 0.5, 'Không có giao dịch', horizontalalignment='center', verticalalignment='center', transform=ax2.transAxes)
         
         # Thêm tiêu đề và nhãn
         ax1.set_title(f'Backtest {symbol} ({period}) - P/L: ${result["profit_loss"]:.2f} ({result["profit_loss_pct"]:.2f}%)', fontsize=14)
