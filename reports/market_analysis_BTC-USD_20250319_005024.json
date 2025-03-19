@@ -1,0 +1,72 @@
+{
+    "symbol": "BTC-USD",
+    "timestamp": "2025-03-19 00:50:23",
+    "is_sideways_market": false,
+    "sideways_score": 0.3,
+    "position_sizing": {
+        "original": 1.0,
+        "adjusted": 1.0,
+        "reduction_pct": 0
+    },
+    "strategy": {
+        "use_mean_reversion": false,
+        "breakout_prediction": "unknown",
+        "tp_sl_ratio": 3.0
+    },
+    "price_targets": {
+        "current_price": 83109.25,
+        "direction": "buy",
+        "tp_price": 98189.84581427602,
+        "sl_price": 78082.38472857466,
+        "tp_distance_pct": 18.145508248812284,
+        "sl_distance_pct": 6.048502749604094,
+        "risk_reward_ratio": 3.0
+    },
+    "price_data": {
+        "current_price": 83109.25,
+        "atr_20d": 4189.0543928544475,
+        "atr_ratio": 0.050404189580034085,
+        "bb_width": 0.165733754464448,
+        "pct_b": 0.3623536210344518,
+        "adx": 37.227099850117554,
+        "rsi": 43.2237950725491
+    },
+    "chart_path": "charts/sideways_detection_BTC-USD_20250319_005023.png",
+    "divergence": {
+        "bullish": {
+            "detected": true,
+            "type": "bullish",
+            "confidence": 1.0,
+            "price_pivots": [
+                9,
+                21
+            ],
+            "rsi_pivots": [
+                9,
+                21
+            ],
+            "price_pivot_values": [
+                84347.0234375,
+                78532.0
+            ],
+            "rsi_pivot_values": [
+                24.58482529582054,
+                32.21479316670418
+            ],
+            "divergence_start": "2025-02-26 00:00:00",
+            "divergence_end": "2025-03-10 00:00:00"
+        },
+        "bearish": {
+            "detected": false,
+            "type": "bearish",
+            "confidence": 0,
+            "price_pivots": [],
+            "rsi_pivots": [],
+            "divergence_start": null,
+            "divergence_end": null
+        },
+        "signal": "buy",
+        "signal_confidence": 1.0,
+        "chart_path": "charts/rsi_divergence_bullish_BTC-USD_20250319_005024.png"
+    }
+}
