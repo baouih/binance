@@ -1,0 +1,21 @@
+=== BÁO CÁO BACKTEST ĐƠN GIẢN ===
+
+Ngày tạo: 2025-03-19 11:49:01
+
+THỐNG KÊ TỔNG QUAN
+Số dư ban đầu: $10000
+Số dư cuối cùng: $12400.00
+Tổng lợi nhuận: $2400.00 (24.00%)
+Tổng số giao dịch: 1
+Giao dịch thắng: 1
+Giao dịch thua: 0
+Tỷ lệ thắng: 100.00%
+
+CHI TIẾT GIAO DỊCH
+Giao dịch #1
+  Symbol: BTC-USD
+  Mở lệnh: 2024-10-12 00:00:00 tại $63193.02
+  Đóng lệnh: 2024-10-29 00:00:00 tại $71074.60
+  Lý do đóng: take_profit
+  Lợi nhuận: $2400.00 (37.42%)
+

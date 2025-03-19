@@ -188,17 +188,29 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                             exit_price = exit_price_val
                         
                         # Thêm vào danh sách giao dịch
+                        # Đảm bảo exit_price là số thực để tránh lỗi khi tính toán
+                        if isinstance(exit_price, (int, float)):
+                            exit_price_float = float(exit_price)
+                        else:
+                            try:
+                                exit_price_float = float(exit_price)
+                            except (ValueError, TypeError):
+                                exit_price_float = entry_price_float  # Mặc định trong trường hợp lỗi
+                        
+                        # Tính phần trăm lợi nhuận an toàn hơn
+                        profit_pct = ((exit_price_float / entry_price_float) - 1) * 100 * leverage
+                        
                         trade = {
                             "symbol": symbol,
                             "entry_date": entry_date,
                             "entry_price": entry_price_float,
                             "exit_date": exit_date,
-                            "exit_price": exit_price,
+                            "exit_price": exit_price_float,
                             "exit_reason": exit_reason,
                             "position_size": position_size,
                             "leverage": leverage,
                             "profit": profit,
-                            "profit_pct": (float(exit_price) / entry_price_float - 1) * 100 * leverage
+                            "profit_pct": profit_pct
                         }
                         
                         symbol_trades.append(trade)
@@ -214,7 +226,7 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                         else:
                             losing_trades += 1
                         
-                        logger.info(f"Kết quả: {exit_reason} tại {exit_date}, giá ${exit_price:.2f}")
+                        logger.info(f"Kết quả: {exit_reason} tại {exit_date}, giá ${exit_price_float:.2f}")
                         logger.info(f"Lợi nhuận: ${profit:.2f} ({trade['profit_pct']:.2f}%)")
                         logger.info(f"Số dư mới: ${balance:.2f}")
                         

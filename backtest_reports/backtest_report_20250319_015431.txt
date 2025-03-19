@@ -1,0 +1,14 @@
+=== BÁO CÁO KẾT QUẢ BACKTEST ===
+
+Ngày tạo báo cáo: 2025-03-19 01:54:32
+
+THỐNG KÊ TỔNG QUAN
+Số dư ban đầu: $10000.00
+Số dư cuối cùng: $10000.00
+Lợi nhuận: $0.00 (0.00%)
+Tổng số giao dịch: 0
+Số giao dịch thắng: 0
+Số giao dịch thua: 0
+Tỷ lệ thắng: 0.00%
+
+CHI TIẾT GIAO DỊCH

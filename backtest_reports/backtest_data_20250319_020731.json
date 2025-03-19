@@ -1,0 +1,10 @@
+{
+  "trades": [],
+  "total_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "initial_balance": 10000,
+  "final_balance": 10000,
+  "profit": 0,
+  "profit_pct": 0.0
+}
