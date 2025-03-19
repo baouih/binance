@@ -108,26 +108,36 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                 current_close = data['Close'].iloc[i]
                 prev_close = data['Close'].iloc[i-1]
                 
-                # RSI dưới 30 và tăng trở lại, giá cũng tăng
-                if isinstance(current_rsi, (int, float)) and isinstance(prev_rsi, (int, float)):
-                    if current_rsi < 30 and current_rsi > prev_rsi and current_close > prev_close:
+                # Sử dụng phương pháp đơn giản cho tín hiệu giao dịch
+                # Kiểm tra nếu đang có xu hướng tăng
+                if i >= 20:  # Cần ít nhất 20 điểm dữ liệu
+                    # Tính giá trung bình 20 ngày
+                    ma20 = data['Close'].iloc[i-20:i].mean()
+                    
+                    # Tín hiệu mua khi giá vừa vượt lên trên MA20 và khối lượng tăng
+                    curr_price = float(current_close.iloc[0]) if hasattr(current_close, 'iloc') else float(current_close)
+                    prev_price = float(prev_close.iloc[0]) if hasattr(prev_close, 'iloc') else float(prev_close)
+                    
+                    if prev_price < ma20 and curr_price > ma20 and curr_price > prev_price:
                         # Tín hiệu mua
                         entry_date = data.index[i]
                         entry_price = current_close
                         
                         # Tính stop loss và take profit dựa trên ATR
+                        entry_price_float = float(entry_price.iloc[0]) if hasattr(entry_price, 'iloc') else float(entry_price)
+                        
                         current_atr = atr.iloc[i]
                         if not np.isnan(current_atr):
                             # Nếu đầy đủ dữ liệu ATR
                             atr_multiplier = risk_config["atr_settings"]["atr_multiplier"][risk_level]
                             tp_multiplier = risk_config["atr_settings"]["take_profit_atr_multiplier"][risk_level]
                             
-                            stop_loss = entry_price - (current_atr * atr_multiplier)
-                            take_profit = entry_price + (current_atr * tp_multiplier)
+                            stop_loss = entry_price_float - (current_atr * atr_multiplier)
+                            take_profit = entry_price_float + (current_atr * tp_multiplier)
                         else:
                             # Nếu không có dữ liệu ATR, sử dụng % cố định
-                            stop_loss = entry_price * 0.95  # 5% stop loss
-                            take_profit = entry_price * 1.15  # 15% take profit
+                            stop_loss = entry_price_float * 0.95  # 5% stop loss
+                            take_profit = entry_price_float * 1.15  # 15% take profit
                         
                         # Tính kích thước vị thế
                         risk_amount = balance * (risk_params['risk_per_trade'] / 100)
