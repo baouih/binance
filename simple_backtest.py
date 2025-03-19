@@ -108,17 +108,21 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                 current_close = data['Close'].iloc[i]
                 prev_close = data['Close'].iloc[i-1]
                 
-                # Sử dụng phương pháp đơn giản cho tín hiệu giao dịch
-                # Kiểm tra nếu đang có xu hướng tăng
+                # Đơn giản hóa - chỉ kiểm tra xu hướng tăng
                 if i >= 20:  # Cần ít nhất 20 điểm dữ liệu
-                    # Tính giá trung bình 20 ngày
-                    ma20 = data['Close'].iloc[i-20:i].mean()
+                    # Lấy dữ liệu giá đóng cửa của 3 nến gần nhất
+                    curr_price = float(data['Close'].iloc[i])
+                    prev_price = float(data['Close'].iloc[i-1])
+                    prev_prev_price = float(data['Close'].iloc[i-2])
                     
-                    # Tín hiệu mua khi giá vừa vượt lên trên MA20 và khối lượng tăng
-                    curr_price = float(current_close.iloc[0]) if hasattr(current_close, 'iloc') else float(current_close)
-                    prev_price = float(prev_close.iloc[0]) if hasattr(prev_close, 'iloc') else float(prev_close)
+                    # Tính MA20
+                    ma20 = float(data['Close'].iloc[i-20:i].mean())
                     
-                    if prev_price < ma20 and curr_price > ma20 and curr_price > prev_price:
+                    # Tín hiệu mua khi có xu hướng tăng rõ ràng và vượt MA20
+                    xu_huong_tang = curr_price > prev_price > prev_prev_price
+                    vuot_ma20 = prev_price <= ma20 and curr_price > ma20
+                    
+                    if xu_huong_tang and vuot_ma20:
                         # Tín hiệu mua
                         entry_date = data.index[i]
                         entry_price = current_close
@@ -141,11 +145,11 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                         
                         # Tính kích thước vị thế
                         risk_amount = balance * (risk_params['risk_per_trade'] / 100)
-                        risk_per_share = entry_price - stop_loss
+                        risk_per_share = entry_price_float - stop_loss
                         position_size = risk_amount / risk_per_share
                         leverage = risk_params['max_leverage']
                         
-                        logger.info(f"Tín hiệu LONG cho {symbol} tại {entry_date}, giá ${entry_price:.2f}")
+                        logger.info(f"Tín hiệu LONG cho {symbol} tại {entry_date}, giá ${entry_price_float:.2f}")
                         logger.info(f"Stop Loss: ${stop_loss:.2f}, Take Profit: ${take_profit:.2f}")
                         logger.info(f"Kích thước vị thế: {position_size:.4f}, Đòn bẩy: {leverage}x")
                         
@@ -157,43 +161,44 @@ def run_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0)
                         
                         # Kiểm tra kết quả sau khi vào lệnh
                         for j in range(i+1, len(data)):
-                            current_price = data['Close'].iloc[j]
+                            curr_price_j = float(data['Close'].iloc[j])
                             
                             # Kiểm tra stop loss
-                            if current_price <= stop_loss:
+                            if curr_price_j <= stop_loss:
                                 exit_date = data.index[j]
                                 exit_price = stop_loss
                                 exit_reason = "stop_loss"
-                                profit = (exit_price - entry_price) * position_size * leverage
+                                profit = (exit_price - entry_price_float) * position_size * leverage
                                 break
                                 
                             # Kiểm tra take profit  
-                            if current_price >= take_profit:
+                            if curr_price_j >= take_profit:
                                 exit_date = data.index[j]
                                 exit_price = take_profit
                                 exit_reason = "take_profit"
-                                profit = (exit_price - entry_price) * position_size * leverage
+                                profit = (exit_price - entry_price_float) * position_size * leverage
                                 break
                         
                         # Nếu không chạm SL/TP thì tính đến điểm kết thúc backtest
                         if exit_date is None:
                             exit_date = data.index[-1]
-                            exit_price = data['Close'].iloc[-1]
+                            exit_price_val = float(data['Close'].iloc[-1])
                             exit_reason = "end_of_test"
-                            profit = (exit_price - entry_price) * position_size * leverage
+                            profit = (exit_price_val - entry_price_float) * position_size * leverage
+                            exit_price = exit_price_val
                         
                         # Thêm vào danh sách giao dịch
                         trade = {
                             "symbol": symbol,
                             "entry_date": entry_date,
-                            "entry_price": entry_price,
+                            "entry_price": entry_price_float,
                             "exit_date": exit_date,
                             "exit_price": exit_price,
                             "exit_reason": exit_reason,
                             "position_size": position_size,
                             "leverage": leverage,
                             "profit": profit,
-                            "profit_pct": (exit_price / entry_price - 1) * 100 * leverage
+                            "profit_pct": (float(exit_price) / entry_price_float - 1) * 100 * leverage
                         }
                         
                         symbol_trades.append(trade)
