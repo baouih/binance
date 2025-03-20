@@ -50,12 +50,20 @@ class SidewaysMarketDetector:
         high_close = abs(df['High'] - df['Close'].shift())
         low_close = abs(df['Low'] - df['Close'].shift())
         
+        # Đặt tên cho các Series
+        high_low.name = 'high_low'
+        high_close.name = 'high_close'
+        low_close.name = 'low_close'
+        
+        # Tạo DataFrame mới với các cột đã đặt tên
         ranges = pd.concat([high_low, high_close, low_close], axis=1)
+        
+        # Tính true range và ATR
         true_range = ranges.max(axis=1)
         df['atr'] = true_range.rolling(self.atr_period).mean()
         
-        # Tính biến động ATR so với giá
-        df['atr_volatility'] = df['atr'] / df['Close'] * 100
+        # Tính biến động ATR so với giá và lưu trực tiếp vào DataFrame
+        df['atr_volatility'] = (df['atr'] / df['Close'] * 100).to_numpy().astype(float)
         
         # Tính biên độ giá trong khoảng lookback_period
         df['price_high'] = df['High'].rolling(self.lookback_period).max()

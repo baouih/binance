@@ -317,8 +317,11 @@ def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance
             data = calculate_indicators(data)
             
             # Phát hiện thị trường đi ngang
-            data_with_sideways, sideways_periods = sideways_detector.detect_sideways_market(data)
+            processed_data, sideways_periods = sideways_detector.detect_sideways_market(data)
             logger.info(f"Đã phát hiện {len(sideways_periods)} giai đoạn thị trường đi ngang")
+            
+            # Cập nhật data với dữ liệu đã xử lý
+            data = processed_data
             
             # Tạo tín hiệu từ MA crossover
             ma_signals = ma_crossover_signals(data)
