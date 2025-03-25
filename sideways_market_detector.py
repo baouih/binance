@@ -62,8 +62,11 @@ class SidewaysMarketDetector:
         true_range = ranges.max(axis=1)
         df['atr'] = true_range.rolling(self.atr_period).mean()
         
-        # Tính biến động ATR so với giá và lưu trực tiếp vào DataFrame
-        df['atr_volatility'] = (df['atr'] / df['Close'] * 100).to_numpy().astype(float)
+        # Tính biến động ATR so với giá (cách đơn giản nhất)
+        # Xử lý giá trị NaN và 0 trong Close
+        tmp_close = df['Close'].replace(0, np.nan)
+        # Tính toán trực tiếp, để pandas tự xử lý các giá trị NaN
+        df['atr_volatility'] = (df['atr'] / tmp_close * 100)
         
         # Tính biên độ giá trong khoảng lookback_period
         df['price_high'] = df['High'].rolling(self.lookback_period).max()
