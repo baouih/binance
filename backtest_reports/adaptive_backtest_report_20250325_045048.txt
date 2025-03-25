@@ -1,0 +1,168 @@
+=== BÁO CÁO KẾT QUẢ BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+
+Ngày tạo báo cáo: 2025-03-25 04:50:48
+
+THỐNG KÊ TỔNG QUAN
+Số dư ban đầu: $10000.00
+Số dư cuối cùng: $5276.79
+Lợi nhuận: $-4723.21 (-47.23%)
+Tổng số giao dịch: 11
+Số giao dịch thắng: 1
+Số giao dịch thua: 10
+Tỷ lệ thắng: 9.09%
+
+CHI TIẾT TỪNG SYMBOL
+Symbol: BTC-USD
+  Số giao dịch: 4
+  Giao dịch thắng/thua: 0/4
+  Lợi nhuận: $-2506.24
+  Tỷ lệ thắng: 0.00%
+  Tín hiệu MA/Sideways: 5/0
+
+Symbol: ETH-USD
+  Số giao dịch: 5
+  Giao dịch thắng/thua: 0/5
+  Lợi nhuận: $-2817.41
+  Tỷ lệ thắng: 0.00%
+  Tín hiệu MA/Sideways: 5/0
+
+Symbol: SOL-USD
+  Số giao dịch: 2
+  Giao dịch thắng/thua: 1/1
+  Lợi nhuận: $600.44
+  Tỷ lệ thắng: 50.00%
+  Tín hiệu MA/Sideways: 3/0
+
+CHI TIẾT GIAO DỊCH
+Giao dịch #1
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-01-14 00:00:00 tại $96534.05
+  Stop Loss: $91475.45
+  Take Profit: $110023.64
+  Kích thước vị thế: 0.0593, Đòn bẩy: 3x
+  Đóng lệnh: 2025-02-24 00:00:00 tại $91475.45
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-900.00 (-15.72%)
+
+Giao dịch #2
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-02-20 00:00:00 tại $98333.94
+  Stop Loss: $94485.74
+  Take Profit: $108595.80
+  Kích thước vị thế: 0.0709, Đòn bẩy: 3x
+  Đóng lệnh: 2025-02-24 00:00:00 tại $94485.74
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-819.00 (-11.74%)
+
+Giao dịch #3
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-03-02 00:00:00 tại $94248.35
+  Stop Loss: $87963.56
+  Take Profit: $111007.79
+  Kích thước vị thế: 0.0395, Đòn bẩy: 3x
+  Đóng lệnh: 2025-03-03 00:00:00 tại $87963.56
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-745.29 (-20.00%)
+
+Giao dịch #4
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-03-19 00:00:00 tại $86854.23
+  Stop Loss: $80517.85
+  Take Profit: $103751.22
+  Kích thước vị thế: 0.0357, Đòn bẩy: 3x
+  Đóng lệnh: 2025-03-25 00:00:00 tại $86462.29
+  Lý do đóng: end_of_test
+  Lợi nhuận: $-41.95 (-1.35%)
+
+Giao dịch #5
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-01-15 00:00:00 tại $3450.54
+  Stop Loss: $3179.85
+  Take Profit: $4172.38
+  Kích thước vị thế: 0.8305, Đòn bẩy: 3x
+  Đóng lệnh: 2025-01-27 00:00:00 tại $3179.85
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-674.44 (-23.53%)
+
+Giao dịch #6
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-01-17 00:00:00 tại $3474.11
+  Stop Loss: $3196.94
+  Take Profit: $4213.21
+  Kích thước vị thế: 0.7381, Đòn bẩy: 3x
+  Đóng lệnh: 2025-01-27 00:00:00 tại $3196.94
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-613.74 (-23.93%)
+
+Giao dịch #7
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-01-31 00:00:00 tại $3298.27
+  Stop Loss: $3015.23
+  Take Profit: $4053.01
+  Kích thước vị thế: 0.6578, Đòn bẩy: 3x
+  Đóng lệnh: 2025-02-02 00:00:00 tại $3015.23
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-558.50 (-25.74%)
+
+Giao dịch #8
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-02-20 00:00:00 tại $2740.39
+  Stop Loss: $2536.31
+  Take Profit: $3284.60
+  Kích thước vị thế: 0.8301, Đòn bẩy: 3x
+  Đóng lệnh: 2025-02-24 00:00:00 tại $2536.31
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-508.24 (-22.34%)
+
+Giao dịch #9
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-02-22 00:00:00 tại $2764.03
+  Stop Loss: $2553.27
+  Take Profit: $3326.05
+  Kích thước vị thế: 0.7315, Đòn bẩy: 3x
+  Đóng lệnh: 2025-02-24 00:00:00 tại $2553.27
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-462.50 (-22.88%)
+
+Giao dịch #10
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-01-15 00:00:00 tại $205.91
+  Stop Loss: $187.61
+  Take Profit: $254.71
+  Kích thước vị thế: 7.6667, Đòn bẩy: 3x
+  Đóng lệnh: 2025-01-18 00:00:00 tại $254.71
+  Lý do đóng: take_profit
+  Lợi nhuận: $1122.32 (71.09%)
+
+Giao dịch #11
+  Symbol: 2024-12-25 00:00:00
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-03-02 00:00:00 tại $178.50
+  Stop Loss: $155.56
+  Take Profit: $239.65
+  Kích thước vị thế: 7.5858, Đòn bẩy: 3x
+  Đóng lệnh: 2025-03-03 00:00:00 tại $155.56
+  Lý do đóng: stop_loss
+  Lợi nhuận: $-521.88 (-38.54%)
+

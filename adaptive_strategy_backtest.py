@@ -422,11 +422,42 @@ def save_report(report, output_dir="backtest_reports"):
     with open(json_file, 'w') as f:
         # Chuyển đổi các đối tượng datetime sang string
         json_data = report.copy()
+        
+        # Xử lý Timestamp cho tất cả các trades
         for trade in json_data['all_trades']:
             trade['entry_date'] = str(trade['entry_date'])
             trade['exit_date'] = str(trade['exit_date'])
         
-        json.dump(json_data, f, indent=4)
+        # Xử lý Timestamp cho kết quả từng symbol
+        for symbol, data in json_data['symbol_results'].items():
+            # Kiểm tra và chuyển đổi các field có thể chứa timestamp
+            if 'sideways_periods' in data:
+                for period in data['sideways_periods']:
+                    if 'start_date' in period:
+                        period['start_date'] = str(period['start_date'])
+                    if 'end_date' in period:
+                        period['end_date'] = str(period['end_date'])
+        
+        # Tạo một custom JSON encoder để xử lý các loại dữ liệu đặc biệt
+        class DateTimeEncoder(json.JSONEncoder):
+            def default(self, o):
+                if isinstance(o, (datetime, pd.Timestamp)):
+                    return str(o)
+                elif isinstance(o, pd.Series):
+                    return o.to_dict()
+                elif isinstance(o, pd.DataFrame):
+                    return o.to_dict(orient='records')
+                elif isinstance(o, np.integer):
+                    return int(o)
+                elif isinstance(o, np.floating):
+                    return float(o)
+                elif isinstance(o, np.ndarray):
+                    return o.tolist()
+                else:
+                    return super().default(o)
+        
+        # Sử dụng custom encoder
+        json.dump(json_data, f, indent=4, cls=DateTimeEncoder)
     
     # Tạo báo cáo văn bản
     with open(report_file, 'w') as f:
@@ -565,7 +596,8 @@ def main():
     parser.add_argument('--timeframe', default='1d', help='Khung thời gian (e.g., 1d, 4h, 1h)')
     parser.add_argument('--balance', type=float, default=10000, help='Số dư ban đầu')
     parser.add_argument('--output-dir', default='backtest_reports', help='Thư mục đầu ra')
-    parser.add_argument('--no-plot', action='store_true', help='Không vẽ biểu đồ')
+    parser.add_argument('--no-plot', action='store_true', default=True, help='Không vẽ biểu đồ')
+    parser.add_argument('--plot', action='store_false', dest='no_plot', help='Vẽ biểu đồ (cần môi trường hỗ trợ đồ họa Qt)')
     
     args = parser.parse_args()
     
