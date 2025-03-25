@@ -1,0 +1,41 @@
+=== BÁO CÁO KẾT QUẢ BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+
+Ngày tạo báo cáo: 2025-03-25 04:54:35
+
+THỐNG KÊ TỔNG QUAN
+Số dư ban đầu: $10000.00
+Số dư cuối cùng: $9940.95
+Lợi nhuận: $-59.05 (-0.59%)
+Tổng số giao dịch: 1
+Số giao dịch thắng: 0
+Số giao dịch thua: 1
+Tỷ lệ thắng: 0.00%
+
+CHI TIẾT TỪNG SYMBOL
+Symbol: BTC-USD
+  Số giao dịch: 1
+  Giao dịch thắng/thua: 0/1
+  Lợi nhuận: $-59.05
+  Tỷ lệ thắng: 0.00%
+  Tín hiệu MA/Sideways: 2/0
+
+Symbol: ETH-USD
+  Số giao dịch: 0
+  Giao dịch thắng/thua: 0/0
+  Lợi nhuận: $0.00
+  Tỷ lệ thắng: 0.00%
+  Tín hiệu MA/Sideways: 0/0
+
+CHI TIẾT GIAO DỊCH
+Giao dịch #1
+  Symbol: BTC-USD
+  Nguồn tín hiệu: ma_crossover
+  Loại: LONG
+  Mở lệnh: 2025-03-19 00:00:00 tại $86854.23
+  Stop Loss: $80517.85
+  Take Profit: $103751.22
+  Kích thước vị thế: 0.0473, Đòn bẩy: 3x
+  Đóng lệnh: 2025-03-25 00:00:00 tại $86438.52
+  Lý do đóng: end_of_test
+  Lợi nhuận: $-59.05 (-1.44%)
+

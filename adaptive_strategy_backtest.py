@@ -167,8 +167,17 @@ def calculate_position_size(signal, balance, risk_params):
     
     return position_size, leverage
 
-def simulate_trades(data, signals, risk_params, initial_balance=10000.0):
-    """Mô phỏng các giao dịch từ tín hiệu"""
+def simulate_trades(data, signals, risk_params, initial_balance=10000.0, symbol=None):
+    """
+    Mô phỏng các giao dịch từ tín hiệu
+    
+    Args:
+        data (pd.DataFrame): Dữ liệu giá
+        signals (List[Dict]): Danh sách tín hiệu giao dịch
+        risk_params (Dict): Tham số quản lý rủi ro
+        initial_balance (float): Số dư ban đầu
+        symbol (str): Mã cặp tiền giao dịch
+    """
     trades = []
     balance = initial_balance
     
@@ -185,7 +194,7 @@ def simulate_trades(data, signals, risk_params, initial_balance=10000.0):
         
         # Thông tin giao dịch
         trade = {
-            'symbol': data.iloc[0].name if hasattr(data.iloc[0], 'name') else 'Unknown',
+            'symbol': symbol,  # Sử dụng symbol được truyền vào
             'entry_date': signal['date'],
             'entry_price': signal['entry_price'],
             'type': signal['type'],
@@ -341,7 +350,7 @@ def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance
             all_signals = apply_atr_based_stops(data, all_signals, risk_config, risk_level)
             
             # Mô phỏng giao dịch
-            symbol_trades, symbol_balance = simulate_trades(data, all_signals, risk_params, balance)
+            symbol_trades, symbol_balance = simulate_trades(data, all_signals, risk_params, balance, symbol)
             
             # Cập nhật số dư
             balance = symbol_balance

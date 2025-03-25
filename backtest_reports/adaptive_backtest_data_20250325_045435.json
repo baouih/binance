@@ -1,0 +1,50 @@
+{
+    "initial_balance": 10000,
+    "final_balance": 9940.953614416769,
+    "total_profit": -59.04638558323131,
+    "total_profit_pct": -0.5904638558323128,
+    "total_trades": 1,
+    "winning_trades": 0,
+    "losing_trades": 1,
+    "win_rate": 0.0,
+    "symbol_results": {
+        "BTC-USD": {
+            "trades": 1,
+            "winning_trades": 0,
+            "losing_trades": 1,
+            "profit": -59.04638558323205,
+            "win_rate": 0.0,
+            "ma_signals": 2,
+            "sideways_signals": 0
+        },
+        "ETH-USD": {
+            "trades": 0,
+            "winning_trades": 0,
+            "losing_trades": 0,
+            "profit": 0,
+            "win_rate": 0,
+            "ma_signals": 0,
+            "sideways_signals": 0
+        }
+    },
+    "all_trades": [
+        {
+            "symbol": "BTC-USD",
+            "entry_date": "2025-03-19 00:00:00",
+            "entry_price": 86854.2265625,
+            "type": "LONG",
+            "stop_loss": 80517.85491071429,
+            "take_profit": 103751.21763392858,
+            "position_size": 0.04734570768358486,
+            "leverage": 3,
+            "signal_source": "ma_crossover",
+            "sideways_period": false,
+            "exit_date": "2025-03-25 00:00:00",
+            "exit_price": 86438.515625,
+            "exit_reason": "end_of_test",
+            "profit": -59.04638558323205,
+            "profit_pct": -1.435891909765119,
+            "balance_after": 9940.953614416769
+        }
+    ]
+}
