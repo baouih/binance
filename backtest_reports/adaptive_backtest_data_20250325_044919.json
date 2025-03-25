@@ -1,0 +1,41 @@
+{
+    "initial_balance": 10000,
+    "final_balance": 5279.101083935806,
+    "total_profit": -4720.898916064194,
+    "total_profit_pct": -47.20898916064195,
+    "total_trades": 11,
+    "winning_trades": 1,
+    "losing_trades": 10,
+    "win_rate": 9.090909090909092,
+    "symbol_results": {
+        "BTC-USD": {
+            "trades": 4,
+            "winning_trades": 0,
+            "losing_trades": 4,
+            "profit": -2502.958086711444,
+            "win_rate": 0.0,
+            "ma_signals": 5,
+            "sideways_signals": 0
+        },
+        "ETH-USD": {
+            "trades": 5,
+            "winning_trades": 0,
+            "losing_trades": 5,
+            "profit": -2818.6467662344894,
+            "win_rate": 0.0,
+            "ma_signals": 5,
+            "sideways_signals": 0
+        },
+        "SOL-USD": {
+            "trades": 2,
+            "winning_trades": 1,
+            "losing_trades": 1,
+            "profit": 600.7059368817416,
+            "win_rate": 50.0,
+            "ma_signals": 3,
+            "sideways_signals": 0
+        }
+    },
+    "all_trades": [
+        {
+            "symbol": 

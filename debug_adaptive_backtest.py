@@ -25,6 +25,16 @@ def main():
     data = yf.download(symbol, period=period, interval=timeframe)
     logger.info(f"Đã tải {len(data)} dòng dữ liệu")
     
+    # Check if we have a MultiIndex DataFrame
+    logger.info(f"Cấu trúc DataFrame: shape={data.shape}, columns={data.columns}")
+    try:
+        # Convert to simple columns if using MultiIndex
+        if isinstance(data.columns, pd.MultiIndex):
+            logger.info("Phát hiện cấu trúc MultiIndex, chuyển đổi sang Single Index")
+            data.columns = [col[0] if col[0] != "" else col[1] for col in data.columns]
+    except Exception as e:
+        logger.error(f"Lỗi khi chuyển đổi columns: {e}")
+    
     # Khởi tạo bộ phát hiện sideways market
     logger.info("Khởi tạo SidewaysMarketDetector")
     detector = SidewaysMarketDetector()

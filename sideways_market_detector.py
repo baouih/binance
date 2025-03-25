@@ -62,11 +62,43 @@ class SidewaysMarketDetector:
         true_range = ranges.max(axis=1)
         df['atr'] = true_range.rolling(self.atr_period).mean()
         
-        # Tính biến động ATR so với giá (cách đơn giản nhất)
-        # Xử lý giá trị NaN và 0 trong Close
-        tmp_close = df['Close'].replace(0, np.nan)
-        # Tính toán trực tiếp, để pandas tự xử lý các giá trị NaN
-        df['atr_volatility'] = (df['atr'] / tmp_close * 100)
+        # Kiểm tra và điều chỉnh cấu trúc DataFrame nếu cần thiết
+        try:
+            # Xử lý nếu DataFrame là MultiIndex
+            if isinstance(df.columns, pd.MultiIndex):
+                logger.info("Phát hiện MultiIndex DataFrame, đang chuyển đổi...")
+                df.columns = [col[0] if col[0] != "" else col[1] for col in df.columns]
+                logger.info(f"Cột sau khi chuyển đổi: {df.columns.tolist()}")
+        except Exception as e:
+            logger.warning(f"Lỗi khi xử lý cấu trúc DataFrame: {e}")
+            
+        # Tính biến động ATR so với giá
+        df['atr_volatility'] = 0.0  # Khởi tạo với giá trị mặc định
+        
+        # Sử dụng phương pháp đơn giản hơn
+        try:
+            # Chỉ chọn các dòng có dữ liệu hợp lệ
+            valid_rows = np.isfinite(df['atr']) & np.isfinite(df['Close']) & (df['Close'] > 0)
+            # Tính toán trực tiếp cho các dòng hợp lệ
+            df.loc[valid_rows, 'atr_volatility'] = df.loc[valid_rows, 'atr'].astype(float) / df.loc[valid_rows, 'Close'].astype(float) * 100
+            logger.info(f"Đã tính ATR volatility cho {valid_rows.sum()} dòng dữ liệu")
+        except Exception as e:
+            logger.error(f"Lỗi khi tính ATR volatility: {e}")
+            # Dùng vòng lặp nếu phương pháp vectorized không hoạt động
+            for i in range(len(df)):
+                try:
+                    atr_val = df['atr'].iloc[i]
+                    close_val = df['Close'].iloc[i]
+                    
+                    # Kiểm tra giá trị hợp lệ (chuyển đổi sang số trước khi kiểm tra)
+                    if (isinstance(atr_val, (int, float)) and 
+                        isinstance(close_val, (int, float)) and 
+                        pd.notnull(atr_val) and pd.notnull(close_val) and close_val > 0):
+                        # Tính toán và gán
+                        volatility = float(atr_val) / float(close_val) * 100
+                        df.at[df.index[i], 'atr_volatility'] = volatility
+                except Exception as e:
+                    logger.warning(f"Lỗi khi tính ATR volatility cho dòng {i}: {e}")
         
         # Tính biên độ giá trong khoảng lookback_period
         df['price_high'] = df['High'].rolling(self.lookback_period).max()
