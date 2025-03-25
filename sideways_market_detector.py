@@ -62,21 +62,11 @@ class SidewaysMarketDetector:
         true_range = ranges.max(axis=1)
         df['atr'] = true_range.rolling(self.atr_period).mean()
         
-        # Thực hiện từng bước và tránh các phép so sánh trên Series
-        # 1. Tạo cột atr_volatility với giá trị NaN
-        df['atr_volatility'] = np.nan
-        
-        # 2. Tạo một Series tạm để tính atr_volatility
-        atr_values = df['atr'].values
-        close_values = df['Close'].values
-        
-        # 3. Tính toán thủ công và gán giá trị
-        for i in range(len(df)):
-            # Kiểm tra có đủ điều kiện tính toán không
-            if (i < len(atr_values) and i < len(close_values) and 
-                not np.isnan(atr_values[i]) and not np.isnan(close_values[i]) and 
-                close_values[i] > 0):
-                df.iloc[i, df.columns.get_loc('atr_volatility')] = (atr_values[i] / close_values[i]) * 100
+        # Tính biến động ATR so với giá (cách đơn giản nhất)
+        # Xử lý giá trị NaN và 0 trong Close
+        tmp_close = df['Close'].replace(0, np.nan)
+        # Tính toán trực tiếp, để pandas tự xử lý các giá trị NaN
+        df['atr_volatility'] = (df['atr'] / tmp_close * 100)
         
         # Tính biên độ giá trong khoảng lookback_period
         df['price_high'] = df['High'].rolling(self.lookback_period).max()
