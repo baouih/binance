@@ -1,0 +1,25 @@
+{
+    "risk_level": "extremely_high",
+    "risk_per_trade": 5.0,
+    "max_leverage": 5,
+    "stop_loss_atr_multiplier": 0.84,
+    "take_profit_atr_multiplier": 1.5,
+    "account_info": {
+        "balance": 1000
+    },
+    "coin_info": {
+        "symbol": "ETHUSDT",
+        "normalized_symbol": "ETH",
+        "volatility_factor": 1.3,
+        "sideways_performance": "good",
+        "trending_performance": "excellent",
+        "recommended_timeframes": [
+            "1h",
+            "4h"
+        ],
+        "recommended_strategies": [
+            "MACrossoverStrategy",
+            "BollingerBandsStrategy"
+        ]
+    }
+}

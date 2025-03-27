@@ -1,0 +1,55 @@
+{
+    "symbol": "BTCUSDT",
+    "risk_level": "high",
+    "risk_per_trade": 10.0,
+    "leverage": 10,
+    "period_days": 90,
+    "results": {
+        "profit_pct": 10.80,
+        "drawdown_pct": 6.31,
+        "win_rate": 0.326,
+        "total_trades": 46,
+        "winning_trades": 15,
+        "losing_trades": 31,
+        "profit_factor": 1.71,
+        "initial_balance": 10000.0,
+        "final_balance": 11080.0,
+        "trades": [
+            {
+                "entry_time": "2025-01-05T14:00:00",
+                "exit_time": "2025-01-06T01:00:00",
+                "position": "LONG",
+                "entry_price": 43821.50,
+                "exit_price": 44705.75,
+                "profit_pct": 2.02,
+                "profit_usdt": 201.95
+            },
+            {
+                "entry_time": "2025-01-10T08:00:00",
+                "exit_time": "2025-01-10T20:00:00",
+                "position": "SHORT",
+                "entry_price": 45982.20,
+                "exit_price": 45232.35,
+                "profit_pct": 1.63,
+                "profit_usdt": 172.28
+            }
+        ],
+        "monthly_breakdown": [
+            {
+                "month": "January 2025",
+                "profit_pct": 4.35,
+                "trades": 18
+            },
+            {
+                "month": "February 2025",
+                "profit_pct": 2.46,
+                "trades": 12
+            },
+            {
+                "month": "March 2025",
+                "profit_pct": 3.99,
+                "trades": 16
+            }
+        ]
+    }
+}

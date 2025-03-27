@@ -1,0 +1,48 @@
+{
+    "risk_level": "high",
+    "risk_per_trade": 20.0,
+    "max_leverage": 12,
+    "stop_loss_atr_multiplier": 1.0,
+    "take_profit_atr_multiplier": 2.6,
+    "trailing_stop": true,
+    "trailing_activation_pct": 0.5,
+    "trailing_callback_pct": 0.3,
+    "partial_profit_taking": {
+        "enabled": true,
+        "levels": [
+            {
+                "pct": 1.0,
+                "portion": 0.25
+            },
+            {
+                "pct": 2.0,
+                "portion": 0.25
+            },
+            {
+                "pct": 3.0,
+                "portion": 0.25
+            },
+            {
+                "pct": 5.0,
+                "portion": 0.25
+            }
+        ]
+    },
+    "max_open_risk": 100.0,
+    "max_positions": 2,
+    "adaptive_risk": true,
+    "market_based_risk": true,
+    "account_info": {
+        "balance": 300,
+        "tier": 300,
+        "small_account_optimization": true,
+        "recommended_coins": [
+            "BTC",
+            "ETH"
+        ]
+    },
+    "warnings": {
+        "high_risk": 20.0,
+        "ultra_high_risk": 40.0
+    }
+}

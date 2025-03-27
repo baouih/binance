@@ -1,0 +1,27 @@
+{
+    "risk_level": "extremely_high",
+    "risk_per_trade": 25.0,
+    "max_leverage": 20,
+    "stop_loss_atr_multiplier": 0.7,
+    "take_profit_atr_multiplier": 1.5,
+    "account_info": {
+        "balance": 1000
+    },
+    "coin_info": {
+        "symbol": "BTCUSDT",
+        "normalized_symbol": "BTC",
+        "volatility_factor": 1.0,
+        "sideways_performance": "excellent",
+        "trending_performance": "excellent",
+        "recommended_timeframes": [
+            "1h",
+            "4h",
+            "1d"
+        ],
+        "recommended_strategies": [
+            "AdaptiveStrategy",
+            "MACrossoverStrategy",
+            "BollingerBandsStrategy"
+        ]
+    }
+}

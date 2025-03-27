@@ -1,0 +1,27 @@
+{
+    "risk_level": "extremely_high",
+    "risk_per_trade": 25.0,
+    "max_leverage": 20,
+    "stop_loss_atr_multiplier": 0.7,
+    "take_profit_atr_multiplier": 1.5,
+    "trailing_stop": true,
+    "trailing_activation_pct": 0.3,
+    "trailing_callback_pct": 0.2,
+    "partial_profit_taking": {
+        "enabled": true,
+        "levels": [
+            {"pct": 0.8, "portion": 0.25},
+            {"pct": 1.5, "portion": 0.25},
+            {"pct": 2.5, "portion": 0.25},
+            {"pct": 4.0, "portion": 0.25}
+        ]
+    },
+    "max_open_risk": 100.0,
+    "max_positions": 8,
+    "adaptive_risk": true,
+    "market_based_risk": true,
+    "warnings": {
+        "high_risk": 15.0,
+        "ultra_high_risk": 30.0
+    }
+}
