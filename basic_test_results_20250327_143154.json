@@ -1,0 +1,19 @@
+{
+    "symbol": "BTC-USD",
+    "period": "3 months",
+    "ma_signals": 8,
+    "sideways_signals": 0,
+    "total_signals": 8,
+    "total_trades": 7,
+    "summary": {
+        "initial_balance": 10000.0,
+        "final_balance": 10226.198096224347,
+        "total_profit": 226.19809622434695,
+        "total_profit_pct": 2.2619809622434697,
+        "total_trades": 7,
+        "winning_trades": 6,
+        "losing_trades": 1,
+        "win_rate": 85.71428571428571
+    },
+    "timestamp": "2025-03-27T14:31:54.118131"
+}

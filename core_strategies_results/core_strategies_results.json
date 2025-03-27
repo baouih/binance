@@ -1,0 +1,351 @@
+{
+    "BTC-USD": {
+        "1h": {
+            "symbol": "BTC-USD",
+            "timeframe": "1h",
+            "days": 30,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 0,
+                    "short_trades": 1,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 0.913717507046666,
+                    "max_profit": 0.913717507046666,
+                    "max_loss": 0.913717507046666,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "4h": {
+            "symbol": "BTC-USD",
+            "timeframe": "4h",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 1,
+                    "short_trades": 0,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 3.0048915413611232,
+                    "max_profit": 3.0048915413611232,
+                    "max_loss": 3.0048915413611232,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "1d": {
+            "symbol": "BTC-USD",
+            "timeframe": "1d",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BTC-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 1,
+                    "short_trades": 0,
+                    "winning_trades": 0,
+                    "winrate": 0.0,
+                    "avg_profit": -7.137105940514714,
+                    "max_profit": -7.137105940514714,
+                    "max_loss": -7.137105940514714,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        }
+    },
+    "ETH-USD": {
+        "1h": {
+            "symbol": "ETH-USD",
+            "timeframe": "1h",
+            "days": 30,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 0,
+                    "short_trades": 1,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 3.355333884417877,
+                    "max_profit": 3.355333884417877,
+                    "max_loss": 3.355333884417877,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "4h": {
+            "symbol": "ETH-USD",
+            "timeframe": "4h",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 1,
+                    "short_trades": 0,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 1.0344224474668244,
+                    "max_profit": 1.0344224474668244,
+                    "max_loss": 1.0344224474668244,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "1d": {
+            "symbol": "ETH-USD",
+            "timeframe": "1d",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "long_trades": 0,
+                    "long_wins": 0,
+                    "long_winrate": 0,
+                    "short_trades": 0,
+                    "short_wins": 0,
+                    "short_winrate": 0,
+                    "total_trades": 0,
+                    "total_wins": 0,
+                    "total_winrate": 0,
+                    "exit_strategies_used": {
+                        "trailing_stop": 0,
+                        "fixed_tp_sl": 0,
+                        "partial_exit": 0,
+                        "dynamic_exit": 0
+                    }
+                },
+                "sideways_market_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "ETH-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 0,
+                    "short_trades": 1,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 16.763583162522643,
+                    "max_profit": 16.763583162522643,
+                    "max_loss": 16.763583162522643,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        }
+    },
+    "BNB-USD": {
+        "1h": {
+            "symbol": "BNB-USD",
+            "timeframe": "1h",
+            "days": 30,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 1,
+                    "short_trades": 0,
+                    "winning_trades": 0,
+                    "winrate": 0.0,
+                    "avg_profit": -1.653570432585843,
+                    "max_profit": -1.653570432585843,
+                    "max_loss": -1.653570432585843,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "4h": {
+            "symbol": "BNB-USD",
+            "timeframe": "4h",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "error": "'str' object has no attribute 'get'"
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 1,
+                    "short_trades": 0,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 1.7305834418448371,
+                    "max_profit": 1.7305834418448371,
+                    "max_loss": 1.7305834418448371,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        },
+        "1d": {
+            "symbol": "BNB-USD",
+            "timeframe": "1d",
+            "days": 90,
+            "strategies": {
+                "adaptive_exit_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "adaptive_exit_strategy",
+                    "long_trades": 0,
+                    "long_wins": 0,
+                    "long_winrate": 0,
+                    "short_trades": 0,
+                    "short_wins": 0,
+                    "short_winrate": 0,
+                    "total_trades": 0,
+                    "total_wins": 0,
+                    "total_winrate": 0,
+                    "exit_strategies_used": {
+                        "trailing_stop": 0,
+                        "fixed_tp_sl": 0,
+                        "partial_exit": 0,
+                        "dynamic_exit": 0
+                    }
+                },
+                "sideways_market_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "sideways_market_strategy",
+                    "error": "'SidewaysMarketStrategy' object has no attribute 'generate_signals'"
+                },
+                "optimized_strategy": {
+                    "symbol": "BNB-USD",
+                    "strategy": "optimized_strategy",
+                    "total_trades": 1,
+                    "long_trades": 0,
+                    "short_trades": 1,
+                    "winning_trades": 1,
+                    "winrate": 100.0,
+                    "avg_profit": 9.660077618882232,
+                    "max_profit": 9.660077618882232,
+                    "max_loss": 9.660077618882232,
+                    "exit_reasons": {
+                        "stop_loss": 0,
+                        "take_profit": 0,
+                        "signal_change": 0,
+                        "end_of_period": 1
+                    }
+                }
+            }
+        }
+    }
+}

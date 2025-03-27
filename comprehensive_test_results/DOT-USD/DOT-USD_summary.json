@@ -1,0 +1,14 @@
+{
+    "symbol": "DOT-USD",
+    "period": "6mo",
+    "timeframe": "1d",
+    "initial_balance": 10000.0,
+    "final_balance": 10000.0,
+    "profit": 0.0,
+    "profit_pct": 0.0,
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "timestamp": "2025-03-27T14:28:32.430290"
+}

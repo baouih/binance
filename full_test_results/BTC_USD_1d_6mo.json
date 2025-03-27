@@ -1,0 +1,32 @@
+{
+    "symbol": "BTC-USD",
+    "timeframe": "1d",
+    "period": "6mo",
+    "total_data_points": 0,
+    "initial_balance": 10000.0,
+    "final_balance": 10000.0,
+    "total_profit": 0,
+    "total_profit_pct": 0,
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "max_drawdown": 0,
+    "max_drawdown_pct": 0,
+    "sharpe_ratio": 0,
+    "sideways_periods": 0,
+    "rsi_divergences": 0,
+    "signals": {
+        "total": 0,
+        "filtered": 0,
+        "by_strategy": {
+            "ma_crossover": 0,
+            "sideways_market": 0,
+            "rsi_divergence": 0,
+            "bollinger_breakout": 0,
+            "multi_timeframe": 0
+        }
+    },
+    "strategies_results": {},
+    "trades": []
+}

@@ -1,0 +1,30 @@
+{
+    "config": {
+        "period": "6mo",
+        "timeframe": "1d",
+        "initial_balance": 10000.0,
+        "use_binance": true
+    },
+    "total_symbols_tested": 10,
+    "successful_tests": 10,
+    "failed_tests": 0,
+    "total_initial_balance": 100000.0,
+    "total_final_balance": 100000.0,
+    "total_profit": 0.0,
+    "total_profit_pct": 0.0,
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "top_symbols": [
+        "SOL-USD",
+        "ETH-USD",
+        "BTC-USD"
+    ],
+    "bottom_symbols": [
+        "AVAX-USD",
+        "DOT-USD",
+        "MATIC-USD"
+    ],
+    "timestamp": "2025-03-27T14:28:32.556348"
+}

@@ -1,0 +1,28 @@
+=== BÁO CÁO TỔNG HỢP BACKTEST (6mo, 1d) ===
+
+Ngày tạo báo cáo: 2025-03-27 14:28:32
+
+THỐNG KÊ TỔNG QUAN
+Số symbol kiểm tra: 10
+Số kiểm tra thành công: 10
+Số kiểm tra thất bại: 0
+
+Tổng số dư ban đầu: $100000.00
+Tổng số dư cuối cùng: $100000.00
+Tổng lợi nhuận: $0.00 (0.00%)
+Tổng số giao dịch: 0
+Số giao dịch thắng: 0
+Số giao dịch thua: 0
+Tỷ lệ thắng: 0.00%
+
+TOP PERFORMERS
+SOL-USD: +0.00%, Win rate: 0.00%, Trades: 0
+ETH-USD: +0.00%, Win rate: 0.00%, Trades: 0
+BTC-USD: +0.00%, Win rate: 0.00%, Trades: 0
+
+WORST PERFORMERS
+AVAX-USD: 0.00%, Win rate: 0.00%, Trades: 0
+DOT-USD: 0.00%, Win rate: 0.00%, Trades: 0
+MATIC-USD: 0.00%, Win rate: 0.00%, Trades: 0
+
+LỖI GẶP PHẢI

@@ -1,0 +1,54 @@
+{
+    "test_time": "2025-03-27T14:29:37.024299",
+    "symbols": [
+        "BTC-USD",
+        "ETH-USD",
+        "BNB-USD"
+    ],
+    "period": "3mo",
+    "timeframe": "1d",
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "strategy_performance": {
+        "ma_crossover": {
+            "signals": 0,
+            "trades": 0,
+            "wins": 0,
+            "win_rate": 0
+        },
+        "sideways_market": {
+            "signals": 0,
+            "trades": 0,
+            "wins": 0,
+            "win_rate": 0
+        }
+    },
+    "symbol_results": {
+        "BTC-USD": {
+            "trades": 0,
+            "win_rate": 0,
+            "profit": 0.0,
+            "profit_pct": 0.0,
+            "ma_signals": 0,
+            "sideways_signals": 0
+        },
+        "ETH-USD": {
+            "trades": 0,
+            "win_rate": 0,
+            "profit": 0.0,
+            "profit_pct": 0.0,
+            "ma_signals": 0,
+            "sideways_signals": 0
+        },
+        "BNB-USD": {
+            "trades": 0,
+            "win_rate": 0,
+            "profit": 0.0,
+            "profit_pct": 0.0,
+            "ma_signals": 0,
+            "sideways_signals": 0
+        }
+    }
+}
