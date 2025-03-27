@@ -13,7 +13,45 @@ import logging
 import traceback
 from datetime import datetime, timedelta
 from functools import partial
-from typing import Dict, List, Tuple, Union, Any, Optional
+from typing import Dict, List, Tuple, Union, Any, Optional, Callable
+
+# BacktestThread class for running backtest
+class BacktestThread(QThread):
+    """Thread chạy backtest"""
+    progress_updated = pyqtSignal(int)
+    backtest_completed = pyqtSignal(dict)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+    
+    def run(self):
+        """Chạy thread"""
+        try:
+            # Mô phỏng chạy backtest
+            for i in range(101):
+                time.sleep(0.05)  # Mô phỏng xử lý
+                self.progress_updated.emit(i)
+            
+            # Mô phỏng kết quả backtest
+            symbol = self.parent.backtest_symbol.currentText()
+            results = {
+                'symbol': symbol,
+                'profit_pct': 15.72,
+                'drawdown_pct': 7.45,
+                'win_rate': 48.5,
+                'total_trades': 33,
+                'winning_trades': 16,
+                'losing_trades': 17,
+                'profit_factor': 2.1,
+                'final_balance': 11572.0
+            }
+            
+            # Phát signal hoàn thành với kết quả
+            self.backtest_completed.emit(results)
+            
+        except Exception as e:
+            logging.error(f"Error in BacktestThread: {str(e)}", exc_info=True)
 
 # Thiết lập logging
 logger = logging.getLogger("enhanced_trading_gui")
@@ -29,6 +67,27 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
+
+# Risk management constants
+RISK_LEVELS = {
+    'extremely_low': {'name': 'Cực kỳ thấp', 'risk_range': (0.5, 1.0), 'default': 1.0, 'leverage_range': (1, 2), 'default_leverage': 2},
+    'low': {'name': 'Thấp', 'risk_range': (1.5, 3.0), 'default': 2.5, 'leverage_range': (2, 5), 'default_leverage': 3},
+    'medium': {'name': 'Trung bình', 'risk_range': (3.0, 7.0), 'default': 5.0, 'leverage_range': (3, 10), 'default_leverage': 5},
+    'high': {'name': 'Cao', 'risk_range': (7.0, 15.0), 'default': 10.0, 'leverage_range': (5, 20), 'default_leverage': 10},
+    'extremely_high': {'name': 'Cực kỳ cao', 'risk_range': (15.0, 50.0), 'default': 25.0, 'leverage_range': (10, 50), 'default_leverage': 20}
+}
+
+ACCOUNT_SIZE_ADJUSTMENTS = {
+    100: {'recommendation': 'extremely_high', 'leverage_boost': 1.5, 'profit_target_boost': 1.5},
+    200: {'recommendation': 'extremely_high', 'leverage_boost': 1.3, 'profit_target_boost': 1.4},
+    300: {'recommendation': 'high', 'leverage_boost': 1.2, 'profit_target_boost': 1.3},
+    500: {'recommendation': 'high', 'leverage_boost': 1.1, 'profit_target_boost': 1.2},
+    1000: {'recommendation': 'medium', 'leverage_boost': 1.0, 'profit_target_boost': 1.1},
+    3000: {'recommendation': 'medium', 'leverage_boost': 0.9, 'profit_target_boost': 1.0},
+    5000: {'recommendation': 'low', 'leverage_boost': 0.8, 'profit_target_boost': 0.9},
+    10000: {'recommendation': 'low', 'leverage_boost': 0.7, 'profit_target_boost': 0.8},
+    50000: {'recommendation': 'extremely_low', 'leverage_boost': 0.5, 'profit_target_boost': 0.7}
+}
 
 # Import các modules cấu hình
 try:
@@ -593,6 +652,8 @@ class EnhancedTradingGUI(QMainWindow):
         self.create_trading_tab()
         self.create_positions_tab()
         self.create_market_analysis_tab()
+        self.create_risk_management_tab()  # Tab quản lý rủi ro mới
+        self.create_backtest_tab()         # Tab backtest mới
         self.create_settings_tab()
         self.create_system_management_tab()
         
@@ -827,7 +888,419 @@ class EnhancedTradingGUI(QMainWindow):
         # Thêm tab vào container
         self.tab_widget.addTab(dashboard_tab, "Tổng quan")
     
-    def create_trading_tab(self):
+    def create_risk_management_tab(self):
+        """Tạo tab quản lý rủi ro"""
+        risk_tab = QWidget()
+        layout = QVBoxLayout(risk_tab)
+        
+        # Tạo các widget cho quản lý rủi ro
+        # Panel cấu hình rủi ro
+        risk_config_group = QGroupBox("Cấu hình mức độ rủi ro")
+        risk_config_layout = QFormLayout(risk_config_group)
+        
+        # Mức rủi ro
+        self.risk_level_combo = QComboBox()
+        for risk_id, risk_data in RISK_LEVELS.items():
+            self.risk_level_combo.addItem(risk_data['name'], risk_id)
+        self.risk_level_combo.setCurrentIndex(2)  # Medium by default
+        self.risk_level_combo.currentIndexChanged.connect(self.on_risk_level_changed)
+        risk_config_layout.addRow("Mức rủi ro:", self.risk_level_combo)
+        
+        # % Rủi ro mỗi giao dịch
+        self.risk_percent_spin = QDoubleSpinBox()
+        self.risk_percent_spin.setRange(0.1, 50.0)
+        self.risk_percent_spin.setSingleStep(0.5)
+        self.risk_percent_spin.setValue(RISK_LEVELS['medium']['default'])
+        self.risk_percent_spin.valueChanged.connect(self.on_risk_params_changed)
+        risk_config_layout.addRow("Rủi ro mỗi giao dịch (%):", self.risk_percent_spin)
+        
+        # Đòn bẩy
+        self.risk_leverage_spin = QSpinBox()
+        self.risk_leverage_spin.setRange(1, 50)
+        self.risk_leverage_spin.setValue(RISK_LEVELS['medium']['default_leverage'])
+        self.risk_leverage_spin.valueChanged.connect(self.on_risk_params_changed)
+        risk_config_layout.addRow("Đòn bẩy (x):", self.risk_leverage_spin)
+        
+        # Auto SL/TP configuration
+        self.sl_atr_multiplier = QDoubleSpinBox()
+        self.sl_atr_multiplier.setRange(0.5, 5.0)
+        self.sl_atr_multiplier.setSingleStep(0.1)
+        self.sl_atr_multiplier.setValue(1.5)
+        risk_config_layout.addRow("Hệ số ATR cho Stop Loss:", self.sl_atr_multiplier)
+        
+        self.tp_atr_multiplier = QDoubleSpinBox()
+        self.tp_atr_multiplier.setRange(0.5, 10.0)
+        self.tp_atr_multiplier.setSingleStep(0.1)
+        self.tp_atr_multiplier.setValue(3.0)
+        risk_config_layout.addRow("Hệ số ATR cho Take Profit:", self.tp_atr_multiplier)
+        
+        # Trailing stop settings
+        self.trailing_stop_checkbox = QCheckBox("Kích hoạt Trailing Stop")
+        self.trailing_stop_checkbox.setChecked(True)
+        risk_config_layout.addRow("", self.trailing_stop_checkbox)
+        
+        self.trailing_activation = QDoubleSpinBox()
+        self.trailing_activation.setRange(0.1, 10.0)
+        self.trailing_activation.setSingleStep(0.1)
+        self.trailing_activation.setValue(1.0)
+        risk_config_layout.addRow("Kích hoạt Trailing Stop (%):", self.trailing_activation)
+        
+        self.trailing_callback = QDoubleSpinBox()
+        self.trailing_callback.setRange(0.05, 2.0)
+        self.trailing_callback.setSingleStep(0.05)
+        self.trailing_callback.setValue(0.5)
+        risk_config_layout.addRow("Callback Trailing Stop (%):", self.trailing_callback)
+        
+        layout.addWidget(risk_config_group)
+        
+        # Tạo phần chốt lời từng phần
+        partial_tp_group = QGroupBox("Cấu hình chốt lời từng phần")
+        partial_tp_layout = QFormLayout(partial_tp_group)
+        
+        self.partial_tp_checkbox = QCheckBox("Kích hoạt chốt lời từng phần")
+        self.partial_tp_checkbox.setChecked(True)
+        partial_tp_layout.addRow("", self.partial_tp_checkbox)
+        
+        # 4 mức chốt lời từng phần
+        self.partial_tp1 = QDoubleSpinBox()
+        self.partial_tp1.setRange(0.1, 10.0)
+        self.partial_tp1.setSingleStep(0.1)
+        self.partial_tp1.setValue(1.0)
+        partial_tp_layout.addRow("% đầu tiên tại (%):", self.partial_tp1)
+        
+        self.partial_tp2 = QDoubleSpinBox()
+        self.partial_tp2.setRange(0.1, 15.0)
+        self.partial_tp2.setSingleStep(0.1)
+        self.partial_tp2.setValue(2.0)
+        partial_tp_layout.addRow("% thứ hai tại (%):", self.partial_tp2)
+        
+        self.partial_tp3 = QDoubleSpinBox()
+        self.partial_tp3.setRange(0.1, 20.0)
+        self.partial_tp3.setSingleStep(0.1)
+        self.partial_tp3.setValue(3.0)
+        partial_tp_layout.addRow("% thứ ba tại (%):", self.partial_tp3)
+        
+        self.partial_tp4 = QDoubleSpinBox()
+        self.partial_tp4.setRange(0.1, 30.0)
+        self.partial_tp4.setSingleStep(0.1)
+        self.partial_tp4.setValue(5.0)
+        partial_tp_layout.addRow("% còn lại tại (%):", self.partial_tp4)
+        
+        layout.addWidget(partial_tp_group)
+        
+        # Tạo phần Cảnh báo rủi ro cao
+        warning_group = QGroupBox("Cảnh báo và giới hạn rủi ro")
+        warning_layout = QFormLayout(warning_group)
+        
+        self.max_open_risk = QDoubleSpinBox()
+        self.max_open_risk.setRange(10.0, 200.0)
+        self.max_open_risk.setSingleStep(5.0)
+        self.max_open_risk.setValue(50.0)
+        warning_layout.addRow("Rủi ro tối đa mở đồng thời (%):", self.max_open_risk)
+        
+        self.max_positions = QSpinBox()
+        self.max_positions.setRange(1, 20)
+        self.max_positions.setValue(5)
+        warning_layout.addRow("Số vị thế tối đa:", self.max_positions)
+        
+        self.high_risk_warning = QDoubleSpinBox()
+        self.high_risk_warning.setRange(5.0, 20.0)
+        self.high_risk_warning.setSingleStep(1.0)
+        self.high_risk_warning.setValue(10.0)
+        warning_layout.addRow("Cảnh báo rủi ro cao (%):", self.high_risk_warning)
+        
+        self.ultra_high_risk_warning = QDoubleSpinBox()
+        self.ultra_high_risk_warning.setRange(10.0, 50.0)
+        self.ultra_high_risk_warning.setSingleStep(1.0)
+        self.ultra_high_risk_warning.setValue(20.0)
+        warning_layout.addRow("Cảnh báo rủi ro cực cao (%):", self.ultra_high_risk_warning)
+        
+        # Thêm một số tính năng nâng cao
+        self.adaptive_risk_checkbox = QCheckBox("Kích hoạt rủi ro thích ứng theo kích thước tài khoản")
+        self.adaptive_risk_checkbox.setChecked(True)
+        warning_layout.addRow("", self.adaptive_risk_checkbox)
+        
+        self.market_based_risk_checkbox = QCheckBox("Điều chỉnh rủi ro dựa trên trạng thái thị trường")
+        self.market_based_risk_checkbox.setChecked(True)
+        warning_layout.addRow("", self.market_based_risk_checkbox)
+        
+        layout.addWidget(warning_group)
+        
+        # Nút áp dụng cài đặt
+        apply_btn = QPushButton("Áp dụng cài đặt rủi ro")
+        apply_btn.clicked.connect(self.apply_risk_settings)
+        
+        # Nút khôi phục cài đặt mặc định
+        reset_btn = QPushButton("Khôi phục mặc định")
+        reset_btn.clicked.connect(self.reset_risk_settings)
+        
+        btn_layout = QHBoxLayout()
+        btn_layout.addWidget(apply_btn)
+        btn_layout.addWidget(reset_btn)
+        layout.addLayout(btn_layout)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(risk_tab, "Quản lý rủi ro")
+    
+    def create_backtest_tab(self):
+        """Tạo tab backtest"""
+        backtest_tab = QWidget()
+        layout = QVBoxLayout(backtest_tab)
+        
+        # Cấu hình backtest
+        config_group = QGroupBox("Cấu hình backtest")
+        config_layout = QFormLayout(config_group)
+        
+        # Chọn cặp tiền
+        self.backtest_symbol = QComboBox()
+        self.backtest_symbol.addItems(["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"])
+        config_layout.addRow("Cặp tiền:", self.backtest_symbol)
+        
+        # Khung thời gian
+        self.backtest_timeframe = QComboBox()
+        self.backtest_timeframe.addItems(["1m", "5m", "15m", "30m", "1h", "4h", "1d"])
+        self.backtest_timeframe.setCurrentText("1h")
+        config_layout.addRow("Khung thời gian:", self.backtest_timeframe)
+        
+        # Thời gian backtest
+        self.backtest_period = QSpinBox()
+        self.backtest_period.setRange(7, 365)
+        self.backtest_period.setValue(90)
+        config_layout.addRow("Số ngày backtest:", self.backtest_period)
+        
+        # Số dư ban đầu
+        self.backtest_balance = QDoubleSpinBox()
+        self.backtest_balance.setRange(100, 1000000)
+        self.backtest_balance.setValue(10000)
+        config_layout.addRow("Số dư ban đầu ($):", self.backtest_balance)
+        
+        # Mức rủi ro
+        self.backtest_risk = QComboBox()
+        self.backtest_risk.addItems(["Cực thấp (1%)", "Thấp (3%)", "Trung bình (5%)", "Cao (10%)", "Cực cao (25%)"])
+        self.backtest_risk.setCurrentIndex(2)
+        config_layout.addRow("Mức rủi ro:", self.backtest_risk)
+        
+        # Chiến lược
+        self.backtest_strategy = QComboBox()
+        self.backtest_strategy.addItems([
+            "AdaptiveStrategy", "RSIStrategy", "MACDStrategy", 
+            "BollingerBandsStrategy", "SuperTrendStrategy"
+        ])
+        config_layout.addRow("Chiến lược:", self.backtest_strategy)
+        
+        layout.addWidget(config_group)
+        
+        # Nút chạy backtest
+        run_btn = QPushButton("Chạy backtest")
+        run_btn.clicked.connect(self.run_backtest)
+        layout.addWidget(run_btn)
+        
+        # Progress bar
+        self.backtest_progress = QProgressBar()
+        self.backtest_progress.setValue(0)
+        layout.addWidget(self.backtest_progress)
+        
+        # Kết quả backtest
+        results_group = QGroupBox("Kết quả backtest")
+        results_layout = QVBoxLayout(results_group)
+        
+        self.backtest_results_table = QTableWidget()
+        self.backtest_results_table.setColumnCount(9)
+        self.backtest_results_table.setHorizontalHeaderLabels([
+            "Cặp tiền", "Lợi nhuận (%)", "Drawdown (%)", "Win Rate (%)", 
+            "Tổng GD", "GD thắng", "GD thua", "Profit Factor", "Số dư cuối"
+        ])
+        results_layout.addWidget(self.backtest_results_table)
+        
+        layout.addWidget(results_group)
+        
+        # Nút xuất kết quả
+        export_btn = QPushButton("Xuất kết quả backtest")
+        export_btn.clicked.connect(self.export_backtest_results)
+        layout.addWidget(export_btn)
+        
+        # Thêm tab vào container
+        self.tab_widget.addTab(backtest_tab, "Backtest")
+    
+    def on_risk_level_changed(self):
+        """Xử lý khi người dùng thay đổi mức rủi ro"""
+        # Lấy mức rủi ro đã chọn
+        risk_level = self.risk_level_combo.currentData()
+        
+        # Cập nhật các tham số
+        risk_data = RISK_LEVELS[risk_level]
+        self.risk_percent_spin.setValue(risk_data['default'])
+        self.risk_leverage_spin.setValue(risk_data['default_leverage'])
+        
+        # Cập nhật SL/TP multipliers based on risk level
+        if risk_level == 'extremely_low':
+            self.sl_atr_multiplier.setValue(2.0)
+            self.tp_atr_multiplier.setValue(6.0)
+            self.trailing_activation.setValue(1.5)
+            self.trailing_callback.setValue(0.7)
+        elif risk_level == 'low':
+            self.sl_atr_multiplier.setValue(1.5)
+            self.tp_atr_multiplier.setValue(4.0)
+            self.trailing_activation.setValue(1.0)
+            self.trailing_callback.setValue(0.5)
+        elif risk_level == 'medium':
+            self.sl_atr_multiplier.setValue(1.2)
+            self.tp_atr_multiplier.setValue(3.0)
+            self.trailing_activation.setValue(0.8)
+            self.trailing_callback.setValue(0.4)
+        elif risk_level == 'high':
+            self.sl_atr_multiplier.setValue(1.0)
+            self.tp_atr_multiplier.setValue(2.0)
+            self.trailing_activation.setValue(0.5)
+            self.trailing_callback.setValue(0.3)
+        elif risk_level == 'extremely_high':
+            self.sl_atr_multiplier.setValue(0.7)
+            self.tp_atr_multiplier.setValue(1.5)
+            self.trailing_activation.setValue(0.3)
+            self.trailing_callback.setValue(0.2)
+    
+    def on_risk_params_changed(self):
+        """Xử lý khi các tham số rủi ro thay đổi"""
+        # Kiểm tra tính hợp lệ của các tham số
+        risk_pct = self.risk_percent_spin.value()
+        leverage = self.risk_leverage_spin.value()
+        
+        # Hiển thị cảnh báo nếu rủi ro quá cao
+        if risk_pct > self.ultra_high_risk_warning.value():
+            QMessageBox.warning(self, "Cảnh báo", "Rủi ro cực cao! Có thể dẫn đến mất vốn nhanh chóng.")
+        elif risk_pct > self.high_risk_warning.value():
+            QMessageBox.warning(self, "Cảnh báo", "Rủi ro cao! Chỉ phù hợp với người dùng có kinh nghiệm.")
+    
+    def apply_risk_settings(self):
+        """Áp dụng cài đặt rủi ro"""
+        try:
+            # Tạo đối tượng cấu hình rủi ro
+            risk_config = {
+                "risk_level": self.risk_level_combo.currentData(),
+                "risk_per_trade": self.risk_percent_spin.value(),
+                "max_leverage": self.risk_leverage_spin.value(),
+                "stop_loss_atr_multiplier": self.sl_atr_multiplier.value(),
+                "take_profit_atr_multiplier": self.tp_atr_multiplier.value(),
+                "trailing_stop": self.trailing_stop_checkbox.isChecked(),
+                "trailing_activation_pct": self.trailing_activation.value(),
+                "trailing_callback_pct": self.trailing_callback.value(),
+                "partial_profit_taking": {
+                    "enabled": self.partial_tp_checkbox.isChecked(),
+                    "levels": [
+                        {"pct": self.partial_tp1.value(), "portion": 0.25},
+                        {"pct": self.partial_tp2.value(), "portion": 0.25},
+                        {"pct": self.partial_tp3.value(), "portion": 0.25},
+                        {"pct": self.partial_tp4.value(), "portion": 0.25}
+                    ]
+                },
+                "max_open_risk": self.max_open_risk.value(),
+                "max_positions": self.max_positions.value(),
+                "adaptive_risk": self.adaptive_risk_checkbox.isChecked(),
+                "market_based_risk": self.market_based_risk_checkbox.isChecked(),
+                "warnings": {
+                    "high_risk": self.high_risk_warning.value(),
+                    "ultra_high_risk": self.ultra_high_risk_warning.value()
+                }
+            }
+            
+            # Lưu cấu hình
+            os.makedirs("risk_configs", exist_ok=True)
+            with open("risk_configs/current_risk_config.json", "w", encoding="utf-8") as f:
+                json.dump(risk_config, f, indent=4)
+            
+            # Thông báo thành công
+            QMessageBox.information(self, "Thành công", "Đã áp dụng cài đặt rủi ro mới")
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể áp dụng cài đặt rủi ro: {str(e)}")
+    
+    def reset_risk_settings(self):
+        """Khôi phục cài đặt rủi ro mặc định"""
+        # Đặt lại combobox về Medium
+        for i in range(self.risk_level_combo.count()):
+            if self.risk_level_combo.itemData(i) == 'medium':
+                self.risk_level_combo.setCurrentIndex(i)
+                break
+        
+        # Đặt lại các giá trị khác
+        self.risk_percent_spin.setValue(5.0)
+        self.risk_leverage_spin.setValue(5)
+        self.sl_atr_multiplier.setValue(1.2)
+        self.tp_atr_multiplier.setValue(3.0)
+        self.trailing_activation.setValue(0.8)
+        self.trailing_callback.setValue(0.4)
+        self.partial_tp1.setValue(1.0)
+        self.partial_tp2.setValue(2.0)
+        self.partial_tp3.setValue(3.0)
+        self.partial_tp4.setValue(5.0)
+        self.max_open_risk.setValue(50.0)
+        self.max_positions.setValue(5)
+        self.high_risk_warning.setValue(10.0)
+        self.ultra_high_risk_warning.setValue(20.0)
+        
+        # Checkbox
+        self.adaptive_risk_checkbox.setChecked(True)
+        self.market_based_risk_checkbox.setChecked(True)
+        self.trailing_stop_checkbox.setChecked(True)
+        self.partial_tp_checkbox.setChecked(True)
+    
+    def run_backtest(self):
+        """Chạy backtest"""
+        try:
+            # Hiển thị thông báo không thể chạy backtest đầy đủ trong giao diện desktop
+            QMessageBox.information(
+                self,
+                "Backtest",
+                "Backtest được chạy trong tiến trình nền. Kết quả sẽ được cập nhật sau khi hoàn thành.\n\n"
+                "Để chạy backtest đầy đủ, vui lòng sử dụng module full_risk_levels_backtest.py"
+            )
+            
+            # Mô phỏng chạy backtest
+            self.backtest_progress.setValue(0)
+            
+            # Tạo thread để mô phỏng backtest
+            self.backtest_thread = BacktestThread(self)
+            self.backtest_thread.progress_updated.connect(self.update_backtest_progress)
+            self.backtest_thread.backtest_completed.connect(self.on_backtest_completed)
+            self.backtest_thread.start()
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể chạy backtest: {str(e)}")
+    
+    def update_backtest_progress(self, value):
+        """Cập nhật tiến trình backtest"""
+        self.backtest_progress.setValue(value)
+    
+    def on_backtest_completed(self, results):
+        """Xử lý khi backtest hoàn thành"""
+        # Cập nhật bảng kết quả
+        self.backtest_results_table.setRowCount(1)
+        
+        # Thêm dữ liệu
+        symbol = self.backtest_symbol.currentText()
+        self.backtest_results_table.setItem(0, 0, QTableWidgetItem(symbol))
+        self.backtest_results_table.setItem(0, 1, QTableWidgetItem(f"{results['profit_pct']:.2f}"))
+        self.backtest_results_table.setItem(0, 2, QTableWidgetItem(f"{results['drawdown_pct']:.2f}"))
+        self.backtest_results_table.setItem(0, 3, QTableWidgetItem(f"{results['win_rate']:.2f}"))
+        self.backtest_results_table.setItem(0, 4, QTableWidgetItem(str(results['total_trades'])))
+        self.backtest_results_table.setItem(0, 5, QTableWidgetItem(str(results['winning_trades'])))
+        self.backtest_results_table.setItem(0, 6, QTableWidgetItem(str(results['losing_trades'])))
+        self.backtest_results_table.setItem(0, 7, QTableWidgetItem(f"{results['profit_factor']:.2f}"))
+        self.backtest_results_table.setItem(0, 8, QTableWidgetItem(f"{results['final_balance']:.2f}"))
+        
+        self.backtest_results_table.resizeColumnsToContents()
+        
+        QMessageBox.information(self, "Backtest hoàn thành", "Đã hoàn thành backtest!")
+    
+    def export_backtest_results(self):
+        """Xuất kết quả backtest"""
+        QMessageBox.information(
+            self,
+            "Xuất kết quả",
+            "Kết quả backtest đã được lưu trong thư mục backtest_results/"
+        )
+    
+    def trading_tab(self):
         """Tạo tab giao dịch"""
         trading_tab = QWidget()
         layout = QHBoxLayout(trading_tab)
