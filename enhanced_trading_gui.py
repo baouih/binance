@@ -15,6 +15,17 @@ from datetime import datetime, timedelta
 from functools import partial
 from typing import Dict, List, Tuple, Union, Any, Optional, Callable
 
+# PyQt5 imports
+from PyQt5.QtWidgets import (
+    QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QTabWidget, QComboBox, QLineEdit, QFormLayout, QGroupBox, QMessageBox, QGridLayout,
+    QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QCheckBox, QDoubleSpinBox,
+    QSpinBox, QTextEdit, QSizePolicy, QSplitter, QStatusBar, QToolBar, QAction, QMenu,
+    QSystemTrayIcon, QStyle, QDesktopWidget
+)
+from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
+
 # BacktestThread class for running backtest
 class BacktestThread(QThread):
     """Thread chạy backtest"""

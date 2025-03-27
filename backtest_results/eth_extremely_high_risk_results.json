@@ -1,8 +1,8 @@
 {
     "symbol": "ETHUSDT",
     "risk_level": "extremely_high",
-    "risk_per_trade": 25.0,
-    "leverage": 20,
+    "risk_per_trade": 5.0,
+    "leverage": 5,
     "period_days": 90,
     "results": {
         "profit_pct": -8.42,
