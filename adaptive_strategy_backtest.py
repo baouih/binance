@@ -44,10 +44,15 @@ def load_risk_config():
 
 def calculate_indicators(data):
     """Tính toán các chỉ báo"""
-    # Tính các đường MA
-    data['ma20'] = data['Close'].rolling(window=20).mean()
-    data['ma50'] = data['Close'].rolling(window=50).mean()
-    data['ma100'] = data['Close'].rolling(window=100).mean()
+    # Tính các đường MA với nhiều chu kỳ khác nhau
+    ma_periods = [10, 20, 50, 100, 200]
+    for period in ma_periods:
+        data[f'ma{period}'] = data['Close'].rolling(window=period).mean()
+    
+    # Tính EMA
+    ema_periods = [9, 21, 55]
+    for period in ema_periods:
+        data[f'ema{period}'] = data['Close'].ewm(span=period, adjust=False).mean()
     
     # Tính RSI
     delta = data['Close'].diff()
@@ -60,6 +65,15 @@ def calculate_indicators(data):
     rs = avg_gain / avg_loss
     data['rsi'] = 100 - (100 / (1 + rs))
     
+    # RSI với nhiều chu kỳ khác nhau
+    for period in [7, 14, 21]:
+        gain_p = delta.where(delta > 0, 0)
+        loss_p = -delta.where(delta < 0, 0)
+        avg_gain_p = gain_p.rolling(window=period).mean()
+        avg_loss_p = loss_p.rolling(window=period).mean()
+        rs_p = avg_gain_p / avg_loss_p
+        data[f'rsi_{period}'] = 100 - (100 / (1 + rs_p))
+    
     # Tính ATR (Average True Range)
     high_low = data['High'] - data['Low']
     high_close = abs(data['High'] - data['Close'].shift())
@@ -67,41 +81,186 @@ def calculate_indicators(data):
     
     ranges = pd.concat([high_low, high_close, low_close], axis=1)
     true_range = ranges.max(axis=1)
-    data['atr'] = true_range.rolling(14).mean()
+    
+    # ATR với nhiều chu kỳ
+    for period in [7, 14, 21]:
+        data[f'atr_{period}'] = true_range.rolling(period).mean()
+    
+    # Đảm bảo tương thích với code cũ
+    data['atr'] = data['atr_14'] if 'atr_14' in data.columns else true_range.rolling(14).mean()
     
     # Bollinger Bands
-    data['sma20'] = data['Close'].rolling(20).mean()
-    data['stddev'] = data['Close'].rolling(20).std()
-    data['bollinger_upper'] = data['sma20'] + (data['stddev'] * 2)
-    data['bollinger_lower'] = data['sma20'] - (data['stddev'] * 2)
+    for period in [20, 50]:
+        data[f'sma{period}'] = data['Close'].rolling(period).mean()
+        data[f'stddev_{period}'] = data['Close'].rolling(period).std()
+        data[f'bb_upper_{period}'] = data[f'sma{period}'] + (data[f'stddev_{period}'] * 2)
+        data[f'bb_lower_{period}'] = data[f'sma{period}'] - (data[f'stddev_{period}'] * 2)
+        # Bollinger Band Width (độ rộng của dải)
+        data[f'bb_width_{period}'] = (data[f'bb_upper_{period}'] - data[f'bb_lower_{period}']) / data[f'sma{period}']
+    
+    # Đảm bảo tương thích với code cũ
+    data['sma20'] = data['sma20'] if 'sma20' in data.columns else data['Close'].rolling(20).mean()
+    data['stddev'] = data['stddev_20'] if 'stddev_20' in data.columns else data['Close'].rolling(20).std()
+    data['bollinger_upper'] = data['bb_upper_20'] if 'bb_upper_20' in data.columns else data['sma20'] + (data['stddev'] * 2)
+    data['bollinger_lower'] = data['bb_lower_20'] if 'bb_lower_20' in data.columns else data['sma20'] - (data['stddev'] * 2)
+    
+    # MACD
+    data['ema12'] = data['Close'].ewm(span=12, adjust=False).mean()
+    data['ema26'] = data['Close'].ewm(span=26, adjust=False).mean()
+    data['macd'] = data['ema12'] - data['ema26']
+    data['macd_signal'] = data['macd'].ewm(span=9, adjust=False).mean()
+    data['macd_hist'] = data['macd'] - data['macd_signal']
+    
+    # Stochastic Oscillator
+    period = 14
+    data['lowest_low'] = data['Low'].rolling(window=period).min()
+    data['highest_high'] = data['High'].rolling(window=period).max()
+    data['stoch_k'] = 100 * ((data['Close'] - data['lowest_low']) / 
+                            (data['highest_high'] - data['lowest_low']))
+    data['stoch_d'] = data['stoch_k'].rolling(window=3).mean()
+    
+    # Volume Indicators
+    if 'Volume' in data.columns:
+        # On-Balance Volume (OBV)
+        data['obv'] = np.where(data['Close'] > data['Close'].shift(1), 
+                              data['Volume'], 
+                              np.where(data['Close'] < data['Close'].shift(1), 
+                                     -data['Volume'], 0)).cumsum()
+        
+        # Volume Moving Average
+        data['volume_ma20'] = data['Volume'].rolling(window=20).mean()
+        data['volume_ratio'] = data['Volume'] / data['volume_ma20']
     
     return data
 
 def ma_crossover_signals(data):
-    """Tạo tín hiệu MA crossover"""
+    """Tạo tín hiệu MA crossover với nhiều chiến lược khác nhau"""
     signals = []
     
-    for i in range(20, len(data)-1):
-        # Kiểm tra điều kiện MA crossover
-        current_close = float(data['Close'].iloc[i])
-        current_ma20 = float(data['ma20'].iloc[i])
-        prev_close = float(data['Close'].iloc[i-1])
-        prev_ma20 = float(data['ma20'].iloc[i-1])
-        
-        # Tín hiệu mua khi giá vượt lên trên MA20
-        if prev_close <= prev_ma20 and current_close > current_ma20:
-            entry_date = data.index[i]
-            entry_price = current_close
-            
-            signals.append({
-                'date': entry_date,
-                'type': 'LONG',
-                'entry_price': entry_price,
-                'signal_source': 'ma_crossover',
-                'sideways_period': False
-            })
+    # Danh sách các cặp MA để tạo tín hiệu crossover
+    ma_pairs = [
+        ('ma10', 'ma20'), 
+        ('ma20', 'ma50'),
+        ('ma50', 'ma100'),
+        ('ema9', 'ema21'),
+        ('ema21', 'ema55')
+    ]
     
-    return signals
+    # Kiểm tra từng cặp MA
+    for fast_ma, slow_ma in ma_pairs:
+        if fast_ma not in data.columns or slow_ma not in data.columns:
+            continue
+            
+        ma_min_periods = int(max(fast_ma.replace('ma', '').replace('ema', ''), 
+                                slow_ma.replace('ma', '').replace('ema', '')))
+        
+        for i in range(ma_min_periods, len(data)-1):
+            # Kiểm tra điều kiện MA crossover
+            current_fast = float(data[fast_ma].iloc[i])
+            current_slow = float(data[slow_ma].iloc[i])
+            prev_fast = float(data[fast_ma].iloc[i-1])
+            prev_slow = float(data[slow_ma].iloc[i-1])
+            
+            current_close = float(data['Close'].iloc[i])
+            current_rsi = float(data['rsi'].iloc[i]) if 'rsi' in data.columns else 50
+            
+            # LONG signal: fast MA crosses above slow MA
+            if prev_fast <= prev_slow and current_fast > current_slow:
+                # Thêm bộ lọc tín hiệu giả bằng RSI và khối lượng
+                valid_signal = True
+                
+                # Lọc theo RSI: Không vào lệnh khi RSI quá cao (>70)
+                if 'rsi' in data.columns and current_rsi > 70:
+                    valid_signal = False
+                
+                # Lọc theo volume: Không vào lệnh khi volume thấp
+                if 'Volume' in data.columns and 'volume_ratio' in data.columns:
+                    current_vol_ratio = float(data['volume_ratio'].iloc[i])
+                    if current_vol_ratio < 0.8:  # Volume thấp hơn 80% trung bình
+                        valid_signal = False
+                
+                # Kiểm tra xu hướng: Không vào lệnh khi đã trong xu hướng giảm mạnh
+                if 'ma100' in data.columns and current_close < float(data['ma100'].iloc[i]):
+                    # Nếu giá dưới MA100, kiểm tra thêm điều kiện
+                    if current_close < float(data['ma50'].iloc[i]) * 0.95:
+                        valid_signal = False
+                
+                if valid_signal:
+                    entry_date = data.index[i]
+                    entry_price = current_close
+                    
+                    signals.append({
+                        'date': entry_date,
+                        'type': 'LONG',
+                        'entry_price': entry_price,
+                        'signal_source': f'{fast_ma}_{slow_ma}_crossover',
+                        'sideways_period': False,
+                        'ma_pair': f'{fast_ma}_{slow_ma}'
+                    })
+            
+            # SHORT signal: fast MA crosses below slow MA
+            elif prev_fast >= prev_slow and current_fast < current_slow:
+                # Thêm bộ lọc tín hiệu giả bằng RSI và khối lượng
+                valid_signal = True
+                
+                # Lọc theo RSI: Không vào lệnh khi RSI quá thấp (<30)
+                if 'rsi' in data.columns and current_rsi < 30:
+                    valid_signal = False
+                
+                # Lọc theo volume: Không vào lệnh khi volume thấp
+                if 'Volume' in data.columns and 'volume_ratio' in data.columns:
+                    current_vol_ratio = float(data['volume_ratio'].iloc[i])
+                    if current_vol_ratio < 0.8:
+                        valid_signal = False
+                
+                # Kiểm tra xu hướng: Không vào lệnh khi đã trong xu hướng tăng mạnh
+                if 'ma100' in data.columns and current_close > float(data['ma100'].iloc[i]):
+                    # Nếu giá trên MA100, kiểm tra thêm điều kiện
+                    if current_close > float(data['ma50'].iloc[i]) * 1.05:
+                        valid_signal = False
+                
+                if valid_signal:
+                    entry_date = data.index[i]
+                    entry_price = current_close
+                    
+                    signals.append({
+                        'date': entry_date,
+                        'type': 'SHORT',
+                        'entry_price': entry_price,
+                        'signal_source': f'{fast_ma}_{slow_ma}_crossover',
+                        'sideways_period': False,
+                        'ma_pair': f'{fast_ma}_{slow_ma}'
+                    })
+    
+    # Bộ lọc tín hiệu giao dịch tập trung
+    # Loại bỏ các tín hiệu quá gần nhau trong cùng một ngày
+    filtered_signals = []
+    if signals:
+        # Sắp xếp tín hiệu theo thời gian
+        sorted_signals = sorted(signals, key=lambda x: x['date'])
+        
+        # Nhóm tín hiệu theo ngày
+        date_groups = {}
+        for signal in sorted_signals:
+            date_str = signal['date'].strftime('%Y-%m-%d')
+            if date_str not in date_groups:
+                date_groups[date_str] = []
+            date_groups[date_str].append(signal)
+        
+        # Lấy tín hiệu tốt nhất cho mỗi ngày
+        for date_str, day_signals in date_groups.items():
+            if len(day_signals) == 1:
+                filtered_signals.append(day_signals[0])
+            else:
+                # Ưu tiên EMA over SMA và chu kỳ ngắn
+                priority_signals = [s for s in day_signals if 'ema' in s['ma_pair']]
+                if priority_signals:
+                    filtered_signals.append(priority_signals[0])
+                else:
+                    filtered_signals.append(day_signals[0])
+    
+    logger.info(f"Đã tạo {len(signals)} tín hiệu MA crossover, sau khi lọc còn {len(filtered_signals)}")
+    return filtered_signals
 
 def apply_atr_based_stops(data, signals, risk_config, risk_level="low"):
     """Áp dụng stop loss và take profit dựa trên ATR"""
@@ -282,8 +441,17 @@ def simulate_trades(data, signals, risk_params, initial_balance=10000.0, symbol=
         
     return trades, balance
 
-def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0):
-    """Chạy backtest với chiến lược thích ứng"""
+def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance=10000.0, use_binance_data=False):
+    """
+    Chạy backtest với chiến lược thích ứng kết hợp và tối ưu hóa
+    
+    Args:
+        symbols (list): Danh sách mã giao dịch
+        period (str): Khoảng thời gian backtest
+        timeframe (str): Khung thời gian
+        initial_balance (float): Số dư ban đầu
+        use_binance_data (bool): Sử dụng dữ liệu từ Binance thay vì Yahoo Finance
+    """
     # Tải cấu hình rủi ro
     risk_config = load_risk_config()
     risk_level = "low"
@@ -297,6 +465,7 @@ def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance
     logger.info(f"Mức rủi ro: {risk_level}")
     logger.info(f"Rủi ro/Giao dịch: {risk_params['risk_per_trade']}%")
     logger.info(f"Đòn bẩy: {risk_params['max_leverage']}x")
+    logger.info(f"Nguồn dữ liệu: {'Binance' if use_binance_data else 'Yahoo Finance'}")
     
     # Tạo bộ phát hiện thị trường đi ngang
     sideways_detector = SidewaysMarketDetector()
@@ -315,7 +484,95 @@ def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance
         
         try:
             # Tải dữ liệu
-            data = yf.download(symbol, period=period, interval=timeframe)
+            if use_binance_data:
+                try:
+                    # Tải dữ liệu từ Binance
+                    from binance.client import Client
+                    import os
+                    
+                    # Lấy API key và secret
+                    api_key = os.environ.get('BINANCE_API_KEY', '')
+                    api_secret = os.environ.get('BINANCE_API_SECRET', '')
+                    
+                    # Nếu dùng testnet thì dùng key testnet
+                    use_testnet = False  # Dùng dữ liệu thực
+                    if use_testnet:
+                        api_key = os.environ.get('BINANCE_TESTNET_API_KEY', api_key)
+                        api_secret = os.environ.get('BINANCE_TESTNET_API_SECRET', api_secret)
+                    
+                    # Chuyển đổi period sang timestamp
+                    from datetime import datetime, timedelta
+                    end_date = datetime.now()
+                    
+                    # Chuyển đổi period từ định dạng Yahoo Finance sang số ngày
+                    if period.endswith('d'):
+                        days = int(period[:-1])
+                    elif period.endswith('mo'):
+                        days = int(period[:-2]) * 30
+                    elif period.endswith('y'):
+                        days = int(period[:-1]) * 365
+                    else:
+                        days = 90  # Mặc định 90 ngày
+                    
+                    start_date = end_date - timedelta(days=days)
+                    
+                    # Chuyển đổi timeframe sang định dạng Binance
+                    interval_mapping = {
+                        '1m': Client.KLINE_INTERVAL_1MINUTE,
+                        '5m': Client.KLINE_INTERVAL_5MINUTE,
+                        '15m': Client.KLINE_INTERVAL_15MINUTE,
+                        '30m': Client.KLINE_INTERVAL_30MINUTE,
+                        '1h': Client.KLINE_INTERVAL_1HOUR,
+                        '2h': Client.KLINE_INTERVAL_2HOUR,
+                        '4h': Client.KLINE_INTERVAL_4HOUR,
+                        '1d': Client.KLINE_INTERVAL_1DAY,
+                    }
+                    binance_interval = interval_mapping.get(timeframe, Client.KLINE_INTERVAL_1DAY)
+                    
+                    # Chuyển đổi symbol (Binance dùng BTCUSDT thay vì BTC-USD)
+                    binance_symbol = symbol
+                    if '-USD' in symbol:
+                        binance_symbol = symbol.replace('-USD', 'USDT')
+                    elif 'USD' not in symbol and 'USDT' not in symbol:
+                        binance_symbol = f"{symbol}USDT"
+                    
+                    logger.info(f"Tải dữ liệu {binance_symbol} từ Binance ({binance_interval}, {days} ngày)")
+                    
+                    # Tạo Binance client
+                    client = Client(api_key, api_secret, testnet=use_testnet)
+                    
+                    # Lấy dữ liệu
+                    klines = client.get_historical_klines(
+                        symbol=binance_symbol,
+                        interval=binance_interval,
+                        start_str=start_date.strftime('%Y-%m-%d'),
+                        end_str=end_date.strftime('%Y-%m-%d')
+                    )
+                    
+                    # Chuyển đổi sang DataFrame
+                    data = pd.DataFrame(klines, columns=[
+                        'timestamp', 'Open', 'High', 'Low', 'Close', 'Volume',
+                        'close_time', 'quote_volume', 'trades', 'taker_buy_base', 
+                        'taker_buy_quote', 'ignored'
+                    ])
+                    
+                    # Chuyển đổi kiểu dữ liệu
+                    data['timestamp'] = pd.to_datetime(data['timestamp'], unit='ms')
+                    data.set_index('timestamp', inplace=True)
+                    
+                    for col in ['Open', 'High', 'Low', 'Close', 'Volume']:
+                        data[col] = pd.to_numeric(data[col])
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi tải dữ liệu từ Binance: {e}")
+                    logger.info(f"Chuyển sang sử dụng dữ liệu từ Yahoo Finance cho {symbol}")
+                    
+                    # Fallback: dùng Yahoo Finance
+                    data = yf.download(symbol, period=period, interval=timeframe)
+            else:
+                # Sử dụng Yahoo Finance
+                data = yf.download(symbol, period=period, interval=timeframe)
+                
             logger.info(f"Đã tải {len(data)} dòng dữ liệu cho {symbol}")
             
             if len(data) < 20:
@@ -348,6 +605,31 @@ def run_adaptive_backtest(symbols, period="3mo", timeframe="1d", initial_balance
             
             # Áp dụng stop loss và take profit dựa trên ATR
             all_signals = apply_atr_based_stops(data, all_signals, risk_config, risk_level)
+            
+            # Triển khai chốt lời từng phần (partial take profit)
+            for signal in all_signals:
+                # Thêm các mức chốt lời từng phần
+                entry_price = signal['entry_price']
+                signal['partial_take_profits'] = []
+                
+                if signal['type'] == 'LONG':
+                    # Mức chốt lời tăng dần: 1%, 2%, 3%, 5%
+                    for pct in [0.01, 0.02, 0.03, 0.05]:
+                        tp_level = entry_price * (1 + pct)
+                        signal['partial_take_profits'].append({
+                            'level': tp_level,
+                            'percentage': 25.0,  # Chốt 25% vị thế ở mỗi mức
+                            'triggered': False
+                        })
+                else:  # SHORT
+                    # Mức chốt lời giảm dần: 1%, 2%, 3%, 5%
+                    for pct in [0.01, 0.02, 0.03, 0.05]:
+                        tp_level = entry_price * (1 - pct)
+                        signal['partial_take_profits'].append({
+                            'level': tp_level,
+                            'percentage': 25.0,  # Chốt 25% vị thế ở mỗi mức
+                            'triggered': False
+                        })
             
             # Mô phỏng giao dịch
             symbol_trades, symbol_balance = simulate_trades(data, all_signals, risk_params, balance, symbol)
@@ -607,6 +889,7 @@ def main():
     parser.add_argument('--output-dir', default='backtest_reports', help='Thư mục đầu ra')
     parser.add_argument('--no-plot', action='store_true', default=True, help='Không vẽ biểu đồ')
     parser.add_argument('--plot', action='store_false', dest='no_plot', help='Vẽ biểu đồ (cần môi trường hỗ trợ đồ họa Qt)')
+    parser.add_argument('--use-binance', action='store_true', help='Sử dụng dữ liệu từ Binance thay vì Yahoo Finance')
     
     args = parser.parse_args()
     
@@ -614,12 +897,25 @@ def main():
     if len(args.symbols) == 1 and ',' in args.symbols[0]:
         args.symbols = args.symbols[0].split(',')
     
+    # Kiểm tra API keys khi sử dụng dữ liệu Binance
+    if args.use_binance:
+        import os
+        api_key = os.environ.get('BINANCE_API_KEY', '')
+        api_secret = os.environ.get('BINANCE_API_SECRET', '')
+        
+        if not api_key or not api_secret:
+            logger.warning("BINANCE_API_KEY hoặc BINANCE_API_SECRET không được thiết lập. Chuyển sang sử dụng Yahoo Finance.")
+            args.use_binance = False
+    
     # Chạy backtest
+    logger.info(f"Bắt đầu backtest với nguồn dữ liệu: {('Binance' if args.use_binance else 'Yahoo Finance')}")
+    
     report = run_adaptive_backtest(
         symbols=args.symbols,
         period=args.period,
         timeframe=args.timeframe,
-        initial_balance=args.balance
+        initial_balance=args.balance,
+        use_binance_data=args.use_binance
     )
     
     # Lưu báo cáo
