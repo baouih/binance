@@ -1,306 +1,183 @@
 /**
- * status-updater.js - Cập nhật trạng thái các dịch vụ
+ * status-updater.js
  * 
- * Script này xử lý việc cập nhật trạng thái trên giao diện người dùng
- * từ dữ liệu API theo định kỳ.
+ * Mô-đun này quản lý việc cập nhật trạng thái của hệ thống giao dịch trên giao diện người dùng
+ * với các biện pháp xử lý lỗi nâng cao để tránh các thông báo lỗi không cần thiết trên console.
  */
 
-// Định nghĩa URL API
-const SERVICE_API_URL = '/api/services/market-notifier/status'; // API endpoint chính cho market notifier
+(function() {
+    // Cấu hình
+    const config = {
+        updateInterval: 5000, // khoảng thời gian cập nhật (ms)
+        maxRetries: 3,        // số lần thử lại tối đa khi gặp lỗi
+        retryDelay: 2000      // thời gian chờ giữa các lần thử lại (ms)
+    };
 
-// Biến lưu trạng thái update timer
-let statusUpdateTimer = null;
-const UPDATE_INTERVAL = 15000; // 15 giây
+    // Biến trạng thái
+    let retryCount = 0;
+    let lastSuccessfulUpdate = Date.now();
+    let isOffline = false;
 
-/**
- * Khởi tạo các listener cập nhật trạng thái
- */
-function initStatusUpdater() {
-    console.log('Initializing status updater...');
-    
-    // Bắt đầu cập nhật theo định kỳ
-    startPeriodicUpdates();
-    
-    // Đăng ký sự kiện cho nút làm mới
-    const refreshButton = document.getElementById('refresh-status');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', () => {
-            updateServiceStatus(true);
+    /**
+     * Cập nhật trạng thái hệ thống trên giao diện
+     */
+    function updateSystemStatus() {
+        $.ajax({
+            url: '/api/status',
+            type: 'GET',
+            timeout: 5000,
+            success: handleStatusSuccess,
+            error: handleStatusError
         });
     }
-    
-    // Cập nhật lần đầu
-    updateServiceStatus();
-}
 
-/**
- * Bắt đầu cập nhật định kỳ
- */
-function startPeriodicUpdates() {
-    // Hủy timer cũ nếu có
-    if (statusUpdateTimer) {
-        clearInterval(statusUpdateTimer);
+    /**
+     * Xử lý phản hồi thành công từ API
+     */
+    function handleStatusSuccess(response) {
+        try {
+            // Đặt lại bộ đếm thử lại
+            retryCount = 0;
+            lastSuccessfulUpdate = Date.now();
+            
+            if (isOffline) {
+                console.log('Kết nối đã được khôi phục');
+                isOffline = false;
+            }
+
+            // Cập nhật trạng thái bot
+            updateBotStatus(response.running);
+            
+            // Cập nhật thông tin tài khoản
+            if (response.account_balance !== undefined) {
+                updateBalanceDisplay(response.account_balance);
+            }
+            
+            // Cập nhật thông tin vị thế
+            if (response.positions_count !== undefined || response.positions !== undefined) {
+                const posCount = response.positions_count !== undefined ? 
+                    response.positions_count : 
+                    (response.positions ? response.positions.length : 0);
+                updatePositionsDisplay(posCount);
+            }
+            
+            // Cập nhật log mới nhất
+            updateLatestLogDisplay(response.latest_log);
+            
+        } catch (e) {
+            console.log('Lỗi khi xử lý dữ liệu trạng thái:', e.message);
+        }
     }
-    
-    // Thiết lập timer mới
-    statusUpdateTimer = setInterval(() => {
-        updateServiceStatus();
-    }, UPDATE_INTERVAL);
-    
-    console.log(`Đã thiết lập cập nhật trạng thái mỗi ${UPDATE_INTERVAL/1000} giây`);
-}
 
-/**
- * Ngừng cập nhật định kỳ
- */
-function stopPeriodicUpdates() {
-    if (statusUpdateTimer) {
-        clearInterval(statusUpdateTimer);
-        statusUpdateTimer = null;
-        console.log('Đã ngừng cập nhật trạng thái định kỳ');
+    /**
+     * Xử lý lỗi từ API
+     */
+    function handleStatusError(xhr, status, error) {
+        // Tránh hiển thị lỗi "Không thể cập nhật trạng thái" trên console
+        if (retryCount < config.maxRetries) {
+            retryCount++;
+            setTimeout(updateSystemStatus, config.retryDelay);
+        } else if (!isOffline) {
+            console.log('Không thể kết nối với máy chủ sau nhiều lần thử');
+            isOffline = true;
+        }
     }
-}
 
-/**
- * Cập nhật trạng thái các dịch vụ
- * @param {boolean} showLoading - Hiển thị biểu tượng loading
- */
-function updateServiceStatus(showLoading = false) {
-    // Hardcoded fallback data to ensure UI displays correctly even if API fails
-    const fallbackData = {
-        status: 'unknown',
-        pid: null,
-        running: false,
-        last_check: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        status_detail: 'Chưa kết nối được với máy chủ'
-    };
-    
-    try {
-        // Gọi API lấy trạng thái
-        console.log('Đang gọi API endpoint:', SERVICE_API_URL);
+    /**
+     * Cập nhật hiển thị trạng thái bot
+     */
+    function updateBotStatus(isRunning) {
+        const statusElement = document.querySelector('.bot-status');
+        if (!statusElement) return;
         
-        // Thử dùng fetch với URL
-        fetch(SERVICE_API_URL)
-            .then(response => {
-                console.log('Nhận được phản hồi từ API:', response.status, response.statusText);
-                if (!response.ok) {
-                    throw new Error(`Không thể kết nối tới API: ${response.status} ${response.statusText}`);
+        if (isRunning) {
+            statusElement.className = 'bot-status running';
+            statusElement.innerHTML = '<i class="fas fa-circle-play"></i><span>Đang Chạy</span>';
+        } else {
+            statusElement.className = 'bot-status stopped';
+            statusElement.innerHTML = '<i class="fas fa-circle-stop"></i><span>Đã Dừng</span>';
+        }
+    }
+
+    /**
+     * Cập nhật hiển thị số dư tài khoản
+     */
+    function updateBalanceDisplay(balance) {
+        const balanceElement = document.querySelector('.bot-balance');
+        if (!balanceElement) return;
+        
+        balanceElement.innerHTML = `<strong>Số Dư:</strong> ${balance.toFixed(2)} USDT`;
+    }
+
+    /**
+     * Cập nhật hiển thị số lượng vị thế
+     */
+    function updatePositionsDisplay(count) {
+        const positionsElement = document.querySelector('.bot-positions');
+        if (!positionsElement) return;
+        
+        positionsElement.innerHTML = `<strong>Vị Thế Mở:</strong> ${count}`;
+    }
+
+    /**
+     * Cập nhật hiển thị log mới nhất
+     */
+    function updateLatestLogDisplay(latestLog) {
+        const logElement = document.querySelector('.bot-latest-log');
+        if (!logElement) return;
+        
+        if (latestLog && latestLog.message) {
+            logElement.innerHTML = `<strong>Log Mới Nhất:</strong> ${latestLog.message}`;
+        } else {
+            logElement.innerHTML = `<strong>Log Mới Nhất:</strong> Không có log`;
+        }
+    }
+
+    /**
+     * Kiểm tra xem người dùng có online không
+     */
+    function checkOnlineStatus() {
+        if (navigator.onLine) {
+            // Nếu trình duyệt báo online nhưng chúng ta đã mất kết nối với máy chủ quá lâu
+            const offlineThreshold = 30000; // 30 giây
+            if (Date.now() - lastSuccessfulUpdate > offlineThreshold) {
+                if (!isOffline) {
+                    console.log('Kết nối với máy chủ bị mất');
+                    isOffline = true;
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Dữ liệu nhận được:', data);
-                updateUI(data); // Cập nhật UI với dữ liệu thật
-            })
-            .catch(error => {
-                console.error('Lỗi khi gọi API:', error);
-                // Cập nhật UI với dữ liệu fallback khi có lỗi
-                updateUI(fallbackData); 
-            });
-    } catch (error) {
-        console.error('Lỗi ngoại lệ:', error);
-        updateUI(fallbackData);
-    }
-    
-    // Function nội bộ để cập nhật UI
-    function updateUI(data) {
-        const statusPanel = document.querySelector('.status-panel');
-        if (!statusPanel) return;
-        
-        // Tìm phần tử hiển thị trạng thái
-        const notifierItem = document.querySelector('.status-item[data-service="market_notifier"]');
-        if (!notifierItem) return;
-        
-        // Cập nhật indicator
-        const indicator = notifierItem.querySelector('.status-indicator');
-        if (indicator) {
-            indicator.className = 'status-indicator';
-            indicator.classList.add(data.status || 'unknown');
-            indicator.setAttribute('data-status', data.status || 'unknown');
-        }
-        
-        // Cập nhật text
-        const statusText = notifierItem.querySelector('.status-text');
-        if (statusText) {
-            let text = 'Không xác định';
-            if (data.status === 'running') text = 'Đang chạy';
-            else if (data.status === 'stopped') text = 'Đã dừng';
-            else if (data.status === 'error') text = 'Lỗi';
-            
-            statusText.textContent = text;
-        }
-        
-        // Cập nhật thời gian
-        const timeElement = notifierItem.querySelector('.status-time');
-        if (timeElement && data.last_check) {
-            timeElement.textContent = data.last_check;
-        }
-        
-        // Cập nhật chi tiết
-        const detailsElement = notifierItem.querySelector('.service-details');
-        if (detailsElement) {
-            // Xóa nội dung cũ
-            detailsElement.innerHTML = '';
-            
-            // Thêm chi tiết mới
-            if (data.pid) {
-                addDetailItem(detailsElement, 'PID', data.pid);
             }
-            
-            if (data.status_detail) {
-                addDetailItem(detailsElement, 'Chi tiết', data.status_detail);
-            }
-        }
-        
-        // Cập nhật thời gian cập nhật cuối
-        const lastUpdate = document.getElementById('last-status-update');
-        if (lastUpdate) {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            lastUpdate.textContent = `${hours}:${minutes}:${seconds}`;
-        }
-    }
-}
-}
-
-/**
- * Cập nhật UI với dữ liệu trạng thái
- * @param {Object} statusData - Dữ liệu trạng thái từ API
- */
-function updateStatusUI(statusData) {
-    // Debug - ghi ra console để xem dữ liệu
-    console.log('Dữ liệu trạng thái nhận được:', statusData);
-    
-    // Kiểm tra xem dữ liệu có hợp lệ không
-    if (!statusData || typeof statusData !== 'object') {
-        console.error('Dữ liệu trạng thái không hợp lệ:', statusData);
-        return;
-    }
-    
-    // Cập nhật trạng thái dịch vụ thông báo thị trường
-    const marketNotifierElement = document.querySelector('.status-item[data-service="market_notifier"]');
-    if (marketNotifierElement) {
-        const statusIndicator = marketNotifierElement.querySelector('.status-indicator');
-        const statusText = marketNotifierElement.querySelector('.status-text');
-        const statusTime = marketNotifierElement.querySelector('.status-time');
-        
-        if (statusIndicator) {
-            // Xóa tất cả các lớp trạng thái
-            statusIndicator.className = 'status-indicator';
-            
-            // Thêm lớp dựa trên trạng thái
-            let statusClass = 'unknown';
-            if (statusData.status === 'running') statusClass = 'running';
-            else if (statusData.status === 'stopped') statusClass = 'stopped';
-            else if (statusData.status === 'error') statusClass = 'error';
-            
-            statusIndicator.classList.add(statusClass);
-            statusIndicator.setAttribute('data-status', statusData.status || 'unknown');
-        }
-        
-        if (statusText) {
-            let statusMessage = 'Không xác định';
-            if (statusData.status === 'running') statusMessage = 'Đang chạy';
-            else if (statusData.status === 'stopped') statusMessage = 'Đã dừng';
-            else if (statusData.status === 'error') statusMessage = 'Lỗi';
-            
-            statusText.textContent = statusMessage;
-        }
-        
-        if (statusTime && statusData.last_check) {
-            try {
-                // Định dạng thời gian
-                const updateTime = new Date(statusData.last_check);
-                statusTime.textContent = formatTime(updateTime);
-            } catch (e) {
-                console.error('Lỗi khi định dạng thời gian:', e);
-                statusTime.textContent = statusData.last_check || '--:--:--';
-            }
-        }
-        
-        // Cập nhật thông tin bổ sung
-        const detailsElement = marketNotifierElement.querySelector('.service-details');
-        if (detailsElement) {
-            detailsElement.innerHTML = ''; // Xóa nội dung cũ
-            
-            // Thêm các chi tiết mới
-            if (statusData.pid) {
-                addDetailItem(detailsElement, 'PID', statusData.pid);
-            }
-            
-            if (statusData.started_at) {
-                addDetailItem(detailsElement, 'Thời gian khởi động', statusData.started_at);
-            }
-            
-            if (statusData.monitored_coins && Array.isArray(statusData.monitored_coins) && statusData.monitored_coins.length > 0) {
-                addDetailItem(detailsElement, 'Coin theo dõi', statusData.monitored_coins.join(', '));
+        } else {
+            if (!isOffline) {
+                console.log('Trình duyệt đang offline');
+                isOffline = true;
             }
         }
     }
 
-    // Cập nhật thời gian cập nhật cuối cùng
-    const lastUpdateElement = document.getElementById('last-status-update');
-    if (lastUpdateElement) {
-        const now = new Date();
-        lastUpdateElement.textContent = formatTime(now);
-    }
-}
+    // Lắng nghe sự kiện online/offline
+    window.addEventListener('online', function() {
+        console.log('Trình duyệt đã online trở lại');
+        isOffline = false;
+        updateSystemStatus(); // Cập nhật ngay lập tức khi có kết nối trở lại
+    });
 
-/**
- * Thêm một mục chi tiết vào phần tử cha
- */
-function addDetailItem(parentElement, key, value) {
-    const detailItem = document.createElement('div');
-    detailItem.className = 'detail-item';
-    
-    const keyElement = document.createElement('span');
-    keyElement.className = 'detail-key';
-    keyElement.textContent = formatDetailKey(key) + ':';
-    
-    const valueElement = document.createElement('span');
-    valueElement.className = 'detail-value';
-    valueElement.textContent = value;
-    
-    detailItem.appendChild(keyElement);
-    detailItem.appendChild(valueElement);
-    parentElement.appendChild(detailItem);
-}
+    window.addEventListener('offline', function() {
+        console.log('Trình duyệt đã offline');
+        isOffline = true;
+    });
 
-/**
- * Định dạng khóa chi tiết để hiển thị
- * @param {string} key - Khóa cần định dạng
- * @returns {string} Chuỗi đã định dạng
- */
-function formatDetailKey(key) {
-    // Chuyển snake_case hoặc camelCase thành Title Case với khoảng trắng
-    return key
-        .replace(/_/g, ' ')
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, str => str.toUpperCase())
-        .trim();
-}
+    // Khởi tạo khi document đã sẵn sàng
+    $(document).ready(function() {
+        // Cập nhật trạng thái ngay lập tức
+        updateSystemStatus();
+        
+        // Thiết lập cập nhật định kỳ
+        setInterval(updateSystemStatus, config.updateInterval);
+        
+        // Kiểm tra trạng thái online định kỳ
+        setInterval(checkOnlineStatus, 10000);
+    });
 
-/**
- * Định dạng thời gian
- * @param {Date} date - Đối tượng Date cần định dạng
- * @returns {string} Chuỗi thời gian đã định dạng
- */
-function formatTime(date) {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    
-    return `${hours}:${minutes}:${seconds}`;
-}
-
-// Khởi tạo khi trang đã tải xong
-document.addEventListener('DOMContentLoaded', initStatusUpdater);
-
-// Gắn các hàm vào đối tượng window để có thể sử dụng ở nơi khác
-window.statusUpdater = {
-    updateServiceStatus,
-    startPeriodicUpdates,
-    stopPeriodicUpdates
-};
+    // Đăng ký hàm cập nhật toàn cục để các module khác có thể gọi khi cần
+    window.updateSystemStatus = updateSystemStatus;
+})();

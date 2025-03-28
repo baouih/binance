@@ -6,6 +6,7 @@
     <title>Hệ Thống Giao Dịch Tiền Điện Tử - Kiểm Tra</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/socket.io/client-dist/socket.io.min.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -497,26 +498,35 @@
                 url: '/api/status',
                 type: 'GET',
                 success: function(response) {
-                    const statusElement = document.querySelector('.bot-status');
-                    const balanceElement = document.querySelector('.bot-balance');
-                    const positionsElement = document.querySelector('.bot-positions');
-                    const logElement = document.querySelector('.bot-latest-log');
-                    
-                    if (response.running) {
-                        statusElement.className = 'bot-status running';
-                        statusElement.innerHTML = '<i class="fas fa-circle-play"></i><span>Đang Chạy</span>';
-                    } else {
-                        statusElement.className = 'bot-status stopped';
-                        statusElement.innerHTML = '<i class="fas fa-circle-stop"></i><span>Đã Dừng</span>';
-                    }
-                    
-                    balanceElement.innerHTML = `<strong>Số Dư:</strong> ${response.account_balance.toFixed(2)} USDT`;
-                    positionsElement.innerHTML = `<strong>Vị Thế Mở:</strong> ${response.positions_count}`;
-                    
-                    if (response.latest_log) {
-                        logElement.innerHTML = `<strong>Log Mới Nhất:</strong> ${response.latest_log.message}`;
-                    } else {
-                        logElement.innerHTML = `<strong>Log Mới Nhất:</strong> Không có log`;
+                    try {
+                        const statusElement = document.querySelector('.bot-status');
+                        const balanceElement = document.querySelector('.bot-balance');
+                        const positionsElement = document.querySelector('.bot-positions');
+                        const logElement = document.querySelector('.bot-latest-log');
+                        
+                        if (response.running) {
+                            statusElement.className = 'bot-status running';
+                            statusElement.innerHTML = '<i class="fas fa-circle-play"></i><span>Đang Chạy</span>';
+                        } else {
+                            statusElement.className = 'bot-status stopped';
+                            statusElement.innerHTML = '<i class="fas fa-circle-stop"></i><span>Đã Dừng</span>';
+                        }
+                        
+                        if (response.account_balance !== undefined) {
+                            balanceElement.innerHTML = `<strong>Số Dư:</strong> ${response.account_balance.toFixed(2)} USDT`;
+                        }
+                        
+                        if (response.positions_count !== undefined) {
+                            positionsElement.innerHTML = `<strong>Vị Thế Mở:</strong> ${response.positions_count}`;
+                        }
+                        
+                        if (response.latest_log) {
+                            logElement.innerHTML = `<strong>Log Mới Nhất:</strong> ${response.latest_log.message}`;
+                        } else {
+                            logElement.innerHTML = `<strong>Log Mới Nhất:</strong> Không có log`;
+                        }
+                    } catch (e) {
+                        console.log('Lỗi khi cập nhật giao diện:', e.message);
                     }
                 },
                 error: function() {
@@ -526,16 +536,18 @@
             });
         }
 
-        // Automatically update status every 5 seconds
-        setInterval(updateStatus, 5000);
-
-        // Document Ready
-        $(document).ready(function() {
-            updateStatus();
-        });
+        /* 
+        // Sử dụng status-updater.js cho cập nhật trạng thái thay vì code tích hợp
+        // setInterval(updateStatus, 5000);
+        // 
+        // $(document).ready(function() {
+        //     updateStatus();
+        // });
+        */
     </script>
     
     <script src="{{ url_for('static', filename='js/socket-error-fix.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/status-updater.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
