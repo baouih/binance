@@ -612,7 +612,29 @@ def position():
 @app.route('/positions')
 def positions():
     """Trang quản lý tất cả vị thế"""
-    return render_template('positions.html')
+    try:
+        # Lấy trạng thái hệ thống cho template
+        bot_status = {
+            'running': False,  # Mặc định là dừng
+            'account_balance': 0,
+            'positions': [],
+            'logs': []
+        }
+        
+        # Cố gắng lấy dữ liệu tài khoản từ API
+        account_response = get_account()
+        if hasattr(account_response, 'json'):
+            account_data = account_response.json
+            bot_status['running'] = False  # Mặc định là dừng
+            bot_status['account_balance'] = account_data.get('balance', 0)
+            bot_status['positions'] = account_data.get('positions', [])
+            bot_status['positions_count'] = len(bot_status['positions'])
+            
+        return render_template('positions.html', status=bot_status)
+    except Exception as e:
+        app.logger.error(f"Error loading positions page: {str(e)}")
+        # Trả về mẫu với dữ liệu trống trong trường hợp lỗi
+        return render_template('positions.html', status={'positions': [], 'running': False, 'account_balance': 0, 'positions_count': 0})
 
 @app.route('/settings')
 def settings():
