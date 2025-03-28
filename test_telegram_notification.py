@@ -34,12 +34,27 @@ def load_env_variables():
                     os.environ[key] = value
 
 def get_telegram_credentials():
-    """Lấy thông tin đăng nhập Telegram từ biến môi trường"""
+    """Lấy thông tin đăng nhập Telegram từ biến môi trường hoặc config file"""
     # Tải từ file .env nếu có
     load_env_variables()
     
+    # Thử lấy từ biến môi trường
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    
+    # Nếu không có trong biến môi trường, thử đọc từ file config
+    if not bot_token or not chat_id:
+        try:
+            if os.path.exists("telegram_config.json"):
+                with open("telegram_config.json", "r") as config_file:
+                    config = json.load(config_file)
+                    if not bot_token and "bot_token" in config:
+                        bot_token = config["bot_token"]
+                    if not chat_id and "chat_id" in config:
+                        chat_id = config["chat_id"]
+                    print("Đã tải thông tin Telegram từ file config")
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc file config Telegram: {e}")
     
     return bot_token, chat_id
 

@@ -418,12 +418,31 @@ def run_service():
             pass
 
 if __name__ == "__main__":
-    # Lưu PID vào file
-    with open("market_notifier.pid", "w") as f:
-        f.write(str(os.getpid()))
-    
-    # Ghi ra stdout để xác nhận script đã chạy
-    print(f"Dịch vụ thông báo thị trường đã được khởi động với PID {os.getpid()}")
-    
-    # Chạy dịch vụ
-    run_service()
+    try:
+        # Lưu PID vào file
+        with open("market_notifier.pid", "w") as f:
+            f.write(str(os.getpid()))
+        
+        # Ghi ra stdout để xác nhận script đã chạy
+        print(f"Dịch vụ thông báo thị trường đã được khởi động với PID {os.getpid()}")
+        
+        # Ghi log
+        logger.info(f"Dịch vụ thông báo thị trường đã được khởi động với PID {os.getpid()}")
+        
+        # Chạy dịch vụ
+        run_service()
+    except Exception as e:
+        logger.critical(f"Lỗi khi khởi động dịch vụ thông báo thị trường: {str(e)}")
+        logger.debug(traceback.format_exc())
+        # Thông báo lỗi nếu có thể
+        try:
+            if telegram:
+                telegram.send_message(
+                    message=f"<b>❌ LỖI KHỞI ĐỘNG</b>\n\n"
+                           f"Dịch vụ thông báo thị trường không thể khởi động\n"
+                           f"Lỗi: {str(e)}"
+                )
+        except:
+            pass
+        # Thoát với mã lỗi
+        sys.exit(1)
