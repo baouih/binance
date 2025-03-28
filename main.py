@@ -620,11 +620,31 @@ def settings():
     try:
         # Get account data for settings page
         account_info = get_account().json
-        return render_template('settings.html', account_data=account_info)
+        bot_status = {
+            'running': False,  # Mặc định là dừng
+            'account_balance': 0,
+            'positions': [],
+            'logs': []
+        }
+        try:
+            # Thử lấy trạng thái bot thực tế
+            bot_status['running'] = is_bot_running()
+            bot_status['account_balance'] = account_info.get('total_wallet_balance', 0)
+            bot_status['positions'] = get_open_positions() or []
+            bot_status['logs'] = get_recent_logs(5) or []
+        except Exception as status_error:
+            app.logger.warning(f"Không thể lấy trạng thái bot: {str(status_error)}")
+            
+        return render_template('settings.html', account_data=account_info, status=bot_status)
     except Exception as e:
         app.logger.error(f"Error loading settings page: {str(e)}")
-        # Return with empty data
-        return render_template('settings.html', account_data={})
+        # Return with empty data and default status
+        return render_template('settings.html', account_data={}, status={
+            'running': False,
+            'account_balance': 0,
+            'positions': [],
+            'logs': []
+        })
 
 @app.route('/bots')
 def bots():
@@ -943,6 +963,43 @@ def get_bot_logs():
         'success': True,
         'logs': logs[:limit]
     })
+
+def get_recent_logs(limit=5):
+    """Lấy log gần đây nhất của hệ thống"""
+    current_time = datetime.now()
+    return [
+        {
+            'timestamp': (current_time - timedelta(minutes=i)).isoformat(),
+            'category': ['market', 'analysis', 'decision', 'action'][i % 4],
+            'message': f'Log mẫu thứ {i+1}'
+        }
+        for i in range(limit)
+    ]
+
+def is_bot_running():
+    """Kiểm tra xem bot có đang chạy không"""
+    # Thực tế sẽ kiểm tra trạng thái thực tế của bot
+    # Đây là phiên bản đơn giản cho demo
+    try:
+        from bot_api_routes import load_bots_config
+        bots = load_bots_config()
+        if bots and len(bots) > 0:
+            return any(bot.get('status') == 'running' for bot in bots)
+        return False
+    except Exception as e:
+        app.logger.warning(f"Không thể kiểm tra trạng thái bot: {str(e)}")
+        return False
+
+def get_open_positions():
+    """Lấy danh sách vị thế đang mở"""
+    try:
+        # Lấy dữ liệu tài khoản
+        account_data = get_account().json
+        if 'positions' in account_data:
+            return account_data['positions']
+    except Exception as e:
+        app.logger.warning(f"Không thể lấy danh sách vị thế: {str(e)}")
+    return []
 
 @app.route('/api/bot/logs/<bot_id>', methods=['GET'])
 def get_bot_logs_by_id(bot_id):
