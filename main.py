@@ -618,6 +618,7 @@ def positions():
             'running': False,  # Mặc định là dừng
             'account_balance': 0,
             'positions': [],
+            'positions_count': 0,
             'logs': []
         }
         
@@ -625,10 +626,18 @@ def positions():
         account_response = get_account()
         if hasattr(account_response, 'json'):
             account_data = account_response.json
-            bot_status['running'] = False  # Mặc định là dừng
+            bot_status['running'] = True  # Đã lấy được dữ liệu thì hệ thống đang chạy
             bot_status['account_balance'] = account_data.get('balance', 0)
-            bot_status['positions'] = account_data.get('positions', [])
-            bot_status['positions_count'] = len(bot_status['positions'])
+            
+            # Đảm bảo positions là một danh sách
+            positions_data = account_data.get('positions', [])
+            if positions_data is not None and isinstance(positions_data, list):
+                bot_status['positions'] = positions_data
+                bot_status['positions_count'] = len(positions_data)
+            else:
+                app.logger.warning("Positions data is not a list or is None")
+                bot_status['positions'] = []
+                bot_status['positions_count'] = 0
             
         return render_template('positions.html', status=bot_status)
     except Exception as e:
