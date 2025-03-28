@@ -1,0 +1,141 @@
+{
+  "timestamp": "2025-03-28 08:35:45",
+  "strategies": {
+    "sideways": {
+      "win_rates": {
+        "risk_10": 100.0,
+        "risk_15": 100.0,
+        "risk_20": 90.76,
+        "risk_25": 85.33
+      },
+      "profits": {
+        "risk_10": 0.1,
+        "risk_15": 0.18,
+        "risk_20": 0.25,
+        "risk_25": 0.3
+      },
+      "trades_count": {
+        "risk_10": 177,
+        "risk_15": 163,
+        "risk_20": 130,
+        "risk_25": 75
+      },
+      "max_drawdown": {
+        "risk_10": 0.0,
+        "risk_15": 0.0,
+        "risk_20": 0.01,
+        "risk_25": 0.05
+      }
+    },
+    "multi_risk": {
+      "win_rates": {
+        "risk_10": 94.96,
+        "risk_15": 91.45,
+        "risk_20": 74.73,
+        "risk_25": 63.64
+      },
+      "profits": {
+        "risk_10": 0.03,
+        "risk_15": 0.07,
+        "risk_20": 0.09,
+        "risk_25": 0.07
+      },
+      "trades_count": {
+        "risk_10": 119,
+        "risk_15": 117,
+        "risk_20": 91,
+        "risk_25": 55
+      },
+      "max_drawdown": {
+        "risk_10": 0.0,
+        "risk_15": 0.0,
+        "risk_20": 0.0,
+        "risk_25": 0.01
+      }
+    },
+    "adaptive": {
+      "win_rates": {
+        "risk_low": 85.71,
+        "risk_medium": 76.19,
+        "risk_high": 64.81
+      },
+      "profits": {
+        "risk_low": 0.15,
+        "risk_medium": 0.31,
+        "risk_high": 0.52
+      },
+      "trades_count": {
+        "risk_low": 63,
+        "risk_medium": 88,
+        "risk_high": 108
+      },
+      "max_drawdown": {
+        "risk_low": 0.01,
+        "risk_medium": 0.06,
+        "risk_high": 0.18
+      }
+    }
+  },
+  "account_recommendations": {
+    "small": {
+      "risk_level": "20-30%",
+      "leverage": "15-20x",
+      "strategy": "Sideways + Adaptive",
+      "expected_monthly_profit": "30-100%",
+      "target_win_rate": "50-75%"
+    },
+    "medium": {
+      "risk_level": "10-15%",
+      "leverage": "5-10x",
+      "strategy": "Multi-Risk + Adaptive",
+      "expected_monthly_profit": "5-30%",
+      "target_win_rate": "70-90%"
+    },
+    "large": {
+      "risk_level": "2-3%",
+      "leverage": "3-5x",
+      "strategy": "Sideways + Multi-Risk",
+      "expected_monthly_profit": "0.5-5%",
+      "target_win_rate": "90-100%"
+    }
+  },
+  "market_conditions": {
+    "bull": {
+      "best_strategy": "Sideways",
+      "best_win_rate": 85.0,
+      "best_profit": 0.2
+    },
+    "bear": {
+      "best_strategy": "Sideways",
+      "best_win_rate": 90.0,
+      "best_profit": 0.25
+    },
+    "sideways": {
+      "best_strategy": "Sideways",
+      "best_win_rate": 95.0,
+      "best_profit": 0.3
+    },
+    "volatile": {
+      "best_strategy": "Adaptive",
+      "best_win_rate": 80.0,
+      "best_profit": 0.5
+    }
+  },
+  "comparison": {
+    "system_low_risk": {
+      "annual_profit": "6-60%",
+      "drawdown": "0-1%",
+      "sharpe": "3.5-5.0"
+    },
+    "system_high_risk": {
+      "annual_profit": "180-1200%",
+      "drawdown": "0.5-12%",
+      "sharpe": "1.5-2.5"
+    },
+    "hodl_bitcoin": {
+      "annual_profit": "130%",
+      "drawdown": "30-85%",
+      "sharpe": "0.8-1.2"
+    }
+  }
+}

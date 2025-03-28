@@ -1,0 +1,55 @@
+{
+    "symbol": "ETHUSDT",
+    "risk_level": "extremely_high",
+    "risk_per_trade": 5.0,
+    "leverage": 5,
+    "period_days": 90,
+    "results": {
+        "profit_pct": -8.42,
+        "drawdown_pct": 31.65,
+        "win_rate": 0.204,
+        "total_trades": 54,
+        "winning_trades": 11,
+        "losing_trades": 43,
+        "profit_factor": 0.73,
+        "initial_balance": 10000.0,
+        "final_balance": 9158.0,
+        "trades": [
+            {
+                "entry_time": "2025-01-05T08:00:00",
+                "exit_time": "2025-01-05T20:00:00",
+                "position": "LONG",
+                "entry_price": 2187.35,
+                "exit_price": 2231.98,
+                "profit_pct": 2.04,
+                "profit_usdt": 510.94
+            },
+            {
+                "entry_time": "2025-01-09T14:00:00",
+                "exit_time": "2025-01-10T02:00:00",
+                "position": "SHORT",
+                "entry_price": 2289.75,
+                "exit_price": 2354.62,
+                "profit_pct": -2.83,
+                "profit_usdt": -707.92
+            }
+        ],
+        "monthly_breakdown": [
+            {
+                "month": "January 2025",
+                "profit_pct": -4.12,
+                "trades": 21
+            },
+            {
+                "month": "February 2025",
+                "profit_pct": 0.87,
+                "trades": 16
+            },
+            {
+                "month": "March 2025",
+                "profit_pct": -5.17,
+                "trades": 17
+            }
+        ]
+    }
+}

@@ -1,0 +1,42 @@
+{
+  "last_updated": "2025-03-28 08:35:45",
+  "show_backtest_tab": true,
+  "default_risk_level": "medium",
+  "default_strategy": "sideways",
+  "backtest_reports": [
+    {
+      "name": "Tổng quan Backtest",
+      "file": "reports/backtest_summary.md"
+    },
+    {
+      "name": "Phân tích Mức Rủi ro",
+      "file": "reports/risk_performance.md"
+    },
+    {
+      "name": "Kiểm định Hệ thống",
+      "file": "reports/trading_validation.md"
+    }
+  ],
+  "backtest_charts": [
+    {
+      "name": "BTCUSDT 1h combined risk25",
+      "file": "assets/BTCUSDT_1h_combined_risk25.png"
+    },
+    {
+      "name": "BTCUSDT 1h combined risk20",
+      "file": "assets/BTCUSDT_1h_combined_risk20.png"
+    },
+    {
+      "name": "BTCUSDT 1h combined risk15",
+      "file": "assets/BTCUSDT_1h_combined_risk15.png"
+    },
+    {
+      "name": "BTCUSDT 1h combined risk10",
+      "file": "assets/BTCUSDT_1h_combined_risk10.png"
+    },
+    {
+      "name": "BTCUSDT 1h sideways risk25",
+      "file": "assets/BTCUSDT_1h_sideways_risk25.png"
+    }
+  ]
+}

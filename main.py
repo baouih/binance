@@ -42,7 +42,7 @@ DEFAULT_CONFIG = {
 try:
     from telegram_notifier import TelegramNotifier
     telegram_notifier = TelegramNotifier(
-        api_key=os.environ.get("TELEGRAM_BOT_TOKEN", ""),
+        token=os.environ.get("TELEGRAM_BOT_TOKEN", ""),
         chat_id=os.environ.get("TELEGRAM_CHAT_ID", "")
     )
 except Exception as e:
@@ -312,7 +312,8 @@ def index():
             'running': False,
             'account_balance': 0,
             'positions': [],
-            'logs': []
+            'logs': [],
+            'market_data': []
         }, market_data={
             'btc_price': 0,
             'eth_price': 0,
