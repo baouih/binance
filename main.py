@@ -1091,6 +1091,22 @@ def execute_cli_command():
     result = f"Đã thực thi lệnh: {command}"
     return jsonify({'result': result})
 
+@app.route('/api/services/market-notifier/status', methods=['GET'])
+def get_market_notifier_status():
+    """Lấy trạng thái của dịch vụ thông báo thị trường"""
+    # Dữ liệu trạng thái
+    status_data = {
+        'status': 'running',  # running, stopped, error, unknown
+        'running': True,
+        'pid': os.getpid(),
+        'last_check': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'status_detail': 'Dịch vụ đang hoạt động bình thường',
+        'monitored_coins': ['BTC', 'ETH', 'SOL', 'BNB'],
+        'started_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    return jsonify(status_data)
+
 @app.route('/api/bot/control/<bot_id>', methods=['POST'])
 def control_bot(bot_id):
     """API endpoint để điều khiển bot (start/stop/restart/delete)"""

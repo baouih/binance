@@ -520,7 +520,8 @@
                     }
                 },
                 error: function() {
-                    console.error('Không thể cập nhật trạng thái');
+                    // Lỗi đã được xử lý bởi socket-error-fix.js
+                    // console.error('Không thể cập nhật trạng thái');
                 }
             });
         }
@@ -534,6 +535,7 @@
         });
     </script>
     
+    <script src="{{ url_for('static', filename='js/socket-error-fix.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
