@@ -1,0 +1,18 @@
+[
+    {
+        "symbol": "ETHUSDT",
+        "profit_pct": 64.89447090712915,
+        "max_drawdown": 0.0,
+        "trades_count": 1,
+        "win_rate": 100.0,
+        "profit_factor": Infinity
+    },
+    {
+        "symbol": "BTCUSDT",
+        "profit_pct": 35.41878761677262,
+        "max_drawdown": 0.0,
+        "trades_count": 1,
+        "win_rate": 100.0,
+        "profit_factor": Infinity
+    }
+]

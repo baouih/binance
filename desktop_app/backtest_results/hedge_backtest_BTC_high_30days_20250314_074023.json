@@ -1,0 +1,26 @@
+{
+  "summary": {
+    "initial_balance": 10000,
+    "final_balance": 10000,
+    "total_return": 0.0,
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "profit_factor": 1,
+    "max_drawdown": 0,
+    "test_duration_days": 30,
+    "risk_level": "high",
+    "leverage": 20,
+    "symbols_tested": [
+      "BTCUSDT"
+    ],
+    "test_time": "2025-03-14 07:40:23"
+  },
+  "trades": [],
+  "individual_symbols": {},
+  "hedge_vs_single": {},
+  "equity_curve": [
+    10000
+  ]
+}

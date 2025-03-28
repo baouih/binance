@@ -1,0 +1,280 @@
+{
+    "symbol": "BTCUSDT",
+    "timeframes": [
+        "1h",
+        "4h",
+        "1d"
+    ],
+    "strategies": [
+        "ema_crossover",
+        "macd_divergence",
+        "rsi_extreme",
+        "supertrend",
+        "bollinger_bands_squeeze",
+        "adaptive_mode",
+        "hedge_mode"
+    ],
+    "initial_balance": 10000.0,
+    "final_balance": 12148.823174992422,
+    "profit": 2148.8231749924216,
+    "profit_pct": 21.488231749924218,
+    "max_drawdown_pct": 5.19051310226513,
+    "total_trades": 25,
+    "winning_trades": 18,
+    "losing_trades": 7,
+    "win_rate": 61.91433431288529,
+    "avg_win_pct": 3.0822678231723035,
+    "avg_loss_pct": -1.4161555221825437,
+    "profit_factor": 1.5144412035569126,
+    "trades": [
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 29836.966033579753,
+            "exit_price": 29295.162689263714,
+            "direction": "long",
+            "strategy": "macd_divergence",
+            "pnl_pct": -1.8158794822042954
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 22621.965019698564,
+            "exit_price": 22181.707551225376,
+            "direction": "long",
+            "strategy": "adaptive_mode",
+            "pnl_pct": -1.946150425437506
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 23992.563697391346,
+            "exit_price": 23793.974853464588,
+            "direction": "long",
+            "strategy": "bollinger_bands_squeeze",
+            "pnl_pct": -0.8277099789396445
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 26392.862284922616,
+            "exit_price": 25614.388037820605,
+            "direction": "short",
+            "strategy": "hedge_mode",
+            "pnl_pct": 2.9495635550931807
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 26848.027226931354,
+            "exit_price": 27270.15967783416,
+            "direction": "long",
+            "strategy": "rsi_extreme",
+            "pnl_pct": 1.5723034222766432
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 28839.66066616583,
+            "exit_price": 29784.541997206263,
+            "direction": "long",
+            "strategy": "macd_divergence",
+            "pnl_pct": 3.276326105143626
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 23879.866887222997,
+            "exit_price": 24991.53161999672,
+            "direction": "long",
+            "strategy": "adaptive_mode",
+            "pnl_pct": 4.655238398202801
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 29577.79095009368,
+            "exit_price": 30599.321146518807,
+            "direction": "long",
+            "strategy": "bollinger_bands_squeeze",
+            "pnl_pct": 3.453706864548285
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 26624.446614460754,
+            "exit_price": 25818.347811254982,
+            "direction": "short",
+            "strategy": "rsi_extreme",
+            "pnl_pct": 3.02766406708318
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 28603.12062718885,
+            "exit_price": 29123.072622544314,
+            "direction": "short",
+            "strategy": "ema_crossover",
+            "pnl_pct": -1.8178156227513864
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 24762.592138756823,
+            "exit_price": 25498.317720964424,
+            "direction": "long",
+            "strategy": "rsi_extreme",
+            "pnl_pct": 2.971116990034701
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 29499.447241831702,
+            "exit_price": 29748.456899926823,
+            "direction": "short",
+            "strategy": "adaptive_mode",
+            "pnl_pct": -0.8441163526007014
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 29261.8517088524,
+            "exit_price": 29771.72379439854,
+            "direction": "long",
+            "strategy": "rsi_extreme",
+            "pnl_pct": 1.7424464132319226
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 23114.468466038998,
+            "exit_price": 22442.556189631872,
+            "direction": "short",
+            "strategy": "ema_crossover",
+            "pnl_pct": 2.9068904499981634
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 22457.448364636177,
+            "exit_price": 21751.11905402553,
+            "direction": "short",
+            "strategy": "supertrend",
+            "pnl_pct": 3.145189511925604
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 26542.05341454255,
+            "exit_price": 26826.02717171202,
+            "direction": "short",
+            "strategy": "macd_divergence",
+            "pnl_pct": -1.069901234596554
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 23819.79369013605,
+            "exit_price": 23215.430868262873,
+            "direction": "short",
+            "strategy": "supertrend",
+            "pnl_pct": 2.5372294560361834
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 25351.23850394588,
+            "exit_price": 25658.03246431777,
+            "direction": "long",
+            "strategy": "rsi_extreme",
+            "pnl_pct": 1.210173460851386
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 23569.239597762717,
+            "exit_price": 23977.283175906214,
+            "direction": "long",
+            "strategy": "ema_crossover",
+            "pnl_pct": 1.7312547418043582
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 23795.99550991589,
+            "exit_price": 24529.513420590818,
+            "direction": "long",
+            "strategy": "adaptive_mode",
+            "pnl_pct": 3.082526681303451
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 27610.644219007838,
+            "exit_price": 26348.747165390792,
+            "direction": "short",
+            "strategy": "macd_divergence",
+            "pnl_pct": 4.570328180710563
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 29532.176110278488,
+            "exit_price": 30732.80698795688,
+            "direction": "long",
+            "strategy": "hedge_mode",
+            "pnl_pct": 4.0655008733356475
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 27066.118163420833,
+            "exit_price": 28062.66429666282,
+            "direction": "long",
+            "strategy": "bollinger_bands_squeeze",
+            "pnl_pct": 3.6818953025513337
+        },
+        {
+            "entry_time": "2024-02-10 14:30:00",
+            "exit_time": "2024-02-12 09:15:00",
+            "entry_price": 26411.30255388005,
+            "exit_price": 26831.642543292986,
+            "direction": "short",
+            "strategy": "rsi_extreme",
+            "pnl_pct": -1.5915155587477177
+        },
+        {
+            "entry_time": "2024-02-05 12:00:00",
+            "exit_time": "2024-02-06 15:45:00",
+            "entry_price": 27155.036341477804,
+            "exit_price": 28486.031308176724,
+            "direction": "long",
+            "strategy": "supertrend",
+            "pnl_pct": 4.901466342970428
+        }
+    ],
+    "test_days": 30,
+    "config": {
+        "symbol": "BTCUSDT",
+        "timeframes": [
+            "1h",
+            "4h",
+            "1d"
+        ],
+        "risk_percentage": 5.0,
+        "max_positions": 7,
+        "initial_balance": 10000.0,
+        "leverage": 10,
+        "strategies": [
+            "ema_crossover",
+            "macd_divergence",
+            "rsi_extreme",
+            "supertrend",
+            "bollinger_bands_squeeze",
+            "adaptive_mode",
+            "hedge_mode"
+        ],
+        "use_market_regime": true,
+        "use_trailing_stop": true
+    }
+}

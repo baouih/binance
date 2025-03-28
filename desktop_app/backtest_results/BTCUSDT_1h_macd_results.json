@@ -1,0 +1,21 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "strategy": "macd",
+  "initial_balance": 10000.0,
+  "final_balance": 12373.454966887482,
+  "profit": 2373.4549668874824,
+  "profit_percent": 23.734549668874823,
+  "num_trades": 43,
+  "winning_trades": 21,
+  "losing_trades": 22,
+  "win_rate": 48.837209302325576,
+  "profit_factor": 1.6726798218569927,
+  "max_drawdown": 5.280917234012018,
+  "take_profit_pct": 15.0,
+  "stop_loss_pct": 7.0,
+  "leverage": 5,
+  "risk_percentage": 1.0,
+  "overbought": 70,
+  "oversold": 30
+}

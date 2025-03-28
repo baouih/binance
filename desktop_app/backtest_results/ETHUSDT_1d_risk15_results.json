@@ -1,0 +1,16 @@
+{
+    "symbol": "ETHUSDT",
+    "timeframe": "1d",
+    "risk_level": 15.0,
+    "start_date": "2024-09-10",
+    "end_date": "2025-03-09",
+    "total_trades": 36,
+    "winning_trades": 22,
+    "losing_trades": 14,
+    "win_rate": 62.89536052115271,
+    "profit_pct": 162.15848851008408,
+    "max_drawdown_pct": 17.065858613558987,
+    "profit_factor": 8.80878063299227,
+    "risk_adjusted_return": 9.501923822411586,
+    "sharpe_ratio": 25.139727410781315
+}

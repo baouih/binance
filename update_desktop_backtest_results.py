@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Cập nhật kết quả backtest vào giao diện desktop
-Tích hợp các báo cáo backtest mới nhất vào ứng dụng desktop
+Update Desktop Backtest Results
+---------------------------------
+Cập nhật kết quả backtest trên phiên bản desktop
 """
 
 import os
@@ -20,68 +21,199 @@ logging.basicConfig(
 )
 logger = logging.getLogger('update_desktop_backtest')
 
-# Đường dẫn đến các file báo cáo backtest
-BACKTEST_SUMMARY_REPORT = 'backtest_summary_report.md'
-RISK_PERFORMANCE_SUMMARY = 'risk_performance_summary.md'
-TRADING_SYSTEM_VALIDATION = 'trading_system_validation.md'
-
-# Đường dẫn đến thư mục desktop app
+# Đường dẫn các thư mục
 DESKTOP_APP_DIR = 'desktop_app'
-DESKTOP_REPORTS_DIR = os.path.join(DESKTOP_APP_DIR, 'reports')
-DESKTOP_BACKTEST_DIR = os.path.join(DESKTOP_APP_DIR, 'backtest_results')
-DESKTOP_ASSETS_DIR = os.path.join(DESKTOP_APP_DIR, 'assets')
+BACKTEST_RESULTS_DIR = 'backtest_results'
+BACKTEST_CHARTS_DIR = 'backtest_charts'
+ASSETS_DIR = os.path.join(DESKTOP_APP_DIR, 'assets')
+REPORTS_DIR = os.path.join(DESKTOP_APP_DIR, 'reports')
+DESKTOP_RESULTS_DIR = os.path.join(DESKTOP_APP_DIR, 'backtest_results')
 
-def ensure_directories():
-    """Đảm bảo các thư mục cần thiết tồn tại"""
-    for directory in [DESKTOP_APP_DIR, DESKTOP_REPORTS_DIR, DESKTOP_BACKTEST_DIR, DESKTOP_ASSETS_DIR]:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-            logger.info(f"Đã tạo thư mục {directory}")
-
-def copy_report_files():
-    """Sao chép các file báo cáo backtest vào thư mục desktop"""
-    reports = [
-        (BACKTEST_SUMMARY_REPORT, os.path.join(DESKTOP_REPORTS_DIR, 'backtest_summary.md')),
-        (RISK_PERFORMANCE_SUMMARY, os.path.join(DESKTOP_REPORTS_DIR, 'risk_performance.md')),
-        (TRADING_SYSTEM_VALIDATION, os.path.join(DESKTOP_REPORTS_DIR, 'trading_validation.md'))
+def create_directories():
+    """Tạo các thư mục cần thiết"""
+    directories = [
+        DESKTOP_APP_DIR,
+        ASSETS_DIR,
+        REPORTS_DIR,
+        DESKTOP_RESULTS_DIR
     ]
     
-    for src, dst in reports:
-        if os.path.exists(src):
-            shutil.copy2(src, dst)
-            logger.info(f"Đã sao chép {src} đến {dst}")
-        else:
-            logger.warning(f"Không tìm thấy file báo cáo {src}")
+    for directory in directories:
+        if not os.path.exists(directory):
+            logger.info(f"Tạo thư mục {directory}")
+            os.makedirs(directory)
+
+def copy_backtest_charts():
+    """Sao chép các biểu đồ backtest"""
+    if not os.path.exists(BACKTEST_CHARTS_DIR):
+        logger.warning(f"Không tìm thấy thư mục {BACKTEST_CHARTS_DIR}")
+        return False
+    
+    # Tìm tất cả các file PNG trong thư mục backtest_charts
+    chart_files = []
+    for root, _, files in os.walk(BACKTEST_CHARTS_DIR):
+        for file in files:
+            if file.endswith('.png'):
+                chart_files.append(os.path.join(root, file))
+    
+    if not chart_files:
+        logger.warning(f"Không tìm thấy biểu đồ trong thư mục {BACKTEST_CHARTS_DIR}")
+        return False
+    
+    # Sao chép các file biểu đồ
+    chart_entries = []
+    for chart_file in chart_files:
+        dest_file = os.path.join(ASSETS_DIR, os.path.basename(chart_file))
+        logger.info(f"Sao chép {chart_file} đến {dest_file}")
+        shutil.copy2(chart_file, dest_file)
+        
+        # Tạo mục cho config
+        name = os.path.basename(chart_file).replace('.png', '').replace('_', ' ')
+        chart_entries.append({
+            "name": name,
+            "file": f"assets/{os.path.basename(chart_file)}"
+        })
+    
+    # Cập nhật config
+    config_path = os.path.join(DESKTOP_APP_DIR, 'gui_config.json')
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            
+            # Cập nhật danh sách biểu đồ
+            config['backtest_charts'] = chart_entries
+            config['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật config: {e}")
+            return False
+    
+    return True
 
 def copy_backtest_results():
-    """Sao chép kết quả backtest vào thư mục desktop"""
-    # Sao chép từ thư mục backtest_results
-    if os.path.exists('backtest_results'):
-        # Lấy 5 file JSON mới nhất
-        json_files = [f for f in os.listdir('backtest_results') if f.endswith('.json')]
-        json_files.sort(key=lambda x: os.path.getmtime(os.path.join('backtest_results', x)), reverse=True)
-        
-        for json_file in json_files[:5]:
-            src = os.path.join('backtest_results', json_file)
-            dst = os.path.join(DESKTOP_BACKTEST_DIR, json_file)
-            shutil.copy2(src, dst)
-            logger.info(f"Đã sao chép {src} đến {dst}")
+    """Sao chép các kết quả backtest"""
+    if not os.path.exists(BACKTEST_RESULTS_DIR):
+        logger.warning(f"Không tìm thấy thư mục {BACKTEST_RESULTS_DIR}")
+        return False
     
-    # Sao chép từ thư mục quick_test_results
-    if os.path.exists('quick_test_results'):
-        # Lấy 5 file PNG mới nhất
-        png_files = [f for f in os.listdir('quick_test_results') if f.endswith('.png')]
-        png_files.sort(key=lambda x: os.path.getmtime(os.path.join('quick_test_results', x)), reverse=True)
-        
-        for png_file in png_files[:5]:
-            src = os.path.join('quick_test_results', png_file)
-            dst = os.path.join(DESKTOP_ASSETS_DIR, png_file)
-            shutil.copy2(src, dst)
-            logger.info(f"Đã sao chép {src} đến {dst}")
+    # Tìm các file JSON trong thư mục backtest_results
+    result_files = []
+    for root, _, files in os.walk(BACKTEST_RESULTS_DIR):
+        for file in files:
+            if file.endswith('.json'):
+                result_files.append(os.path.join(root, file))
+    
+    if not result_files:
+        logger.warning(f"Không tìm thấy kết quả trong thư mục {BACKTEST_RESULTS_DIR}")
+        return False
+    
+    # Sao chép các file kết quả
+    for result_file in result_files:
+        dest_file = os.path.join(DESKTOP_RESULTS_DIR, os.path.basename(result_file))
+        logger.info(f"Sao chép {result_file} đến {dest_file}")
+        shutil.copy2(result_file, dest_file)
+    
+    return True
 
-def create_backtest_summary_json():
-    """Tạo file JSON tóm tắt kết quả backtest cho giao diện desktop"""
-    # Dữ liệu tóm tắt dựa trên báo cáo
+def copy_backtest_reports():
+    """Sao chép các báo cáo backtest"""
+    report_files = [
+        {'src': 'backtest_summary_report.md', 'dst': os.path.join(REPORTS_DIR, 'backtest_summary.md')},
+        {'src': 'risk_performance_summary.md', 'dst': os.path.join(REPORTS_DIR, 'risk_performance.md')},
+        {'src': 'trading_system_validation.md', 'dst': os.path.join(REPORTS_DIR, 'trading_validation.md')}
+    ]
+    
+    success_count = 0
+    for report in report_files:
+        # Kiểm tra xem file nguồn có tồn tại không
+        if os.path.exists(report['src']):
+            logger.info(f"Sao chép {report['src']} đến {report['dst']}")
+            # Tạo thư mục nếu chưa tồn tại
+            os.makedirs(os.path.dirname(report['dst']), exist_ok=True)
+            # Sao chép file
+            shutil.copy2(report['src'], report['dst'])
+            success_count += 1
+        else:
+            logger.warning(f"Không tìm thấy file nguồn {report['src']}")
+    
+    return success_count > 0
+
+def update_gui_config():
+    """Cập nhật file cấu hình GUI"""
+    config_path = os.path.join(DESKTOP_APP_DIR, 'gui_config.json')
+    
+    # Cấu hình mặc định
+    default_config = {
+        "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "show_backtest_tab": True,
+        "default_risk_level": "medium",
+        "default_strategy": "sideways",
+        "backtest_reports": [
+            {"name": "Tổng quan Backtest", "file": "reports/backtest_summary.md"},
+            {"name": "Phân tích Mức Rủi ro", "file": "reports/risk_performance.md"},
+            {"name": "Kiểm định Hệ thống", "file": "reports/trading_validation.md"}
+        ],
+        "backtest_charts": []
+    }
+    
+    # Tìm các file hình ảnh trong thư mục assets
+    chart_entries = []
+    if os.path.exists(ASSETS_DIR):
+        for file in os.listdir(ASSETS_DIR):
+            if file.endswith('.png'):
+                name = file.replace('.png', '').replace('_', ' ')
+                chart_entries.append({
+                    "name": name,
+                    "file": f"assets/{file}"
+                })
+    
+    # Cập nhật cấu hình
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            
+            # Cập nhật danh sách biểu đồ nếu có
+            if chart_entries:
+                config['backtest_charts'] = chart_entries
+            
+            # Cập nhật thời gian
+            config['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+            
+            logger.info("Đã cập nhật file cấu hình GUI")
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật config: {e}")
+            
+            # Tạo file cấu hình mới
+            logger.info("Tạo file cấu hình mới")
+            default_config['backtest_charts'] = chart_entries
+            
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(default_config, f, indent=2, ensure_ascii=False)
+    else:
+        # Tạo file cấu hình mới
+        logger.info("Tạo file cấu hình mới")
+        default_config['backtest_charts'] = chart_entries
+        
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(default_config, f, indent=2, ensure_ascii=False)
+
+def create_backtest_summary():
+    """Tạo tóm tắt backtest"""
+    summary_path = os.path.join(DESKTOP_RESULTS_DIR, 'backtest_summary.json')
+    
+    # Kiểm tra xem tệp tóm tắt đã tồn tại chưa
+    if os.path.exists(summary_path):
+        logger.info(f"Tệp tóm tắt backtest đã tồn tại: {summary_path}")
+        return True
+    
+    # Dữ liệu tóm tắt
     summary_data = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "strategies": {
@@ -224,248 +356,42 @@ def create_backtest_summary_json():
         }
     }
     
-    # Lưu dữ liệu tóm tắt vào file JSON
-    output_file = os.path.join(DESKTOP_BACKTEST_DIR, 'backtest_summary.json')
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(summary_data, f, indent=2, ensure_ascii=False)
+    # Tạo thư mục nếu chưa tồn tại
+    os.makedirs(os.path.dirname(summary_path), exist_ok=True)
     
-    logger.info(f"Đã tạo file tóm tắt backtest: {output_file}")
-
-def update_desktop_gui_config():
-    """Cập nhật file cấu hình của desktop GUI để hiển thị kết quả backtest mới nhất"""
-    config_file = os.path.join(DESKTOP_APP_DIR, 'gui_config.json')
-    
-    # Tạo cấu hình mặc định nếu không tồn tại
-    if not os.path.exists(config_file):
-        config = {
-            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "show_backtest_tab": True,
-            "default_risk_level": "medium",
-            "default_strategy": "sideways",
-            "backtest_reports": [
-                {"name": "Tổng quan Backtest", "file": "reports/backtest_summary.md"},
-                {"name": "Phân tích Mức Rủi ro", "file": "reports/risk_performance.md"},
-                {"name": "Kiểm định Hệ thống", "file": "reports/trading_validation.md"}
-            ],
-            "backtest_charts": []
-        }
-    else:
-        # Đọc cấu hình hiện tại
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        
-        # Cập nhật thời gian
-        config["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        config["show_backtest_tab"] = True
-    
-    # Thêm đường dẫn đến các biểu đồ backtest
-    config["backtest_charts"] = []
-    if os.path.exists(DESKTOP_ASSETS_DIR):
-        png_files = [f for f in os.listdir(DESKTOP_ASSETS_DIR) if f.endswith('.png')]
-        for png_file in png_files:
-            config["backtest_charts"].append({
-                "name": png_file.replace('.png', '').replace('_', ' '),
-                "file": f"assets/{png_file}"
-            })
-    
-    # Lưu cấu hình
-    with open(config_file, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
-    
-    logger.info(f"Đã cập nhật file cấu hình GUI: {config_file}")
-
-def update_gui_code():
-    """Cập nhật mã nguồn của giao diện desktop để hiển thị kết quả backtest"""
+    # Ghi file tóm tắt
     try:
-        # Đọc file enhanced_trading_gui.py
-        with open('enhanced_trading_gui.py', 'r', encoding='utf-8') as f:
-            gui_code = f.read()
-        
-        # Kiểm tra xem đã có tab Backtest chưa
-        if 'def create_backtest_tab' not in gui_code:
-            # Thêm vào cuối class MainApp
-            add_position = gui_code.find('if __name__ == "__main__":')
-            if add_position != -1:
-                # Code cho tab Backtest
-                backtest_tab_code = """
-    def create_backtest_tab(self):
-        \"\"\"Tạo tab Backtest Results\"\"\"
-        backtest_tab = QWidget()
-        layout = QVBoxLayout(backtest_tab)
-        
-        # Tiêu đề
-        title_label = QLabel("Kết quả Backtest")
-        title_label.setStyleSheet("font-size: 18px; font-weight: bold; margin-bottom: 10px;")
-        layout.addWidget(title_label)
-        
-        # Tạo tab widget cho các báo cáo khác nhau
-        reports_tabs = QTabWidget()
-        
-        # Tab tóm tắt
-        summary_tab = QWidget()
-        summary_layout = QVBoxLayout(summary_tab)
-        
-        # Hiển thị biểu đồ chiến lược
-        strategy_group = QGroupBox("Hiệu suất Chiến lược")
-        strategy_layout = QVBoxLayout()
-        
-        # Tạo bảng hiển thị win rate
-        win_rate_table = QTableWidget()
-        win_rate_table.setColumnCount(5)
-        win_rate_table.setHorizontalHeaderLabels(["Chiến lược", "Rủi ro 10%", "Rủi ro 15%", "Rủi ro 20%", "Rủi ro 25%"])
-        win_rate_table.setRowCount(3)
-        win_rate_table.setVerticalHeaderLabels(["Sideways", "Multi-Risk", "Adaptive"])
-        
-        # Tải dữ liệu từ file JSON
-        summary_file = os.path.join('desktop_app', 'backtest_results', 'backtest_summary.json')
-        if os.path.exists(summary_file):
-            with open(summary_file, 'r', encoding='utf-8') as f:
-                summary_data = json.load(f)
-            
-            # Đổ dữ liệu vào bảng
-            # Sideways
-            win_rate_table.setItem(0, 0, QTableWidgetItem("Sideways"))
-            win_rate_table.setItem(0, 1, QTableWidgetItem(f"{summary_data['strategies']['sideways']['win_rates']['risk_10']}%"))
-            win_rate_table.setItem(0, 2, QTableWidgetItem(f"{summary_data['strategies']['sideways']['win_rates']['risk_15']}%"))
-            win_rate_table.setItem(0, 3, QTableWidgetItem(f"{summary_data['strategies']['sideways']['win_rates']['risk_20']}%"))
-            win_rate_table.setItem(0, 4, QTableWidgetItem(f"{summary_data['strategies']['sideways']['win_rates']['risk_25']}%"))
-            
-            # Multi-Risk
-            win_rate_table.setItem(1, 0, QTableWidgetItem("Multi-Risk"))
-            win_rate_table.setItem(1, 1, QTableWidgetItem(f"{summary_data['strategies']['multi_risk']['win_rates']['risk_10']}%"))
-            win_rate_table.setItem(1, 2, QTableWidgetItem(f"{summary_data['strategies']['multi_risk']['win_rates']['risk_15']}%"))
-            win_rate_table.setItem(1, 3, QTableWidgetItem(f"{summary_data['strategies']['multi_risk']['win_rates']['risk_20']}%"))
-            win_rate_table.setItem(1, 4, QTableWidgetItem(f"{summary_data['strategies']['multi_risk']['win_rates']['risk_25']}%"))
-            
-            # Adaptive
-            win_rate_table.setItem(2, 0, QTableWidgetItem("Adaptive"))
-            win_rate_table.setItem(2, 1, QTableWidgetItem(f"{summary_data['strategies']['adaptive']['win_rates']['risk_low']}%"))
-            win_rate_table.setItem(2, 2, QTableWidgetItem(f"{summary_data['strategies']['adaptive']['win_rates']['risk_medium']}%"))
-            win_rate_table.setItem(2, 3, QTableWidgetItem(f"{summary_data['strategies']['adaptive']['win_rates']['risk_high']}%"))
-            win_rate_table.setItem(2, 4, QTableWidgetItem("N/A"))
-        
-        strategy_layout.addWidget(win_rate_table)
-        strategy_group.setLayout(strategy_layout)
-        summary_layout.addWidget(strategy_group)
-        
-        # Đề xuất theo kích thước tài khoản
-        account_group = QGroupBox("Đề xuất theo Kích thước Tài khoản")
-        account_layout = QVBoxLayout()
-        
-        # Tạo bảng đề xuất
-        account_table = QTableWidget()
-        account_table.setColumnCount(5)
-        account_table.setHorizontalHeaderLabels(["Kích thước", "Rủi ro", "Đòn bẩy", "Chiến lược", "Profit/tháng"])
-        account_table.setRowCount(3)
-        account_table.setVerticalHeaderLabels(["Nhỏ ($100-500)", "Trung bình ($500-$5,000)", "Lớn (>$5,000)"])
-        
-        if os.path.exists(summary_file):
-            # Nhỏ
-            account_table.setItem(0, 0, QTableWidgetItem("Nhỏ ($100-500)"))
-            account_table.setItem(0, 1, QTableWidgetItem(summary_data['account_recommendations']['small']['risk_level']))
-            account_table.setItem(0, 2, QTableWidgetItem(summary_data['account_recommendations']['small']['leverage']))
-            account_table.setItem(0, 3, QTableWidgetItem(summary_data['account_recommendations']['small']['strategy']))
-            account_table.setItem(0, 4, QTableWidgetItem(summary_data['account_recommendations']['small']['expected_monthly_profit']))
-            
-            # Trung bình
-            account_table.setItem(1, 0, QTableWidgetItem("Trung bình ($500-$5,000)"))
-            account_table.setItem(1, 1, QTableWidgetItem(summary_data['account_recommendations']['medium']['risk_level']))
-            account_table.setItem(1, 2, QTableWidgetItem(summary_data['account_recommendations']['medium']['leverage']))
-            account_table.setItem(1, 3, QTableWidgetItem(summary_data['account_recommendations']['medium']['strategy']))
-            account_table.setItem(1, 4, QTableWidgetItem(summary_data['account_recommendations']['medium']['expected_monthly_profit']))
-            
-            # Lớn
-            account_table.setItem(2, 0, QTableWidgetItem("Lớn (>$5,000)"))
-            account_table.setItem(2, 1, QTableWidgetItem(summary_data['account_recommendations']['large']['risk_level']))
-            account_table.setItem(2, 2, QTableWidgetItem(summary_data['account_recommendations']['large']['leverage']))
-            account_table.setItem(2, 3, QTableWidgetItem(summary_data['account_recommendations']['large']['strategy']))
-            account_table.setItem(2, 4, QTableWidgetItem(summary_data['account_recommendations']['large']['expected_monthly_profit']))
-        
-        account_layout.addWidget(account_table)
-        account_group.setLayout(account_layout)
-        summary_layout.addWidget(account_group)
-        
-        # Thêm vào tab tóm tắt
-        summary_tab.setLayout(summary_layout)
-        reports_tabs.addTab(summary_tab, "Tóm tắt")
-        
-        # Tab báo cáo chi tiết
-        for report_file in ['reports/backtest_summary.md', 'reports/risk_performance.md', 'reports/trading_validation.md']:
-            full_path = os.path.join('desktop_app', report_file)
-            if os.path.exists(full_path):
-                report_tab = QWidget()
-                report_layout = QVBoxLayout(report_tab)
-                
-                report_text = QTextEdit()
-                report_text.setReadOnly(True)
-                
-                with open(full_path, 'r', encoding='utf-8') as f:
-                    report_content = f.read()
-                
-                report_text.setMarkdown(report_content)
-                report_layout.addWidget(report_text)
-                
-                tab_name = os.path.basename(report_file).replace('.md', '').replace('_', ' ').title()
-                reports_tabs.addTab(report_tab, tab_name)
-        
-        # Thêm tab widget vào layout
-        layout.addWidget(reports_tabs)
-        
-        return backtest_tab
-"""
-                
-                # Thêm vào MainApp.__init__ để tạo tab
-                init_content = gui_code[:add_position]
-                # Tìm vị trí sau khi tạo các tab khác
-                tab_position = init_content.find('self.tabs.addTab(self.create_market_tab(), "Thị Trường")')
-                if tab_position != -1:
-                    # Tìm điểm kết thúc của init
-                    tab_end = init_content[tab_position:].find('\n        # ')
-                    if tab_end != -1:
-                        # Vị trí thêm mã
-                        insert_position = tab_position + tab_end
-                        # Thêm tab mới
-                        new_tab_code = '\n        self.tabs.addTab(self.create_backtest_tab(), "Backtest")'
-                        # Ghép mã
-                        new_gui_code = init_content[:insert_position] + new_tab_code + init_content[insert_position:] + backtest_tab_code + gui_code[add_position:]
-                        
-                        # Lưu mã mới
-                        with open('enhanced_trading_gui.py', 'w', encoding='utf-8') as f:
-                            f.write(new_gui_code)
-                        
-                        logger.info("Đã cập nhật mã GUI để thêm tab Backtest")
-                    else:
-                        logger.warning("Không tìm thấy vị trí để thêm tab Backtest vào GUI")
-                else:
-                    logger.warning("Không tìm thấy vị trí tabs.addTab trong GUI")
-        else:
-            logger.info("Tab Backtest đã tồn tại trong GUI, không cần cập nhật")
+        with open(summary_path, 'w', encoding='utf-8') as f:
+            json.dump(summary_data, f, indent=2, ensure_ascii=False)
+        logger.info(f"Đã tạo tệp tóm tắt backtest: {summary_path}")
+        return True
     except Exception as e:
-        logger.error(f"Lỗi khi cập nhật mã GUI: {e}")
+        logger.error(f"Lỗi khi tạo tệp tóm tắt backtest: {e}")
+        return False
 
 def main():
-    """Hàm chính để cập nhật kết quả backtest vào giao diện desktop"""
-    logger.info("Bắt đầu cập nhật kết quả backtest vào giao diện desktop")
+    """Hàm chính để cập nhật kết quả backtest"""
+    logger.info("Bắt đầu cập nhật kết quả backtest")
     
-    # Đảm bảo các thư mục cần thiết tồn tại
-    ensure_directories()
+    # Tạo các thư mục cần thiết
+    create_directories()
     
-    # Sao chép các file báo cáo
-    copy_report_files()
+    # Sao chép các biểu đồ backtest
+    copy_backtest_charts()
     
-    # Sao chép kết quả backtest
+    # Sao chép các kết quả backtest
     copy_backtest_results()
     
-    # Tạo file JSON tóm tắt
-    create_backtest_summary_json()
+    # Sao chép các báo cáo backtest
+    copy_backtest_reports()
+    
+    # Tạo tóm tắt backtest
+    create_backtest_summary()
     
     # Cập nhật file cấu hình GUI
-    update_desktop_gui_config()
+    update_gui_config()
     
-    # Cập nhật mã nguồn GUI
-    update_gui_code()
-    
-    logger.info("Hoàn thành cập nhật kết quả backtest vào giao diện desktop")
+    logger.info("Đã hoàn thành cập nhật kết quả backtest")
 
 if __name__ == "__main__":
     main()

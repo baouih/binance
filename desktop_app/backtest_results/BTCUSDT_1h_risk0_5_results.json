@@ -1,0 +1,62 @@
+{
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "initial_balance": 10000.0,
+    "final_balance": 10048.66656563117,
+    "profit": 48.66656563117067,
+    "profit_percentage": 0.4866656563117067,
+    "total_trades": 17,
+    "win_trades": 14,
+    "lose_trades": 3,
+    "win_rate": 82.35294117647058,
+    "profit_factor": 2.2526604934717347,
+    "avg_profit": 6.251223485740128,
+    "avg_loss": -12.950187723063252,
+    "max_drawdown": 0.3166914361401224,
+    "strategy": "adaptive",
+    "leverage": 3,
+    "risk_percentage": 0.5,
+    "use_adaptive_risk": true,
+    "regime_performance": {
+        "ranging": {
+            "trades": 11,
+            "wins": 8,
+            "losses": 3,
+            "profit": 45.06596832934189,
+            "loss": -38.850563169189755,
+            "win_rate": 72.72727272727273,
+            "profit_factor": 1.159982369704263,
+            "avg_profit": 5.6332460411677365,
+            "avg_loss": -12.950187723063252,
+            "net_pnl": 6.215405160152137,
+            "net_pnl_pct": 0.06215405160152137
+        },
+        "trending": {
+            "trades": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 14.296150857439814,
+            "loss": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "avg_profit": 7.148075428719907,
+            "avg_loss": 0,
+            "net_pnl": 14.296150857439814,
+            "net_pnl_pct": 0.14296150857439813
+        },
+        "quiet": {
+            "trades": 4,
+            "wins": 4,
+            "losses": 0,
+            "profit": 28.155009613580095,
+            "loss": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "avg_profit": 7.038752403395024,
+            "avg_loss": 0,
+            "net_pnl": 28.155009613580095,
+            "net_pnl_pct": 0.28155009613580095
+        }
+    },
+    "timestamp": "2025-03-06 12:49:20"
+}

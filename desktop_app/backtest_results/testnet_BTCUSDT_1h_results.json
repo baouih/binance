@@ -1,0 +1,23 @@
+{
+  "symbol": "BTCUSDT",
+  "interval": "1h",
+  "strategy": "adaptive",
+  "initial_balance": 10000.0,
+  "final_balance": 4129.938300285408,
+  "profit": -5870.061699714592,
+  "profit_percent": -58.700616997145914,
+  "num_trades": 6,
+  "winning_trades": 2,
+  "losing_trades": 4,
+  "win_rate": 33.33333333333333,
+  "profit_factor": 0.2041179719768938,
+  "max_drawdown": 64.30547115293234,
+  "leverage": 5,
+  "risk_percentage": 1.0,
+  "use_trailing_stop": false,
+  "regime_distribution": {
+    "trending": 160,
+    "volatile": 10,
+    "quiet": 90
+  }
+}

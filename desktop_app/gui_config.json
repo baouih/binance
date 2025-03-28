@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-03-28 08:35:45",
+  "last_updated": "2025-03-28 14:25:17",
   "show_backtest_tab": true,
   "default_risk_level": "medium",
   "default_strategy": "sideways",
@@ -37,6 +37,270 @@
     {
       "name": "BTCUSDT 1h sideways risk25",
       "file": "assets/BTCUSDT_1h_sideways_risk25.png"
+    },
+    {
+      "name": "BTCUSDT 1h backtest chart",
+      "file": "assets/BTCUSDT_1h_backtest_chart.png"
+    },
+    {
+      "name": "BTCUSDT 1h backtest equity",
+      "file": "assets/BTCUSDT_1h_backtest_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h backtest drawdown",
+      "file": "assets/BTCUSDT_1h_backtest_drawdown.png"
+    },
+    {
+      "name": "BTCUSDT 1h backtest distribution",
+      "file": "assets/BTCUSDT_1h_backtest_distribution.png"
+    },
+    {
+      "name": "BTCUSDT 1h rsi equity",
+      "file": "assets/BTCUSDT_1h_rsi_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h rsi signals",
+      "file": "assets/BTCUSDT_1h_rsi_signals.png"
+    },
+    {
+      "name": "BTCUSDT 1h macd equity",
+      "file": "assets/BTCUSDT_1h_macd_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h macd signals",
+      "file": "assets/BTCUSDT_1h_macd_signals.png"
+    },
+    {
+      "name": "testnet BTCUSDT 1h equity",
+      "file": "assets/testnet_BTCUSDT_1h_equity.png"
+    },
+    {
+      "name": "testnet BTCUSDT 1h regime",
+      "file": "assets/testnet_BTCUSDT_1h_regime.png"
+    },
+    {
+      "name": "testnet BTCUSDT 1h signals",
+      "file": "assets/testnet_BTCUSDT_1h_signals.png"
+    },
+    {
+      "name": "BTCUSDT 1h RSI equity",
+      "file": "assets/BTCUSDT_1h_RSI_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h MACD equity",
+      "file": "assets/BTCUSDT_1h_MACD_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h BollingerBands equity",
+      "file": "assets/BTCUSDT_1h_BollingerBands_equity.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 175831 equity",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_175831_equity.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 175831 regimes pie",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_175831_regimes_pie.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 175831 win rates",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_175831_win_rates.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 175831 strategies",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_175831_strategies.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 180416 equity",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_180416_equity.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 180416 regimes pie",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_180416_regimes_pie.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 180416 win rates",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_180416_win_rates.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 180416 strategies",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_180416_strategies.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 184249 equity",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_184249_equity.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 184249 regimes pie",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_184249_regimes_pie.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 184249 win rates",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_184249_win_rates.png"
+    },
+    {
+      "name": "adaptive summary BTCUSDT 1h 20250301 184249 strategies",
+      "file": "assets/adaptive_summary_BTCUSDT_1h_20250301_184249_strategies.png"
+    },
+    {
+      "name": "adaptive summary SOLUSDT 1h 20250301 184321 equity",
+      "file": "assets/adaptive_summary_SOLUSDT_1h_20250301_184321_equity.png"
+    },
+    {
+      "name": "adaptive summary SOLUSDT 1h 20250301 184321 regimes pie",
+      "file": "assets/adaptive_summary_SOLUSDT_1h_20250301_184321_regimes_pie.png"
+    },
+    {
+      "name": "adaptive summary SOLUSDT 1h 20250301 184321 win rates",
+      "file": "assets/adaptive_summary_SOLUSDT_1h_20250301_184321_win_rates.png"
+    },
+    {
+      "name": "adaptive summary SOLUSDT 1h 20250301 184321 strategies",
+      "file": "assets/adaptive_summary_SOLUSDT_1h_20250301_184321_strategies.png"
+    },
+    {
+      "name": "bb quiet price chart",
+      "file": "assets/bb_quiet_price_chart.png"
+    },
+    {
+      "name": "bb quiet equity curve",
+      "file": "assets/bb_quiet_equity_curve.png"
+    },
+    {
+      "name": "bb quiet width chart",
+      "file": "assets/bb_quiet_width_chart.png"
+    },
+    {
+      "name": "bb quiet profit distribution",
+      "file": "assets/bb_quiet_profit_distribution.png"
+    },
+    {
+      "name": "percentage trending long demo",
+      "file": "assets/percentage_trending_long_demo.png"
+    },
+    {
+      "name": "percentage trending short demo",
+      "file": "assets/percentage_trending_short_demo.png"
+    },
+    {
+      "name": "percentage ranging long demo",
+      "file": "assets/percentage_ranging_long_demo.png"
+    },
+    {
+      "name": "percentage volatile long demo",
+      "file": "assets/percentage_volatile_long_demo.png"
+    },
+    {
+      "name": "step trending long demo",
+      "file": "assets/step_trending_long_demo.png"
+    },
+    {
+      "name": "ETHUSDT 1h macd equity",
+      "file": "assets/ETHUSDT_1h_macd_equity.png"
+    },
+    {
+      "name": "ETHUSDT 1h macd signals",
+      "file": "assets/ETHUSDT_1h_macd_signals.png"
+    },
+    {
+      "name": "BTCUSDT 1h combined equity",
+      "file": "assets/BTCUSDT_1h_combined_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h combined signals",
+      "file": "assets/BTCUSDT_1h_combined_signals.png"
+    },
+    {
+      "name": "BTCUSDT 1h adaptive equity",
+      "file": "assets/BTCUSDT_1h_adaptive_equity.png"
+    },
+    {
+      "name": "BTCUSDT 1h adaptive signals",
+      "file": "assets/BTCUSDT_1h_adaptive_signals.png"
+    },
+    {
+      "name": "ETHUSDT 1h adaptive equity",
+      "file": "assets/ETHUSDT_1h_adaptive_equity.png"
+    },
+    {
+      "name": "ETHUSDT 1h adaptive signals",
+      "file": "assets/ETHUSDT_1h_adaptive_signals.png"
+    },
+    {
+      "name": "BNBUSDT 1h adaptive equity",
+      "file": "assets/BNBUSDT_1h_adaptive_equity.png"
+    },
+    {
+      "name": "BNBUSDT 1h adaptive signals",
+      "file": "assets/BNBUSDT_1h_adaptive_signals.png"
+    },
+    {
+      "name": "profit by symbol 100 lev20x 20241208 20250308",
+      "file": "assets/profit_by_symbol_100_lev20x_20241208_20250308.png"
+    },
+    {
+      "name": "winrate by symbol 100 lev20x 20241208 20250308",
+      "file": "assets/winrate_by_symbol_100_lev20x_20241208_20250308.png"
+    },
+    {
+      "name": "balance top5 100 lev20x 20241208 20250308",
+      "file": "assets/balance_top5_100_lev20x_20241208_20250308.png"
+    },
+    {
+      "name": "profit vs drawdown 100 lev20x 20241208 20250308",
+      "file": "assets/profit_vs_drawdown_100_lev20x_20241208_20250308.png"
+    },
+    {
+      "name": "BTCUSDT high risk backtest",
+      "file": "assets/BTCUSDT_high_risk_backtest.png"
+    },
+    {
+      "name": "ETHUSDT high risk backtest",
+      "file": "assets/ETHUSDT_high_risk_backtest.png"
+    },
+    {
+      "name": "BNBUSDT high risk backtest",
+      "file": "assets/BNBUSDT_high_risk_backtest.png"
+    },
+    {
+      "name": "SOLUSDT high risk backtest",
+      "file": "assets/SOLUSDT_high_risk_backtest.png"
+    },
+    {
+      "name": "backtest BTC-USD 1mo 20250318 091034",
+      "file": "assets/backtest_BTC-USD_1mo_20250318_091034.png"
+    },
+    {
+      "name": "summary 1mo 20250318 091034",
+      "file": "assets/summary_1mo_20250318_091034.png"
+    },
+    {
+      "name": "backtest BTC-USD 1mo 20250318 151803",
+      "file": "assets/backtest_BTC-USD_1mo_20250318_151803.png"
+    },
+    {
+      "name": "summary 1mo 20250318 151803",
+      "file": "assets/summary_1mo_20250318_151803.png"
+    },
+    {
+      "name": "backtest ETH-USD 1mo 20250318 152141",
+      "file": "assets/backtest_ETH-USD_1mo_20250318_152141.png"
+    },
+    {
+      "name": "backtest SOL-USD 1mo 20250318 152142",
+      "file": "assets/backtest_SOL-USD_1mo_20250318_152142.png"
+    },
+    {
+      "name": "summary 1mo 20250318 152142",
+      "file": "assets/summary_1mo_20250318_152142.png"
+    },
+    {
+      "name": "backtest BTC-USD 15d 20250319 002803",
+      "file": "assets/backtest_BTC-USD_15d_20250319_002803.png"
+    },
+    {
+      "name": "summary 15d 20250319 002803",
+      "file": "assets/summary_15d_20250319_002803.png"
     }
   ]
 }
