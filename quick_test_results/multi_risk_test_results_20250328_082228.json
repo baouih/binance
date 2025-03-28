@@ -1,0 +1,404 @@
+{
+    "multi_risk": {
+        "0.10": {
+            "strategy": "multi_risk",
+            "risk_level": 0.1,
+            "initial_balance": 10000,
+            "final_balance": 10003.288663055693,
+            "profit_loss": 3.2886630556931777,
+            "profit_loss_pct": 0.03288663055693178,
+            "max_drawdown": 0.03946648335295322,
+            "max_drawdown_pct": 0.0003945490654610044,
+            "total_trades": 119,
+            "winning_trades": 113,
+            "losing_trades": 6,
+            "win_rate": 94.9579831932773,
+            "profit_factor": 24.278798272971684,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 5,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.028588969149087352
+                },
+                "SIDEWAYS": {
+                    "trades": 62,
+                    "win_rate": 91.93548387096774,
+                    "avg_profit": 0.021640137592675367
+                },
+                "BULL": {
+                    "trades": 47,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.0365346978486072
+                },
+                "VOLATILE": {
+                    "trades": 5,
+                    "win_rate": 80.0,
+                    "avg_profit": 0.01737977606514605
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.15": {
+            "strategy": "multi_risk",
+            "risk_level": 0.15,
+            "initial_balance": 10000,
+            "final_balance": 10006.91738304369,
+            "profit_loss": 6.917383043690279,
+            "profit_loss_pct": 0.0691738304369028,
+            "max_drawdown": 0.0671012122566026,
+            "max_drawdown_pct": 0.0006705725874372763,
+            "total_trades": 117,
+            "winning_trades": 107,
+            "losing_trades": 10,
+            "win_rate": 91.45299145299145,
+            "profit_factor": 20.170002460484238,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 5,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.05995697579828506
+                },
+                "SIDEWAYS": {
+                    "trades": 64,
+                    "win_rate": 87.5,
+                    "avg_profit": 0.04849813295267269
+                },
+                "BULL": {
+                    "trades": 43,
+                    "win_rate": 97.67441860465115,
+                    "avg_profit": 0.07767112730645348
+                },
+                "VOLATILE": {
+                    "trades": 5,
+                    "win_rate": 80.0,
+                    "avg_profit": 0.03477183631172007
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.20": {
+            "strategy": "multi_risk",
+            "risk_level": 0.2,
+            "initial_balance": 10000,
+            "final_balance": 10008.941974479898,
+            "profit_loss": 8.941974479897908,
+            "profit_loss_pct": 0.08941974479897907,
+            "max_drawdown": 0.1863753561210615,
+            "max_drawdown_pct": 0.0018626725285642762,
+            "total_trades": 91,
+            "winning_trades": 68,
+            "losing_trades": 23,
+            "win_rate": 74.72527472527473,
+            "profit_factor": 8.476144767751737,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 4,
+                    "win_rate": 75.0,
+                    "avg_profit": 0.08258005292140366
+                },
+                "SIDEWAYS": {
+                    "trades": 49,
+                    "win_rate": 65.3061224489796,
+                    "avg_profit": 0.06739798556538033
+                },
+                "BULL": {
+                    "trades": 33,
+                    "win_rate": 87.87878787878788,
+                    "avg_profit": 0.14899652275831193
+                },
+                "VOLATILE": {
+                    "trades": 5,
+                    "win_rate": 80.0,
+                    "avg_profit": 0.07845354489912026
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.25": {
+            "strategy": "multi_risk",
+            "risk_level": 0.25,
+            "initial_balance": 10000,
+            "final_balance": 10006.94827430317,
+            "profit_loss": 6.948274303169455,
+            "profit_loss_pct": 0.06948274303169455,
+            "max_drawdown": 0.5815100765867101,
+            "max_drawdown_pct": 0.005814296761296155,
+            "total_trades": 55,
+            "winning_trades": 35,
+            "losing_trades": 20,
+            "win_rate": 63.63636363636363,
+            "profit_factor": 4.59787697945078,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 2,
+                    "win_rate": 50.0,
+                    "avg_profit": 0.08230832079173395
+                },
+                "SIDEWAYS": {
+                    "trades": 29,
+                    "win_rate": 51.724137931034484,
+                    "avg_profit": 0.06626286266214211
+                },
+                "BULL": {
+                    "trades": 21,
+                    "win_rate": 76.19047619047619,
+                    "avg_profit": 0.20818798955815074
+                },
+                "VOLATILE": {
+                    "trades": 3,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.16336228788873497
+                }
+            },
+            "market_type_counts": {}
+        }
+    },
+    "sideways": {
+        "0.10": {
+            "strategy": "sideways",
+            "risk_level": 0.1,
+            "initial_balance": 10000,
+            "final_balance": 10010.266020611827,
+            "profit_loss": 10.266020611827116,
+            "profit_loss_pct": 0.10266020611827116,
+            "max_drawdown": 0,
+            "max_drawdown_pct": 0,
+            "total_trades": 177,
+            "winning_trades": 177,
+            "losing_trades": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "market_condition_performance": {
+                "SIDEWAYS": {
+                    "trades": 177,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.05800011645102975
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.15": {
+            "strategy": "sideways",
+            "risk_level": 0.15,
+            "initial_balance": 10000,
+            "final_balance": 10018.227974609796,
+            "profit_loss": 18.227974609795638,
+            "profit_loss_pct": 0.18227974609795636,
+            "max_drawdown": 0,
+            "max_drawdown_pct": 0,
+            "total_trades": 163,
+            "winning_trades": 163,
+            "losing_trades": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "market_condition_performance": {
+                "SIDEWAYS": {
+                    "trades": 163,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.11182806509080195
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.20": {
+            "strategy": "sideways",
+            "risk_level": 0.2,
+            "initial_balance": 10000,
+            "final_balance": 10025.2412457079,
+            "profit_loss": 25.241245707900816,
+            "profit_loss_pct": 0.25241245707900817,
+            "max_drawdown": 0,
+            "max_drawdown_pct": 0,
+            "total_trades": 142,
+            "winning_trades": 142,
+            "losing_trades": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "market_condition_performance": {
+                "SIDEWAYS": {
+                    "trades": 142,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.1777552514640246
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.25": {
+            "strategy": "sideways",
+            "risk_level": 0.25,
+            "initial_balance": 10000,
+            "final_balance": 10042.083944999962,
+            "profit_loss": 42.083944999962114,
+            "profit_loss_pct": 0.4208394499996211,
+            "max_drawdown": 0,
+            "max_drawdown_pct": 0,
+            "total_trades": 127,
+            "winning_trades": 127,
+            "losing_trades": 0,
+            "win_rate": 100.0,
+            "profit_factor": Infinity,
+            "market_condition_performance": {
+                "SIDEWAYS": {
+                    "trades": 127,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.3313696456690178
+                }
+            },
+            "market_type_counts": {}
+        }
+    },
+    "combined": {
+        "0.10": {
+            "strategy": "combined",
+            "risk_level": 0.1,
+            "initial_balance": 10000,
+            "final_balance": 10007.349427830262,
+            "profit_loss": 7.349427830262357,
+            "profit_loss_pct": 0.07349427830262358,
+            "max_drawdown": 0.03948017648872337,
+            "max_drawdown_pct": 0.0003945490654620871,
+            "total_trades": 160,
+            "winning_trades": 154,
+            "losing_trades": 6,
+            "win_rate": 96.25,
+            "profit_factor": 53.01261178383827,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 5,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.028588969149087352
+                },
+                "SIDEWAYS": {
+                    "trades": 128,
+                    "win_rate": 96.09375,
+                    "avg_profit": 0.0500719112859002
+                },
+                "BULL": {
+                    "trades": 23,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.03185162331270932
+                },
+                "VOLATILE": {
+                    "trades": 4,
+                    "win_rate": 75.0,
+                    "avg_profit": 0.01617275093216198
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.15": {
+            "strategy": "combined",
+            "risk_level": 0.15,
+            "initial_balance": 10000,
+            "final_balance": 10014.227769923677,
+            "profit_loss": 14.227769923676533,
+            "profit_loss_pct": 0.14227769923676534,
+            "max_drawdown": 0.06714598421785922,
+            "max_drawdown_pct": 0.0006705725874326546,
+            "total_trades": 155,
+            "winning_trades": 145,
+            "losing_trades": 10,
+            "win_rate": 93.54838709677419,
+            "profit_factor": 40.322487978119504,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 5,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.05995697579828506
+                },
+                "SIDEWAYS": {
+                    "trades": 124,
+                    "win_rate": 93.54838709677419,
+                    "avg_profit": 0.0988431798290089
+                },
+                "BULL": {
+                    "trades": 22,
+                    "win_rate": 95.45454545454545,
+                    "avg_profit": 0.07008915788024407
+                },
+                "VOLATILE": {
+                    "trades": 4,
+                    "win_rate": 75.0,
+                    "avg_profit": 0.03236731813107603
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.20": {
+            "strategy": "combined",
+            "risk_level": 0.2,
+            "initial_balance": 10000,
+            "final_balance": 10020.320402215355,
+            "profit_loss": 20.32040221535499,
+            "profit_loss_pct": 0.20320402215354988,
+            "max_drawdown": 0.135974935039485,
+            "max_drawdown_pct": 0.0013581346216320908,
+            "total_trades": 145,
+            "winning_trades": 123,
+            "losing_trades": 22,
+            "win_rate": 84.82758620689656,
+            "profit_factor": 19.526289484810594,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 4,
+                    "win_rate": 75.0,
+                    "avg_profit": 0.08258005292140366
+                },
+                "SIDEWAYS": {
+                    "trades": 116,
+                    "win_rate": 86.20689655172413,
+                    "avg_profit": 0.146199973030171
+                },
+                "BULL": {
+                    "trades": 21,
+                    "win_rate": 80.95238095238095,
+                    "avg_profit": 0.1298702143781066
+                },
+                "VOLATILE": {
+                    "trades": 4,
+                    "win_rate": 75.0,
+                    "avg_profit": 0.07590265755672777
+                }
+            },
+            "market_type_counts": {}
+        },
+        "0.25": {
+            "strategy": "combined",
+            "risk_level": 0.25,
+            "initial_balance": 10000,
+            "final_balance": 10027.75758883608,
+            "profit_loss": 27.757588836080686,
+            "profit_loss_pct": 0.2775758883608068,
+            "max_drawdown": 0.21876173154123535,
+            "max_drawdown_pct": 0.002185667836888507,
+            "total_trades": 116,
+            "winning_trades": 95,
+            "losing_trades": 21,
+            "win_rate": 81.89655172413794,
+            "profit_factor": 18.06190386078465,
+            "market_condition_performance": {
+                "NEUTRAL": {
+                    "trades": 2,
+                    "win_rate": 50.0,
+                    "avg_profit": 0.08230832079173395
+                },
+                "SIDEWAYS": {
+                    "trades": 97,
+                    "win_rate": 84.5360824742268,
+                    "avg_profit": 0.25539365423018534
+                },
+                "BULL": {
+                    "trades": 14,
+                    "win_rate": 64.28571428571429,
+                    "avg_profit": 0.1616583986083926
+                },
+                "VOLATILE": {
+                    "trades": 3,
+                    "win_rate": 100.0,
+                    "avg_profit": 0.1855233845510196
+                }
+            },
+            "market_type_counts": {}
+        }
+    }
+}
