@@ -401,10 +401,10 @@
             <span>{{ 'Đang Chạy' if status.running else 'Đã Dừng' }}</span>
         </div>
         <div class="bot-balance">
-            <strong>Số Dư:</strong> {{ status.account_balance|round(2) }} USDT
+            <strong>Số Dư:</strong> {{ status.account_balance|round(2) if status.account_balance is defined else '0.00' }} USDT
         </div>
         <div class="bot-positions">
-            <strong>Vị Thế Mở:</strong> {{ status.positions|length }}
+            <strong>Vị Thế Mở:</strong> {{ status.positions|length if status.positions is defined else '0' }}
         </div>
         <div class="bot-latest-log">
             <strong>Log Mới Nhất:</strong>

@@ -25,7 +25,7 @@
                     <i class="fas fa-coins running"></i>
                 </div>
                 <div class="status-label">Tổng Số Vị Thế</div>
-                <div class="status-value" id="totalPositions">{{ status.positions|length }}</div>
+                <div class="status-value" id="totalPositions">{{ status.positions|length if status.positions is defined else 0 }}</div>
             </div>
         </div>
         
@@ -36,7 +36,14 @@
                 </div>
                 <div class="status-label">Vị Thế LONG</div>
                 <div class="status-value" id="longPositions">
-                    {% set long_count = status.positions|selectattr('type', 'equalto', 'LONG')|list|length %}
+                    {% set long_count = 0 %}
+                    {% if status.positions is defined %}
+                        {% for position in status.positions %}
+                            {% if position.type == 'LONG' %}
+                                {% set long_count = long_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     {{ long_count }}
                 </div>
             </div>
@@ -49,7 +56,14 @@
                 </div>
                 <div class="status-label">Vị Thế SHORT</div>
                 <div class="status-value" id="shortPositions">
-                    {% set short_count = status.positions|selectattr('type', 'equalto', 'SHORT')|list|length %}
+                    {% set short_count = 0 %}
+                    {% if status.positions is defined %}
+                        {% for position in status.positions %}
+                            {% if position.type == 'SHORT' %}
+                                {% set short_count = short_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     {{ short_count }}
                 </div>
             </div>
@@ -64,7 +78,7 @@
                     <h5 class="mb-0">Danh Sách Vị Thế</h5>
                 </div>
                 <div class="card-body">
-                    {% if status.positions %}
+                    {% if status.positions is defined and status.positions %}
                     <div class="table-responsive">
                         <table class="table table-striped" id="positionsTable">
                             <thead>

@@ -39,11 +39,15 @@
                 </div>
                 <div class="status-label">Giá ETH</div>
                 <div class="status-value" id="ethPrice">
-                    {% for item in status.market_data if item.symbol == 'ETHUSDT' %}
-                        {{ item.price }}
+                    {% if status is defined and status.market_data is defined %}
+                        {% for item in status.market_data if item.symbol == 'ETHUSDT' %}
+                            {{ item.price }}
+                        {% else %}
+                            N/A
+                        {% endfor %}
                     {% else %}
                         N/A
-                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -55,7 +59,14 @@
                 </div>
                 <div class="status-label">Tín Hiệu Mua</div>
                 <div class="status-value" id="buySignals">
-                    {% set buy_count = status.market_data|selectattr('signal', 'contains', 'Mua')|list|length if status.market_data else 0 %}
+                    {% set buy_count = 0 %}
+                    {% if status is defined and status.market_data is defined %}
+                        {% for item in status.market_data %}
+                            {% if item.signal is defined and 'Mua' in item.signal %}
+                                {% set buy_count = buy_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     {{ buy_count }}
                 </div>
             </div>
@@ -68,7 +79,14 @@
                 </div>
                 <div class="status-label">Tín Hiệu Bán</div>
                 <div class="status-value" id="sellSignals">
-                    {% set sell_count = status.market_data|selectattr('signal', 'contains', 'Bán')|list|length if status.market_data else 0 %}
+                    {% set sell_count = 0 %}
+                    {% if status is defined and status.market_data is defined %}
+                        {% for item in status.market_data %}
+                            {% if item.signal is defined and 'Bán' in item.signal %}
+                                {% set sell_count = sell_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     {{ sell_count }}
                 </div>
             </div>
@@ -123,7 +141,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Dữ Liệu Thị Trường</h5>
-                    <span class="badge bg-primary" id="marketItemCount">{{ status.market_data|length }} cặp tiền</span>
+                    <span class="badge bg-primary" id="marketItemCount">{% if status is defined and status.market_data is defined %}{{ status.market_data|length }}{% else %}0{% endif %} cặp tiền</span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -140,29 +158,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in status.market_data %}
-                                <tr>
-                                    <td>{{ item.symbol }}</td>
-                                    <td>{{ item.price }}</td>
-                                    <td class="{{ 'text-success' if '+' in item.change_24h else 'text-danger' }}">{{ item.change_24h }}</td>
-                                    <td>{{ item.volume }}</td>
-                                    <td class="
-                                        {% if 'Mua' in item.signal %}signal-buy
-                                        {% elif 'Bán' in item.signal %}signal-sell
-                                        {% else %}signal-neutral{% endif %}
-                                    ">{{ item.signal }}</td>
-                                    <td class="
-                                        {% if 'Tăng' in item.trend %}trend-up
-                                        {% elif 'Giảm' in item.trend %}trend-down
-                                        {% else %}trend-sideways{% endif %}
-                                    ">{{ item.trend }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary open-position-btn" data-symbol="{{ item.symbol }}">
-                                            <i class="fas fa-plus"></i> Mở Vị Thế
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
+                                {% if status is defined and status.market_data is defined %}
+                                    {% for item in status.market_data %}
+                                    <tr>
+                                        <td>{{ item.symbol }}</td>
+                                        <td>{{ item.price }}</td>
+                                        <td class="{{ 'text-success' if item.change_24h is defined and '+' in item.change_24h else 'text-danger' }}">{{ item.change_24h }}</td>
+                                        <td>{{ item.volume }}</td>
+                                        <td class="
+                                            {% if item.signal is defined and 'Mua' in item.signal %}signal-buy
+                                            {% elif item.signal is defined and 'Bán' in item.signal %}signal-sell
+                                            {% else %}signal-neutral{% endif %}
+                                        ">{{ item.signal }}</td>
+                                        <td class="
+                                            {% if item.trend is defined and 'Tăng' in item.trend %}trend-up
+                                            {% elif item.trend is defined and 'Giảm' in item.trend %}trend-down
+                                            {% else %}trend-sideways{% endif %}
+                                        ">{{ item.trend }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary open-position-btn" data-symbol="{{ item.symbol }}">
+                                                <i class="fas fa-plus"></i> Mở Vị Thế
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -187,7 +207,14 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="upTrendList">
-                                        {% set up_trend = status.market_data|selectattr('trend', 'contains', 'Tăng')|list if status.market_data else [] %}
+                                        {% set up_trend = [] %}
+                                        {% if status is defined and status.market_data is defined %}
+                                            {% for item in status.market_data %}
+                                                {% if item.trend is defined and 'Tăng' in item.trend %}
+                                                    {% set up_trend = up_trend + [item] %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                         {% for item in up_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
@@ -211,7 +238,14 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="sidewayTrendList">
-                                        {% set sideway_trend = status.market_data|selectattr('trend', 'contains', 'Sideway')|list if status.market_data else [] %}
+                                        {% set sideway_trend = [] %}
+                                        {% if status is defined and status.market_data is defined %}
+                                            {% for item in status.market_data %}
+                                                {% if item.trend is defined and 'Sideway' in item.trend %}
+                                                    {% set sideway_trend = sideway_trend + [item] %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                         {% for item in sideway_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
@@ -235,7 +269,14 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group" id="downTrendList">
-                                        {% set down_trend = status.market_data|selectattr('trend', 'contains', 'Giảm')|list if status.market_data else [] %}
+                                        {% set down_trend = [] %}
+                                        {% if status is defined and status.market_data is defined %}
+                                            {% for item in status.market_data %}
+                                                {% if item.trend is defined and 'Giảm' in item.trend %}
+                                                    {% set down_trend = down_trend + [item] %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                         {% for item in down_trend[:5] %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                 {{ item.symbol }}
