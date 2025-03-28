@@ -303,8 +303,18 @@ def index():
                 'pairs': []
             }
             
+        # Merge market data into status for simpler template usage
+        bot_status.update({
+            'btc_price': market_data.get('btc_price', 0),
+            'eth_price': market_data.get('eth_price', 0),
+            'ada_price': market_data.get('ada_price', 0),
+            'btc_change_24h': market_data.get('btc_change_24h', 0),
+            'eth_change_24h': market_data.get('eth_change_24h', 0),
+            'ada_change_24h': market_data.get('ada_change_24h', 0)
+        })
+        
         # Render template với dữ liệu đã chuẩn bị
-        return render_template('index.html', status=bot_status, market_data=market_data)
+        return render_template('index.html', status=bot_status)
     except Exception as e:
         logger.error(f"Error loading dashboard: {str(e)}")
         # Return with empty data in case of error
@@ -313,13 +323,12 @@ def index():
             'account_balance': 0,
             'positions': [],
             'logs': [],
-            'market_data': []
-        }, market_data={
             'btc_price': 0,
             'eth_price': 0,
+            'ada_price': 0,
             'btc_change_24h': 0,
             'eth_change_24h': 0,
-            'pairs': []
+            'ada_change_24h': 0
         })
 
 @app.route('/market')
@@ -1773,14 +1782,14 @@ def scheduled_bot_status_update():
 
 # Đăng ký các blueprint
 try:
-    from config_routes import config_blueprint
+    from routes.config_routes import config_blueprint
     app.register_blueprint(config_blueprint)
     logger.info("Đã đăng ký blueprint cho cấu hình")
 except Exception as e:
     logger.warning(f"Không thể đăng ký blueprint cho cấu hình: {str(e)}")
 
 try:
-    from bot_api_routes import bot_api_blueprint
+    from routes.bot_api_routes import bot_api_blueprint
     app.register_blueprint(bot_api_blueprint)
     logger.info("Đã đăng ký blueprint cho API Bot")
 except Exception as e:

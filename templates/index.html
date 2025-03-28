@@ -83,23 +83,33 @@
                                 </tr>
                             </thead>
                             <tbody id="marketOverviewTable">
-                                {% for item in status.market_data[:5] %}
                                 <tr>
-                                    <td>{{ item.symbol }}</td>
-                                    <td>{{ item.price }}</td>
-                                    <td class="{{ 'text-success' if '+' in item.change_24h else 'text-danger' }}">{{ item.change_24h }}</td>
-                                    <td class="
-                                        {% if 'Mua' in item.signal %}signal-buy
-                                        {% elif 'Bán' in item.signal %}signal-sell
-                                        {% else %}signal-neutral{% endif %}
-                                    ">{{ item.signal }}</td>
-                                    <td class="
-                                        {% if 'Tăng' in item.trend %}trend-up
-                                        {% elif 'Giảm' in item.trend %}trend-down
-                                        {% else %}trend-sideways{% endif %}
-                                    ">{{ item.trend }}</td>
+                                    <td>BTC</td>
+                                    <td>{{ status.btc_price if status.btc_price else '0' }}</td>
+                                    <td class="{{ 'text-success' if status.btc_change_24h and status.btc_change_24h > 0 else 'text-danger' }}">
+                                        {{ status.btc_change_24h if status.btc_change_24h else '0.00' }}%
+                                    </td>
+                                    <td class="signal-neutral">Không có tín hiệu</td>
+                                    <td class="trend-sideways">Đi ngang</td>
                                 </tr>
-                                {% endfor %}
+                                <tr>
+                                    <td>ETH</td>
+                                    <td>{{ status.eth_price if status.eth_price else '0' }}</td>
+                                    <td class="{{ 'text-success' if status.eth_change_24h and status.eth_change_24h > 0 else 'text-danger' }}">
+                                        {{ status.eth_change_24h if status.eth_change_24h else '0.00' }}%
+                                    </td>
+                                    <td class="signal-neutral">Không có tín hiệu</td>
+                                    <td class="trend-sideways">Đi ngang</td>
+                                </tr>
+                                <tr>
+                                    <td>ADA</td>
+                                    <td>{{ status.ada_price if status.ada_price else '0' }}</td>
+                                    <td class="{{ 'text-success' if status.ada_change_24h and status.ada_change_24h > 0 else 'text-danger' }}">
+                                        {{ status.ada_change_24h if status.ada_change_24h else '0.00' }}%
+                                    </td>
+                                    <td class="signal-neutral">Không có tín hiệu</td>
+                                    <td class="trend-sideways">Đi ngang</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -117,7 +127,7 @@
                 </div>
                 <div class="card-body">
                     <div class="log-container">
-                        {% for log in status.logs[:10] %}
+                        {% for log in status.logs[0:10] if status.logs %}
                         <div class="log-entry {{ log.type }}">
                             <small>{{ log.timestamp }}</small><br>
                             {{ log.message }}

@@ -423,6 +423,1176 @@ class MarketAnalyzer:
         
         return upper_band, middle_band, lower_band
     
+    def get_technical_indicators(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy các chỉ báo kỹ thuật cho danh sách cặp tiền và khung thời gian
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1h', '4h', '1d']
+        :return: Dict chứa kết quả phân tích chỉ báo kỹ thuật
+        """
+        if not symbols:
+            symbols = self.symbols
+        
+        if not timeframes:
+            timeframes = ['1h', '4h', '1d']
+            
+        logger.info(f"Phân tích chỉ báo kỹ thuật cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính các chỉ báo kỹ thuật
+                    sma_20 = self.calculate_sma(df, 20).iloc[-1]
+                    sma_50 = self.calculate_sma(df, 50).iloc[-1]
+                    sma_200 = self.calculate_sma(df, 200).iloc[-1] if len(df) >= 200 else None
+                    
+                    ema_12 = self.calculate_ema(df, 12).iloc[-1]
+                    ema_26 = self.calculate_ema(df, 26).iloc[-1]
+                    
+                    rsi = self.calculate_rsi(df).iloc[-1]
+                    
+                    macd, signal, histogram = self.calculate_macd(df)
+                    macd_value = macd.iloc[-1]
+                    signal_value = signal.iloc[-1]
+                    histogram_value = histogram.iloc[-1]
+                    
+                    upper_band, middle_band, lower_band = self.calculate_bollinger_bands(df)
+                    upper_value = upper_band.iloc[-1]
+                    middle_value = middle_band.iloc[-1]
+                    lower_value = lower_band.iloc[-1]
+                    
+                    # Tính xu hướng dựa trên SMA
+                    current_price = df["close"].iloc[-1]
+                    trend = "neutral"
+                    
+                    if current_price > sma_50 and sma_20 > sma_50:
+                        trend = "bullish"
+                    elif current_price < sma_50 and sma_20 < sma_50:
+                        trend = "bearish"
+                    
+                    # Tính tín hiệu dựa trên RSI
+                    rsi_signal = "neutral"
+                    
+                    if rsi > 70:
+                        rsi_signal = "overbought"
+                    elif rsi < 30:
+                        rsi_signal = "oversold"
+                    
+                    # Tín hiệu MACD
+                    macd_signal = "neutral"
+                    
+                    if macd_value > signal_value and histogram_value > 0:
+                        macd_signal = "bullish"
+                    elif macd_value < signal_value and histogram_value < 0:
+                        macd_signal = "bearish"
+                    
+                    # Đánh giá tổng hợp
+                    signals_count = {
+                        "bullish": 0,
+                        "bearish": 0,
+                        "neutral": 0
+                    }
+                    
+                    if trend == "bullish":
+                        signals_count["bullish"] += 1
+                    elif trend == "bearish":
+                        signals_count["bearish"] += 1
+                    else:
+                        signals_count["neutral"] += 1
+                    
+                    if rsi_signal == "overbought":
+                        signals_count["bearish"] += 1
+                    elif rsi_signal == "oversold":
+                        signals_count["bullish"] += 1
+                    else:
+                        signals_count["neutral"] += 1
+                    
+                    if macd_signal == "bullish":
+                        signals_count["bullish"] += 1
+                    elif macd_signal == "bearish":
+                        signals_count["bearish"] += 1
+                    else:
+                        signals_count["neutral"] += 1
+                    
+                    # Xác định tín hiệu cuối cùng
+                    overall_signal = "neutral"
+                    
+                    if signals_count["bullish"] > signals_count["bearish"]:
+                        overall_signal = "bullish"
+                    elif signals_count["bearish"] > signals_count["bullish"]:
+                        overall_signal = "bearish"
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "price": current_price,
+                        "indicators": {
+                            "sma": {
+                                "sma20": sma_20,
+                                "sma50": sma_50,
+                                "sma200": sma_200
+                            },
+                            "ema": {
+                                "ema12": ema_12,
+                                "ema26": ema_26
+                            },
+                            "rsi": rsi,
+                            "macd": {
+                                "macd": macd_value,
+                                "signal": signal_value,
+                                "histogram": histogram_value
+                            },
+                            "bollinger_bands": {
+                                "upper": upper_value,
+                                "middle": middle_value,
+                                "lower": lower_value
+                            }
+                        },
+                        "signals": {
+                            "trend": trend,
+                            "rsi": rsi_signal,
+                            "macd": macd_signal,
+                            "overall": overall_signal
+                        }
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi tính chỉ báo cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+
+    def get_market_regime(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Xác định chế độ thị trường (trending, ranging, volatile)
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1d']
+        :return: Dict chứa kết quả phân tích chế độ thị trường
+        """
+        if not symbols:
+            symbols = self.symbols[:2]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1d']
+            
+        logger.info(f"Phân tích chế độ thị trường cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính các chỉ số biến động
+                    df['returns'] = df['close'].pct_change()
+                    volatility = df['returns'].std() * 100  # Độ biến động chuẩn hoá
+                    
+                    # Tính xu hướng với chỉ số ADX
+                    df['tr1'] = abs(df['high'] - df['low'])
+                    df['tr2'] = abs(df['high'] - df['close'].shift(1))
+                    df['tr3'] = abs(df['low'] - df['close'].shift(1))
+                    df['tr'] = df[['tr1', 'tr2', 'tr3']].max(axis=1)
+                    df['atr'] = df['tr'].rolling(window=14).mean()
+                    
+                    # Tính +DM và -DM
+                    df['up_move'] = df['high'] - df['high'].shift(1)
+                    df['down_move'] = df['low'].shift(1) - df['low']
+                    
+                    df['+dm'] = ((df['up_move'] > df['down_move']) & (df['up_move'] > 0)) * df['up_move']
+                    df['-dm'] = ((df['down_move'] > df['up_move']) & (df['down_move'] > 0)) * df['down_move']
+                    
+                    # Tính +DI và -DI
+                    df['+di'] = 100 * (df['+dm'] / df['atr']).rolling(window=14).mean()
+                    df['-di'] = 100 * (df['-dm'] / df['atr']).rolling(window=14).mean()
+                    
+                    # Tính DX và ADX
+                    df['dx'] = 100 * abs(df['+di'] - df['-di']) / (df['+di'] + df['-di'])
+                    df['adx'] = df['dx'].rolling(window=14).mean()
+                    
+                    # Lấy giá trị ADX
+                    try:
+                        adx = df['adx'].iloc[-1]
+                    except:
+                        adx = 0
+                    
+                    # Phân loại chế độ thị trường
+                    regime = "undetermined"
+                    regime_strength = "neutral"
+                    
+                    if adx > 25:
+                        regime = "trending"
+                        if adx > 50:
+                            regime_strength = "strong"
+                        else:
+                            regime_strength = "moderate"
+                    else:
+                        if volatility > 3:  # Ngưỡng biến động cao
+                            regime = "volatile"
+                            if volatility > 5:
+                                regime_strength = "strong"
+                            else:
+                                regime_strength = "moderate"
+                        else:
+                            regime = "ranging"
+                            if volatility < 1:
+                                regime_strength = "strong"
+                            else:
+                                regime_strength = "moderate"
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "regime": regime,
+                        "strength": regime_strength,
+                        "metrics": {
+                            "adx": adx,
+                            "volatility": volatility,
+                            "plus_di": df['+di'].iloc[-1] if '+di' in df else 0,
+                            "minus_di": df['-di'].iloc[-1] if '-di' in df else 0,
+                        }
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi phân tích chế độ thị trường cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_market_forecast(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Dự báo xu hướng thị trường
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1d']
+        :return: Dict chứa kết quả dự báo thị trường
+        """
+        if not symbols:
+            symbols = self.symbols[:2]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1d']
+            
+        logger.info(f"Dự báo thị trường cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính chỉ báo
+                    sma_20 = self.calculate_sma(df, 20)
+                    sma_50 = self.calculate_sma(df, 50)
+                    current_price = df['close'].iloc[-1]
+                    
+                    # Dự báo xu hướng giá
+                    price_trend = "neutral"
+                    if current_price > sma_20.iloc[-1] and sma_20.iloc[-1] > sma_50.iloc[-1]:
+                        price_trend = "bullish"
+                    elif current_price < sma_20.iloc[-1] and sma_20.iloc[-1] < sma_50.iloc[-1]:
+                        price_trend = "bearish"
+                    
+                    # Dự báo mức biến động 
+                    returns = df['close'].pct_change()
+                    volatility = returns.std() * 100
+                    avg_volatility = returns.rolling(window=20).std().mean() * 100
+                    
+                    volatility_forecast = "normal"
+                    if volatility > avg_volatility * 1.5:
+                        volatility_forecast = "high"
+                    elif volatility < avg_volatility * 0.5:
+                        volatility_forecast = "low"
+                    
+                    # Dự báo mức hỗ trợ và kháng cự
+                    sr_levels = self.identify_support_resistance(df)
+                    support_levels = [level for level in sr_levels if level['type'] == 'Hỗ trợ']
+                    resistance_levels = [level for level in sr_levels if level['type'] == 'Kháng cự']
+                    
+                    # Sắp xếp và lấy các mức gần nhất
+                    support_levels.sort(key=lambda x: abs(x['value'] - current_price))
+                    resistance_levels.sort(key=lambda x: abs(x['value'] - current_price))
+                    
+                    nearest_support = support_levels[0]['value'] if support_levels else None
+                    nearest_resistance = resistance_levels[0]['value'] if resistance_levels else None
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "price_trend": price_trend,
+                        "volatility_forecast": volatility_forecast,
+                        "nearest_support": nearest_support,
+                        "nearest_resistance": nearest_resistance,
+                        "price_target": {
+                            "short_term": current_price * (1.05 if price_trend == "bullish" else 0.95),
+                            "medium_term": current_price * (1.1 if price_trend == "bullish" else 0.9)
+                        },
+                        "confidence": 0.7  # Độ tin cậy của dự báo
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi dự báo thị trường cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_trading_recommendation(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Đưa ra khuyến nghị giao dịch
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1h', '4h']
+        :return: Dict chứa kết quả khuyến nghị giao dịch
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1h', '4h']
+            
+        logger.info(f"Khuyến nghị giao dịch cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính các chỉ báo
+                    sma_20 = self.calculate_sma(df, 20)
+                    sma_50 = self.calculate_sma(df, 50)
+                    rsi = self.calculate_rsi(df)
+                    macd, signal, histogram = self.calculate_macd(df)
+                    upper_band, middle_band, lower_band = self.calculate_bollinger_bands(df)
+                    
+                    # Phân tích chỉ báo
+                    current_price = df['close'].iloc[-1]
+                    
+                    # Tín hiệu từ SMA
+                    sma_signal = "neutral"
+                    if current_price > sma_20.iloc[-1] and sma_20.iloc[-1] > sma_50.iloc[-1]:
+                        sma_signal = "buy"
+                    elif current_price < sma_20.iloc[-1] and sma_20.iloc[-1] < sma_50.iloc[-1]:
+                        sma_signal = "sell"
+                    
+                    # Tín hiệu từ RSI
+                    rsi_signal = "neutral"
+                    rsi_value = rsi.iloc[-1]
+                    if rsi_value < 30:
+                        rsi_signal = "buy"  # Quá bán
+                    elif rsi_value > 70:
+                        rsi_signal = "sell"  # Quá mua
+                    
+                    # Tín hiệu từ MACD
+                    macd_signal_result = "neutral"
+                    if macd.iloc[-1] > signal.iloc[-1] and macd.iloc[-2] <= signal.iloc[-2]:
+                        macd_signal_result = "buy"  # Cắt lên
+                    elif macd.iloc[-1] < signal.iloc[-1] and macd.iloc[-2] >= signal.iloc[-2]:
+                        macd_signal_result = "sell"  # Cắt xuống
+                    
+                    # Tín hiệu từ Bollinger Bands
+                    bb_signal = "neutral"
+                    if current_price < lower_band.iloc[-1]:
+                        bb_signal = "buy"  # Chạm dải dưới
+                    elif current_price > upper_band.iloc[-1]:
+                        bb_signal = "sell"  # Chạm dải trên
+                    
+                    # Kết hợp các tín hiệu
+                    signals = {
+                        "sma": sma_signal,
+                        "rsi": rsi_signal,
+                        "macd": macd_signal_result,
+                        "bb": bb_signal
+                    }
+                    
+                    buy_count = sum(1 for signal in signals.values() if signal == "buy")
+                    sell_count = sum(1 for signal in signals.values() if signal == "sell")
+                    
+                    final_recommendation = "neutral"
+                    if buy_count > sell_count and buy_count >= 2:
+                        final_recommendation = "buy"
+                    elif sell_count > buy_count and sell_count >= 2:
+                        final_recommendation = "sell"
+                    
+                    # Tính mức giá vào lệnh và stop loss
+                    entry_price = current_price
+                    
+                    # Tính stop loss và take profit dựa trên ATR
+                    atr = self.calculate_atr(df).iloc[-1]
+                    
+                    stop_loss = None
+                    take_profit = None
+                    
+                    if final_recommendation == "buy":
+                        stop_loss = entry_price - (2 * atr)
+                        take_profit = entry_price + (3 * atr)
+                    elif final_recommendation == "sell":
+                        stop_loss = entry_price + (2 * atr)
+                        take_profit = entry_price - (3 * atr)
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "recommendation": final_recommendation,
+                        "current_price": current_price,
+                        "entry_price": entry_price,
+                        "stop_loss": stop_loss,
+                        "take_profit": take_profit,
+                        "signals": signals,
+                        "metrics": {
+                            "rsi": rsi_value,
+                            "sma20": sma_20.iloc[-1],
+                            "sma50": sma_50.iloc[-1],
+                            "macd": macd.iloc[-1],
+                            "signal": signal.iloc[-1],
+                            "bb_upper": upper_band.iloc[-1],
+                            "bb_lower": lower_band.iloc[-1]
+                        }
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy khuyến nghị giao dịch cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_trading_signals(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy tín hiệu giao dịch
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1h', '4h']
+        :return: Dict chứa kết quả tín hiệu giao dịch
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1h', '4h']
+            
+        logger.info(f"Lấy tín hiệu giao dịch cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy khuyến nghị giao dịch
+                    recommendation = self.get_trading_recommendation([symbol], [timeframe])
+                    
+                    if recommendation["status"] == "success" and symbol in recommendation["data"]:
+                        symbol_data = recommendation["data"][symbol]
+                        if timeframe in symbol_data and symbol_data[timeframe]["status"] == "success":
+                            # Lấy dữ liệu từ khuyến nghị
+                            rec_data = symbol_data[timeframe]
+                            
+                            # Tính toán thêm thông tin tín hiệu
+                            signal_strength = "medium"
+                            signal_type = rec_data["recommendation"].upper()
+                            
+                            # Tính độ mạnh của tín hiệu
+                            buy_signals = sum(1 for signal in rec_data["signals"].values() if signal == "buy")
+                            sell_signals = sum(1 for signal in rec_data["signals"].values() if signal == "sell")
+                            
+                            if signal_type == "BUY" and buy_signals >= 3:
+                                signal_strength = "strong"
+                            elif signal_type == "SELL" and sell_signals >= 3:
+                                signal_strength = "strong"
+                            elif signal_type == "NEUTRAL":
+                                signal_strength = "weak"
+                            
+                            # Thêm vào kết quả
+                            result["data"][symbol][timeframe] = {
+                                "status": "success",
+                                "signal": {
+                                    "type": signal_type,
+                                    "strength": signal_strength,
+                                    "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    "price": rec_data["current_price"],
+                                    "timeframe": timeframe,
+                                    "stop_loss": rec_data["stop_loss"],
+                                    "take_profit": rec_data["take_profit"]
+                                }
+                            }
+                        else:
+                            result["data"][symbol][timeframe] = {
+                                "status": "error",
+                                "message": "Không có dữ liệu khuyến nghị"
+                            }
+                    else:
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không thể lấy khuyến nghị"
+                        }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy tín hiệu giao dịch cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_market_trends(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy xu hướng thị trường
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1d']
+        :return: Dict chứa kết quả xu hướng thị trường
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1d']
+            
+        logger.info(f"Lấy xu hướng thị trường cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính các chỉ báo
+                    sma_20 = self.calculate_sma(df, 20)
+                    sma_50 = self.calculate_sma(df, 50)
+                    sma_200 = self.calculate_sma(df, 200) if len(df) >= 200 else None
+                    
+                    # Phân tích xu hướng
+                    current_price = df['close'].iloc[-1]
+                    
+                    short_term_trend = "Sideway"
+                    if current_price > sma_20.iloc[-1] and sma_20.iloc[-1] > sma_20.iloc[-5]:
+                        short_term_trend = "Uptrend"
+                    elif current_price < sma_20.iloc[-1] and sma_20.iloc[-1] < sma_20.iloc[-5]:
+                        short_term_trend = "Downtrend"
+                    
+                    medium_term_trend = "Sideway"
+                    if sma_50.iloc[-1] > sma_50.iloc[-20]:
+                        medium_term_trend = "Uptrend"
+                    elif sma_50.iloc[-1] < sma_50.iloc[-20]:
+                        medium_term_trend = "Downtrend"
+                    
+                    long_term_trend = "Sideway"
+                    if sma_200 is not None:
+                        if sma_200.iloc[-1] > sma_200.iloc[-50]:
+                            long_term_trend = "Uptrend"
+                        elif sma_200.iloc[-1] < sma_200.iloc[-50]:
+                            long_term_trend = "Downtrend"
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "trends": {
+                            "short_term": short_term_trend,
+                            "medium_term": medium_term_trend,
+                            "long_term": long_term_trend
+                        },
+                        "price": current_price,
+                        "indicators": {
+                            "sma20": sma_20.iloc[-1],
+                            "sma50": sma_50.iloc[-1],
+                            "sma200": sma_200.iloc[-1] if sma_200 is not None else None
+                        }
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy xu hướng thị trường cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_market_volumes(self, symbols: List[str] = None, timeframes: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy khối lượng giao dịch
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :param timeframes: Danh sách khung thời gian, mặc định là ['1d']
+        :return: Dict chứa kết quả khối lượng giao dịch
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+        
+        if not timeframes:
+            timeframes = ['1d']
+            
+        logger.info(f"Lấy khối lượng giao dịch cho {len(symbols)} cặp tiền và {len(timeframes)} khung thời gian")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            result["data"][symbol] = {}
+            
+            for timeframe in timeframes:
+                try:
+                    # Lấy dữ liệu lịch sử
+                    df = self.get_historical_data(symbol, timeframe, 100)
+                    
+                    if df.empty:
+                        logger.warning(f"Không có dữ liệu cho {symbol} - {timeframe}")
+                        result["data"][symbol][timeframe] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu"
+                        }
+                        continue
+                    
+                    # Tính chỉ báo về khối lượng
+                    volume = df['volume']
+                    avg_volume = volume.rolling(window=20).mean()
+                    volume_change = (volume.iloc[-1] / avg_volume.iloc[-1] - 1) * 100
+                    
+                    # Phân tích khối lượng
+                    volume_trend = "normal"
+                    if volume.iloc[-1] > avg_volume.iloc[-1] * 1.5:
+                        volume_trend = "increasing"
+                    elif volume.iloc[-1] < avg_volume.iloc[-1] * 0.5:
+                        volume_trend = "decreasing"
+                    
+                    # Tính OBV (On-Balance Volume)
+                    df['direction'] = np.where(df['close'] > df['close'].shift(1), 1, -1)
+                    df.loc[df['close'] == df['close'].shift(1), 'direction'] = 0
+                    df['obv'] = (df['volume'] * df['direction']).cumsum()
+                    
+                    # Thêm vào kết quả
+                    result["data"][symbol][timeframe] = {
+                        "status": "success",
+                        "volumes": {
+                            "current": float(volume.iloc[-1]),
+                            "average": float(avg_volume.iloc[-1]),
+                            "change": float(volume_change),
+                            "trend": volume_trend
+                        },
+                        "obv": {
+                            "current": float(df['obv'].iloc[-1]),
+                            "previous": float(df['obv'].iloc[-2])
+                        }
+                    }
+                    
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy khối lượng giao dịch cho {symbol} - {timeframe}: {str(e)}")
+                    result["data"][symbol][timeframe] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+        
+        return result
+    
+    def get_24h_volumes(self, symbols: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy khối lượng giao dịch 24h
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :return: Dict chứa kết quả khối lượng giao dịch 24h
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+            
+        logger.info(f"Lấy khối lượng giao dịch 24h cho {len(symbols)} cặp tiền")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        for symbol in symbols:
+            try:
+                # Lấy thông tin 24h từ API
+                if hasattr(self.client, 'futures_ticker'):
+                    ticker = self.client.futures_ticker(symbol=symbol)
+                    
+                    if ticker:
+                        volume_24h = float(ticker.get('volume', 0))
+                        quote_volume_24h = float(ticker.get('quoteVolume', 0))
+                        
+                        result["data"][symbol] = {
+                            "status": "success",
+                            "volume_24h": volume_24h,
+                            "quote_volume_24h": quote_volume_24h,
+                            "trades_24h": int(ticker.get('count', 0))
+                        }
+                    else:
+                        result["data"][symbol] = {
+                            "status": "error",
+                            "message": "Không lấy được dữ liệu từ API"
+                        }
+                else:
+                    # Sử dụng dữ liệu lịch sử 1h, 24 nến
+                    df = self.get_historical_data(symbol, '1h', 24)
+                    
+                    if not df.empty:
+                        volume_24h = df['volume'].sum()
+                        
+                        result["data"][symbol] = {
+                            "status": "success",
+                            "volume_24h": float(volume_24h),
+                            "average_hourly": float(volume_24h / 24)
+                        }
+                    else:
+                        result["data"][symbol] = {
+                            "status": "error",
+                            "message": "Không có dữ liệu lịch sử"
+                        }
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy khối lượng giao dịch 24h cho {symbol}: {str(e)}")
+                result["data"][symbol] = {
+                    "status": "error",
+                    "message": str(e)
+                }
+        
+        return result
+    
+    def get_market_summary(self, symbols: List[str] = None) -> Dict[str, Any]:
+        """
+        Lấy tóm tắt thị trường
+        
+        :param symbols: Danh sách cặp tiền cần phân tích, mặc định là self.symbols
+        :return: Dict chứa kết quả tóm tắt thị trường
+        """
+        if not symbols:
+            symbols = self.symbols[:3]  # Chỉ lấy vài cặp đại diện
+            
+        logger.info(f"Lấy tóm tắt thị trường cho {len(symbols)} cặp tiền")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        # Lấy các chỉ báo tổng hợp
+        for symbol in symbols:
+            try:
+                # Lấy giá hiện tại
+                price_info = self.get_current_price(symbol)
+                
+                if price_info["status"] == "success":
+                    current_price = price_info["price"]
+                    change_24h = price_info["change_24h"]
+                    
+                    # Lấy chỉ báo kỹ thuật
+                    indicator_1h = self.get_technical_indicators([symbol], ['1h'])
+                    
+                    # Lấy xu hướng
+                    trend_1d = self.get_market_trends([symbol], ['1d'])
+                    
+                    # Tổng hợp dữ liệu
+                    summary = {
+                        "price": current_price,
+                        "change_24h": change_24h,
+                        "signal": "NEUTRAL"
+                    }
+                    
+                    # Thêm tín hiệu từ chỉ báo 1h nếu có
+                    if indicator_1h["status"] == "success" and symbol in indicator_1h["data"]:
+                        if "1h" in indicator_1h["data"][symbol]:
+                            indicator_data = indicator_1h["data"][symbol]["1h"]
+                            if "signals" in indicator_data and "overall" in indicator_data["signals"]:
+                                summary["signal"] = indicator_data["signals"]["overall"]
+                    
+                    # Thêm xu hướng từ dữ liệu 1d nếu có
+                    if trend_1d["status"] == "success" and symbol in trend_1d["data"]:
+                        if "1d" in trend_1d["data"][symbol]:
+                            trend_data = trend_1d["data"][symbol]["1d"]
+                            if "trends" in trend_data:
+                                summary["trends"] = trend_data["trends"]
+                    
+                    result["data"][symbol] = summary
+                else:
+                    result["data"][symbol] = {
+                        "status": "error",
+                        "message": "Không lấy được giá hiện tại"
+                    }
+                
+            except Exception as e:
+                logger.error(f"Lỗi khi lấy tóm tắt thị trường cho {symbol}: {str(e)}")
+                result["data"][symbol] = {
+                    "status": "error",
+                    "message": str(e)
+                }
+        
+        return result
+    
+    def get_btc_levels(self) -> Dict[str, Any]:
+        """
+        Lấy các mức giá Bitcoin quan trọng
+        
+        :return: Dict chứa kết quả các mức giá Bitcoin
+        """
+        logger.info("Phân tích các mức giá Bitcoin quan trọng")
+        
+        result = {
+            "status": "success",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": {}
+        }
+        
+        try:
+            # Lấy dữ liệu lịch sử
+            df = self.get_historical_data("BTCUSDT", "1d", 100)
+            
+            if df.empty:
+                logger.warning("Không có dữ liệu lịch sử cho Bitcoin")
+                return {
+                    "status": "error",
+                    "message": "Không có dữ liệu lịch sử"
+                }
+            
+            # Tính các mức hỗ trợ và kháng cự
+            sr_levels = self.identify_support_resistance(df)
+            
+            # Lấy giá hiện tại
+            current_price = df["close"].iloc[-1]
+            
+            # Phân loại các mức theo loại và khoảng cách
+            support_levels = [level for level in sr_levels if level['type'] == 'Hỗ trợ' and level['value'] < current_price]
+            resistance_levels = [level for level in sr_levels if level['type'] == 'Kháng cự' and level['value'] > current_price]
+            
+            # Sắp xếp theo khoảng cách
+            support_levels.sort(key=lambda x: current_price - x['value'])
+            resistance_levels.sort(key=lambda x: x['value'] - current_price)
+            
+            # Lấy các mức đáng chú ý
+            result["data"] = {
+                "current_price": current_price,
+                "support_levels": [level['value'] for level in support_levels[:3]],
+                "resistance_levels": [level['value'] for level in resistance_levels[:3]],
+                "psychological_levels": [
+                    round(current_price / 10000) * 10000,  # Mức tâm lý gần nhất 10k
+                    round(current_price / 5000) * 5000,    # Mức tâm lý gần nhất 5k
+                    round(current_price / 1000) * 1000     # Mức tâm lý gần nhất 1k
+                ]
+            }
+            
+            # Thêm các vùng giá lịch sử
+            all_time_high = df["high"].max()
+            result["data"]["all_time_high"] = all_time_high
+            
+            # Tính các mức Fibonacci retracement từ đỉnh cao nhất gần đây đến đáy gần đây
+            recent_high = df["high"].iloc[-20:].max()
+            recent_low = df["low"].iloc[-20:].min()
+            
+            range_price = recent_high - recent_low
+            
+            result["data"]["fibonacci_levels"] = {
+                "0.0": recent_low,
+                "0.236": recent_low + 0.236 * range_price,
+                "0.382": recent_low + 0.382 * range_price,
+                "0.5": recent_low + 0.5 * range_price,
+                "0.618": recent_low + 0.618 * range_price,
+                "0.786": recent_low + 0.786 * range_price,
+                "1.0": recent_high
+            }
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích các mức giá Bitcoin: {str(e)}")
+            result = {
+                "status": "error",
+                "message": str(e)
+            }
+        
+        return result
+    
+    def get_signal(self, symbol: str, timeframe: str = '1h') -> Dict[str, Any]:
+        """
+        Lấy tín hiệu giao dịch cho một cặp tiền cụ thể
+        
+        :param symbol: Cặp tiền cần phân tích
+        :param timeframe: Khung thời gian
+        :return: Dict chứa kết quả tín hiệu giao dịch
+        """
+        logger.info(f"Phân tích tín hiệu cho {symbol} - {timeframe}")
+        
+        try:
+            # Lấy dữ liệu lịch sử
+            df = self.get_historical_data(symbol, timeframe, 100)
+            
+            if df.empty:
+                logger.warning(f"Không có dữ liệu lịch sử cho {symbol}")
+                return {
+                    "status": "error",
+                    "message": "Không có dữ liệu lịch sử"
+                }
+            
+            # Tính các chỉ báo
+            sma_20 = self.calculate_sma(df, 20)
+            sma_50 = self.calculate_sma(df, 50)
+            rsi = self.calculate_rsi(df)
+            macd, signal, histogram = self.calculate_macd(df)
+            
+            # Lấy giá hiện tại
+            current_price = df["close"].iloc[-1]
+            
+            # Tín hiệu từ SMA
+            sma_signal = "NEUTRAL"
+            if current_price > sma_20.iloc[-1] and sma_20.iloc[-1] > sma_50.iloc[-1]:
+                sma_signal = "BUY"
+            elif current_price < sma_20.iloc[-1] and sma_20.iloc[-1] < sma_50.iloc[-1]:
+                sma_signal = "SELL"
+            
+            # Tín hiệu từ RSI
+            rsi_signal = "NEUTRAL"
+            rsi_value = rsi.iloc[-1]
+            if rsi_value < 30:
+                rsi_signal = "BUY"  # Quá bán
+            elif rsi_value > 70:
+                rsi_signal = "SELL"  # Quá mua
+            
+            # Tín hiệu từ MACD
+            macd_signal_result = "NEUTRAL"
+            if macd.iloc[-1] > signal.iloc[-1] and macd.iloc[-2] <= signal.iloc[-2]:
+                macd_signal_result = "BUY"  # Cắt lên
+            elif macd.iloc[-1] < signal.iloc[-1] and macd.iloc[-2] >= signal.iloc[-2]:
+                macd_signal_result = "SELL"  # Cắt xuống
+            
+            # Tính tín hiệu tổng hợp
+            signals = [sma_signal, rsi_signal, macd_signal_result]
+            buy_count = signals.count("BUY")
+            sell_count = signals.count("SELL")
+            
+            final_signal = "NEUTRAL"
+            if buy_count > sell_count:
+                final_signal = "BUY"
+            elif sell_count > buy_count:
+                final_signal = "SELL"
+            
+            # Tính độ mạnh tín hiệu
+            signal_strength = "medium"
+            if final_signal == "BUY" and buy_count >= 2:
+                signal_strength = "strong"
+            elif final_signal == "SELL" and sell_count >= 2:
+                signal_strength = "strong"
+            elif final_signal == "NEUTRAL":
+                signal_strength = "weak"
+            
+            return {
+                "status": "success",
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "signal": final_signal,
+                "strength": signal_strength,
+                "price": current_price,
+                "indicators": {
+                    "sma": sma_signal,
+                    "rsi": {
+                        "value": rsi_value,
+                        "signal": rsi_signal
+                    },
+                    "macd": {
+                        "value": macd.iloc[-1],
+                        "signal_line": signal.iloc[-1],
+                        "signal": macd_signal_result
+                    }
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích tín hiệu cho {symbol}: {str(e)}")
+            return {
+                "status": "error",
+                "message": str(e)
+            }
+    
+    def get_trend(self, symbol: str, timeframe: str = '1h') -> Dict[str, Any]:
+        """
+        Lấy xu hướng cho một cặp tiền cụ thể
+        
+        :param symbol: Cặp tiền cần phân tích
+        :param timeframe: Khung thời gian
+        :return: Dict chứa kết quả xu hướng
+        """
+        logger.info(f"Phân tích xu hướng cho {symbol} - {timeframe}")
+        
+        try:
+            # Lấy dữ liệu lịch sử
+            df = self.get_historical_data(symbol, timeframe, 100)
+            
+            if df.empty:
+                logger.warning(f"Không có dữ liệu lịch sử cho {symbol}")
+                return {
+                    "status": "error",
+                    "message": "Không có dữ liệu lịch sử"
+                }
+            
+            # Tính các chỉ báo
+            sma_20 = self.calculate_sma(df, 20)
+            sma_50 = self.calculate_sma(df, 50)
+            sma_200 = self.calculate_sma(df, 200) if len(df) >= 200 else None
+            
+            # Lấy giá hiện tại
+            current_price = df["close"].iloc[-1]
+            
+            # Xác định xu hướng ngắn hạn
+            short_term_trend = "SIDEWAY"
+            if current_price > sma_20.iloc[-1] and sma_20.iloc[-1] > sma_20.iloc[-5]:
+                short_term_trend = "UPTREND"
+            elif current_price < sma_20.iloc[-1] and sma_20.iloc[-1] < sma_20.iloc[-5]:
+                short_term_trend = "DOWNTREND"
+            
+            # Xác định xu hướng trung hạn
+            medium_term_trend = "SIDEWAY"
+            if sma_50.iloc[-1] > sma_50.iloc[-20]:
+                medium_term_trend = "UPTREND"
+            elif sma_50.iloc[-1] < sma_50.iloc[-20]:
+                medium_term_trend = "DOWNTREND"
+            
+            # Xác định xu hướng dài hạn
+            long_term_trend = "SIDEWAY"
+            if sma_200 is not None:
+                if current_price > sma_200.iloc[-1]:
+                    long_term_trend = "UPTREND"
+                elif current_price < sma_200.iloc[-1]:
+                    long_term_trend = "DOWNTREND"
+            
+            # Xác định xu hướng tổng thể
+            trends = [short_term_trend, medium_term_trend, long_term_trend]
+            uptrend_count = trends.count("UPTREND")
+            downtrend_count = trends.count("DOWNTREND")
+            
+            overall_trend = "SIDEWAY"
+            if uptrend_count > downtrend_count:
+                overall_trend = "UPTREND"
+            elif downtrend_count > uptrend_count:
+                overall_trend = "DOWNTREND"
+            
+            return {
+                "status": "success",
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "trend": overall_trend,
+                "trends": {
+                    "short_term": short_term_trend,
+                    "medium_term": medium_term_trend,
+                    "long_term": long_term_trend
+                },
+                "price": current_price,
+                "indicators": {
+                    "sma20": sma_20.iloc[-1],
+                    "sma50": sma_50.iloc[-1],
+                    "sma200": sma_200.iloc[-1] if sma_200 is not None else None
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Lỗi khi phân tích xu hướng cho {symbol}: {str(e)}")
+            return {
+                "status": "error",
+                "message": str(e)
+            }
+    
     def identify_support_resistance(self, df: pd.DataFrame, window_size: int = 10, threshold: float = 0.02) -> List[Dict[str, Any]]:
         """
         Xác định các mức hỗ trợ và kháng cự
