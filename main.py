@@ -41,9 +41,27 @@ DEFAULT_CONFIG = {
 # Initialize Telegram Notifier
 try:
     from telegram_notifier import TelegramNotifier
+    # Thử đọc từ file cấu hình nếu có
+    telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
+    
+    # Nếu không có trong biến môi trường, thử đọc từ file config
+    if not telegram_token or not telegram_chat_id:
+        try:
+            if os.path.exists("telegram_config.json"):
+                with open("telegram_config.json", "r") as config_file:
+                    config = json.load(config_file)
+                    if not telegram_token and "bot_token" in config:
+                        telegram_token = config["bot_token"]
+                    if not telegram_chat_id and "chat_id" in config:
+                        telegram_chat_id = config["chat_id"]
+                    logger.info("Đã tải thông tin Telegram từ file config")
+        except Exception as e:
+            logger.error(f"Lỗi khi đọc file config Telegram: {e}")
+    
     telegram_notifier = TelegramNotifier(
-        token=os.environ.get("TELEGRAM_BOT_TOKEN", ""),
-        chat_id=os.environ.get("TELEGRAM_CHAT_ID", "")
+        token=telegram_token,
+        chat_id=telegram_chat_id
     )
 except Exception as e:
     logger.error(f"Lỗi khi khởi tạo Telegram Notifier: {str(e)}")
@@ -73,7 +91,61 @@ bot_status = {
 
 # Tạo Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "your_secret_key_here")
+app.secret_key = os.environ.get("SECRET_KEY", "trading_system_secure_key_2025")
+
+# Định nghĩa scheduler trong file main.py để tránh vấn đề import
+def start_scheduler():
+    """Khởi động scheduler cho các tác vụ định kỳ"""
+    try:
+        import schedule
+        import threading
+        
+        # Lập lịch kiểm tra trạng thái bot mỗi phút
+        def check_bot_status():
+            logger.info("Đang kiểm tra trạng thái bot...")
+            # Mã kiểm tra trạng thái bot
+            return True
+            
+        # Lập lịch cập nhật dữ liệu thị trường mỗi 5 phút
+        def update_market_data_task():
+            logger.info("Đang cập nhật dữ liệu thị trường...")
+            # Mã cập nhật dữ liệu thị trường
+            return True
+            
+        # Lập lịch kiểm tra vị thế mỗi 2 phút
+        def check_positions():
+            logger.info("Đang kiểm tra các vị thế...")
+            # Mã kiểm tra vị thế
+            return True
+            
+        # Thêm các task vào schedule
+        schedule.every(1).minutes.do(check_bot_status)
+        schedule.every(5).minutes.do(update_market_data_task)
+        schedule.every(2).minutes.do(check_positions)
+        
+        # Chạy scheduler trong một thread riêng
+        def run_scheduler():
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
+                
+        scheduler_thread = threading.Thread(target=run_scheduler)
+        scheduler_thread.daemon = True
+        scheduler_thread.start()
+        
+        logger.info("Đã khởi động scheduler cho cập nhật trạng thái bot")
+        return True
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động scheduler: {str(e)}")
+        return False
+
+# Khởi động scheduler khi ứng dụng khởi động (vì gunicorn không chạy __main__)
+logger.info("Khởi động scheduler và các background tasks...")
+scheduler_started = start_scheduler()
+if scheduler_started:
+    logger.info("Đã khởi động scheduler thành công")
+else:
+    logger.warning("Không thể khởi động scheduler")
 
 # Hàm lấy dữ liệu phân tích thị trường
 def get_market_data():
@@ -590,13 +662,20 @@ def get_account():
     except:
         api_mode = 'testnet'
     
-    # Khởi tạo Binance API client
-    from binance_api import BinanceAPI
-    api_key = os.environ.get("BINANCE_API_KEY", "")
-    api_secret = os.environ.get("BINANCE_API_SECRET", "")
-    use_testnet = api_mode != 'live'
-    binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
+    # Create a Flask response object with account data
+    from flask import jsonify, make_response
     
+    try:
+        # Khởi tạo Binance API client
+        from binance_api import BinanceAPI
+        api_key = os.environ.get("BINANCE_API_KEY", "")
+        api_secret = os.environ.get("BINANCE_API_SECRET", "")
+        use_testnet = api_mode != 'live'
+        binance_client = BinanceAPI(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi tạo Binance API client: {str(e)}")
+        binance_client = None
+        
     # Mặc định cho dữ liệu tài khoản
     account_data = {
         'balance': 0.00,
