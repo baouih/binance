@@ -92,6 +92,8 @@ bot_status = {
 # Tạo Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "trading_system_secure_key_2025")
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Tắt cache cho tất cả file tĩnh
+app.config['TEMPLATES_AUTO_RELOAD'] = True  # Tự động tải lại templates
 
 # Định nghĩa scheduler trong file main.py để tránh vấn đề import
 def start_scheduler():
@@ -346,15 +348,19 @@ def index():
         }
         
         # Cố gắng lấy dữ liệu tài khoản từ API
-        account_info = get_account().json
-        try:
-            # Thử lấy trạng thái bot thực tế
-            bot_status['running'] = is_bot_running()
-            bot_status['account_balance'] = account_info.get('balance', 0)
-            bot_status['positions'] = account_info.get('positions', [])
-            bot_status['logs'] = get_recent_logs(5) or []
-        except Exception as status_error:
-            logger.warning(f"Không thể lấy trạng thái bot: {str(status_error)}")
+        account_response = get_account()
+        if hasattr(account_response, 'json'):
+            account_info = account_response.json
+            try:
+                # Thử lấy trạng thái bot thực tế
+                bot_status['running'] = is_bot_running()
+                bot_status['account_balance'] = account_info.get('balance', 0)
+                bot_status['positions'] = account_info.get('positions', [])
+                bot_status['logs'] = get_recent_logs(5) or []
+            except Exception as status_error:
+                logger.warning(f"Không thể lấy trạng thái bot: {str(status_error)}")
+        else:
+            logger.warning("Không thể lấy thông tin tài khoản từ API")
             
         # Debug thông tin market_data
         logger.info(f"Dashboard loaded successfully: BTC price = ${market_data.get('btc_price', 'N/A')}")
@@ -386,7 +392,8 @@ def index():
         })
         
         # Render template với dữ liệu đã chuẩn bị
-        return render_template('index.html', status=bot_status)
+        response = render_template('index.html', status=bot_status)
+        return response
     except Exception as e:
         logger.error(f"Error loading dashboard: {str(e)}")
         # Return with empty data in case of error
