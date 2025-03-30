@@ -1905,4 +1905,4 @@ def start_scheduler():
 if __name__ == '__main__':
     logger.info("Starting background tasks and scheduler...")
     start_scheduler()  # Kích hoạt scheduler để chạy các task định kỳ
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
