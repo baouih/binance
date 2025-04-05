@@ -1,0 +1,24 @@
+2025-03-05 04:08:41,638 - setup_always_on - INFO - Đang thiết lập dịch vụ Always On...
+2025-03-05 04:08:41,638 - setup_always_on - INFO - Khởi động dịch vụ keep-alive trên cổng 8080
+2025-03-05 04:08:41,639 - setup_always_on - INFO - Đã bắt đầu dịch vụ keep-alive trong nền
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 
+=== HƯỚNG DẪN THIẾT LẬP UPTIME ROBOT ===
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 1. Truy cập website: https://uptimerobot.com/
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 2. Đăng ký tài khoản miễn phí
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 3. Sau khi đăng nhập, chọn 'Add New Monitor'
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 4. Chọn 'HTTP(s)' làm Monitor Type
+2025-03-05 04:08:41,639 - setup_always_on - INFO - 5. Đặt tên cho monitor, ví dụ: 'Binance Trader Bot'
+2025-03-05 04:08:41,640 - setup_always_on - INFO - 6. Nhập URL của Replit của bạn: https://YourReplitURL.replit.app
+2025-03-05 04:08:41,640 - setup_always_on - INFO - 7. Để mọi cài đặt khác ở mặc định và lưu
+2025-03-05 04:08:41,640 - setup_always_on - INFO - 8. UptimeRobot sẽ tự động ping ứng dụng của bạn mỗi 5 phút
+2025-03-05 04:08:41,640 - setup_always_on - INFO - 
+Lưu ý: Tài khoản miễn phí của UptimeRobot cho phép 50 monitors
+2025-03-05 04:08:41,640 - setup_always_on - INFO - Keep-alive đã được thiết lập thành công!
+ * Serving Flask app 'setup_always_on'
+ * Debug mode: off
+2025-03-05 04:08:41,651 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://172.31.128.65:8080
+2025-03-05 04:08:41,651 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-05 04:08:44,216 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 04:08:44] "GET /status HTTP/1.1" 200 -

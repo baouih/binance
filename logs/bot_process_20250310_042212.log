@@ -1,0 +1,3 @@
+usage: bot_startup.py [-h] [--risk-level {10,15,20,30}] [--no-trading]
+                      [--testnet]
+bot_startup.py: error: unrecognized arguments: --test-mode

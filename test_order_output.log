@@ -1,0 +1,47 @@
+2025-03-08 15:57:15,622 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-08 15:57:15,622 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-08 15:57:15,622 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-08 15:57:15,623 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-08 15:57:15,816 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-08 15:57:15,816 - test_order - INFO - Số dư tài khoản hiện tại: 13567.33514302 USDT
+2025-03-08 15:57:15,978 - test_order - INFO - Giá hiện tại của SOLUSDT: 180.0 USDT
+2025-03-08 15:57:16,132 - test_order - INFO - Đã thiết lập đòn bẩy 5x cho SOLUSDT
+2025-03-08 15:57:16,132 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-08 15:57:16,133 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-08 15:57:16,133 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-08 15:57:16,133 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-08 15:57:16,133 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-08 15:57:16,133 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-08 15:57:16,133 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-08 15:57:16,295 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-08 15:57:16,303 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-08 15:57:16,466 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-08 15:57:16,472 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-08 15:57:16,631 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-08 15:57:16,636 - test_order - INFO - Thông số giao dịch:
+2025-03-08 15:57:16,636 - test_order - INFO - - Symbol: SOLUSDT
+2025-03-08 15:57:16,636 - test_order - INFO - - Đòn bẩy: 5x
+2025-03-08 15:57:16,636 - test_order - INFO - - Kích thước vị thế: 1.884 SOL (≈ 339.12 USDT)
+2025-03-08 15:57:16,636 - test_order - INFO - - Giá hiện tại: 180.0 USDT
+2025-03-08 15:57:16,637 - test_order - INFO - - Stop Loss: 171.0 USDT (5.0%)
+2025-03-08 15:57:16,637 - test_order - INFO - - Take Profit: 193.5 USDT (7.5%)
+Xác nhận đặt lệnh BUY MARKET? (y/n): 2025-03-08 15:57:16,637 - test_order - INFO - Kiểm tra các phương thức có sẵn trong API:
+2025-03-08 15:57:16,637 - test_order - INFO - Các phương thức: cancel_order, convert_klines_to_dataframe, create_order, download_historical_data, futures_account_balance, futures_account_trades, futures_cancel_all_orders, futures_change_leverage, futures_close_position, futures_create_order, futures_exchange_info, futures_get_position, futures_klines, futures_set_stop_loss, futures_set_take_profit, futures_ticker_price, get_24h_ticker, get_account, get_account_status, get_aggregate_trades, get_all_orders, get_avg_price, get_book_ticker, get_exchange_info, get_futures_account, get_futures_position_risk, get_historical_klines, get_historical_trades, get_klines, get_open_orders, get_order, get_order_book, get_price_ticker, get_recent_trades, get_symbol_info, get_symbol_ticker, get_trade_fee, test_order
+2025-03-08 15:57:16,637 - binance_api - INFO - Lấy thông tin chi tiết về Binance Futures...
+2025-03-08 15:57:16,802 - binance_api - INFO - Đã lấy thông tin chi tiết Binance Futures thành công
+2025-03-08 15:57:16,810 - test_order - INFO - Kích thước vị thế sau khi làm tròn: 1.0 SOLUSDT
+2025-03-08 15:57:16,810 - test_order - INFO - Thử đặt lệnh với tham số: {'symbol': 'SOLUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 1.0, 'newOrderRespType': 'RESULT'}
+2025-03-08 15:57:17,244 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=BUY&type=MARKET&quantity=1.0&newOrderRespType=RESULT&timestamp=1741449436810&signature=22ed29fdd60efe698574b08673a955578e0cfcda7b3a457d6b4a85969618bfad
+2025-03-08 15:57:17,244 - test_order - INFO - Đã đặt lệnh MARKET BUY thành công: {
+  "error": "400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=BUY&type=MARKET&quantity=1.0&newOrderRespType=RESULT&timestamp=1741449436810&signature=22ed29fdd60efe698574b08673a955578e0cfcda7b3a457d6b4a85969618bfad"
+}
+2025-03-08 15:57:17,245 - test_order - INFO - Thử đặt lệnh Stop Loss với tham số: {'symbol': 'SOLUSDT', 'side': 'SELL', 'type': 'STOP_MARKET', 'stopPrice': 171.0, 'closePosition': True}
+2025-03-08 15:57:17,395 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=SELL&type=STOP_MARKET&stopPrice=171.0&closePosition=True&timestamp=1741449437245&signature=8d5bd8768b62a0976740d7ccccfcc52672ddc36035ba263ac654a6001933125d
+2025-03-08 15:57:17,395 - test_order - INFO - Đã đặt lệnh Stop Loss thành công: {
+  "error": "400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=SELL&type=STOP_MARKET&stopPrice=171.0&closePosition=True&timestamp=1741449437245&signature=8d5bd8768b62a0976740d7ccccfcc52672ddc36035ba263ac654a6001933125d"
+}
+2025-03-08 15:57:17,395 - test_order - INFO - Thử đặt lệnh Take Profit với tham số: {'symbol': 'SOLUSDT', 'side': 'SELL', 'type': 'TAKE_PROFIT_MARKET', 'stopPrice': 193.5, 'closePosition': True}
+2025-03-08 15:57:17,546 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=193.5&closePosition=True&timestamp=1741449437395&signature=c3d4ec02659e5e55ab510ac7922d84e738701b31cdd0753ddbe6cc028b6c3299
+2025-03-08 15:57:17,546 - test_order - INFO - Đã đặt lệnh Take Profit thành công: {
+  "error": "400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=193.5&closePosition=True&timestamp=1741449437395&signature=c3d4ec02659e5e55ab510ac7922d84e738701b31cdd0753ddbe6cc028b6c3299"
+}

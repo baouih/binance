@@ -1,0 +1,308 @@
+2025-03-27 14:47:10,650 - core_strategies_test - INFO - Bắt đầu test các chiến thuật core lúc: 2025-03-27 14:47:10.650538
+2025-03-27 14:47:10,650 - core_strategies_test - INFO - Test BTC-USD trên khung thời gian 1h
+2025-03-27 14:47:10,860 - core_strategies_test - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 30 ngày)
+2025-03-27 14:47:11,243 - core_strategies_test - INFO - Đã tải 721 dòng dữ liệu
+2025-03-27 14:47:11,244 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BTC-USD
+2025-03-27 14:47:11,694 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:11,707 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:11,708 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:11,710 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 143, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:11,711 - core_strategies_test - INFO - Test sideways_market_strategy cho BTC-USD
+2025-03-27 14:47:11,924 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:11,936 - sideways_detector - INFO - Đã tính ATR volatility cho 708 dòng dữ liệu
+2025-03-27 14:47:11,947 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:11,949 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:11,990 - sideways_detector - INFO - Đã phát hiện 7 giai đoạn thị trường đi ngang
+2025-03-27 14:47:11,991 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:11,992 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:11,992 - core_strategies_test - INFO - Test optimized_strategy cho BTC-USD
+2025-03-27 14:47:11,997 - core_strategies_test - INFO - Test BTC-USD trên khung thời gian 4h
+2025-03-27 14:47:12,164 - core_strategies_test - INFO - Tải dữ liệu BTCUSDT từ Binance (4h, 90 ngày)
+2025-03-27 14:47:12,485 - core_strategies_test - INFO - Đã tải 541 dòng dữ liệu
+2025-03-27 14:47:12,485 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BTC-USD
+2025-03-27 14:47:12,486 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:12,494 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:12,494 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:12,495 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 163, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:12,495 - core_strategies_test - INFO - Test sideways_market_strategy cho BTC-USD
+2025-03-27 14:47:12,496 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:12,504 - sideways_detector - INFO - Đã tính ATR volatility cho 528 dòng dữ liệu
+2025-03-27 14:47:12,510 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:12,512 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:12,538 - sideways_detector - INFO - Đã phát hiện 5 giai đoạn thị trường đi ngang
+2025-03-27 14:47:12,538 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:12,538 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:12,539 - core_strategies_test - INFO - Test optimized_strategy cho BTC-USD
+2025-03-27 14:47:12,543 - core_strategies_test - INFO - Test BTC-USD trên khung thời gian 1d
+2025-03-27 14:47:12,707 - core_strategies_test - INFO - Tải dữ liệu BTCUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:47:13,017 - core_strategies_test - INFO - Đã tải 91 dòng dữ liệu
+2025-03-27 14:47:13,018 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BTC-USD
+2025-03-27 14:47:13,019 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:13,025 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:13,025 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:13,026 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 163, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:13,026 - core_strategies_test - INFO - Test sideways_market_strategy cho BTC-USD
+2025-03-27 14:47:13,026 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:13,036 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:47:13,043 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:13,044 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:13,048 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:47:13,049 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:13,049 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:13,049 - core_strategies_test - INFO - Test optimized_strategy cho BTC-USD
+2025-03-27 14:47:13,054 - core_strategies_test - INFO - Test ETH-USD trên khung thời gian 1h
+2025-03-27 14:47:13,252 - core_strategies_test - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 30 ngày)
+2025-03-27 14:47:13,574 - core_strategies_test - INFO - Đã tải 721 dòng dữ liệu
+2025-03-27 14:47:13,574 - core_strategies_test - INFO - Test adaptive_exit_strategy cho ETH-USD
+2025-03-27 14:47:13,574 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:13,582 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:13,582 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:13,582 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 143, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:13,583 - core_strategies_test - INFO - Test sideways_market_strategy cho ETH-USD
+2025-03-27 14:47:13,583 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:13,591 - sideways_detector - INFO - Đã tính ATR volatility cho 708 dòng dữ liệu
+2025-03-27 14:47:13,598 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:13,600 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:13,631 - sideways_detector - INFO - Đã phát hiện 7 giai đoạn thị trường đi ngang
+2025-03-27 14:47:13,632 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:13,632 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:13,633 - core_strategies_test - INFO - Test optimized_strategy cho ETH-USD
+2025-03-27 14:47:13,637 - core_strategies_test - INFO - Test ETH-USD trên khung thời gian 4h
+2025-03-27 14:47:13,793 - core_strategies_test - INFO - Tải dữ liệu ETHUSDT từ Binance (4h, 90 ngày)
+2025-03-27 14:47:14,112 - core_strategies_test - INFO - Đã tải 541 dòng dữ liệu
+2025-03-27 14:47:14,112 - core_strategies_test - INFO - Test adaptive_exit_strategy cho ETH-USD
+2025-03-27 14:47:14,113 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:14,120 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:14,121 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:14,121 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 163, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:14,122 - core_strategies_test - INFO - Test sideways_market_strategy cho ETH-USD
+2025-03-27 14:47:14,122 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:14,131 - sideways_detector - INFO - Đã tính ATR volatility cho 528 dòng dữ liệu
+2025-03-27 14:47:14,138 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:14,139 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:14,163 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:47:14,163 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:14,164 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:14,164 - core_strategies_test - INFO - Test optimized_strategy cho ETH-USD
+2025-03-27 14:47:14,168 - core_strategies_test - INFO - Test ETH-USD trên khung thời gian 1d
+2025-03-27 14:47:14,321 - core_strategies_test - INFO - Tải dữ liệu ETHUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:47:14,628 - core_strategies_test - INFO - Đã tải 91 dòng dữ liệu
+2025-03-27 14:47:14,628 - core_strategies_test - INFO - Test adaptive_exit_strategy cho ETH-USD
+2025-03-27 14:47:14,629 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:14,636 - core_strategies_test - INFO - Test sideways_market_strategy cho ETH-USD
+2025-03-27 14:47:14,637 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:14,648 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:47:14,658 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:14,660 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:14,667 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:47:14,668 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:14,669 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:14,669 - core_strategies_test - INFO - Test optimized_strategy cho ETH-USD
+2025-03-27 14:47:14,676 - core_strategies_test - INFO - Test BNB-USD trên khung thời gian 1h
+2025-03-27 14:47:14,837 - core_strategies_test - INFO - Tải dữ liệu BNBUSDT từ Binance (1h, 30 ngày)
+2025-03-27 14:47:15,159 - core_strategies_test - INFO - Đã tải 721 dòng dữ liệu
+2025-03-27 14:47:15,160 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BNB-USD
+2025-03-27 14:47:15,160 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:15,167 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:15,167 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:15,168 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 163, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:15,168 - core_strategies_test - INFO - Test sideways_market_strategy cho BNB-USD
+2025-03-27 14:47:15,168 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:15,177 - sideways_detector - INFO - Đã tính ATR volatility cho 708 dòng dữ liệu
+2025-03-27 14:47:15,187 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:15,190 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:15,229 - sideways_detector - INFO - Đã phát hiện 7 giai đoạn thị trường đi ngang
+2025-03-27 14:47:15,230 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:15,231 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:15,232 - core_strategies_test - INFO - Test optimized_strategy cho BNB-USD
+2025-03-27 14:47:15,237 - core_strategies_test - INFO - Test BNB-USD trên khung thời gian 4h
+2025-03-27 14:47:15,401 - core_strategies_test - INFO - Tải dữ liệu BNBUSDT từ Binance (4h, 90 ngày)
+2025-03-27 14:47:15,719 - core_strategies_test - INFO - Đã tải 541 dòng dữ liệu
+2025-03-27 14:47:15,719 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BNB-USD
+2025-03-27 14:47:15,719 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:15,726 - adaptive_exit_strategy - ERROR - Lỗi khi xác định chiến lược thoát lệnh: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+2025-03-27 14:47:15,727 - core_strategies_test - ERROR - Lỗi khi test adaptive_exit_strategy: 'str' object has no attribute 'get'
+2025-03-27 14:47:15,727 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 240, in determine_exit_strategy
+    regime_result = self.regime_detector.detect_regime(market_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedMarketRegimeDetector' object has no attribute 'detect_regime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 163, in test_adaptive_exit_strategy
+    exit_strategy = strategy.determine_exit_strategy(df.iloc[:i+1], 'trending')
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/adaptive_exit_strategy.py", line 352, in determine_exit_strategy
+    'position_type': position_data.get('position_type', 'unknown'),
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+2025-03-27 14:47:15,728 - core_strategies_test - INFO - Test sideways_market_strategy cho BNB-USD
+2025-03-27 14:47:15,728 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:15,737 - sideways_detector - INFO - Đã tính ATR volatility cho 528 dòng dữ liệu
+2025-03-27 14:47:15,743 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:15,745 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:15,774 - sideways_detector - INFO - Đã phát hiện 4 giai đoạn thị trường đi ngang
+2025-03-27 14:47:15,775 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:15,775 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:15,775 - core_strategies_test - INFO - Test optimized_strategy cho BNB-USD
+2025-03-27 14:47:15,781 - core_strategies_test - INFO - Test BNB-USD trên khung thời gian 1d
+2025-03-27 14:47:15,947 - core_strategies_test - INFO - Tải dữ liệu BNBUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:47:16,257 - core_strategies_test - INFO - Đã tải 91 dòng dữ liệu
+2025-03-27 14:47:16,258 - core_strategies_test - INFO - Test adaptive_exit_strategy cho BNB-USD
+2025-03-27 14:47:16,258 - enhanced_market_regime - INFO - Đã khởi tạo EnhancedMarketRegimeDetector với phương pháp: ensemble
+2025-03-27 14:47:16,267 - core_strategies_test - INFO - Test sideways_market_strategy cho BNB-USD
+2025-03-27 14:47:16,267 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-27 14:47:16,277 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:47:16,285 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:47:16,287 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:47:16,292 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:47:16,293 - core_strategies_test - ERROR - Lỗi khi test sideways_market_strategy: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+2025-03-27 14:47:16,293 - core_strategies_test - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_core_strategies.py", line 257, in test_sideways_market_strategy
+    signals = strategy.generate_signals(df, sideways_periods)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SidewaysMarketStrategy' object has no attribute 'generate_signals'
+
+2025-03-27 14:47:16,294 - core_strategies_test - INFO - Test optimized_strategy cho BNB-USD
+2025-03-27 14:47:16,299 - core_strategies_test - INFO - Đã tạo báo cáo tóm tắt tại core_strategies_results/core_strategies_summary.md
+2025-03-27 14:47:16,299 - core_strategies_test - INFO - Kết thúc test các chiến thuật core lúc: 2025-03-27 14:47:16.299940
+2025-03-27 14:47:16,300 - core_strategies_test - INFO - Tổng thời gian thực hiện: 0:00:05.649402

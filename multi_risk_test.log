@@ -1,0 +1,35 @@
+2025-03-06 12:49:15,507 - multi_risk_test - INFO - === BẮT ĐẦU THỬ NGHIỆM ĐA MỨC RỦI RO 3 THÁNG ===
+2025-03-06 12:49:15,507 - multi_risk_test - INFO - Tổng số cặp tiền: 2
+2025-03-06 12:49:15,508 - multi_risk_test - INFO - Khung thời gian: 1h
+2025-03-06 12:49:15,508 - multi_risk_test - INFO - Các mức rủi ro: [0.5, 1.0, 1.5, 2.0, 3.0]
+2025-03-06 12:49:15,508 - multi_risk_test - INFO - Sử dụng rủi ro thích ứng: True
+2025-03-06 12:49:15,508 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 0.5%...
+2025-03-06 12:49:22,076 - multi_risk_test - WARNING - Không tìm thấy file kết quả backtest_results/BTCUSDT_1h_risk0_5_results.json, kiểm tra file adaptive_results.json
+2025-03-06 12:49:22,077 - multi_risk_test - INFO - BTCUSDT (Rủi ro 0.5%): Lợi nhuận 0.49%, Win rate 82.35%, Profit factor 2.25
+2025-03-06 12:49:22,077 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 1.0%...
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - === BẮT ĐẦU THỬ NGHIỆM ĐA MỨC RỦI RO 3 THÁNG ===
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - Tổng số cặp tiền: 2
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - Khung thời gian: 1h
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - Các mức rủi ro: [0.5, 1.0, 1.5, 2.0, 3.0]
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - Sử dụng rủi ro thích ứng: True
+2025-03-06 12:54:33,089 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 0.5%...
+2025-03-06 12:54:38,825 - multi_risk_test - INFO - BTCUSDT (Rủi ro 0.5%): Lợi nhuận 0.49%, Win rate 82.35%, Profit factor 2.25
+2025-03-06 12:54:38,825 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 1.0%...
+2025-03-06 13:42:47,513 - multi_risk_test - INFO - === BẮT ĐẦU THỬ NGHIỆM ĐA MỨC RỦI RO 3 THÁNG ===
+2025-03-06 13:42:47,514 - multi_risk_test - INFO - Tổng số cặp tiền: 14
+2025-03-06 13:42:47,514 - multi_risk_test - INFO - Khung thời gian: 1h
+2025-03-06 13:42:47,515 - multi_risk_test - INFO - Các mức rủi ro: [0.5, 1.0, 1.5, 2.0, 3.0]
+2025-03-06 13:42:47,515 - multi_risk_test - INFO - Sử dụng rủi ro thích ứng: True
+2025-03-06 13:42:47,515 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 0.5%...
+2025-03-06 13:59:31,394 - multi_risk_test - INFO - === BẮT ĐẦU THỬ NGHIỆM ĐA MỨC RỦI RO 3 THÁNG ===
+2025-03-06 13:59:31,395 - multi_risk_test - INFO - Tổng số cặp tiền: 1
+2025-03-06 13:59:31,396 - multi_risk_test - INFO - Khung thời gian: 1h
+2025-03-06 13:59:31,396 - multi_risk_test - INFO - Các mức rủi ro: [0.5, 1.0, 1.5, 2.0, 3.0]
+2025-03-06 13:59:31,396 - multi_risk_test - INFO - Sử dụng rủi ro thích ứng: False
+2025-03-06 13:59:31,396 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 0.5%...
+2025-03-06 14:49:13,509 - multi_risk_test - INFO - === BẮT ĐẦU THỬ NGHIỆM ĐA MỨC RỦI RO 3 THÁNG ===
+2025-03-06 14:49:13,509 - multi_risk_test - INFO - Tổng số cặp tiền: 1
+2025-03-06 14:49:13,510 - multi_risk_test - INFO - Khung thời gian: 1h
+2025-03-06 14:49:13,510 - multi_risk_test - INFO - Các mức rủi ro: [0.5, 1.0, 1.5, 2.0, 3.0]
+2025-03-06 14:49:13,510 - multi_risk_test - INFO - Sử dụng rủi ro thích ứng: False
+2025-03-06 14:49:13,510 - multi_risk_test - INFO - Chạy backtest cho BTCUSDT 1h với mức rủi ro 0.5%...

@@ -1,0 +1,23 @@
+2025-03-02 00:40:45,487 - performance_report - INFO - Tìm thấy 9 file kết quả backtest
+2025-03-02 00:40:45,488 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_rsi_results.json
+2025-03-02 00:40:45,488 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_macd_results.json
+2025-03-02 00:40:45,488 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/testnet_BTCUSDT_1h_results.json
+2025-03-02 00:40:45,495 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_RSI_results.json
+2025-03-02 00:40:45,502 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_MACD_results.json
+2025-03-02 00:40:45,510 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_BollingerBands_results.json
+2025-03-02 00:40:45,516 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_Stochastic_results.json
+2025-03-02 00:40:45,522 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_EMACross_results.json
+2025-03-02 00:40:45,528 - performance_report - INFO - Đã tải dữ liệu từ backtest_results/BTCUSDT_1h_ADX_results.json
+2025-03-02 00:40:45,528 - performance_report - WARNING - Không có giao dịch trong backtest_results/BTCUSDT_1h_rsi_results.json
+2025-03-02 00:40:45,528 - performance_report - WARNING - Không có giao dịch trong backtest_results/BTCUSDT_1h_macd_results.json
+2025-03-02 00:40:45,528 - performance_report - WARNING - Không có giao dịch trong backtest_results/testnet_BTCUSDT_1h_results.json
+2025-03-02 00:40:45,560 - performance_report - INFO - Đã lưu báo cáo tổng hợp vào reports/performance_summary.csv
+2025-03-02 00:40:46,231 - performance_report - INFO - Đã tạo các biểu đồ so sánh
+2025-03-02 00:40:46,236 - performance_report - WARNING - Không có dữ liệu về chế độ thị trường
+2025-03-02 00:40:46,236 - performance_report - INFO - Đã tạo báo cáo đầy đủ tại reports/performance_report.md
+2025-03-02 00:40:46,236 - performance_report - WARNING - Không có giao dịch trong backtest_results/BTCUSDT_1h_rsi_results.json
+2025-03-02 00:40:46,236 - performance_report - WARNING - Không có giao dịch trong backtest_results/BTCUSDT_1h_macd_results.json
+2025-03-02 00:40:46,237 - performance_report - WARNING - Không có giao dịch trong backtest_results/testnet_BTCUSDT_1h_results.json
+2025-03-02 00:40:46,259 - performance_report - INFO - Đã lưu báo cáo tổng hợp vào reports/performance_summary.csv
+2025-03-02 00:40:46,810 - performance_report - INFO - Đã tạo các biểu đồ so sánh
+2025-03-02 00:40:46,811 - performance_report - WARNING - Không có dữ liệu về chế độ thị trường

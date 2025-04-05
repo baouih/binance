@@ -1,0 +1,20 @@
+2025-03-09 05:51:09,399 - check_testnet_symbols - INFO - Bắt đầu kiểm tra các symbols trên Binance Futures Testnet
+2025-03-09 05:51:09,730 - check_testnet_symbols - INFO - Có 407 cặp đang giao dịch trên Testnet
+2025-03-09 05:51:09,891 - check_testnet_symbols - INFO - Đã lấy giá của 433 cặp
+2025-03-09 05:51:10,059 - check_testnet_symbols - INFO - === KIỂM TRA 13 SYMBOLS MỤC TIÊU ===
+2025-03-09 05:51:10,059 - check_testnet_symbols - INFO - Có sẵn: 12
+2025-03-09 05:51:10,060 - check_testnet_symbols - INFO - ✅ BTCUSDT: 86133.1
+2025-03-09 05:51:10,060 - check_testnet_symbols - INFO - ✅ ETHUSDT: 2169.41
+2025-03-09 05:51:10,060 - check_testnet_symbols - INFO - ✅ BNBUSDT: 596.128
+2025-03-09 05:51:10,060 - check_testnet_symbols - INFO - ✅ SOLUSDT: 175.0
+2025-03-09 05:51:10,060 - check_testnet_symbols - INFO - ✅ ADAUSDT: 0.9
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ DOGEUSDT: 0.191
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ LTCUSDT: 104.0
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ DOTUSDT: 5.0
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ XRPUSDT: 2.5044
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ AVAXUSDT: 22.0
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ LINKUSDT: 15.286
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ✅ ATOMUSDT: 3.501
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - Không có sẵn: 1
+2025-03-09 05:51:10,061 - check_testnet_symbols - INFO - ❌ MATICUSDT: Not found or not trading
+2025-03-09 05:51:10,219 - check_testnet_symbols - INFO - Đã lưu kết quả vào testnet_available_symbols.json

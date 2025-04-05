@@ -1,0 +1,97 @@
+2025-03-10 01:02:47,207 - test_integrated_strategy - INFO - ===== Tham số Test =====
+2025-03-10 01:02:47,208 - test_integrated_strategy - INFO - Symbol: BTCUSDT
+2025-03-10 01:02:47,208 - test_integrated_strategy - INFO - Interval: 1h
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - Lookback days: 30
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - Risk %: 5.0
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - Leverage: 1.0
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - ML Model: BTCUSDT_1h_3m_target3d
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - Simulation mode: False
+2025-03-10 01:02:47,209 - test_integrated_strategy - INFO - Data directory: Using API
+2025-03-10 01:02:47,209 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-10 01:02:47,209 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-10 01:02:47,209 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-10 01:02:47,378 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-10 01:02:47,378 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-10 01:02:47,380 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-10 01:02:47,381 - advanced_ml_optimizer - INFO - Khởi tạo AdvancedMLOptimizer với 3 loại mô hình cơ sở
+2025-03-10 01:02:47,381 - advanced_ml_optimizer - INFO - Mô hình riêng cho mỗi chế độ thị trường: True
+2025-03-10 01:02:47,381 - advanced_ml_optimizer - INFO - Sử dụng lựa chọn tính năng tự động: True
+2025-03-10 01:02:47,381 - advanced_ml_optimizer - INFO - Sử dụng kỹ thuật ensemble: True
+2025-03-10 01:02:47,382 - ml_strategy_tester - INFO - Khởi tạo MLStrategyTester, chế độ mô phỏng: False
+2025-03-10 01:02:47,382 - ml_strategy_tester - INFO - Tích hợp ML với chiến lược rủi ro cao cho BTCUSDT 1h
+2025-03-10 01:02:47,407 - ml_strategy_tester - INFO - Đã tải mô hình BTCUSDT_1h_3m_target3d thành công
+2025-03-10 01:02:47,407 - ml_strategy_tester - INFO - Chuẩn bị dữ liệu cho backtesting BTCUSDT 1h
+2025-03-10 01:02:47,615 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 01:02:47,647 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 01:02:47,648 - data_processor - INFO - Price: 81685.70 (0.55% change)
+2025-03-10 01:02:47,648 - data_processor - INFO - Trend: Downtrend
+2025-03-10 01:02:47,648 - data_processor - INFO - RSI: 28.86 (Oversold)
+2025-03-10 01:02:47,648 - data_processor - INFO - MACD: -1234.52 (Signal: -1087.19)
+2025-03-10 01:02:47,648 - data_processor - INFO - Volume: 0.13x average
+2025-03-10 01:02:47,649 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 01:02:47,649 - data_processor - INFO - ===========================
+2025-03-10 01:02:47,649 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 01:02:47,649 - ml_strategy_tester - INFO - Đã tải 720 nến cho BTCUSDT 1h
+2025-03-10 01:02:47,669 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:47,784 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:47,811 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:47,859 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:47,892 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:47,919 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:47,946 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:47,958 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:47,978 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,124 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:48,139 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,172 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:48,183 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,254 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:48,282 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,354 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:48,415 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,431 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:48,501 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 01:02:48,518 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 01:02:48,574 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:48,642 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 01:02:48,643 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 01:02:48,660 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 01:02:48,680 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 01:02:48,717 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 01:02:48,760 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 01:02:48,795 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 01:02:48,967 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 01:02:49,038 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 01:02:49,083 - ml_strategy_tester - INFO - Đã chuẩn bị dữ liệu cho backtesting với 135 đặc trưng
+2025-03-10 01:02:49,086 - ml_feature_calculator - INFO - Đã khởi tạo MLFeatureCalculator với 31 tính năng
+2025-03-10 01:02:49,086 - ml_feature_calculator - INFO - Đã khởi tạo MLFeatureCalculator với 28 tính năng
+2025-03-10 01:02:49,097 - ml_strategy_tester - INFO - Đã tính toán 31 tính năng cần thiết cho mô hình
+2025-03-10 01:02:49,101 - ml_strategy_tester - ERROR - Lỗi khi chuẩn hóa dữ liệu: X has 28 features, but StandardScaler is expecting 31 features as input.
+2025-03-10 01:02:50,208 - ml_strategy_tester - INFO - Đã lưu biểu đồ tại ml_test_charts/BTCUSDT_1h_ml_only_backtest.png
+2025-03-10 01:02:51,391 - ml_strategy_tester - INFO - Đã lưu biểu đồ tại ml_test_charts/BTCUSDT_1h_high_risk_only_backtest.png
+2025-03-10 01:02:51,398 - ml_feature_calculator - INFO - Đã khởi tạo MLFeatureCalculator với 31 tính năng
+2025-03-10 01:02:51,401 - ml_feature_calculator - INFO - Đã khởi tạo MLFeatureCalculator với 28 tính năng
+2025-03-10 01:02:51,415 - ml_strategy_tester - INFO - Đã tính toán 31 tính năng cần thiết cho mô hình
+2025-03-10 01:02:51,420 - ml_strategy_tester - ERROR - Lỗi khi chuẩn hóa dữ liệu: X has 28 features, but StandardScaler is expecting 31 features as input.
+2025-03-10 01:02:54,091 - ml_strategy_tester - INFO - Đã lưu biểu đồ tại ml_test_charts/BTCUSDT_1h_integrated_backtest.png
+2025-03-10 01:02:54,098 - ml_strategy_tester - INFO - Đã lưu kết quả tích hợp tại ml_test_results/BTCUSDT_1h_integration_test.json
+2025-03-10 01:02:54,996 - ml_strategy_tester - INFO - Đã tạo các biểu đồ so sánh tích hợp cho BTCUSDT 1h
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO - ===== Kết quả Test =====
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO - Symbol: BTCUSDT, Interval: 1h, Lookback: 30 days
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO - Xếp hạng chiến lược:
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO -   1. ml_only: 0.00% (Win rate: 0.00%, Trades: 0)
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO -   2. integrated: 0.00% (Win rate: 0.00%, Trades: 0)
+2025-03-10 01:02:54,996 - test_integrated_strategy - INFO -   3. high_risk_only: -0.11% (Win rate: 46.15%, Trades: 13)
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO - 
+Chi tiết chiến lược tích hợp:
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Lợi nhuận: 0.00%
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Max drawdown: 0.00%
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Số giao dịch: 0
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Win rate: 0.00%
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Profit factor: 0.00
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Avg win: 0.00%
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Avg loss: 0.00%
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO -   Sharpe ratio: 0.00
+2025-03-10 01:02:54,997 - test_integrated_strategy - INFO - 
+Biểu đồ đã được lưu tại thư mục: ml_test_charts/BTCUSDT_1h

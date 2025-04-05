@@ -1,0 +1,136 @@
+2025-03-09 15:26:30,902 - high_risk_entry_tester - WARNING - Không tìm thấy file cấu hình configs/high_risk_test_config.json, sử dụng cấu hình mặc định
+2025-03-09 15:26:30,904 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_test_config.json
+2025-03-09 15:26:30,904 - high_risk_entry_tester - INFO - Đã thiết lập các tham số theo mức độ rủi ro high:
+2025-03-09 15:26:30,904 - high_risk_entry_tester - INFO -   - Đòn bẩy: 5x
+2025-03-09 15:26:30,904 - high_risk_entry_tester - INFO -   - Stop Loss: 7%
+2025-03-09 15:26:30,905 - high_risk_entry_tester - INFO -   - Take Profit: 21%
+2025-03-09 15:26:30,905 - high_risk_entry_tester - INFO -   - Kích thước lệnh: 20%
+2025-03-09 15:26:30,906 - high_risk_entry_tester - INFO -   - Số lệnh tối đa: 5
+2025-03-09 15:26:31,089 - high_risk_entry_tester - INFO - Đã kết nối đến Binance Testnet API
+2025-03-09 15:26:31,090 - high_risk_entry_tester - INFO - Đã khởi tạo HighRiskEntryTester với mức độ rủi ro: high
+2025-03-09 15:26:31,091 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_test_config.json
+2025-03-09 15:26:31,091 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra 3 coin: BTCUSDT, ETHUSDT, SOLUSDT
+2025-03-09 15:26:31,091 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra BTCUSDT...
+2025-03-09 15:26:31,737 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho BTCUSDT từ 23 Feb 2025 15:26:31 đến 09 Mar 2025 15:26:31
+2025-03-09 15:26:31,936 - high_risk_entry_tester - INFO - Không tìm thấy giao dịch nào cho BTCUSDT
+2025-03-09 15:26:31,936 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra ETHUSDT...
+2025-03-09 15:26:32,532 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho ETHUSDT từ 23 Feb 2025 15:26:31 đến 09 Mar 2025 15:26:31
+2025-03-09 15:26:32,681 - high_risk_entry_tester - INFO - Không tìm thấy giao dịch nào cho ETHUSDT
+2025-03-09 15:26:32,681 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra SOLUSDT...
+2025-03-09 15:26:33,267 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho SOLUSDT từ 23 Feb 2025 15:26:32 đến 09 Mar 2025 15:26:32
+2025-03-09 15:26:33,337 - high_risk_entry_tester - INFO - Không tìm thấy giao dịch nào cho SOLUSDT
+2025-03-09 15:26:33,338 - high_risk_entry_tester - WARNING - Không có kết quả nào
+2025-03-09 15:27:36,390 - high_risk_entry_tester - INFO - Đã tải cấu hình từ configs/high_risk_test_config.json
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO - Đã thiết lập các tham số theo mức độ rủi ro high:
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO -   - Đòn bẩy: 5x
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO -   - Stop Loss: 7%
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO -   - Take Profit: 21%
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO -   - Kích thước lệnh: 20%
+2025-03-09 15:27:36,391 - high_risk_entry_tester - INFO -   - Số lệnh tối đa: 5
+2025-03-09 15:27:36,561 - high_risk_entry_tester - INFO - Đã kết nối đến Binance Testnet API
+2025-03-09 15:27:36,561 - high_risk_entry_tester - INFO - Đã khởi tạo HighRiskEntryTester với mức độ rủi ro: high
+2025-03-09 15:27:36,562 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_test_config.json
+2025-03-09 15:27:36,562 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra 5 coin: BTCUSDT, ETHUSDT, SOLUSDT, LINKUSDT, BNBUSDT
+2025-03-09 15:27:36,563 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra BTCUSDT...
+2025-03-09 15:27:37,206 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho BTCUSDT từ 07 Feb 2025 15:27:36 đến 09 Mar 2025 15:27:36
+2025-03-09 15:27:37,217 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-06 14:00:00: -35.00%
+2025-03-09 15:27:37,227 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-06 20:00:00: -35.00%
+2025-03-09 15:27:37,253 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-07 14:00:00: -35.00%
+2025-03-09 15:27:37,261 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-07 15:00:00: 105.00%
+2025-03-09 15:27:37,273 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-07 21:00:00: 105.00%
+2025-03-09 15:27:37,277 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-07 22:00:00: -35.00%
+2025-03-09 15:27:37,286 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-08 14:00:00: -35.00%
+2025-03-09 15:27:37,316 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-09 07:00:00: -15.09%
+2025-03-09 15:27:37,324 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-09 14:00:00: 1.34%
+2025-03-09 15:27:37,324 - high_risk_entry_tester - INFO - Kết quả kiểm tra BTCUSDT: 9 giao dịch, tỷ lệ thắng 33.33%, tổng lợi nhuận 21.25%
+2025-03-09 15:27:37,324 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra ETHUSDT...
+2025-03-09 15:27:37,634 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho ETHUSDT từ 07 Feb 2025 15:27:37 đến 09 Mar 2025 15:27:37
+2025-03-09 15:27:37,666 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-06 15:00:00: -35.00%
+2025-03-09 15:27:37,677 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-07 08:00:00: -35.00%
+2025-03-09 15:27:37,699 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-07 14:00:00: -24.54%
+2025-03-09 15:27:37,713 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho ETHUSDT tại 2025-03-07 15:00:00: 22.40%
+2025-03-09 15:27:37,719 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-08 00:00:00: -9.69%
+2025-03-09 15:27:37,735 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-08 10:00:00: -7.03%
+2025-03-09 15:27:37,742 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho ETHUSDT tại 2025-03-08 14:00:00: 15.89%
+2025-03-09 15:27:37,773 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-09 14:00:00: -1.64%
+2025-03-09 15:27:37,773 - high_risk_entry_tester - INFO - Kết quả kiểm tra ETHUSDT: 8 giao dịch, tỷ lệ thắng 25.00%, tổng lợi nhuận -74.62%
+2025-03-09 15:27:37,773 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra SOLUSDT...
+2025-03-09 15:27:38,373 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho SOLUSDT từ 07 Feb 2025 15:27:37 đến 09 Mar 2025 15:27:37
+2025-03-09 15:27:38,389 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho SOLUSDT tại 2025-03-07 07:00:00: -35.00%
+2025-03-09 15:27:38,395 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho SOLUSDT tại 2025-03-08 00:00:00: -32.95%
+2025-03-09 15:27:38,411 - high_risk_entry_tester - INFO - Kết quả kiểm tra SOLUSDT: 2 giao dịch, tỷ lệ thắng 0.00%, tổng lợi nhuận -67.95%
+2025-03-09 15:27:38,411 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra LINKUSDT...
+2025-03-09 15:27:38,721 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho LINKUSDT từ 07 Feb 2025 15:27:38 đến 09 Mar 2025 15:27:38
+2025-03-09 15:27:38,736 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho LINKUSDT tại 2025-03-06 10:00:00: -35.00%
+2025-03-09 15:27:38,742 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho LINKUSDT tại 2025-03-07 00:00:00: -35.00%
+2025-03-09 15:27:38,747 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho LINKUSDT tại 2025-03-07 08:00:00: -35.00%
+2025-03-09 15:27:38,802 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho LINKUSDT tại 2025-03-09 10:00:00: 9.88%
+2025-03-09 15:27:38,803 - high_risk_entry_tester - INFO - Kết quả kiểm tra LINKUSDT: 4 giao dịch, tỷ lệ thắng 25.00%, tổng lợi nhuận -95.12%
+2025-03-09 15:27:38,803 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra BNBUSDT...
+2025-03-09 15:27:39,112 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho BNBUSDT từ 07 Feb 2025 15:27:38 đến 09 Mar 2025 15:27:38
+2025-03-09 15:27:39,140 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BNBUSDT tại 2025-03-07 20:00:00: 22.37%
+2025-03-09 15:27:39,151 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BNBUSDT tại 2025-03-07 22:00:00: -20.80%
+2025-03-09 15:27:39,169 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BNBUSDT tại 2025-03-08 22:00:00: 20.90%
+2025-03-09 15:27:39,170 - high_risk_entry_tester - INFO - Kết quả kiểm tra BNBUSDT: 3 giao dịch, tỷ lệ thắng 66.67%, tổng lợi nhuận 22.48%
+2025-03-09 15:27:39,482 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 05 Mar 2025 14:00:00 đến 06 Mar 2025 15:00:00
+2025-03-09 15:27:39,797 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 05 Mar 2025 20:00:00 đến 06 Mar 2025 21:00:00
+2025-03-09 15:27:40,113 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 14:00:00 đến 07 Mar 2025 15:00:00
+2025-03-09 15:27:40,725 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 15:00:00 đến 07 Mar 2025 16:00:00
+2025-03-09 15:27:41,329 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 21:00:00 đến 07 Mar 2025 22:00:00
+2025-03-09 15:27:41,645 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 22:00:00 đến 07 Mar 2025 23:00:00
+2025-03-09 15:27:41,965 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 07 Mar 2025 14:00:00 đến 08 Mar 2025 15:00:00
+2025-03-09 15:27:42,282 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 08 Mar 2025 07:00:00 đến 09 Mar 2025 08:00:00
+2025-03-09 15:27:42,599 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 08 Mar 2025 14:00:00 đến 09 Mar 2025 15:00:00
+2025-03-09 15:27:43,200 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 05 Mar 2025 15:00:00 đến 06 Mar 2025 16:00:00
+2025-03-09 15:27:43,801 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 08:00:00 đến 07 Mar 2025 09:00:00
+2025-03-09 15:27:44,122 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 14:00:00 đến 07 Mar 2025 15:00:00
+2025-03-09 15:27:44,441 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 15:00:00 đến 07 Mar 2025 16:00:00
+2025-03-09 15:27:45,051 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 07 Mar 2025 00:00:00 đến 08 Mar 2025 01:00:00
+2025-03-09 15:27:59,262 - high_risk_entry_tester - INFO - Đã tải cấu hình từ configs/high_risk_test_config.json
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO - Đã thiết lập các tham số theo mức độ rủi ro high:
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO -   - Đòn bẩy: 5x
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO -   - Stop Loss: 7%
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO -   - Take Profit: 21%
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO -   - Kích thước lệnh: 20%
+2025-03-09 15:27:59,263 - high_risk_entry_tester - INFO -   - Số lệnh tối đa: 5
+2025-03-09 15:27:59,431 - high_risk_entry_tester - INFO - Đã kết nối đến Binance Testnet API
+2025-03-09 15:27:59,431 - high_risk_entry_tester - INFO - Đã khởi tạo HighRiskEntryTester với mức độ rủi ro: high
+2025-03-09 15:27:59,432 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_test_config.json
+2025-03-09 15:27:59,432 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra 2 coin: BTCUSDT, ETHUSDT
+2025-03-09 15:27:59,432 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra BTCUSDT...
+2025-03-09 15:28:00,339 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho BTCUSDT từ 23 Feb 2025 15:27:59 đến 09 Mar 2025 15:27:59
+2025-03-09 15:28:00,352 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-06 14:00:00: -35.00%
+2025-03-09 15:28:00,364 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-06 20:00:00: -35.00%
+2025-03-09 15:28:00,391 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-07 14:00:00: -35.00%
+2025-03-09 15:28:00,400 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-07 15:00:00: 105.00%
+2025-03-09 15:28:00,416 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-07 21:00:00: 105.00%
+2025-03-09 15:28:00,420 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-07 22:00:00: -35.00%
+2025-03-09 15:28:00,431 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-08 14:00:00: -35.00%
+2025-03-09 15:28:00,468 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho BTCUSDT tại 2025-03-09 07:00:00: -15.04%
+2025-03-09 15:28:00,474 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho BTCUSDT tại 2025-03-09 14:00:00: 1.29%
+2025-03-09 15:28:00,475 - high_risk_entry_tester - INFO - Kết quả kiểm tra BTCUSDT: 9 giao dịch, tỷ lệ thắng 33.33%, tổng lợi nhuận 21.25%
+2025-03-09 15:28:00,475 - high_risk_entry_tester - INFO - Bắt đầu kiểm tra ETHUSDT...
+2025-03-09 15:28:01,073 - high_risk_entry_tester - INFO - Đã lấy 99 nến 1h cho ETHUSDT từ 23 Feb 2025 15:28:00 đến 09 Mar 2025 15:28:00
+2025-03-09 15:28:01,100 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-06 15:00:00: -35.00%
+2025-03-09 15:28:01,110 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-07 08:00:00: -35.00%
+2025-03-09 15:28:01,128 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-07 14:00:00: -24.50%
+2025-03-09 15:28:01,145 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho ETHUSDT tại 2025-03-07 15:00:00: 22.35%
+2025-03-09 15:28:01,153 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-08 00:00:00: -9.64%
+2025-03-09 15:28:01,172 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-08 10:00:00: -6.98%
+2025-03-09 15:28:01,182 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Short cho ETHUSDT tại 2025-03-08 14:00:00: 15.84%
+2025-03-09 15:28:01,224 - high_risk_entry_tester - INFO - Đã tìm thấy giao dịch Long cho ETHUSDT tại 2025-03-09 14:00:00: -1.60%
+2025-03-09 15:28:01,224 - high_risk_entry_tester - INFO - Kết quả kiểm tra ETHUSDT: 8 giao dịch, tỷ lệ thắng 25.00%, tổng lợi nhuận -74.52%
+2025-03-09 15:28:01,538 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 05 Mar 2025 14:00:00 đến 06 Mar 2025 15:00:00
+2025-03-09 15:28:01,867 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 05 Mar 2025 20:00:00 đến 06 Mar 2025 21:00:00
+2025-03-09 15:28:02,481 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 14:00:00 đến 07 Mar 2025 15:00:00
+2025-03-09 15:28:03,359 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 15:00:00 đến 07 Mar 2025 16:00:00
+2025-03-09 15:28:03,966 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 21:00:00 đến 07 Mar 2025 22:00:00
+2025-03-09 15:28:04,567 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 06 Mar 2025 22:00:00 đến 07 Mar 2025 23:00:00
+2025-03-09 15:28:04,878 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 07 Mar 2025 14:00:00 đến 08 Mar 2025 15:00:00
+2025-03-09 15:28:05,193 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 08 Mar 2025 07:00:00 đến 09 Mar 2025 08:00:00
+2025-03-09 15:28:05,795 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho BTCUSDT từ 08 Mar 2025 14:00:00 đến 09 Mar 2025 15:00:00
+2025-03-09 15:28:06,399 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 05 Mar 2025 15:00:00 đến 06 Mar 2025 16:00:00
+2025-03-09 15:28:07,001 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 08:00:00 đến 07 Mar 2025 09:00:00
+2025-03-09 15:28:07,597 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 14:00:00 đến 07 Mar 2025 15:00:00
+2025-03-09 15:28:07,910 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 06 Mar 2025 15:00:00 đến 07 Mar 2025 16:00:00
+2025-03-09 15:28:08,517 - high_risk_entry_tester - INFO - Đã lấy 26 nến 1h cho ETHUSDT từ 07 Mar 2025 00:00:00 đến 08 Mar 2025 01:00:00

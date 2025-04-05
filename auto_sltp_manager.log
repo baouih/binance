@@ -1,0 +1,15 @@
+2025-03-11 15:01:09,047 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-11 15:01:09,047 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-11 15:01:09,048 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-11 15:01:09,223 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-11 15:01:09,223 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-11 15:01:09,223 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-11 15:01:09,223 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-11 15:01:09,223 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-11 15:01:09,223 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-11 15:01:09,223 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-11 15:01:09,684 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-11 15:01:09,686 - binance_api - INFO - Không có vị thế active từ account API
+2025-03-11 15:01:09,686 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-11 15:01:09,687 - auto_sltp_manager - INFO - Đã cập nhật 0 vị thế đang mở
+[Tue 11 Mar 2025 03:01:10 PM UTC] ✅ Dịch vụ Auto SLTP Manager đang chạy bình thường

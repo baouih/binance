@@ -1,0 +1,198 @@
+2025-03-10 09:13:15,591 - main - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 179, in index
+    return render_template('index.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/templates/index.html", line 3, in top-level template code
+    {% set active_page = 'dashboard' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/templates/common_layout.html", line 495, in top-level template code
+    <div class="bot-status {{ 'running' if bot_status.running else 'stopped' }}">
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'bot_status' is undefined
+2025-03-10 09:46:57,946 - web_app - INFO - Đang kiểm tra kết nối với Binance API...
+2025-03-10 09:46:58,948 - web_app - INFO - ✅ Kết nối API thành công!
+2025-03-10 09:47:15,395 - web_app - INFO - Đang kiểm tra kết nối Telegram...
+2025-03-10 09:47:16,595 - web_app - INFO - ✅ Kết nối Telegram thành công!
+2025-03-10 09:47:16,596 - web_app - INFO - 📩 Đã gửi tin nhắn kiểm tra tới Telegram
+2025-03-10 09:47:48,671 - web_app - INFO - Đã lưu cấu hình
+2025-03-10 09:47:48,672 - web_app - INFO - Đã cập nhật cài đặt: api_mode=testnet, risk_level=30, max_leverage=20, trailing_stop=True, sltp_management=True, auto_trading=True, market_analysis=True, telegram_notifications=True
+2025-03-10 09:47:52,609 - web_app - INFO - Đang kiểm tra kết nối Telegram...
+2025-03-10 09:47:53,810 - web_app - INFO - ✅ Kết nối Telegram thành công!
+2025-03-10 09:47:53,810 - web_app - INFO - 📩 Đã gửi tin nhắn kiểm tra tới Telegram
+2025-03-10 09:48:12,775 - web_app - INFO - Đang kiểm tra kết nối với Binance API...
+2025-03-10 09:48:13,786 - web_app - INFO - ✅ Kết nối API thành công!
+2025-03-10 09:48:16,797 - web_app - INFO - Đang kiểm tra kết nối Telegram...
+2025-03-10 09:48:17,998 - web_app - INFO - ✅ Kết nối Telegram thành công!
+2025-03-10 09:48:17,998 - web_app - INFO - 📩 Đã gửi tin nhắn kiểm tra tới Telegram
+2025-03-10 09:48:19,424 - web_app - INFO - Đang kiểm tra lấy dữ liệu thị trường...
+2025-03-10 09:48:20,925 - web_app - INFO - ✅ Lấy dữ liệu thị trường thành công!
+2025-03-10 09:48:22,510 - web_app - INFO - Đang kiểm tra chức năng quản lý vị thế...
+2025-03-10 09:48:24,311 - web_app - INFO - Đã mở vị thế test: BTCUSDT LONG tại giá 51907.61
+2025-03-10 09:48:24,311 - web_app - INFO - ✅ Kiểm tra mở vị thế thành công
+2025-03-10 09:48:24,311 - web_app - INFO - ✅ Kiểm tra cập nhật SL/TP thành công
+2025-03-10 09:48:24,311 - web_app - INFO - ✅ Kiểm tra đóng vị thế thành công
+2025-03-10 09:48:25,250 - web_app - INFO - Đang kiểm tra chức năng phân tích kỹ thuật...
+2025-03-10 09:48:27,250 - web_app - INFO - ✅ Kiểm tra phân tích chỉ báo RSI thành công
+2025-03-10 09:48:27,251 - web_app - INFO - ✅ Kiểm tra phân tích chỉ báo MACD thành công
+2025-03-10 09:48:27,251 - web_app - INFO - ✅ Kiểm tra phân tích Bollinger Bands thành công
+2025-03-10 09:48:27,251 - web_app - INFO - ✅ Kiểm tra phân tích Volume Profile thành công
+2025-03-10 09:48:29,834 - web_app - INFO - Hệ thống kiểm tra đã khởi động
+2025-03-10 09:48:47,563 - web_app - INFO - Đã đóng vị thế: BTCUSDT LONG
+2025-03-10 09:48:49,287 - main - ERROR - Exception on /market [GET]
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 187, in market
+    return render_template('market.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/templates/market.html", line 2, in top-level template code
+    {% set active_page = 'market' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/templates/common_layout.html", line 393, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/templates/market.html", line 58, in block 'content'
+    {% set buy_count = status.market_data|selectattr('signal', 'search', 'Mua')|list|length %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/async_utils.py", line 48, in wrapper
+    return normal_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1364, in sync_do_list
+    return list(value)
+           ^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1803, in select_or_reject
+    if func(item):
+       ^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1788, in <lambda>
+    return lambda item: modfunc(func(transfunc(item)))
+                                ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1783, in func
+    return context.environment.call_test(name, item, args, kwargs, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 594, in call_test
+    return self._filter_test_common(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 526, in _filter_test_common
+    raise TemplateRuntimeError(msg)
+jinja2.exceptions.TemplateRuntimeError: No test named 'search'.
+2025-03-10 09:48:59,225 - main - ERROR - Exception on /market [GET]
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 187, in market
+    return render_template('market.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/templates/market.html", line 2, in top-level template code
+    {% set active_page = 'market' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/templates/common_layout.html", line 393, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/templates/market.html", line 58, in block 'content'
+    {% set buy_count = status.market_data|selectattr('signal', 'search', 'Mua')|list|length %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/async_utils.py", line 48, in wrapper
+    return normal_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1364, in sync_do_list
+    return list(value)
+           ^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1803, in select_or_reject
+    if func(item):
+       ^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1788, in <lambda>
+    return lambda item: modfunc(func(transfunc(item)))
+                                ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1783, in func
+    return context.environment.call_test(name, item, args, kwargs, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 594, in call_test
+    return self._filter_test_common(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 526, in _filter_test_common
+    raise TemplateRuntimeError(msg)
+jinja2.exceptions.TemplateRuntimeError: No test named 'search'.
+2025-03-10 09:49:06,559 - web_app - INFO - Đã mở vị thế test: BTCUSDT LONG tại giá 34071.97
+2025-03-10 11:22:48,074 - web_app - INFO - Đang kiểm tra kết nối với Binance API...
+2025-03-10 11:22:49,077 - web_app - INFO - ✅ Kết nối API thành công!
+2025-03-10 11:22:51,735 - web_app - INFO - Đang kiểm tra kết nối Telegram...
+2025-03-10 11:22:52,935 - web_app - INFO - ✅ Kết nối Telegram thành công!
+2025-03-10 11:22:52,935 - web_app - INFO - 📩 Đã gửi tin nhắn kiểm tra tới Telegram
+2025-03-10 11:22:59,379 - web_app - INFO - Đang kiểm tra lấy dữ liệu thị trường...
+2025-03-10 11:23:00,880 - web_app - INFO - ✅ Lấy dữ liệu thị trường thành công!
+2025-03-10 11:23:01,924 - web_app - INFO - Đang kiểm tra chức năng quản lý vị thế...
+2025-03-10 11:23:03,725 - web_app - INFO - Đã mở vị thế test: BNBUSDT SHORT tại giá 25945.33
+2025-03-10 11:23:03,725 - web_app - INFO - ✅ Kiểm tra mở vị thế thành công
+2025-03-10 11:23:03,725 - web_app - INFO - ✅ Kiểm tra cập nhật SL/TP thành công
+2025-03-10 11:23:03,725 - web_app - INFO - ✅ Kiểm tra đóng vị thế thành công
+2025-03-10 11:23:05,102 - web_app - INFO - Đang kiểm tra chức năng phân tích kỹ thuật...
+2025-03-10 11:23:07,102 - web_app - INFO - ✅ Kiểm tra phân tích chỉ báo RSI thành công
+2025-03-10 11:23:07,102 - web_app - INFO - ✅ Kiểm tra phân tích chỉ báo MACD thành công
+2025-03-10 11:23:07,103 - web_app - INFO - ✅ Kiểm tra phân tích Bollinger Bands thành công
+2025-03-10 11:23:07,103 - web_app - INFO - ✅ Kiểm tra phân tích Volume Profile thành công

@@ -1,0 +1,12 @@
+2025-03-05 02:44:13,693 - __main__ - INFO - Khởi động controller backtest với thông báo Telegram
+2025-03-05 02:44:13,696 - __main__ - INFO - Đã khởi động backtest với PID: 2609
+2025-03-05 02:44:14,917 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công: info
+✅ Gửi thông báo info thành công
+2025-03-05 02:44:14,961 - __main__ - INFO - Đã gửi thông báo Telegram thành công: info
+2025-03-05 02:44:14,962 - __main__ - INFO - Bắt đầu giám sát backtest (PID: 2609)
+ info
+2025-03-05 02:44:14,962 - __main__ - INFO - Bắt đầu giám sát backtest (PID: 2609)
+2025-03-06 12:19:57,718 - __main__ - INFO - Khởi động controller backtest với thông báo Telegram
+2025-03-06 12:19:57,722 - __main__ - INFO - Đã khởi động backtest với PID: 3773
+2025-03-06 12:19:59,773 - __main__ - INFO - Đã gửi thông báo Telegram thành công: info
+2025-03-06 12:19:59,774 - __main__ - WARNING - Không tìm thấy tiến trình backtest đang chạy

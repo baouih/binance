@@ -1,0 +1,102 @@
+2025-03-09 11:40:53,642 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:40:53,642 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:40:53,643 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:40:53,643 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 11:40:53,643 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:40:53,643 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:40:53,643 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:40:53,644 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 11:40:53,644 - position_trailing_stop - INFO - Đã tải 1 vị thế từ active_positions.json
+2025-03-09 11:40:53,644 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:40:53,644 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:40:53,822 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:40:53,822 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:40:53,822 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:40:53,823 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:54,005 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho BTCUSDT: 'stop_loss'
+2025-03-09 11:40:54,005 - leverage_risk_manager - INFO - Đề xuất take profit cho BTCUSDT LONG: 94685.05 (R:R 2.0:1, Thị trường: None)
+2025-03-09 11:40:54,005 - leverage_risk_manager - INFO - Đang theo dõi vị thế BTCUSDT LONG tại 86077.32222222
+2025-03-09 11:40:54,005 - integrated_risk_system - INFO - Đã thêm vị thế mới BTCUSDT từ Binance
+2025-03-09 11:40:54,006 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:54,304 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520454156&signature=b4faee850fe2e701e33e38acace059f705af0cf96d3b218c9ab9be79d3c03979
+2025-03-09 11:40:54,305 - binance_api - INFO - Đã đặt stop loss cho BTCUSDT LONG tại giá 81773.456111109: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520454156&signature=b4faee850fe2e701e33e38acace059f705af0cf96d3b218c9ab9be79d3c03979'}
+2025-03-09 11:40:54,305 - integrated_risk_system - ERROR - Lỗi khi đặt Stop Loss cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520454156&signature=b4faee850fe2e701e33e38acace059f705af0cf96d3b218c9ab9be79d3c03979'}
+2025-03-09 11:40:54,453 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520454305&signature=b5c10a4fde0fd85aa72c6c0a04966b59537aebb3e178a1ef1c9fe551db521143
+2025-03-09 11:40:54,454 - binance_api - INFO - Đã đặt take profit cho BTCUSDT LONG tại giá 94685.05: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520454305&signature=b5c10a4fde0fd85aa72c6c0a04966b59537aebb3e178a1ef1c9fe551db521143'}
+2025-03-09 11:40:54,454 - integrated_risk_system - ERROR - Lỗi khi đặt Take Profit cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520454305&signature=b5c10a4fde0fd85aa72c6c0a04966b59537aebb3e178a1ef1c9fe551db521143'}
+2025-03-09 11:40:54,454 - integrated_risk_system - ERROR - Không thể đồng bộ SL/TP cho BTCUSDT với Binance: ['Lỗi đặt SL: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520454156&signature=b4faee850fe2e701e33e38acace059f705af0cf96d3b218c9ab9be79d3c03979', 'Lỗi đặt TP: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520454305&signature=b5c10a4fde0fd85aa72c6c0a04966b59537aebb3e178a1ef1c9fe551db521143']
+2025-03-09 11:40:54,454 - integrated_risk_system - INFO - Bắt đầu dịch vụ giám sát tích hợp với chu kỳ 30 giây
+2025-03-09 11:40:54,454 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:40:54,454 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:40:54,910 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:40:54,911 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:40:54,911 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:40:54,911 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:54,911 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:55,067 - integrated_risk_system - ERROR - Lỗi khi cập nhật vị thế: 'stop_loss'
+2025-03-09 11:55:26,043 - integrated_system - INFO - === KHỞI ĐỘNG HỆ THỐNG QUẢN LÝ DỊCH VỤ ===
+2025-03-09 11:55:26,045 - integrated_system - INFO - Đã dừng tất cả các dịch vụ
+2025-03-09 11:55:30,135 - integrated_system - INFO - === KHỞI ĐỘNG HỆ THỐNG QUẢN LÝ DỊCH VỤ ===
+2025-03-09 11:55:30,136 - integrated_system - INFO - Đang khởi động dịch vụ main_trading_bot với lệnh: python main.py
+2025-03-09 11:55:32,137 - integrated_system - ERROR - Không thể khởi động dịch vụ main_trading_bot. Lỗi: 2025-03-09 11:55:31,738 - market_sentiment_analyzer - INFO - Đã tải dữ liệu cảm xúc từ data/market_sentiment.json
+2025-03-09 11:55:31,738 - market_sentiment_analyzer - INFO - Đã khởi tạo MarketSentimentAnalyzer, sử dụng file: data/market_sentiment.json
+2025-03-09 11:55:31,738 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:55:31,738 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:55:31,738 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:55:31,738 - data_processor - INFO - Đã khởi tạo DataProcessor, sử dụng cache dir: data/cache
+2025-03-09 11:55:31,740 - update_manager - INFO - Đã tải cấu hình cập nhật từ update_config.json
+2025-03-09 11:55:31,740 - update_manager - INFO - Đã khởi tạo UpdateManager với phiên bản hiện tại: 1.0.0
+2025-03-09 11:55:31,746 - update_route - INFO - Đã đăng ký blueprint update_route
+2025-03-09 11:55:31,746 - main - INFO - Đã đăng ký tất cả các blueprint routes
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,768 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,769 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,769 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 11:55:31,769 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:55:31,769 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:55:31,769 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:55:31,771 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 11:55:31,772 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 11:55:31,772 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 11:55:31,772 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 11:55:31,772 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 11:55:31,772 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:55:31,772 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:55:31,772 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:55:31,774 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 11:55:31,774 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 11:55:31,774 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 11:55:31,774 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 11:55:31,774 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 11:55:31,774 - main - INFO - Đã tải module thông báo chi tiết
+2025-03-09 11:55:31,774 - main - INFO - Đã tải danh sách 13 cặp tiền từ account_config.json
+2025-03-09 11:55:31,784 - main - INFO - Đã khởi tạo thread chạy hệ thống trailing stop tự động
+2025-03-09 11:55:31,784 - main - INFO - Đã khởi tạo thread chạy hệ thống thông báo thị trường tự động
+2025-03-09 11:55:31,786 - keep_alive - INFO - Khởi động dịch vụ keep-alive
+2025-03-09 11:55:31,787 - keep_alive - INFO - Dịch vụ keep-alive đang chạy trên cổng 8080
+2025-03-09 11:55:31,787 - keep_alive - INFO - Sử dụng dịch vụ như UptimeRobot để ping URL của Replit để giữ nó luôn hoạt động
+2025-03-09 11:55:31,787 - main - INFO - Đã kích hoạt keep-alive để duy trì hoạt động
+Traceback (most recent call last):
+  File "/home/runner/workspace/main.py", line 2449, in <module>
+2025-03-09 11:55:31,787 - main - INFO - Đã tải cấu hình tài khoản từ account_config.json
+2025-03-09 11:55:31,788 - main - INFO - Đã tải cấu hình tài khoản từ account_config.json
+    run_app()
+  File "/home/runner/workspace/main.py", line 2391, in run_app
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False, log_output=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask_socketio/__init__.py", line 650, in run
+2025-03-09 11:55:31,793 - main - INFO - Đã tải cấu hình bot từ bot_config.json
+2025-03-09 11:55:31,793 - main - INFO - Đã tải cấu hình Telegram: enabled=True, notify_new_trades=True, notify_error_status=True, notify_daily_summary=True
+2025-03-09 11:55:31,794 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,794 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,794 - main - INFO - Đã tải cấu hình Telegram từ telegram_config.json
+2025-03-09 11:55:31,794 - background_tasks - INFO - Bắt đầu tác vụ nền
+2025-03-09 11:55:31,794 - background_tasks - INFO - Khởi tạo hệ thống chiến thuật giao dịch
+    raise RuntimeError('The Werkzeug web server is not '
+RuntimeError: The Werkzeug web server is not designed to run in production. Pass allow_unsafe_werkzeug=True to the run() method to disable this error.
+2025-03-09 11:55:31,795 - strategy_integration - INFO - Đã tải cấu hình từ account_config.json
+
+2025-03-09 11:55:32,138 - integrated_system - INFO - Đang khởi động dịch vụ auto_sltp_manager với lệnh: python auto_sltp_manager.py
+2025-03-09 11:55:34,140 - integrated_system - INFO - Dịch vụ auto_sltp_manager đã được khởi động thành công với PID 639
+2025-03-09 11:55:34,141 - integrated_system - INFO - Đang khởi động dịch vụ trailing_stop với lệnh: bash start_trailing_stop.sh

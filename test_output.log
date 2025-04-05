@@ -1,0 +1,139 @@
+2025-03-06 06:23:48,423 - test_trailing_stop - INFO - Testing PercentageTrailingStop
+2025-03-06 06:23:48,424 - trailing_stop - INFO - Khởi tạo trailing stop cho vị thế BTCUSDT: entry=50000.0, activation=50500.0, initial_stop=49750.0, min_profit_protection=50149.99999999999
+2025-03-06 06:23:48,424 - test_trailing_stop - INFO - Position initialized: {
+  "symbol": "BTCUSDT",
+  "side": "LONG",
+  "entry_price": 50000.0,
+  "quantity": 0.1,
+  "leverage": 5,
+  "trailing_status": {
+    "strategy": "percentage",
+    "activated": false,
+    "stop_price": 49750.0,
+    "initial_stop_price": 49750.0,
+    "peak_price": 50000.0,
+    "activation_threshold_reached": false,
+    "status": "waiting",
+    "last_update_time": 1741242228,
+    "partial_exits": [],
+    "activation_price": 50500.0,
+    "min_profit_price": 50149.99999999999,
+    "activation_percent": 1.0,
+    "callback_percent": 0.5,
+    "dynamic_callback": true,
+    "min_profit_protection": 0.3,
+    "partial_exit_config": [
+      {
+        "threshold": 2.0,
+        "percentage": 0.2
+      },
+      {
+        "threshold": 4.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 6.0,
+        "percentage": 0.3
+      }
+    ],
+    "highest_profit_pct": 0.0,
+    "creation_time": 1741242228,
+    "partial_exits_pending": [
+      {
+        "threshold": 2.0,
+        "percentage": 0.2
+      },
+      {
+        "threshold": 4.0,
+        "percentage": 0.3
+      },
+      {
+        "threshold": 6.0,
+        "percentage": 0.3
+      }
+    ]
+  }
+}
+2025-03-06 06:23:48,424 - test_trailing_stop - INFO - 
+--- Test case 1: Price increase but below activation threshold ---
+2025-03-06 06:23:48,424 - test_trailing_stop - INFO - Current price: 50300.0, Profit: 0.60%
+2025-03-06 06:23:48,424 - test_trailing_stop - INFO - Trailing status activated: False
+2025-03-06 06:23:48,424 - test_trailing_stop - INFO - Should close: False, reason: 
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Should exit partial: False, exit_pct: 0.0
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - 
+--- Test case 2: Price reaches activation threshold ---
+2025-03-06 06:23:48,425 - trailing_stop - INFO - Kích hoạt trailing stop cho vị thế BTCUSDT: giá hiện tại=50600.0, activation_price=50500.0, profit=1.20%
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Current price: 50600.0, Profit: 1.20%
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Trailing status activated: True
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Stop price: 50296.4
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Should close: False, reason: 
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Should exit partial: False, exit_pct: 0.0
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - 
+--- Test case 3: Price continues to increase, trailing stop follows ---
+2025-03-06 06:23:48,425 - trailing_stop - INFO - Nên thoát 20.0% vị thế BTCUSDT: đạt ngưỡng 2.0%, giá hiện tại=51000.0
+2025-03-06 06:23:48,425 - test_trailing_stop - INFO - Current price: 51000.0, Profit: 2.00%
+2025-03-06 06:23:48,430 - test_trailing_stop - INFO - New stop price: 50694.0
+2025-03-06 06:23:48,430 - test_trailing_stop - INFO - Should close: False, reason: 
+2025-03-06 06:23:48,430 - test_trailing_stop - INFO - Should exit partial: True, exit_pct: 0.2
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Exit info: {
+  "threshold": 2.0,
+  "percentage": 0.2,
+  "price": 51000.0,
+  "time": 1741242228,
+  "profit_pct": 2.0000000000000018
+}
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - 
+--- Test case 4: Price increases more, dynamic callback gets stronger ---
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Current price: 52500.0, Profit: 5.00%
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Current callback percent: 1.0
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - New stop price: 51975.0
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Should close: False, reason: 
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - 
+--- Test case 5: Price decreases and hits trailing stop ---
+2025-03-06 06:23:48,431 - trailing_stop - INFO - Nên đóng vị thế BTCUSDT: Giá 51965.0 đã chạm trailing stop 51975.00, lợi nhuận hiện tại: 3.93%, cao nhất đạt được: 5.00%
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Current price: 51965.0, Stop price: 51975.0
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Should close: True, reason: Giá 51965.0 đã chạm trailing stop 51975.00, lợi nhuận hiện tại: 3.93%, cao nhất đạt được: 5.00%
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - 
+
+===================================================
+2025-03-06 06:23:48,431 - test_trailing_stop - INFO - Testing EnhancedAdaptiveTrailingStop
+2025-03-06 06:23:48,431 - trailing_stop - INFO - Đã tải cấu hình từ configs/trailing_stop_config.json
+2025-03-06 06:23:48,432 - trailing_stop - INFO - Không tìm thấy hoặc không thể tải lịch sử trailing stop
+2025-03-06 06:23:48,432 - trailing_stop - INFO - Đã khởi tạo Enhanced Adaptive Trailing Stop
+2025-03-06 06:23:48,432 - trailing_stop - INFO - Khởi tạo trailing stop cho vị thế BTCUSDT: entry=50000.0, activation=50400.0, initial_stop=49800.0, min_profit_protection=50100.0
+2025-03-06 06:23:48,432 - trailing_stop - INFO - Đã khởi tạo trailing stop cho vị thế BTCUSDT: chiến lược percentage, chế độ trending
+2025-03-06 06:23:48,432 - test_trailing_stop - INFO - Position initialized with percentage/trending strategy
+2025-03-06 06:23:48,432 - trailing_stop - INFO - Kích hoạt trailing stop cho vị thế BTCUSDT: giá hiện tại=50600.0, activation_price=50400.0, profit=1.20%
+2025-03-06 06:23:48,432 - test_trailing_stop - INFO - Current price: 50600.0
+2025-03-06 06:23:48,432 - test_trailing_stop - INFO - Trailing status: {
+  "activated": true,
+  "stop_price": 50357.119999999995,
+  "initial_stop_price": 49800.0,
+  "peak_price": 50600.0,
+  "strategy": "percentage",
+  "market_regime": "trending",
+  "status": "active"
+}
+2025-03-06 06:23:48,432 - test_trailing_stop - INFO - Should close: False, reason: 
+2025-03-06 06:23:48,433 - trailing_stop - INFO - Nên thoát 20.0% vị thế BTCUSDT: đạt ngưỡng 1.5%, giá hiện tại=51500.0
+2025-03-06 06:23:48,433 - test_trailing_stop - INFO - Current price: 51500.0
+2025-03-06 06:23:48,433 - test_trailing_stop - INFO - Partial exit: {
+  "percentage": 0.2,
+  "threshold": 1.5,
+  "price": 51500.0,
+  "time": 1741242228
+}
+2025-03-06 06:23:48,433 - trailing_stop - WARNING - Không thể lấy ATR cho BTCUSDT, sử dụng 2% giá trị
+2025-03-06 06:23:48,433 - trailing_stop - INFO - Khởi tạo ATR trailing stop cho vị thế BTCUSDT: entry_price=50000.0, activation_price=52000.0, initial_stop=46000.0, atr=1000.0
+2025-03-06 06:23:48,433 - trailing_stop - INFO - Đã khởi tạo trailing stop cho vị thế BTCUSDT: chiến lược atr_based, chế độ volatile
+2025-03-06 06:23:48,433 - trailing_stop - INFO - Đã chuyển đổi chiến lược trailing stop cho vị thế BTCUSDT: từ percentage/trending sang atr_based/volatile
+2025-03-06 06:23:48,433 - test_trailing_stop - INFO - Strategy switched to atr_based/volatile
+2025-03-06 06:23:48,433 - test_trailing_stop - INFO - New trailing status: {
+  "activated": true,
+  "stop_price": 47500.0,
+  "initial_stop_price": 46000.0,
+  "peak_price": 51500.0,
+  "strategy": "atr_based",
+  "market_regime": "volatile",
+  "status": "pending"
+}

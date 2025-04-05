@@ -1,0 +1,7 @@
+2025-03-09 05:03:25,280 - trailing_stop_scheduler - INFO - Thực hiện hành động: start
+2025-03-09 05:03:25,280 - trailing_stop_scheduler - INFO - Đang dừng dịch vụ trailing stop (PID: 3090)
+2025-03-09 05:03:25,781 - trailing_stop_scheduler - INFO - Đã dừng thành công dịch vụ trailing stop (PID: 3090)
+2025-03-09 05:03:25,782 - trailing_stop_scheduler - INFO - Đang khởi động dịch vụ trailing stop với lệnh: /home/runner/workspace/.pythonlibs/bin/python position_trailing_stop.py --mode service --interval 60
+2025-03-09 05:03:25,782 - trailing_stop_scheduler - INFO - Đã lưu PID 3174 vào trailing_stop.pid
+2025-03-09 05:03:25,783 - trailing_stop_scheduler - INFO - Đã khởi động dịch vụ trailing stop với PID 3174
+Đã khởi động dịch vụ trailing stop thành công

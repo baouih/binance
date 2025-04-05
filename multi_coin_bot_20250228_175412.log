@@ -1,0 +1,42 @@
+2025-02-28 17:54:13,304 - telegram_notify - WARNING - Telegram notifier không được kích hoạt do thiếu token hoặc chat_id
+2025-02-28 17:54:13,304 - telegram_notify - WARNING - Đặt TELEGRAM_BOT_TOKEN và TELEGRAM_CHAT_ID trong biến môi trường để kích hoạt
+2025-02-28 17:54:13,305 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-02-28 17:54:13,305 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-02-28 17:54:13,826 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://testnet.binancefuture.com/fapi/v1/ping
+2025-02-28 17:54:13,826 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-02-28 17:54:13,827 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-02-28 17:54:13,827 - app.composite_indicator - INFO - Khởi tạo CompositeIndicator với 9 chỉ báo: ['rsi', 'macd', 'ema_cross', 'bbands', 'volume_trend', 'adx', 'stochastic', 'obv', 'atr']
+2025-02-28 17:54:13,827 - multi_coin_bot - INFO - Đã khởi tạo bot với 2 cặp giao dịch: BTCUSDT, ETHUSDT
+2025-02-28 17:54:13,828 - multi_coin_bot - INFO - Bắt đầu chạy bot đa đồng tiền với chu kỳ 60s
+2025-02-28 17:54:13,828 - multi_coin_bot - INFO - === Chu kỳ kiểm tra #1 ===
+2025-02-28 17:54:14,353 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://testnet.binancefuture.com/fapi/v1/ping
+2025-02-28 17:54:14,615 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-02-28 17:54:14,617 - data_processor - INFO - Detected market regime: neutral
+2025-02-28 17:54:14,652 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-02-28 17:54:14,652 - data_processor - INFO - Price: 83749.40 (-0.24% change)
+2025-02-28 17:54:14,653 - data_processor - INFO - Trend: Downtrend
+2025-02-28 17:54:14,653 - data_processor - INFO - RSI: 41.88 (Neutral)
+2025-02-28 17:54:14,653 - data_processor - INFO - MACD: -1425.34 (Signal: -1745.50)
+2025-02-28 17:54:14,653 - data_processor - INFO - Volume: 4.79x average
+2025-02-28 17:54:14,653 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-02-28 17:54:14,653 - data_processor - INFO - ===========================
+2025-02-28 17:54:14,653 - data_processor - INFO - Processed 168 samples with indicators
+2025-02-28 17:54:14,654 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang volatile
+2025-02-28 17:54:14,734 - binance_api - INFO - Lấy giá giao dịch từ Coinbase: 83868.54 USD
+2025-02-28 17:54:14,735 - multi_coin_bot - INFO - Phân tích BTCUSDT: neutral (Confidence: 0.00, Regime: volatile)
+2025-02-28 17:54:14,979 - data_processor - INFO - Detected market regime: neutral
+2025-02-28 17:54:15,006 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-02-28 17:54:15,006 - data_processor - INFO - Price: 2161.94 (0.36% change)
+2025-02-28 17:54:15,006 - data_processor - INFO - Trend: Downtrend
+2025-02-28 17:54:15,006 - data_processor - INFO - RSI: 19.20 (Oversold)
+2025-02-28 17:54:15,006 - data_processor - INFO - MACD: -116.58 (Signal: -104.16)
+2025-02-28 17:54:15,006 - data_processor - INFO - Volume: 0.16x average
+2025-02-28 17:54:15,006 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-02-28 17:54:15,007 - data_processor - INFO - ===========================
+2025-02-28 17:54:15,007 - data_processor - INFO - Processed 168 samples with indicators
+2025-02-28 17:54:15,101 - binance_api - INFO - Lấy giá giao dịch từ Coinbase: 2216.80 USD
+2025-02-28 17:54:15,102 - multi_coin_bot - INFO - Phân tích ETHUSDT: neutral (Confidence: 0.00, Regime: volatile)
+2025-02-28 17:54:15,103 - multi_coin_bot - INFO - Không có tín hiệu giao dịch đủ mạnh.
+2025-02-28 17:54:15,103 - multi_coin_bot - INFO - Đang chờ 60 giây đến lần kiểm tra tiếp theo...

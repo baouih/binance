@@ -1,0 +1,817 @@
+2025-02-27 07:00:58,837 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:00:58,839 - __main__ - INFO - Starting Flask server on port 8080...
+2025-02-27 07:00:58,839 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:00:58,839 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:00:58,851 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://172.31.128.13:8080
+2025-02-27 07:00:58,852 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:01:18,792 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:01:18,793 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:01:18,793 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:01:18,793 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:01:18,806 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:01:18,806 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:06:08,688 - __main__ - INFO - Successfully initialized Flask app
+2025-02-27 07:06:08,688 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:06:08,689 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:06:08,689 - __main__ - INFO - Current working directory: ['/home/runner/workspace/app', '/nix/store/lc7qv2ldzrs1aq3hbyzmbgvn0h2w26pl-sitecustomize/lib/python/site-packages', '/nix/store/dfg63lldbvcj207iyr9z0xw21d8ax02n-python3.11-pip-24.0/lib/python3.11/site-packages', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python311.zip', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/lib-dynload', '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages', '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages', '/nix/store/wblvmd5y7izx0z10d1w7ga7zc4apjxmb-python3.11-setuptools-75.1.1/lib/python3.11/site-packages']
+2025-02-27 07:06:08,701 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:06:08,701 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:06:22,025 - __main__ - INFO - Successfully initialized Flask app
+2025-02-27 07:06:22,026 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:06:22,026 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:06:22,026 - __main__ - INFO - Current working directory: ['/home/runner/workspace/app', '/nix/store/lc7qv2ldzrs1aq3hbyzmbgvn0h2w26pl-sitecustomize/lib/python/site-packages', '/nix/store/dfg63lldbvcj207iyr9z0xw21d8ax02n-python3.11-pip-24.0/lib/python3.11/site-packages', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python311.zip', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11', '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/lib-dynload', '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages', '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages', '/nix/store/wblvmd5y7izx0z10d1w7ga7zc4apjxmb-python3.11-setuptools-75.1.1/lib/python3.11/site-packages']
+2025-02-27 07:06:22,036 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:06:22,036 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:07:43,859 - __main__ - INFO - Successfully initialized Flask app
+2025-02-27 07:07:43,860 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:07:43,860 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:07:43,860 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:07:43,871 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:07:43,872 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:08:19,201 - __main__ - INFO - Successfully initialized Flask app
+2025-02-27 07:08:19,202 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:08:19,202 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:08:19,202 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:08:19,251 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:08:19,252 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:08:19,256 - werkzeug - INFO -  * Restarting with stat
+2025-02-27 07:08:19,618 - __main__ - INFO - Successfully initialized Flask app
+2025-02-27 07:08:19,619 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:08:19,619 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:08:19,620 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:08:19,662 - werkzeug - WARNING -  * Debugger is active!
+2025-02-27 07:08:19,666 - werkzeug - INFO -  * Debugger PIN: 369-433-880
+2025-02-27 07:09:33,715 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:09:33,717 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:09:33,717 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:09:33,717 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:09:33,758 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:09:33,758 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:09:33,761 - werkzeug - INFO -  * Restarting with stat
+2025-02-27 07:09:34,042 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:09:34,043 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:09:34,044 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:09:34,044 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:09:34,072 - werkzeug - WARNING -  * Debugger is active!
+2025-02-27 07:09:34,075 - werkzeug - INFO -  * Debugger PIN: 444-914-527
+2025-02-27 07:09:50,122 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/werkzeug/__init__.py', reloading
+2025-02-27 07:09:50,165 - werkzeug - INFO -  * Restarting with stat
+2025-02-27 07:09:50,697 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:09:50,699 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:09:50,699 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:09:50,700 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:09:50,731 - werkzeug - WARNING -  * Debugger is active!
+2025-02-27 07:09:50,737 - werkzeug - INFO -  * Debugger PIN: 982-157-481
+2025-02-27 07:10:06,632 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:10:06,633 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:10:06,633 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:10:06,633 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:10:06,650 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.13:5000
+2025-02-27 07:10:06,650 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-27 07:10:06,655 - werkzeug - INFO -  * Restarting with stat
+2025-02-27 07:10:06,906 - __main__ - INFO - Successfully imported Flask
+2025-02-27 07:10:06,908 - __main__ - INFO - Starting Flask server...
+2025-02-27 07:10:06,908 - __main__ - INFO - Python version: 3.11.10 (main, Sep  7 2024, 01:03:31) [GCC 13.3.0]
+2025-02-27 07:10:06,909 - __main__ - INFO - Current working directory: /home/runner/workspace
+2025-02-27 07:10:06,918 - werkzeug - WARNING -  * Debugger is active!
+2025-02-27 07:10:06,924 - werkzeug - INFO -  * Debugger PIN: 102-641-322
+2025-02-28 00:24:08,943 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:24:09,248 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 00:24:09,248 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:24:09,261 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:24:09,511 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:24:09,520 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:24:09,529 - werkzeug - INFO -  * Debugger PIN: 140-963-195
+2025-02-28 00:24:11,382 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:24:11] "GET / HTTP/1.1" 200 -
+2025-02-28 00:24:29,654 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:24:29,666 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 00:24:29,666 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:24:29,672 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:24:29,909 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:24:29,918 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:24:29,926 - werkzeug - INFO -  * Debugger PIN: 930-459-769
+2025-02-28 00:24:30,864 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:24:30] "GET / HTTP/1.1" 200 -
+2025-02-28 00:24:31,568 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:24:31] "GET / HTTP/1.1" 200 -
+2025-02-28 00:27:48,032 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 00:27:48,067 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:27:48,747 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:27:48,774 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 00:27:48,776 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:27:48,783 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:27:49,223 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:27:49,236 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:27:49,248 - werkzeug - INFO -  * Debugger PIN: 922-681-049
+2025-02-28 00:28:13,598 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:28:13,609 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 00:28:13,610 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:28:13,616 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:28:13,887 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:28:13,897 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:28:13,904 - werkzeug - INFO -  * Debugger PIN: 792-236-955
+2025-02-28 00:30:26,232 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:30:26,265 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:30:26,265 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:30:26,277 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:30:26,605 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:30:26,618 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:30:26,629 - werkzeug - INFO -  * Debugger PIN: 130-705-539
+2025-02-28 00:30:27,154 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:30:27,154 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:30:27,154 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:30:27,154 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:30:27,166 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:30:27] "GET / HTTP/1.1" 200 -
+2025-02-28 00:30:28,043 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:30:28,043 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:30:28,044 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:30:28,044 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:30:28,044 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:30:28] "GET / HTTP/1.1" 200 -
+2025-02-28 00:33:08,356 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 00:33:08,397 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:33:08,689 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:33:08,698 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:33:08,704 - werkzeug - INFO -  * Debugger PIN: 124-406-617
+2025-02-28 00:33:09,421 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:33:09,447 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:33:09,448 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:33:09,456 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:33:09,717 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:33:09,727 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:33:09,734 - werkzeug - INFO -  * Debugger PIN: 116-811-597
+2025-02-28 00:33:09,914 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:33:09,915 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:33:09,916 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:33:09,917 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:33:09,949 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:33:09] "GET / HTTP/1.1" 200 -
+2025-02-28 00:33:10,003 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:33:10,003 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:33:10,003 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:33:10,005 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:33:10,005 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:33:10] "GET / HTTP/1.1" 200 -
+2025-02-28 00:33:10,783 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:33:10,783 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:33:10,783 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:33:10,783 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:33:10,784 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:33:10] "GET / HTTP/1.1" 200 -
+2025-02-28 00:36:40,051 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 00:36:40,083 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:36:40,366 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:36:40,374 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:36:40,383 - werkzeug - INFO -  * Debugger PIN: 578-433-213
+2025-02-28 00:37:08,780 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:08,793 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:37:08,793 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:37:08,801 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:37:09,046 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:09,056 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:37:09,064 - werkzeug - INFO -  * Debugger PIN: 372-991-472
+2025-02-28 00:37:09,912 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:37:09,913 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:37:09,913 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:37:09,913 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:37:09,926 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:37:09] "GET / HTTP/1.1" 200 -
+2025-02-28 00:37:34,849 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:34,859 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:37:34,859 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:37:34,864 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:37:35,125 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:35,133 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:37:35,138 - werkzeug - INFO -  * Debugger PIN: 262-147-639
+2025-02-28 00:37:49,797 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:49,812 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:37:49,812 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:37:49,817 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:37:50,108 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:37:50,116 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:37:50,122 - werkzeug - INFO -  * Debugger PIN: 626-785-908
+2025-02-28 00:38:41,763 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:38:41,776 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:38:41,776 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:38:41,783 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:38:42,050 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:38:42,058 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:38:42,063 - werkzeug - INFO -  * Debugger PIN: 119-337-318
+2025-02-28 00:38:42,787 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:38:42,787 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:38:42,788 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:38:42,788 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:38:42,802 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:38:42] "GET / HTTP/1.1" 200 -
+2025-02-28 00:40:17,667 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 00:40:17,698 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:40:18,578 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:40:18,586 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:40:18,588 - werkzeug - INFO -  * Debugger PIN: 144-957-916
+2025-02-28 00:40:37,371 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:40:37,382 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.128.52:3000
+2025-02-28 00:40:37,382 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 00:40:37,383 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:40:37,920 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:40:37,934 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 00:40:37,936 - werkzeug - INFO -  * Debugger PIN: 137-571-174
+2025-02-28 00:40:41,350 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:40:41,350 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:40:41,351 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:40:41,351 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:40:41,378 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:40:41] "GET / HTTP/1.1" 200 -
+2025-02-28 00:40:44,223 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:40:44,223 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:40:44,223 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:40:44,223 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:40:44,224 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:40:44] "GET / HTTP/1.1" 200 -
+2025-02-28 00:40:44,246 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:40:44,246 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:40:44,246 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:40:44,246 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:40:44,247 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:40:44] "GET / HTTP/1.1" 200 -
+2025-02-28 00:47:10,061 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:10] "GET /settings HTTP/1.1" 200 -
+2025-02-28 00:47:11,147 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:11] "GET /socket.io/?EIO=4&transport=polling&t=PLA1ORK HTTP/1.1" 200 -
+2025-02-28 00:47:11,375 - __main__ - INFO - Client connected: ATw_93EKGwBmxthVAAAB
+2025-02-28 00:47:11,375 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:11] "POST /socket.io/?EIO=4&transport=polling&t=PLA1OUu&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1" 200 -
+2025-02-28 00:47:11,423 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:11] "GET /socket.io/?EIO=4&transport=polling&t=PLA1OUx&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1" 200 -
+2025-02-28 00:47:11,891 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:11] "[35m[1mGET /socket.io/?EIO=4&transport=websocket&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1[0m" 500 -
+2025-02-28 00:47:16,396 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:16] "POST /socket.io/?EIO=4&transport=polling&t=PLA1PjO&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1" 200 -
+2025-02-28 00:47:19,628 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:19] "POST /socket.io/?EIO=4&transport=polling&t=PLA1QVs&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1" 200 -
+2025-02-28 00:47:25,959 - __main__ - INFO - Client disconnected: ATw_93EKGwBmxthVAAAB
+2025-02-28 00:47:25,959 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:25] "POST /socket.io/?EIO=4&transport=polling&t=PLA1S2b&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1" 200 -
+2025-02-28 00:47:25,963 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:25] "[33mGET /trading-view HTTP/1.1[0m" 404 -
+2025-02-28 00:47:30,660 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:30] "GET /settings HTTP/1.1" 200 -
+2025-02-28 00:47:31,835 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:31] "GET /socket.io/?EIO=4&transport=polling&t=PLA1TUc HTTP/1.1" 200 -
+2025-02-28 00:47:32,013 - __main__ - INFO - Client connected: 6NFtGJ_PjKzy4PLwAAAD
+2025-02-28 00:47:32,014 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:32] "POST /socket.io/?EIO=4&transport=polling&t=PLA1TXO&sid=7CREeuhFZjXYylYpAAAC HTTP/1.1" 200 -
+2025-02-28 00:47:32,017 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:32] "GET /socket.io/?EIO=4&transport=polling&t=PLA1TXQ&sid=7CREeuhFZjXYylYpAAAC HTTP/1.1" 200 -
+2025-02-28 00:47:32,560 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:32] "[35m[1mGET /socket.io/?EIO=4&transport=websocket&sid=7CREeuhFZjXYylYpAAAC HTTP/1.1[0m" 500 -
+2025-02-28 00:47:43,370 - __main__ - INFO - Client disconnected: 6NFtGJ_PjKzy4PLwAAAD
+2025-02-28 00:47:43,371 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:43] "POST /socket.io/?EIO=4&transport=polling&t=PLA1WIh&sid=7CREeuhFZjXYylYpAAAC HTTP/1.1" 200 -
+2025-02-28 00:47:43,549 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:47:43,550 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:47:43,550 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:47:43,550 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:47:43,551 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:43] "GET / HTTP/1.1" 200 -
+2025-02-28 00:47:56,589 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:47:56] "[31m[1mGET /socket.io/?EIO=4&transport=polling&t=PLA1OY9&sid=FxGsjZOE14rkvgDMAAAA HTTP/1.1[0m" 400 -
+2025-02-28 00:48:17,184 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 00:48:17] "[31m[1mGET /socket.io/?EIO=4&transport=polling&t=PLA1Ta0&sid=7CREeuhFZjXYylYpAAAC HTTP/1.1[0m" 400 -
+2025-02-28 00:49:40,152 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 00:49:40,219 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 00:49:41,154 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:49:41,154 - __main__ - ERROR - Failed to start server: [Errno 98] Address already in use
+2025-02-28 00:49:41,154 - __main__ - ERROR - Detailed error traceback:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 207, in <module>
+    eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 3000)), app)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/eventlet/convenience.py", line 78, in listen
+    sock.bind(addr)
+OSError: [Errno 98] Address already in use
+2025-02-28 00:50:11,893 - __main__ - INFO - Starting Flask server...
+2025-02-28 00:50:12,673 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:50:12,674 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:50:12,676 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:50:12,676 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:50:16,086 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:50:16,086 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:50:16,087 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:50:16,087 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:52:57,394 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:52:57,394 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:52:57,394 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:52:57,394 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:53:01,316 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:53:01,316 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:53:01,316 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:53:01,317 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 00:58:05,262 - __main__ - INFO - Client connected: m5VoaNVXMsdKI45VAAAC
+2025-02-28 00:58:05,324 - __main__ - INFO - Client connected: u9gKMz6GOyPikKa4AAAD
+2025-02-28 00:58:08,424 - __main__ - INFO - Received ML settings update: {'models': {'random_forest': True, 'gradient_boosting': True, 'svm': True}, 'min_confidence': 0.7}
+2025-02-28 00:58:10,107 - __main__ - INFO - Received trading settings update: {'mode': 'simulation', 'pairs': []}
+2025-02-28 00:58:14,750 - __main__ - INFO - Received ML settings update: {'models': {'random_forest': True, 'gradient_boosting': True, 'svm': True}, 'min_confidence': 0.7}
+2025-02-28 00:58:31,598 - __main__ - INFO - Client disconnected: u9gKMz6GOyPikKa4AAAD
+2025-02-28 00:58:31,602 - __main__ - INFO - Client disconnected: m5VoaNVXMsdKI45VAAAC
+2025-02-28 00:58:31,616 - __main__ - INFO - Index endpoint accessed
+2025-02-28 00:58:31,616 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 00:58:31,616 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 00:58:31,616 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:00:07,470 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:00:08,428 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:00:08,429 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:00:08,429 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:00:08,429 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:00:09,565 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:00:09,565 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:00:09,565 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:00:09,565 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:13:41,861 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:13:42,784 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:13:42,784 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:13:42,785 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:13:42,786 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:13:45,259 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:13:45,260 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:13:45,260 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:13:45,260 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:19:02,756 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:19:03,605 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:19:03,605 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:19:03,605 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:19:03,607 - __main__ - ERROR - Error parsing test results: No module named 'psycopg2'
+2025-02-28 01:19:03,614 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 104, in parse_test_results
+    from database_repository import DatabaseRepository
+  File "/home/runner/workspace/app/database_repository.py", line 8, in <module>
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+2025-02-28 01:19:03,636 - __main__ - ERROR - Error in index route: Object of type Undefined is not JSON serializable
+2025-02-28 01:19:03,637 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 224, in index
+    return render_template(
+           ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/app/templates/results.html", line 280, in top-level template code
+    labels: {{ trading_data.timestamps|tojson|safe }},
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1726, in do_tojson
+    return htmlsafe_json_dumps(value, dumps=dumps, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/utils.py", line 669, in htmlsafe_json_dumps
+    dumps(obj, **kwargs)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/json/provider.py", line 180, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/json/provider.py", line 120, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type Undefined is not JSON serializable
+2025-02-28 01:19:03,654 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:19:03,654 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:19:03,655 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:19:03,656 - __main__ - ERROR - Error parsing test results: No module named 'psycopg2'
+2025-02-28 01:19:03,656 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 104, in parse_test_results
+    from database_repository import DatabaseRepository
+  File "/home/runner/workspace/app/database_repository.py", line 8, in <module>
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+2025-02-28 01:19:03,656 - __main__ - ERROR - Error in index route: Object of type Undefined is not JSON serializable
+2025-02-28 01:19:03,657 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 224, in index
+    return render_template(
+           ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/app/templates/results.html", line 280, in top-level template code
+    labels: {{ trading_data.timestamps|tojson|safe }},
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/filters.py", line 1726, in do_tojson
+    return htmlsafe_json_dumps(value, dumps=dumps, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/utils.py", line 669, in htmlsafe_json_dumps
+    dumps(obj, **kwargs)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/json/provider.py", line 180, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/json/provider.py", line 120, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type Undefined is not JSON serializable
+2025-02-28 01:20:18,315 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:20:18,768 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:20:18,768 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:20:18,768 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:20:19,985 - database_repository - INFO - Database connection established
+2025-02-28 01:20:20,148 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:20:20,148 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:20:20,149 - database_repository - INFO - Database connection closed
+2025-02-28 01:20:20,166 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:20:20,166 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:20:20,166 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:20:20,602 - database_repository - INFO - Database connection established
+2025-02-28 01:20:20,733 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:20:20,733 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:20:20,733 - database_repository - INFO - Database connection closed
+2025-02-28 01:20:20,734 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:20:20,735 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:20:20,735 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:20:21,143 - database_repository - INFO - Database connection established
+2025-02-28 01:20:21,273 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:20:21,274 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:20:21,274 - database_repository - INFO - Database connection closed
+2025-02-28 01:22:16,852 - __main__ - INFO - Client connected: b26qR_TPqjJ6XgAKAAAC
+2025-02-28 01:22:17,007 - __main__ - INFO - Client connected: foBsRGlzSUYr-nQRAAAD
+2025-02-28 01:22:18,971 - __main__ - INFO - Received trading settings update: {'mode': 'simulation', 'pairs': ['BTCUSDT']}
+2025-02-28 01:22:21,364 - __main__ - INFO - Received ML settings update: {'models': {'random_forest': True, 'gradient_boosting': True, 'svm': True}, 'min_confidence': 0.7}
+2025-02-28 01:22:25,228 - database_repository - INFO - Database connection established
+2025-02-28 01:22:25,228 - ml_strategy_optimizer - INFO - MLStrategyOptimizer initialized
+2025-02-28 01:22:25,229 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:22:25,229 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:22:25,229 - ml_strategy_optimizer - INFO - Training ML models...
+2025-02-28 01:22:25,229 - ml_strategy_optimizer - ERROR - Error preparing features: 'str' object has no attribute 'iterrows'
+2025-02-28 01:22:25,230 - ml_strategy_optimizer - ERROR - Error in train_models: 'str' object has no attribute 'iterrows'
+2025-02-28 01:22:25,230 - __main__ - ERROR - Error handling ML settings: 'str' object has no attribute 'iterrows'
+2025-02-28 01:22:25,230 - database_repository - INFO - Database connection closed
+2025-02-28 01:22:25,231 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:22:25,232 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:22:25,232 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:22:25,640 - database_repository - INFO - Database connection established
+2025-02-28 01:22:25,795 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:22:25,795 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:22:25,795 - database_repository - INFO - Database connection closed
+2025-02-28 01:22:25,796 - __main__ - INFO - Client disconnected: b26qR_TPqjJ6XgAKAAAC
+2025-02-28 01:22:25,797 - __main__ - INFO - Client disconnected: foBsRGlzSUYr-nQRAAAD
+2025-02-28 01:26:42,512 - database_repository - INFO - Database connection established
+2025-02-28 01:26:42,517 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:26:43,550 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:26:43,551 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:26:43,551 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:26:43,972 - database_repository - INFO - Database connection established
+2025-02-28 01:26:44,128 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:26:44,129 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:26:44,129 - database_repository - INFO - Database connection closed
+2025-02-28 01:28:33,383 - database_repository - INFO - Database connection established
+2025-02-28 01:28:33,387 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:28:33,938 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:28:33,938 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:28:33,939 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:28:34,093 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:28:34,094 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:30:13,052 - database_repository - INFO - Database connection established
+2025-02-28 01:30:13,058 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:31:37,563 - database_repository - INFO - Database connection established
+2025-02-28 01:31:37,567 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:31:40,160 - database_repository - INFO - Database connection established
+2025-02-28 01:31:40,165 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:31:51,922 - database_repository - INFO - Database connection established
+2025-02-28 01:31:51,926 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:34:09,049 - database_repository - INFO - Database connection established
+2025-02-28 01:34:09,398 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:34:12,863 - database_repository - INFO - Database connection established
+2025-02-28 01:34:12,866 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:34:20,978 - database_repository - INFO - Database connection established
+2025-02-28 01:34:20,981 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:35:19,632 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:35:19,632 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:35:19,633 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:35:19,792 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:35:19,792 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:36:05,272 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:36:05,273 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:36:05,274 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:36:05,340 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:36:05,340 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:36:39,928 - database_repository - INFO - Database connection established
+2025-02-28 01:36:39,931 - __main__ - INFO - Starting Flask server...
+2025-02-28 01:36:43,267 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:36:43,268 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:36:43,268 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:36:43,400 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:36:43,401 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:36:43,401 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:36:43,932 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:36:43,932 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:36:43,932 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:36:43,996 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:36:43,997 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:36:43,997 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:37:39,385 - database_repository - INFO - Database connection established
+2025-02-28 01:37:39,388 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 01:37:42,402 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:37:42,403 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:37:42,403 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:37:42,534 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:37:42,534 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:37:42,534 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:37:43,456 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:37:43,456 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:37:43,457 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:37:43,522 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:37:43,522 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:37:43,522 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:37:53,001 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:37:53,001 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:37:53,001 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:37:53,067 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:37:53,067 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:37:53,067 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:38:48,403 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:38:48,404 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:38:48,404 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:38:48,469 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:38:48,469 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:38:48,469 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:38:54,331 - __main__ - INFO - Ping endpoint accessed
+2025-02-28 01:46:10,735 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:46:10,738 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:46:10,740 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:46:10,740 - database_repository - ERROR - Error getting trades: FATAL:  terminating connection due to idle-in-transaction timeout
+SSL connection has been closed unexpectedly
+
+2025-02-28 01:46:10,741 - __main__ - ERROR - Error parsing test results: FATAL:  terminating connection due to idle-in-transaction timeout
+SSL connection has been closed unexpectedly
+
+2025-02-28 01:46:10,741 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 119, in parse_test_results
+    value = 0
+  File "/home/runner/workspace/app/database_repository.py", line 158, in get_latest_trades
+    self.cur.execute(query, (symbol, limit))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/eventlet/support/psycopg2_patcher.py", line 46, in eventlet_wait_callback
+    state = conn.poll()
+            ^^^^^^^^^^^
+psycopg2.OperationalError: FATAL:  terminating connection due to idle-in-transaction timeout
+SSL connection has been closed unexpectedly
+
+2025-02-28 01:46:18,965 - __main__ - ERROR - Error getting notifications: connection already closed
+2025-02-28 01:46:19,336 - __main__ - INFO - Client connected: sxt9mDfZ2_i9Nx8SAAAB
+2025-02-28 01:46:19,652 - __main__ - INFO - Client connected: cICvfi9AVoqbIEY1AAAD
+2025-02-28 01:46:24,737 - __main__ - INFO - Client disconnected: cICvfi9AVoqbIEY1AAAD
+2025-02-28 01:46:24,740 - __main__ - INFO - Client disconnected: sxt9mDfZ2_i9Nx8SAAAB
+2025-02-28 01:46:24,753 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:46:24,753 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:46:24,753 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:46:24,754 - database_repository - ERROR - Error getting trades: cursor already closed
+2025-02-28 01:46:24,754 - __main__ - ERROR - Error parsing test results: cursor already closed
+2025-02-28 01:46:24,754 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 119, in parse_test_results
+    value = 0
+  File "/home/runner/workspace/app/database_repository.py", line 158, in get_latest_trades
+    self.cur.execute(query, (symbol, limit))
+psycopg2.InterfaceError: cursor already closed
+2025-02-28 01:46:51,825 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:46:51,825 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:46:51,825 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:46:51,825 - database_repository - ERROR - Error getting trades: cursor already closed
+2025-02-28 01:46:51,826 - __main__ - ERROR - Error parsing test results: cursor already closed
+2025-02-28 01:46:51,826 - __main__ - ERROR - Detailed error:
+Traceback (most recent call last):
+  File "/home/runner/workspace/app/web_server.py", line 119, in parse_test_results
+    value = 0
+  File "/home/runner/workspace/app/database_repository.py", line 158, in get_latest_trades
+    self.cur.execute(query, (symbol, limit))
+psycopg2.InterfaceError: cursor already closed
+2025-02-28 01:46:58,951 - __main__ - ERROR - Error getting notifications: connection already closed
+2025-02-28 01:46:59,102 - __main__ - INFO - Client connected: BPeDoCU0a2ayAn22AAAF
+2025-02-28 01:46:59,667 - __main__ - INFO - Client connected: 8RTo0OJdJusxn75bAAAH
+2025-02-28 01:47:11,673 - __main__ - INFO - Client disconnected: 8RTo0OJdJusxn75bAAAH
+2025-02-28 01:47:11,676 - __main__ - INFO - Client disconnected: BPeDoCU0a2ayAn22AAAF
+2025-02-28 01:47:11,692 - __main__ - ERROR - Error getting bot status: connection already closed
+2025-02-28 01:47:11,714 - __main__ - ERROR - Error loading control panel: 'dict object' has no attribute 'current_profit_loss'
+2025-02-28 01:48:42,410 - database_repository - INFO - Database connection established
+2025-02-28 01:48:42,410 - __main__ - INFO - Database connection established
+2025-02-28 01:48:42,413 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 01:48:43,285 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:48:43,285 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:48:43,285 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:48:43,450 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:48:43,450 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:48:43,450 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:48:43,625 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:48:43,626 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:48:43,626 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:48:43,691 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:48:43,691 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:48:43,691 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:50:32,068 - database_repository - INFO - Database connection established
+2025-02-28 01:50:32,070 - __main__ - INFO - Database connection established
+2025-02-28 01:50:32,073 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 01:50:32,468 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:50:32,468 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:50:32,468 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:50:32,468 - __main__ - INFO - Starting to parse test results
+2025-02-28 01:50:32,600 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:50:32,600 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:50:32,600 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 01:50:34,216 - __main__ - INFO - Index endpoint accessed
+2025-02-28 01:50:34,216 - __main__ - INFO - Attempting to load trading_summary.log
+2025-02-28 01:50:34,216 - __main__ - INFO - Successfully loaded 1106 bytes from trading_summary.log
+2025-02-28 01:50:34,216 - __main__ - INFO - Starting to parse test results
+2025-02-28 01:50:34,282 - database_repository - INFO - Retrieved 0 trades
+2025-02-28 01:50:34,282 - __main__ - INFO - Parsed results - Overall stats: 0 items, Regime stats: 0 regimes
+2025-02-28 01:50:34,282 - __main__ - INFO - Trading data - Timestamps: 0, Returns: 0
+2025-02-28 02:06:46,164 - database_repository - INFO - Database connection established
+2025-02-28 02:06:46,166 - __main__ - INFO - Database connection established
+2025-02-28 02:06:46,167 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:07:14,782 - database_repository - INFO - Database connection established
+2025-02-28 02:07:14,782 - __main__ - INFO - Database connection established
+2025-02-28 02:07:14,784 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:07:15,231 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:07:15,257 - __main__ - ERROR - Error in index route: 'overall_stats' is undefined
+2025-02-28 02:07:15,784 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:07:15,785 - __main__ - ERROR - Error in index route: 'overall_stats' is undefined
+2025-02-28 02:07:51,096 - database_repository - INFO - Database connection established
+2025-02-28 02:07:51,096 - __main__ - INFO - Database connection established
+2025-02-28 02:07:51,098 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:07:51,494 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:07:51,697 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:08:19,502 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:08:19,565 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 02:08:19,566 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 02:08:19,575 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:08:19,844 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:08:19,853 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:08:19,870 - werkzeug - INFO -  * Debugger PIN: 377-979-872
+2025-02-28 02:08:21,503 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:08:21,525 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:08:21] "GET / HTTP/1.1" 200 -
+2025-02-28 02:08:21,685 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:08:21,685 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:08:21] "GET / HTTP/1.1" 200 -
+2025-02-28 02:08:33,074 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:08:33,075 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:08:33] "GET / HTTP/1.1" 200 -
+2025-02-28 02:09:32,527 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 02:09:32,555 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:09:33,114 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:09:33,115 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:09:33,115 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:09:33,126 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 02:09:33,126 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 02:09:33,132 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:09:33,369 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:09:33,370 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:09:33,370 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:09:33,379 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:09:33,384 - werkzeug - INFO -  * Debugger PIN: 119-794-643
+2025-02-28 02:09:33,994 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:09:34,012 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:09:34] "GET / HTTP/1.1" 200 -
+2025-02-28 02:09:34,239 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:09:34,240 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:09:34] "GET / HTTP/1.1" 200 -
+2025-02-28 02:10:04,630 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 02:10:04,660 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:10:05,129 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:10:05,264 - __main__ - INFO - SocketIO initialized successfully
+2025-02-28 02:10:05,266 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:10:05,266 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:10:05,266 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:10:05,269 - werkzeug - INFO -  * Debugger PIN: 936-445-322
+2025-02-28 02:10:32,357 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:10:32,478 - __main__ - INFO - SocketIO initialized successfully
+2025-02-28 02:10:32,480 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:10:32,480 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:10:32,480 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:10:32,923 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:10:33,049 - __main__ - INFO - SocketIO initialized successfully
+2025-02-28 02:10:33,050 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:10:33,050 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:10:33,051 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:10:33,053 - werkzeug - INFO -  * Debugger PIN: 143-421-390
+2025-02-28 02:10:33,507 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:10:33,685 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:11:05,091 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 02:11:05,186 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:11:06,390 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:11:06,395 - engineio.server - INFO - Server initialized for eventlet.
+2025-02-28 02:11:06,396 - __main__ - INFO - SocketIO initialized successfully
+2025-02-28 02:11:06,397 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:11:06,397 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:11:06,398 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:11:06,995 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:11:07,001 - engineio.server - INFO - Server initialized for eventlet.
+2025-02-28 02:11:07,001 - __main__ - INFO - SocketIO initialized successfully
+2025-02-28 02:11:07,002 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:11:07,002 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:11:07,003 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:11:07,005 - werkzeug - INFO -  * Debugger PIN: 122-446-274
+2025-02-28 02:11:07,456 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:11:07,638 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:11:09,400 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:15:49,619 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 02:15:49,834 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:15:51,067 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:15:51,072 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:15:51,075 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:15:51,107 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 02:15:51,109 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 02:15:51,126 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:15:51,510 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:15:51,511 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:15:51,511 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:15:51,521 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:15:51,529 - werkzeug - INFO -  * Debugger PIN: 560-110-449
+2025-02-28 02:15:54,435 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:15:54,459 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:15:54] "GET / HTTP/1.1" 200 -
+2025-02-28 02:15:54,619 - __main__ - INFO - Index endpoint accessed
+2025-02-28 02:15:54,620 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:15:54] "GET / HTTP/1.1" 200 -
+2025-02-28 02:16:16,031 - werkzeug - INFO -  * Detected change in '/home/runner/workspace/app/web_server.py', reloading
+2025-02-28 02:16:16,076 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:16:16,373 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:16:16,373 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:16:16,373 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:16:16,383 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:16:16,389 - werkzeug - INFO -  * Debugger PIN: 576-576-948
+2025-02-28 02:16:17,684 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:16:17,685 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:16:17,685 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:16:17,697 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.128.52:5000
+2025-02-28 02:16:17,698 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-02-28 02:16:17,703 - werkzeug - INFO -  * Restarting with stat
+2025-02-28 02:16:17,945 - __main__ - INFO - Flask app initialized successfully
+2025-02-28 02:16:17,945 - __main__ - INFO - All routes registered successfully
+2025-02-28 02:16:17,945 - __main__ - INFO - Starting Flask server on port 5000...
+2025-02-28 02:16:17,954 - werkzeug - WARNING -  * Debugger is active!
+2025-02-28 02:16:17,962 - werkzeug - INFO -  * Debugger PIN: 819-237-142
+2025-02-28 02:16:18,142 - __main__ - INFO - Index route accessed
+2025-02-28 02:16:18,143 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:16:18] "GET / HTTP/1.1" 200 -
+2025-02-28 02:16:18,302 - __main__ - INFO - Index route accessed
+2025-02-28 02:16:18,303 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:16:18] "GET / HTTP/1.1" 200 -
+2025-02-28 02:16:19,679 - __main__ - INFO - Index route accessed
+2025-02-28 02:16:19,680 - werkzeug - INFO - 172.31.128.52 - - [28/Feb/2025 02:16:19] "GET / HTTP/1.1" 200 -

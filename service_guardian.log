@@ -1,0 +1,18 @@
+2025-03-12 01:50:29,173 - trading_system - INFO - Đang khởi tạo hệ thống giao dịch...
+2025-03-12 01:50:29,174 - trading_system - INFO - Đã tạo file cấu hình mặc định: configs/service_config.json
+2025-03-12 01:50:29,174 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 01:50:29,922 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 01:50:29,922 - trading_system - INFO - Đã gửi thông báo khởi động hệ thống
+2025-03-12 01:50:29,922 - trading_system - INFO - Hệ thống đã được khởi tạo
+2025-03-12 01:50:29,922 - trading_system - INFO - Đang khởi động hệ thống phân tích thị trường...
+2025-03-12 01:50:33,121 - trading_system - ERROR - Lỗi khi khởi động hệ thống phân tích thị trường: mã thoát 1
+2025-03-12 05:55:04,339 - service_guardian - INFO - Đã tải cấu hình từ configs/service_config.json
+2025-03-12 05:55:04,339 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 05:55:04,340 - service_guardian - INFO - Service Guardian đã được khởi tạo
+2025-03-12 05:55:04,340 - service_guardian - INFO - Đang khởi động Service Guardian
+2025-03-12 05:55:04,340 - service_guardian - INFO - Đang khởi động dịch vụ: market_analyzer với lệnh: python activate_market_analyzer.py --once
+2025-03-12 05:55:04,343 - service_guardian - INFO - Đã khởi động dịch vụ market_analyzer, PID: 14820
+2025-03-12 05:55:07,343 - service_guardian - INFO - Dịch vụ market_analyzer đã chạy thành công
+2025-03-12 05:55:07,344 - service_guardian - INFO - Bắt đầu giám sát dịch vụ market_analyzer, kiểm tra mỗi 60s
+2025-03-12 05:55:08,146 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 05:55:08,146 - service_guardian - INFO - Đã gửi báo cáo trạng thái hệ thống

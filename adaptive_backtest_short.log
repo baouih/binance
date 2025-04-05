@@ -1,0 +1,27 @@
+2025-03-20 01:13:34,477 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-20 01:13:34,477 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-20 01:13:34,477 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-20 01:13:34,477 - adaptive_backtest - INFO - Khoảng thời gian: 1mo
+2025-03-20 01:13:34,478 - adaptive_backtest - INFO - Số dư ban đầu: $10000
+2025-03-20 01:13:34,478 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-20 01:13:34,478 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-20 01:13:34,478 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-20 01:13:34,478 - adaptive_backtest - INFO - 
+Bắt đầu backtest BTC-USD
+[*********************100%***********************]  1 of 1 completed
+2025-03-20 01:13:34,737 - adaptive_backtest - INFO - Đã tải 28 dòng dữ liệu cho BTC-USD
+2025-03-20 01:13:34,760 - adaptive_backtest - ERROR - Lỗi khi backtest BTC-USD: Cannot set a DataFrame with multiple columns to the single column atr_volatility
+2025-03-20 01:13:34,760 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-20 01:13:34,761 - adaptive_backtest - INFO - Đã lưu báo cáo: backtest_reports/adaptive_backtest_report_20250320_011334.txt
+2025-03-20 01:13:34,762 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: backtest_reports/adaptive_backtest_data_20250320_011334.json
+2025-03-20 01:13:34,762 - adaptive_backtest - WARNING - Không có dữ liệu giao dịch để vẽ biểu đồ
+YF.download() has changed argument auto_adjust default to True

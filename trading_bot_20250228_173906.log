@@ -1,0 +1,53 @@
+2025-02-28 17:39:08,848 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-02-28 17:39:08,848 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-02-28 17:39:09,373 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://testnet.binancefuture.com/fapi/v1/ping
+2025-02-28 17:39:09,373 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-02-28 17:39:09,376 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-02-28 17:39:09,376 - app.composite_indicator - INFO - Khởi tạo CompositeIndicator với 9 chỉ báo: ['rsi', 'macd', 'ema_cross', 'bbands', 'volume_trend', 'adx', 'stochastic', 'obv', 'atr']
+2025-02-28 17:39:09,377 - advanced_ml_optimizer - INFO - Khởi tạo AdvancedMLOptimizer với 2 loại mô hình cơ sở
+2025-02-28 17:39:09,377 - advanced_ml_optimizer - INFO - Mô hình riêng cho mỗi chế độ thị trường: True
+2025-02-28 17:39:09,377 - advanced_ml_optimizer - INFO - Sử dụng lựa chọn tính năng tự động: True
+2025-02-28 17:39:09,377 - advanced_ml_optimizer - INFO - Sử dụng kỹ thuật ensemble: True
+2025-02-28 17:39:09,377 - live_trading - INFO - Đang nạp mô hình từ: models/ml_models_20250228_173146.pkl
+2025-02-28 17:39:09,422 - advanced_ml_optimizer - INFO - Đã tải mô hình từ models/ml_models_20250228_173146.pkl
+2025-02-28 17:39:09,422 - advanced_ml_optimizer - INFO - Số lượng mô hình: 3
+2025-02-28 17:39:09,422 - live_trading - INFO - Đã nạp mô hình thành công với 3 mô hình
+2025-02-28 17:39:09,422 - live_trading - INFO - Khởi tạo bot giao dịch: ['BTCUSDT'], timeframes=['1h'], live_mode=False
+2025-02-28 17:39:09,422 - live_trading - INFO - Đang lấy dữ liệu huấn luyện cho BTCUSDT trong 30 ngày
+2025-02-28 17:39:09,841 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-02-28 17:39:09,845 - data_processor - INFO - Detected market regime: neutral
+2025-02-28 17:39:09,882 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-02-28 17:39:09,882 - data_processor - INFO - Price: 83827.40 (-0.15% change)
+2025-02-28 17:39:09,882 - data_processor - INFO - Trend: Downtrend
+2025-02-28 17:39:09,882 - data_processor - INFO - RSI: 42.11 (Neutral)
+2025-02-28 17:39:09,882 - data_processor - INFO - MACD: -1419.11 (Signal: -1744.25)
+2025-02-28 17:39:09,882 - data_processor - INFO - Volume: 3.28x average
+2025-02-28 17:39:09,882 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-02-28 17:39:09,882 - data_processor - INFO - ===========================
+2025-02-28 17:39:09,882 - data_processor - INFO - Processed 720 samples with indicators
+2025-02-28 17:39:09,886 - advanced_ml_optimizer - INFO - Đã cắt X từ 720 xuống 719 để khớp với y
+2025-02-28 17:39:09,886 - advanced_ml_optimizer - INFO - Kích thước cuối cùng: X = 719, y = 719
+2025-02-28 17:39:09,886 - live_trading - INFO - Huấn luyện mô hình cho BTCUSDT với 720 mẫu, phân phối lớp: (array([-1.,  0.,  1.]), array([306, 108, 305]))
+2025-02-28 17:39:09,887 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang volatile
+Traceback (most recent call last):
+  File "/home/runner/workspace/run_live_trading.py", line 616, in <module>
+    main()
+  File "/home/runner/workspace/run_live_trading.py", line 610, in main
+    bot._train_new_models()
+  File "/home/runner/workspace/run_live_trading.py", line 154, in _train_new_models
+    self.ml_optimizer.train_models(X, y, regime=market_regime)
+  File "/home/runner/workspace/app/advanced_ml_optimizer.py", line 251, in train_models
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/model_selection/_split.py", line 2848, in train_test_split
+    arrays = indexable(*arrays)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 532, in indexable
+    check_consistent_length(*result)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 475, in check_consistent_length
+    raise ValueError(
+ValueError: Found input variables with inconsistent numbers of samples: [720, 719]

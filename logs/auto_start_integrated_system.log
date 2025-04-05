@@ -1,0 +1,133 @@
+Sun 09 Mar 2025 04:51:52 AM UTC - Bắt đầu khởi động hệ thống tích hợp
+Sun 09 Mar 2025 04:51:52 AM UTC - Khởi động dịch vụ giám sát
+Monitor PID: 1677
+Sun 09 Mar 2025 04:51:52 AM UTC - Thêm trailing stop và điều chỉnh TP/SL cho vị thế hiện có
+2025-03-09 04:51:52,304 - trailing_stop_adder - INFO - === Thêm/Cập nhật Trailing Stop cho TẤT CẢ vị thế hiện có (chế độ force) ===
+2025-03-09 04:51:52,306 - trailing_stop_adder - INFO - Đã xóa danh sách vị thế được theo dõi để buộc cập nhật lại toàn bộ
+2025-03-09 04:51:52,499 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v2/positionRisk
+2025-03-09 04:51:52,951 - trailing_stop_adder - INFO - Đã lấy 3 vị thế đang hoạt động
+2025-03-09 04:51:53,108 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v1/openOrders
+2025-03-09 04:51:53,265 - trailing_stop_adder - INFO - Đã lấy 9 lệnh đang mở
+2025-03-09 04:51:53,265 - trailing_stop_adder - INFO - Xử lý vị thế ETHUSDT:
+2025-03-09 04:51:53,265 - trailing_stop_adder - INFO -   - Số lượng: 0.124
+2025-03-09 04:51:53,265 - trailing_stop_adder - INFO -   - Giá vào: 2181.38
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đã có lệnh Trailing Stop cho ETHUSDT, không cần tạo thêm
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO - Xử lý vị thế BNBUSDT:
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Số lượng: 0.45
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Giá vào: 600.3683333333
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đã có lệnh Trailing Stop cho BNBUSDT, không cần tạo thêm
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO - Xử lý vị thế BTCUSDT:
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Số lượng: 0.003
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Giá vào: 86100.3
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:53,266 - trailing_stop_adder - INFO -   - Đã có lệnh Trailing Stop cho BTCUSDT, không cần tạo thêm
+2025-03-09 04:51:53,267 - trailing_stop_adder - INFO - Đã hoàn thành kiểm tra và thêm Trailing Stop cho các vị thế.
+2025-03-09 04:51:53,267 - trailing_stop_adder - INFO - 
+=== Thêm TP 3% cho các vị thế hiện có ===
+2025-03-09 04:51:53,423 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v2/positionRisk
+2025-03-09 04:51:53,593 - trailing_stop_adder - INFO - Đã lấy 3 vị thế đang hoạt động
+2025-03-09 04:51:53,749 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v1/openOrders
+2025-03-09 04:51:53,922 - trailing_stop_adder - INFO - Đã lấy 9 lệnh đang mở
+2025-03-09 04:51:53,922 - trailing_stop_adder - INFO - Xử lý vị thế ETHUSDT:
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Số lượng: 0.124
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Giá vào: 2181.38
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Đã có lệnh TP 3.0% cho ETHUSDT, không cần tạo thêm
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO - Xử lý vị thế BNBUSDT:
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Số lượng: 0.45
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Giá vào: 600.3683333333
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:53,923 - trailing_stop_adder - INFO -   - Thêm TP 3.0% cho BNBUSDT tại giá 618.38
+2025-03-09 04:51:54,080 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v1/order
+2025-03-09 04:51:54,080 - trailing_stop_adder - INFO - Tham số: {'symbol': 'BNBUSDT', 'side': 'SELL', 'type': 'TAKE_PROFIT_MARKET', 'timestamp': 1741495914009, 'positionSide': 'LONG', 'quantity': '0.225', 'stopPrice': '618.38'}
+2025-03-09 04:51:54,246 - trailing_stop_adder - ERROR - Lỗi khi đặt lệnh: 400 - {"code":-1111,"msg":"Precision is over the maximum defined for this asset."}
+2025-03-09 04:51:54,246 - trailing_stop_adder - ERROR -   - Không thể tạo TP 3.0% cho BNBUSDT
+2025-03-09 04:51:54,246 - trailing_stop_adder - INFO - Xử lý vị thế BTCUSDT:
+2025-03-09 04:51:54,246 - trailing_stop_adder - INFO -   - Số lượng: 0.003
+2025-03-09 04:51:54,246 - trailing_stop_adder - INFO -   - Giá vào: 86100.3
+2025-03-09 04:51:54,247 - trailing_stop_adder - INFO -   - Đòn bẩy: 5.0x
+2025-03-09 04:51:54,247 - trailing_stop_adder - INFO -   - Position Side: LONG
+2025-03-09 04:51:54,247 - trailing_stop_adder - INFO -   - Thêm TP 3.0% cho BTCUSDT tại giá 88683.31
+2025-03-09 04:51:54,401 - trailing_stop_adder - INFO - Gửi request đến: https://testnet.binancefuture.com/fapi/v1/order
+2025-03-09 04:51:54,401 - trailing_stop_adder - INFO - Tham số: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'TAKE_PROFIT_MARKET', 'timestamp': 1741495914330, 'positionSide': 'LONG', 'quantity': '0.0015', 'stopPrice': '88683.31'}
+2025-03-09 04:51:54,564 - trailing_stop_adder - ERROR - Lỗi khi đặt lệnh: 400 - {"code":-1111,"msg":"Precision is over the maximum defined for this asset."}
+2025-03-09 04:51:54,564 - trailing_stop_adder - ERROR -   - Không thể tạo TP 3.0% cho BTCUSDT
+2025-03-09 04:51:54,565 - trailing_stop_adder - INFO - Đã hoàn thành kiểm tra và thêm TP 3.0% cho các vị thế.
+Sun 09 Mar 2025 04:51:54 AM UTC - Khởi động dịch vụ giám sát TP/SL liên tục
+Adaptive SL Manager PID: 1797
+Sun 09 Mar 2025 04:51:56 AM UTC - Khởi động scheduler service
+Scheduler PID: 1809
+Sun 09 Mar 2025 04:51:58 AM UTC - Khởi động dịch vụ trailing stop
+Service starter PID: 1816
+Sun 09 Mar 2025 04:51:58 AM UTC - Đã lưu PID vào integrated_system.pid
+Sun 09 Mar 2025 05:03:20 AM UTC - Bắt đầu khởi động hệ thống tích hợp
+Sun 09 Mar 2025 05:03:20 AM UTC - Khởi động dịch vụ giám sát
+Monitor PID: 3066
+Sun 09 Mar 2025 05:03:20 AM UTC - Thêm trailing stop và điều chỉnh TP/SL cho vị thế hiện có
+2025-03-09 05:03:20,471 - trailing_stop_adder - INFO - === Thêm/Cập nhật Trailing Stop cho TẤT CẢ vị thế hiện có (chế độ force) ===
+2025-03-09 05:03:20,472 - trailing_stop_adder - INFO - Đã xóa danh sách vị thế được theo dõi để buộc cập nhật lại toàn bộ
+2025-03-09 05:03:20,479 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:20,480 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:20,480 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:20,480 - trailing_stop_adder - INFO - Đang lấy vị thế từ Binance API...
+2025-03-09 05:03:20,685 - trailing_stop_adder - INFO - Đã lấy 3 vị thế đang hoạt động
+2025-03-09 05:03:20,686 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:20,686 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:20,686 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:20,686 - trailing_stop_adder - INFO - Đang lấy lệnh đang mở từ Binance API...
+2025-03-09 05:03:20,686 - trailing_stop_adder - ERROR - Lỗi khi lấy thông tin lệnh đang mở: 'BinanceAPI' object has no attribute 'futures_get_open_orders'
+2025-03-09 05:03:20,686 - trailing_stop_adder - ERROR - Không thể lấy danh sách lệnh đang mở.
+2025-03-09 05:03:20,686 - trailing_stop_adder - INFO - 
+=== Thêm TP 3% cho các vị thế hiện có ===
+2025-03-09 05:03:20,687 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:20,687 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:20,687 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:20,687 - trailing_stop_adder - INFO - Đang lấy vị thế từ Binance API...
+2025-03-09 05:03:21,158 - trailing_stop_adder - INFO - Đã lấy 3 vị thế đang hoạt động
+2025-03-09 05:03:21,159 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:21,159 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:21,159 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:21,159 - trailing_stop_adder - INFO - Đang lấy lệnh đang mở từ Binance API...
+2025-03-09 05:03:21,159 - trailing_stop_adder - ERROR - Lỗi khi lấy thông tin lệnh đang mở: 'BinanceAPI' object has no attribute 'futures_get_open_orders'
+2025-03-09 05:03:21,159 - trailing_stop_adder - ERROR - Không thể lấy danh sách lệnh đang mở.
+Sun 09 Mar 2025 05:03:21 AM UTC - Khởi động dịch vụ giám sát TP/SL liên tục
+Adaptive SL Manager PID: 3108
+Sun 09 Mar 2025 05:03:23 AM UTC - Khởi động scheduler service
+Scheduler PID: 3160
+Sun 09 Mar 2025 05:03:25 AM UTC - Khởi động dịch vụ trailing stop
+Service starter PID: 3167
+Sun 09 Mar 2025 05:03:25 AM UTC - Đã lưu PID vào integrated_system.pid
+Sun 09 Mar 2025 05:03:30 AM UTC - Kiểm tra trạng thái hệ thống
+2025-03-09 05:03:30,290 - trailing_stop_scheduler - INFO - Thực hiện hành động: status
+
+=== TRẠNG THÁI HỆ THỐNG TRAILING STOP ===
+Thời gian kiểm tra: 2025-03-09 05:03:30
+Dịch vụ trailing stop: ĐANG CHẠY
+  PID: 3174
+Dịch vụ lập lịch: ĐANG CHẠY
+  PID: 3078
+
+Đang theo dõi: 3 vị thế
+Đã kích hoạt trailing stop: 0 vị thế
+
+CHI TIẾT VỊ THẾ:
+  ETHUSDT (LONG):
+    Giá vào: 2181.38
+    Trailing stop: None (Chưa kích hoạt)
+
+  BNBUSDT (LONG):
+    Giá vào: 600.3683333333
+    Trailing stop: None (Chưa kích hoạt)
+
+  BTCUSDT (LONG):
+    Giá vào: 86100.3
+    Trailing stop: None (Chưa kích hoạt)
+
+Sun 09 Mar 2025 05:03:30 AM UTC - Đã hoàn tất khởi động hệ thống tích hợp

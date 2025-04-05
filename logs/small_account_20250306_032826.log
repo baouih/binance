@@ -1,0 +1,25 @@
+===== Khởi động hệ thống tài khoản nhỏ - Thu 06 Mar 2025 03:28:26 AM UTC =====
+1. Kiểm tra cài đặt đòn bẩy cho các cặp tiền ưu tiên...
+Đã khởi tạo SmallAccountMonitor, testnet=True
+Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho ADAUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho DOGEUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho MATICUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho XRPUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho ETHUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+Kết quả: {'ADAUSDT': False, 'DOGEUSDT': False, 'MATICUSDT': False, 'XRPUSDT': False, 'ETHUSDT': False}
+2. Thiết lập SL/TP cho các vị thế đang mở...
+2025-03-06 03:28:26,551 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-06 03:28:26,552 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-06 03:28:26,552 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-06 03:28:26,552 - auto_setup_sltp - ERROR - Lỗi trong quá trình thiết lập SL/TP: 'BinanceAPI' object has no attribute 'get_position_info'
+3. Bắt đầu giám sát tài khoản nhỏ...
+   Đã khởi động giám sát với PID: 1558
+4. Khởi động hệ thống trailing stop...
+   Đã khởi động trailing stop với PID: 1568
+
+===== Hệ thống tài khoản nhỏ đã khởi động xong! =====
+Để kiểm tra logs:
+- Giám sát tài khoản: tail -f logs/small_account_monitor_20250306_032826.log
+- Trailing stop: tail -f logs/trailing_stop_20250306_032826.log
+
+Để dừng hệ thống: kill $(cat small_account_monitor.pid)

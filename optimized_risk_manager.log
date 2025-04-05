@@ -1,0 +1,26 @@
+2025-03-15 12:11:23,766 - optimized_risk_manager - INFO - Khởi tạo OptimizedRiskManager với account_size=10000
+2025-03-15 12:11:23,766 - optimized_risk_manager - INFO - Mức rủi ro mặc định: extreme_risk (20%)
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Cập nhật trạng thái thị trường: {'regime': 'NEUTRAL', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'} -> {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'}
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Điều chỉnh mức rủi ro: extreme_risk (20%) -> ultra_high_risk (25%) dựa trên trạng thái thị trường
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Tính position size cho BTCUSDT tại mức rủi ro ultra_high_risk (25%): size=2.000000, entry=50000.00, risk_amount=$2500.00
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Cập nhật trạng thái thị trường: {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'} -> {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'}
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Điều chỉnh mức rủi ro: ultra_high_risk (25%) -> extreme_risk (20%) dựa trên trạng thái thị trường
+2025-03-15 12:11:23,767 - optimized_risk_manager - INFO - Tính position size cho BTCUSDT tại mức rủi ro extreme_risk (20%): size=2.000000, entry=50000.00, risk_amount=$2000.00
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Cập nhật trạng thái thị trường: {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'} -> {'regime': 'SIDEWAYS', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'}
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Điều chỉnh mức rủi ro: extreme_risk (20%) -> high_risk (15%) dựa trên trạng thái thị trường
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Tính position size cho BTCUSDT tại mức rủi ro high_risk (15%): size=2.000000, entry=50000.00, risk_amount=$1500.00
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Cập nhật trạng thái thị trường: {'regime': 'SIDEWAYS', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'} -> {'regime': 'BEAR', 'volatility': 'NORMAL', 'trend_strength': 'STRONG'}
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Điều chỉnh mức rủi ro: high_risk (15%) -> high_moderate (10%) dựa trên trạng thái thị trường
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Tính position size cho BTCUSDT tại mức rủi ro high_moderate (10%): size=2.000000, entry=50000.00, risk_amount=$1000.00
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Cập nhật trạng thái thị trường: {'regime': 'BEAR', 'volatility': 'NORMAL', 'trend_strength': 'STRONG'} -> {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'}
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Điều chỉnh mức rủi ro: high_moderate (10%) -> ultra_high_risk (25%) dựa trên trạng thái thị trường
+2025-03-15 12:11:23,768 - optimized_risk_manager - INFO - Tính position size cho BTCUSDT tại mức rủi ro ultra_high_risk (25%): size=2.000000, entry=50000.00, risk_amount=$2500.00
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Đã lưu trạng thái vào test_optimized_risk_state.json
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất high_moderate: profit=100.00, drawdown=2.00, win_rate=100.00%
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất high_moderate: profit=50.00, drawdown=5.00, win_rate=100.00%
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất high_risk: profit=100.00, drawdown=2.00, win_rate=100.00%
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất high_risk: profit=50.00, drawdown=5.00, win_rate=100.00%
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất extreme_risk: profit=100.00, drawdown=2.00, win_rate=100.00%
+2025-03-15 12:11:23,769 - optimized_risk_manager - INFO - Cập nhật hiệu suất extreme_risk: profit=50.00, drawdown=5.00, win_rate=100.00%
+2025-03-15 12:11:23,770 - optimized_risk_manager - INFO - Cập nhật hiệu suất ultra_high_risk: profit=100.00, drawdown=2.00, win_rate=100.00%
+2025-03-15 12:11:23,770 - optimized_risk_manager - INFO - Cập nhật hiệu suất ultra_high_risk: profit=50.00, drawdown=5.00, win_rate=100.00%

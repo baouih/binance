@@ -1,0 +1,13 @@
+2025-03-06 03:27:22,615 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-06 03:27:22,615 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-06 03:27:22,615 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-06 03:28:26,338 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-06 03:28:26,338 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-06 03:28:26,338 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-06 03:28:26,339 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 03:28:26,339 - small_account_monitor - INFO - Đã khởi tạo SmallAccountMonitor, testnet=True
+2025-03-06 03:28:26,339 - small_account_monitor - ERROR - Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho ADAUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+2025-03-06 03:28:26,339 - small_account_monitor - ERROR - Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho DOGEUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+2025-03-06 03:28:26,339 - small_account_monitor - ERROR - Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho MATICUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+2025-03-06 03:28:26,339 - small_account_monitor - ERROR - Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho XRPUSDT: 'BinanceAPI' object has no attribute 'get_leverage'
+2025-03-06 03:28:26,339 - small_account_monitor - ERROR - Lỗi khi kiểm tra/điều chỉnh đòn bẩy cho ETHUSDT: 'BinanceAPI' object has no attribute 'get_leverage'

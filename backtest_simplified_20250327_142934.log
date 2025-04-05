@@ -1,0 +1,129 @@
+2025-03-27 14:29:34,744 - simplified_backtest - INFO - Bắt đầu backtest đơn giản lúc: 2025-03-27 14:29:34.744265
+2025-03-27 14:29:34,744 - simplified_backtest - INFO - Bắt đầu backtest đơn giản với 3 symbols trong 3mo
+2025-03-27 14:29:34,744 - simplified_backtest - INFO - Test symbol BTC-USD với 3mo dữ liệu trên khung 1d
+2025-03-27 14:29:34,744 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:29:34,744 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:29:34,745 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:29:34,745 - adaptive_backtest - INFO - Khoảng thời gian: 3mo
+2025-03-27 14:29:34,745 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:29:34,745 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:29:34,746 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:29:34,746 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:29:34,746 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:29:34,746 - adaptive_backtest - INFO - 
+Bắt đầu backtest BTC-USD
+2025-03-27 14:29:35,397 - adaptive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:29:35,914 - adaptive_backtest - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-27 14:29:35,944 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:29:35,951 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:29:35,953 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:29:35,959 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:35,959 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:35,967 - adaptive_backtest - ERROR - Lỗi khi backtest BTC-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:29:35,967 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:29:35,967 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:29:35,967 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:29:35,967 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:29:35,967 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:29:35,968 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:29:35,968 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:29:35,968 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:29:35,968 - simplified_backtest - INFO - Kết quả BTC-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:35,968 - simplified_backtest - INFO - Test symbol ETH-USD với 3mo dữ liệu trên khung 1d
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Khoảng thời gian: 3mo
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:29:35,969 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:29:35,970 - adaptive_backtest - INFO - 
+Bắt đầu backtest ETH-USD
+2025-03-27 14:29:35,970 - adaptive_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:29:36,441 - adaptive_backtest - INFO - Đã tải 91 dòng dữ liệu cho ETH-USD
+2025-03-27 14:29:36,468 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:29:36,475 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:29:36,477 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:29:36,483 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:36,483 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:36,492 - adaptive_backtest - ERROR - Lỗi khi backtest ETH-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:29:36,492 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:29:36,493 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:29:36,494 - simplified_backtest - INFO - Kết quả ETH-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:36,494 - simplified_backtest - INFO - Test symbol BNB-USD với 3mo dữ liệu trên khung 1d
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Khoảng thời gian: 3mo
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - 
+Bắt đầu backtest BNB-USD
+2025-03-27 14:29:36,494 - adaptive_backtest - INFO - Tải dữ liệu BNBUSDT từ Binance (1d, 90 ngày)
+2025-03-27 14:29:36,972 - adaptive_backtest - INFO - Đã tải 91 dòng dữ liệu cho BNB-USD
+2025-03-27 14:29:36,999 - sideways_detector - INFO - Đã tính ATR volatility cho 78 dòng dữ liệu
+2025-03-27 14:29:37,007 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:29:37,008 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:29:37,014 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:37,014 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:29:37,022 - adaptive_backtest - ERROR - Lỗi khi backtest BNB-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:29:37,022 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:29:37,023 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:29:37,024 - simplified_backtest - INFO - Kết quả BNB-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:37,024 - simplified_backtest - INFO - 
+=== BÁO CÁO TÓM TẮT ===
+2025-03-27 14:29:37,024 - simplified_backtest - INFO - Tổng số giao dịch: 0
+2025-03-27 14:29:37,024 - simplified_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:29:37,024 - simplified_backtest - INFO - Tỷ lệ thắng tổng thể: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - 
+Hiệu suất theo chiến lược:
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - - MA Crossover: 0/0 thắng (0.00%)
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - - Sideways Market: 0/0 thắng (0.00%)
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - 
+Hiệu suất theo symbol:
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - - BTC-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - - ETH-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - - BNB-USD: 0 giao dịch, Win rate: 0.00%, Profit: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - 
+=== PHÂN TÍCH RỦI RO ===
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - Win rate trong biến động cao: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - Win rate trong biến động thấp: 0.00%
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - 
+=== KẾT LUẬN VÀ ĐỀ XUẤT ===
+2025-03-27 14:29:37,025 - simplified_backtest - INFO - Chiến lược cần cải thiện với tỷ lệ thắng < 50%
+2025-03-27 14:29:37,026 - simplified_backtest - INFO - Chiến lược MA Crossover hoạt động tốt hơn Sideways Market Detection
+2025-03-27 14:29:37,026 - simplified_backtest - ERROR - Lỗi khi chạy backtest đơn giản: cannot access local variable 'max_drawdown_pct' where it is not associated with a value
+2025-03-27 14:29:37,027 - simplified_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/run_simplified_backtest.py", line 260, in <module>
+    summary = run_simplified_test()
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/run_simplified_backtest.py", line 239, in run_simplified_test
+    if max_drawdown_pct > 20:
+       ^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'max_drawdown_pct' where it is not associated with a value
+
+2025-03-27 14:29:37,027 - simplified_backtest - INFO - Kết thúc backtest đơn giản lúc: 2025-03-27 14:29:37.027134
+2025-03-27 14:29:37,027 - simplified_backtest - INFO - Tổng thời gian thực hiện: 0:00:02.282869

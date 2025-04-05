@@ -1,0 +1,72 @@
+2025-03-06 15:53:16,704 - single_coin_risk_test - INFO - === BẮT ĐẦU CHẠY BACKTEST VỚI 5 MỨC RỦI RO CHO BTCUSDT ===
+2025-03-06 15:53:16,704 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 0.5%
+2025-03-06 15:53:16,705 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 0.5% trên dữ liệu 3 tháng
+2025-03-06 15:53:16,705 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 15:53:17,660 - single_coin_risk_test - ERROR - Lỗi khi chạy backtest: usage: enhanced_backtest.py [-h] [--symbol SYMBOL] [--interval INTERVAL]
+                            [--balance BALANCE] [--leverage LEVERAGE]
+                            [--risk RISK] [--stop_loss STOP_LOSS]
+                            [--take_profit TAKE_PROFIT] [--adaptive_risk]
+                            [--data_dir DATA_DIR] [--start_date START_DATE]
+                            [--end_date END_DATE]
+enhanced_backtest.py: error: unrecognized arguments: --output_prefix 3month_BTCUSDT_risk0_5_
+
+2025-03-06 15:53:18,661 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 1.0%
+2025-03-06 15:53:18,661 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 1.0% trên dữ liệu 3 tháng
+2025-03-06 15:53:18,662 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 15:53:19,484 - single_coin_risk_test - ERROR - Lỗi khi chạy backtest: usage: enhanced_backtest.py [-h] [--symbol SYMBOL] [--interval INTERVAL]
+                            [--balance BALANCE] [--leverage LEVERAGE]
+                            [--risk RISK] [--stop_loss STOP_LOSS]
+                            [--take_profit TAKE_PROFIT] [--adaptive_risk]
+                            [--data_dir DATA_DIR] [--start_date START_DATE]
+                            [--end_date END_DATE]
+enhanced_backtest.py: error: unrecognized arguments: --output_prefix 3month_BTCUSDT_risk1_0_
+
+2025-03-06 15:53:20,485 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 1.5%
+2025-03-06 15:53:20,485 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 1.5% trên dữ liệu 3 tháng
+2025-03-06 15:53:20,485 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 15:53:21,444 - single_coin_risk_test - ERROR - Lỗi khi chạy backtest: usage: enhanced_backtest.py [-h] [--symbol SYMBOL] [--interval INTERVAL]
+                            [--balance BALANCE] [--leverage LEVERAGE]
+                            [--risk RISK] [--stop_loss STOP_LOSS]
+                            [--take_profit TAKE_PROFIT] [--adaptive_risk]
+                            [--data_dir DATA_DIR] [--start_date START_DATE]
+                            [--end_date END_DATE]
+enhanced_backtest.py: error: unrecognized arguments: --output_prefix 3month_BTCUSDT_risk1_5_
+
+2025-03-06 15:53:22,445 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 2.0%
+2025-03-06 15:53:22,446 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 2.0% trên dữ liệu 3 tháng
+2025-03-06 15:53:22,447 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 15:53:23,335 - single_coin_risk_test - ERROR - Lỗi khi chạy backtest: usage: enhanced_backtest.py [-h] [--symbol SYMBOL] [--interval INTERVAL]
+                            [--balance BALANCE] [--leverage LEVERAGE]
+                            [--risk RISK] [--stop_loss STOP_LOSS]
+                            [--take_profit TAKE_PROFIT] [--adaptive_risk]
+                            [--data_dir DATA_DIR] [--start_date START_DATE]
+                            [--end_date END_DATE]
+enhanced_backtest.py: error: unrecognized arguments: --output_prefix 3month_BTCUSDT_risk2_0_
+
+2025-03-06 15:53:24,336 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 3.0%
+2025-03-06 15:53:24,336 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 3.0% trên dữ liệu 3 tháng
+2025-03-06 15:53:24,336 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 15:53:25,438 - single_coin_risk_test - ERROR - Lỗi khi chạy backtest: usage: enhanced_backtest.py [-h] [--symbol SYMBOL] [--interval INTERVAL]
+                            [--balance BALANCE] [--leverage LEVERAGE]
+                            [--risk RISK] [--stop_loss STOP_LOSS]
+                            [--take_profit TAKE_PROFIT] [--adaptive_risk]
+                            [--data_dir DATA_DIR] [--start_date START_DATE]
+                            [--end_date END_DATE]
+enhanced_backtest.py: error: unrecognized arguments: --output_prefix 3month_BTCUSDT_risk3_0_
+
+2025-03-06 15:53:27,017 - single_coin_risk_test - INFO - Đã lưu biểu đồ so sánh vào risk_analysis/BTCUSDT_1h_risk_comparison.png
+2025-03-06 15:53:27,018 - single_coin_risk_test - INFO - Đã tạo báo cáo tổng hợp tại risk_analysis/BTCUSDT_1h_risk_summary.md
+2025-03-06 15:53:27,018 - single_coin_risk_test - INFO - Xem báo cáo tổng hợp tại: risk_analysis/BTCUSDT_1h_risk_summary.md
+2025-03-06 15:53:27,018 - single_coin_risk_test - INFO - === ĐÃ HOÀN THÀNH BACKTEST VỚI 5 MỨC RỦI RO CHO BTCUSDT ===
+2025-03-06 16:31:09,858 - single_coin_risk_test - INFO - === BẮT ĐẦU CHẠY BACKTEST VỚI 5 MỨC RỦI RO CHO BTCUSDT ===
+2025-03-06 16:31:09,859 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 0.5%
+2025-03-06 16:31:09,859 - single_coin_risk_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 0.5% trên dữ liệu 3 tháng
+2025-03-06 16:31:09,859 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 17:43:38,621 - single_coin_risk_test - INFO - === BẮT ĐẦU CHẠY BACKTEST VỚI 5 MỨC RỦI RO CHO ETHUSDT ===
+2025-03-06 17:43:38,621 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 0.5%
+2025-03-06 17:43:38,621 - single_coin_risk_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 0.5% trên dữ liệu 3 tháng
+2025-03-06 17:43:38,621 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06
+2025-03-06 17:43:45,609 - single_coin_risk_test - WARNING - Không tìm thấy file kết quả sau khi chạy backtest: backtest_results/ETHUSDT_1h_risk0_5_results.json
+2025-03-06 17:43:46,609 - single_coin_risk_test - INFO - Chạy backtest với mức rủi ro 1.0%
+2025-03-06 17:43:46,609 - single_coin_risk_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 1.0% trên dữ liệu 3 tháng
+2025-03-06 17:43:46,609 - single_coin_risk_test - INFO - Khoảng thời gian: 2024-12-06 đến 2025-03-06

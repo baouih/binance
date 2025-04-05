@@ -1,0 +1,18 @@
+2025-03-12 12:01:12,288 - start_all_services - INFO - ===== BẮT ĐẦU KHỞI ĐỘNG TẤT CẢ DỊCH VỤ =====
+2025-03-12 12:01:12,288 - start_all_services - INFO - Thời gian: 12:01:12 12/03/2025
+2025-03-12 12:01:12,289 - start_all_services - INFO - Đang khởi động Market Notifier...
+2025-03-12 12:01:12,298 - start_all_services - INFO - Đã khởi động Market Notifier
+2025-03-12 12:01:12,298 - start_all_services - INFO - ✅ Market Notifier đã được khởi động thành công
+2025-03-12 12:01:14,298 - start_all_services - INFO - Đang khởi động Unified Trading Service...
+2025-03-12 12:01:14,306 - start_all_services - INFO - Đã khởi động Unified Trading Service
+2025-03-12 12:01:14,307 - start_all_services - INFO - ✅ Unified Trading Service đã được khởi động thành công
+2025-03-12 12:01:16,307 - start_all_services - INFO - ===== KẾT THÚC KHỞI ĐỘNG DỊCH VỤ =====
+2025-03-13 04:08:58,647 - start_all_services - INFO - ===== BẮT ĐẦU KHỞI ĐỘNG TẤT CẢ DỊCH VỤ =====
+2025-03-13 04:08:58,647 - start_all_services - INFO - Thời gian: 04:08:58 13/03/2025
+2025-03-13 04:08:58,647 - start_all_services - INFO - Đang khởi động Market Notifier...
+2025-03-13 04:08:58,655 - start_all_services - INFO - Đã khởi động Market Notifier
+2025-03-13 04:08:58,655 - start_all_services - INFO - ✅ Market Notifier đã được khởi động thành công
+2025-03-13 04:09:00,656 - start_all_services - INFO - Đang khởi động Unified Trading Service...
+2025-03-13 04:09:00,663 - start_all_services - INFO - Đã khởi động Unified Trading Service
+2025-03-13 04:09:00,663 - start_all_services - INFO - ✅ Unified Trading Service đã được khởi động thành công
+2025-03-13 04:09:02,663 - start_all_services - INFO - ===== KẾT THÚC KHỞI ĐỘNG DỊCH VỤ =====

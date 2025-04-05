@@ -1,0 +1,4 @@
+2025-03-28 16:24:04,909 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-28 16:24:04,910 - market_notifier - INFO - Khởi tạo TelegramNotifier thành công
+2025-03-28 16:24:04,910 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-28 16:24:04,910 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường

@@ -1,0 +1,5 @@
+2025-03-10 04:14:32,399 - test_runner - INFO - ===== Bắt đầu chạy bộ test toàn bộ hệ thống =====
+2025-03-10 04:14:32,700 - test_comprehensive - WARNING - Could not import modules: No module named 'position_sizing'
+2025-03-10 04:14:32,700 - test_comprehensive - WARNING - Will continue with mock implementations
+2025-03-10 04:14:33,123 - test_order_execution - WARNING - Could not import order_execution module: cannot import name 'OCOOrderExecutor' from 'order_execution' (/home/runner/workspace/order_execution.py)
+2025-03-10 04:14:33,123 - test_order_execution - WARNING - Using mock implementations for testing

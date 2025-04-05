@@ -1,0 +1,160 @@
+2025-03-15 12:40:47,700 - risk_performance_test - INFO - Risk level high_moderate (10%) in Bull Market:
+2025-03-15 12:40:47,712 - risk_performance_test - INFO -   Profit/Loss: $4545449.54 (45454.50%)
+2025-03-15 12:40:47,712 - risk_performance_test - INFO -   Max Drawdown: $57505.67 (34.39%)
+2025-03-15 12:40:47,712 - risk_performance_test - INFO -   Win Rate: 61.48%
+2025-03-15 12:40:47,712 - risk_performance_test - INFO -   Profit Factor: 1.79
+2025-03-15 12:40:48,233 - risk_performance_test - INFO - Risk level high_moderate (10%) in Bear Market:
+2025-03-15 12:40:48,233 - risk_performance_test - INFO -   Profit/Loss: $-9334.22 (-93.34%)
+2025-03-15 12:40:48,233 - risk_performance_test - INFO -   Max Drawdown: $23775.39 (97.62%)
+2025-03-15 12:40:48,234 - risk_performance_test - INFO -   Win Rate: 35.90%
+2025-03-15 12:40:48,234 - risk_performance_test - INFO -   Profit Factor: 0.90
+2025-03-15 12:40:48,705 - risk_performance_test - INFO - Risk level high_moderate (10%) in Sideways Market:
+2025-03-15 12:40:48,706 - risk_performance_test - INFO -   Profit/Loss: $-6175.97 (-61.76%)
+2025-03-15 12:40:48,706 - risk_performance_test - INFO -   Max Drawdown: $21240.05 (86.46%)
+2025-03-15 12:40:48,706 - risk_performance_test - INFO -   Win Rate: 40.61%
+2025-03-15 12:40:48,706 - risk_performance_test - INFO -   Profit Factor: 0.93
+2025-03-15 12:40:49,184 - risk_performance_test - INFO - Risk level high_moderate (10%) in Volatile Market:
+2025-03-15 12:40:49,184 - risk_performance_test - INFO -   Profit/Loss: $23766.67 (237.67%)
+2025-03-15 12:40:49,184 - risk_performance_test - INFO -   Max Drawdown: $8601.96 (74.80%)
+2025-03-15 12:40:49,184 - risk_performance_test - INFO -   Win Rate: 46.48%
+2025-03-15 12:40:49,184 - risk_performance_test - INFO -   Profit Factor: 1.21
+2025-03-15 12:40:49,645 - risk_performance_test - INFO - Risk level high_risk (15%) in Bull Market:
+2025-03-15 12:40:49,646 - risk_performance_test - INFO -   Profit/Loss: $696282412.01 (6962824.12%)
+2025-03-15 12:40:49,646 - risk_performance_test - INFO -   Max Drawdown: $1516696.43 (47.80%)
+2025-03-15 12:40:49,646 - risk_performance_test - INFO -   Win Rate: 62.21%
+2025-03-15 12:40:49,646 - risk_performance_test - INFO -   Profit Factor: 2.26
+2025-03-15 12:40:50,036 - risk_performance_test - INFO - Risk level high_risk (15%) in Bear Market:
+2025-03-15 12:40:50,036 - risk_performance_test - INFO -   Profit/Loss: $2005580.30 (20055.80%)
+2025-03-15 12:40:50,036 - risk_performance_test - INFO -   Max Drawdown: $68907.13 (80.35%)
+2025-03-15 12:40:50,036 - risk_performance_test - INFO -   Win Rate: 54.48%
+2025-03-15 12:40:50,036 - risk_performance_test - INFO -   Profit Factor: 1.72
+2025-03-15 12:40:50,402 - risk_performance_test - INFO - Risk level high_risk (15%) in Sideways Market:
+2025-03-15 12:40:50,402 - risk_performance_test - INFO -   Profit/Loss: $-5245.00 (-52.45%)
+2025-03-15 12:40:50,402 - risk_performance_test - INFO -   Max Drawdown: $32872.13 (90.17%)
+2025-03-15 12:40:50,402 - risk_performance_test - INFO -   Win Rate: 42.96%
+2025-03-15 12:40:50,402 - risk_performance_test - INFO -   Profit Factor: 0.96
+2025-03-15 12:40:50,779 - risk_performance_test - INFO - Risk level high_risk (15%) in Volatile Market:
+2025-03-15 12:40:50,779 - risk_performance_test - INFO -   Profit/Loss: $64965.70 (649.66%)
+2025-03-15 12:40:50,779 - risk_performance_test - INFO -   Max Drawdown: $459144.94 (86.90%)
+2025-03-15 12:40:50,779 - risk_performance_test - INFO -   Win Rate: 47.67%
+2025-03-15 12:40:50,779 - risk_performance_test - INFO -   Profit Factor: 1.05
+2025-03-15 12:40:51,139 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Bull Market:
+2025-03-15 12:40:51,139 - risk_performance_test - INFO -   Profit/Loss: $3537650319510.94 (35376503195.11%)
+2025-03-15 12:40:51,140 - risk_performance_test - INFO -   Max Drawdown: $228235285984.20 (53.93%)
+2025-03-15 12:40:51,140 - risk_performance_test - INFO -   Win Rate: 70.99%
+2025-03-15 12:40:51,140 - risk_performance_test - INFO -   Profit Factor: 2.98
+2025-03-15 12:40:51,482 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Bear Market:
+2025-03-15 12:40:51,482 - risk_performance_test - INFO -   Profit/Loss: $5589947.84 (55899.48%)
+2025-03-15 12:40:51,482 - risk_performance_test - INFO -   Max Drawdown: $23187.92 (90.22%)
+2025-03-15 12:40:51,482 - risk_performance_test - INFO -   Win Rate: 55.47%
+2025-03-15 12:40:51,482 - risk_performance_test - INFO -   Profit Factor: 1.49
+2025-03-15 12:40:51,830 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Sideways Market:
+2025-03-15 12:40:51,830 - risk_performance_test - INFO -   Profit/Loss: $345792.79 (3457.93%)
+2025-03-15 12:40:51,831 - risk_performance_test - INFO -   Max Drawdown: $2416860.08 (89.83%)
+2025-03-15 12:40:51,831 - risk_performance_test - INFO -   Win Rate: 51.03%
+2025-03-15 12:40:51,831 - risk_performance_test - INFO -   Profit Factor: 1.03
+2025-03-15 12:40:52,187 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Volatile Market:
+2025-03-15 12:40:52,188 - risk_performance_test - INFO -   Profit/Loss: $658180.58 (6581.81%)
+2025-03-15 12:40:52,188 - risk_performance_test - INFO -   Max Drawdown: $3026591.04 (85.48%)
+2025-03-15 12:40:52,188 - risk_performance_test - INFO -   Win Rate: 52.14%
+2025-03-15 12:40:52,188 - risk_performance_test - INFO -   Profit Factor: 1.06
+2025-03-15 12:40:52,540 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Bull Market:
+2025-03-15 12:40:52,540 - risk_performance_test - INFO -   Profit/Loss: $3510091756357691.00 (35100917563576.91%)
+2025-03-15 12:40:52,540 - risk_performance_test - INFO -   Max Drawdown: $13915438.76 (76.27%)
+2025-03-15 12:40:52,540 - risk_performance_test - INFO -   Win Rate: 76.32%
+2025-03-15 12:40:52,540 - risk_performance_test - INFO -   Profit Factor: 10.66
+2025-03-15 12:40:52,895 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Bear Market:
+2025-03-15 12:40:52,895 - risk_performance_test - INFO -   Profit/Loss: $184771796632.58 (1847717966.33%)
+2025-03-15 12:40:52,895 - risk_performance_test - INFO -   Max Drawdown: $148907536555.11 (68.36%)
+2025-03-15 12:40:52,895 - risk_performance_test - INFO -   Win Rate: 66.90%
+2025-03-15 12:40:52,895 - risk_performance_test - INFO -   Profit Factor: 1.58
+2025-03-15 12:40:53,248 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Sideways Market:
+2025-03-15 12:40:53,248 - risk_performance_test - INFO -   Profit/Loss: $270928.77 (2709.29%)
+2025-03-15 12:40:53,248 - risk_performance_test - INFO -   Max Drawdown: $110276.00 (84.60%)
+2025-03-15 12:40:53,249 - risk_performance_test - INFO -   Win Rate: 51.45%
+2025-03-15 12:40:53,249 - risk_performance_test - INFO -   Profit Factor: 1.12
+2025-03-15 12:40:53,611 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Volatile Market:
+2025-03-15 12:40:53,611 - risk_performance_test - INFO -   Profit/Loss: $2879870478.06 (28798704.78%)
+2025-03-15 12:40:53,611 - risk_performance_test - INFO -   Max Drawdown: $1456951227.27 (85.36%)
+2025-03-15 12:40:53,611 - risk_performance_test - INFO -   Win Rate: 59.88%
+2025-03-15 12:40:53,612 - risk_performance_test - INFO -   Profit Factor: 1.62
+2025-03-15 12:43:40,056 - risk_performance_test - INFO - Risk level high_moderate (10%) in Bull Market:
+2025-03-15 12:43:40,056 - risk_performance_test - INFO -   Profit/Loss: $45018.04 (450.18%)
+2025-03-15 12:43:40,056 - risk_performance_test - INFO -   Max Drawdown: $10475.99 (19.00%)
+2025-03-15 12:43:40,056 - risk_performance_test - INFO -   Win Rate: 62.86%
+2025-03-15 12:43:40,056 - risk_performance_test - INFO -   Profit Factor: 2.03
+2025-03-15 12:43:40,429 - risk_performance_test - INFO - Risk level high_moderate (10%) in Bear Market:
+2025-03-15 12:43:40,430 - risk_performance_test - INFO -   Profit/Loss: $45018.04 (450.18%)
+2025-03-15 12:43:40,430 - risk_performance_test - INFO -   Max Drawdown: $4548.08 (34.39%)
+2025-03-15 12:43:40,430 - risk_performance_test - INFO -   Win Rate: 62.86%
+2025-03-15 12:43:40,430 - risk_performance_test - INFO -   Profit Factor: 2.63
+2025-03-15 12:43:40,809 - risk_performance_test - INFO - Risk level high_moderate (10%) in Sideways Market:
+2025-03-15 12:43:40,809 - risk_performance_test - INFO -   Profit/Loss: $2640.76 (26.41%)
+2025-03-15 12:43:40,809 - risk_performance_test - INFO -   Max Drawdown: $4107.82 (41.08%)
+2025-03-15 12:43:40,809 - risk_performance_test - INFO -   Win Rate: 45.71%
+2025-03-15 12:43:40,809 - risk_performance_test - INFO -   Profit Factor: 1.15
+2025-03-15 12:43:41,158 - risk_performance_test - INFO - Risk level high_moderate (10%) in Volatile Market:
+2025-03-15 12:43:41,158 - risk_performance_test - INFO -   Profit/Loss: $2640.76 (26.41%)
+2025-03-15 12:43:41,158 - risk_performance_test - INFO -   Max Drawdown: $4393.35 (34.53%)
+2025-03-15 12:43:41,158 - risk_performance_test - INFO -   Win Rate: 45.71%
+2025-03-15 12:43:41,159 - risk_performance_test - INFO -   Profit Factor: 1.12
+2025-03-15 12:43:41,556 - risk_performance_test - INFO - Risk level high_risk (15%) in Bull Market:
+2025-03-15 12:43:41,557 - risk_performance_test - INFO -   Profit/Loss: $136664.98 (1366.65%)
+2025-03-15 12:43:41,557 - risk_performance_test - INFO -   Max Drawdown: $74086.04 (36.75%)
+2025-03-15 12:43:41,557 - risk_performance_test - INFO -   Win Rate: 74.29%
+2025-03-15 12:43:41,557 - risk_performance_test - INFO -   Profit Factor: 1.87
+2025-03-15 12:43:41,984 - risk_performance_test - INFO - Risk level high_risk (15%) in Bear Market:
+2025-03-15 12:43:41,984 - risk_performance_test - INFO -   Profit/Loss: $104781.29 (1047.81%)
+2025-03-15 12:43:41,984 - risk_performance_test - INFO -   Max Drawdown: $23459.85 (34.39%)
+2025-03-15 12:43:41,984 - risk_performance_test - INFO -   Win Rate: 71.43%
+2025-03-15 12:43:41,984 - risk_performance_test - INFO -   Profit Factor: 2.60
+2025-03-15 12:43:42,354 - risk_performance_test - INFO - Risk level high_risk (15%) in Sideways Market:
+2025-03-15 12:43:42,355 - risk_performance_test - INFO -   Profit/Loss: $-3940.91 (-39.41%)
+2025-03-15 12:43:42,355 - risk_performance_test - INFO -   Max Drawdown: $8725.80 (70.83%)
+2025-03-15 12:43:42,355 - risk_performance_test - INFO -   Win Rate: 37.14%
+2025-03-15 12:43:42,355 - risk_performance_test - INFO -   Profit Factor: 0.77
+2025-03-15 12:43:42,713 - risk_performance_test - INFO - Risk level high_risk (15%) in Volatile Market:
+2025-03-15 12:43:42,713 - risk_performance_test - INFO -   Profit/Loss: $60300.83 (603.01%)
+2025-03-15 12:43:42,713 - risk_performance_test - INFO -   Max Drawdown: $2422.55 (19.00%)
+2025-03-15 12:43:42,714 - risk_performance_test - INFO -   Win Rate: 65.71%
+2025-03-15 12:43:42,714 - risk_performance_test - INFO -   Profit Factor: 2.65
+2025-03-15 12:43:43,056 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Bull Market:
+2025-03-15 12:43:43,056 - risk_performance_test - INFO -   Profit/Loss: $229462.27 (2294.62%)
+2025-03-15 12:43:43,056 - risk_performance_test - INFO -   Max Drawdown: $14401.38 (19.00%)
+2025-03-15 12:43:43,056 - risk_performance_test - INFO -   Win Rate: 80.00%
+2025-03-15 12:43:43,056 - risk_performance_test - INFO -   Profit Factor: 4.43
+2025-03-15 12:43:43,400 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Bear Market:
+2025-03-15 12:43:43,400 - risk_performance_test - INFO -   Profit/Loss: $60300.83 (603.01%)
+2025-03-15 12:43:43,400 - risk_performance_test - INFO -   Max Drawdown: $16490.32 (19.00%)
+2025-03-15 12:43:43,400 - risk_performance_test - INFO -   Win Rate: 65.71%
+2025-03-15 12:43:43,400 - risk_performance_test - INFO -   Profit Factor: 2.06
+2025-03-15 12:43:43,753 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Sideways Market:
+2025-03-15 12:43:43,753 - risk_performance_test - INFO -   Profit/Loss: $-2257.83 (-22.58%)
+2025-03-15 12:43:43,753 - risk_performance_test - INFO -   Max Drawdown: $4945.86 (43.19%)
+2025-03-15 12:43:43,753 - risk_performance_test - INFO -   Win Rate: 40.00%
+2025-03-15 12:43:43,753 - risk_performance_test - INFO -   Profit Factor: 0.88
+2025-03-15 12:43:44,094 - risk_performance_test - INFO - Risk level extreme_risk (20%) in Volatile Market:
+2025-03-15 12:43:44,094 - risk_performance_test - INFO -   Profit/Loss: $16371.76 (163.72%)
+2025-03-15 12:43:44,094 - risk_performance_test - INFO -   Max Drawdown: $11231.44 (29.87%)
+2025-03-15 12:43:44,094 - risk_performance_test - INFO -   Win Rate: 54.29%
+2025-03-15 12:43:44,095 - risk_performance_test - INFO -   Profit Factor: 1.41
+2025-03-15 12:43:44,424 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Bull Market:
+2025-03-15 12:43:44,425 - risk_performance_test - INFO -   Profit/Loss: $177405.26 (1774.05%)
+2025-03-15 12:43:44,425 - risk_performance_test - INFO -   Max Drawdown: $6917.06 (34.39%)
+2025-03-15 12:43:44,425 - risk_performance_test - INFO -   Win Rate: 77.14%
+2025-03-15 12:43:44,425 - risk_performance_test - INFO -   Profit Factor: 3.99
+2025-03-15 12:43:44,792 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Bear Market:
+2025-03-15 12:43:44,792 - risk_performance_test - INFO -   Profit/Loss: $33057.60 (330.58%)
+2025-03-15 12:43:44,792 - risk_performance_test - INFO -   Max Drawdown: $7669.07 (34.39%)
+2025-03-15 12:43:44,792 - risk_performance_test - INFO -   Win Rate: 60.00%
+2025-03-15 12:43:44,792 - risk_performance_test - INFO -   Profit Factor: 2.17
+2025-03-15 12:43:45,184 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Sideways Market:
+2025-03-15 12:43:45,184 - risk_performance_test - INFO -   Profit/Loss: $2640.76 (26.41%)
+2025-03-15 12:43:45,184 - risk_performance_test - INFO -   Max Drawdown: $3674.52 (36.75%)
+2025-03-15 12:43:45,184 - risk_performance_test - INFO -   Win Rate: 45.71%
+2025-03-15 12:43:45,184 - risk_performance_test - INFO -   Profit Factor: 1.12
+2025-03-15 12:43:45,556 - risk_performance_test - INFO - Risk level ultra_high_risk (25%) in Volatile Market:
+2025-03-15 12:43:45,556 - risk_performance_test - INFO -   Profit/Loss: $136664.98 (1366.65%)
+2025-03-15 12:43:45,557 - risk_performance_test - INFO -   Max Drawdown: $4569.66 (27.10%)
+2025-03-15 12:43:45,557 - risk_performance_test - INFO -   Win Rate: 74.29%
+2025-03-15 12:43:45,557 - risk_performance_test - INFO -   Profit Factor: 4.44

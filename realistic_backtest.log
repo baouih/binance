@@ -1,0 +1,272 @@
+2025-03-15 17:14:28,379 - realistic_backtest - INFO - === BẮT ĐẦU BACKTEST THỰC TẾ ===
+2025-03-15 17:14:28,379 - realistic_backtest - INFO - Chạy backtest cho BTCUSDT
+2025-03-15 17:14:28,380 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-15 17:14:28,380 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-15 17:14:28,380 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (90 ngày)
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Đã tính toán 30 chỉ báo kỹ thuật
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Đã tải 2160 nến dữ liệu cho BTCUSDT 1h
+2025-03-15 17:14:28,413 - realistic_backtest - INFO - Bắt đầu backtest từ idx 100 đến 2159
+2025-03-15 17:14:28,414 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-15 17:27:13,052 - realistic_backtest - INFO - === BẮT ĐẦU BACKTEST THỰC TẾ ===
+2025-03-15 17:27:13,052 - realistic_backtest - INFO - Chạy backtest cho BTCUSDT
+2025-03-15 17:27:13,052 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-15 17:27:13,052 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-15 17:27:13,053 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (90 ngày)
+2025-03-15 17:27:13,087 - realistic_backtest - INFO - Đã tính toán 30 chỉ báo kỹ thuật
+2025-03-15 17:27:13,087 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-15 17:27:13,087 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-15 17:27:13,088 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-15 17:27:13,088 - realistic_backtest - INFO - Đã tải 2160 nến dữ liệu cho BTCUSDT 1h
+2025-03-15 17:27:13,088 - realistic_backtest - INFO - Bắt đầu backtest từ idx 100 đến 2159
+2025-03-15 17:27:13,088 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-15 17:39:48,618 - realistic_backtest - INFO - === BẮT ĐẦU BACKTEST THỰC TẾ ===
+2025-03-15 17:39:48,619 - realistic_backtest - INFO - Chạy backtest cho BTCUSDT
+2025-03-15 17:39:48,619 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-15 17:39:48,619 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-15 17:39:48,620 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (20 ngày)
+2025-03-15 17:39:48,642 - realistic_backtest - INFO - Đã tính toán 29 chỉ báo kỹ thuật
+2025-03-15 17:39:48,642 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-15 17:39:48,642 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-15 17:39:48,643 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-15 17:39:48,643 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 1h
+2025-03-15 17:39:48,643 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-15 17:39:48,643 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-15 17:39:48,733 - realistic_backtest - INFO - Kết thúc backtest: P/L: 43.36%, Win Rate: 64.00%, Trades: 25
+2025-03-15 17:39:48,733 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 64.00%, Trades: 25, P/L: 4336.13
+2025-03-16 01:34:00,333 - multi_timeframe_backtest - INFO - === BẮT ĐẦU BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:34:00,334 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 30m
+2025-03-16 01:34:00,335 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,335 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,336 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,336 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,337 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 30m (10 ngày)
+2025-03-16 01:34:00,337 - realistic_backtest - ERROR - Chưa tải dữ liệu. Hãy gọi load_data() trước.
+2025-03-16 01:34:00,338 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 30m: 'NoneType' object is not subscriptable
+2025-03-16 01:34:00,338 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1h
+2025-03-16 01:34:00,338 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (20 ngày)
+2025-03-16 01:34:00,339 - realistic_backtest - ERROR - Chưa tải dữ liệu. Hãy gọi load_data() trước.
+2025-03-16 01:34:00,339 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1h: 'NoneType' object is not subscriptable
+2025-03-16 01:34:00,339 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 4h
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,339 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 4h (40 ngày)
+2025-03-16 01:34:00,340 - realistic_backtest - ERROR - Chưa tải dữ liệu. Hãy gọi load_data() trước.
+2025-03-16 01:34:00,340 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 4h: 'NoneType' object is not subscriptable
+2025-03-16 01:34:00,340 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1d
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,340 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:34:00,341 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:34:00,341 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1d (80 ngày)
+2025-03-16 01:34:00,341 - realistic_backtest - ERROR - Chưa tải dữ liệu. Hãy gọi load_data() trước.
+2025-03-16 01:34:00,341 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1d: 'NoneType' object is not subscriptable
+2025-03-16 01:34:00,344 - multi_timeframe_backtest - INFO - Đã lưu tổng kết vào backtest_summary/multi_timeframe_summary.json
+2025-03-16 01:34:00,344 - multi_timeframe_backtest - INFO - === KẾT QUẢ BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:34:00,344 - multi_timeframe_backtest - INFO - Khung thời gian tốt nhất: 30m với P/L: 0.00%
+2025-03-16 01:34:00,345 - multi_timeframe_backtest - INFO - - 30m: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:34:00,345 - multi_timeframe_backtest - INFO - - 1h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:34:00,345 - multi_timeframe_backtest - INFO - - 4h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:34:00,345 - multi_timeframe_backtest - INFO - - 1d: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:37:55,833 - multi_timeframe_backtest - INFO - === BẮT ĐẦU BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:37:55,834 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 30m
+2025-03-16 01:37:55,834 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,834 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 30m (10 ngày)
+2025-03-16 01:37:55,835 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 30m: RealisticBacktest.load_data() takes 1 positional argument but 2 were given
+2025-03-16 01:37:55,835 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1h
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,835 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (20 ngày)
+2025-03-16 01:37:55,836 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1h: RealisticBacktest.load_data() takes 1 positional argument but 2 were given
+2025-03-16 01:37:55,836 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 4h
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,836 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 4h (40 ngày)
+2025-03-16 01:37:55,836 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 4h: RealisticBacktest.load_data() takes 1 positional argument but 2 were given
+2025-03-16 01:37:55,837 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1d
+2025-03-16 01:37:55,837 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,837 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,837 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:37:55,837 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:37:55,837 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1d (80 ngày)
+2025-03-16 01:37:55,837 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1d: RealisticBacktest.load_data() takes 1 positional argument but 2 were given
+2025-03-16 01:37:55,838 - multi_timeframe_backtest - INFO - Đã lưu tổng kết vào backtest_summary/multi_timeframe_summary.json
+2025-03-16 01:37:55,838 - multi_timeframe_backtest - INFO - === KẾT QUẢ BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:37:55,838 - multi_timeframe_backtest - INFO - Khung thời gian tốt nhất: 30m với P/L: 0.00%
+2025-03-16 01:37:55,839 - multi_timeframe_backtest - INFO - - 30m: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:37:55,839 - multi_timeframe_backtest - INFO - - 1h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:37:55,839 - multi_timeframe_backtest - INFO - - 4h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:37:55,839 - multi_timeframe_backtest - INFO - - 1d: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:40:12,263 - realistic_backtest - INFO - === BẮT ĐẦU BACKTEST THỰC TẾ ===
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - === PHÂN TÍCH THUẬT TOÁN TRÊN NHIỀU CẶP TIỀN VÀ KHUNG THỜI GIAN ===
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - === KHUNG THỜI GIAN: 30m (10 ngày) ===
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - Chạy backtest cho BTCUSDT 30m với tài khoản $300
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:40:12,264 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 30m (10 ngày)
+2025-03-16 01:40:12,296 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 01:40:12,296 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 01:40:12,296 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 01:40:12,296 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 300.00
+2025-03-16 01:40:12,297 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 30m
+2025-03-16 01:40:12,297 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-16 01:40:12,297 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 01:45:22,581 - multi_timeframe_backtest - INFO - === BẮT ĐẦU BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:45:22,583 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 30m
+2025-03-16 01:45:22,584 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,584 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,584 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,584 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,584 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 30m (10 ngày)
+2025-03-16 01:45:22,617 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 01:45:22,617 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 01:45:22,617 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 01:45:22,617 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 01:45:22,617 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 30m
+2025-03-16 01:45:22,618 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-16 01:45:22,618 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 01:45:22,717 - realistic_backtest - INFO - Cần giảm rủi ro: đóng 1 vị thế có rủi ro cao
+2025-03-16 01:45:22,750 - realistic_backtest - INFO - Kết thúc backtest: P/L: -42.37%, Win Rate: 53.85%, Trades: 52
+2025-03-16 01:45:22,750 - realistic_backtest - INFO - Chiến lược sideways: Win Rate: 25.00%, Trades: 4, P/L: -1430.20
+2025-03-16 01:45:22,750 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 56.25%, Trades: 48, P/L: -2806.71
+2025-03-16 01:45:22,750 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 30m: 'profit_loss_pct'
+2025-03-16 01:45:22,751 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1h
+2025-03-16 01:45:22,751 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,751 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,751 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,751 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,751 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (20 ngày)
+2025-03-16 01:45:22,779 - realistic_backtest - INFO - Đã tính toán 29 chỉ báo kỹ thuật
+2025-03-16 01:45:22,779 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 01:45:22,779 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 01:45:22,779 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 01:45:22,780 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 1h
+2025-03-16 01:45:22,780 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-16 01:45:22,780 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 01:45:22,879 - realistic_backtest - INFO - Kết thúc backtest: P/L: 43.36%, Win Rate: 64.00%, Trades: 25
+2025-03-16 01:45:22,880 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 64.00%, Trades: 25, P/L: 4336.13
+2025-03-16 01:45:22,880 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1h: 'profit_loss_pct'
+2025-03-16 01:45:22,880 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 4h
+2025-03-16 01:45:22,880 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,880 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,881 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,881 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,881 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 4h (40 ngày)
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Đã tải 146 nến dữ liệu cho BTCUSDT 4h
+2025-03-16 01:45:22,905 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 145 (tổng 126 nến)
+2025-03-16 01:45:22,906 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Kết thúc backtest: P/L: 101.70%, Win Rate: 80.00%, Trades: 15
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 85.71%, Trades: 14, P/L: 11231.08
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Chiến lược range_trading: Win Rate: 0.00%, Trades: 1, P/L: -1061.55
+2025-03-16 01:45:22,951 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 4h: 'profit_loss_pct'
+2025-03-16 01:45:22,951 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1d
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,951 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 01:45:22,952 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 01:45:22,952 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1d (80 ngày)
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Đã tải 25 nến dữ liệu cho BTCUSDT 1d
+2025-03-16 01:45:22,972 - realistic_backtest - INFO - Bắt đầu backtest từ idx 8 đến 24 (tổng 17 nến)
+2025-03-16 01:45:22,973 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 01:45:22,977 - realistic_backtest - INFO - Kết thúc backtest: P/L: 0.00%, Win Rate: 0.00%, Trades: 0
+2025-03-16 01:45:22,977 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1d: 'profit_loss_pct'
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - Đã lưu tổng kết vào backtest_summary/multi_timeframe_summary.json
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - === KẾT QUẢ BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - Khung thời gian tốt nhất: 30m với P/L: 0.00%
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - - 30m: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - - 1h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:45:22,978 - multi_timeframe_backtest - INFO - - 4h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 01:45:22,979 - multi_timeframe_backtest - INFO - - 1d: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 02:22:36,317 - multi_timeframe_backtest - INFO - === BẮT ĐẦU BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 02:22:36,323 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 30m
+2025-03-16 02:22:36,324 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-16 02:22:36,324 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 02:22:36,324 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 02:22:36,324 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 30m (10 ngày)
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 30m
+2025-03-16 02:22:36,354 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-16 02:22:36,355 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 02:22:36,440 - realistic_backtest - INFO - Cần giảm rủi ro: đóng 1 vị thế có rủi ro cao
+2025-03-16 02:22:36,472 - realistic_backtest - INFO - Kết thúc backtest: P/L: -42.37%, Win Rate: 53.85%, Trades: 52
+2025-03-16 02:22:36,472 - realistic_backtest - INFO - Chiến lược sideways: Win Rate: 25.00%, Trades: 4, P/L: -1430.20
+2025-03-16 02:22:36,472 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 56.25%, Trades: 48, P/L: -2806.71
+2025-03-16 02:22:36,472 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 30m: 'total_trades'
+2025-03-16 02:22:36,473 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1h
+2025-03-16 02:22:36,473 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-16 02:22:36,473 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 02:22:36,473 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 02:22:36,473 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1h (20 ngày)
+2025-03-16 02:22:36,500 - realistic_backtest - INFO - Đã tính toán 29 chỉ báo kỹ thuật
+2025-03-16 02:22:36,500 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 02:22:36,501 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 02:22:36,501 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 02:22:36,501 - realistic_backtest - INFO - Đã tải 481 nến dữ liệu cho BTCUSDT 1h
+2025-03-16 02:22:36,501 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 320 (tổng 301 nến)
+2025-03-16 02:22:36,501 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 02:22:36,601 - realistic_backtest - INFO - Kết thúc backtest: P/L: 43.36%, Win Rate: 64.00%, Trades: 25
+2025-03-16 02:22:36,601 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 64.00%, Trades: 25, P/L: 4336.13
+2025-03-16 02:22:36,601 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 1h: 'total_trades'
+2025-03-16 02:22:36,602 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 4h
+2025-03-16 02:22:36,602 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-16 02:22:36,602 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 02:22:36,602 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 02:22:36,602 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 4h (40 ngày)
+2025-03-16 02:22:36,626 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 02:22:36,626 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 02:22:36,626 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 02:22:36,626 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 02:22:36,626 - realistic_backtest - INFO - Đã tải 146 nến dữ liệu cho BTCUSDT 4h
+2025-03-16 02:22:36,627 - realistic_backtest - INFO - Bắt đầu backtest từ idx 20 đến 145 (tổng 126 nến)
+2025-03-16 02:22:36,627 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 02:22:36,670 - realistic_backtest - INFO - Kết thúc backtest: P/L: 101.70%, Win Rate: 80.00%, Trades: 15
+2025-03-16 02:22:36,670 - realistic_backtest - INFO - Chiến lược counter_trend: Win Rate: 85.71%, Trades: 14, P/L: 11231.08
+2025-03-16 02:22:36,670 - realistic_backtest - INFO - Chiến lược range_trading: Win Rate: 0.00%, Trades: 1, P/L: -1061.55
+2025-03-16 02:22:36,670 - multi_timeframe_backtest - ERROR - Lỗi khi chạy backtest cho BTCUSDT 4h: 'total_trades'
+2025-03-16 02:22:36,670 - multi_timeframe_backtest - INFO - Chạy backtest cho BTCUSDT trên khung thời gian 1d
+2025-03-16 02:22:36,671 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-16 02:22:36,671 - realistic_backtest - INFO - Đã khởi tạo Adaptive Risk Manager
+2025-03-16 02:22:36,671 - realistic_backtest - INFO - Đã khởi tạo Strategy Selector
+2025-03-16 02:22:36,671 - realistic_backtest - INFO - Đã khởi tạo Realistic Backtest cho BTCUSDT 1d (80 ngày)
+2025-03-16 02:22:36,686 - realistic_backtest - INFO - Đã tính toán 24 chỉ báo kỹ thuật
+2025-03-16 02:22:36,686 - realistic_backtest - INFO - Đã khởi tạo Market Analyzer
+2025-03-16 02:22:36,687 - realistic_backtest - INFO - Đã khởi tạo Signal Generator
+2025-03-16 02:22:36,687 - realistic_backtest - INFO - Đã khởi tạo Trading Simulator với số dư 10000.00
+2025-03-16 02:22:36,687 - realistic_backtest - INFO - Đã tải 25 nến dữ liệu cho BTCUSDT 1d
+2025-03-16 02:22:36,687 - realistic_backtest - INFO - Bắt đầu backtest từ idx 8 đến 24 (tổng 17 nến)
+2025-03-16 02:22:36,687 - realistic_backtest - INFO - Đã reset Trading Simulator
+2025-03-16 02:22:36,690 - realistic_backtest - INFO - Kết thúc backtest: P/L: 0.00%, Win Rate: 0.00%, Trades: 0
+2025-03-16 02:22:36,690 - multi_timeframe_backtest - INFO - Đã lưu báo cáo chi tiết cho BTCUSDT 1d tại backtest_reports/BTCUSDT_1d_80d.json
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - Đã lưu tổng kết vào backtest_summary/multi_timeframe_summary.json
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - === KẾT QUẢ BACKTEST ĐA KHUNG THỜI GIAN ===
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - Khung thời gian tốt nhất: 30m với P/L: 0.00%
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - - 30m: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - - 1h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 02:22:36,691 - multi_timeframe_backtest - INFO - - 4h: P/L: 0.00%, WR: 0.00%, Giao dịch: 0
+2025-03-16 02:22:36,692 - multi_timeframe_backtest - INFO - - 1d: P/L: 0.00%, WR: 0.00%, Giao dịch: 0

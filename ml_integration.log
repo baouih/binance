@@ -1,0 +1,455 @@
+2025-03-09 23:15:53,201 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-09 23:15:53,201 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 23:15:53,201 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 23:15:53,202 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 23:15:53,612 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 23:15:53,613 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 23:19:07,111 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-09 23:19:07,112 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 23:19:07,112 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 23:19:07,112 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 23:19:07,280 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 23:19:07,281 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 23:19:35,549 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-09 23:19:35,551 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 23:19:35,551 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 23:19:35,551 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 23:19:35,715 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 23:19:35,715 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-10 00:14:20,763 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-10 00:14:20,764 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-10 00:14:20,764 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-10 00:14:20,764 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-10 00:14:20,933 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-10 00:14:20,933 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-10 00:14:20,934 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-10 00:14:20,936 - ml_integration_manager - INFO - Khởi tạo MLIntegrationManager với cấu hình từ ml_pipeline_results/ml_deployment_config.json, thư mục dữ liệu: real_data
+2025-03-10 00:14:20,936 - ml_integration_manager - INFO - Tải các mô hình ML...
+2025-03-10 00:14:20,936 - ml_integration_manager - INFO - Tải mô hình BTCUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:14:20,936 - ml_integration_manager - ERROR - Không tìm thấy các file cần thiết: ['ml_models/BTCUSDT_1h_3m_target3d_random_forest_model.joblib', 'ml_models/BTCUSDT_1h_3m_target3d_random_forest_scaler.joblib', 'ml_models/BTCUSDT_1h_3m_target3d_random_forest_features.json']
+2025-03-10 00:14:20,936 - ml_integration_manager - ERROR - Không thể tải mô hình BTCUSDT_1h_3m_target3d_random_forest cho BTCUSDT_1h
+2025-03-10 00:14:20,936 - ml_integration_manager - INFO - Tải mô hình ETHUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:14:20,936 - ml_integration_manager - ERROR - Không tìm thấy các file cần thiết: ['ml_models/ETHUSDT_1h_3m_target3d_random_forest_model.joblib', 'ml_models/ETHUSDT_1h_3m_target3d_random_forest_scaler.joblib', 'ml_models/ETHUSDT_1h_3m_target3d_random_forest_features.json']
+2025-03-10 00:14:20,936 - ml_integration_manager - ERROR - Không thể tải mô hình ETHUSDT_1h_3m_target3d_random_forest cho ETHUSDT_1h
+2025-03-10 00:14:20,937 - ml_integration_manager - INFO - Đã tải 0 mô hình
+2025-03-10 00:14:20,937 - ml_integration_manager - INFO - Tạo tín hiệu cho BTCUSDT 1h
+2025-03-10 00:14:20,937 - ml_integration_manager - WARNING - Không có mô hình cho BTCUSDT_1h
+2025-03-10 00:14:21,143 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,147 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:14:21,176 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:14:21,176 - data_processor - INFO - Price: 80869.50 (0.22% change)
+2025-03-10 00:14:21,176 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:14:21,177 - data_processor - INFO - RSI: 22.48 (Oversold)
+2025-03-10 00:14:21,177 - data_processor - INFO - MACD: -1311.14 (Signal: -1056.30)
+2025-03-10 00:14:21,177 - data_processor - INFO - Volume: 0.55x average
+2025-03-10 00:14:21,177 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:14:21,177 - data_processor - INFO - ===========================
+2025-03-10 00:14:21,177 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:14:21,220 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,232 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,261 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,439 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,457 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,592 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,598 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,616 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,739 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,747 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,762 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:21,913 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:21,976 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:22,000 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:22,072 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:22,122 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:22,135 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:22,194 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:14:22,201 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:14:22,376 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:22,413 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:14:22,414 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:14:22,420 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:14:22,428 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:14:22,452 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:14:22,476 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:14:22,500 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:14:22,767 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:14:22,803 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:14:22,829 - ml_integration_manager - INFO - Đã tạo tín hiệu rủi ro cao cho BTCUSDT 1h: 0
+2025-03-10 00:14:22,830 - ml_integration_manager - INFO - Không có tín hiệu đồng thuận cho BTCUSDT: ML=0, Risk=0
+2025-03-10 00:14:22,830 - ml_integration_manager - INFO - Đã tạo tín hiệu tích hợp cho BTCUSDT 1h: 0
+2025-03-10 00:14:22,830 - ml_integration_manager - INFO - Hoàn tất
+2025-03-10 00:17:18,525 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-10 00:17:18,525 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-10 00:17:18,526 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-10 00:17:18,526 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-10 00:17:18,694 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-10 00:17:18,694 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-10 00:17:18,696 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-10 00:17:18,697 - ml_integration_manager - INFO - Khởi tạo MLIntegrationManager với cấu hình từ ml_pipeline_results/ml_deployment_config.json, thư mục dữ liệu: real_data
+2025-03-10 00:17:18,697 - ml_integration_manager - INFO - Tải các mô hình ML...
+2025-03-10 00:17:18,697 - ml_integration_manager - INFO - Tải mô hình BTCUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:17:19,247 - ml_integration_manager - INFO - Đã tải mô hình BTCUSDT_1h_3m_target3d_random_forest thành công
+2025-03-10 00:17:19,247 - ml_integration_manager - INFO - Đã tải mô hình BTCUSDT_1h_3m_target3d_random_forest cho BTCUSDT_1h
+2025-03-10 00:17:19,248 - ml_integration_manager - INFO - Tải mô hình ETHUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:17:19,287 - ml_integration_manager - INFO - Đã tải mô hình ETHUSDT_1h_3m_target3d_random_forest thành công
+2025-03-10 00:17:19,287 - ml_integration_manager - INFO - Đã tải mô hình ETHUSDT_1h_3m_target3d_random_forest cho ETHUSDT_1h
+2025-03-10 00:17:19,287 - ml_integration_manager - INFO - Đã tải 2 mô hình
+2025-03-10 00:17:19,287 - ml_integration_manager - INFO - Tạo tín hiệu cho BTCUSDT 1h
+2025-03-10 00:17:19,479 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:19,515 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:19,515 - data_processor - INFO - Price: 80660.00 (-0.04% change)
+2025-03-10 00:17:19,516 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:19,516 - data_processor - INFO - RSI: 20.39 (Oversold)
+2025-03-10 00:17:19,516 - data_processor - INFO - MACD: -1327.85 (Signal: -1059.65)
+2025-03-10 00:17:19,516 - data_processor - INFO - Volume: 0.65x average
+2025-03-10 00:17:19,516 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:19,516 - data_processor - INFO - ===========================
+2025-03-10 00:17:19,516 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:19,534 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,580 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,595 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,640 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,665 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,691 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,717 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,725 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,744 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,880 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,892 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:19,916 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:19,924 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:20,007 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:20,037 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:20,106 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:20,149 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:20,161 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:20,212 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:20,218 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:20,258 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:20,300 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:20,300 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:20,307 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:20,317 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:20,338 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:20,361 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:20,380 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:20,496 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:20,527 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:20,556 - ml_integration_manager - WARNING - Thiếu 3 đặc trưng: {'info', 'features', 'creation_date'}
+2025-03-10 00:17:20,557 - ml_integration_manager - ERROR - Lỗi khi tạo tín hiệu ML cho BTCUSDT 1h: at least one array or dtype is required
+2025-03-10 00:17:20,559 - ml_integration_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/ml_integration_manager.py", line 333, in generate_ml_signal
+    X_scaled = scaler.transform(X)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/preprocessing/_data.py", line 1062, in transform
+    X = validate_data(
+        ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 931, in check_array
+    dtype_orig = np.result_type(*dtypes_orig)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: at least one array or dtype is required
+
+2025-03-10 00:17:21,127 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:21,157 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:21,157 - data_processor - INFO - Price: 80678.00 (-0.01% change)
+2025-03-10 00:17:21,158 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:21,158 - data_processor - INFO - RSI: 20.44 (Oversold)
+2025-03-10 00:17:21,158 - data_processor - INFO - MACD: -1326.41 (Signal: -1059.36)
+2025-03-10 00:17:21,158 - data_processor - INFO - Volume: 0.65x average
+2025-03-10 00:17:21,158 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:21,158 - data_processor - INFO - ===========================
+2025-03-10 00:17:21,158 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:21,176 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,221 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,238 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,282 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,303 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,324 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,349 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,357 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,371 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,548 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,577 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,602 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,786 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,860 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,881 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,943 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:21,987 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:21,997 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:22,041 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:22,047 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:22,090 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:22,133 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:22,133 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:22,140 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:22,158 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:22,178 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:22,196 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:22,214 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:22,324 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:22,352 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:22,377 - ml_integration_manager - INFO - Đã tạo tín hiệu rủi ro cao cho BTCUSDT 1h: 0
+2025-03-10 00:17:22,377 - ml_integration_manager - INFO - Không có tín hiệu đồng thuận cho BTCUSDT: ML=0, Risk=0
+2025-03-10 00:17:22,378 - ml_integration_manager - INFO - Đã tạo tín hiệu tích hợp cho BTCUSDT 1h: 0
+2025-03-10 00:17:22,378 - ml_integration_manager - INFO - Hoàn tất
+2025-03-10 00:17:41,247 - ml_integration_manager - INFO - Đã tải cấu hình từ ml_pipeline_results/ml_deployment_config.json
+2025-03-10 00:17:41,247 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-10 00:17:41,247 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-10 00:17:41,247 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-10 00:17:41,416 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-10 00:17:41,416 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-10 00:17:41,418 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-10 00:17:41,419 - ml_integration_manager - INFO - Khởi tạo MLIntegrationManager với cấu hình từ ml_pipeline_results/ml_deployment_config.json, thư mục dữ liệu: real_data
+2025-03-10 00:17:41,419 - ml_integration_manager - INFO - Tải các mô hình ML...
+2025-03-10 00:17:41,420 - ml_integration_manager - INFO - Tải mô hình BTCUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:17:41,943 - ml_integration_manager - INFO - Đã tải mô hình BTCUSDT_1h_3m_target3d_random_forest thành công
+2025-03-10 00:17:41,943 - ml_integration_manager - INFO - Đã tải mô hình BTCUSDT_1h_3m_target3d_random_forest cho BTCUSDT_1h
+2025-03-10 00:17:41,943 - ml_integration_manager - INFO - Tải mô hình ETHUSDT_1h_3m_target3d_random_forest
+2025-03-10 00:17:41,980 - ml_integration_manager - INFO - Đã tải mô hình ETHUSDT_1h_3m_target3d_random_forest thành công
+2025-03-10 00:17:41,980 - ml_integration_manager - INFO - Đã tải mô hình ETHUSDT_1h_3m_target3d_random_forest cho ETHUSDT_1h
+2025-03-10 00:17:41,980 - ml_integration_manager - INFO - Đã tải 2 mô hình
+2025-03-10 00:17:41,980 - ml_integration_manager - INFO - Cập nhật hệ thống với tín hiệu ML (một lần)
+2025-03-10 00:17:42,552 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:42,590 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:42,590 - data_processor - INFO - Price: 80608.60 (-0.10% change)
+2025-03-10 00:17:42,590 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:42,590 - data_processor - INFO - RSI: 20.24 (Oversold)
+2025-03-10 00:17:42,590 - data_processor - INFO - MACD: -1331.95 (Signal: -1060.47)
+2025-03-10 00:17:42,590 - data_processor - INFO - Volume: 0.66x average
+2025-03-10 00:17:42,590 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:42,590 - data_processor - INFO - ===========================
+2025-03-10 00:17:42,591 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:42,610 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,659 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,676 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,716 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,738 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,761 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,786 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,795 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,818 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,952 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,965 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:42,989 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:42,996 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,070 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:43,100 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,171 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:43,218 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,232 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:43,279 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:43,287 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:43,329 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,376 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:43,376 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:43,383 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:43,391 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:43,419 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:43,440 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:43,464 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:43,583 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,624 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:43,653 - ml_integration_manager - WARNING - Thiếu 3 đặc trưng: {'features', 'info', 'creation_date'}
+2025-03-10 00:17:43,654 - ml_integration_manager - ERROR - Lỗi khi tạo tín hiệu ML cho BTCUSDT 1h: at least one array or dtype is required
+2025-03-10 00:17:43,656 - ml_integration_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/ml_integration_manager.py", line 333, in generate_ml_signal
+    X_scaled = scaler.transform(X)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/preprocessing/_data.py", line 1062, in transform
+    X = validate_data(
+        ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 931, in check_array
+    dtype_orig = np.result_type(*dtypes_orig)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: at least one array or dtype is required
+
+2025-03-10 00:17:43,860 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:43,889 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:43,889 - data_processor - INFO - Price: 80579.70 (-0.14% change)
+2025-03-10 00:17:43,890 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:43,890 - data_processor - INFO - RSI: 20.16 (Oversold)
+2025-03-10 00:17:43,890 - data_processor - INFO - MACD: -1334.26 (Signal: -1060.93)
+2025-03-10 00:17:43,890 - data_processor - INFO - Volume: 0.66x average
+2025-03-10 00:17:43,890 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:43,890 - data_processor - INFO - ===========================
+2025-03-10 00:17:43,890 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:43,906 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,938 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:43,950 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:43,982 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,000 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,019 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,037 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,043 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,057 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,228 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,237 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,253 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,483 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,543 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,698 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,760 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,802 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,812 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:44,856 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:44,861 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:44,893 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:44,930 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:44,930 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:44,935 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:44,952 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:45,132 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:45,157 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:45,180 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:45,297 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:45,334 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:45,367 - ml_integration_manager - INFO - Đã tạo tín hiệu rủi ro cao cho BTCUSDT 1h: 0
+2025-03-10 00:17:45,368 - ml_integration_manager - INFO - Không có tín hiệu đồng thuận cho BTCUSDT: ML=0, Risk=0
+2025-03-10 00:17:45,368 - ml_integration_manager - INFO - Đã tạo tín hiệu tích hợp cho BTCUSDT 1h: 0
+2025-03-10 00:17:45,944 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:45,980 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:45,980 - data_processor - INFO - Price: 2016.89 (-0.11% change)
+2025-03-10 00:17:45,980 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:45,980 - data_processor - INFO - RSI: 25.81 (Oversold)
+2025-03-10 00:17:45,980 - data_processor - INFO - MACD: -42.27 (Signal: -35.10)
+2025-03-10 00:17:45,980 - data_processor - INFO - Volume: 0.41x average
+2025-03-10 00:17:45,980 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:45,980 - data_processor - INFO - ===========================
+2025-03-10 00:17:45,981 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:46,002 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,024 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:46,025 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:46,033 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:46,076 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,091 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,103 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,112 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,147 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,162 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,216 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,225 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,248 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,256 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,289 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,357 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,425 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,478 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,533 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,544 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,555 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,567 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,587 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,602 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,643 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:46,668 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:46,734 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,742 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:46,762 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:46,789 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:46,862 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:46,877 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:46,877 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:46,883 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang volatile
+2025-03-10 00:17:46,908 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:46,916 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:46,943 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:47,067 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:47,074 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:47,144 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:47,162 - ml_integration_manager - WARNING - Thiếu 3 đặc trưng: {'features', 'info', 'creation_date'}
+2025-03-10 00:17:47,163 - ml_integration_manager - ERROR - Lỗi khi tạo tín hiệu ML cho ETHUSDT 1h: at least one array or dtype is required
+2025-03-10 00:17:47,164 - ml_integration_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/ml_integration_manager.py", line 333, in generate_ml_signal
+    X_scaled = scaler.transform(X)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/preprocessing/_data.py", line 1062, in transform
+    X = validate_data(
+        ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/utils/validation.py", line 931, in check_array
+    dtype_orig = np.result_type(*dtypes_orig)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: at least one array or dtype is required
+
+2025-03-10 00:17:47,733 - data_processor - INFO - Detected market regime: neutral
+2025-03-10 00:17:47,760 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-10 00:17:47,760 - data_processor - INFO - Price: 2016.45 (-0.14% change)
+2025-03-10 00:17:47,760 - data_processor - INFO - Trend: Downtrend
+2025-03-10 00:17:47,760 - data_processor - INFO - RSI: 25.76 (Oversold)
+2025-03-10 00:17:47,760 - data_processor - INFO - MACD: -42.30 (Signal: -35.11)
+2025-03-10 00:17:47,760 - data_processor - INFO - Volume: 0.41x average
+2025-03-10 00:17:47,760 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-10 00:17:47,760 - data_processor - INFO - ===========================
+2025-03-10 00:17:47,761 - data_processor - INFO - Processed 720 samples with indicators
+2025-03-10 00:17:47,775 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:47,784 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:47,799 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:47,799 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:47,805 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang neutral
+2025-03-10 00:17:48,027 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,039 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,050 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,059 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,088 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,099 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,139 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,146 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,173 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,181 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,209 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,283 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,351 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,405 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,455 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,466 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,478 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,489 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,507 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,523 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,567 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:48,592 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:48,653 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,662 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:48,685 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:48,710 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:48,768 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,783 - market_regime_detector - INFO - Phát hiện breakout! Thay đổi chế độ thị trường sang: breakout
+2025-03-10 00:17:48,783 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang breakout
+2025-03-10 00:17:48,791 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ breakout sang volatile
+2025-03-10 00:17:48,816 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:48,824 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:48,852 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-10 00:17:48,978 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-10 00:17:48,988 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-10 00:17:49,005 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-10 00:17:49,023 - ml_integration_manager - INFO - Đã tạo tín hiệu rủi ro cao cho ETHUSDT 1h: 0
+2025-03-10 00:17:49,023 - ml_integration_manager - INFO - Không có tín hiệu đồng thuận cho ETHUSDT: ML=0, Risk=0
+2025-03-10 00:17:49,024 - ml_integration_manager - INFO - Đã tạo tín hiệu tích hợp cho ETHUSDT 1h: 0
+2025-03-10 00:17:49,024 - ml_integration_manager - INFO - Đã tạo tín hiệu cho 2 cặp tiền
+2025-03-10 00:17:49,024 - ml_integration_manager - INFO - Đã cập nhật hệ thống với tín hiệu ML: ./ml_integration_signals.json
+2025-03-10 00:17:49,024 - ml_integration_manager - INFO - Hoàn tất

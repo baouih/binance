@@ -1,0 +1,128 @@
+2025-03-15 11:12:05,762 - risk_test - INFO - Sử dụng mức rủi ro: conservative (5.0%)
+2025-03-15 11:12:05,762 - risk_test - INFO - Khởi tạo Backtest Engine cho BTCUSDT với balance=10000, leverage=5
+2025-03-15 11:12:05,762 - risk_test - INFO - Khởi tạo AdaptiveStrategy với periods=10/20/50
+2025-03-15 11:12:05,762 - risk_test - INFO - Bắt đầu chạy backtest cho BTCUSDT với strategy=AdaptiveStrategy
+2025-03-15 11:12:05,770 - risk_test - INFO - Đã tính xong các chỉ báo cho AdaptiveStrategy
+2025-03-15 11:12:05,805 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96503.63 với size=0.103623, SL=95345.59, TP=98530.21, Market=RANGING
+2025-03-15 11:12:05,805 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95345.59 với lý do SL, PnL=-120.00 (-1.20%), Balance=9880.00
+2025-03-15 11:12:05,812 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96144.61 với size=0.102762, SL=97298.35, TP=94125.57, Market=RANGING
+2025-03-15 11:12:05,812 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95337.00 với lý do TP1, PnL=20.75 (0.84%), Balance=9900.75, Còn lại: 75%
+2025-03-15 11:12:05,813 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94529.38 với lý do TP2, PnL=41.50 (1.68%), Balance=9942.24, Còn lại: 67%
+2025-03-15 11:12:05,813 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94125.57 với lý do TP3, PnL=51.87 (2.10%), Balance=9994.11, Còn lại: 50%
+2025-03-15 11:12:05,814 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97298.35 với lý do SL, PnL=-29.64 (-1.20%), Balance=9964.47
+2025-03-15 11:12:05,819 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97306.78 với size=0.102403, SL=96139.10, TP=99350.22, Market=RANGING
+2025-03-15 11:12:05,820 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98124.16 với lý do TP1, PnL=20.93 (0.84%), Balance=9985.40, Còn lại: 75%
+2025-03-15 11:12:05,820 - risk_test - INFO - Chốt lời 33% vị thế LONG BTCUSDT tại 98941.53 với lý do TP2, PnL=41.85 (1.68%), Balance=10027.25, Còn lại: 67%
+2025-03-15 11:12:05,820 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96139.10 với lý do SL, PnL=-59.79 (-1.20%), Balance=9967.46
+2025-03-15 11:12:05,826 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 97383.33 với size=0.102353, SL=98551.93, TP=95338.28, Market=RANGING
+2025-03-15 11:12:05,833 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 96565.31 với lý do TP1, PnL=20.93 (0.84%), Balance=9988.40, Còn lại: 75%
+2025-03-15 11:12:05,833 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 95747.29 với lý do TP2, PnL=41.86 (1.68%), Balance=10030.26, Còn lại: 67%
+2025-03-15 11:12:05,833 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 95338.28 với lý do TP3, PnL=52.33 (2.10%), Balance=10082.59, Còn lại: 50%
+2025-03-15 11:12:05,836 - risk_test - INFO - Đóng vị thế BTCUSDT tại 98551.93 với lý do SL, PnL=-29.90 (-1.20%), Balance=10052.69
+2025-03-15 11:12:05,838 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96336.07 với size=0.104350, SL=97492.10, TP=94313.01, Market=RANGING
+2025-03-15 11:12:05,838 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95526.85 với lý do TP1, PnL=21.11 (0.84%), Balance=10073.80, Còn lại: 75%
+2025-03-15 11:12:05,839 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94717.62 với lý do TP2, PnL=42.22 (1.68%), Balance=10116.02, Còn lại: 67%
+2025-03-15 11:12:05,839 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94313.01 với lý do TP3, PnL=52.78 (2.10%), Balance=10168.79, Còn lại: 50%
+2025-03-15 11:12:05,843 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97492.10 với lý do SL, PnL=-30.16 (-1.20%), Balance=10138.64
+2025-03-15 11:12:05,846 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 95962.27 với size=0.105652, SL=94810.72, TP=97977.48, Market=RANGING
+2025-03-15 11:12:05,848 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94810.72 với lý do SL, PnL=-121.66 (-1.20%), Balance=10016.97
+2025-03-15 11:12:05,854 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96222.14 với size=0.104103, SL=97376.81, TP=94201.48, Market=RANGING
+2025-03-15 11:12:05,855 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95413.87 với lý do TP1, PnL=21.04 (0.84%), Balance=10038.01, Còn lại: 75%
+2025-03-15 11:12:05,856 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94605.61 với lý do TP2, PnL=42.07 (1.68%), Balance=10080.08, Còn lại: 67%
+2025-03-15 11:12:05,856 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94201.48 với lý do TP3, PnL=52.59 (2.10%), Balance=10132.67, Còn lại: 50%
+2025-03-15 11:12:05,856 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97376.81 với lý do SL, PnL=-30.05 (-1.20%), Balance=10102.62
+2025-03-15 11:12:05,870 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97600.54 với size=0.103510, SL=96136.53, TP=100528.56, Market=BULL
+2025-03-15 11:12:05,879 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98771.75 với lý do TP1, PnL=30.31 (1.20%), Balance=10132.92, Còn lại: 75%
+2025-03-15 11:12:05,881 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96136.53 với lý do SL, PnL=-113.65 (-1.50%), Balance=10019.27
+2025-03-15 11:12:05,894 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 95465.0 với size=0.104952, SL=96896.97, TP=92601.05, Market=BEAR
+2025-03-15 11:12:05,896 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 94319.42 với lý do TP1, PnL=30.06 (1.20%), Balance=10049.33, Còn lại: 75%
+2025-03-15 11:12:05,896 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 93173.84 với lý do TP2, PnL=60.12 (2.40%), Balance=10109.44, Còn lại: 67%
+2025-03-15 11:12:05,898 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 92601.05 với lý do TP3, PnL=75.14 (3.00%), Balance=10184.59, Còn lại: 50%
+2025-03-15 11:12:05,898 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96896.97 với lý do SL, PnL=-37.57 (-1.50%), Balance=10147.02
+2025-03-15 11:12:05,923 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96579.99 với size=0.105063, SL=95421.03, TP=98608.17, Market=RANGING
+2025-03-15 11:12:05,925 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95421.03 với lý do SL, PnL=-121.76 (-1.20%), Balance=10025.25
+2025-03-15 11:12:05,930 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96414.0 với size=0.103981, SL=97570.97, TP=94389.31, Market=RANGING
+2025-03-15 11:12:05,936 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95604.12 với lý do TP1, PnL=21.05 (0.84%), Balance=10046.31, Còn lại: 75%
+2025-03-15 11:12:05,943 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94794.24 với lý do TP2, PnL=42.11 (1.68%), Balance=10088.41, Còn lại: 67%
+2025-03-15 11:12:05,943 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94389.31 với lý do TP3, PnL=52.63 (2.10%), Balance=10141.04, Còn lại: 50%
+2025-03-15 11:12:05,951 - risk_test - INFO - Đã kích hoạt Trailing Stop cho BTCUSDT tại 94630.66 với stop=94914.55
+2025-03-15 11:12:05,952 - risk_test - INFO - Cập nhật Trailing Stop BTCUSDT xuống 94565.72
+2025-03-15 11:12:05,954 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94605.39 với lý do TRAILING_STOP, PnL=47.02 (1.88%), Balance=10188.06
+2025-03-15 11:12:05,966 - risk_test - INFO - Đang xử lý candle 500/582 (85.9%), ngày 2025-02-26 09:00:00, giá 89116.02. Thời gian còn lại: 0:00:00.032001
+2025-03-15 11:12:05,971 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 87590.69 với size=0.116314, SL=88904.55, TP=84962.97, Market=BEAR
+2025-03-15 11:12:05,972 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 86539.60 với lý do TP1, PnL=30.56 (1.20%), Balance=10218.62, Còn lại: 75%
+2025-03-15 11:12:05,972 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 85488.51 với lý do TP2, PnL=61.13 (2.40%), Balance=10279.75, Còn lại: 67%
+2025-03-15 11:12:05,972 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 84962.97 với lý do TP3, PnL=76.41 (3.00%), Balance=10356.16, Còn lại: 50%
+2025-03-15 11:12:05,973 - risk_test - INFO - Đóng vị thế BTCUSDT tại 88904.55 với lý do SL, PnL=-38.21 (-1.50%), Balance=10317.96
+2025-03-15 11:12:05,982 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 84124.0 với size=0.122652, SL=85385.86, TP=81600.28, Market=BEAR
+2025-03-15 11:12:05,983 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 83114.51 với lý do TP1, PnL=30.95 (1.20%), Balance=10348.91, Còn lại: 75%
+2025-03-15 11:12:05,984 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 82105.02 với lý do TP2, PnL=61.91 (2.40%), Balance=10410.82, Còn lại: 67%
+2025-03-15 11:12:05,984 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 81600.28 với lý do TP3, PnL=77.38 (3.00%), Balance=10488.20, Còn lại: 50%
+2025-03-15 11:12:05,986 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85385.86 với lý do SL, PnL=-38.69 (-1.50%), Balance=10449.51
+2025-03-15 11:12:05,999 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 85306.99 với size=0.122493, SL=86586.59, TP=82747.78, Market=BEAR
+2025-03-15 11:12:06,000 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85306.99 với lý do FINAL, PnL=0.00 (0.00%), Balance=10449.51
+2025-03-15 11:12:06,000 - risk_test - INFO - Hoàn thành backtest cho BTCUSDT trong 0:00:00.229730
+2025-03-15 11:26:33,230 - risk_test - INFO - Sử dụng mức rủi ro: conservative (5.0%)
+2025-03-15 11:26:33,231 - risk_test - INFO - Khởi tạo Backtest Engine cho BTCUSDT với balance=10000, leverage=5
+2025-03-15 11:26:33,231 - risk_test - INFO - Khởi tạo AdaptiveStrategy với periods=10/20/50
+2025-03-15 11:26:33,231 - risk_test - INFO - Bắt đầu chạy backtest cho BTCUSDT với strategy=AdaptiveStrategy
+2025-03-15 11:26:33,240 - risk_test - INFO - Đã tính xong các chỉ báo cho AdaptiveStrategy
+2025-03-15 11:26:33,257 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96503.63 với size=0.103623, SL=95345.59, TP=98530.21, Market=RANGING
+2025-03-15 11:26:33,258 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95345.59 với lý do SL, PnL=-120.00 (-1.20%), Balance=9880.00
+2025-03-15 11:26:33,265 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96144.61 với size=0.102762, SL=97298.35, TP=94125.57, Market=RANGING
+2025-03-15 11:26:33,266 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95337.00 với lý do TP1, PnL=20.75 (0.84%), Balance=9900.75, Còn lại: 75%
+2025-03-15 11:26:33,267 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94529.38 với lý do TP2, PnL=41.50 (1.68%), Balance=9942.24, Còn lại: 67%
+2025-03-15 11:26:33,267 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94125.57 với lý do TP3, PnL=51.87 (2.10%), Balance=9994.11, Còn lại: 50%
+2025-03-15 11:26:33,268 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97298.35 với lý do SL, PnL=-29.64 (-1.20%), Balance=9964.47
+2025-03-15 11:26:33,276 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97306.78 với size=0.102403, SL=96139.10, TP=99350.22, Market=RANGING
+2025-03-15 11:26:33,276 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98124.16 với lý do TP1, PnL=20.93 (0.84%), Balance=9985.40, Còn lại: 75%
+2025-03-15 11:26:33,277 - risk_test - INFO - Chốt lời 33% vị thế LONG BTCUSDT tại 98941.53 với lý do TP2, PnL=41.85 (1.68%), Balance=10027.25, Còn lại: 67%
+2025-03-15 11:26:33,277 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96139.10 với lý do SL, PnL=-59.79 (-1.20%), Balance=9967.46
+2025-03-15 11:26:33,284 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 97383.33 với size=0.102353, SL=98551.93, TP=95338.28, Market=RANGING
+2025-03-15 11:26:33,292 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 96565.31 với lý do TP1, PnL=20.93 (0.84%), Balance=9988.40, Còn lại: 75%
+2025-03-15 11:26:33,293 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 95747.29 với lý do TP2, PnL=41.86 (1.68%), Balance=10030.26, Còn lại: 67%
+2025-03-15 11:26:33,293 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 95338.28 với lý do TP3, PnL=52.33 (2.10%), Balance=10082.59, Còn lại: 50%
+2025-03-15 11:26:33,297 - risk_test - INFO - Đóng vị thế BTCUSDT tại 98551.93 với lý do SL, PnL=-29.90 (-1.20%), Balance=10052.69
+2025-03-15 11:26:33,299 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96336.07 với size=0.104350, SL=97492.10, TP=94313.01, Market=RANGING
+2025-03-15 11:26:33,300 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95526.85 với lý do TP1, PnL=21.11 (0.84%), Balance=10073.80, Còn lại: 75%
+2025-03-15 11:26:33,301 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94717.62 với lý do TP2, PnL=42.22 (1.68%), Balance=10116.02, Còn lại: 67%
+2025-03-15 11:26:33,301 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94313.01 với lý do TP3, PnL=52.78 (2.10%), Balance=10168.79, Còn lại: 50%
+2025-03-15 11:26:33,308 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97492.10 với lý do SL, PnL=-30.16 (-1.20%), Balance=10138.64
+2025-03-15 11:26:33,312 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 95962.27 với size=0.105652, SL=94810.72, TP=97977.48, Market=RANGING
+2025-03-15 11:26:33,315 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94810.72 với lý do SL, PnL=-121.66 (-1.20%), Balance=10016.97
+2025-03-15 11:26:33,323 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96222.14 với size=0.104103, SL=97376.81, TP=94201.48, Market=RANGING
+2025-03-15 11:26:33,325 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95413.87 với lý do TP1, PnL=21.04 (0.84%), Balance=10038.01, Còn lại: 75%
+2025-03-15 11:26:33,325 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94605.61 với lý do TP2, PnL=42.07 (1.68%), Balance=10080.08, Còn lại: 67%
+2025-03-15 11:26:33,325 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94201.48 với lý do TP3, PnL=52.59 (2.10%), Balance=10132.67, Còn lại: 50%
+2025-03-15 11:26:33,326 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97376.81 với lý do SL, PnL=-30.05 (-1.20%), Balance=10102.62
+2025-03-15 11:26:33,345 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97600.54 với size=0.103510, SL=96136.53, TP=100528.56, Market=BULL
+2025-03-15 11:26:33,359 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98771.75 với lý do TP1, PnL=30.31 (1.20%), Balance=10132.92, Còn lại: 75%
+2025-03-15 11:26:33,362 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96136.53 với lý do SL, PnL=-113.65 (-1.50%), Balance=10019.27
+2025-03-15 11:26:33,383 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 95465.0 với size=0.104952, SL=96896.97, TP=92601.05, Market=BEAR
+2025-03-15 11:26:33,385 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 94319.42 với lý do TP1, PnL=30.06 (1.20%), Balance=10049.33, Còn lại: 75%
+2025-03-15 11:26:33,386 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 93173.84 với lý do TP2, PnL=60.12 (2.40%), Balance=10109.44, Còn lại: 67%
+2025-03-15 11:26:33,389 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 92601.05 với lý do TP3, PnL=75.14 (3.00%), Balance=10184.59, Còn lại: 50%
+2025-03-15 11:26:33,389 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96896.97 với lý do SL, PnL=-37.57 (-1.50%), Balance=10147.02
+2025-03-15 11:26:33,428 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96579.99 với size=0.105063, SL=95421.03, TP=98608.17, Market=RANGING
+2025-03-15 11:26:33,431 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95421.03 với lý do SL, PnL=-121.76 (-1.20%), Balance=10025.25
+2025-03-15 11:26:33,436 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96414.0 với size=0.103981, SL=97570.97, TP=94389.31, Market=RANGING
+2025-03-15 11:26:33,446 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95604.12 với lý do TP1, PnL=21.05 (0.84%), Balance=10046.31, Còn lại: 75%
+2025-03-15 11:26:33,455 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94794.24 với lý do TP2, PnL=42.11 (1.68%), Balance=10088.41, Còn lại: 67%
+2025-03-15 11:26:33,455 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94389.31 với lý do TP3, PnL=52.63 (2.10%), Balance=10141.04, Còn lại: 50%
+2025-03-15 11:26:33,467 - risk_test - INFO - Đã kích hoạt Trailing Stop cho BTCUSDT tại 94630.66 với stop=94914.55
+2025-03-15 11:26:33,469 - risk_test - INFO - Cập nhật Trailing Stop BTCUSDT xuống 94565.72
+2025-03-15 11:26:33,470 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94605.39 với lý do TRAILING_STOP, PnL=47.02 (1.88%), Balance=10188.06
+2025-03-15 11:26:33,487 - risk_test - INFO - Đang xử lý candle 500/582 (85.9%), ngày 2025-02-26 09:00:00, giá 89116.02. Thời gian còn lại: 0:00:00.040558
+2025-03-15 11:26:33,490 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 87590.69 với size=0.116314, SL=88904.55, TP=84962.97, Market=BEAR
+2025-03-15 11:26:33,491 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 86539.60 với lý do TP1, PnL=30.56 (1.20%), Balance=10218.62, Còn lại: 75%
+2025-03-15 11:26:33,491 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 85488.51 với lý do TP2, PnL=61.13 (2.40%), Balance=10279.75, Còn lại: 67%
+2025-03-15 11:26:33,492 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 84962.97 với lý do TP3, PnL=76.41 (3.00%), Balance=10356.16, Còn lại: 50%
+2025-03-15 11:26:33,492 - risk_test - INFO - Đóng vị thế BTCUSDT tại 88904.55 với lý do SL, PnL=-38.21 (-1.50%), Balance=10317.96
+2025-03-15 11:26:33,504 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 84124.0 với size=0.122652, SL=85385.86, TP=81600.28, Market=BEAR
+2025-03-15 11:26:33,505 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 83114.51 với lý do TP1, PnL=30.95 (1.20%), Balance=10348.91, Còn lại: 75%
+2025-03-15 11:26:33,506 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 82105.02 với lý do TP2, PnL=61.91 (2.40%), Balance=10410.82, Còn lại: 67%
+2025-03-15 11:26:33,506 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 81600.28 với lý do TP3, PnL=77.38 (3.00%), Balance=10488.20, Còn lại: 50%
+2025-03-15 11:26:33,509 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85385.86 với lý do SL, PnL=-38.69 (-1.50%), Balance=10449.51
+2025-03-15 11:26:33,522 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 85306.99 với size=0.122493, SL=86586.59, TP=82747.78, Market=BEAR
+2025-03-15 11:26:33,523 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85306.99 với lý do FINAL, PnL=0.00 (0.00%), Balance=10449.51
+2025-03-15 11:26:33,523 - risk_test - INFO - Hoàn thành backtest cho BTCUSDT trong 0:00:00.282764

@@ -1,0 +1,4 @@
+2025-03-15 12:29:29,137 - sideways_market_strategy - INFO - Khởi tạo SidewaysMarketStrategy
+2025-03-15 12:29:29,164 - sideways_market_strategy - INFO - Xác định thị trường đi ngang: Range=0.88%, Slope=-0.0127%
+2025-03-15 12:29:29,164 - sideways_market_strategy - INFO - Biên độ: High=49274.35, Low=48845.03, Mid=49059.69
+2025-03-15 12:29:29,215 - sideways_market_strategy - INFO - Không có tín hiệu rõ ràng cho thị trường đi ngang: No clear signal in sideways market. Long points: 1, Short points: 1

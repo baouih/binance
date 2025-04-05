@@ -1,0 +1,484 @@
+2025-03-09 17:44:51,918 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 17:44:51,919 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 17:44:51,919 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ demo
+2025-03-09 17:44:52,327 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 17:44:52,328 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 17:44:52,329 - data_processor - INFO - DataProcessor initialized in simulation mode with ML features
+2025-03-09 17:44:52,329 - enhanced_ml_trainer - INFO - Khởi tạo EnhancedMLTrainer, chế độ mô phỏng: True
+2025-03-09 17:44:52,329 - enhanced_ml_trainer - INFO - === Bắt đầu huấn luyện 2 mô hình ===
+2025-03-09 17:44:52,329 - enhanced_ml_trainer - INFO - Nhiệm vụ 1/2: BTCUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 17:44:52,329 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 17:44:52,329 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 17:44:52,329 - binance_api - INFO - SIMULATION: Generated 1000 samples of synthetic data for BTCUSDT
+2025-03-09 17:44:52,394 - binance_api - INFO - Date range: 2025-01-27 02:44:52.329967 to 2025-03-09 17:44:52.329967
+2025-03-09 17:44:52,395 - binance_api - INFO - Price range: 82368.61 to 164798.11
+2025-03-09 17:44:52,427 - data_processor - INFO - Detected market regime: ranging
+2025-03-09 17:44:52,468 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-09 17:44:52,468 - data_processor - INFO - Price: 164798.11 (0.00% change)
+2025-03-09 17:44:52,468 - data_processor - INFO - Trend: Uptrend
+2025-03-09 17:44:52,468 - data_processor - INFO - RSI: 0.00 (Oversold)
+2025-03-09 17:44:52,468 - data_processor - INFO - MACD: 0.00 (Signal: 0.00)
+2025-03-09 17:44:52,468 - data_processor - INFO - Volume: 1.46x average
+2025-03-09 17:44:52,468 - data_processor - INFO - Market Regime: ranging - Thị trường đi ngang - giá dao động trong một khoảng hẹp xác định.
+2025-03-09 17:44:52,468 - data_processor - INFO - ===========================
+2025-03-09 17:44:52,468 - data_processor - INFO - Processed 1000 samples with indicators
+2025-03-09 17:44:52,468 - enhanced_ml_trainer - INFO - Đã tải 1000 nến cho BTCUSDT 1h
+2025-03-09 17:44:52,504 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang volatile
+2025-03-09 17:44:52,537 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang ranging
+2025-03-09 17:44:53,949 - enhanced_ml_trainer - INFO - Đã chuẩn bị 139 đặc trưng cho mô hình
+2025-03-09 17:44:53,958 - enhanced_ml_trainer - INFO - Phân phối mục tiêu (threshold=1.0%):
+2025-03-09 17:44:53,958 - enhanced_ml_trainer - INFO -   Giữ nguyên: 68.75%
+2025-03-09 17:44:53,958 - enhanced_ml_trainer - INFO -   Mua: 31.25%
+2025-03-09 17:44:53,959 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu sau khi tạo đặc trưng và mục tiêu: 16 mẫu
+2025-03-09 17:44:53,959 - enhanced_ml_trainer - INFO - Nhiệm vụ 2/2: ETHUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 17:44:53,959 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 17:44:53,959 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 17:44:53,959 - binance_api - INFO - SIMULATION: Generated 1000 samples of synthetic data for ETHUSDT
+2025-03-09 17:44:54,277 - binance_api - INFO - Date range: 2025-01-27 02:44:53.959618 to 2025-03-09 17:44:53.959618
+2025-03-09 17:44:54,278 - binance_api - INFO - Price range: 4942.53 to 9885.06
+2025-03-09 17:44:54,315 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ ranging sang neutral
+2025-03-09 17:44:54,320 - data_processor - INFO - Detected market regime: neutral
+2025-03-09 17:44:54,360 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-09 17:44:54,360 - data_processor - INFO - Price: 9885.06 (0.00% change)
+2025-03-09 17:44:54,360 - data_processor - INFO - Trend: Uptrend
+2025-03-09 17:44:54,360 - data_processor - INFO - RSI: 0.00 (Oversold)
+2025-03-09 17:44:54,360 - data_processor - INFO - MACD: 0.00 (Signal: 0.00)
+2025-03-09 17:44:54,361 - data_processor - INFO - Volume: 0.74x average
+2025-03-09 17:44:54,361 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-03-09 17:44:54,361 - data_processor - INFO - ===========================
+2025-03-09 17:44:54,361 - data_processor - INFO - Processed 1000 samples with indicators
+2025-03-09 17:44:54,361 - enhanced_ml_trainer - INFO - Đã tải 1000 nến cho ETHUSDT 1h
+2025-03-09 17:44:54,406 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+2025-03-09 17:44:54,421 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ volatile sang neutral
+2025-03-09 17:44:54,427 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang ranging
+2025-03-09 17:44:55,610 - enhanced_ml_trainer - INFO - Đã chuẩn bị 139 đặc trưng cho mô hình
+2025-03-09 17:44:55,613 - enhanced_ml_trainer - INFO - Phân phối mục tiêu (threshold=1.0%):
+2025-03-09 17:44:55,613 - enhanced_ml_trainer - INFO -   Giữ nguyên: 100.00%
+2025-03-09 17:44:55,613 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu sau khi tạo đặc trưng và mục tiêu: 8 mẫu
+2025-03-09 17:44:55,614 - enhanced_ml_trainer - INFO - === Đã hoàn thành huấn luyện 0/2 mô hình ===
+2025-03-09 17:44:55,614 - enhanced_ml_trainer - INFO - Thời gian tổng cộng: 3.28 giây
+2025-03-09 17:44:55,614 - enhanced_ml_trainer - INFO - Kết quả đã được lưu tại: ml_results/all_models_training_results.json
+2025-03-09 17:44:55,614 - enhanced_ml_trainer - WARNING - Không tìm thấy kết quả đánh giá mô hình
+2025-03-09 23:13:24,478 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 23:13:24,483 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 23:13:24,484 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 23:13:24,657 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 23:13:24,658 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 23:13:24,884 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-09 23:13:24,884 - enhanced_ml_trainer - INFO - Khởi tạo EnhancedMLTrainer, chế độ mô phỏng: False
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - === Bắt đầu huấn luyện 80 mô hình ===
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - Nhiệm vụ 1/80: BTCUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_1h.csv
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 1h
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - Nhiệm vụ 2/80: BTCUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,885 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_1h.csv
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 1h
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - Nhiệm vụ 3/80: BTCUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_1h.csv
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 1h
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - Nhiệm vụ 4/80: BTCUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,886 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_1h.csv
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 1h
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - Nhiệm vụ 5/80: BTCUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_4h.csv
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 4h
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - Nhiệm vụ 6/80: BTCUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,887 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_4h.csv
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 4h
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - Nhiệm vụ 7/80: BTCUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_4h.csv
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 4h
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - Nhiệm vụ 8/80: BTCUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,888 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BTCUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BTCUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BTCUSDT_4h.csv
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BTCUSDT 4h
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - Nhiệm vụ 9/80: ETHUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_1h.csv
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 1h
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - Nhiệm vụ 10/80: ETHUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,889 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_1h.csv
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 1h
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - Nhiệm vụ 11/80: ETHUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_1h.csv
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 1h
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - Nhiệm vụ 12/80: ETHUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,890 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_1h.csv
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 1h
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - Nhiệm vụ 13/80: ETHUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_4h.csv
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 4h
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - Nhiệm vụ 14/80: ETHUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_4h.csv
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 4h
+2025-03-09 23:13:24,891 - enhanced_ml_trainer - INFO - Nhiệm vụ 15/80: ETHUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_4h.csv
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 4h
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - Nhiệm vụ 16/80: ETHUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ETHUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ETHUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ETHUSDT_4h.csv
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ETHUSDT 4h
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - Nhiệm vụ 17/80: BNBUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_1h.csv
+2025-03-09 23:13:24,892 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 1h
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Nhiệm vụ 18/80: BNBUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_1h.csv
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 1h
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Nhiệm vụ 19/80: BNBUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_1h.csv
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 1h
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Nhiệm vụ 20/80: BNBUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,893 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_1h.csv
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 1h
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - Nhiệm vụ 21/80: BNBUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_4h.csv
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 4h
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - Nhiệm vụ 22/80: BNBUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,894 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_4h.csv
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 4h
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - Nhiệm vụ 23/80: BNBUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_4h.csv
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 4h
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - Nhiệm vụ 24/80: BNBUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho BNBUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho BNBUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/BNBUSDT_4h.csv
+2025-03-09 23:13:24,895 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho BNBUSDT 4h
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Nhiệm vụ 25/80: SOLUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_1h.csv
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 1h
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Nhiệm vụ 26/80: SOLUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_1h.csv
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 1h
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Nhiệm vụ 27/80: SOLUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,896 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_1h.csv
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 1h
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - Nhiệm vụ 28/80: SOLUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_1h.csv
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 1h
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - Nhiệm vụ 29/80: SOLUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_4h.csv
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 4h
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - Nhiệm vụ 30/80: SOLUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,897 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_4h.csv
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 4h
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - Nhiệm vụ 31/80: SOLUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_4h.csv
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 4h
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - Nhiệm vụ 32/80: SOLUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho SOLUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho SOLUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,898 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/SOLUSDT_4h.csv
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho SOLUSDT 4h
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - Nhiệm vụ 33/80: ADAUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_1h.csv
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 1h
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - Nhiệm vụ 34/80: ADAUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,903 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_1h.csv
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 1h
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - Nhiệm vụ 35/80: ADAUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_1h.csv
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 1h
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - Nhiệm vụ 36/80: ADAUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_1h.csv
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 1h
+2025-03-09 23:13:24,904 - enhanced_ml_trainer - INFO - Nhiệm vụ 37/80: ADAUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_4h.csv
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 4h
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - Nhiệm vụ 38/80: ADAUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_4h.csv
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 4h
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - Nhiệm vụ 39/80: ADAUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,905 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_4h.csv
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 4h
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - Nhiệm vụ 40/80: ADAUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho ADAUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho ADAUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/ADAUSDT_4h.csv
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho ADAUSDT 4h
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - Nhiệm vụ 41/80: XRPUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_1h.csv
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 1h
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - Nhiệm vụ 42/80: XRPUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,906 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_1h.csv
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 1h
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - Nhiệm vụ 43/80: XRPUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_1h.csv
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 1h
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - Nhiệm vụ 44/80: XRPUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,907 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_1h.csv
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 1h
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - Nhiệm vụ 45/80: XRPUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_4h.csv
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 4h
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - Nhiệm vụ 46/80: XRPUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_4h.csv
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 4h
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - Nhiệm vụ 47/80: XRPUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,908 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_4h.csv
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 4h
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - INFO - Nhiệm vụ 48/80: XRPUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho XRPUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho XRPUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/XRPUSDT_4h.csv
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho XRPUSDT 4h
+2025-03-09 23:13:24,911 - enhanced_ml_trainer - INFO - Nhiệm vụ 49/80: DOGEUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_1h.csv
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 1h
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - Nhiệm vụ 50/80: DOGEUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_1h.csv
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 1h
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - Nhiệm vụ 51/80: DOGEUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_1h.csv
+2025-03-09 23:13:24,912 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 1h
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Nhiệm vụ 52/80: DOGEUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_1h.csv
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 1h
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Nhiệm vụ 53/80: DOGEUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_4h.csv
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 4h
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Nhiệm vụ 54/80: DOGEUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_4h.csv
+2025-03-09 23:13:24,913 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 4h
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Nhiệm vụ 55/80: DOGEUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_4h.csv
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 4h
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Nhiệm vụ 56/80: DOGEUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOGEUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOGEUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOGEUSDT_4h.csv
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOGEUSDT 4h
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Nhiệm vụ 57/80: DOTUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,914 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_1h.csv
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 1h
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - Nhiệm vụ 58/80: DOTUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_1h.csv
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 1h
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - Nhiệm vụ 59/80: DOTUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_1h.csv
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 1h
+2025-03-09 23:13:24,915 - enhanced_ml_trainer - INFO - Nhiệm vụ 60/80: DOTUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,916 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,916 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_1h.csv
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 1h
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - Nhiệm vụ 61/80: DOTUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_4h.csv
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 4h
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - Nhiệm vụ 62/80: DOTUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,917 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_4h.csv
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 4h
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - Nhiệm vụ 63/80: DOTUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_4h.csv
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 4h
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - Nhiệm vụ 64/80: DOTUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho DOTUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho DOTUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/DOTUSDT_4h.csv
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho DOTUSDT 4h
+2025-03-09 23:13:24,918 - enhanced_ml_trainer - INFO - Nhiệm vụ 65/80: AVAXUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_1h.csv
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 1h
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - Nhiệm vụ 66/80: AVAXUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_1h.csv
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 1h
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - Nhiệm vụ 67/80: AVAXUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,919 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_1h.csv
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 1h
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - INFO - Nhiệm vụ 68/80: AVAXUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,920 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_1h.csv
+2025-03-09 23:13:24,922 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 1h
+2025-03-09 23:13:24,922 - enhanced_ml_trainer - INFO - Nhiệm vụ 69/80: AVAXUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,922 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,922 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_4h.csv
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 4h
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - Nhiệm vụ 70/80: AVAXUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_4h.csv
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 4h
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - Nhiệm vụ 71/80: AVAXUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,923 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_4h.csv
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 4h
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - Nhiệm vụ 72/80: AVAXUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho AVAXUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho AVAXUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/AVAXUSDT_4h.csv
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho AVAXUSDT 4h
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - Nhiệm vụ 73/80: MATICUSDT 1h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 1h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,924 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_1h.csv
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 1h
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - Nhiệm vụ 74/80: MATICUSDT 1h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 1h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 1h, 30 ngày
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_1h.csv
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 1h
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - Nhiệm vụ 75/80: MATICUSDT 1h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 1h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,925 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_1h.csv
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 1h
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - Nhiệm vụ 76/80: MATICUSDT 1h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 1h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 1h, 90 ngày
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_1h.csv
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 1h
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - Nhiệm vụ 77/80: MATICUSDT 4h (30 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 4h (dữ liệu 1m, mục tiêu 1d) ===
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_4h.csv
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 4h
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - Nhiệm vụ 78/80: MATICUSDT 4h (30 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,926 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 4h (dữ liệu 1m, mục tiêu 3d) ===
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 4h, 30 ngày
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_4h.csv
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 4h
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - Nhiệm vụ 79/80: MATICUSDT 4h (90 ngày, mục tiêu 1d)
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 4h (dữ liệu 3m, mục tiêu 1d) ===
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_4h.csv
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 4h
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - Nhiệm vụ 80/80: MATICUSDT 4h (90 ngày, mục tiêu 3d)
+2025-03-09 23:13:24,927 - enhanced_ml_trainer - INFO - === Huấn luyện mô hình cho MATICUSDT 4h (dữ liệu 3m, mục tiêu 3d) ===
+2025-03-09 23:13:24,928 - enhanced_ml_trainer - INFO - Tải dữ liệu lịch sử cho MATICUSDT, khung thời gian 4h, 90 ngày
+2025-03-09 23:13:24,928 - enhanced_ml_trainer - WARNING - Không tìm thấy file dữ liệu real_data/MATICUSDT_4h.csv
+2025-03-09 23:13:24,928 - enhanced_ml_trainer - ERROR - Không đủ dữ liệu cho MATICUSDT 4h
+2025-03-09 23:13:24,932 - enhanced_ml_trainer - INFO - === Đã hoàn thành huấn luyện 0/80 mô hình ===
+2025-03-09 23:13:24,932 - enhanced_ml_trainer - INFO - Thời gian tổng cộng: 0.04 giây
+2025-03-09 23:13:24,932 - enhanced_ml_trainer - INFO - Kết quả đã được lưu tại: ml_results/all_models_training_results.json
+2025-03-09 23:13:24,932 - enhanced_ml_trainer - WARNING - Không tìm thấy kết quả đánh giá mô hình
+2025-03-09 23:13:27,886 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 23:13:27,888 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 23:13:27,889 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 23:13:28,307 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 23:13:28,308 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 23:13:28,310 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-03-09 23:13:28,311 - enhanced_ml_trainer - INFO - Khởi tạo EnhancedMLTrainer, chế độ mô phỏng: False
+2025-03-09 23:13:28,311 - enhanced_ml_trainer - INFO - Tạo báo cáo tổng hợp cho các mô hình đã huấn luyện
+2025-03-09 23:13:28,311 - enhanced_ml_trainer - WARNING - Không tìm thấy kết quả đánh giá mô hình

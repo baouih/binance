@@ -1,0 +1,53 @@
+2025-03-05 04:13:44,699 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-05 04:13:44,699 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-05 04:13:44,699 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-05 04:13:44,700 - leverage_risk_manager - INFO - Đã lưu cấu hình rủi ro vào risk_config.json
+2025-03-05 04:13:44,700 - leverage_risk_manager - INFO - Đã tạo cấu hình rủi ro mặc định và lưu vào risk_config.json
+2025-03-05 04:13:44,700 - position_trailing_stop - INFO - Không tìm thấy file active_positions.json, tạo mới
+2025-03-05 04:13:44,701 - position_trailing_stop - INFO - Đã lưu 0 vị thế vào active_positions.json
+2025-03-05 04:13:44,701 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-05 04:13:44,701 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-05 04:13:44,934 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-05 04:13:44,934 - binance_api - INFO - Đã lấy 2 vị thế active từ account API
+2025-03-05 04:13:44,934 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-05 04:13:44,934 - position_trailing_stop - INFO - Phát hiện vị thế mới từ sàn: ETHUSDT SHORT
+2025-03-05 04:13:45,381 - leverage_risk_manager - INFO - Đã cập nhật thông tin biến động cho ETHUSDT: high (5.55%)
+2025-03-05 04:13:45,382 - leverage_risk_manager - INFO - Đề xuất stop loss cho ETHUSDT SHORT: 2398.5 (ATR: 119.30, Thị trường: None)
+2025-03-05 04:13:45,382 - leverage_risk_manager - INFO - Đề xuất take profit cho ETHUSDT SHORT: 1682.72 (R:R 2.0:1, Thị trường: None)
+2025-03-05 04:13:45,382 - leverage_risk_manager - INFO - Đang theo dõi vị thế ETHUSDT SHORT tại 2159.906666667
+2025-03-05 04:13:45,382 - position_trailing_stop - INFO - Phát hiện vị thế mới từ sàn: BTCUSDT LONG
+2025-03-05 04:13:45,541 - leverage_risk_manager - INFO - Đã cập nhật thông tin biến động cho BTCUSDT: medium (1.96%)
+2025-03-05 04:13:45,541 - leverage_risk_manager - INFO - Đề xuất stop loss cho BTCUSDT LONG: 80673.6 (ATR: 1707.86, Thị trường: None)
+2025-03-05 04:13:45,541 - leverage_risk_manager - INFO - Đề xuất take profit cho BTCUSDT LONG: 90920.8 (R:R 2.0:1, Thị trường: None)
+2025-03-05 04:13:45,542 - leverage_risk_manager - INFO - Đang theo dõi vị thế BTCUSDT LONG tại 84089.33333333
+2025-03-05 04:13:45,542 - position_trailing_stop - INFO - Đã lưu 2 vị thế vào active_positions.json
+2025-03-05 04:13:45,542 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-05 04:13:45,542 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-05 04:13:45,704 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-05 04:13:45,704 - binance_api - INFO - Đã lấy 2 vị thế active từ account API
+2025-03-05 04:13:45,704 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-05 04:13:45,705 - position_trailing_stop - INFO - Đã lưu 2 vị thế vào active_positions.json
+
+=== DANH SÁCH VỊ THẾ ĐANG MỞ ===
+Symbol: ETHUSDT
+  Hướng: SHORT
+  Giá vào: 2159.906666667
+  Giá hiện tại: 2147.85
+  Số lượng: 1.2
+  Đòn bẩy: 20x
+  Stop Loss: 2398.5
+  Take Profit: 1682.72
+  Trailing Stop: Chưa kích hoạt
+  Unrealized P/L: 11.16%
+
+Symbol: BTCUSDT
+  Hướng: LONG
+  Giá vào: 84089.33333333
+  Giá hiện tại: 87100.0
+  Số lượng: 0.09
+  Đòn bẩy: 10x
+  Stop Loss: 80673.6
+  Take Profit: 90920.8
+  Trailing Stop: Chưa kích hoạt
+  Unrealized P/L: 35.80%
+

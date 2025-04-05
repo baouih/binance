@@ -1,0 +1,196 @@
+2025-03-01 17:39:01,066 - __main__ - INFO - Bắt đầu backtest nhiều chiến lược với tham số: Namespace(symbols=['BTCUSDT'], intervals=['1h'], balance=10000.0, risk=1.0, leverage=5, trail=False)
+2025-03-01 17:39:01,066 - __main__ - INFO - === MULTI-STRATEGY BACKTEST: BTCUSDT 1h ===
+2025-03-01 17:39:01,066 - __main__ - INFO - Số dư ban đầu: $10000.0
+2025-03-01 17:39:01,067 - __main__ - INFO - Rủi ro: 1.0%
+2025-03-01 17:39:01,067 - __main__ - INFO - Đòn bẩy: 5x
+2025-03-01 17:39:01,067 - __main__ - INFO - Trailing Stop: Disabled
+2025-03-01 17:39:01,104 - __main__ - INFO - Đã tải dữ liệu mẫu từ real_data/BTCUSDT_1h_sample.csv: 4320 dòng
+2025-03-01 17:39:01,147 - __main__ - INFO - Đã tính toán 25 chỉ báo kỹ thuật
+2025-03-01 17:39:01,148 - __main__ - INFO - Kiểm thử chiến lược: RSI
+2025-03-01 17:39:03,723 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (RSI) ===
+2025-03-01 17:39:03,723 - __main__ - INFO - Tổng số giao dịch: 9
+2025-03-01 17:39:03,723 - __main__ - INFO - Tỷ lệ thắng: 55.56%
+2025-03-01 17:39:03,723 - __main__ - INFO - Hệ số lợi nhuận: 2.64
+2025-03-01 17:39:03,723 - __main__ - INFO - Lợi nhuận trung bình: 219.15
+2025-03-01 17:39:03,723 - __main__ - INFO - Thua lỗ trung bình: -103.87
+2025-03-01 17:39:03,724 - __main__ - INFO - Drawdown tối đa: 3.23%
+2025-03-01 17:39:03,724 - __main__ - INFO - Sharpe ratio: 27.63
+2025-03-01 17:39:03,724 - __main__ - INFO - ROI: 6.80%
+2025-03-01 17:39:03,724 - __main__ - INFO - Số dư cuối: 10680.23
+2025-03-01 17:39:03,752 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_RSI_trades.csv
+2025-03-01 17:39:03,752 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_RSI_results.json
+2025-03-01 17:39:03,752 - __main__ - INFO - Kiểm thử chiến lược: MACD
+2025-03-01 17:39:06,985 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (MACD) ===
+2025-03-01 17:39:06,986 - __main__ - INFO - Tổng số giao dịch: 371
+2025-03-01 17:39:06,986 - __main__ - INFO - Tỷ lệ thắng: 37.47%
+2025-03-01 17:39:06,986 - __main__ - INFO - Hệ số lợi nhuận: 1.03
+2025-03-01 17:39:06,986 - __main__ - INFO - Lợi nhuận trung bình: 76.70
+2025-03-01 17:39:06,986 - __main__ - INFO - Thua lỗ trung bình: -44.41
+2025-03-01 17:39:06,987 - __main__ - INFO - Drawdown tối đa: 14.74%
+2025-03-01 17:39:06,987 - __main__ - INFO - Sharpe ratio: 5.77
+2025-03-01 17:39:06,987 - __main__ - INFO - ROI: 3.58%
+2025-03-01 17:39:06,987 - __main__ - INFO - Số dư cuối: 10358.17
+2025-03-01 17:39:07,028 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_MACD_trades.csv
+2025-03-01 17:39:07,029 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_MACD_results.json
+2025-03-01 17:39:07,029 - __main__ - INFO - Kiểm thử chiến lược: BollingerBands
+2025-03-01 18:03:54,578 - __main__ - INFO - Bắt đầu backtest nhiều chiến lược với tham số: Namespace(symbols=['BTCUSDT'], intervals=['1h'], balance=10000.0, risk=1.0, leverage=5, trail=False)
+2025-03-01 18:03:54,580 - __main__ - INFO - === MULTI-STRATEGY BACKTEST: BTCUSDT 1h ===
+2025-03-01 18:03:54,581 - __main__ - INFO - Số dư ban đầu: $10000.0
+2025-03-01 18:03:54,581 - __main__ - INFO - Rủi ro: 1.0%
+2025-03-01 18:03:54,581 - __main__ - INFO - Đòn bẩy: 5x
+2025-03-01 18:03:54,581 - __main__ - INFO - Trailing Stop: Disabled
+2025-03-01 18:03:54,593 - __main__ - INFO - Đã tải dữ liệu mẫu từ real_data/BTCUSDT_1h_sample.csv: 4320 dòng
+2025-03-01 18:03:54,619 - __main__ - INFO - Đã tính toán 25 chỉ báo kỹ thuật
+2025-03-01 18:03:54,620 - __main__ - INFO - Kiểm thử chiến lược: RSI
+2025-03-01 18:03:56,113 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (RSI) ===
+2025-03-01 18:03:56,113 - __main__ - INFO - Tổng số giao dịch: 9
+2025-03-01 18:03:56,113 - __main__ - INFO - Tỷ lệ thắng: 55.56%
+2025-03-01 18:03:56,113 - __main__ - INFO - Hệ số lợi nhuận: 2.64
+2025-03-01 18:03:56,113 - __main__ - INFO - Lợi nhuận trung bình: 219.15
+2025-03-01 18:03:56,113 - __main__ - INFO - Thua lỗ trung bình: -103.87
+2025-03-01 18:03:56,113 - __main__ - INFO - Drawdown tối đa: 3.23%
+2025-03-01 18:03:56,113 - __main__ - INFO - Sharpe ratio: 27.63
+2025-03-01 18:03:56,114 - __main__ - INFO - ROI: 6.80%
+2025-03-01 18:03:56,114 - __main__ - INFO - Số dư cuối: 10680.23
+2025-03-01 18:03:56,129 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_RSI_trades.csv
+2025-03-01 18:03:56,129 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_RSI_results.json
+2025-03-01 18:03:56,129 - __main__ - INFO - Kiểm thử chiến lược: MACD
+2025-03-01 18:03:58,121 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (MACD) ===
+2025-03-01 18:03:58,121 - __main__ - INFO - Tổng số giao dịch: 371
+2025-03-01 18:03:58,121 - __main__ - INFO - Tỷ lệ thắng: 37.47%
+2025-03-01 18:03:58,121 - __main__ - INFO - Hệ số lợi nhuận: 1.03
+2025-03-01 18:03:58,121 - __main__ - INFO - Lợi nhuận trung bình: 76.70
+2025-03-01 18:03:58,121 - __main__ - INFO - Thua lỗ trung bình: -44.41
+2025-03-01 18:03:58,121 - __main__ - INFO - Drawdown tối đa: 14.74%
+2025-03-01 18:03:58,121 - __main__ - INFO - Sharpe ratio: 5.77
+2025-03-01 18:03:58,122 - __main__ - INFO - ROI: 3.58%
+2025-03-01 18:03:58,122 - __main__ - INFO - Số dư cuối: 10358.17
+2025-03-01 18:03:58,149 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_MACD_trades.csv
+2025-03-01 18:03:58,149 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_MACD_results.json
+2025-03-01 18:03:58,149 - __main__ - INFO - Kiểm thử chiến lược: BollingerBands
+2025-03-01 18:04:00,133 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (BollingerBands) ===
+2025-03-01 18:04:00,133 - __main__ - INFO - Tổng số giao dịch: 608
+2025-03-01 18:04:00,133 - __main__ - INFO - Tỷ lệ thắng: 41.94%
+2025-03-01 18:04:00,133 - __main__ - INFO - Hệ số lợi nhuận: 0.89
+2025-03-01 18:04:00,134 - __main__ - INFO - Lợi nhuận trung bình: 42.18
+2025-03-01 18:04:00,134 - __main__ - INFO - Thua lỗ trung bình: -34.28
+2025-03-01 18:04:00,134 - __main__ - INFO - Drawdown tối đa: 15.22%
+2025-03-01 18:04:00,134 - __main__ - INFO - Sharpe ratio: -16.28
+2025-03-01 18:04:00,134 - __main__ - INFO - ROI: -13.47%
+2025-03-01 18:04:00,134 - __main__ - INFO - Số dư cuối: 8652.73
+2025-03-01 18:04:00,171 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_BollingerBands_trades.csv
+2025-03-01 18:04:00,172 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_BollingerBands_results.json
+2025-03-01 18:04:00,172 - __main__ - INFO - Kiểm thử chiến lược: Stochastic
+2025-03-01 18:04:01,838 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (Stochastic) ===
+2025-03-01 18:04:01,838 - __main__ - INFO - Tổng số giao dịch: 149
+2025-03-01 18:04:01,838 - __main__ - INFO - Tỷ lệ thắng: 46.31%
+2025-03-01 18:04:01,838 - __main__ - INFO - Hệ số lợi nhuận: 1.04
+2025-03-01 18:04:01,838 - __main__ - INFO - Lợi nhuận trung bình: 116.90
+2025-03-01 18:04:01,838 - __main__ - INFO - Thua lỗ trung bình: -96.86
+2025-03-01 18:04:01,838 - __main__ - INFO - Drawdown tối đa: 18.70%
+2025-03-01 18:04:01,839 - __main__ - INFO - Sharpe ratio: 5.41
+2025-03-01 18:04:01,839 - __main__ - INFO - ROI: 3.17%
+2025-03-01 18:04:01,839 - __main__ - INFO - Số dư cuối: 10317.13
+2025-03-01 18:04:01,859 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_Stochastic_trades.csv
+2025-03-01 18:04:01,860 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_Stochastic_results.json
+2025-03-01 18:04:01,860 - __main__ - INFO - Kiểm thử chiến lược: EMACross
+2025-03-01 18:04:03,522 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (EMACross) ===
+2025-03-01 18:04:03,522 - __main__ - INFO - Tổng số giao dịch: 181
+2025-03-01 18:04:03,522 - __main__ - INFO - Tỷ lệ thắng: 33.15%
+2025-03-01 18:04:03,523 - __main__ - INFO - Hệ số lợi nhuận: 1.15
+2025-03-01 18:04:03,523 - __main__ - INFO - Lợi nhuận trung bình: 122.38
+2025-03-01 18:04:03,523 - __main__ - INFO - Thua lỗ trung bình: -52.85
+2025-03-01 18:04:03,523 - __main__ - INFO - Drawdown tối đa: 9.29%
+2025-03-01 18:04:03,523 - __main__ - INFO - Sharpe ratio: 14.34
+2025-03-01 18:04:03,523 - __main__ - INFO - ROI: 9.47%
+2025-03-01 18:04:03,523 - __main__ - INFO - Số dư cuối: 10947.31
+2025-03-01 18:04:03,544 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_EMACross_trades.csv
+2025-03-01 18:04:03,544 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_EMACross_results.json
+2025-03-01 18:04:03,544 - __main__ - INFO - Kiểm thử chiến lược: ADX
+2025-03-01 18:04:05,292 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (ADX) ===
+2025-03-01 18:04:05,292 - __main__ - INFO - Tổng số giao dịch: 131
+2025-03-01 18:04:05,292 - __main__ - INFO - Tỷ lệ thắng: 40.46%
+2025-03-01 18:04:05,292 - __main__ - INFO - Hệ số lợi nhuận: 1.25
+2025-03-01 18:04:05,293 - __main__ - INFO - Lợi nhuận trung bình: 126.35
+2025-03-01 18:04:05,293 - __main__ - INFO - Thua lỗ trung bình: -68.55
+2025-03-01 18:04:05,293 - __main__ - INFO - Drawdown tối đa: 7.52%
+2025-03-01 18:04:05,293 - __main__ - INFO - Sharpe ratio: 20.22
+2025-03-01 18:04:05,293 - __main__ - INFO - ROI: 13.50%
+2025-03-01 18:04:05,293 - __main__ - INFO - Số dư cuối: 11349.70
+2025-03-01 18:04:05,313 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_ADX_trades.csv
+2025-03-01 18:04:05,313 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_ADX_results.json
+2025-03-01 18:04:05,313 - __main__ - INFO - Kiểm thử chiến lược: Composite
+2025-03-01 18:39:08,079 - __main__ - INFO - Bắt đầu backtest nhiều chiến lược với tham số: Namespace(symbols=['BTCUSDT'], intervals=['1h'], balance=10000.0, risk=1.0, leverage=5, trail=True)
+2025-03-01 18:39:08,106 - __main__ - INFO - === MULTI-STRATEGY BACKTEST: BTCUSDT 1h ===
+2025-03-01 18:39:08,106 - __main__ - INFO - Số dư ban đầu: $10000.0
+2025-03-01 18:39:08,106 - __main__ - INFO - Rủi ro: 1.0%
+2025-03-01 18:39:08,106 - __main__ - INFO - Đòn bẩy: 5x
+2025-03-01 18:39:08,106 - __main__ - INFO - Trailing Stop: Enabled
+2025-03-01 18:39:08,145 - __main__ - INFO - Đã tải dữ liệu mẫu từ real_data/BTCUSDT_1h_sample.csv: 4320 dòng
+2025-03-01 18:39:08,172 - __main__ - INFO - Đã tính toán 25 chỉ báo kỹ thuật
+2025-03-01 18:39:08,173 - __main__ - INFO - Kiểm thử chiến lược: RSI
+2025-03-01 18:39:09,698 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (RSI) ===
+2025-03-01 18:39:09,699 - __main__ - INFO - Tổng số giao dịch: 9
+2025-03-01 18:39:09,699 - __main__ - INFO - Tỷ lệ thắng: 66.67%
+2025-03-01 18:39:09,699 - __main__ - INFO - Hệ số lợi nhuận: 6.36
+2025-03-01 18:39:09,699 - __main__ - INFO - Lợi nhuận trung bình: 252.48
+2025-03-01 18:39:09,699 - __main__ - INFO - Thua lỗ trung bình: -79.40
+2025-03-01 18:39:09,699 - __main__ - INFO - Drawdown tối đa: 2.63%
+2025-03-01 18:39:09,699 - __main__ - INFO - Sharpe ratio: 40.85
+2025-03-01 18:39:09,700 - __main__ - INFO - ROI: 12.77%
+2025-03-01 18:39:09,700 - __main__ - INFO - Số dư cuối: 11276.68
+2025-03-01 18:39:09,729 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_RSI_trades.csv
+2025-03-01 18:39:09,729 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_RSI_results.json
+2025-03-01 18:39:09,729 - __main__ - INFO - Kiểm thử chiến lược: MACD
+2025-03-01 18:39:11,675 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (MACD) ===
+2025-03-01 18:39:11,675 - __main__ - INFO - Tổng số giao dịch: 350
+2025-03-01 18:39:11,675 - __main__ - INFO - Tỷ lệ thắng: 36.57%
+2025-03-01 18:39:11,676 - __main__ - INFO - Hệ số lợi nhuận: 1.00
+2025-03-01 18:39:11,676 - __main__ - INFO - Lợi nhuận trung bình: 73.90
+2025-03-01 18:39:11,676 - __main__ - INFO - Thua lỗ trung bình: -42.70
+2025-03-01 18:39:11,676 - __main__ - INFO - Drawdown tối đa: 16.85%
+2025-03-01 18:39:11,676 - __main__ - INFO - Sharpe ratio: 1.47
+2025-03-01 18:39:11,676 - __main__ - INFO - ROI: -0.20%
+2025-03-01 18:39:11,676 - __main__ - INFO - Số dư cuối: 9980.24
+2025-03-01 18:39:11,713 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_MACD_trades.csv
+2025-03-01 18:39:11,713 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_MACD_results.json
+2025-03-01 18:39:11,714 - __main__ - INFO - Kiểm thử chiến lược: BollingerBands
+2025-03-01 18:39:13,914 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (BollingerBands) ===
+2025-03-01 18:39:13,915 - __main__ - INFO - Tổng số giao dịch: 607
+2025-03-01 18:39:13,915 - __main__ - INFO - Tỷ lệ thắng: 41.68%
+2025-03-01 18:39:13,915 - __main__ - INFO - Hệ số lợi nhuận: 0.89
+2025-03-01 18:39:13,915 - __main__ - INFO - Lợi nhuận trung bình: 41.68
+2025-03-01 18:39:13,915 - __main__ - INFO - Thua lỗ trung bình: -33.54
+2025-03-01 18:39:13,915 - __main__ - INFO - Drawdown tối đa: 15.29%
+2025-03-01 18:39:13,915 - __main__ - INFO - Sharpe ratio: -16.11
+2025-03-01 18:39:13,916 - __main__ - INFO - ROI: -13.29%
+2025-03-01 18:39:13,916 - __main__ - INFO - Số dư cuối: 8671.45
+2025-03-01 18:39:13,957 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_BollingerBands_trades.csv
+2025-03-01 18:39:13,957 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_BollingerBands_results.json
+2025-03-01 18:39:13,957 - __main__ - INFO - Kiểm thử chiến lược: Stochastic
+2025-03-01 18:39:16,131 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (Stochastic) ===
+2025-03-01 18:39:16,131 - __main__ - INFO - Tổng số giao dịch: 152
+2025-03-01 18:39:16,131 - __main__ - INFO - Tỷ lệ thắng: 45.39%
+2025-03-01 18:39:16,131 - __main__ - INFO - Hệ số lợi nhuận: 1.04
+2025-03-01 18:39:16,131 - __main__ - INFO - Lợi nhuận trung bình: 116.60
+2025-03-01 18:39:16,132 - __main__ - INFO - Thua lỗ trung bình: -92.90
+2025-03-01 18:39:16,132 - __main__ - INFO - Drawdown tối đa: 19.59%
+2025-03-01 18:39:16,132 - __main__ - INFO - Sharpe ratio: 5.65
+2025-03-01 18:39:16,132 - __main__ - INFO - ROI: 3.35%
+2025-03-01 18:39:16,132 - __main__ - INFO - Số dư cuối: 10335.13
+2025-03-01 18:39:16,226 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_Stochastic_trades.csv
+2025-03-01 18:39:16,226 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_Stochastic_results.json
+2025-03-01 18:39:16,226 - __main__ - INFO - Kiểm thử chiến lược: EMACross
+2025-03-01 18:39:18,289 - __main__ - INFO - === KẾT QUẢ BACKTEST BTCUSDT 1h (EMACross) ===
+2025-03-01 18:39:18,289 - __main__ - INFO - Tổng số giao dịch: 181
+2025-03-01 18:39:18,289 - __main__ - INFO - Tỷ lệ thắng: 32.60%
+2025-03-01 18:39:18,290 - __main__ - INFO - Hệ số lợi nhuận: 1.07
+2025-03-01 18:39:18,290 - __main__ - INFO - Lợi nhuận trung bình: 112.78
+2025-03-01 18:39:18,290 - __main__ - INFO - Thua lỗ trung bình: -51.12
+2025-03-01 18:39:18,290 - __main__ - INFO - Drawdown tối đa: 10.64%
+2025-03-01 18:39:18,290 - __main__ - INFO - Sharpe ratio: 6.88
+2025-03-01 18:39:18,290 - __main__ - INFO - ROI: 4.18%
+2025-03-01 18:39:18,290 - __main__ - INFO - Số dư cuối: 10417.61
+2025-03-01 18:39:18,310 - __main__ - INFO - Đã lưu chi tiết giao dịch: backtest_results/BTCUSDT_1h_EMACross_trades.csv
+2025-03-01 18:39:18,310 - __main__ - INFO - Đã lưu kết quả chi tiết: backtest_results/BTCUSDT_1h_EMACross_results.json
+2025-03-01 18:39:18,310 - __main__ - INFO - Kiểm thử chiến lược: ADX

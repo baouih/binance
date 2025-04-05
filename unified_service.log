@@ -1,0 +1,220 @@
+2025-03-12 06:00:55,696 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 06:00:55,697 - unified_service - INFO - Đã lưu PID 15429 vào unified_trading_service.pid
+2025-03-12 06:00:55,857 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:00:55,858 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:00:55,858 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:00:55,858 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:00:55,858 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 06:00:55,858 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 06:00:55,859 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 06:00:56,559 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 06:00:56,560 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:00:56,561 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:00:56,561 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:00:56,561 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:00:57,172 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 06:00:57.098000
+2025-03-12 06:00:57,173 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:00:57,173 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:00:57,173 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:00:57,381 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 06:00:57,382 - unified_service - INFO - Bắt đầu chạy bộ lập lịch...
+2025-03-12 06:11:40,980 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 06:11:40,981 - unified_service - INFO - Đã lưu PID 16835 vào unified_trading_service.pid
+2025-03-12 06:11:41,139 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:11:41,139 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:11:41,139 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:11:41,140 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:11:41,140 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 06:11:41,140 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 06:11:41,140 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 06:11:41,722 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 06:11:41,723 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:11:41,723 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:11:41,723 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:11:41,723 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:11:42,047 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 06:11:41.973000
+2025-03-12 06:11:42,049 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:11:42,049 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:11:42,049 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:11:42,506 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 06:11:42,506 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-12 06:11:42,506 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-12 06:11:42,755 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-12 06:11:42,755 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:11:42,756 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:11:42,756 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:11:42,756 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:11:42,756 - unified_service - ERROR - Lỗi khi khởi tạo Market Analyzer: MarketAnalyzer.__init__() got an unexpected keyword argument 'symbols'
+2025-03-12 06:11:42,756 - unified_service - ERROR - Không thể khởi tạo Market Analyzer
+2025-03-12 06:11:42,757 - unified_service - INFO - Bắt đầu chạy bộ lập lịch...
+2025-03-12 06:15:49,072 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 06:15:49,079 - unified_service - INFO - Đã lưu PID 17537 vào unified_trading_service.pid
+2025-03-12 06:15:49,253 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:15:49,253 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:15:49,253 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:15:49,253 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:15:49,254 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 06:15:49,254 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 06:15:49,254 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 06:15:50,004 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 06:15:50,005 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:15:50,006 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:15:50,006 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:15:50,006 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:15:50,328 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 06:15:50.252000
+2025-03-12 06:15:50,330 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:15:50,330 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:15:50,330 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:15:50,509 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 06:15:50,509 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-12 06:15:50,509 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-12 06:15:51,091 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-12 06:15:51,554 - market_analyzer - INFO - Thời gian máy chủ Binance: 2025-03-12 06:15:51.481000
+2025-03-12 06:15:51,556 - market_analyzer - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:15:51,556 - market_analyzer - INFO - Đã khởi tạo Market Analyzer
+2025-03-12 06:15:51,556 - unified_service - INFO - Đã khởi tạo Market Analyzer với chế độ testnet
+2025-03-12 06:15:51,556 - unified_service - INFO - Sẽ phân tích 15 cặp tiền: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, ADAUSDT, XRPUSDT, DOGEUSDT, DOTUSDT, AVAXUSDT, LINKUSDT, LTCUSDT, UNIUSDT, ATOMUSDT, MATICUSDT, ICPUSDT
+2025-03-12 06:15:51,556 - unified_service - INFO - Sẽ phân tích 6 khung thời gian: 1m, 5m, 15m, 1h, 4h, 1d
+2025-03-12 06:15:54,423 - unified_service - INFO - Không tìm thấy cơ hội giao dịch nào
+2025-03-12 06:15:54,426 - unified_service - INFO - Bắt đầu chạy bộ lập lịch...
+2025-03-12 06:29:16,261 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 06:29:16,262 - unified_service - INFO - Đã lưu PID 18121 vào unified_trading_service.pid
+2025-03-12 06:29:16,404 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:29:16,405 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:29:16,405 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:29:16,405 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:29:16,406 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 06:29:16,406 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 06:29:16,406 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 06:29:16,965 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 06:29:16,966 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:29:16,966 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:29:16,966 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:29:16,966 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:29:17,283 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 06:29:17.209000
+2025-03-12 06:29:17,284 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:29:17,285 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:29:17,285 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:29:17,492 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 06:29:17,493 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-12 06:29:17,493 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-12 06:29:17,833 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-12 06:29:18,302 - market_analyzer - INFO - Thời gian máy chủ Binance: 2025-03-12 06:29:18.227000
+2025-03-12 06:29:18,303 - market_analyzer - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:29:18,304 - market_analyzer - INFO - Đã khởi tạo Market Analyzer
+2025-03-12 06:29:18,304 - unified_service - INFO - Đã khởi tạo Market Analyzer với chế độ testnet
+2025-03-12 06:29:18,304 - unified_service - INFO - Sẽ phân tích 15 cặp tiền: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, ADAUSDT, XRPUSDT, DOGEUSDT, DOTUSDT, AVAXUSDT, LINKUSDT, LTCUSDT, UNIUSDT, ATOMUSDT, MATICUSDT, ICPUSDT
+2025-03-12 06:29:18,304 - unified_service - INFO - Sẽ phân tích 6 khung thời gian: 1m, 5m, 15m, 1h, 4h, 1d
+2025-03-12 06:29:18,304 - unified_service - INFO - Bắt đầu quét cơ hội giao dịch với Market Analyzer...
+2025-03-12 06:29:20,842 - unified_service - INFO - Kết quả quét cơ hội: {'status': 'success', 'opportunities': [], 'count': 0}
+2025-03-12 06:29:20,843 - unified_service - INFO - Không tìm thấy cơ hội giao dịch nào
+2025-03-12 06:29:20,843 - unified_service - INFO - Bắt đầu chạy bộ lập lịch...
+2025-03-12 06:31:40,787 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 06:31:40,787 - unified_service - INFO - Đã lưu PID 18687 vào unified_trading_service.pid
+2025-03-12 06:31:40,923 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:31:40,923 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:31:40,923 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:31:40,924 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:31:40,924 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 06:31:40,924 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 06:31:40,924 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 06:31:41,520 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 06:31:41,520 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 06:31:41,520 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 06:31:41,521 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 06:31:41,521 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 06:31:41,833 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 06:31:41.757000
+2025-03-12 06:31:41,834 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:31:41,834 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:31:41,834 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 06:31:42,021 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 06:31:42,021 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-12 06:31:42,021 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-12 06:31:42,305 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-12 06:31:42,774 - market_analyzer - INFO - Thời gian máy chủ Binance: 2025-03-12 06:31:42.699000
+2025-03-12 06:31:42,775 - market_analyzer - INFO - Đã kết nối thành công với Binance API
+2025-03-12 06:31:42,776 - market_analyzer - INFO - Đã khởi tạo Market Analyzer
+2025-03-12 06:31:42,776 - unified_service - INFO - Đã khởi tạo Market Analyzer với chế độ testnet
+2025-03-12 06:31:42,776 - unified_service - INFO - Sẽ phân tích 15 cặp tiền: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, ADAUSDT, XRPUSDT, DOGEUSDT, DOTUSDT, AVAXUSDT, LINKUSDT, LTCUSDT, UNIUSDT, ATOMUSDT, MATICUSDT, ICPUSDT
+2025-03-12 06:31:42,776 - unified_service - INFO - Sẽ phân tích 6 khung thời gian: 1m, 5m, 15m, 1h, 4h, 1d
+2025-03-12 06:31:42,776 - unified_service - INFO - Bắt đầu quét cơ hội giao dịch với Market Analyzer...
+2025-03-12 06:31:43,233 - market_analyzer - INFO - Phân tích BTCUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:43,691 - market_analyzer - INFO - Phân tích ETHUSDT: Tín hiệu=Bán, Mạnh=Trung bình, Trend=Giảm, RSI=50
+2025-03-12 06:31:43,858 - market_analyzer - INFO - Phân tích BNBUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,024 - market_analyzer - INFO - Phân tích SOLUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,190 - market_analyzer - INFO - Phân tích DOGEUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,356 - market_analyzer - INFO - Phân tích ADAUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,528 - market_analyzer - INFO - Phân tích XRPUSDT: Tín hiệu=Chờ đợi, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,698 - market_analyzer - INFO - Phân tích DOTUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:44,866 - market_analyzer - INFO - Phân tích LTCUSDT: Tín hiệu=Bán, Mạnh=Trung bình, Trend=Giảm, RSI=50
+2025-03-12 06:31:45,030 - market_analyzer - INFO - Phân tích AVAXUSDT: Tín hiệu=Mua, Mạnh=Trung bình, Trend=Tăng, RSI=50
+2025-03-12 06:31:45,031 - unified_service - INFO - Kết quả quét cơ hội: {'status': 'success', 'opportunities': [{'symbol': 'DOTUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(3.982), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 3.982, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(3.978), 'take_profit': np.float64(4.10146), 'risk_reward_ratio': np.float64(29.865000000000006)}, {'symbol': 'BNBUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(553.38), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 553.38, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(550.0), 'take_profit': np.float64(569.9814), 'risk_reward_ratio': np.float64(4.911656804733738)}, {'symbol': 'ADAUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(0.7221), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 0.7221, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(0.70055), 'take_profit': np.float64(0.743763), 'risk_reward_ratio': np.float64(1.0052436194895606)}, {'symbol': 'SOLUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(122.63), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 122.63, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(118.83), 'take_profit': np.float64(126.3089), 'risk_reward_ratio': np.float64(0.9681315789473688)}, {'symbol': 'LTCUSDT', 'signal': 'SHORT', 'side': 'SELL', 'strength': 'Trung bình', 'price': np.float64(89.47), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 89.47, 'reason': 'Tín hiệu Bán Trung bình, xu hướng ngắn hạn Giảm', 'stop_loss': np.float64(93.02), 'take_profit': np.float64(86.7859), 'risk_reward_ratio': np.float64(0.7560845070422544)}, {'symbol': 'AVAXUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(17.25), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 17.25, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(16.52), 'take_profit': np.float64(17.767500000000002), 'risk_reward_ratio': np.float64(0.7089041095890433)}, {'symbol': 'DOGEUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(0.16237), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 0.16237, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(0.14413), 'take_profit': np.float64(0.1672411), 'risk_reward_ratio': np.float64(0.2670559210526328)}, {'symbol': 'ETHUSDT', 'signal': 'SHORT', 'side': 'SELL', 'strength': 'Trung bình', 'price': np.float64(1871.88), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 1871.88, 'reason': 'Tín hiệu Bán Trung bình, xu hướng ngắn hạn Giảm', 'stop_loss': np.float64(2164.16), 'take_profit': np.float64(1815.7236), 'risk_reward_ratio': np.float64(0.19213220199808445)}, {'symbol': 'BTCUSDT', 'signal': 'LONG', 'side': 'BUY', 'strength': 'Trung bình', 'price': np.float64(81716.71), 'signal_strength': 2.5, 'confidence': 0.25, 'entry_price': 81716.71, 'reason': 'Tín hiệu Mua Trung bình, xu hướng ngắn hạn Tăng', 'stop_loss': np.float64(19803.7), 'take_profit': np.float64(84168.21130000001), 'risk_reward_ratio': np.float64(0.03959589914946799)}], 'count': 9}
+2025-03-12 06:31:45,031 - unified_service - INFO - Đã tìm thấy 9 cơ hội giao dịch
+2025-03-12 06:31:45,032 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 06:31:45,800 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 06:31:45,801 - unified_service - INFO - Đã gửi thông báo Telegram về cơ hội giao dịch
+2025-03-12 06:31:45,802 - unified_service - INFO - Bắt đầu chạy bộ lập lịch...
+2025-03-12 12:01:14,398 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-12 12:01:14,401 - unified_service - INFO - Đã lưu PID 894 vào unified_trading_service.pid
+2025-03-12 12:01:14,542 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 12:01:14,542 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 12:01:14,543 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 12:01:14,543 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 12:01:14,543 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-12 12:01:14,543 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-12 12:01:14,543 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-12 12:01:15,193 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-12 12:01:15,194 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-12 12:01:15,194 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-12 12:01:15,194 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-12 12:01:15,194 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-12 12:01:15,790 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-12 12:01:15.717000
+2025-03-12 12:01:15,794 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-12 12:01:15,794 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-12 12:01:15,794 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-12 12:01:16,246 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-12 12:01:16,246 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-12 12:01:16,246 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-13 04:09:00,775 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-13 04:09:00,776 - unified_service - INFO - Đã lưu PID 1472 vào unified_trading_service.pid
+2025-03-13 04:09:00,944 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:09:00,944 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:09:00,944 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:09:00,944 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:09:00,945 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-13 04:09:00,945 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-13 04:09:00,945 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-13 04:09:01,739 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-13 04:09:01,741 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:09:01,741 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:09:01,741 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:09:01,741 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:09:02,062 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-13 04:09:01.988000
+2025-03-13 04:09:02,064 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-13 04:09:02,064 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:09:02,064 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:09:02,364 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-13 04:09:02,364 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-13 04:09:02,364 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-13 04:25:40,516 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-13 04:25:40,517 - unified_service - INFO - Đã lưu PID 2856 vào unified_trading_service.pid
+2025-03-13 04:25:40,665 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:25:40,665 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:25:40,665 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-13 04:25:41,291 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-13 04:25:41,291 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:25:41,292 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:25:41,292 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:25:41,292 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:25:41,641 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-13 04:25:41.569000
+2025-03-13 04:25:41,643 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-13 04:25:41,643 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:25:41,643 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:25:41,823 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-13 04:25:41,824 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-13 04:25:41,825 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-13 04:25:42,204 - market_analyzer - INFO - Đã import thành công các thư viện phân tích

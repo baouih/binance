@@ -1,0 +1,97 @@
+2025-03-09 05:46:12,936 - test_thread_monitor - INFO - === BẮT ĐẦU KIỂM TRA THREAD MONITOR ===
+2025-03-09 05:46:12,936 - thread_monitor - INFO - Thread monitor bắt đầu chạy
+2025-03-09 05:46:12,937 - thread_monitor - INFO - Đã bắt đầu thread giám sát
+2025-03-09 05:46:12,937 - thread_monitor - INFO - Thread 'thread_normal' bắt đầu chạy
+2025-03-09 05:46:12,937 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'thread_normal'
+2025-03-09 05:46:12,937 - test_thread_monitor - INFO - Thread bình thường bắt đầu, sẽ chạy trong 5 giây
+2025-03-09 05:46:12,938 - test_thread_monitor - INFO - Thread bình thường: Đang xử lý... 1/5
+2025-03-09 05:46:13,938 - thread_monitor - INFO - Thread 'thread_infinite' bắt đầu chạy
+2025-03-09 05:46:13,938 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'thread_infinite'
+2025-03-09 05:46:13,938 - test_thread_monitor - INFO - Thread bình thường: Đang xử lý... 2/5
+2025-03-09 05:46:13,938 - test_thread_monitor - INFO - Thread vô hạn bắt đầu
+2025-03-09 05:46:13,938 - test_thread_monitor - INFO - Thread vô hạn: nhịp thứ 1
+2025-03-09 05:46:14,938 - thread_monitor - INFO - Thread 'thread_error' bắt đầu chạy
+2025-03-09 05:46:14,939 - test_thread_monitor - INFO - Thread bình thường: Đang xử lý... 3/5
+2025-03-09 05:46:14,939 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'thread_error'
+2025-03-09 05:46:14,939 - test_thread_monitor - INFO - Thread lỗi bắt đầu, sẽ gặp lỗi sau 3 giây
+2025-03-09 05:46:14,939 - test_thread_monitor - INFO - Thread lỗi: Đang xử lý... 1/3
+2025-03-09 05:46:15,939 - test_thread_monitor - INFO - Thread vô hạn: nhịp thứ 2
+2025-03-09 05:46:15,939 - test_thread_monitor - INFO - Thread bình thường: Đang xử lý... 4/5
+2025-03-09 05:46:15,939 - test_thread_monitor - INFO - Thread lỗi: Đang xử lý... 2/3
+2025-03-09 05:46:16,939 - test_thread_monitor - INFO - --- THỐNG KÊ THREADS (1/10) ---
+2025-03-09 05:46:16,939 - test_thread_monitor - INFO - ✅ thread_normal: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:16,939 - test_thread_monitor - INFO - ✅ thread_infinite: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:16,940 - test_thread_monitor - INFO - ✅ thread_error: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:16,940 - test_thread_monitor - INFO - Thread lỗi: Đang xử lý... 3/3
+2025-03-09 05:46:16,939 - test_thread_monitor - INFO - Thread bình thường: Đang xử lý... 5/5
+2025-03-09 05:46:17,939 - test_thread_monitor - INFO - Thread vô hạn: nhịp thứ 3
+2025-03-09 05:46:17,940 - test_thread_monitor - INFO - Thread lỗi chuẩn bị ném ngoại lệ
+2025-03-09 05:46:17,940 - test_thread_monitor - INFO - Thread bình thường hoàn thành công việc
+2025-03-09 05:46:17,940 - thread_monitor - ERROR - Lỗi trong thread 'thread_error': Lỗi giả lập cho mục đích test!
+2025-03-09 05:46:17,940 - thread_monitor - INFO - Thread 'thread_normal' đã hoàn thành với kết quả: True
+2025-03-09 05:46:17,942 - thread_monitor - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/thread_monitor.py", line 171, in _wrapped_thread_func
+    result = thread_func(*args)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/test_thread_monitor.py", line 39, in test_worker_error
+    raise ValueError("Lỗi giả lập cho mục đích test!")
+ValueError: Lỗi giả lập cho mục đích test!
+
+2025-03-09 05:46:18,940 - test_thread_monitor - INFO - --- THỐNG KÊ THREADS (2/10) ---
+2025-03-09 05:46:18,940 - test_thread_monitor - INFO - ❌ thread_normal: completed, Restarts: 0, Errors: 0
+2025-03-09 05:46:18,940 - test_thread_monitor - INFO - ✅ thread_infinite: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:18,940 - test_thread_monitor - INFO - ❌ thread_error: error, Restarts: 0, Errors: 1
+2025-03-09 05:46:19,939 - test_thread_monitor - INFO - Thread vô hạn: nhịp thứ 4
+2025-03-09 05:46:20,941 - test_thread_monitor - INFO - --- THỐNG KÊ THREADS (3/10) ---
+2025-03-09 05:46:20,941 - test_thread_monitor - INFO - ❌ thread_normal: completed, Restarts: 0, Errors: 0
+2025-03-09 05:46:20,941 - test_thread_monitor - INFO - ✅ thread_infinite: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:20,941 - test_thread_monitor - INFO - ❌ thread_error: error, Restarts: 0, Errors: 1
+2025-03-09 05:46:21,940 - test_thread_monitor - INFO - Thread vô hạn: nhịp thứ 5
+2025-03-09 05:46:22,941 - test_thread_monitor - INFO - --- THỐNG KÊ THREADS (4/10) ---
+2025-03-09 05:46:22,942 - test_thread_monitor - INFO - ❌ thread_normal: completed, Restarts: 0, Errors: 0
+2025-03-09 05:46:22,942 - test_thread_monitor - INFO - ✅ thread_infinite: running, Restarts: 0, Errors: 0
+2025-03-09 05:46:22,942 - test_thread_monitor - INFO - ❌ thread_error: error, Restarts: 0, Errors: 1
+2025-03-09 06:09:42,436 - thread_monitor - INFO - Thread monitor bắt đầu chạy
+2025-03-09 06:09:42,436 - thread_monitor - INFO - Đã bắt đầu thread giám sát
+2025-03-09 06:09:42,439 - thread_monitor - INFO - Thread 'normal_thread' bắt đầu chạy
+2025-03-09 06:09:42,439 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'normal_thread'
+2025-03-09 06:09:42,439 - thread_monitor - INFO - Thread 'infinite_thread' bắt đầu chạy
+2025-03-09 06:09:42,439 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'infinite_thread'
+2025-03-09 06:09:42,439 - thread_monitor - INFO - Thread bình thường bắt đầu, sẽ chạy trong 10s
+2025-03-09 06:09:42,440 - thread_monitor - INFO - Thread vô hạn bắt đầu
+2025-03-09 06:09:42,440 - thread_monitor - INFO - Thread bình thường: đang xử lý 1/10
+2025-03-09 06:09:42,440 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 1
+2025-03-09 06:09:43,440 - thread_monitor - INFO - Thread bình thường: đang xử lý 2/10
+2025-03-09 06:09:44,440 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 2
+2025-03-09 06:09:44,440 - thread_monitor - INFO - Thread bình thường: đang xử lý 3/10
+2025-03-09 06:09:45,440 - thread_monitor - INFO - Thread 'error_thread' bắt đầu chạy
+2025-03-09 06:09:45,440 - thread_monitor - INFO - Đã đăng ký và khởi động thread 'error_thread'
+2025-03-09 06:09:45,440 - thread_monitor - INFO - Thread lỗi bắt đầu, sẽ gặp lỗi sau 5s
+2025-03-09 06:09:45,440 - thread_monitor - INFO - Thread lỗi: đang xử lý 1/5
+2025-03-09 06:09:45,441 - thread_monitor - INFO - Thread bình thường: đang xử lý 4/10
+2025-03-09 06:09:46,440 - thread_monitor - INFO - Thread lỗi: đang xử lý 2/5
+2025-03-09 06:09:46,441 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 3
+2025-03-09 06:09:46,441 - thread_monitor - INFO - Thread bình thường: đang xử lý 5/10
+2025-03-09 06:09:47,441 - thread_monitor - INFO - Thread lỗi: đang xử lý 3/5
+2025-03-09 06:09:47,441 - thread_monitor - INFO - Thread bình thường: đang xử lý 6/10
+2025-03-09 06:09:48,441 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 4
+2025-03-09 06:09:48,441 - thread_monitor - INFO - Thread lỗi: đang xử lý 4/5
+2025-03-09 06:09:48,441 - thread_monitor - INFO - Thread bình thường: đang xử lý 7/10
+2025-03-09 06:09:49,442 - thread_monitor - INFO - Thread lỗi: đang xử lý 5/5
+2025-03-09 06:09:49,442 - thread_monitor - INFO - Thread bình thường: đang xử lý 8/10
+2025-03-09 06:09:50,441 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 5
+2025-03-09 06:09:50,442 - thread_monitor - INFO - Thread lỗi chuẩn bị ném ngoại lệ
+2025-03-09 06:09:50,442 - thread_monitor - ERROR - Lỗi trong thread 'error_thread': Lỗi giả lập cho mục đích test!
+2025-03-09 06:09:50,443 - thread_monitor - INFO - Thread bình thường: đang xử lý 9/10
+2025-03-09 06:09:50,443 - thread_monitor - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/thread_monitor.py", line 171, in _wrapped_thread_func
+    result = thread_func(*args)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/thread_monitor.py", line 432, in test_error_thread
+    raise ValueError("Lỗi giả lập cho mục đích test!")
+ValueError: Lỗi giả lập cho mục đích test!
+
+2025-03-09 06:09:51,443 - thread_monitor - INFO - Thread bình thường: đang xử lý 10/10
+2025-03-09 06:09:52,442 - thread_monitor - INFO - Thread vô hạn: nhịp thứ 6
+2025-03-09 06:09:52,444 - thread_monitor - INFO - Thread bình thường kết thúc
+2025-03-09 06:09:52,444 - thread_monitor - INFO - Thread 'normal_thread' đã hoàn thành với kết quả: Thành công

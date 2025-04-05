@@ -1,0 +1,13 @@
+2025-03-09 14:20:22,675 - balanced_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro vừa phải cho BTCUSDT 1h (90 ngày)
+2025-03-09 14:20:22,675 - balanced_risk_test - INFO - Các mức rủi ro: [10.0, 12.5, 15.0]
+2025-03-09 14:20:22,676 - balanced_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 10.0%
+2025-03-09 14:20:22,676 - balanced_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 12.5%
+2025-03-09 14:20:22,676 - balanced_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 15.0%
+2025-03-09 14:20:23,312 - balanced_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro vừa phải: risk_analysis/moderate/BTCUSDT_1h_moderate_risk_performance.png
+2025-03-09 14:20:24,056 - balanced_risk_test - INFO - Đã tạo biểu đồ so sánh các mức rủi ro: risk_analysis/moderate/BTCUSDT_1h_risk_comparison.png
+2025-03-09 14:20:24,056 - balanced_risk_test - INFO - Đã tạo báo cáo phân tích rủi ro: balanced_risk_results/balanced_risk_analysis.md
+2025-03-09 14:20:24,057 - balanced_risk_test - INFO - Đã tạo biểu đồ so sánh các mức rủi ro: risk_analysis/moderate/BTCUSDT_1h_risk_comparison.png
+2025-03-09 14:20:24,057 - balanced_risk_test - INFO - Đã tạo báo cáo phân tích: balanced_risk_results/balanced_risk_analysis.md
+2025-03-09 14:20:24,057 - balanced_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro vừa phải cho BTCUSDT 1h
+2025-03-09 14:20:24,057 - balanced_risk_test - INFO - Kết quả được lưu trong thư mục: balanced_risk_results
+2025-03-09 14:20:24,057 - balanced_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/moderate

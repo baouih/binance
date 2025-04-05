@@ -1,0 +1,65 @@
+2025-03-15 11:45:01,863 - adaptive_multi_risk - INFO - Khởi tạo AdaptiveMultiRiskManager với account_size=10000
+2025-03-15 11:45:01,863 - adaptive_multi_risk - INFO - Mức rủi ro mặc định: moderate (7%)
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'NEUTRAL', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'} -> {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'}
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: moderate -> high_risk (15%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro high_risk (15%): size=1.500000, entry=50000.00, risk_amount=$1500.00
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'BULL', 'volatility': 'LOW', 'trend_strength': 'STRONG'} -> {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'}
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: high_risk -> moderate (7%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro moderate (7%): size=0.700000, entry=50000.00, risk_amount=$700.00
+2025-03-15 11:45:01,864 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'BULL', 'volatility': 'HIGH', 'trend_strength': 'STRONG'} -> {'regime': 'BEAR', 'volatility': 'HIGH', 'trend_strength': 'STRONG'}
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: moderate -> ultra_conservative (3%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro ultra_conservative (3%): size=0.300000, entry=50000.00, risk_amount=$300.00
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'BEAR', 'volatility': 'HIGH', 'trend_strength': 'STRONG'} -> {'regime': 'SIDEWAYS', 'volatility': 'LOW', 'trend_strength': 'NEUTRAL'}
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: ultra_conservative -> moderate (7%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro moderate (7%): size=0.700000, entry=50000.00, risk_amount=$700.00
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'SIDEWAYS', 'volatility': 'LOW', 'trend_strength': 'NEUTRAL'} -> {'regime': 'VOLATILE', 'volatility': 'HIGH', 'trend_strength': 'WEAK'}
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: moderate -> ultra_conservative (3%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro ultra_conservative (3%): size=0.300000, entry=50000.00, risk_amount=$300.00
+2025-03-15 11:45:01,865 - adaptive_multi_risk - INFO - Cập nhật trạng thái thị trường: {'regime': 'VOLATILE', 'volatility': 'HIGH', 'trend_strength': 'WEAK'} -> {'regime': 'NEUTRAL', 'volatility': 'NORMAL', 'trend_strength': 'NEUTRAL'}
+2025-03-15 11:45:01,866 - adaptive_multi_risk - INFO - Điều chỉnh mức rủi ro: ultra_conservative -> moderate (7%) dựa trên trạng thái thị trường
+2025-03-15 11:45:01,866 - adaptive_multi_risk - INFO - Tính position size cho BTCUSDT tại mức rủi ro moderate (7%): size=0.700000, entry=50000.00, risk_amount=$700.00
+2025-03-15 11:45:01,866 - adaptive_multi_risk - INFO - Phân bổ vốn: {
+  "ultra_conservative": {
+    "risk_percentage": 0.03,
+    "capital_allocation": 0.2,
+    "allocated_amount": 2000.0
+  },
+  "conservative": {
+    "risk_percentage": 0.05,
+    "capital_allocation": 0.2,
+    "allocated_amount": 2000.0
+  },
+  "moderate": {
+    "risk_percentage": 0.07,
+    "capital_allocation": 0.2,
+    "allocated_amount": 2000.0
+  },
+  "aggressive": {
+    "risk_percentage": 0.09,
+    "capital_allocation": 0.2,
+    "allocated_amount": 2000.0
+  },
+  "high_risk": {
+    "risk_percentage": 0.15,
+    "capital_allocation": 0.1,
+    "allocated_amount": 1000.0
+  },
+  "extreme_risk": {
+    "risk_percentage": 0.2,
+    "capital_allocation": 0.05,
+    "allocated_amount": 500.0
+  },
+  "ultra_high_risk": {
+    "risk_percentage": 0.25,
+    "capital_allocation": 0.03,
+    "allocated_amount": 300.0
+  },
+  "super_high_risk": {
+    "risk_percentage": 0.3,
+    "capital_allocation": 0.02,
+    "allocated_amount": 200.0
+  }
+}
+2025-03-15 11:45:01,866 - adaptive_multi_risk - INFO - Đã lưu trạng thái vào test_multi_risk_state.json
+2025-03-15 11:45:01,867 - adaptive_multi_risk - INFO - Cập nhật hiệu suất conservative: profit=100.00, drawdown=1.20, win_rate=100.00%
+2025-03-15 11:45:01,867 - adaptive_multi_risk - INFO - Cập nhật hiệu suất high_risk: profit=-200.00, drawdown=5.30, win_rate=0.00%

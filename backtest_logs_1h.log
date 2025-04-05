@@ -1,0 +1,37 @@
+=== Bắt đầu chạy backtest cho nhiều đồng coin và chiến lược ===
+Khung thời gian: 1h
+Số lượng coins: 8
+Số lượng chiến lược: 6
+Số lượng khoảng thời gian: 4
+Tổng số test sẽ chạy: 192
+-------------------------------------------------
+Chạy backtest cho BTCUSDT...
+  + Đang chạy: BTCUSDT - rsi - 1 tháng (2025-02-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - rsi - 1 tháng
+    Tiến trình: 1/192 (0%) - Còn lại: 0h 9m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - rsi - 3 tháng (2024-12-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - rsi - 3 tháng
+    Tiến trình: 2/192 (1%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - rsi - 6 tháng (2024-09-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - rsi - 6 tháng
+    Tiến trình: 3/192 (1%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - rsi - 9 tháng (2024-06-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - rsi - 9 tháng
+    Tiến trình: 4/192 (2%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - macd - 1 tháng (2025-02-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - macd - 1 tháng
+    Tiến trình: 5/192 (2%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - macd - 3 tháng (2024-12-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - macd - 3 tháng
+    Tiến trình: 6/192 (3%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - macd - 6 tháng (2024-09-01 đến 2025-03-01)
+    [THẤT BẠI] Không tìm thấy file kết quả cho BTCUSDT - macd - 6 tháng
+    Tiến trình: 7/192 (3%) - Còn lại: 0h 6m
+-------------------------------------------------
+  + Đang chạy: BTCUSDT - macd - 9 tháng (2024-06-01 đến 2025-03-01)

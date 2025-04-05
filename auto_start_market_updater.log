@@ -1,0 +1,10 @@
+Wed 05 Mar 2025 06:27:22 AM UTC - Bắt đầu khởi động dịch vụ cập nhật dữ liệu thị trường
+Wed 05 Mar 2025 06:27:22 AM UTC - PID file tồn tại nhưng dịch vụ không chạy, xóa PID file
+Wed 05 Mar 2025 06:27:22 AM UTC - Khởi động dịch vụ cập nhật dữ liệu thị trường
+Wed 05 Mar 2025 06:27:22 AM UTC - Dịch vụ đã được khởi động với PID 12239
+Wed 05 Mar 2025 10:18:26 AM UTC - Bắt đầu kiểm tra và khởi động dịch vụ cập nhật dữ liệu thị trường
+Wed 05 Mar 2025 10:18:26 AM UTC - Khởi động dịch vụ cập nhật dữ liệu thị trường
+Wed 05 Mar 2025 10:18:26 AM UTC - Dịch vụ đã được khởi động với PID 1098
+Wed 05 Mar 2025 10:18:26 AM UTC - Khởi động lại Flask app vì workflow đã dừng
+Wed 05 Mar 2025 10:18:26 AM UTC - Flask app đã được khởi động với PID 1105
+Wed 05 Mar 2025 10:18:26 AM UTC - Đã thêm script vào crontab để chạy mỗi 5 phút

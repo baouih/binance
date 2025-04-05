@@ -1,0 +1,10 @@
+[2025-03-06 04:06:33] Bắt đầu script theo dõi vị thế
+[2025-03-06 04:06:33] Kiểm tra và thiết lập SL/TP cho BTC
+[2025-03-06 04:06:33] Kiểm tra và thiết lập SL/TP cho tất cả vị thế
+[2025-03-06 04:06:33] Theo dõi và thiết lập SL/TP cho các vị thế thủ công
+[2025-03-06 04:06:33] Đã thêm cron job kiểm tra BTC mỗi 5 phút
+[2025-03-06 04:06:33] Đã thêm cron job kiểm tra tất cả vị thế và vị thế thủ công
+[2025-03-06 04:06:33] Thiết lập hoàn tất. Xem log tại monitor_all_positions.log
+[2025-03-06 04:06:33] Khởi động giám sát tài khoản nhỏ
+[2025-03-06 04:06:33] Đã khởi động giám sát tài khoản nhỏ
+[2025-03-06 04:06:33] Hoàn tất thiết lập theo dõi

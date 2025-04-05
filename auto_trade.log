@@ -1,0 +1,14 @@
+2025-03-05 04:13:52,493 - auto_trade_scheduler - INFO - Khởi động Auto Trade Scheduler
+2025-03-05 04:13:52,494 - auto_trade_scheduler - INFO - Khởi động dịch vụ trailing stop với chu kỳ 60 giây
+2025-03-05 04:13:52,494 - auto_trade_scheduler - INFO - Đã lưu PID 1652 vào file trailing_stop.pid
+2025-03-05 04:13:52,494 - auto_trade_scheduler - INFO - Dịch vụ trailing stop đã khởi động với PID 1652
+2025-03-05 04:13:52,495 - auto_trade_scheduler - INFO - Khởi động dịch vụ keep-alive trên cổng 8080
+2025-03-05 04:13:52,495 - auto_trade_scheduler - INFO - Dịch vụ trailing stop đang hoạt động bình thường
+2025-03-05 04:13:52,495 - auto_trade_scheduler - INFO - Đã lưu PID 1646 vào file keep_alive.pid
+ * Serving Flask app 'auto_trade_scheduler'
+ * Debug mode: off
+2025-03-05 04:13:52,507 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://172.31.128.65:8080
+2025-03-05 04:13:52,507 - werkzeug - INFO - [33mPress CTRL+C to quit[0m

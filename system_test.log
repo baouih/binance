@@ -1,0 +1,303 @@
+2025-03-05 17:45:52,957 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-05 17:45:52,958 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-05 17:45:52,958 - run_test - INFO - === Chạy test API Data Validator ===
+2025-03-05 17:45:52,958 - run_test - INFO - Test 1: Kiểm tra xác thực dữ liệu k-lines
+2025-03-05 17:45:52,958 - api_data_validator - WARNING - Dữ liệu klines không hợp lệ: Candlestick ở vị trí 0 có giá thấp nhất (34500.0) > giá cao nhất (34000.0); Candlestick ở vị trí 0 có giá cao nhất (34000.0) < giá mở/đóng cửa; Candlestick ở vị trí 1 có volume âm (-1200.0)
+2025-03-05 17:45:52,958 - run_test - INFO - Test 2: Kiểm tra xác thực dữ liệu vị thế
+2025-03-05 17:45:52,958 - api_data_validator - WARNING - Dữ liệu vị thế không hợp lệ: Thiếu trường bắt buộc 'leverage'; Trường 'positionAmt' không phải là số hợp lệ
+2025-03-05 17:45:52,958 - run_test - INFO - Test 3: Kiểm tra chuyển đổi dữ liệu
+2025-03-05 17:45:52,958 - run_test - INFO - Test 4: Kiểm tra retry mechanism
+2025-03-05 17:45:52,959 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 1/3): Test failure
+2025-03-05 17:45:53,059 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 2/3): Test failure
+2025-03-05 17:45:53,159 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 3/3): Test failure
+2025-03-05 17:45:53,159 - api_data_validator - ERROR - Đã thử 3 lần nhưng đều thất bại: Test failure
+2025-03-05 17:45:53,159 - run_test - INFO - Kết quả test API Data Validator: PASSED
+2025-03-05 17:45:53,160 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250305_174553.json
+2025-03-05 17:45:53,160 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250305_174553.txt
+2025-03-05 17:46:01,010 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-05 17:46:01,011 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-05 17:46:01,011 - run_test - INFO - === Chạy test Adaptive Strategy Selector ===
+2025-03-05 17:46:01,011 - run_test - INFO - Test 1: Phát hiện chế độ thị trường
+2025-03-05 17:46:01,012 - run_test - INFO - Test 2: Lấy chiến lược theo chế độ thị trường
+2025-03-05 17:46:01,012 - run_test - INFO - Test 3: Lấy quyết định giao dịch
+2025-03-05 17:46:01,012 - run_test - ERROR - Lỗi khi chạy test Adaptive Strategy Selector: 'DataCache' object has no attribute 'get_timestamp'
+2025-03-05 17:46:01,017 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250305_174601.json
+2025-03-05 17:46:01,023 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250305_174601.txt
+2025-03-05 17:46:13,672 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-05 17:46:13,673 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-05 17:46:13,673 - run_test - INFO - === Chạy test Dynamic Risk Allocator ===
+2025-03-05 17:46:13,673 - run_test - INFO - Test 1: Tính toán risk percentage theo biến động thị trường
+2025-03-05 17:46:13,673 - run_test - ERROR - Lỗi khi chạy test Dynamic Risk Allocator: 'DataCache' object has no attribute 'get_timestamp'
+2025-03-05 17:46:13,674 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250305_174613.json
+2025-03-05 17:46:13,674 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250305_174613.txt
+2025-03-05 17:47:04,581 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-05 17:47:04,586 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-05 17:47:04,586 - run_test - INFO - === Chạy test Dynamic Risk Allocator ===
+2025-03-05 17:47:04,586 - run_test - INFO - Test 1: Tính toán risk percentage theo biến động thị trường
+2025-03-05 17:47:04,587 - run_test - INFO - Test 2: Tính toán risk percentage theo drawdown
+2025-03-05 17:47:04,587 - run_test - INFO - Test 3: Tính toán kích thước vị thế
+2025-03-05 17:47:04,587 - run_test - INFO - Test 4: Phân bổ vốn cho nhiều cặp tiền
+2025-03-05 17:47:04,587 - run_test - INFO - Kết quả test Dynamic Risk Allocator: FAILED
+2025-03-05 17:47:04,588 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250305_174704.json
+2025-03-05 17:47:04,589 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250305_174704.txt
+2025-03-05 17:47:11,987 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-05 17:47:11,988 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-05 17:47:11,988 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-05 17:47:11,988 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-05 17:47:11,988 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-05 17:47:11,988 - run_test - INFO - Kết quả test Advanced Trailing Stop: FAILED
+2025-03-05 17:47:11,989 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250305_174711.json
+2025-03-05 17:47:11,989 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250305_174711.txt
+2025-03-06 00:41:02,744 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:41:02,747 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:41:02,747 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-06 00:41:02,747 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-06 00:41:02,747 - advanced_trailing_stop - INFO - Đã kích hoạt trailing stop cho BTCUSDT ở mức 50247.50
+2025-03-06 00:41:02,747 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-06 00:41:02,748 - run_test - INFO - Kết quả test Advanced Trailing Stop: FAILED
+2025-03-06 00:41:02,748 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_004102.json
+2025-03-06 00:41:02,749 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_004102.txt
+2025-03-06 00:44:11,083 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:44:11,086 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:44:11,086 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-06 00:44:11,087 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-06 00:44:11,088 - advanced_trailing_stop - INFO - Đã kích hoạt trailing stop cho BTCUSDT ở mức 50247.50
+2025-03-06 00:44:11,088 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-06 00:44:11,088 - run_test - INFO - Kết quả test Advanced Trailing Stop: PASSED
+2025-03-06 00:44:11,090 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_004411.json
+2025-03-06 00:44:11,090 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_004411.txt
+2025-03-06 00:44:47,839 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:44:47,839 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:44:47,839 - run_test - INFO - === Bắt đầu chạy tất cả các bài test lúc 2025-03-06 00:44:47.839499 ===
+2025-03-06 00:44:47,839 - run_test - INFO - === Chạy test API Data Validator ===
+2025-03-06 00:44:47,839 - run_test - INFO - Test 1: Kiểm tra xác thực dữ liệu k-lines
+2025-03-06 00:44:47,839 - api_data_validator - WARNING - Dữ liệu klines không hợp lệ: Candlestick ở vị trí 0 có giá thấp nhất (34500.0) > giá cao nhất (34000.0); Candlestick ở vị trí 0 có giá cao nhất (34000.0) < giá mở/đóng cửa; Candlestick ở vị trí 1 có volume âm (-1200.0)
+2025-03-06 00:44:47,839 - run_test - INFO - Test 2: Kiểm tra xác thực dữ liệu vị thế
+2025-03-06 00:44:47,840 - api_data_validator - WARNING - Dữ liệu vị thế không hợp lệ: Thiếu trường bắt buộc 'leverage'; Trường 'positionAmt' không phải là số hợp lệ
+2025-03-06 00:44:47,840 - run_test - INFO - Test 3: Kiểm tra chuyển đổi dữ liệu
+2025-03-06 00:44:47,840 - run_test - INFO - Test 4: Kiểm tra retry mechanism
+2025-03-06 00:44:47,840 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 1/3): Test failure
+2025-03-06 00:44:48,841 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 2/3): Test failure
+2025-03-06 00:44:49,841 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 3/3): Test failure
+2025-03-06 00:44:49,841 - api_data_validator - ERROR - Đã thử 3 lần nhưng đều thất bại: Test failure
+2025-03-06 00:44:49,841 - run_test - INFO - Kết quả test API Data Validator: PASSED
+2025-03-06 00:44:49,841 - run_test - INFO - === Chạy test Adaptive Strategy Selector ===
+2025-03-06 00:44:49,842 - run_test - INFO - Test 1: Phát hiện chế độ thị trường
+2025-03-06 00:44:49,842 - run_test - INFO - Test 2: Lấy chiến lược theo chế độ thị trường
+2025-03-06 00:44:49,842 - run_test - INFO - Test 3: Lấy quyết định giao dịch
+2025-03-06 00:44:49,842 - run_test - INFO - Kết quả test Adaptive Strategy Selector: FAILED
+2025-03-06 00:44:49,843 - run_test - INFO - === Chạy test Dynamic Risk Allocator ===
+2025-03-06 00:44:49,843 - run_test - INFO - Test 1: Tính toán risk percentage theo biến động thị trường
+2025-03-06 00:44:49,843 - run_test - INFO - Test 2: Tính toán risk percentage theo drawdown
+2025-03-06 00:44:49,843 - run_test - INFO - Test 3: Tính toán kích thước vị thế
+2025-03-06 00:44:49,843 - run_test - INFO - Test 4: Phân bổ vốn cho nhiều cặp tiền
+2025-03-06 00:44:49,844 - run_test - INFO - Kết quả test Dynamic Risk Allocator: FAILED
+2025-03-06 00:44:49,844 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-06 00:44:49,844 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-06 00:44:49,844 - advanced_trailing_stop - INFO - Đã kích hoạt trailing stop cho BTCUSDT ở mức 50247.50
+2025-03-06 00:44:49,844 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-06 00:44:49,845 - run_test - INFO - Kết quả test Advanced Trailing Stop: PASSED
+2025-03-06 00:44:49,845 - run_test - INFO - === Chạy test các kịch bản giao dịch ===
+2025-03-06 00:44:49,845 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:44:49,845 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:44:49,846 - run_test - INFO - Test 1: Kịch bản thị trường trending
+2025-03-06 00:44:49,846 - test_cases - INFO - === Chạy test vào lệnh với thị trường trending cho BTCUSDT ===
+2025-03-06 00:44:49,871 - test_cases - INFO - Kết quả test thị trường trending cho BTCUSDT:
+2025-03-06 00:44:49,872 - test_cases - INFO - - Chế độ thị trường: trending
+2025-03-06 00:44:49,872 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 00:44:49,872 - test_cases - INFO - - Risk %: 0.60%
+2025-03-06 00:44:49,872 - test_cases - INFO - - Tín hiệu: SELL (mạnh: 0.21)
+2025-03-06 00:44:49,872 - test_cases - INFO - - Entry: $28306.50
+2025-03-06 00:44:49,872 - test_cases - INFO - - Stop Loss: $55195.92
+2025-03-06 00:44:49,872 - test_cases - INFO - - Take Profit: $50372.98
+2025-03-06 00:44:49,872 - test_cases - INFO - - Quantity: 0.002
+2025-03-06 00:44:49,872 - test_cases - INFO - - Position Size: $63.16
+2025-03-06 00:44:49,873 - run_test - INFO - Test 2: Kịch bản thị trường biến động
+2025-03-06 00:44:49,873 - test_cases - INFO - === Chạy test vào lệnh với thị trường biến động mạnh cho BTCUSDT ===
+2025-03-06 00:44:49,895 - adaptive_strategy_selector - ERROR - Lỗi khi tính tín hiệu breakout cho BTCUSDT 1h: unsupported operand type(s) for *: 'NoneType' and 'float'
+2025-03-06 00:44:49,895 - test_cases - INFO - Kết quả test thị trường biến động mạnh cho BTCUSDT:
+2025-03-06 00:44:49,895 - test_cases - INFO - - Chế độ thị trường: volatile
+2025-03-06 00:44:49,895 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 00:44:49,895 - test_cases - INFO - - Risk %: 0.30% (so với cơ sở: 1.00%)
+2025-03-06 00:44:49,896 - test_cases - INFO - - Risk giảm: Có
+2025-03-06 00:44:49,896 - test_cases - INFO - - Tín hiệu: SELL (mạnh: 0.21)
+2025-03-06 00:44:49,896 - test_cases - INFO - - Entry: $28629.07
+2025-03-06 00:44:49,896 - test_cases - INFO - - Stop Loss: $48705.21
+2025-03-06 00:44:49,896 - test_cases - INFO - - Take Profit: $44022.02
+2025-03-06 00:44:49,896 - test_cases - INFO - - Quantity: 0.001
+2025-03-06 00:44:49,896 - test_cases - INFO - - Position Size: $42.78
+2025-03-06 00:44:49,896 - test_cases - INFO - - SL/TP dựa trên ATR: Có
+2025-03-06 00:44:49,896 - run_test - INFO - Test 3: Kịch bản thị trường đi ngang
+2025-03-06 00:44:49,896 - test_cases - INFO - === Chạy test vào lệnh với thị trường dao động trong biên độ cho BTCUSDT ===
+2025-03-06 00:44:49,919 - test_cases - INFO - Kết quả test thị trường dao động trong biên độ cho BTCUSDT:
+2025-03-06 00:44:49,919 - test_cases - INFO - - Chế độ thị trường: ranging
+2025-03-06 00:44:49,920 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 00:44:49,920 - test_cases - INFO - - Mean reversion ưu tiên: Không
+2025-03-06 00:44:49,920 - test_cases - INFO - - Risk %: 0.40%
+2025-03-06 00:44:49,920 - test_cases - INFO - - Tín hiệu: BUY (mạnh: 0.21)
+2025-03-06 00:44:49,920 - test_cases - INFO - - Entry: $47527.82
+2025-03-06 00:44:49,920 - test_cases - INFO - - Stop Loss: $53413.03
+2025-03-06 00:44:49,920 - test_cases - INFO - - Take Profit: $56138.18
+2025-03-06 00:44:49,920 - test_cases - INFO - - Quantity: 0.006
+2025-03-06 00:44:49,920 - test_cases - INFO - - Position Size: $323.03
+2025-03-06 00:44:49,920 - run_test - INFO - Test 4: Kịch bản thị trường đi ngược với vị thế
+2025-03-06 00:44:49,920 - test_cases - INFO - === Chạy test quản lý vị thế khi thị trường đi ngược với vị thế cho BTCUSDT ===
+2025-03-06 00:44:49,921 - test_cases - INFO - Kết quả test quản lý vị thế khi thị trường đi ngược với vị thế cho BTCUSDT:
+2025-03-06 00:44:49,921 - test_cases - INFO - - Vị thế: BUY 0.1 BTCUSDT @ $50000
+2025-03-06 00:44:49,921 - test_cases - INFO - - Stop Loss: $49000
+2025-03-06 00:44:49,921 - test_cases - INFO - - Take Profit: $52000
+2025-03-06 00:44:49,921 - test_cases - INFO - - Diễn biến giá: [50000, 49800, 49500, 49200, 49100, 49050, 49000]
+2025-03-06 00:44:49,921 - test_cases - INFO - - Stop Loss kích hoạt: Có
+2025-03-06 00:44:49,921 - test_cases - INFO - - Lý do: stop_loss
+2025-03-06 00:44:49,921 - test_cases - INFO - - Giá đóng vị thế: $49000
+2025-03-06 00:44:49,921 - test_cases - INFO - - PnL cuối cùng: $-100.00 (-2.00%)
+2025-03-06 00:44:49,922 - run_test - INFO - Test 5: Kịch bản thị trường đi thuận với vị thế
+2025-03-06 00:44:49,922 - test_cases - INFO - === Chạy test quản lý vị thế khi thị trường đi thuận với vị thế cho BTCUSDT ===
+2025-03-06 00:44:49,922 - test_cases - INFO - Kết quả test quản lý vị thế khi thị trường đi thuận với vị thế cho BTCUSDT:
+2025-03-06 00:44:49,922 - test_cases - INFO - - Vị thế: BUY 0.1 BTCUSDT @ $50000
+2025-03-06 00:44:49,922 - test_cases - INFO - - Stop Loss ban đầu: $49000
+2025-03-06 00:44:49,922 - test_cases - INFO - - Take Profit: $52000
+2025-03-06 00:44:49,922 - test_cases - INFO - - Diễn biến giá: [50000, 50200, 50500, 50800, 51000, 51200, 51000, 50800, 50600]
+2025-03-06 00:44:49,922 - test_cases - INFO - - Giá cao nhất đạt được: $51200
+2025-03-06 00:44:49,922 - test_cases - INFO - - Trailing Stop kích hoạt: Không
+2025-03-06 00:44:49,922 - test_cases - INFO - - Vị thế đóng: Không
+2025-03-06 00:44:49,922 - run_test - INFO - Kết quả test các kịch bản giao dịch: FAILED
+2025-03-06 00:44:49,923 - run_test - INFO - === Chạy test Comprehensive Backtest ===
+2025-03-06 00:44:49,924 - comprehensive_backtest - INFO - Đã tải cấu hình từ configs/backtest_config_test.json
+2025-03-06 00:44:49,924 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:44:49,924 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:44:49,924 - comprehensive_backtest - INFO - Bắt đầu backtest
+2025-03-06 00:44:49,924 - comprehensive_backtest - INFO - Tải dữ liệu cho backtest từ 2023-01-01 đến 2023-01-10
+2025-03-06 00:44:49,924 - comprehensive_backtest - ERROR - Không tìm thấy file dữ liệu backtest_data/BTCUSDT_1h.csv
+2025-03-06 00:44:49,924 - comprehensive_backtest - WARNING - Có lỗi khi tải dữ liệu, backtest có thể không đầy đủ
+2025-03-06 00:44:49,924 - comprehensive_backtest - ERROR - Không thể tải dữ liệu, dừng backtest
+2025-03-06 00:44:49,925 - comprehensive_backtest - INFO - Đã tạo báo cáo HTML tại backtest_reports/backtest_report_20250306_004449.html
+2025-03-06 00:44:49,925 - run_test - INFO - Kết quả test Comprehensive Backtest: FAILED
+2025-03-06 00:44:49,925 - run_test - INFO - === Kết thúc tất cả các bài test lúc 2025-03-06 00:44:49.925523 ===
+2025-03-06 00:44:49,925 - run_test - INFO - === Tổng thời gian chạy: 0:00:02.086024 ===
+2025-03-06 00:44:49,927 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_004449.json
+2025-03-06 00:44:49,927 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_004449.txt
+2025-03-06 00:44:49,929 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_004449.json
+2025-03-06 00:44:49,929 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_004449.txt
+2025-03-06 00:59:50,244 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 00:59:50,244 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 00:59:50,244 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-06 00:59:50,244 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-06 00:59:50,244 - advanced_trailing_stop - INFO - Đã kích hoạt trailing stop cho BTCUSDT ở mức 50247.50
+2025-03-06 00:59:50,244 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-06 00:59:50,245 - run_test - INFO - Kết quả test Advanced Trailing Stop: PASSED
+2025-03-06 00:59:50,245 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_005950.json
+2025-03-06 00:59:50,246 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_005950.txt
+2025-03-06 01:00:02,702 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 01:00:02,702 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 01:00:02,703 - run_test - INFO - === Bắt đầu chạy tất cả các bài test lúc 2025-03-06 01:00:02.703012 ===
+2025-03-06 01:00:02,703 - run_test - INFO - === Chạy test API Data Validator ===
+2025-03-06 01:00:02,703 - run_test - INFO - Test 1: Kiểm tra xác thực dữ liệu k-lines
+2025-03-06 01:00:02,703 - api_data_validator - WARNING - Dữ liệu klines không hợp lệ: Candlestick ở vị trí 0 có giá thấp nhất (34500.0) > giá cao nhất (34000.0); Candlestick ở vị trí 0 có giá cao nhất (34000.0) < giá mở/đóng cửa; Candlestick ở vị trí 1 có volume âm (-1200.0)
+2025-03-06 01:00:02,703 - run_test - INFO - Test 2: Kiểm tra xác thực dữ liệu vị thế
+2025-03-06 01:00:02,703 - api_data_validator - WARNING - Dữ liệu vị thế không hợp lệ: Thiếu trường bắt buộc 'leverage'; Trường 'positionAmt' không phải là số hợp lệ
+2025-03-06 01:00:02,703 - run_test - INFO - Test 3: Kiểm tra chuyển đổi dữ liệu
+2025-03-06 01:00:02,703 - run_test - INFO - Test 4: Kiểm tra retry mechanism
+2025-03-06 01:00:02,704 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 1/3): Test failure
+2025-03-06 01:00:03,704 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 2/3): Test failure
+2025-03-06 01:00:04,704 - api_data_validator - WARNING - Lỗi khi thực thi test_function_failure (lần thử 3/3): Test failure
+2025-03-06 01:00:04,704 - api_data_validator - ERROR - Đã thử 3 lần nhưng đều thất bại: Test failure
+2025-03-06 01:00:04,704 - run_test - INFO - Kết quả test API Data Validator: PASSED
+2025-03-06 01:00:04,704 - run_test - INFO - === Chạy test Adaptive Strategy Selector ===
+2025-03-06 01:00:04,705 - run_test - INFO - Test 1: Phát hiện chế độ thị trường
+2025-03-06 01:00:04,705 - run_test - INFO - Test 2: Lấy chiến lược theo chế độ thị trường
+2025-03-06 01:00:04,705 - run_test - INFO - Test 3: Lấy quyết định giao dịch
+2025-03-06 01:00:04,705 - run_test - INFO - Kết quả test Adaptive Strategy Selector: FAILED
+2025-03-06 01:00:04,705 - run_test - INFO - === Chạy test Dynamic Risk Allocator ===
+2025-03-06 01:00:04,705 - run_test - INFO - Test 1: Tính toán risk percentage theo biến động thị trường
+2025-03-06 01:00:04,705 - run_test - INFO - Test 2: Tính toán risk percentage theo drawdown
+2025-03-06 01:00:04,706 - run_test - INFO - Test 3: Tính toán kích thước vị thế
+2025-03-06 01:00:04,706 - run_test - INFO - Test 4: Phân bổ vốn cho nhiều cặp tiền
+2025-03-06 01:00:04,706 - run_test - INFO - Kết quả test Dynamic Risk Allocator: FAILED
+2025-03-06 01:00:04,706 - run_test - INFO - === Chạy test Advanced Trailing Stop ===
+2025-03-06 01:00:04,706 - run_test - INFO - Test 1: Trailing Stop Percentage
+2025-03-06 01:00:04,706 - advanced_trailing_stop - INFO - Đã kích hoạt trailing stop cho BTCUSDT ở mức 50247.50
+2025-03-06 01:00:04,706 - run_test - INFO - Test 2: Trailing Stop ATR
+2025-03-06 01:00:04,706 - run_test - INFO - Kết quả test Advanced Trailing Stop: PASSED
+2025-03-06 01:00:04,706 - run_test - INFO - === Chạy test các kịch bản giao dịch ===
+2025-03-06 01:00:04,707 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 01:00:04,707 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 01:00:04,707 - run_test - INFO - Test 1: Kịch bản thị trường trending
+2025-03-06 01:00:04,707 - test_cases - INFO - === Chạy test vào lệnh với thị trường trending cho BTCUSDT ===
+2025-03-06 01:00:04,724 - adaptive_strategy_selector - ERROR - Lỗi khi tính tín hiệu breakout cho BTCUSDT 1h: unsupported operand type(s) for *: 'NoneType' and 'float'
+2025-03-06 01:00:04,724 - test_cases - INFO - Kết quả test thị trường trending cho BTCUSDT:
+2025-03-06 01:00:04,724 - test_cases - INFO - - Chế độ thị trường: trending
+2025-03-06 01:00:04,724 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 01:00:04,724 - test_cases - INFO - - Risk %: 0.60%
+2025-03-06 01:00:04,725 - test_cases - INFO - - Tín hiệu: BUY (mạnh: 0.21)
+2025-03-06 01:00:04,725 - test_cases - INFO - - Entry: $69583.52
+2025-03-06 01:00:04,725 - test_cases - INFO - - Stop Loss: $77442.03
+2025-03-06 01:00:04,725 - test_cases - INFO - - Take Profit: $84627.38
+2025-03-06 01:00:04,725 - test_cases - INFO - - Quantity: 0.007
+2025-03-06 01:00:04,725 - test_cases - INFO - - Position Size: $531.27
+2025-03-06 01:00:04,725 - run_test - INFO - Test 2: Kịch bản thị trường biến động
+2025-03-06 01:00:04,725 - test_cases - INFO - === Chạy test vào lệnh với thị trường biến động mạnh cho BTCUSDT ===
+2025-03-06 01:00:04,748 - test_cases - INFO - Kết quả test thị trường biến động mạnh cho BTCUSDT:
+2025-03-06 01:00:04,748 - test_cases - INFO - - Chế độ thị trường: volatile
+2025-03-06 01:00:04,749 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 01:00:04,749 - test_cases - INFO - - Risk %: 0.30% (so với cơ sở: 1.00%)
+2025-03-06 01:00:04,749 - test_cases - INFO - - Risk giảm: Có
+2025-03-06 01:00:04,749 - test_cases - INFO - - Tín hiệu: BUY (mạnh: 0.30)
+2025-03-06 01:00:04,749 - test_cases - INFO - - Entry: $68990.02
+2025-03-06 01:00:04,749 - test_cases - INFO - - Stop Loss: $39651.61
+2025-03-06 01:00:04,749 - test_cases - INFO - - Take Profit: $43781.99
+2025-03-06 01:00:04,749 - test_cases - INFO - - Quantity: 0.001
+2025-03-06 01:00:04,749 - test_cases - INFO - - Position Size: $70.55
+2025-03-06 01:00:04,749 - test_cases - INFO - - SL/TP dựa trên ATR: Có
+2025-03-06 01:00:04,749 - run_test - INFO - Test 3: Kịch bản thị trường đi ngang
+2025-03-06 01:00:04,750 - test_cases - INFO - === Chạy test vào lệnh với thị trường dao động trong biên độ cho BTCUSDT ===
+2025-03-06 01:00:04,765 - test_cases - INFO - Kết quả test thị trường dao động trong biên độ cho BTCUSDT:
+2025-03-06 01:00:04,765 - test_cases - INFO - - Chế độ thị trường: ranging
+2025-03-06 01:00:04,765 - test_cases - INFO - - Chiến lược hàng đầu: trend_following (trọng số: 0.30)
+2025-03-06 01:00:04,765 - test_cases - INFO - - Mean reversion ưu tiên: Không
+2025-03-06 01:00:04,765 - test_cases - INFO - - Risk %: 0.40%
+2025-03-06 01:00:04,765 - test_cases - INFO - - Tín hiệu: BUY (mạnh: 0.28)
+2025-03-06 01:00:04,765 - test_cases - INFO - - Entry: $48144.08
+2025-03-06 01:00:04,765 - test_cases - INFO - - Stop Loss: $48707.59
+2025-03-06 01:00:04,766 - test_cases - INFO - - Take Profit: $51192.67
+2025-03-06 01:00:04,766 - test_cases - INFO - - Quantity: 0.041
+2025-03-06 01:00:04,766 - test_cases - INFO - - Position Size: $2000.00
+2025-03-06 01:00:04,766 - run_test - INFO - Test 4: Kịch bản thị trường đi ngược với vị thế
+2025-03-06 01:00:04,766 - test_cases - INFO - === Chạy test quản lý vị thế khi thị trường đi ngược với vị thế cho BTCUSDT ===
+2025-03-06 01:00:04,766 - test_cases - INFO - Kết quả test quản lý vị thế khi thị trường đi ngược với vị thế cho BTCUSDT:
+2025-03-06 01:00:04,766 - test_cases - INFO - - Vị thế: BUY 0.1 BTCUSDT @ $50000
+2025-03-06 01:00:04,766 - test_cases - INFO - - Stop Loss: $49000
+2025-03-06 01:00:04,766 - test_cases - INFO - - Take Profit: $52000
+2025-03-06 01:00:04,766 - test_cases - INFO - - Diễn biến giá: [50000, 49800, 49500, 49200, 49100, 49050, 49000]
+2025-03-06 01:00:04,767 - test_cases - INFO - - Stop Loss kích hoạt: Có
+2025-03-06 01:00:04,767 - test_cases - INFO - - Lý do: stop_loss
+2025-03-06 01:00:04,767 - test_cases - INFO - - Giá đóng vị thế: $49000
+2025-03-06 01:00:04,767 - test_cases - INFO - - PnL cuối cùng: $-100.00 (-2.00%)
+2025-03-06 01:00:04,767 - run_test - INFO - Test 5: Kịch bản thị trường đi thuận với vị thế
+2025-03-06 01:00:04,767 - test_cases - INFO - === Chạy test quản lý vị thế khi thị trường đi thuận với vị thế cho BTCUSDT ===
+2025-03-06 01:00:04,767 - test_cases - INFO - Kết quả test quản lý vị thế khi thị trường đi thuận với vị thế cho BTCUSDT:
+2025-03-06 01:00:04,767 - test_cases - INFO - - Vị thế: BUY 0.1 BTCUSDT @ $50000
+2025-03-06 01:00:04,767 - test_cases - INFO - - Stop Loss ban đầu: $49000
+2025-03-06 01:00:04,767 - test_cases - INFO - - Take Profit: $52000
+2025-03-06 01:00:04,767 - test_cases - INFO - - Diễn biến giá: [50000, 50200, 50500, 50800, 51000, 51200, 51000, 50800, 50600]
+2025-03-06 01:00:04,767 - test_cases - INFO - - Giá cao nhất đạt được: $51200
+2025-03-06 01:00:04,767 - test_cases - INFO - - Trailing Stop kích hoạt: Không
+2025-03-06 01:00:04,768 - test_cases - INFO - - Vị thế đóng: Không
+2025-03-06 01:00:04,768 - run_test - INFO - Kết quả test các kịch bản giao dịch: FAILED
+2025-03-06 01:00:04,768 - run_test - INFO - === Chạy test Comprehensive Backtest ===
+2025-03-06 01:00:04,769 - comprehensive_backtest - INFO - Đã tải cấu hình từ configs/backtest_config_test.json
+2025-03-06 01:00:04,769 - adaptive_strategy_selector - INFO - Đã tải cấu hình từ configs/strategy_market_config.json
+2025-03-06 01:00:04,769 - dynamic_risk_allocator - INFO - Đã tải cấu hình từ configs/risk_config.json
+2025-03-06 01:00:04,769 - comprehensive_backtest - INFO - Bắt đầu backtest
+2025-03-06 01:00:04,769 - comprehensive_backtest - INFO - Tải dữ liệu cho backtest từ 2023-01-01 đến 2023-01-10
+2025-03-06 01:00:04,769 - comprehensive_backtest - ERROR - Không tìm thấy file dữ liệu backtest_data/BTCUSDT_1h.csv
+2025-03-06 01:00:04,769 - comprehensive_backtest - WARNING - Có lỗi khi tải dữ liệu, backtest có thể không đầy đủ
+2025-03-06 01:00:04,769 - comprehensive_backtest - ERROR - Không thể tải dữ liệu, dừng backtest
+2025-03-06 01:00:04,770 - comprehensive_backtest - INFO - Đã tạo báo cáo HTML tại backtest_reports/backtest_report_20250306_010004.html
+2025-03-06 01:00:04,770 - run_test - INFO - Kết quả test Comprehensive Backtest: FAILED
+2025-03-06 01:00:04,770 - run_test - INFO - === Kết thúc tất cả các bài test lúc 2025-03-06 01:00:04.770258 ===
+2025-03-06 01:00:04,770 - run_test - INFO - === Tổng thời gian chạy: 0:00:02.067246 ===
+2025-03-06 01:00:04,771 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_010004.json
+2025-03-06 01:00:04,771 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_010004.txt
+2025-03-06 01:00:04,772 - run_test - INFO - Đã lưu kết quả test tại test_results/test_results_20250306_010004.json
+2025-03-06 01:00:04,773 - run_test - INFO - Đã lưu báo cáo tóm tắt tại test_results/test_summary_20250306_010004.txt

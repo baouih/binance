@@ -1,0 +1,9 @@
+2025-03-09 14:02:10,934 - report_generator - INFO - Khởi tạo generator báo cáo từ thư mục backtest_results
+2025-03-09 14:02:10,934 - report_generator - INFO - Bắt đầu tạo báo cáo...
+2025-03-09 14:02:10,954 - report_generator - ERROR - Lỗi khi tải kết quả backtest: Expecting value: line 6 column 27 (char 127)
+2025-03-09 14:02:10,954 - report_generator - INFO - Đã tải 0 báo cáo tổng hợp
+2025-03-09 14:02:10,954 - report_generator - ERROR - Không có dữ liệu để tạo báo cáo hiệu suất theo symbol
+2025-03-09 14:02:10,954 - report_generator - ERROR - Không có dữ liệu để tạo báo cáo hiệu suất theo kích thước tài khoản
+2025-03-09 14:02:10,954 - report_generator - ERROR - Không có dữ liệu để tạo báo cáo tổng hợp
+2025-03-09 14:02:10,961 - report_generator - INFO - Đã tạo báo cáo HTML
+2025-03-09 14:02:10,961 - report_generator - INFO - Hoàn thành tạo báo cáo

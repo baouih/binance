@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import (
     QSpinBox, QTextEdit, QSizePolicy, QSplitter, QStatusBar, QToolBar, QAction, QMenu,
     QSystemTrayIcon, QStyle, QDesktopWidget
 )
-from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
+from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings, QMutex, QMutexLocker
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
 
 # BacktestThread class for running backtest
@@ -76,7 +76,7 @@ from PyQt5.QtWidgets import (
     QSpinBox, QTextEdit, QSizePolicy, QSplitter, QStatusBar, QToolBar, QAction, QMenu,
     QSystemTrayIcon, QStyle, QDesktopWidget
 )
-from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings
+from PyQt5.QtCore import Qt, QSize, QTimer, QThread, pyqtSignal, QDateTime, QSettings, QMutex, QMutexLocker
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QColor, QPalette, QCursor, QDesktopServices
 
 # Risk management constants
@@ -273,7 +273,7 @@ class RefreshThread(QThread):
     """Thread cập nhật dữ liệu theo thời gian thực"""
     signal = pyqtSignal(dict)
     
-    def __init__(self, market_analyzer, position_manager, interval=10):
+    def __init__(self, market_analyzer, position_manager, interval=5):
         """
         Khởi tạo thread cập nhật
         
@@ -286,45 +286,214 @@ class RefreshThread(QThread):
         self.position_manager = position_manager
         self.interval = interval
         self.running = True
+        self.last_market_update_time = 0
+        self.last_position_update_time = 0
+        self._mutex = QMutex()  # Mutex để bảo vệ dữ liệu khi truy cập đồng thời
+        self._previous_balance = 0  # Lưu trữ số dư trước đó
+        self._error_count = 0  # Theo dõi số lỗi liên tiếp
+        self._max_errors = 5  # Số lỗi tối đa trước khi tạm ngưng
     
     def run(self):
         """Chạy thread"""
+        logger.info("Thread cập nhật dữ liệu đã bắt đầu")
+        
+        # Đặt priority thấp hơn để không ảnh hưởng đến UI thread
+        self.setPriority(QThread.LowPriority)
+        
+        # Tạm dừng để đảm bảo UI đã khởi tạo hoàn chỉnh
+        QThread.msleep(1000)
+        
+        # Cập nhật ngay lập tức khi khởi động
+        try:
+            self.update_data(True)
+        except Exception as e:
+            logger.error(f"Lỗi khởi tạo thread cập nhật: {str(e)}", exc_info=True)
+        
+        # Vòng lặp chính của thread
         while self.running:
             try:
-                # Lấy dữ liệu thị trường
-                market_data = {}
-                if self.market_analyzer:
-                    market_overview = self.market_analyzer.get_market_overview()
-                    if market_overview.get("status") == "success":
-                        market_data["market_overview"] = market_overview.get("data", [])
+                # Sử dụng QThread.msleep thay vì time.sleep để xử lý sự kiện tốt hơn
+                for i in range(self.interval):
+                    if not self.running:
+                        break
+                    QThread.msleep(1000)  # Ngủ từng giây và kiểm tra trạng thái
                 
-                # Lấy danh sách vị thế
-                positions = []
-                if self.position_manager:
-                    positions = self.position_manager.get_all_positions()
-                market_data["positions"] = positions
+                # Kiểm tra xem thread có còn chạy không
+                if not self.running:
+                    break
+                    
+                # Cập nhật dữ liệu định kỳ
+                self.update_data()
                 
-                # Lấy số dư tài khoản
-                account_balance = {}
-                if self.position_manager:
-                    account_info = self.position_manager.get_account_balance()
-                    if account_info.get("status") == "success":
-                        account_balance = account_info.get("balance", {})
-                market_data["account_balance"] = account_balance
+                # Reset bộ đếm lỗi nếu thành công
+                self._error_count = 0
                 
-                # Phát tín hiệu với dữ liệu mới
-                self.signal.emit(market_data)
-            
             except Exception as e:
-                logger.error(f"Lỗi trong thread cập nhật: {str(e)}", exc_info=True)
+                # Tăng bộ đếm lỗi và xử lý theo cấp độ
+                self._error_count += 1
+                logger.error(f"Lỗi trong thread cập nhật ({self._error_count}/{self._max_errors}): {str(e)}", 
+                             exc_info=True)
+                
+                # Nếu có quá nhiều lỗi liên tiếp, tạm dừng một thời gian dài hơn
+                if self._error_count >= self._max_errors:
+                    logger.warning(f"Quá nhiều lỗi, thread cập nhật sẽ tạm dừng 30 giây để ổn định")
+                    for i in range(30):
+                        if not self.running:
+                            break
+                        QThread.msleep(1000)
+                    self._error_count = 0  # Reset bộ đếm lỗi
+    
+    def update_data(self, force_update=False):
+        """
+        Cập nhật dữ liệu và phát tín hiệu
+        
+        :param force_update: Buộc cập nhật bất kể thời gian
+        """
+        # Khóa mutex để đảm bảo không có xung đột khi cập nhật dữ liệu
+        locker = QMutexLocker(self._mutex)
+        
+        current_time = time.time()
+        market_data = {}
+        
+        # Kiểm tra xem có cần cập nhật dữ liệu thị trường không
+        if force_update or (current_time - self.last_market_update_time >= 15):  # Cập nhật thị trường mỗi 15 giây
+            try:
+                if self.market_analyzer and hasattr(self.market_analyzer, 'get_market_overview'):
+                    # Lấy tổng quan thị trường
+                    market_overview = self.market_analyzer.get_market_overview()
+                    if isinstance(market_overview, dict) and market_overview.get("status") == "success":
+                        market_data["market_overview"] = market_overview.get("data", [])
+                    
+                    # Lấy phân tích kỹ thuật nếu phương thức tồn tại
+                    if hasattr(self.market_analyzer, 'get_technical_analysis'):
+                        technical_analysis = self.market_analyzer.get_technical_analysis()
+                        if technical_analysis:
+                            market_data["technical_analysis"] = technical_analysis
+                    
+                    # Lấy tín hiệu mới nếu phương thức tồn tại
+                    if hasattr(self.market_analyzer, 'get_new_signals'):
+                        new_signals = self.market_analyzer.get_new_signals()
+                        if new_signals:
+                            market_data["new_signals"] = new_signals
+                            logger.info(f"Đã phát hiện {len(new_signals)} tín hiệu mới")
+                
+                self.last_market_update_time = current_time
+                market_data["market_update_time"] = datetime.now().strftime("%H:%M:%S")
+            except Exception as e:
+                logger.error(f"Lỗi khi cập nhật dữ liệu thị trường: {str(e)}")
+                # Không rethrow ngoại lệ để vẫn tiếp tục cập nhật các phần khác
+        
+        # Luôn cập nhật vị thế và số dư tài khoản (quan trọng cho giao dịch)
+        try:
+            # Lấy danh sách vị thế
+            positions = []
+            if self.position_manager and hasattr(self.position_manager, 'get_all_positions'):
+                try:
+                    positions = self.position_manager.get_all_positions()
+                    
+                    # Kiểm tra dữ liệu trả về có hợp lệ không
+                    if positions is None:
+                        positions = []
+                        logger.warning("get_all_positions trả về None, sử dụng danh sách trống")
+                    
+                    if not isinstance(positions, list):
+                        positions = []
+                        logger.warning(f"get_all_positions không trả về list, sử dụng danh sách trống. Nhận được: {type(positions)}")
+                    
+                    # Kiểm tra xem có vị thế nào cần được xử lý ngay không
+                    for position in positions:
+                        # Kiểm tra vị thế mới mở
+                        if position.get("is_new", False):
+                            logger.info(f"Phát hiện vị thế mới: {position.get('symbol')} {position.get('side')}")
+                            market_data["new_position"] = position
+                        
+                        # Kiểm tra vị thế cần điều chỉnh SL/TP
+                        if position.get("needs_adjustment", False):
+                            logger.info(f"Vị thế cần điều chỉnh SL/TP: {position.get('symbol')} {position.get('side')}")
+                            market_data["position_needs_adjustment"] = position
+                            
+                        # Kiểm tra và thêm dữ liệu cần thiết nếu thiếu
+                        if "trend" not in position:
+                            position["trend"] = ""
+                        if "price_change" not in position:
+                            position["price_change"] = 0
+                        if "sl_warning" not in position:
+                            position["sl_warning"] = False
+                        if "tp_update" not in position:
+                            position["tp_update"] = False
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy vị thế: {str(e)}", exc_info=True)
             
-            # Ngủ theo khoảng thời gian cập nhật
-            time.sleep(self.interval)
+            market_data["positions"] = positions
+            
+            # Lấy số dư tài khoản
+            account_balance = {}
+            if self.position_manager and hasattr(self.position_manager, 'get_account_balance'):
+                try:
+                    account_info = self.position_manager.get_account_balance()
+                    if isinstance(account_info, dict) and account_info.get("status") == "success":
+                        account_balance = account_info.get("balance", {})
+                        
+                        # Kiểm tra thay đổi số dư
+                        current_balance = account_balance.get("total_balance", 0)
+                        previous_balance = self._previous_balance
+                        
+                        # Nếu có thay đổi đáng kể (> 1 USD hoặc > 0.1%)
+                        if previous_balance > 0 and (abs(current_balance - previous_balance) > 1 or abs(current_balance / previous_balance - 1) > 0.001):
+                            logger.info(f"Số dư thay đổi: {previous_balance:.2f} -> {current_balance:.2f} USD")
+                            market_data["balance_changed"] = True
+                        
+                        # Lưu số dư hiện tại để so sánh lần sau
+                        self._previous_balance = current_balance
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy số dư tài khoản: {str(e)}", exc_info=True)
+                    
+            market_data["account_balance"] = account_balance
+            
+            # Lấy danh sách lệnh đang chờ
+            pending_orders = []
+            if self.position_manager and hasattr(self.position_manager, 'get_open_orders'):
+                try:
+                    pending_orders = self.position_manager.get_open_orders()
+                    
+                    # Kiểm tra dữ liệu trả về có hợp lệ không
+                    if pending_orders is None:
+                        pending_orders = []
+                        logger.warning("get_open_orders trả về None, sử dụng danh sách trống")
+                    
+                    if not isinstance(pending_orders, list):
+                        pending_orders = []
+                        logger.warning(f"get_open_orders không trả về list, sử dụng danh sách trống. Nhận được: {type(pending_orders)}")
+                except Exception as e:
+                    logger.error(f"Lỗi khi lấy lệnh đang chờ: {str(e)}", exc_info=True)
+                
+            market_data["pending_orders"] = pending_orders
+            
+            self.last_position_update_time = current_time
+            market_data["position_update_time"] = datetime.now().strftime("%H:%M:%S")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật vị thế và số dư: {str(e)}", exc_info=True)
+        
+        # Phát tín hiệu với dữ liệu mới
+        if market_data and self.running:  # Chỉ emit nếu thread vẫn đang chạy
+            try:
+                self.signal.emit(market_data)
+            except Exception as e:
+                logger.error(f"Lỗi khi emit tín hiệu: {str(e)}", exc_info=True)
+        
+        # Giải phóng mutex
+        locker = None
     
     def stop(self):
-        """Dừng thread"""
+        """Dừng thread an toàn"""
+        logger.info("Đang dừng thread cập nhật dữ liệu...")
         self.running = False
-        self.wait()
+        
+        # Đảm bảo thread có thời gian để dừng
+        if not self.wait(5000):  # Đợi tối đa 5 giây
+            logger.warning("Không thể dừng thread một cách bình thường, sẽ buộc dừng")
+            self.terminate()  # Chỉ sử dụng trong trường hợp khẩn cấp
 
 class EnhancedTradingGUI(QMainWindow):
     """Giao diện đồ họa nâng cao cho giao dịch"""
@@ -2181,34 +2350,107 @@ class EnhancedTradingGUI(QMainWindow):
         
         :param data: Dữ liệu cập nhật
         """
+        if not isinstance(data, dict):
+            logger.error(f"Lỗi: data không phải là dictionary, nhận được: {type(data)}")
+            return
+            
         try:
-            # Cập nhật thông tin tài khoản
-            account_balance = data.get("account_balance", {})
-            self.update_account_balance(account_balance)
+            # Kiểm tra thông tin tài khoản
+            if "account_balance" in data:
+                account_balance = data.get("account_balance", {})
+                if isinstance(account_balance, dict):
+                    self.update_account_balance(account_balance)
+                else:
+                    logger.warning(f"account_balance không phải là dictionary: {type(account_balance)}")
             
-            # Cập nhật danh sách vị thế
-            positions = data.get("positions", [])
-            self.update_positions(positions)
+            # Kiểm tra và cập nhật danh sách vị thế
+            positions = []
+            if "positions" in data:
+                positions = data.get("positions", [])
+                if isinstance(positions, list):
+                    # Xử lý thông báo cho vị thế mới nếu có
+                    if "new_position" in data:
+                        new_position = data["new_position"]
+                        symbol = new_position.get("symbol", "")
+                        side = new_position.get("side", "")
+                        if symbol and side:
+                            self.show_info(
+                                "Vị thế mới", 
+                                f"Đã mở vị thế mới: {symbol} {side}"
+                            )
+                    
+                    # Xử lý thông báo cho vị thế cần điều chỉnh
+                    if "position_needs_adjustment" in data:
+                        pos = data["position_needs_adjustment"]
+                        symbol = pos.get("symbol", "")
+                        if symbol:
+                            self.show_info(
+                                "Cần điều chỉnh vị thế", 
+                                f"Vị thế {symbol} cần điều chỉnh SL/TP"
+                            )
+                    
+                    # Cập nhật bảng vị thế
+                    try:
+                        self.update_positions(positions)
+                    except Exception as pos_err:
+                        logger.error(f"Lỗi khi cập nhật vị thế: {str(pos_err)}", exc_info=True)
+                else:
+                    logger.warning(f"positions không phải là list: {type(positions)}")
             
-            # Cập nhật thông tin thị trường
-            market_overview = data.get("market_overview", [])
-            self.update_market_overview(market_overview)
+            # Kiểm tra và cập nhật thông tin thị trường
+            if "market_overview" in data:
+                market_overview = data.get("market_overview", [])
+                if isinstance(market_overview, list):
+                    try:
+                        self.update_market_overview(market_overview)
+                    except Exception as market_err:
+                        logger.error(f"Lỗi khi cập nhật thông tin thị trường: {str(market_err)}", exc_info=True)
+                else:
+                    logger.warning(f"market_overview không phải là list: {type(market_overview)}")
             
-            # Cập nhật thông tin giao dịch
-            self.update_trading_info()
+            # Cập nhật danh sách combobox vị thế một cách an toàn
+            try:
+                if isinstance(positions, list):
+                    self.update_position_combos(positions)
+            except Exception as combo_err:
+                logger.warning(f"Lỗi khi cập nhật danh sách combobox: {str(combo_err)}")
             
-            # Cập nhật trạng thái kết nối
-            self.connection_label.setText("Trạng thái kết nối: Đã kết nối")
+            # Cập nhật thông tin giao dịch nếu cần
+            # Chỉ cập nhật khi có sự thay đổi để tránh việc cập nhật liên tục
+            if hasattr(self, 'symbol_combo') and self.symbol_combo and self.symbol_combo.currentText():
+                try:
+                    self.update_trading_info()
+                except Exception as trading_err:
+                    logger.warning(f"Lỗi khi cập nhật thông tin giao dịch: {str(trading_err)}")
+            
+            # Kiểm tra thay đổi số dư
+            if data.get("balance_changed", False) and hasattr(self, 'total_balance_label'):
+                # Cập nhật UI với hiệu ứng để thu hút sự chú ý
+                current_style = self.total_balance_label.styleSheet()
+                self.total_balance_label.setStyleSheet("color: #F59E0B; font-weight: bold;")
+                
+                # Tạo timer để reset style sau 3 giây
+                QTimer.singleShot(3000, lambda: self.total_balance_label.setStyleSheet(current_style))
+            
+            # Cập nhật trạng thái kết nối an toàn
+            if hasattr(self, 'connection_label'):
+                self.connection_label.setText("Trạng thái kết nối: Đã kết nối")
+                self.connection_label.setStyleSheet("color: #22C55E; font-weight: bold;")
             
             # Cập nhật thời gian cập nhật lần cuối
-            current_time = datetime.now().strftime("%H:%M:%S")
-            self.last_update_label.setText(f"Cập nhật lần cuối: {current_time}")
+            if hasattr(self, 'last_update_label'):
+                current_time = datetime.now().strftime("%H:%M:%S")
+                self.last_update_label.setText(f"Cập nhật lần cuối: {current_time}")
             
-            # Cập nhật danh sách vị thế trong combobox
-            self.update_position_combos(positions)
+            # Cập nhật thời gian cập nhật gần nhất trên thanh trạng thái
+            if hasattr(self, 'statusBar'):
+                current_time = datetime.now().strftime("%H:%M:%S")
+                position_count = len(positions)
+                self.statusBar().showMessage(f"Cập nhật lúc: {current_time} | Số vị thế: {position_count}", 3000)
         
         except Exception as e:
             logger.error(f"Lỗi khi cập nhật dữ liệu: {str(e)}", exc_info=True)
+            # Không ném ngoại lệ ra UI
     
     def update_account_balance(self, account_balance: Dict[str, Any]):
         """
@@ -2240,43 +2482,172 @@ class EnhancedTradingGUI(QMainWindow):
         
         :param positions: Danh sách vị thế
         """
-        # Cập nhật bảng vị thế trong tab tổng quan
-        self.positions_table.setRowCount(len(positions))
-        
-        for row, position in enumerate(positions):
-            symbol = position.get("symbol", "")
-            side = position.get("side", "")
-            size = position.get("size", 0)
-            entry_price = position.get("entry_price", 0)
-            mark_price = position.get("mark_price", 0)
-            stop_loss = position.get("stop_loss", "N/A")
-            take_profit = position.get("take_profit", "N/A")
-            unrealized_pnl = position.get("unrealized_pnl", 0)
-            profit_percent = position.get("profit_percent", 0)
+        try:
+            # Lấy danh sách symbol của vị thế đang hiển thị
+            current_positions = []
+            for row in range(self.positions_table.rowCount()):
+                if self.positions_table.item(row, 0):  # Kiểm tra cột symbol
+                    symbol_text = self.positions_table.item(row, 0).text()
+                    if symbol_text and symbol_text != "Không có vị thế nào đang mở":
+                        current_positions.append(symbol_text)
             
-            # Tạo các item cho bảng
-            self.positions_table.setItem(row, 0, QTableWidgetItem(symbol))
+            # Phát hiện các vị thế mới và cũ
+            existing_symbols = [p.get('symbol', '') for p in positions]
+            new_positions = [p for p in positions if p.get('symbol', '') not in current_positions]
+            closed_positions = [sym for sym in current_positions if sym not in existing_symbols]
             
-            side_item = QTableWidgetItem(side)
-            if side == "LONG":
-                side_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Long
+            # Hiển thị thông báo về vị thế mới
+            if new_positions:
+                new_symbols = [p.get('symbol', '') for p in new_positions]
+                logger.info(f"Phát hiện vị thế mới: {', '.join(new_symbols)}")
+                self.statusBar().showMessage(f"Đã mở vị thế mới: {', '.join(new_symbols)}", 5000)
+            
+            # Hiển thị thông báo về vị thế đã đóng
+            if closed_positions:
+                logger.info(f"Vị thế đã đóng: {', '.join(closed_positions)}")
+                self.statusBar().showMessage(f"Đã đóng vị thế: {', '.join(closed_positions)}", 5000)
+            
+            # Cập nhật bảng vị thế trong tab tổng quan
+            if positions:
+                self.positions_table.setRowCount(len(positions))
+                
+                # Biến để theo dõi tổng lợi nhuận
+                total_unrealized_pnl = 0
+                total_profit_percent = 0
+                
+                for row, position in enumerate(positions):
+                    symbol = position.get("symbol", "")
+                    side = position.get("side", "")
+                    size = position.get("size", 0)
+                    entry_price = position.get("entry_price", 0)
+                    mark_price = position.get("mark_price", 0)
+                    stop_loss = position.get("stop_loss", "N/A")
+                    take_profit = position.get("take_profit", "N/A")
+                    unrealized_pnl = position.get("unrealized_pnl", 0)
+                    profit_percent = position.get("profit_percent", 0)
+                    leverage = position.get("leverage", 1)
+                    
+                    # Cộng dồn lợi nhuận
+                    total_unrealized_pnl += unrealized_pnl
+                    if profit_percent != 0:
+                        total_profit_percent += profit_percent
+                    
+                    # Kiểm tra nếu vị thế mới hoặc cập nhật giá
+                    is_new = symbol in [p.get('symbol', '') for p in new_positions]
+                    
+                    # Tạo các item cho bảng
+                    symbol_item = QTableWidgetItem(symbol)
+                    if is_new:
+                        font = symbol_item.font()
+                        font.setBold(True)
+                        symbol_item.setFont(font)
+                        symbol_item.setBackground(QColor(53, 66, 83))  # Highlight màu sáng
+                    
+                    # Thêm thông tin xu hướng (nếu có)
+                    trend = position.get("trend", "")
+                    if trend == "UP":
+                        symbol_item.setIcon(QIcon("static/icons/trend_up.png"))
+                        symbol_item.setToolTip("Xu hướng tăng")
+                    elif trend == "DOWN":
+                        symbol_item.setIcon(QIcon("static/icons/trend_down.png"))
+                        symbol_item.setToolTip("Xu hướng giảm")
+                    
+                    self.positions_table.setItem(row, 0, symbol_item)
+                    
+                    side_item = QTableWidgetItem(side)
+                    if side == "LONG":
+                        side_item.setForeground(QColor("#22C55E"))  # Màu xanh cho Long
+                    else:
+                        side_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Short
+                    self.positions_table.setItem(row, 1, side_item)
+                    
+                    self.positions_table.setItem(row, 2, QTableWidgetItem(f"{size:.4f}"))
+                    self.positions_table.setItem(row, 3, QTableWidgetItem(f"{entry_price:.2f}"))
+                    
+                    # Hiển thị giá hiện tại với thay đổi gần đây
+                    mark_price_item = QTableWidgetItem(f"{mark_price:.2f}")
+                    price_change = position.get("price_change", 0)
+                    if price_change > 0:
+                        mark_price_item.setForeground(QColor("#22C55E"))
+                        mark_price_item.setToolTip(f"Tăng {price_change:.2f}% trong 5 phút qua")
+                    elif price_change < 0:
+                        mark_price_item.setForeground(QColor("#EF4444"))
+                        mark_price_item.setToolTip(f"Giảm {abs(price_change):.2f}% trong 5 phút qua")
+                    self.positions_table.setItem(row, 4, mark_price_item)
+                    
+                    # Hiển thị SL/TP và thêm cảnh báo nếu cần
+                    sl_item = QTableWidgetItem(f"{stop_loss}" if stop_loss != "N/A" else "N/A")
+                    if position.get("sl_warning", False):
+                        sl_item.setIcon(QIcon("static/icons/warning.png"))
+                        sl_item.setToolTip("Cần cập nhật Stop Loss")
+                        sl_item.setBackground(QColor(64, 25, 25))  # Nền đỏ nhạt
+                    self.positions_table.setItem(row, 5, sl_item)
+                    
+                    tp_item = QTableWidgetItem(f"{take_profit}" if take_profit != "N/A" else "N/A")
+                    if position.get("tp_update", False):
+                        tp_item.setIcon(QIcon("static/icons/arrow_up.png"))
+                        tp_item.setToolTip("Có thể tăng Take Profit")
+                    self.positions_table.setItem(row, 6, tp_item)
+                    
+                    # Hiển thị đòn bẩy và thêm cảnh báo nếu cao
+                    leverage_item = QTableWidgetItem(f"{leverage}x")
+                    if leverage > 20:
+                        leverage_item.setForeground(QColor("#EF4444"))
+                        leverage_item.setToolTip("Đòn bẩy cao, rủi ro lớn")
+                    self.positions_table.setItem(row, 7, leverage_item)
+                    
+                    # Hiển thị lợi nhuận với màu sắc và phần trăm
+                    pnl_item = QTableWidgetItem(f"{unrealized_pnl:.2f}")
+                    if unrealized_pnl > 0:
+                        pnl_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
+                    elif unrealized_pnl < 0:
+                        pnl_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
+                    else:
+                        pnl_item.setForeground(QColor("#94A3B8"))  # Màu xám nếu 0
+                    self.positions_table.setItem(row, 8, pnl_item)
+                    
+                    percent_item = QTableWidgetItem(f"{profit_percent:.2f}%")
+                    if profit_percent > 0:
+                        percent_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
+                    elif profit_percent < 0:
+                        percent_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
+                    else:
+                        percent_item.setForeground(QColor("#94A3B8"))  # Màu xám nếu 0
+                    self.positions_table.setItem(row, 9, percent_item)
+                
+                # Cập nhật thông tin tổng lợi nhuận
+                if hasattr(self, 'total_pnl_label'):
+                    # Định dạng màu sắc dựa vào lợi nhuận
+                    if total_unrealized_pnl > 0:
+                        self.total_pnl_label.setStyleSheet("color: #22C55E; font-weight: bold;")
+                    elif total_unrealized_pnl < 0:
+                        self.total_pnl_label.setStyleSheet("color: #EF4444; font-weight: bold;")
+                    else:
+                        self.total_pnl_label.setStyleSheet("color: white; font-weight: bold;")
+                    
+                    # Hiển thị cả số tiền và phần trăm
+                    avg_percent = total_profit_percent / len(positions) if positions else 0
+                    self.total_pnl_label.setText(f"Lợi nhuận: {total_unrealized_pnl:.2f} USDT ({avg_percent:.2f}%)")
             else:
-                side_item.setForeground(QColor("#EF4444"))  # Màu đỏ cho Short
-            self.positions_table.setItem(row, 1, side_item)
+                # Không có vị thế nào
+                self.positions_table.setRowCount(1)
+                self.positions_table.setSpan(0, 0, 1, 10)  # Gộp tất cả các cột
+                no_pos_item = QTableWidgetItem("Không có vị thế nào đang mở")
+                no_pos_item.setTextAlignment(Qt.AlignCenter)
+                self.positions_table.setItem(0, 0, no_pos_item)
+                
+                # Xóa tổng lợi nhuận nếu không có vị thế
+                if hasattr(self, 'total_pnl_label'):
+                    self.total_pnl_label.setText("Lợi nhuận: 0.00 USDT (0.00%)")
+                    self.total_pnl_label.setStyleSheet("color: white; font-weight: bold;")
             
-            self.positions_table.setItem(row, 2, QTableWidgetItem(f"{size:.4f}"))
-            self.positions_table.setItem(row, 3, QTableWidgetItem(f"{entry_price:.2f}"))
-            self.positions_table.setItem(row, 4, QTableWidgetItem(f"{mark_price:.2f}"))
-            
-            self.positions_table.setItem(row, 5, QTableWidgetItem(f"{stop_loss}" if stop_loss != "N/A" else "N/A"))
-            self.positions_table.setItem(row, 6, QTableWidgetItem(f"{take_profit}" if take_profit != "N/A" else "N/A"))
-            
-            pnl_item = QTableWidgetItem(f"{unrealized_pnl:.2f} ({profit_percent:.2f}%)")
-            if unrealized_pnl > 0:
-                pnl_item.setForeground(QColor("#22C55E"))  # Màu xanh khi lời
-            elif unrealized_pnl < 0:
-                pnl_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi lỗ
-            self.positions_table.setItem(row, 7, pnl_item)
+            # Cập nhật thời gian cập nhật gần nhất
+            if hasattr(self, 'last_update_label'):
+                current_time = datetime.now().strftime("%H:%M:%S")
+                self.last_update_label.setText(f"Cập nhật lúc: {current_time}")
+        
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật vị thế: {str(e)}", exc_info=True)
         
         # Cập nhật bảng vị thế trong tab quản lý vị thế
         self.positions_detail_table.setRowCount(len(positions))
@@ -2330,46 +2701,218 @@ class EnhancedTradingGUI(QMainWindow):
         
         :param market_overview: Thông tin tổng quan thị trường
         """
-        self.market_table.setRowCount(len(market_overview))
+        try:
+            if not market_overview:
+                logger.warning("Không có dữ liệu thị trường để cập nhật")
+                return
+                
+            self.market_table.setRowCount(len(market_overview))
+            
+            # Biến theo dõi xu hướng thị trường tổng thể
+            market_direction = {"up": 0, "down": 0, "neutral": 0}
+            
+            # Cập nhật giá BTC và ETH trên dashboard với biến động
+            btc_data = None
+            eth_data = None
+            for market_data in market_overview:
+                symbol = market_data.get("symbol", "")
+                price = market_data.get("price", 0)
+                change_24h = market_data.get("change_24h", 0)
+                
+                if symbol == "BTCUSDT":
+                    btc_data = market_data
+                    # Cập nhật giá BTC với màu sắc dựa theo xu hướng
+                    if change_24h > 0:
+                        self.btc_price_label.setStyleSheet("color: #22C55E; font-weight: bold;")
+                    elif change_24h < 0:
+                        self.btc_price_label.setStyleSheet("color: #EF4444; font-weight: bold;")
+                    else:
+                        self.btc_price_label.setStyleSheet("color: white; font-weight: bold;")
+                    self.btc_price_label.setText(f"{price:.2f} USDT ({change_24h:+.2f}%)")
+                    
+                elif symbol == "ETHUSDT":
+                    eth_data = market_data
+                    # Cập nhật giá ETH với màu sắc dựa theo xu hướng
+                    if change_24h > 0:
+                        self.eth_price_label.setStyleSheet("color: #22C55E; font-weight: bold;")
+                    elif change_24h < 0:
+                        self.eth_price_label.setStyleSheet("color: #EF4444; font-weight: bold;")
+                    else:
+                        self.eth_price_label.setStyleSheet("color: white; font-weight: bold;")
+                    self.eth_price_label.setText(f"{price:.2f} USDT ({change_24h:+.2f}%)")
+                
+                # Đếm số coin tăng/giảm để xác định xu hướng thị trường
+                if change_24h > 0.5:  # Tăng đáng kể
+                    market_direction["up"] += 1
+                elif change_24h < -0.5:  # Giảm đáng kể
+                    market_direction["down"] += 1
+                else:  # Đi ngang
+                    market_direction["neutral"] += 1
+            
+            # Cập nhật trạng thái thị trường tổng thể
+            if hasattr(self, 'market_status_label'):
+                if market_direction["up"] > market_direction["down"] * 1.5:
+                    self.market_status_label.setText("Trạng thái thị trường: TĂNG MẠNH")
+                    self.market_status_label.setStyleSheet("color: #22C55E; font-weight: bold;")
+                elif market_direction["up"] > market_direction["down"]:
+                    self.market_status_label.setText("Trạng thái thị trường: TĂNG NHẸ")
+                    self.market_status_label.setStyleSheet("color: #22C55E;")
+                elif market_direction["down"] > market_direction["up"] * 1.5:
+                    self.market_status_label.setText("Trạng thái thị trường: GIẢM MẠNH")
+                    self.market_status_label.setStyleSheet("color: #EF4444; font-weight: bold;")
+                elif market_direction["down"] > market_direction["up"]:
+                    self.market_status_label.setText("Trạng thái thị trường: GIẢM NHẸ")
+                    self.market_status_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.market_status_label.setText("Trạng thái thị trường: ĐI NGANG")
+                    self.market_status_label.setStyleSheet("color: #94A3B8;")
+            
+            # Cập nhật bảng thị trường
+            for row, market_data in enumerate(market_overview):
+                symbol = market_data.get("symbol", "")
+                price = market_data.get("price", 0)
+                change_24h = market_data.get("change_24h", 0)
+                change_1h = market_data.get("change_1h", 0)
+                volume = market_data.get("volume", 0)
+                
+                # Kiểm tra vị thế đang mở cho symbol này
+                has_position = False
+                if hasattr(self, 'positions_table'):
+                    for pos_row in range(self.positions_table.rowCount()):
+                        if self.positions_table.item(pos_row, 0) and self.positions_table.item(pos_row, 0).text() == symbol:
+                            has_position = True
+                            break
+                
+                # Tạo các item cho bảng với định dạng tốt hơn
+                symbol_item = QTableWidgetItem(symbol)
+                
+                # Highlight các cặp tiền đang có vị thế mở
+                if has_position:
+                    font = symbol_item.font()
+                    font.setBold(True)
+                    symbol_item.setFont(font)
+                    symbol_item.setBackground(QColor(53, 66, 83))
+                    symbol_item.setToolTip("Đang có vị thế mở")
+                
+                # Thêm icon cho các symbol phổ biến
+                if symbol in ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]:
+                    symbol_item.setIcon(QIcon(f"static/icons/{symbol.lower().replace('usdt', '')}.png"))
+                
+                self.market_table.setItem(row, 0, symbol_item)
+                
+                # Hiển thị giá với độ chính xác phù hợp
+                if price >= 1000:
+                    price_str = f"{price:.1f}"
+                elif price >= 100:
+                    price_str = f"{price:.2f}"
+                elif price >= 1:
+                    price_str = f"{price:.3f}"
+                elif price >= 0.1:
+                    price_str = f"{price:.4f}"
+                else:
+                    price_str = f"{price:.6f}"
+                
+                self.market_table.setItem(row, 1, QTableWidgetItem(price_str))
+                
+                # Hiển thị biến động 1 giờ
+                change_1h_item = QTableWidgetItem(f"{change_1h:+.2f}%")
+                if change_1h > 1.5:  # Tăng mạnh
+                    change_1h_item.setForeground(QColor("#22C55E"))
+                    change_1h_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif change_1h > 0:  # Tăng nhẹ
+                    change_1h_item.setForeground(QColor("#22C55E"))
+                elif change_1h < -1.5:  # Giảm mạnh
+                    change_1h_item.setForeground(QColor("#EF4444"))
+                    change_1h_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif change_1h < 0:  # Giảm nhẹ
+                    change_1h_item.setForeground(QColor("#EF4444"))
+                self.market_table.setItem(row, 2, change_1h_item)
+                
+                # Hiển thị biến động 24 giờ
+                change_24h_item = QTableWidgetItem(f"{change_24h:+.2f}%")
+                if change_24h > 5:  # Tăng mạnh
+                    change_24h_item.setForeground(QColor("#22C55E"))
+                    change_24h_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif change_24h > 0:  # Tăng nhẹ
+                    change_24h_item.setForeground(QColor("#22C55E"))
+                elif change_24h < -5:  # Giảm mạnh
+                    change_24h_item.setForeground(QColor("#EF4444"))
+                    change_24h_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif change_24h < 0:  # Giảm nhẹ
+                    change_24h_item.setForeground(QColor("#EF4444"))
+                self.market_table.setItem(row, 3, change_24h_item)
+                
+                # Format khối lượng theo đơn vị K, M, B
+                if volume >= 1_000_000_000:
+                    volume_str = f"{volume / 1_000_000_000:.2f}B"
+                elif volume >= 1_000_000:
+                    volume_str = f"{volume / 1_000_000:.2f}M"
+                elif volume >= 1_000:
+                    volume_str = f"{volume / 1_000:.2f}K"
+                else:
+                    volume_str = f"{volume:.2f}"
+                
+                # Màu sắc cho khối lượng cao
+                volume_item = QTableWidgetItem(volume_str)
+                if volume > market_data.get("avg_volume", 0) * 1.5:
+                    volume_item.setForeground(QColor("#3B82F6"))  # Khối lượng cao
+                    volume_item.setToolTip("Khối lượng cao hơn trung bình 50%")
+                self.market_table.setItem(row, 4, volume_item)
+                
+                # Thêm cột tín hiệu kỹ thuật nếu có
+                signal = market_data.get("signal", "")
+                signal_item = QTableWidgetItem(signal)
+                if signal == "STRONG_BUY":
+                    signal_item.setForeground(QColor("#15803D"))  # Xanh đậm
+                    signal_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif signal == "BUY":
+                    signal_item.setForeground(QColor("#22C55E"))  # Xanh
+                elif signal == "STRONG_SELL":
+                    signal_item.setForeground(QColor("#B91C1C"))  # Đỏ đậm
+                    signal_item.setFont(QFont("Arial", 9, QFont.Bold))
+                elif signal == "SELL":
+                    signal_item.setForeground(QColor("#EF4444"))  # Đỏ
+                elif signal == "NEUTRAL":
+                    signal_item.setForeground(QColor("#94A3B8"))  # Xám
+                
+                if hasattr(self.market_table, 'columnCount') and self.market_table.columnCount() > 5:
+                    self.market_table.setItem(row, 5, signal_item)
+            
+            # Tự động điều chỉnh kích thước cột
+            self.market_table.resizeColumnsToContents()
+            
+            # Cập nhật thời gian cập nhật
+            if hasattr(self, 'market_update_time_label'):
+                current_time = datetime.now().strftime("%H:%M:%S")
+                self.market_update_time_label.setText(f"Cập nhật lúc: {current_time}")
+            
+            # Thêm phân tích xu hướng BTC/ETH nếu có dữ liệu
+            if btc_data and hasattr(self, 'btc_trend_label'):
+                trend = btc_data.get("trend", "")
+                if trend == "UP":
+                    self.btc_trend_label.setText("Xu hướng: TĂNG ↑")
+                    self.btc_trend_label.setStyleSheet("color: #22C55E;")
+                elif trend == "DOWN":
+                    self.btc_trend_label.setText("Xu hướng: GIẢM ↓")
+                    self.btc_trend_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.btc_trend_label.setText("Xu hướng: ĐI NGANG →")
+                    self.btc_trend_label.setStyleSheet("color: #94A3B8;")
+            
+            if eth_data and hasattr(self, 'eth_trend_label'):
+                trend = eth_data.get("trend", "")
+                if trend == "UP":
+                    self.eth_trend_label.setText("Xu hướng: TĂNG ↑")
+                    self.eth_trend_label.setStyleSheet("color: #22C55E;")
+                elif trend == "DOWN":
+                    self.eth_trend_label.setText("Xu hướng: GIẢM ↓")
+                    self.eth_trend_label.setStyleSheet("color: #EF4444;")
+                else:
+                    self.eth_trend_label.setText("Xu hướng: ĐI NGANG →")
+                    self.eth_trend_label.setStyleSheet("color: #94A3B8;")
         
-        # Cập nhật giá BTC và ETH trên dashboard
-        for market_data in market_overview:
-            symbol = market_data.get("symbol", "")
-            price = market_data.get("price", 0)
-            
-            if symbol == "BTCUSDT":
-                self.btc_price_label.setText(f"{price:.2f} USDT")
-            elif symbol == "ETHUSDT":
-                self.eth_price_label.setText(f"{price:.2f} USDT")
-        
-        for row, market_data in enumerate(market_overview):
-            symbol = market_data.get("symbol", "")
-            price = market_data.get("price", 0)
-            change_24h = market_data.get("change_24h", 0)
-            volume = market_data.get("volume", 0)
-            
-            # Tạo các item cho bảng
-            self.market_table.setItem(row, 0, QTableWidgetItem(symbol))
-            self.market_table.setItem(row, 1, QTableWidgetItem(f"{price:.2f}"))
-            
-            change_item = QTableWidgetItem(f"{change_24h:.2f}%")
-            if change_24h > 0:
-                change_item.setForeground(QColor("#22C55E"))  # Màu xanh khi tăng
-            elif change_24h < 0:
-                change_item.setForeground(QColor("#EF4444"))  # Màu đỏ khi giảm
-            self.market_table.setItem(row, 2, change_item)
-            
-            # Format khối lượng theo đơn vị K, M, B
-            if volume >= 1_000_000_000:
-                volume_str = f"{volume / 1_000_000_000:.2f}B"
-            elif volume >= 1_000_000:
-                volume_str = f"{volume / 1_000_000:.2f}M"
-            elif volume >= 1_000:
-                volume_str = f"{volume / 1_000:.2f}K"
-            else:
-                volume_str = f"{volume:.2f}"
-            
-            self.market_table.setItem(row, 3, QTableWidgetItem(volume_str))
+        except Exception as e:
+            logger.error(f"Lỗi khi cập nhật tổng quan thị trường: {str(e)}", exc_info=True)
     
     def update_trading_info(self):
         """Cập nhật thông tin giao dịch"""

@@ -1,0 +1,36 @@
+2025-03-05 02:55:19,366 - fetch_real_data - INFO - Chuẩn bị tải dữ liệu cho 1 cặp tiền và 1 khung thời gian
+2025-03-05 02:55:19,366 - fetch_real_data - INFO - - Symbols: BTCUSDT
+2025-03-05 02:55:19,367 - fetch_real_data - INFO - - Intervals: 1h
+2025-03-05 02:55:19,367 - fetch_real_data - INFO - - Khoảng thời gian: 2024-02-01 đến 2024-02-28
+2025-03-05 02:55:19,367 - fetch_real_data - INFO - - Thư mục lưu: test_data
+2025-03-05 02:55:19,737 - fetch_real_data - INFO - Đã kết nối đến Binance. Server time: 2025-03-05 02:55:19.664000
+2025-03-05 02:55:19,748 - fetch_real_data - INFO - Đang lấy dữ liệu BTCUSDT 1h từ 2024-02-01 đến 2024-02-28...
+2025-03-05 02:55:20,128 - fetch_real_data - INFO - Đã lưu 649 dòng dữ liệu vào test_data/BTCUSDT_1h.csv
+2025-03-05 02:55:20,630 - fetch_real_data - INFO - Hoàn tất! Đã tải 1/1 file với tổng cộng 649 nến.
+2025-03-05 02:55:20,630 - fetch_real_data - INFO - Báo cáo chi tiết được lưu tại test_data/fetch_results.json
+2025-03-05 02:55:56,939 - fetch_real_data - INFO - Chuẩn bị tải dữ liệu cho 9 cặp tiền và 1 khung thời gian
+2025-03-05 02:55:56,940 - fetch_real_data - INFO - - Symbols: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, ADAUSDT, XRPUSDT, DOGEUSDT, DOTUSDT, LINKUSDT
+2025-03-05 02:55:56,940 - fetch_real_data - INFO - - Intervals: 1h
+2025-03-05 02:55:56,940 - fetch_real_data - INFO - - Khoảng thời gian: 2024-02-28 đến 2024-02-29
+2025-03-05 02:55:56,940 - fetch_real_data - INFO - - Thư mục lưu: test_data/multi_pairs
+2025-03-05 02:55:57,362 - fetch_real_data - INFO - Đã kết nối đến Binance. Server time: 2025-03-05 02:55:57.287000
+2025-03-05 02:55:57,372 - fetch_real_data - INFO - Đang lấy dữ liệu BTCUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:55:57,725 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/BTCUSDT_1h.csv
+2025-03-05 02:55:58,228 - fetch_real_data - INFO - Đang lấy dữ liệu ETHUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:55:58,542 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/ETHUSDT_1h.csv
+2025-03-05 02:55:59,053 - fetch_real_data - INFO - Đang lấy dữ liệu BNBUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:55:59,369 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/BNBUSDT_1h.csv
+2025-03-05 02:55:59,870 - fetch_real_data - INFO - Đang lấy dữ liệu SOLUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:00,184 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/SOLUSDT_1h.csv
+2025-03-05 02:56:00,685 - fetch_real_data - INFO - Đang lấy dữ liệu ADAUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:00,997 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/ADAUSDT_1h.csv
+2025-03-05 02:56:01,498 - fetch_real_data - INFO - Đang lấy dữ liệu XRPUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:01,812 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/XRPUSDT_1h.csv
+2025-03-05 02:56:02,313 - fetch_real_data - INFO - Đang lấy dữ liệu DOGEUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:02,628 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/DOGEUSDT_1h.csv
+2025-03-05 02:56:03,129 - fetch_real_data - INFO - Đang lấy dữ liệu DOTUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:03,443 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/DOTUSDT_1h.csv
+2025-03-05 02:56:03,944 - fetch_real_data - INFO - Đang lấy dữ liệu LINKUSDT 1h từ 2024-02-28 đến 2024-02-29...
+2025-03-05 02:56:04,264 - fetch_real_data - INFO - Đã lưu 25 dòng dữ liệu vào test_data/multi_pairs/LINKUSDT_1h.csv
+2025-03-05 02:56:04,766 - fetch_real_data - INFO - Hoàn tất! Đã tải 9/9 file với tổng cộng 225 nến.
+2025-03-05 02:56:04,766 - fetch_real_data - INFO - Báo cáo chi tiết được lưu tại test_data/multi_pairs/fetch_results.json

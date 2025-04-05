@@ -1,0 +1,80 @@
+2025-03-01 04:14:26,495 - quick_backtest - INFO - Bắt đầu backtest modules...
+2025-03-01 04:14:26,495 - quick_backtest - INFO - Không tìm thấy file dữ liệu. Tạo dữ liệu mẫu...
+2025-03-01 04:14:26,496 - quick_backtest - INFO - Tạo dữ liệu mẫu BTCUSDT cho 90 ngày
+2025-03-01 04:14:26,541 - quick_backtest - INFO - Đã lưu dữ liệu mẫu vào data/BTCUSDT_1h.csv
+2025-03-01 04:14:26,541 - quick_backtest - INFO - Bắt đầu backtest tích hợp cho BTCUSDT trên khung 1h với chiến lược simple_ma_cross
+2025-03-01 04:14:26,763 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.014862682430478289 giá 144311.30924535097
+2025-03-01 04:14:26,763 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.017482748750968974 giá 144311.30924535097
+2025-03-01 04:14:26,764 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:26,773 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.013836684846891587 giá 150489.92034962281
+2025-03-01 04:14:26,773 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.01486557823538253 giá 150489.92034962281
+2025-03-01 04:14:26,774 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:26,797 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.014158761666834642 giá 146645.46175473137
+2025-03-01 04:14:26,797 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.014812614369337795 giá 146645.46175473137
+2025-03-01 04:14:26,798 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:26,812 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.015278780666926586 giá 154596.30744119574
+2025-03-01 04:14:26,813 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.014547477814038264 giá 154596.30744119574
+2025-03-01 04:14:26,813 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:26,865 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.014841693252136988 giá 160401.64643955271
+2025-03-01 04:14:26,865 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.01702020159058696 giá 160401.64643955271
+2025-03-01 04:14:26,866 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:26,875 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.014760449259013698 giá 163883.45834284928
+2025-03-01 04:14:26,875 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.012774596994791852 giá 163883.45834284928
+2025-03-01 04:14:26,875 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:26,936 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.013920502703182173 giá 175336.48356581872
+2025-03-01 04:14:26,937 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.014215695111145843 giá 175336.48356581872
+2025-03-01 04:14:26,937 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:26,956 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.014010429196249986 giá 179454.28843377973
+2025-03-01 04:14:26,957 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011853283266859506 giá 179454.28843377973
+2025-03-01 04:14:26,957 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,008 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.013201342021969799 giá 181435.19555390198
+2025-03-01 04:14:27,008 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.01337210344152703 giá 181435.19555390198
+2025-03-01 04:14:27,008 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,053 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011724275475760836 giá 168906.84614885424
+2025-03-01 04:14:27,054 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.012828974004824027 giá 168906.84614885424
+2025-03-01 04:14:27,054 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,101 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.011864536309788506 giá 171660.86878906086
+2025-03-01 04:14:27,102 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.013695510705436776 giá 171660.86878906086
+2025-03-01 04:14:27,102 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,112 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.01035171581429983 giá 176847.79051115818
+2025-03-01 04:14:27,112 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.012632968257753393 giá 176847.79051115818
+2025-03-01 04:14:27,112 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,138 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.011812350910681805 giá 178572.9268239011
+2025-03-01 04:14:27,139 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.011661379682861813 giá 178572.9268239011
+2025-03-01 04:14:27,139 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,187 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.012888906524073578 giá 176639.8690894713
+2025-03-01 04:14:27,187 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.015086930574479563 giá 176639.8690894713
+2025-03-01 04:14:27,187 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,307 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.012192898655127946 giá 198622.21298617945
+2025-03-01 04:14:27,308 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.012732647581887163 giá 198622.21298617945
+2025-03-01 04:14:27,308 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,349 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011243554406893615 giá 197581.45770549093
+2025-03-01 04:14:27,349 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.010849104296324394 giá 197581.45770549093
+2025-03-01 04:14:27,349 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,384 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.00976414887521415 giá 197677.6269797036
+2025-03-01 04:14:27,385 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.010681393578795958 giá 197677.6269797036
+2025-03-01 04:14:27,385 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,394 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011566334178467898 giá 200967.2474289297
+2025-03-01 04:14:27,394 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.013173300660771471 giá 200967.2474289297
+2025-03-01 04:14:27,394 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,428 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.010811680352154124 giá 203857.7486397952
+2025-03-01 04:14:27,428 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.009685477840633528 giá 203857.7486397952
+2025-03-01 04:14:27,428 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,445 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.013521562924377376 giá 205283.0907089776
+2025-03-01 04:14:27,445 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011303260529820324 giá 205283.0907089776
+2025-03-01 04:14:27,446 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,457 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.010869381954768772 giá 202803.71760609507
+2025-03-01 04:14:27,457 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.01275744714743329 giá 202803.71760609507
+2025-03-01 04:14:27,458 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,464 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.010113501490291747 giá 207781.63430896273
+2025-03-01 04:14:27,464 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.011609847828739488 giá 207781.63430896273
+2025-03-01 04:14:27,464 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:27,478 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.013385281692186652 giá 203791.96870984707
+2025-03-01 04:14:27,478 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT SELL 0.011129829411826142 giá 203791.96870984707
+2025-03-01 04:14:27,479 - quick_backtest - ERROR - Lỗi khi vào lệnh Short: name 'time' is not defined
+2025-03-01 04:14:27,499 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.010794675965351998 giá 206388.33385010358
+2025-03-01 04:14:27,499 - quick_backtest - INFO - Lệnh thực thi: BTCUSDT BUY 0.012993753447981695 giá 206388.33385010358
+2025-03-01 04:14:27,499 - quick_backtest - ERROR - Lỗi khi vào lệnh Long: name 'time' is not defined
+2025-03-01 04:14:28,542 - quick_backtest - INFO - Kết quả backtest tích hợp lưu tại backtest_results/integrated_backtest_BTCUSDT_1h.json
+2025-03-01 04:14:28,543 - quick_backtest - INFO - Kết quả backtest: success
+2025-03-01 04:14:28,543 - quick_backtest - ERROR - Lỗi trong quá trình backtest: EOF when reading a line

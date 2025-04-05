@@ -1,0 +1,100 @@
+2025-03-01 19:10:48,691 - INFO - Đã kết nối thành công với Binance API (testnet)
+2025-03-01 19:10:48,692 - INFO - Bắt đầu kiểm tra toàn diện (thời lượng: 0.5 giờ)
+2025-03-01 19:10:48,692 - INFO - Đang tải dữ liệu lịch sử...
+2025-03-01 19:10:48,706 - INFO - Đã tải dữ liệu BTCUSDT 1h từ file (564 nến)
+2025-03-01 19:10:48,724 - INFO - Đã tải dữ liệu BTCUSDT 4h từ file (142 nến)
+2025-03-01 19:10:48,736 - INFO - Đang cập nhật dữ liệu thị trường...
+2025-03-01 19:10:48,994 - INFO - Đã cập nhật dữ liệu BTCUSDT 1h - Nến mới nhất: 2025-02-05 13:00:00
+2025-03-01 19:10:49,191 - INFO - Đã cập nhật dữ liệu BTCUSDT 4h - Nến mới nhất: 2025-02-05 12:00:00
+2025-03-01 19:10:49,191 - INFO - Chạy một vòng kiểm tra bot...
+2025-03-01 19:10:49,191 - WARNING - Không đủ dữ liệu để phát hiện chế độ thị trường (cần ít nhất 20 nến)
+2025-03-01 19:10:49,191 - INFO - Chế độ thị trường hiện tại: unknown
+2025-03-01 19:10:49,192 - INFO - Chiến lược được chọn: {'rsi': 0.4, 'bbands': 0.4, 'stochastic': 0.2}
+2025-03-01 19:10:49,192 - INFO - BTCUSDT: Chế độ: unknown, Hành động: HOLD
+2025-03-01 19:10:49,193 - INFO - Chiến lược được chọn: {'rsi': 0.4, 'bbands': 0.4, 'stochastic': 0.2}
+2025-03-01 19:10:49,193 - INFO - Hoàn thành vòng lặp 1. Chờ 5 phút trước khi cập nhật.
+2025-03-06 11:20:53,554 - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-06 11:20:53,554 - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-06 11:20:53,554 - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-06 11:20:53,555 - INFO - Đã kết nối thành công với Binance API (testnet)
+2025-03-06 11:20:53,555 - INFO - Đã khởi tạo DataProcessor, sử dụng cache dir: data/cache
+2025-03-06 11:20:53,555 - INFO - Bắt đầu kiểm tra toàn diện (thời lượng: 2 giờ)
+2025-03-06 11:20:53,556 - INFO - Đang tải dữ liệu lịch sử...
+2025-03-06 11:20:53,563 - INFO - Đã tải dữ liệu BTCUSDT 1h từ file (649 nến)
+2025-03-06 11:20:53,564 - ERROR - Lỗi khi tải dữ liệu BTCUSDT 1h: 'DataProcessor' object has no attribute 'add_indicators'
+2025-03-06 11:20:53,564 - INFO - Đang cập nhật dữ liệu thị trường...
+2025-03-06 11:20:53,797 - ERROR - Lỗi khi cập nhật dữ liệu BTCUSDT 1h: '1h'
+2025-03-06 11:20:53,797 - INFO - Chạy một vòng kiểm tra bot...
+2025-03-06 11:20:53,798 - ERROR - Lỗi khi chạy bot cho BTCUSDT: '1h'
+2025-03-06 11:20:53,798 - INFO - Hoàn thành vòng lặp 1. Chờ 5 phút trước khi cập nhật.
+2025-03-09 15:58:46,765 - high_risk_entry_tester - INFO - Đã tải cấu hình từ configs/high_risk_entry_config.json
+2025-03-09 15:58:46,766 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:58:46,766 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:58:46,766 - high_risk_entry_tester - INFO - Đã khởi tạo HighRiskEntryTester với 4 khung thời gian và 6 cặp tiền
+2025-03-09 15:58:46,766 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:58:46,766 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:58:46,767 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_entry_config.json
+2025-03-09 15:58:46,767 - comprehensive_test - INFO - Đã cấu hình mức độ rủi ro CAO (R:R=3.0, SL=7%, TP=21%)
+2025-03-09 15:58:46,767 - comprehensive_test - INFO - Đã khởi tạo ComprehensiveTest với 7 cặp tiền, mức độ rủi ro HIGH
+2025-03-09 15:58:46,767 - comprehensive_test - INFO - Đang tải dữ liệu thị trường từ Binance...
+2025-03-09 15:58:46,774 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/BTCUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:46,774 - comprehensive_test - INFO - Đã tải dữ liệu BTCUSDT (1h, 30 ngày)
+2025-03-09 15:58:46,779 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/ETHUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:46,779 - comprehensive_test - INFO - Đã tải dữ liệu ETHUSDT (1h, 30 ngày)
+2025-03-09 15:58:46,782 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/BNBUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:46,783 - comprehensive_test - INFO - Đã tải dữ liệu BNBUSDT (1h, 30 ngày)
+2025-03-09 15:58:46,786 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/SOLUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:46,786 - comprehensive_test - INFO - Đã tải dữ liệu SOLUSDT (1h, 30 ngày)
+2025-03-09 15:58:46,786 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/DOGEUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:58:47,086 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/DOGEUSDT_1h_30d.csv
+2025-03-09 15:58:47,086 - comprehensive_test - INFO - Đã tải dữ liệu DOGEUSDT (1h, 30 ngày)
+2025-03-09 15:58:47,086 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/XRPUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:58:47,355 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/XRPUSDT_1h_30d.csv
+2025-03-09 15:58:47,355 - comprehensive_test - INFO - Đã tải dữ liệu XRPUSDT (1h, 30 ngày)
+2025-03-09 15:58:47,355 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/ADAUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:58:47,625 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/ADAUSDT_1h_30d.csv
+2025-03-09 15:58:47,625 - comprehensive_test - INFO - Đã tải dữ liệu ADAUSDT (1h, 30 ngày)
+2025-03-09 15:58:47,625 - comprehensive_test - INFO - Đang chạy kiểm tra các điểm vào lệnh rủi ro cao...
+2025-03-09 15:58:47,625 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_entry_config.json
+2025-03-09 15:58:47,629 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/BTCUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:47,789 - high_risk_entry_tester - INFO - BTCUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:47,864 - high_risk_entry_tester - INFO - BTCUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:47,927 - high_risk_entry_tester - INFO - BTCUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:47,991 - high_risk_entry_tester - INFO - BTCUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:47,996 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/ETHUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:48,142 - high_risk_entry_tester - INFO - ETHUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:48,219 - high_risk_entry_tester - INFO - ETHUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:48,289 - high_risk_entry_tester - INFO - ETHUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:48,356 - high_risk_entry_tester - INFO - ETHUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:48,360 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/BNBUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:48,506 - high_risk_entry_tester - INFO - BNBUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:48,589 - high_risk_entry_tester - INFO - BNBUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:48,673 - high_risk_entry_tester - INFO - BNBUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:48,740 - high_risk_entry_tester - INFO - BNBUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:48,744 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/SOLUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:48,896 - high_risk_entry_tester - INFO - SOLUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:48,972 - high_risk_entry_tester - INFO - SOLUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:49,037 - high_risk_entry_tester - INFO - SOLUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:49,117 - high_risk_entry_tester - INFO - SOLUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:49,120 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/DOGEUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:49,266 - high_risk_entry_tester - INFO - DOGEUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:49,347 - high_risk_entry_tester - INFO - DOGEUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:49,416 - high_risk_entry_tester - INFO - DOGEUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:49,479 - high_risk_entry_tester - INFO - DOGEUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:49,482 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/XRPUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:49,629 - high_risk_entry_tester - INFO - XRPUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:49,743 - high_risk_entry_tester - INFO - XRPUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:49,848 - high_risk_entry_tester - INFO - XRPUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:49,923 - high_risk_entry_tester - INFO - XRPUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:49,927 - high_risk_entry_tester - INFO - Đã tải dữ liệu từ test_data/ADAUSDT_1h_30d.csv, 721 dòng
+2025-03-09 15:58:50,109 - high_risk_entry_tester - INFO - ADAUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:58:50,194 - high_risk_entry_tester - INFO - ADAUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:58:50,295 - high_risk_entry_tester - INFO - ADAUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:58:50,397 - high_risk_entry_tester - INFO - ADAUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:58:50,399 - high_risk_entry_tester - INFO - Đã lưu kết quả vào high_risk_results/high_risk_entry_test_20250309_155850.json
+2025-03-09 15:58:50,399 - comprehensive_test - INFO - Đang phân tích các cửa sổ thời gian tối ưu...
+2025-03-09 15:58:50,400 - comprehensive_test - INFO - Đang kiểm tra chiến lược kết hợp...
+2025-03-09 15:58:50,400 - comprehensive_test - INFO - Đang tạo báo cáo cuối cùng...
+2025-03-09 15:58:50,401 - comprehensive_test - INFO - Đã lưu báo cáo vào comprehensive_test_results/comprehensive_test_report_20250309_155850.json
+2025-03-09 15:58:50,401 - comprehensive_test - INFO - Đã lưu báo cáo markdown vào comprehensive_test_results/comprehensive_test_report_20250309_155850.md
+2025-03-09 15:58:50,401 - comprehensive_test - INFO - Đã hoàn thành tất cả các bài kiểm tra!

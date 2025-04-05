@@ -1,0 +1,7 @@
+2025-03-09 08:05:02,937 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:05:02,938 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:05:02,938 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:05:02,938 - telegram_notifier - INFO - Đã khởi tạo Telegram Notifier thành công
+2025-03-09 08:05:02,938 - telegram_notifier - ERROR - Lỗi khi lấy thông tin tài khoản: 'BinanceAPI' object has no attribute 'get_futures_account_info'
+2025-03-09 08:05:03,711 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:05:03,711 - telegram_notifier - INFO - Đã gửi thông báo thành công

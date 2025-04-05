@@ -1,0 +1,175 @@
+2025-03-17 00:53:40,599 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 00:53:40,768 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (1h) từ 2023-01-01 đến 2025-03-17
+2025-03-17 00:53:41,086 - data_downloader - INFO - Đã tải: 5% (1000 candlesticks)
+2025-03-17 00:53:41,903 - data_downloader - INFO - Đã tải: 10% (1999 candlesticks)
+2025-03-17 00:53:42,717 - data_downloader - INFO - Đã tải: 15% (2999 candlesticks)
+2025-03-17 00:53:43,534 - data_downloader - INFO - Đã tải: 20% (3999 candlesticks)
+2025-03-17 00:53:44,353 - data_downloader - INFO - Đã tải: 25% (4999 candlesticks)
+2025-03-17 00:53:45,167 - data_downloader - INFO - Đã tải: 31% (5999 candlesticks)
+2025-03-17 00:53:45,981 - data_downloader - INFO - Đã tải: 36% (6999 candlesticks)
+2025-03-17 01:00:22,453 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:00:22,617 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:00:22,930 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:00:23,731 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:00:24,251 - data_downloader - INFO - Đã lưu dữ liệu vào data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:00:24,252 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:00:26,182 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:00:26,348 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:00:26,659 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:00:27,169 - data_downloader - INFO - Đã lưu dữ liệu vào data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:00:27,169 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:00:29,064 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:00:29,231 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:00:29,824 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:00:30,330 - data_downloader - INFO - Đã lưu dữ liệu vào data/BTCUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:00:30,330 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:37:06,964 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:37:07,159 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:37:07,479 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:37:08,282 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:37:08,803 - data_downloader - INFO - Đã lưu dữ liệu vào data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:37:08,803 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:37:10,796 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:37:10,963 - data_downloader - INFO - Đang tải dữ liệu cho BTCUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:37:11,268 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:37:11,778 - data_downloader - INFO - Đã lưu dữ liệu vào data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:37:11,778 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:38:24,826 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:38:24,995 - data_downloader - INFO - Đang tải dữ liệu cho ETHUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:38:25,314 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:38:26,116 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:38:26,635 - data_downloader - INFO - Đã lưu dữ liệu vào data/ETHUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:38:26,635 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:39:32,994 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:39:33,161 - data_downloader - INFO - Đang tải dữ liệu cho ETHUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:39:33,464 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:39:33,973 - data_downloader - INFO - Đã lưu dữ liệu vào data/ETHUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:39:33,973 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:41:46,578 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:41:46,746 - data_downloader - INFO - Đang tải dữ liệu cho ETHUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:41:47,045 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:41:47,552 - data_downloader - INFO - Đã lưu dữ liệu vào data/ETHUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:41:47,552 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:44:25,736 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:44:25,902 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:44:26,213 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:44:27,013 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:44:27,531 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:44:27,531 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:45:34,619 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:45:34,786 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:45:35,093 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:45:35,603 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:45:35,603 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:46:43,297 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:46:43,462 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:46:43,765 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:46:44,271 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:46:44,271 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:47:52,035 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:47:52,204 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:47:52,526 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:47:53,325 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:47:53,845 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:47:53,845 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:49:01,103 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:49:01,269 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:49:01,574 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:49:02,088 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:49:02,088 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:50:14,225 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:50:14,391 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:50:14,692 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:50:15,198 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:50:15,198 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:51:07,937 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:51:08,107 - data_downloader - INFO - Đang tải dữ liệu cho DOGEUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:51:08,571 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:51:09,374 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:51:09,895 - data_downloader - INFO - Đã lưu dữ liệu vào data/DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:51:09,895 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:52:05,531 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:52:05,700 - data_downloader - INFO - Đang tải dữ liệu cho DOGEUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:52:06,006 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:52:06,517 - data_downloader - INFO - Đã lưu dữ liệu vào data/DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:52:06,517 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:53:45,436 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:53:45,601 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:53:45,908 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:53:46,419 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:53:46,419 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:54:54,393 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:54:54,668 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:54:54,971 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:54:55,477 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:54:55,478 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:56:03,498 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:56:03,663 - data_downloader - INFO - Đang tải dữ liệu cho BNBUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:56:03,975 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:56:04,786 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:56:05,303 - data_downloader - INFO - Đã lưu dữ liệu vào data/BNBUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:56:05,303 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:57:13,343 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:57:13,513 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:57:13,831 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 01:57:14,635 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 01:57:15,155 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 01:57:15,155 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:58:25,467 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:58:25,635 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:58:25,934 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 01:58:26,443 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 01:58:26,443 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 01:59:38,061 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 01:59:38,227 - data_downloader - INFO - Đang tải dữ liệu cho SOLUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 01:59:38,528 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 01:59:39,034 - data_downloader - INFO - Đã lưu dữ liệu vào data/SOLUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 01:59:39,034 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:00:52,081 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:00:52,248 - data_downloader - INFO - Đang tải dữ liệu cho DOGEUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:00:52,569 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 02:00:53,374 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 02:00:53,891 - data_downloader - INFO - Đã lưu dữ liệu vào data/DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 02:00:53,891 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:02:02,541 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:02:02,713 - data_downloader - INFO - Đang tải dữ liệu cho DOGEUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:02:03,016 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 02:02:03,524 - data_downloader - INFO - Đã lưu dữ liệu vào data/DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 02:02:03,524 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:03:25,827 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:03:25,996 - data_downloader - INFO - Đang tải dữ liệu cho DOGEUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:03:26,310 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 02:03:26,947 - data_downloader - INFO - Đã lưu dữ liệu vào data/DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 02:03:26,947 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:04:14,421 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:04:14,587 - data_downloader - INFO - Đang tải dữ liệu cho ADAUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:04:14,902 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 02:04:15,704 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 02:04:16,220 - data_downloader - INFO - Đã lưu dữ liệu vào data/ADAUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 02:04:16,220 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:06:51,402 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:06:51,572 - data_downloader - INFO - Đang tải dữ liệu cho ADAUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:06:51,875 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 02:06:52,384 - data_downloader - INFO - Đã lưu dữ liệu vào data/ADAUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 02:06:52,385 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:08:02,258 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:08:04,302 - data_downloader - INFO - Đang tải dữ liệu cho ADAUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:08:04,607 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 02:08:05,113 - data_downloader - INFO - Đã lưu dữ liệu vào data/ADAUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 02:08:05,113 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:09:13,642 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:09:13,809 - data_downloader - INFO - Đang tải dữ liệu cho XRPUSDT (1h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:09:14,122 - data_downloader - INFO - Đã tải: 96% (1000 candlesticks)
+2025-03-17 02:09:14,924 - data_downloader - INFO - Đã tải: 100% (1033 candlesticks)
+2025-03-17 02:09:15,441 - data_downloader - INFO - Đã lưu dữ liệu vào data/XRPUSDT_1h_2024-02-01_to_2024-03-15.csv (1033 dòng)
+2025-03-17 02:09:15,441 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:10:28,855 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:10:29,024 - data_downloader - INFO - Đang tải dữ liệu cho XRPUSDT (4h) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:10:29,326 - data_downloader - INFO - Đã tải: 100% (259 candlesticks)
+2025-03-17 02:10:29,834 - data_downloader - INFO - Đã lưu dữ liệu vào data/XRPUSDT_4h_2024-02-01_to_2024-03-15.csv (259 dòng)
+2025-03-17 02:10:29,834 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử
+2025-03-17 02:11:46,375 - data_downloader - INFO - Khởi tạo Binance client với API key: 3d53...4c30
+2025-03-17 02:11:46,565 - data_downloader - INFO - Đang tải dữ liệu cho XRPUSDT (1d) từ 2024-02-01 đến 2024-03-15
+2025-03-17 02:11:47,153 - data_downloader - INFO - Đã tải: 100% (44 candlesticks)
+2025-03-17 02:11:47,659 - data_downloader - INFO - Đã lưu dữ liệu vào data/XRPUSDT_1d_2024-02-01_to_2024-03-15.csv (44 dòng)
+2025-03-17 02:11:47,659 - data_downloader - INFO - Đã tải thành công dữ liệu lịch sử

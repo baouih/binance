@@ -1,0 +1,28 @@
+2025-03-27 15:00:34,111 - comprehensive_backtest - INFO - === BẮT ĐẦU BACKTEST TOÀN DIỆN ===
+2025-03-27 15:00:34,111 - comprehensive_backtest - INFO - Symbols: ['BTC-USD', 'ETH-USD', 'BNB-USD', 'SOL-USD']
+2025-03-27 15:00:34,111 - comprehensive_backtest - INFO - Timeframes: ['1h', '4h', '1d']
+2025-03-27 15:00:34,111 - comprehensive_backtest - INFO - Risk levels: ['low', 'medium', 'high']
+2025-03-27 15:00:34,112 - comprehensive_backtest - INFO - Giai đoạn test: 180 ngày
+2025-03-27 15:00:34,112 - comprehensive_backtest - INFO - Bắt đầu test BTC-USD trên khung 1h với mức rủi ro low
+2025-03-27 15:00:34,286 - comprehensive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 180 ngày)
+2025-03-27 15:00:37,030 - comprehensive_backtest - INFO - Đã tải 4321 dòng dữ liệu
+2025-03-27 15:00:37,062 - comprehensive_backtest - INFO - Đã phát hiện 119 giai đoạn thị trường: 82 xu hướng, 33 đi ngang, 4 biến động cao
+2025-03-27 15:00:37,205 - comprehensive_backtest - INFO - Đã tạo 116 tín hiệu, sau khi lọc còn 97 tín hiệu
+2025-03-27 15:00:37,206 - comprehensive_backtest - INFO - Phân bố tín hiệu: Xu hướng: 81, Đi ngang: 16, Biến động: 0
+2025-03-27 15:00:37,247 - comprehensive_backtest - INFO - Kết quả cho BTC-USD (1h, low): Trades: 97, Win rate: 28.87%, Profit: -0.16%, Drawdown: 1.05%
+2025-03-27 15:00:37,249 - comprehensive_backtest - INFO - Bắt đầu test BTC-USD trên khung 1h với mức rủi ro medium
+2025-03-27 15:00:37,440 - comprehensive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 180 ngày)
+2025-03-27 15:00:39,573 - comprehensive_backtest - INFO - Đã tải 4321 dòng dữ liệu
+2025-03-27 15:00:39,603 - comprehensive_backtest - INFO - Đã phát hiện 119 giai đoạn thị trường: 82 xu hướng, 33 đi ngang, 4 biến động cao
+2025-03-27 15:00:39,744 - comprehensive_backtest - INFO - Đã tạo 116 tín hiệu, sau khi lọc còn 97 tín hiệu
+2025-03-27 15:00:39,744 - comprehensive_backtest - INFO - Phân bố tín hiệu: Xu hướng: 81, Đi ngang: 16, Biến động: 0
+2025-03-27 15:00:39,778 - comprehensive_backtest - INFO - Kết quả cho BTC-USD (1h, medium): Trades: 97, Win rate: 25.77%, Profit: 0.14%, Drawdown: 2.68%
+2025-03-27 15:00:39,779 - comprehensive_backtest - INFO - Bắt đầu test BTC-USD trên khung 1h với mức rủi ro high
+2025-03-27 15:00:39,936 - comprehensive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 180 ngày)
+2025-03-27 15:00:41,933 - comprehensive_backtest - INFO - Đã tải 4321 dòng dữ liệu
+2025-03-27 15:00:41,963 - comprehensive_backtest - INFO - Đã phát hiện 119 giai đoạn thị trường: 82 xu hướng, 33 đi ngang, 4 biến động cao
+2025-03-27 15:00:42,103 - comprehensive_backtest - INFO - Đã tạo 116 tín hiệu, sau khi lọc còn 97 tín hiệu
+2025-03-27 15:00:42,103 - comprehensive_backtest - INFO - Phân bố tín hiệu: Xu hướng: 81, Đi ngang: 16, Biến động: 0
+2025-03-27 15:00:42,140 - comprehensive_backtest - INFO - Kết quả cho BTC-USD (1h, high): Trades: 97, Win rate: 24.74%, Profit: 4.51%, Drawdown: 5.51%
+2025-03-27 15:00:42,142 - comprehensive_backtest - INFO - Bắt đầu test BTC-USD trên khung 4h với mức rủi ro low
+2025-03-27 15:00:42,309 - comprehensive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (4h, 180 ngày)

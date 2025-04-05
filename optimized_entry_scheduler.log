@@ -1,0 +1,13 @@
+2025-03-09 15:13:29,168 - optimized_entry_scheduler - INFO - Đã tải cấu hình từ configs/optimized_entry_config.json
+2025-03-09 15:13:29,168 - optimized_entry_scheduler - INFO - Khởi tạo Optimized Entry Scheduler với timezone UTC+7
+2025-03-09 15:13:29,169 - optimized_entry_scheduler - INFO - Đã lập lịch thông báo cho thời điểm Daily Candle Close lúc 06:30
+2025-03-09 15:13:29,169 - optimized_entry_scheduler - INFO - Đã lập lịch thông báo cho thời điểm New York Open lúc 20:30
+2025-03-09 15:13:29,169 - optimized_entry_scheduler - INFO - Đã gửi thông báo về thời điểm vào lệnh: Asian-European Transition
+2025-03-09 15:13:29,169 - optimized_entry_scheduler - INFO - Đã bắt đầu chạy Optimized Entry Scheduler (timezone: UTC+7)
+2025-03-09 15:51:33,503 - optimized_entry_scheduler - WARNING - Không tìm thấy file cấu hình configs/entry_scheduler_config.json, sử dụng cấu hình mặc định
+2025-03-09 15:51:33,503 - optimized_entry_scheduler - INFO - Đã lưu cấu hình vào configs/entry_scheduler_config.json
+2025-03-09 15:51:33,504 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:51:33,504 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:51:33,504 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:51:33,504 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:51:33,504 - optimized_entry_scheduler - INFO - Đã khởi tạo OptimizedEntryScheduler với 6 lịch trình

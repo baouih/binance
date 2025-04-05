@@ -1,0 +1,5 @@
+2025-03-09 15:36:27,765 - time_optimized_strategy - WARNING - Không tìm thấy file cấu hình configs/time_optimized_strategy_config.json, sử dụng cấu hình mặc định
+2025-03-09 15:36:27,765 - time_optimized_strategy - INFO - Đã lưu cấu hình vào configs/time_optimized_strategy_config.json
+2025-03-09 15:36:27,765 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:51:39,056 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:51:39,056 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7

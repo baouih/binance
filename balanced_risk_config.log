@@ -1,0 +1,4 @@
+2025-03-09 14:36:16,121 - balanced_risk_config - INFO - Đã tạo cấu hình cân bằng tại balanced_risk_config.json
+2025-03-09 14:36:16,121 - balanced_risk_config - INFO - Mức rủi ro ban đầu: 20.0%
+2025-03-09 14:36:16,121 - balanced_risk_config - INFO - Mức rủi ro cân bằng: 14.0%
+2025-03-09 14:36:16,121 - balanced_risk_config - INFO - Số tiền rủi ro tối đa mỗi giao dịch: $1895.99

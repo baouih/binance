@@ -1,0 +1,12 @@
+2025-03-06 13:21:24,807 - risk_analyzer - INFO - Tìm thấy 26 file kết quả trong backtest_results
+2025-03-06 13:21:24,828 - risk_analyzer - ERROR - Lỗi khi tải file backtest_results/adaptive_backtest_20250301_175350.json: Expecting value: line 6 column 27 (char 127)
+2025-03-06 13:21:24,830 - risk_analyzer - ERROR - Lỗi khi tải file backtest_results/adaptive_backtest_BTCUSDT_1h_20250301_175604.json: Expecting value: line 6 column 27 (char 126)
+2025-03-06 13:21:24,850 - risk_analyzer - INFO - Đã tải 24 kết quả thỏa mãn điều kiện
+2025-03-06 13:21:24,850 - risk_analyzer - INFO - Mức rủi ro: [0.5, 1.0, 1.5, 5.0]
+2025-03-06 13:21:25,579 - risk_analyzer - INFO - Đã lưu biểu đồ hiệu suất theo mức rủi ro
+2025-03-06 13:21:25,977 - risk_analyzer - INFO - Đã lưu biểu đồ lợi nhuận theo khoảng thời gian và mức rủi ro
+2025-03-06 13:21:26,250 - risk_analyzer - INFO - Đã lưu biểu đồ win rate theo khoảng thời gian và mức rủi ro
+2025-03-06 13:21:26,500 - risk_analyzer - INFO - Đã lưu bảng tối ưu hóa lợi nhuận
+2025-03-06 13:21:26,715 - risk_analyzer - INFO - Đã lưu bảng tối ưu hóa Sharpe Ratio
+2025-03-06 13:21:26,765 - risk_analyzer - INFO - Đã lưu báo cáo mức rủi ro tối ưu vào reports/risk_analysis/optimal_risk_report.html
+2025-03-06 13:21:26,765 - risk_analyzer - INFO - Phân tích hoàn tất. Báo cáo được lưu tại: reports/risk_analysis/optimal_risk_report.html

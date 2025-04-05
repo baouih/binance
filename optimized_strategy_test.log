@@ -1,0 +1,4 @@
+2025-03-09 15:05:19,740 - optimized_strategy_backtester - INFO - Đang chạy backtest cho BTCUSDT...
+2025-03-09 15:05:19,740 - optimized_strategy_backtester - INFO - Đang tải dữ liệu từ file: data/1d/BTCUSDT_1d.csv
+2025-03-09 15:05:19,753 - optimized_strategy_backtester - INFO - Đang tải dữ liệu từ file: data/4h/BTCUSDT_4h.csv
+2025-03-09 15:05:19,815 - optimized_strategy_backtester - INFO - Đang tải dữ liệu từ file: data/1h/BTCUSDT_1h.csv

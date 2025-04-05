@@ -1,0 +1,56 @@
+2025-03-27 15:07:43,926 - full_risk_backtest - INFO - === BẮT ĐẦU BACKTEST ĐẦY ĐỦ 5 MỨC RỦI RO ===
+2025-03-27 15:07:43,926 - full_risk_backtest - INFO - Symbols: ['BTC-USD', 'ETH-USD']
+2025-03-27 15:07:43,926 - full_risk_backtest - INFO - Timeframe: 1h
+2025-03-27 15:07:43,926 - full_risk_backtest - INFO - Risk levels: ['extremely_low', 'low', 'medium', 'high', 'extremely_high']
+2025-03-27 15:07:43,927 - full_risk_backtest - INFO - Giai đoạn test: 90 ngày
+2025-03-27 15:07:43,927 - full_risk_backtest - INFO - Bắt đầu test BTC-USD với mức rủi ro extremely_low
+2025-03-27 15:07:44,096 - full_risk_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:44,826 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:44,909 - full_risk_backtest - INFO - Đã tạo 230 tín hiệu gốc, sau khi lọc còn 125 tín hiệu
+2025-03-27 15:07:44,969 - full_risk_backtest - INFO - Kết quả cho BTC-USD (extremely_low): Trades: 125, Win rate: 34.40%, Profit: 0.11%, Drawdown: 0.24%
+2025-03-27 15:07:44,970 - full_risk_backtest - INFO - Bắt đầu test BTC-USD với mức rủi ro low
+2025-03-27 15:07:45,139 - full_risk_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:45,790 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:45,859 - full_risk_backtest - INFO - Đã tạo 230 tín hiệu gốc, sau khi lọc còn 125 tín hiệu
+2025-03-27 15:07:45,901 - full_risk_backtest - INFO - Kết quả cho BTC-USD (low): Trades: 125, Win rate: 31.20%, Profit: 0.99%, Drawdown: 1.11%
+2025-03-27 15:07:45,902 - full_risk_backtest - INFO - Bắt đầu test BTC-USD với mức rủi ro medium
+2025-03-27 15:07:46,106 - full_risk_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:46,753 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:46,818 - full_risk_backtest - INFO - Đã tạo 230 tín hiệu gốc, sau khi lọc còn 125 tín hiệu
+2025-03-27 15:07:46,855 - full_risk_backtest - INFO - Kết quả cho BTC-USD (medium): Trades: 125, Win rate: 27.20%, Profit: 1.81%, Drawdown: 3.83%
+2025-03-27 15:07:46,856 - full_risk_backtest - INFO - Bắt đầu test BTC-USD với mức rủi ro high
+2025-03-27 15:07:47,018 - full_risk_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:47,677 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:47,745 - full_risk_backtest - INFO - Đã tạo 230 tín hiệu gốc, sau khi lọc còn 125 tín hiệu
+2025-03-27 15:07:47,783 - full_risk_backtest - INFO - Kết quả cho BTC-USD (high): Trades: 125, Win rate: 26.40%, Profit: 10.80%, Drawdown: 6.31%
+2025-03-27 15:07:47,784 - full_risk_backtest - INFO - Bắt đầu test BTC-USD với mức rủi ro extremely_high
+2025-03-27 15:07:47,943 - full_risk_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:48,601 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:48,674 - full_risk_backtest - INFO - Đã tạo 230 tín hiệu gốc, sau khi lọc còn 125 tín hiệu
+2025-03-27 15:07:48,706 - full_risk_backtest - INFO - Kết quả cho BTC-USD (extremely_high): Trades: 125, Win rate: 20.00%, Profit: 24.22%, Drawdown: 19.48%
+2025-03-27 15:07:48,708 - full_risk_backtest - INFO - Bắt đầu test ETH-USD với mức rủi ro extremely_low
+2025-03-27 15:07:48,870 - full_risk_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:49,523 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:49,607 - full_risk_backtest - INFO - Đã tạo 258 tín hiệu gốc, sau khi lọc còn 137 tín hiệu
+2025-03-27 15:07:49,657 - full_risk_backtest - INFO - Kết quả cho ETH-USD (extremely_low): Trades: 137, Win rate: 33.58%, Profit: -0.36%, Drawdown: 0.72%
+2025-03-27 15:07:49,659 - full_risk_backtest - INFO - Bắt đầu test ETH-USD với mức rủi ro low
+2025-03-27 15:07:49,817 - full_risk_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:50,501 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:50,569 - full_risk_backtest - INFO - Đã tạo 258 tín hiệu gốc, sau khi lọc còn 137 tín hiệu
+2025-03-27 15:07:50,604 - full_risk_backtest - INFO - Kết quả cho ETH-USD (low): Trades: 137, Win rate: 30.66%, Profit: -1.39%, Drawdown: 2.43%
+2025-03-27 15:07:50,605 - full_risk_backtest - INFO - Bắt đầu test ETH-USD với mức rủi ro medium
+2025-03-27 15:07:50,765 - full_risk_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:51,408 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:51,488 - full_risk_backtest - INFO - Đã tạo 258 tín hiệu gốc, sau khi lọc còn 137 tín hiệu
+2025-03-27 15:07:51,526 - full_risk_backtest - INFO - Kết quả cho ETH-USD (medium): Trades: 137, Win rate: 30.66%, Profit: 0.93%, Drawdown: 3.78%
+2025-03-27 15:07:51,528 - full_risk_backtest - INFO - Bắt đầu test ETH-USD với mức rủi ro high
+2025-03-27 15:07:51,717 - full_risk_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:52,365 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:52,440 - full_risk_backtest - INFO - Đã tạo 258 tín hiệu gốc, sau khi lọc còn 137 tín hiệu
+2025-03-27 15:07:52,474 - full_risk_backtest - INFO - Kết quả cho ETH-USD (high): Trades: 137, Win rate: 27.01%, Profit: -1.44%, Drawdown: 12.83%
+2025-03-27 15:07:52,475 - full_risk_backtest - INFO - Bắt đầu test ETH-USD với mức rủi ro extremely_high
+2025-03-27 15:07:52,635 - full_risk_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 90 ngày)
+2025-03-27 15:07:53,285 - full_risk_backtest - INFO - Đã tải 2161 dòng dữ liệu
+2025-03-27 15:07:53,348 - full_risk_backtest - INFO - Đã tạo 258 tín hiệu gốc, sau khi lọc còn 137 tín hiệu
+2025-03-27 15:07:53,374 - full_risk_backtest - INFO - Kết quả cho ETH-USD (extremely_high): Trades: 137, Win rate: 21.17%, Profit: -8.42%, Drawdown: 35.40%
+2025-03-27 15:07:53,376 - full_risk_backtest - INFO - Đã tạo báo cáo tại: full_risk_backtest_results/full_risk_report.md

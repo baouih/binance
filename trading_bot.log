@@ -1,0 +1,130 @@
+2025-03-01 06:00:00 - BinanceTrader - INFO - Bot khởi động
+2025-03-01 06:00:01 - BinanceTrader - INFO - Binance API kết nối thành công
+2025-03-01 06:00:02 - BinanceTrader - INFO - Đang tải mô hình...
+2025-03-01 06:00:03 - BinanceTrader - INFO - Mô hình đã tải thành công
+2025-03-01 06:00:04 - BinanceTrader - INFO - Đang tải cấu hình từ multi_coin_config.json
+2025-03-01 06:05:00 - BinanceTrader - INFO - Đang phân tích BTCUSDT trên khung 1h
+2025-03-01 06:05:01 - BinanceTrader - INFO - Phát hiện điều kiện thị trường: trending
+2025-03-01 06:05:02 - BinanceTrader - INFO - Chỉ số RSI(14): 68.5
+2025-03-01 06:05:03 - BinanceTrader - INFO - Chỉ số MACD: 120.5 (Signal: 100.2)
+2025-03-01 06:05:04 - BinanceTrader - INFO - Chỉ số Bollinger Bands: Upper: 82500, Middle: 80000, Lower: 77500
+2025-03-01 06:05:05 - BinanceTrader - INFO - Cấu hình vùng hỗ trợ/kháng cự: [72000, 75000, 78000, 81000, 85000]
+2025-03-01 06:10:00 - BinanceTrader - INFO - Đang phân tích BTCUSDT trên khung 4h
+2025-03-01 06:10:01 - BinanceTrader - INFO - Xác nhận xu hướng tăng trên khung 4h
+2025-03-01 06:15:00 - BinanceTrader - INFO - Tín hiệu tổng hợp cho BTCUSDT: BUY (Score: 0.75)
+2025-03-01 06:15:01 - BinanceTrader - INFO - Đang tạo lệnh BUY cho BTCUSDT
+2025-03-01 06:15:02 - BinanceTrader - INFO - Số lượng: 0.05 BTC
+2025-03-01 06:15:03 - BinanceTrader - INFO - Giá vào lệnh: 75000.0 USD
+2025-03-01 06:15:04 - BinanceTrader - INFO - Stop Loss: 72000.0 USD
+2025-03-01 06:15:05 - BinanceTrader - INFO - Take Profit: 82500.0 USD
+2025-03-01 06:15:06 - BinanceTrader - INFO - [✓] Lệnh đã được tạo thành công: ID_12345
+2025-03-01 06:15:07 - BinanceTrader - INFO - Thông báo Telegram đã được gửi
+2025-03-01 07:00:00 - BinanceTrader - INFO - Đang phân tích ETHUSDT trên khung 1h
+2025-03-01 07:00:01 - BinanceTrader - INFO - Phát hiện điều kiện thị trường: ranging
+2025-03-01 07:00:02 - BinanceTrader - INFO - Chỉ số RSI(14): 32.5
+2025-03-01 07:00:03 - BinanceTrader - INFO - Chỉ số MACD: -15.2 (Signal: -10.5)
+2025-03-01 07:30:00 - BinanceTrader - INFO - Tín hiệu tổng hợp cho ETHUSDT: SELL (Score: -0.62)
+2025-03-01 07:30:01 - BinanceTrader - INFO - Đang tạo lệnh SELL cho ETHUSDT
+2025-03-01 07:30:02 - BinanceTrader - INFO - Số lượng: 0.5 ETH
+2025-03-01 07:30:03 - BinanceTrader - INFO - Giá vào lệnh: 2450.0 USD
+2025-03-01 07:30:04 - BinanceTrader - INFO - Stop Loss: 2550.0 USD
+2025-03-01 07:30:05 - BinanceTrader - INFO - Take Profit: 2300.0 USD
+2025-03-01 07:30:06 - BinanceTrader - INFO - [✓] Lệnh đã được tạo thành công: ID_12346
+2025-03-01 07:30:07 - BinanceTrader - INFO - Thông báo Telegram đã được gửi
+2025-03-01 08:00:00 - BinanceTrader - INFO - Đang cập nhật trạng thái vị thế
+2025-03-01 08:00:01 - BinanceTrader - INFO - BTCUSDT: Giá hiện tại: 76500.0 USD, P&L: +75.0 USD (2.0%)
+2025-03-01 08:00:02 - BinanceTrader - INFO - ETHUSDT: Giá hiện tại: 2435.0 USD, P&L: +7.5 USD (0.61%)
+2025-03-01 09:00:00 - BinanceTrader - INFO - Đang cập nhật trạng thái vị thế
+2025-03-01 09:00:01 - BinanceTrader - INFO - BTCUSDT: Giá hiện tại: 78000.0 USD, P&L: +150.0 USD (4.0%)
+2025-03-01 09:00:02 - BinanceTrader - INFO - ETHUSDT: Giá hiện tại: 2420.0 USD, P&L: +15.0 USD (1.22%)
+2025-03-01 10:00:00 - BinanceTrader - INFO - Đang cập nhật trạng thái vị thế
+2025-03-01 10:00:01 - BinanceTrader - INFO - BTCUSDT: Giá hiện tại: 80000.0 USD, P&L: +250.0 USD (6.67%)
+2025-03-01 10:00:02 - BinanceTrader - INFO - ETHUSDT: Giá hiện tại: 2400.0 USD, P&L: +25.0 USD (2.04%)
+2025-03-01 10:10:00 - BinanceTrader - INFO - Đang cập nhật dữ liệu thị trường...
+2025-03-01 10:10:01 - BinanceTrader - INFO - Dữ liệu thị trường đã được cập nhật
+2025-03-01 10:15:00 - BinanceTrader - INFO - Trạng thái hệ thống: Ổn định, CPU: 15%, RAM: 250MB
+2025-03-01 18:03:30,709 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-01 18:03:30,711 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-01 18:03:31,231 - binance_api - ERROR - Lỗi kết nối Binance API: 451 Client Error:  for url: https://fapi.binance.com/fapi/v1/ping
+2025-03-01 18:03:31,231 - binance_api - WARNING - Đã chuyển sang chế độ giả lập tạm thời do vấn đề kết nối.
+2025-03-01 18:03:31,231 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-01 18:03:31,237 - data_processor - INFO - DataProcessor initialized in simulation mode with ML features
+2025-03-01 18:03:31,237 - trading_bot_runner - INFO - Tạo chiến lược theo yêu cầu: regime_ml
+2025-03-01 18:03:31,237 - trading_bot_runner - INFO - Tìm thấy mô hình ML: models/btc_scaler.joblib
+2025-03-01 18:03:31,238 - binance_api - INFO - SIMULATION: Generated 1000 samples of synthetic data for BTCUSDT
+2025-03-01 18:03:31,337 - binance_api - INFO - Date range: 2025-02-19 08:18:31.238910 to 2025-03-01 18:03:31.238910
+2025-03-01 18:03:31,338 - binance_api - INFO - Price range: 85168.01 to 170411.41
+2025-03-01 18:03:31,368 - data_processor - INFO - Detected market regime: ranging
+2025-03-01 18:03:31,405 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-01 18:03:31,405 - data_processor - INFO - Price: 170411.41 (0.00% change)
+2025-03-01 18:03:31,405 - data_processor - INFO - Trend: Uptrend
+2025-03-01 18:03:31,405 - data_processor - INFO - RSI: 0.00 (Oversold)
+2025-03-01 18:03:31,405 - data_processor - INFO - MACD: 0.00 (Signal: 0.00)
+2025-03-01 18:03:31,405 - data_processor - INFO - Volume: 1.34x average
+2025-03-01 18:03:31,405 - data_processor - INFO - Market Regime: ranging - Thị trường đi ngang - giá dao động trong một khoảng hẹp xác định.
+2025-03-01 18:03:31,405 - data_processor - INFO - ===========================
+2025-03-01 18:03:31,405 - data_processor - INFO - Processed 1000 samples with indicators
+2025-03-01 18:03:31,407 - trading_bot_runner - INFO - Chế độ thị trường khởi tạo: ranging
+2025-03-01 18:03:31,407 - strategy_factory - INFO - Đã tạo chiến lược regime_ml thành công
+2025-03-01 18:03:31,407 - trading_bot_runner - INFO - Đã tạo chiến lược AutoStrategy thành công
+2025-03-01 18:03:31,407 - trading_bot - INFO - Loaded 0 open positions from storage
+2025-03-01 18:03:31,410 - trading_bot - INFO - Loaded 9 historical trades from storage
+2025-03-01 18:03:31,410 - trading_bot - INFO - Trading bot initialized for BTCUSDT on 15m interval
+2025-03-01 18:03:31,410 - trading_bot_runner - INFO - Đã khởi tạo bot giao dịch: Symbol=BTCUSDT, Interval=15m, Test Mode=True, Leverage=1x, Risk=1.0%, Strategy=AutoStrategy, Use ML=True
+2025-03-01 18:03:31,410 - trading_bot_runner - INFO - Bắt đầu chạy bot giao dịch với khoảng thời gian kiểm tra 30s
+2025-03-01 18:03:31,410 - binance_api - INFO - SIMULATION: Generated 1000 samples of synthetic data for BTCUSDT
+2025-03-01 18:03:31,502 - binance_api - INFO - Date range: 2025-02-19 08:18:31.410901 to 2025-03-01 18:03:31.410901
+2025-03-01 18:03:31,502 - binance_api - INFO - Price range: 85168.01 to 170411.41
+2025-03-01 18:03:31,526 - data_processor - INFO - Detected market regime: ranging
+2025-03-01 18:03:31,560 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-01 18:03:31,560 - data_processor - INFO - Price: 170411.41 (0.00% change)
+2025-03-01 18:03:31,560 - data_processor - INFO - Trend: Uptrend
+2025-03-01 18:03:31,560 - data_processor - INFO - RSI: 0.00 (Oversold)
+2025-03-01 18:03:31,560 - data_processor - INFO - MACD: 0.00 (Signal: 0.00)
+2025-03-01 18:03:31,561 - data_processor - INFO - Volume: 1.34x average
+2025-03-01 18:03:31,561 - data_processor - INFO - Market Regime: ranging - Thị trường đi ngang - giá dao động trong một khoảng hẹp xác định.
+2025-03-01 18:03:31,561 - data_processor - INFO - ===========================
+2025-03-01 18:03:31,561 - data_processor - INFO - Processed 1000 samples with indicators
+2025-03-01 18:03:31,561 - trading_bot - INFO - Loaded 0 open positions from storage
+2025-03-01 18:03:31,561 - trading_bot - INFO - Loaded 9 historical trades from storage
+2025-03-01 18:03:31,562 - binance_api - INFO - SIMULATION: Generated 1000 samples of synthetic data for BTCUSDT
+2025-03-01 18:03:31,564 - trading_bot - INFO - Trading bot started for BTCUSDT with Auto Strategy strategy, check interval: 30s
+2025-03-01 18:03:31,564 - trading_bot_runner - INFO - Bot giao dịch đã bắt đầu chạy thành công
+2025-03-01 18:03:31,658 - binance_api - INFO - Date range: 2025-02-19 08:18:31.562268 to 2025-03-01 18:03:31.562268
+2025-03-01 18:03:31,659 - binance_api - INFO - Price range: 85168.01 to 170411.41
+2025-03-01 18:03:31,684 - data_processor - INFO - Detected market regime: ranging
+2025-03-01 18:03:31,725 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-03-01 18:03:31,726 - data_processor - INFO - Price: 170411.41 (0.00% change)
+2025-03-01 18:03:31,726 - data_processor - INFO - Trend: Uptrend
+2025-03-01 18:03:31,726 - data_processor - INFO - RSI: 0.00 (Oversold)
+2025-03-01 18:03:31,726 - data_processor - INFO - MACD: 0.00 (Signal: 0.00)
+2025-03-01 18:03:31,727 - data_processor - INFO - Volume: 1.34x average
+2025-03-01 18:03:31,727 - data_processor - INFO - Market Regime: ranging - Thị trường đi ngang - giá dao động trong một khoảng hẹp xác định.
+2025-03-01 18:03:31,727 - data_processor - INFO - ===========================
+2025-03-01 18:03:31,727 - data_processor - INFO - Processed 1000 samples with indicators
+2025-03-01 18:03:31,728 - strategy - INFO - Auto Strategy - Current market regime: ranging
+2025-03-01 18:03:31,729 - strategy - INFO - ML Strategy - Current market regime: ranging
+2025-03-01 18:03:31,730 - ml_optimizer - WARNING - Models not trained yet.
+2025-03-01 18:03:31,730 - strategy - INFO - Auto Strategy using Combined Strategy for ranging regime. Signal: 1
+2025-03-01 18:03:31,730 - trading_bot - INFO - Trading signal for BTCUSDT: 1
+2025-03-01 18:03:31,812 - binance_api - INFO - Sử dụng giá hiện tại từ Coinbase cho sổ lệnh: 85205.71 USD
+2025-03-01 18:03:31,813 - trading_bot - INFO - TEST MODE: BUY order placed for 0.006 BTCUSDT at 85205.705
+2025-03-01 18:03:31,818 - trading_bot - INFO - Position opened: 1740852211813
+2025-03-01 18:03:31,819 - strategy - INFO - Auto Strategy - Current market regime: ranging
+2025-03-01 18:03:31,821 - strategy - INFO - ML Strategy - Current market regime: ranging
+2025-03-01 18:03:31,822 - ml_optimizer - WARNING - Models not trained yet.
+2025-03-01 18:03:31,822 - strategy - INFO - Auto Strategy using Combined Strategy for ranging regime. Signal: 1
+2025-03-01 18:03:31,822 - trading_bot - INFO - TEST MODE: Closing position 1740852211813 at 170411.41
+2025-03-01 18:03:31,823 - trading_bot - INFO - Position closed: 1740852211813, P&L: 100.00%
+2025-03-01 20:02:03,526 - main - INFO - CLI Controller đã được import thành công
+2025-03-01 20:02:03,544 - main - INFO - Bot không chạy
+2025-03-01 20:02:03,582 - main - ERROR - Lỗi không xác định: EOF when reading a line
+2025-03-01 20:03:37,765 - main - INFO - CLI Controller đã được import thành công
+2025-03-01 20:03:37,780 - main - INFO - Bot không chạy
+2025-03-01 20:03:37,795 - main - ERROR - Lỗi không xác định: EOF when reading a line
+2025-03-01 20:04:58,995 - main - INFO - CLI Controller đã được import thành công
+2025-03-01 20:04:59,012 - main - INFO - Bot không chạy
+2025-03-01 20:04:59,031 - main - ERROR - Lỗi không xác định: EOF when reading a line

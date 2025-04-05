@@ -1,0 +1,6 @@
+2025-03-01 16:00:57,801 - ml_analysis - INFO - Tìm thấy 1 báo cáo tổng hợp
+2025-03-01 16:00:57,801 - ml_analysis - INFO - Đã tải báo cáo: ml_results/ml_summary_report.json
+2025-03-01 16:00:58,251 - ml_analysis - INFO - Đã tạo biểu đồ so sánh khoảng thời gian: ml_charts/period_comparison.png
+2025-03-01 16:00:58,501 - ml_analysis - INFO - Đã tạo biểu đồ so sánh mục tiêu: ml_charts/target_comparison.png
+2025-03-01 16:00:58,788 - ml_analysis - INFO - Đã tạo biểu đồ top features: ml_charts/top_features.png
+2025-03-01 16:00:58,789 - ml_analysis - INFO - Đã tạo báo cáo tổng hợp: ml_results/ml_performance_analysis.html

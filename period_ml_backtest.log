@@ -1,0 +1,60 @@
+2025-03-01 15:53:36,836 - period_ml_backtest - INFO - Chuẩn bị dữ liệu cho 2 coins, 1 khung thời gian, 2 khoảng thời gian
+2025-03-01 15:53:36,847 - period_ml_backtest - INFO - Đã tải dữ liệu BTCUSDT_1h_1m: 564 mẫu từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:53:36,866 - period_ml_backtest - INFO - Đã trích xuất đặc trưng cho BTCUSDT_1h_1m: 458 mẫu
+2025-03-01 15:53:36,871 - period_ml_backtest - INFO - Đã tải dữ liệu BTCUSDT_1h_3m: 564 mẫu từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:53:36,887 - period_ml_backtest - INFO - Đã trích xuất đặc trưng cho BTCUSDT_1h_3m: 458 mẫu
+2025-03-01 15:53:36,898 - period_ml_backtest - INFO - Đã tải dữ liệu ETHUSDT_1h_1m: 564 mẫu từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:53:36,914 - period_ml_backtest - INFO - Đã trích xuất đặc trưng cho ETHUSDT_1h_1m: 458 mẫu
+2025-03-01 15:53:36,919 - period_ml_backtest - INFO - Đã tải dữ liệu ETHUSDT_1h_3m: 564 mẫu từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:53:36,935 - period_ml_backtest - INFO - Đã trích xuất đặc trưng cho ETHUSDT_1h_3m: 458 mẫu
+2025-03-01 15:53:36,935 - period_ml_backtest - INFO - Đã chuẩn bị 4 bộ dữ liệu thành công
+2025-03-01 15:53:36,935 - period_ml_backtest - INFO - Chạy huấn luyện cho 4 bộ dữ liệu, 2 mục tiêu
+2025-03-01 15:53:39,128 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình BTCUSDT_1h_1m_target1d
+2025-03-01 15:53:40,166 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình BTCUSDT_1h_1m_target3d
+2025-03-01 15:53:41,215 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình BTCUSDT_1h_3m_target1d
+2025-03-01 15:53:42,468 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình BTCUSDT_1h_3m_target3d
+2025-03-01 15:53:43,471 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình ETHUSDT_1h_1m_target1d
+2025-03-01 15:53:44,479 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình ETHUSDT_1h_1m_target3d
+2025-03-01 15:53:45,508 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình ETHUSDT_1h_3m_target1d
+2025-03-01 15:53:46,669 - period_ml_backtest - INFO - Đã huấn luyện và lưu mô hình ETHUSDT_1h_3m_target3d
+2025-03-01 15:53:46,670 - period_ml_backtest - INFO - Đã tạo báo cáo tổng hợp: ml_results/ml_summary_report.json
+2025-03-01 15:53:46,670 - period_ml_backtest - INFO - Đã tạo báo cáo HTML: ml_results/ml_summary_report.html
+2025-03-01 15:53:46,670 - period_ml_backtest - INFO - Đã chạy huấn luyện cho 8 mô hình
+2025-03-01 16:47:02 - __main__ - INFO - Bắt đầu backtest: BTCUSDT 1h (1_month), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:47:02 - __main__ - INFO - Đã tải dữ liệu từ real_data/1_month/BTCUSDT_1h.csv: 721 dòng từ 2025-01-29 23:00:00 đến 2025-02-28 23:00:00
+2025-03-01 16:47:02 - __main__ - INFO - Đã tính 24 chỉ báo
+2025-03-01 16:47:02 - __main__ - INFO - Phân phối mục tiêu: Tăng=47.60%, Giảm=52.40%, Đi ngang=0.00%
+2025-03-01 16:47:02 - __main__ - INFO - Đã chuẩn bị 24 đặc trưng
+2025-03-01 16:47:02 - __main__ - INFO - Kết quả huấn luyện random_forest: Accuracy=0.5905, F1-Score=0.5899
+2025-03-01 16:49:32 - __main__ - INFO - Bắt đầu backtest: BTCUSDT 1h (1_month), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:49:32 - __main__ - INFO - Đã tải dữ liệu từ real_data/1_month/BTCUSDT_1h.csv: 721 dòng từ 2025-01-29 23:00:00 đến 2025-02-28 23:00:00
+2025-03-01 16:49:32 - __main__ - INFO - Đã tính 24 chỉ báo
+2025-03-01 16:49:32 - __main__ - INFO - Phân phối mục tiêu: Tăng=47.60%, Giảm=52.40%, Đi ngang=0.00%
+2025-03-01 16:49:32 - __main__ - INFO - Đã chuẩn bị 24 đặc trưng
+2025-03-01 16:49:32 - __main__ - INFO - Kết quả huấn luyện random_forest: Accuracy=0.5905, F1-Score=0.5899
+2025-03-01 16:49:33 - __main__ - INFO - Đã lưu mô hình tại ml_models/BTCUSDT_1h_1_month_1d_random_forest_model.joblib
+2025-03-01 16:49:33 - __main__ - INFO - Đã lưu kết quả tại ml_results/BTCUSDT_1h_1_month_1d_random_forest_results.json
+2025-03-01 16:49:33 - __main__ - INFO - Hoàn thành backtest: BTCUSDT 1h (1_month), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:49:45 - __main__ - INFO - Bắt đầu backtest: BTCUSDT 4h (1_month), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:49:45 - __main__ - INFO - Đã tải dữ liệu từ real_data/1_month/BTCUSDT_4h.csv: 181 dòng từ 2025-01-29 20:00:00 đến 2025-02-28 20:00:00
+2025-03-01 16:49:45 - __main__ - INFO - Đã tính 24 chỉ báo
+2025-03-01 16:49:45 - __main__ - INFO - Phân phối mục tiêu: Tăng=0.00%, Giảm=0.00%, Đi ngang=0.00%
+2025-03-01 16:49:45 - __main__ - INFO - Đã chuẩn bị 24 đặc trưng
+2025-03-01 16:50:01 - __main__ - INFO - Bắt đầu backtest: BTCUSDT 1h (3_months), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:50:01 - __main__ - INFO - Đã tải dữ liệu từ real_data/3_months/BTCUSDT_1h.csv: 2161 dòng từ 2024-11-30 23:00:00 đến 2025-02-28 23:00:00
+2025-03-01 16:50:01 - __main__ - INFO - Đã tính 24 chỉ báo
+2025-03-01 16:50:01 - __main__ - INFO - Phân phối mục tiêu: Tăng=49.01%, Giảm=50.99%, Đi ngang=0.00%
+2025-03-01 16:50:01 - __main__ - INFO - Đã chuẩn bị 24 đặc trưng
+2025-03-01 16:50:02 - __main__ - INFO - Kết quả huấn luyện random_forest: Accuracy=0.5751, F1-Score=0.5747
+2025-03-01 16:50:03 - __main__ - INFO - Đã lưu mô hình tại ml_models/BTCUSDT_1h_3_months_1d_random_forest_model.joblib
+2025-03-01 16:50:03 - __main__ - INFO - Đã lưu kết quả tại ml_results/BTCUSDT_1h_3_months_1d_random_forest_results.json
+2025-03-01 16:50:03 - __main__ - INFO - Hoàn thành backtest: BTCUSDT 1h (3_months), dự đoán 1 ngày, mô hình random_forest
+2025-03-01 16:50:18 - __main__ - INFO - Bắt đầu backtest: BTCUSDT 1h (3_months), dự đoán 1 ngày, mô hình gradient_boosting
+2025-03-01 16:50:18 - __main__ - INFO - Đã tải dữ liệu từ real_data/3_months/BTCUSDT_1h.csv: 2161 dòng từ 2024-11-30 23:00:00 đến 2025-02-28 23:00:00
+2025-03-01 16:50:18 - __main__ - INFO - Đã tính 24 chỉ báo
+2025-03-01 16:50:18 - __main__ - INFO - Phân phối mục tiêu: Tăng=49.01%, Giảm=50.99%, Đi ngang=0.00%
+2025-03-01 16:50:18 - __main__ - INFO - Đã chuẩn bị 24 đặc trưng
+2025-03-01 16:50:20 - __main__ - INFO - Kết quả huấn luyện gradient_boosting: Accuracy=0.5318, F1-Score=0.5311
+2025-03-01 16:50:21 - __main__ - INFO - Đã lưu mô hình tại ml_models/BTCUSDT_1h_3_months_1d_gradient_boosting_model.joblib
+2025-03-01 16:50:21 - __main__ - INFO - Đã lưu kết quả tại ml_results/BTCUSDT_1h_3_months_1d_gradient_boosting_results.json
+2025-03-01 16:50:21 - __main__ - INFO - Hoàn thành backtest: BTCUSDT 1h (3_months), dự đoán 1 ngày, mô hình gradient_boosting

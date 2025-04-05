@@ -1,0 +1,399 @@
+2025-03-09 11:07:38,944 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:07:38,944 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:07:38,945 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:07:39,121 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 11:07:39,121 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 11:07:39,121 - sltp_check - WARNING - Không tìm thấy file sltp_config.json, sử dụng cấu hình mặc định
+2025-03-09 11:07:39,121 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-09 11:07:39,121 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-09 11:07:39,121 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:07:39,121 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:07:39,592 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:07:39,593 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:07:39,593 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:07:39,593 - sltp_check - INFO - Tìm thấy 1 vị thế đang mở
+2025-03-09 11:07:39,593 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-09 11:07:39,593 - sltp_check - ERROR - Lỗi khi kiểm tra SL/TP cho BTCUSDT: 'BinanceAPI' object has no attribute 'get_futures_open_orders'
+2025-03-09 11:07:39,594 - sltp_check - INFO - Vị thế BTCUSDT: entry=86077.32222222, LONG, amount=0.009, SL=84355.78, TP=88659.64
+2025-03-09 11:07:39,594 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-09 11:07:39,594 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-09 11:07:39,594 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-09 11:07:39,594 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 88659.64
+2025-03-09 11:07:39,594 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 88659.64,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:07:39,746 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4111363963
+2025-03-09 11:07:39,747 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 84355.78
+2025-03-09 11:07:39,747 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 84355.78,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:07:40,187 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4111363984
+2025-03-09 11:07:40,187 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-09 11:07:40,188 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-09 11:07:40,188 - sltp_check - INFO - Tổng số vị thế: 1
+2025-03-09 11:07:40,188 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-09 11:07:40,188 - sltp_check - INFO - Lỗi: 0
+2025-03-09 11:07:40,188 - sltp_check - INFO - Thời gian chạy: 1.07 giây
+2025-03-09 11:07:40,188 - sltp_check - INFO - ✅ Kiểm tra hoàn tất, tất cả các vị thế có đầy đủ SL/TP
+2025-03-09 11:08:09,253 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:08:09,254 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:08:09,254 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:08:09,445 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 11:08:09,446 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 11:08:09,446 - sltp_check - WARNING - Không tìm thấy file sltp_config.json, sử dụng cấu hình mặc định
+2025-03-09 11:08:09,446 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-09 11:08:09,446 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-09 11:08:09,446 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:08:09,446 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:08:09,902 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:08:09,902 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:08:09,902 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:08:09,903 - sltp_check - INFO - Tìm thấy 1 vị thế đang mở
+2025-03-09 11:08:09,903 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-09 11:08:09,903 - sltp_check - ERROR - Lỗi khi kiểm tra SL/TP cho BTCUSDT: 'BinanceAPI' object has no attribute 'futures_get_open_orders'
+2025-03-09 11:08:09,903 - sltp_check - INFO - Vị thế BTCUSDT: entry=86077.32222222, LONG, amount=0.009, SL=84355.78, TP=88659.64
+2025-03-09 11:08:09,903 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-09 11:08:09,903 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-09 11:08:09,903 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-09 11:08:09,903 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 88659.64
+2025-03-09 11:08:09,903 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 88659.64,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:08:10,061 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4111364723
+2025-03-09 11:08:10,061 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 84355.78
+2025-03-09 11:08:10,061 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 84355.78,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:08:10,215 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4111364727
+2025-03-09 11:08:10,215 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-09 11:08:10,215 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-09 11:08:10,215 - sltp_check - INFO - Tổng số vị thế: 1
+2025-03-09 11:08:10,215 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-09 11:08:10,215 - sltp_check - INFO - Lỗi: 0
+2025-03-09 11:08:10,215 - sltp_check - INFO - Thời gian chạy: 0.77 giây
+2025-03-09 11:08:10,215 - sltp_check - INFO - ✅ Kiểm tra hoàn tất, tất cả các vị thế có đầy đủ SL/TP
+2025-03-09 11:08:33,934 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:08:33,934 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:08:33,934 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:08:34,103 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 11:08:34,103 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 11:08:34,104 - sltp_check - WARNING - Không tìm thấy file sltp_config.json, sử dụng cấu hình mặc định
+2025-03-09 11:08:34,104 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-09 11:08:34,104 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-09 11:08:34,104 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:08:34,104 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:08:34,554 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:08:34,554 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:08:34,555 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:08:34,555 - sltp_check - INFO - Tìm thấy 1 vị thế đang mở
+2025-03-09 11:08:34,555 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-09 11:08:34,555 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-09 11:08:34,555 - sltp_check - INFO - Vị thế BTCUSDT: entry=86077.32222222, LONG, amount=0.009, SL=84355.78, TP=88659.64
+2025-03-09 11:08:34,555 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-09 11:08:34,555 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-09 11:08:34,556 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-09 11:08:34,556 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 88659.64
+2025-03-09 11:08:34,556 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 88659.64,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:08:34,708 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4111365400
+2025-03-09 11:08:34,708 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 84355.78
+2025-03-09 11:08:34,708 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 84355.78,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:08:35,139 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4111365405
+2025-03-09 11:08:35,139 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-09 11:08:35,140 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-09 11:08:35,140 - sltp_check - INFO - Tổng số vị thế: 1
+2025-03-09 11:08:35,140 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-09 11:08:35,140 - sltp_check - INFO - Lỗi: 0
+2025-03-09 11:08:35,140 - sltp_check - INFO - Thời gian chạy: 1.04 giây
+2025-03-09 11:08:35,140 - sltp_check - INFO - ✅ Kiểm tra hoàn tất, tất cả các vị thế có đầy đủ SL/TP
+2025-03-09 11:40:28,221 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:40:28,221 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:40:28,222 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:40:28,394 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 11:40:28,395 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 11:40:28,395 - sltp_check - INFO - Đã tải cấu hình từ sltp_config.json
+2025-03-09 11:40:28,395 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-09 11:40:28,395 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-09 11:40:28,395 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:40:28,395 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:40:28,565 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:40:28,565 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:40:28,565 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:40:28,566 - sltp_check - INFO - Tìm thấy 1 vị thế đang mở
+2025-03-09 11:40:28,566 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-09 11:40:28,566 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-09 11:40:28,566 - sltp_check - INFO - Vị thế BTCUSDT: entry=86077.32222222, LONG, amount=0.009, SL=84355.78, TP=88659.64
+2025-03-09 11:40:28,566 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-09 11:40:28,566 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-09 11:40:28,566 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-09 11:40:28,566 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 88659.64
+2025-03-09 11:40:28,566 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 88659.64,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:40:29,001 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4111425125
+2025-03-09 11:40:29,001 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 84355.78
+2025-03-09 11:40:29,002 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 84355.78,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:40:29,440 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4111425148
+2025-03-09 11:40:29,440 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-09 11:40:29,440 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-09 11:40:29,440 - sltp_check - INFO - Tổng số vị thế: 1
+2025-03-09 11:40:29,440 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-09 11:40:29,441 - sltp_check - INFO - Lỗi: 0
+2025-03-09 11:40:29,441 - sltp_check - INFO - Thời gian chạy: 1.05 giây
+2025-03-09 11:40:29,441 - sltp_check - INFO - ✅ Kiểm tra hoàn tất, tất cả các vị thế có đầy đủ SL/TP
+2025-03-09 11:45:09,882 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:45:09,882 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:45:09,882 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:45:10,052 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 11:45:10,052 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 11:45:10,052 - sltp_check - INFO - Đã tải cấu hình từ sltp_config.json
+2025-03-09 11:45:10,053 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-09 11:45:10,053 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-09 11:45:10,053 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:45:10,053 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:45:10,222 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:45:10,223 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:45:10,223 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:45:10,223 - sltp_check - INFO - Tìm thấy 1 vị thế đang mở
+2025-03-09 11:45:10,223 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-09 11:45:10,223 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-09 11:45:10,224 - sltp_check - INFO - Vị thế BTCUSDT: entry=86077.32222222, LONG, amount=0.009, SL=84355.78, TP=88659.64
+2025-03-09 11:45:10,224 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-09 11:45:10,224 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-09 11:45:10,224 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-09 11:45:10,224 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 88659.64
+2025-03-09 11:45:10,224 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 88659.64,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:45:10,374 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4111433772
+2025-03-09 11:45:10,374 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 84355.78
+2025-03-09 11:45:10,374 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.009,
+  "stopPrice": 84355.78,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-09 11:45:10,807 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4111433779
+2025-03-09 11:45:10,807 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-09 11:45:10,807 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-09 11:45:10,807 - sltp_check - INFO - Tổng số vị thế: 1
+2025-03-09 11:45:10,807 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-09 11:45:10,807 - sltp_check - INFO - Lỗi: 0
+2025-03-09 11:45:10,807 - sltp_check - INFO - Thời gian chạy: 0.75 giây
+2025-03-09 11:45:10,808 - sltp_check - INFO - ✅ Kiểm tra hoàn tất, tất cả các vị thế có đầy đủ SL/TP
+2025-03-28 16:19:43,582 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-28 16:19:43,583 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-28 16:19:43,583 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-28 16:19:43,751 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-28 16:19:43,751 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-28 16:19:43,751 - sltp_check - INFO - Đã tải cấu hình từ sltp_config.json
+2025-03-28 16:19:43,751 - sltp_check - INFO - Chế độ tài khoản: hedge mode
+2025-03-28 16:19:43,751 - sltp_check - INFO - === Bắt đầu kiểm tra và sửa SL/TP ===
+2025-03-28 16:19:43,752 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-28 16:19:43,752 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-28 16:19:43,920 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-28 16:19:43,921 - binance_api - INFO - Đã lấy 4 vị thế active từ account API
+2025-03-28 16:19:43,921 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-28 16:19:43,921 - sltp_check - INFO - Tìm thấy 4 vị thế đang mở
+2025-03-28 16:19:43,921 - sltp_check - INFO - 
+--- Kiểm tra SOLUSDT ---
+2025-03-28 16:19:43,921 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-28 16:19:43,922 - sltp_check - INFO - Vị thế SOLUSDT: entry=135.3, SHORT, amount=1.0, SL=138.01, TP=131.24
+2025-03-28 16:19:43,922 - sltp_check - INFO - Đặt cả SL và TP cho SOLUSDT
+2025-03-28 16:19:43,922 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-28 16:19:43,922 - binance_api_fixes - INFO - Thêm position_side=SHORT cho lệnh SL/TP trong hedge mode
+2025-03-28 16:19:43,922 - binance_api_fixes - INFO - Đặt Take Profit cho SOLUSDT tại giá 131.24
+2025-03-28 16:19:43,922 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho SOLUSDT: {
+  "symbol": "SOLUSDT",
+  "side": "BUY",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 1.0,
+  "stopPrice": 131.24,
+  "positionSide": "SHORT",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,089 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 58959594
+2025-03-28 16:19:44,089 - binance_api_fixes - INFO - Đặt Stop Loss cho SOLUSDT tại giá 138.01
+2025-03-28 16:19:44,089 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho SOLUSDT: {
+  "symbol": "SOLUSDT",
+  "side": "BUY",
+  "type": "STOP_MARKET",
+  "quantity": 1.0,
+  "stopPrice": 138.01,
+  "positionSide": "SHORT",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,243 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=BUY&type=STOP_MARKET&quantity=1.0&stopPrice=138.01&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784090&signature=e1dcf0a4129a841a76f3d3c367f974ca81495da58e2aba94f522f92940e59f30
+2025-03-28 16:19:44,243 - binance_api_fixes - ERROR - Lỗi khi đặt SL: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=BUY&type=STOP_MARKET&quantity=1.0&stopPrice=138.01&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784090&signature=e1dcf0a4129a841a76f3d3c367f974ca81495da58e2aba94f522f92940e59f30'}
+2025-03-28 16:19:44,244 - sltp_check - ERROR - ❌ Lỗi khi đặt SL/TP: {'take_profit': {'orderId': 58959594, 'symbol': 'SOLUSDT', 'status': 'NEW', 'clientOrderId': 'NdojUvZgjnv938XJYnVYUI', 'price': '0.0000', 'avgPrice': '0.00', 'origQty': '1', 'executedQty': '0', 'cumQty': '0', 'cumQuote': '0.0000', 'timeInForce': 'GTC', 'type': 'TAKE_PROFIT_MARKET', 'reduceOnly': True, 'closePosition': False, 'side': 'BUY', 'positionSide': 'SHORT', 'stopPrice': '131.2400', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'TAKE_PROFIT_MARKET', 'priceMatch': 'NONE', 'selfTradePreventionMode': 'EXPIRE_MAKER', 'goodTillDate': 0, 'updateTime': 1743178784013}, 'stop_loss': {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=SOLUSDT&side=BUY&type=STOP_MARKET&quantity=1.0&stopPrice=138.01&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784090&signature=e1dcf0a4129a841a76f3d3c367f974ca81495da58e2aba94f522f92940e59f30'}}
+2025-03-28 16:19:44,244 - sltp_check - INFO - 
+--- Kiểm tra ETHUSDT ---
+2025-03-28 16:19:44,244 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-28 16:19:44,244 - sltp_check - INFO - Vị thế ETHUSDT: entry=1920.66, LONG, amount=0.053, SL=1882.25, TP=1978.28
+2025-03-28 16:19:44,244 - sltp_check - INFO - Đặt cả SL và TP cho ETHUSDT
+2025-03-28 16:19:44,244 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-28 16:19:44,244 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-28 16:19:44,244 - binance_api_fixes - INFO - Đặt Take Profit cho ETHUSDT tại giá 1978.28
+2025-03-28 16:19:44,245 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho ETHUSDT: {
+  "symbol": "ETHUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.053,
+  "stopPrice": 1978.28,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,395 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 1539878113
+2025-03-28 16:19:44,396 - binance_api_fixes - INFO - Đặt Stop Loss cho ETHUSDT tại giá 1882.25
+2025-03-28 16:19:44,396 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho ETHUSDT: {
+  "symbol": "ETHUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.053,
+  "stopPrice": 1882.25,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,546 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&quantity=0.053&stopPrice=1882.25&positionSide=LONG&working_type=MARK_PRICE&timestamp=1743178784396&signature=b3f78aaf4ef3419f8301fff03f452dc063ffc5d60bd31c5e4ba666df2a78f85a
+2025-03-28 16:19:44,547 - binance_api_fixes - ERROR - Lỗi khi đặt SL: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&quantity=0.053&stopPrice=1882.25&positionSide=LONG&working_type=MARK_PRICE&timestamp=1743178784396&signature=b3f78aaf4ef3419f8301fff03f452dc063ffc5d60bd31c5e4ba666df2a78f85a'}
+2025-03-28 16:19:44,547 - sltp_check - ERROR - ❌ Lỗi khi đặt SL/TP: {'take_profit': {'orderId': 1539878113, 'symbol': 'ETHUSDT', 'status': 'NEW', 'clientOrderId': '6J9mprOF2fMDD7zgc9WkXv', 'price': '0.00', 'avgPrice': '0.00', 'origQty': '0.053', 'executedQty': '0.000', 'cumQty': '0.000', 'cumQuote': '0.00000', 'timeInForce': 'GTC', 'type': 'TAKE_PROFIT_MARKET', 'reduceOnly': True, 'closePosition': False, 'side': 'SELL', 'positionSide': 'LONG', 'stopPrice': '1978.28', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'TAKE_PROFIT_MARKET', 'priceMatch': 'NONE', 'selfTradePreventionMode': 'EXPIRE_MAKER', 'goodTillDate': 0, 'updateTime': 1743178784321}, 'stop_loss': {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&quantity=0.053&stopPrice=1882.25&positionSide=LONG&working_type=MARK_PRICE&timestamp=1743178784396&signature=b3f78aaf4ef3419f8301fff03f452dc063ffc5d60bd31c5e4ba666df2a78f85a'}}
+2025-03-28 16:19:44,548 - sltp_check - INFO - 
+--- Kiểm tra DOGEUSDT ---
+2025-03-28 16:19:44,548 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-28 16:19:44,548 - sltp_check - INFO - Vị thế DOGEUSDT: entry=0.19, SHORT, amount=50.0, SL=0.19, TP=0.18
+2025-03-28 16:19:44,548 - sltp_check - INFO - Đặt cả SL và TP cho DOGEUSDT
+2025-03-28 16:19:44,548 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-28 16:19:44,548 - binance_api_fixes - INFO - Thêm position_side=SHORT cho lệnh SL/TP trong hedge mode
+2025-03-28 16:19:44,549 - binance_api_fixes - INFO - Đặt Take Profit cho DOGEUSDT tại giá 0.18
+2025-03-28 16:19:44,549 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho DOGEUSDT: {
+  "symbol": "DOGEUSDT",
+  "side": "BUY",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 50.0,
+  "stopPrice": 0.18,
+  "positionSide": "SHORT",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,703 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 94235896
+2025-03-28 16:19:44,703 - binance_api_fixes - INFO - Đặt Stop Loss cho DOGEUSDT tại giá 0.19
+2025-03-28 16:19:44,703 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho DOGEUSDT: {
+  "symbol": "DOGEUSDT",
+  "side": "BUY",
+  "type": "STOP_MARKET",
+  "quantity": 50.0,
+  "stopPrice": 0.19,
+  "positionSide": "SHORT",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:44,857 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=DOGEUSDT&side=BUY&type=STOP_MARKET&quantity=50.0&stopPrice=0.19&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784703&signature=522709c856f13f248fd19f29887b5cb480f8d3cfe1adde27b56a77299a18f8d0
+2025-03-28 16:19:44,857 - binance_api_fixes - ERROR - Lỗi khi đặt SL: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=DOGEUSDT&side=BUY&type=STOP_MARKET&quantity=50.0&stopPrice=0.19&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784703&signature=522709c856f13f248fd19f29887b5cb480f8d3cfe1adde27b56a77299a18f8d0'}
+2025-03-28 16:19:44,857 - sltp_check - ERROR - ❌ Lỗi khi đặt SL/TP: {'take_profit': {'orderId': 94235896, 'symbol': 'DOGEUSDT', 'status': 'NEW', 'clientOrderId': '6hUcThps2REdt1QOddy9sb', 'price': '0.000000', 'avgPrice': '0.00', 'origQty': '50', 'executedQty': '0', 'cumQty': '0', 'cumQuote': '0.000000', 'timeInForce': 'GTC', 'type': 'TAKE_PROFIT_MARKET', 'reduceOnly': True, 'closePosition': False, 'side': 'BUY', 'positionSide': 'SHORT', 'stopPrice': '0.180000', 'workingType': 'CONTRACT_PRICE', 'priceProtect': False, 'origType': 'TAKE_PROFIT_MARKET', 'priceMatch': 'NONE', 'selfTradePreventionMode': 'EXPIRE_MAKER', 'goodTillDate': 0, 'updateTime': 1743178784628}, 'stop_loss': {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=DOGEUSDT&side=BUY&type=STOP_MARKET&quantity=50.0&stopPrice=0.19&positionSide=SHORT&working_type=MARK_PRICE&timestamp=1743178784703&signature=522709c856f13f248fd19f29887b5cb480f8d3cfe1adde27b56a77299a18f8d0'}}
+2025-03-28 16:19:44,857 - sltp_check - INFO - 
+--- Kiểm tra BTCUSDT ---
+2025-03-28 16:19:44,857 - sltp_check - INFO - Bỏ qua kiểm tra lệnh mở, sẽ luôn đặt SL/TP mới
+2025-03-28 16:19:44,857 - sltp_check - INFO - Vị thế BTCUSDT: entry=82711.2, LONG, amount=0.002, SL=81056.98, TP=85192.54
+2025-03-28 16:19:44,857 - sltp_check - INFO - Đặt cả SL và TP cho BTCUSDT
+2025-03-28 16:19:44,858 - binance_api_fixes - INFO - Đang đặt SL/TP cho tài khoản ở chế độ hedge mode
+2025-03-28 16:19:44,858 - binance_api_fixes - INFO - Thêm position_side=LONG cho lệnh SL/TP trong hedge mode
+2025-03-28 16:19:44,858 - binance_api_fixes - INFO - Đặt Take Profit cho BTCUSDT tại giá 85192.54
+2025-03-28 16:19:44,858 - binance_api_fixes - INFO - Tạo lệnh TAKE_PROFIT_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "TAKE_PROFIT_MARKET",
+  "quantity": 0.002,
+  "stopPrice": 85192.54,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:45,008 - binance_api_fixes - INFO - Đặt TP thành công, orderId: 4145290378
+2025-03-28 16:19:45,008 - binance_api_fixes - INFO - Đặt Stop Loss cho BTCUSDT tại giá 81056.98
+2025-03-28 16:19:45,008 - binance_api_fixes - INFO - Tạo lệnh STOP_MARKET cho BTCUSDT: {
+  "symbol": "BTCUSDT",
+  "side": "SELL",
+  "type": "STOP_MARKET",
+  "quantity": 0.002,
+  "stopPrice": 81056.98,
+  "positionSide": "LONG",
+  "working_type": "MARK_PRICE"
+}
+2025-03-28 16:19:45,162 - binance_api_fixes - INFO - Đặt SL thành công, orderId: 4145290385
+2025-03-28 16:19:45,162 - sltp_check - INFO - ✅ Đặt SL/TP thành công cho BTCUSDT
+2025-03-28 16:19:45,162 - sltp_check - INFO - 
+=== Kết quả kiểm tra ===
+2025-03-28 16:19:45,162 - sltp_check - INFO - Tổng số vị thế: 4
+2025-03-28 16:19:45,162 - sltp_check - INFO - Vị thế đã sửa: 1
+2025-03-28 16:19:45,162 - sltp_check - INFO - Lỗi: 3
+2025-03-28 16:19:45,162 - sltp_check - INFO - Thời gian chạy: 1.41 giây
+2025-03-28 16:19:45,162 - sltp_check - WARNING - ⚠️ Kiểm tra hoàn tất, có 3 lỗi cần xem xét thêm

@@ -1,0 +1,269 @@
+2025-03-09 07:23:54,964 - sltp_telegram_integration - INFO - Đã ghi PID 3185 vào file sltp_telegram_integration.pid
+2025-03-09 07:23:54,966 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:23:54,966 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:23:54,967 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:23:55,135 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:23:55,135 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:23:55,136 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:23:55,136 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:23:55,136 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:23:55,136 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:23:55,136 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:23:55,136 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:23:55,595 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:23:56,383 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:23:56,383 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:23:56,383 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 07:23:56,383 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 07:23:56,384 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:23:56,384 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:23:56,547 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:23:56,548 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:23:56,548 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:23:56,548 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 07:23:56,702 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:23:57,003 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:23:57,583 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:23:57,584 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:23:57,754 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:23:58,513 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:23:58,513 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram
+2025-03-09 07:41:27,886 - sltp_telegram_integration - INFO - Đã ghi PID 4952 vào file sltp_telegram_integration.pid
+2025-03-09 07:41:27,887 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:41:27,887 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:41:27,887 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:41:28,063 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:41:28,063 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:41:28,063 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:41:28,063 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:41:28,063 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:41:28,063 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:41:28,063 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:41:28,064 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:41:28,259 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:41:29,016 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:41:29,016 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:41:29,017 - sltp_telegram_integration - INFO - Không thể cập nhật tên tiến trình, bỏ qua
+2025-03-09 07:41:29,017 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:41:29,017 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:41:29,017 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:41:29,188 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:41:29,188 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:41:29,188 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:41:29,188 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:41:29,188 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:41:29,188 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:41:29,188 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:41:29,188 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:41:29,354 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:41:30,123 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:41:30,123 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:41:30,123 - sltp_telegram_integration - INFO - Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet=True
+2025-03-09 07:41:30,124 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 07:41:30,124 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 07:41:30,124 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:41:30,124 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:41:30,572 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:41:30,573 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:41:30,573 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:41:30,573 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 07:41:30,730 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:41:31,321 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:41:31,922 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:41:31,922 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:41:32,089 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:41:32,846 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:41:32,847 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram
+2025-03-09 07:45:28,381 - sltp_telegram_integration - INFO - Đã ghi PID 5339 vào file sltp_telegram_integration.pid
+2025-03-09 07:45:28,382 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:45:28,382 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:45:28,382 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:45:28,551 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:45:28,552 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:45:28,552 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:45:28,552 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:45:28,552 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:45:28,552 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:45:28,552 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:45:28,552 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:45:28,729 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:45:29,491 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:45:29,492 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:45:29,492 - sltp_telegram_integration - INFO - Không thể cập nhật tên tiến trình, bỏ qua
+2025-03-09 07:45:29,492 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:45:29,492 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:45:29,492 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:45:29,652 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:45:29,653 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:45:29,653 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:45:29,653 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:45:29,653 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:45:29,653 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:45:29,653 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:45:29,653 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:45:29,824 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:45:30,590 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:45:30,590 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:45:30,590 - sltp_telegram_integration - INFO - Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet=True
+2025-03-09 07:45:30,590 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 07:45:30,590 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 07:45:30,591 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:45:30,591 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:45:30,751 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:45:30,752 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:45:30,752 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:45:30,752 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 07:45:31,179 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:45:31,479 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:45:32,067 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL và TP, bỏ qua
+2025-03-09 07:45:32,067 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:45:32,245 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:45:33,022 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:45:33,022 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram
+2025-03-09 07:49:22,570 - sltp_telegram_integration - INFO - Đã ghi PID 5860 vào file sltp_telegram_integration.pid
+2025-03-09 07:49:22,571 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:49:22,571 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:49:22,571 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:49:22,737 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:49:22,737 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:49:22,737 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:49:22,737 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:49:22,737 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:49:22,737 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:49:22,737 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:49:22,737 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:49:23,026 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:49:23,796 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:49:23,796 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:49:23,797 - sltp_telegram_integration - INFO - Không thể cập nhật tên tiến trình, bỏ qua
+2025-03-09 07:49:23,797 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:49:23,797 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:49:23,797 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:49:23,963 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:49:23,964 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:49:23,964 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:49:23,964 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:49:23,964 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:49:23,964 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:49:23,964 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:49:23,964 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:49:24,138 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:49:24,896 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:49:24,896 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:49:24,896 - sltp_telegram_integration - INFO - Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet=True
+2025-03-09 07:49:24,896 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 07:49:24,897 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 07:49:24,897 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:49:24,897 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:49:25,061 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:49:25,062 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:49:25,062 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:49:25,062 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 07:49:25,212 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 07:49:25,212 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:49:25,802 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 07:49:25,802 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:49:26,123 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 07:49:26,123 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:49:26,123 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:49:26,299 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:49:27,081 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:49:27,081 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram
+2025-03-09 07:55:06,379 - sltp_telegram_integration - INFO - Đã ghi PID 6475 vào file sltp_telegram_integration.pid
+2025-03-09 07:55:06,381 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:55:06,381 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:55:06,381 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:55:06,552 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:55:06,552 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:55:06,552 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:55:06,553 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:55:06,553 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:55:06,553 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:55:06,553 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:55:06,553 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:55:06,724 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:55:07,496 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:55:07,496 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:55:07,496 - sltp_telegram_integration - INFO - Không thể cập nhật tên tiến trình, bỏ qua
+2025-03-09 07:55:07,497 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:55:07,497 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:55:07,497 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:55:07,654 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:55:07,655 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:55:07,655 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:55:07,655 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:55:07,655 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:55:07,655 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:55:07,655 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:55:07,655 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:55:07,826 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:55:08,582 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:55:08,582 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:55:08,582 - sltp_telegram_integration - INFO - Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet=True
+2025-03-09 07:55:08,582 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 07:55:08,583 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 07:55:08,583 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:55:08,583 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:55:08,754 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:55:08,755 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:55:08,755 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:55:08,755 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 07:55:09,194 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 07:55:09,194 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:55:09,784 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 07:55:09,784 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:55:10,083 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 07:55:10,083 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 07:55:10,083 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:55:10,252 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:55:11,009 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:55:11,009 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram
+2025-03-09 08:04:43,406 - sltp_telegram_integration - INFO - Đã ghi PID 859 vào file sltp_telegram_integration.pid
+2025-03-09 08:04:43,408 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:04:43,409 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:04:43,409 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:04:43,570 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 08:04:43,570 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 08:04:43,571 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 08:04:43,571 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 08:04:43,571 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 08:04:43,571 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 08:04:43,571 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 08:04:43,571 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:43,737 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:44,501 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:04:44,502 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 08:04:44,502 - sltp_telegram_integration - INFO - Không thể cập nhật tên tiến trình, bỏ qua
+2025-03-09 08:04:44,502 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:04:44,503 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:04:44,503 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:04:44,663 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 08:04:44,664 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 08:04:44,664 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 08:04:44,664 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 08:04:44,664 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 08:04:44,664 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 08:04:44,664 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 08:04:44,664 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:44,836 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:45,675 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:04:45,676 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 08:04:45,676 - sltp_telegram_integration - INFO - Đã khởi tạo EnhancedAutoSLTPManager thành công, chế độ testnet=True
+2025-03-09 08:04:45,676 - sltp_telegram_integration - INFO - Chạy liên tục với interval=60s
+2025-03-09 08:04:45,676 - auto_sltp_manager - INFO - Bắt đầu chạy Auto SL/TP Manager với interval=60s
+2025-03-09 08:04:45,676 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:04:45,676 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:46,123 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:46,124 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:04:46,124 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:04:46,124 - auto_sltp_manager - INFO - Đã cập nhật 3 vị thế đang mở
+2025-03-09 08:04:46,274 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 08:04:46,274 - auto_sltp_manager - INFO - ETHUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 08:04:46,873 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 08:04:46,873 - auto_sltp_manager - INFO - BNBUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 08:04:47,462 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 08:04:47,462 - auto_sltp_manager - INFO - BTCUSDT đã có cả SL (3 lệnh) và TP (3 lệnh), bỏ qua
+2025-03-09 08:04:47,462 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:47,629 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:48,386 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:04:48,386 - sltp_telegram_integration - INFO - Đã gửi cập nhật vị thế định kỳ tới Telegram

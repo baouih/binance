@@ -1,0 +1,31 @@
+===== Khởi động hệ thống tài khoản nhỏ - Thu 06 Mar 2025 03:27:22 AM UTC =====
+1. Kiểm tra cài đặt đòn bẩy cho các cặp tiền ưu tiên...
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/home/runner/workspace/small_account_monitor.py", line 63, in __init__
+    self.risk_allocator = DynamicRiskAllocator(self.risk_config, self.data_cache)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/dynamic_risk_allocator.py", line 41, in __init__
+    self.config = self._load_config()
+                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/dynamic_risk_allocator.py", line 111, in _load_config
+    if os.path.exists(self.config_path):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen genericpath>", line 19, in exists
+TypeError: stat: path should be string, bytes, os.PathLike or integer, not DataCache
+2. Thiết lập SL/TP cho các vị thế đang mở...
+2025-03-06 03:27:22,826 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-06 03:27:22,826 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-06 03:27:22,826 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-06 03:27:22,827 - auto_setup_sltp - ERROR - Lỗi trong quá trình thiết lập SL/TP: 'ProfitManager' object has no attribute 'config'
+3. Bắt đầu giám sát tài khoản nhỏ...
+   Đã khởi động giám sát với PID: 1253
+4. Khởi động hệ thống trailing stop...
+   Đã khởi động trailing stop với PID: 1258
+
+===== Hệ thống tài khoản nhỏ đã khởi động xong! =====
+Để kiểm tra logs:
+- Giám sát tài khoản: tail -f logs/small_account_monitor_20250306_032722.log
+- Trailing stop: tail -f logs/trailing_stop_20250306_032722.log
+
+Để dừng hệ thống: kill $(cat small_account_monitor.pid)

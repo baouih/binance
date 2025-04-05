@@ -1,0 +1,130 @@
+2025-03-07 03:36:09,643 - test_new_modules - INFO - Kiểm tra Order Flow Indicators...
+2025-03-07 03:36:09,658 - order_flow_indicators - INFO - Đã mô phỏng dữ liệu order flow cho BTCUSDT từ 100 nến
+2025-03-07 03:36:09,658 - test_new_modules - INFO - Đã thêm 0 chỉ báo mới: set()
+2025-03-07 03:36:09,659 - test_new_modules - INFO - Order Flow Bias: False
+2025-03-07 03:36:09,659 - test_new_modules - INFO - Buy Signal: False
+2025-03-07 03:36:09,659 - test_new_modules - INFO - Sell Signal: False
+2025-03-07 03:36:09,764 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:09,771 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:09,793 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:09,801 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:09,874 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:09,883 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 03:36:11,097 - order_flow_indicators - INFO - Đã tạo biểu đồ delta flow tại: data/order_flow/BTCUSDT/BTCUSDT_delta_flow.png
+2025-03-07 03:36:11,097 - test_new_modules - INFO - Đã tạo biểu đồ tại: data/order_flow/BTCUSDT/BTCUSDT_delta_flow.png
+2025-03-07 03:36:11,097 - test_new_modules - INFO - Kiểm tra Volume Profile Analyzer...
+2025-03-07 03:36:11,098 - test_new_modules - ERROR - Lỗi khi kiểm tra Volume Profile Analyzer: VolumeProfileAnalyzer.calculate_volume_profile() got an unexpected keyword argument 'lookback_periods'
+2025-03-07 03:36:11,098 - test_new_modules - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/test_new_modules.py", line 204, in test_volume_profile_analyzer
+    profile = vp_analyzer.calculate_volume_profile(df, lookback_periods=50)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: VolumeProfileAnalyzer.calculate_volume_profile() got an unexpected keyword argument 'lookback_periods'
+
+2025-03-07 03:36:11,098 - test_new_modules - INFO - Kiểm tra Adaptive Exit Strategy...
+2025-03-07 03:36:11,112 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 03:36:11,113 - test_new_modules - INFO - Chế độ thị trường: neutral
+2025-03-07 03:36:11,113 - test_new_modules - INFO - Chiến lược active: ['trailing_stop', 'indicator_based_exit']
+2025-03-07 03:36:11,113 - test_new_modules - INFO - - trailing_stop: 0.52
+2025-03-07 03:36:11,113 - test_new_modules - INFO - - indicator_based_exit: 0.48
+2025-03-07 03:36:11,114 - test_new_modules - INFO - Stop Loss: 56939.89 (trailing_stop)
+2025-03-07 03:36:11,114 - test_new_modules - INFO - Trailing Stop: 56939.89
+2025-03-07 03:36:11,114 - test_new_modules - INFO - Partial Take Profits: 0
+2025-03-07 03:36:11,128 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 03:36:11,131 - test_new_modules - INFO - Exit Signal: False
+2025-03-07 03:36:11,428 - adaptive_exit_strategy - INFO - Đã tạo biểu đồ các điểm thoát lệnh tại: data/exit_strategies/exit_points_chart.png
+2025-03-07 03:36:11,429 - test_new_modules - INFO - Đã tạo biểu đồ các điểm thoát lệnh tại: data/exit_strategies/exit_points_chart.png
+2025-03-07 03:36:11,429 - test_new_modules - INFO - Kiểm tra Partial Take Profit Manager...
+2025-03-07 03:36:11,429 - partial_take_profit_manager - INFO - Đã tải cấu hình từ: data/partial_take_profit
+2025-03-07 03:36:11,441 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 03:36:11,441 - test_new_modules - INFO - Số mức chốt lời: 3
+2025-03-07 03:36:11,441 - test_new_modules - INFO - Mức 1: 55101.08 (30%)
+2025-03-07 03:36:11,441 - test_new_modules - INFO - Mức 2: 55915.38 (30%)
+2025-03-07 03:36:11,441 - test_new_modules - INFO - Mức 3: 57001.12 (40%)
+2025-03-07 03:36:11,442 - test_new_modules - INFO - TP Signal at price 55101.08: True
+2025-03-07 03:36:11,442 - test_new_modules - INFO - TP Level: 1
+2025-03-07 03:36:11,442 - test_new_modules - INFO - TP Quantity: 0.03
+2025-03-07 03:36:11,442 - partial_take_profit_manager - INFO - Đã thực hiện chốt lời mức 1 cho BTCUSDT - test_position với giá 55101.07825104532
+2025-03-07 03:36:11,442 - test_new_modules - INFO - Execute TP Result: True
+2025-03-07 03:36:11,442 - test_new_modules - INFO - Adjusted Stop: None
+2025-03-07 03:36:11,443 - test_new_modules - INFO - Remaining Levels: 2
+2025-03-07 03:36:11,443 - test_new_modules - INFO - Executed Percent: 30.0%
+2025-03-07 03:36:11,443 - test_new_modules - INFO - Remaining Quantity: 0.070000
+2025-03-07 03:36:11,520 - partial_take_profit_manager - ERROR - Lỗi khi tạo biểu đồ các mức chốt lời: subplot() takes 1 or 3 positional arguments but 4 were given
+2025-03-07 03:36:11,530 - partial_take_profit_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/partial_take_profit_manager.py", line 713, in visualize_tp_levels
+    plt.subplot(2, 1, 2 if market_data is not None and not market_data.empty else 1, 1)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/matplotlib/pyplot.py", line 1544, in subplot
+    key = SubplotSpec._from_subplot_args(fig, args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/matplotlib/gridspec.py", line 576, in _from_subplot_args
+    raise _api.nargs_error("subplot", takes="1 or 3", given=len(args))
+TypeError: subplot() takes 1 or 3 positional arguments but 4 were given
+
+2025-03-07 03:36:11,530 - test_new_modules - INFO - Đã tạo biểu đồ các mức chốt lời tại: Error creating chart
+2025-03-07 03:36:11,530 - partial_take_profit_manager - INFO - Đã reset cấu hình chốt lời cho BTCUSDT - test_position
+2025-03-07 04:46:22,671 - test_new_modules - INFO - Kiểm tra Order Flow Indicators...
+2025-03-07 04:46:22,688 - order_flow_indicators - INFO - Đã mô phỏng dữ liệu order flow cho BTCUSDT từ 100 nến
+2025-03-07 04:46:22,689 - test_new_modules - INFO - Đã thêm 0 chỉ báo mới: set()
+2025-03-07 04:46:22,689 - test_new_modules - INFO - Order Flow Bias: False
+2025-03-07 04:46:22,689 - test_new_modules - INFO - Buy Signal: False
+2025-03-07 04:46:22,689 - test_new_modules - INFO - Sell Signal: False
+2025-03-07 04:46:22,766 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:22,773 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:22,785 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:22,791 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:22,851 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:22,858 - matplotlib.category - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2025-03-07 04:46:23,900 - order_flow_indicators - INFO - Đã tạo biểu đồ delta flow tại: data/order_flow/BTCUSDT/BTCUSDT_delta_flow.png
+2025-03-07 04:46:23,901 - test_new_modules - INFO - Đã tạo biểu đồ tại: data/order_flow/BTCUSDT/BTCUSDT_delta_flow.png
+2025-03-07 04:46:23,901 - test_new_modules - INFO - Kiểm tra Volume Profile Analyzer...
+2025-03-07 04:46:23,910 - test_new_modules - INFO - POC: 57352.681496383695
+2025-03-07 04:46:23,910 - test_new_modules - INFO - Value Area: {'high': np.float64(79969.33173956533), 'low': np.float64(57106.848341566496)}
+2025-03-07 04:46:23,910 - test_new_modules - INFO - Secondary POCs: [{'price_low': 56983.931764157904, 'price_high': 57229.764918975095, 'price_mid': 57106.848341566496, 'volume': 766.8547742792011}, {'price_low': 57229.764918975095, 'price_high': 57475.59807379229, 'price_mid': 57352.681496383695, 'volume': 2369.7295265910543}, {'price_low': 57475.59807379229, 'price_high': 57721.43122860948, 'price_mid': 57598.51465120088, 'volume': 899.8814441605354}, {'price_low': 57721.43122860948, 'price_high': 57967.26438342667, 'price_mid': 57844.34780601808, 'volume': 629.0970102807712}, {'price_low': 59933.929621964206, 'price_high': 60179.7627767814, 'price_mid': 60056.8461993728, 'volume': 535.3457364321501}, {'price_low': 60179.7627767814, 'price_high': 60425.59593159859, 'price_mid': 60302.67935419, 'volume': 784.1933592812908}, {'price_low': 60425.59593159859, 'price_high': 60671.42908641578, 'price_mid': 60548.51250900718, 'volume': 732.4423568279842}, {'price_low': 60671.42908641578, 'price_high': 60917.26224123297, 'price_mid': 60794.34566382438, 'volume': 497.0768459250328}, {'price_low': 63129.7606345877, 'price_high': 63375.59378940489, 'price_mid': 63252.6772119963, 'volume': 728.9604716523562}, {'price_low': 63375.59378940489, 'price_high': 63621.42694422208, 'price_mid': 63498.51036681348, 'volume': 823.2463051927019}, {'price_low': 64358.92640867365, 'price_high': 64604.75956349085, 'price_mid': 64481.84298608225, 'volume': 529.7908684025582}, {'price_low': 64604.75956349085, 'price_high': 64850.592718308035, 'price_mid': 64727.67614089944, 'volume': 510.938722979289}, {'price_low': 64850.592718308035, 'price_high': 65096.425873125234, 'price_mid': 64973.509295716634, 'volume': 510.93872297931927}, {'price_low': 71979.7542080066, 'price_high': 72225.58736282379, 'price_mid': 72102.67078541519, 'volume': 546.9374793132997}, {'price_low': 72225.58736282379, 'price_high': 72471.42051764097, 'price_mid': 72348.50394023239, 'volume': 621.7424293717314}, {'price_low': 72471.42051764097, 'price_high': 72717.25367245817, 'price_mid': 72594.33709504957, 'volume': 561.9824782042967}, {'price_low': 78617.24938807078, 'price_high': 78863.08254288798, 'price_mid': 78740.16596547938, 'volume': 751.738463843615}, {'price_low': 78863.08254288798, 'price_high': 79108.91569770516, 'price_mid': 78985.99912029656, 'volume': 1059.0867828354062}, {'price_low': 79108.91569770516, 'price_high': 79354.74885252235, 'price_mid': 79231.83227511376, 'volume': 1059.0867828354062}, {'price_low': 79354.74885252235, 'price_high': 79600.58200733954, 'price_mid': 79477.66542993094, 'volume': 921.8617713165344}, {'price_low': 79600.58200733954, 'price_high': 79846.41516215674, 'price_mid': 79723.49858474814, 'volume': 961.8742824426713}, {'price_low': 79846.41516215674, 'price_high': 80092.24831697393, 'price_mid': 79969.33173956533, 'volume': 878.042678400838}]
+2025-03-07 04:46:23,944 - test_new_modules - INFO - Support Zones: 1
+2025-03-07 04:46:23,944 - test_new_modules - INFO - Resistance Zones: 5
+2025-03-07 04:46:23,954 - test_new_modules - INFO - Volume Patterns: 0
+2025-03-07 04:46:24,298 - test_new_modules - INFO - Đã tạo biểu đồ Volume Profile tại: charts/volume_profile/volume_profile_20250307_044624.png
+2025-03-07 04:46:24,302 - test_new_modules - INFO - VWAP: 70686.7033616338
+2025-03-07 04:46:24,569 - test_new_modules - INFO - Đã tạo biểu đồ VWAP tại: charts/vwap/vwap_day_20250307_044624.png
+2025-03-07 04:46:24,569 - test_new_modules - INFO - Kiểm tra Adaptive Exit Strategy...
+2025-03-07 04:46:24,584 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 04:46:24,585 - test_new_modules - INFO - Chế độ thị trường: neutral
+2025-03-07 04:46:24,585 - test_new_modules - INFO - Chiến lược active: ['trailing_stop', 'indicator_based_exit']
+2025-03-07 04:46:24,585 - test_new_modules - INFO - - trailing_stop: 0.52
+2025-03-07 04:46:24,585 - test_new_modules - INFO - - indicator_based_exit: 0.48
+2025-03-07 04:46:24,586 - test_new_modules - INFO - Stop Loss: 56939.89 (trailing_stop)
+2025-03-07 04:46:24,586 - test_new_modules - INFO - Trailing Stop: 56939.89
+2025-03-07 04:46:24,586 - test_new_modules - INFO - Partial Take Profits: 0
+2025-03-07 04:46:24,599 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 04:46:24,600 - test_new_modules - INFO - Exit Signal: False
+2025-03-07 04:46:24,988 - adaptive_exit_strategy - INFO - Đã tạo biểu đồ các điểm thoát lệnh tại: data/exit_strategies/exit_points_chart.png
+2025-03-07 04:46:24,989 - test_new_modules - INFO - Đã tạo biểu đồ các điểm thoát lệnh tại: data/exit_strategies/exit_points_chart.png
+2025-03-07 04:46:24,989 - test_new_modules - INFO - Kiểm tra Partial Take Profit Manager...
+2025-03-07 04:46:24,989 - partial_take_profit_manager - INFO - Đã tải cấu hình từ: data/partial_take_profit
+2025-03-07 04:46:25,001 - enhanced_market_regime_detector - ERROR - Lỗi khi phát hiện chế độ thị trường: 'ATR_Ratio'
+2025-03-07 04:46:25,001 - test_new_modules - INFO - Số mức chốt lời: 3
+2025-03-07 04:46:25,001 - test_new_modules - INFO - Mức 1: 55101.08 (30%)
+2025-03-07 04:46:25,001 - test_new_modules - INFO - Mức 2: 55915.38 (30%)
+2025-03-07 04:46:25,001 - test_new_modules - INFO - Mức 3: 57001.12 (40%)
+2025-03-07 04:46:25,002 - test_new_modules - INFO - TP Signal at price 55101.08: True
+2025-03-07 04:46:25,002 - test_new_modules - INFO - TP Level: 1
+2025-03-07 04:46:25,002 - test_new_modules - INFO - TP Quantity: 0.03
+2025-03-07 04:46:25,002 - partial_take_profit_manager - INFO - Đã thực hiện chốt lời mức 1 cho BTCUSDT - test_position với giá 55101.07825104532
+2025-03-07 04:46:25,002 - test_new_modules - INFO - Execute TP Result: True
+2025-03-07 04:46:25,002 - test_new_modules - INFO - Adjusted Stop: None
+2025-03-07 04:46:25,002 - test_new_modules - INFO - Remaining Levels: 2
+2025-03-07 04:46:25,002 - test_new_modules - INFO - Executed Percent: 30.0%
+2025-03-07 04:46:25,003 - test_new_modules - INFO - Remaining Quantity: 0.070000
+2025-03-07 04:46:25,090 - partial_take_profit_manager - ERROR - Lỗi khi tạo biểu đồ các mức chốt lời: subplot() takes 1 or 3 positional arguments but 4 were given
+2025-03-07 04:46:25,093 - partial_take_profit_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/partial_take_profit_manager.py", line 713, in visualize_tp_levels
+    plt.subplot(2, 1, 2 if market_data is not None and not market_data.empty else 1, 1)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/matplotlib/pyplot.py", line 1544, in subplot
+    key = SubplotSpec._from_subplot_args(fig, args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/matplotlib/gridspec.py", line 576, in _from_subplot_args
+    raise _api.nargs_error("subplot", takes="1 or 3", given=len(args))
+TypeError: subplot() takes 1 or 3 positional arguments but 4 were given
+
+2025-03-07 04:46:25,093 - test_new_modules - INFO - Đã tạo biểu đồ các mức chốt lời tại: Error creating chart
+2025-03-07 04:46:25,093 - partial_take_profit_manager - INFO - Đã reset cấu hình chốt lời cho BTCUSDT - test_position

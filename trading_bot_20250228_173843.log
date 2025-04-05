@@ -1,0 +1,14 @@
+2025-02-28 17:38:46,408 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-02-28 17:38:46,409 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-02-28 17:38:46,951 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://testnet.binancefuture.com/fapi/v1/ping
+2025-02-28 17:38:46,951 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+Traceback (most recent call last):
+  File "/home/runner/workspace/run_live_trading.py", line 616, in <module>
+    main()
+  File "/home/runner/workspace/run_live_trading.py", line 599, in main
+    bot = LiveTradingBot(
+          ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/run_live_trading.py", line 85, in __init__
+    self.data_processor = DataProcessor(self.api, use_advanced_features=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: DataProcessor.__init__() got an unexpected keyword argument 'use_advanced_features'

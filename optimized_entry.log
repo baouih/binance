@@ -1,0 +1,7 @@
+2025-03-09 14:56:55,241 - optimized_entry_strategy - INFO - Đã lưu chiến lược vào lệnh vào optimized_entry_strategy.json
+2025-03-09 14:56:55,241 - optimized_entry_strategy - INFO - Đã tạo báo cáo lịch trình vào lệnh tại optimized_entry_schedule.md
+2025-03-09 14:56:55,242 - optimized_entry_strategy - INFO - Đã tạo file mẫu giao dịch: trading_patterns/breakout_after_consolidation.md
+2025-03-09 14:56:55,242 - optimized_entry_strategy - INFO - Đã tạo file mẫu giao dịch: trading_patterns/double_bottom_top.md
+2025-03-09 14:56:55,242 - optimized_entry_strategy - INFO - Đã tạo file mẫu giao dịch: trading_patterns/golden_cross.md
+2025-03-09 14:56:55,243 - optimized_entry_strategy - INFO - Đã tạo file mẫu giao dịch: trading_patterns/support_resistance_bounce.md
+2025-03-09 14:56:55,243 - optimized_entry_strategy - INFO - Đã tạo file mẫu giao dịch: trading_patterns/oversold_overbought_reversal.md

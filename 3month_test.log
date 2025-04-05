@@ -1,0 +1,7 @@
+2025-03-06 12:44:37,791 - 3month_test - INFO - === BẮT ĐẦU THỬ NGHIỆM THỰC TẾ 3 THÁNG ===
+2025-03-06 12:44:37,791 - 3month_test - INFO - Tổng số cặp tiền: 2
+2025-03-06 12:44:37,791 - 3month_test - INFO - Khung thời gian: 1h
+2025-03-06 12:44:37,791 - 3month_test - INFO - Sử dụng rủi ro thích ứng: True
+2025-03-06 12:44:37,792 - 3month_test - INFO - Chạy backtest cho BTCUSDT 1h...
+2025-03-06 12:44:46,213 - 3month_test - INFO - BTCUSDT: Lợi nhuận 0.97%, Win rate 82.35%, Profit factor 2.25
+2025-03-06 12:44:46,217 - 3month_test - INFO - Chạy backtest cho ETHUSDT 1h...

@@ -1,0 +1,9 @@
+2025-03-11 15:01:06,874 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-11 15:01:07,481 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-11 15:01:07.405000
+2025-03-11 15:01:07,482 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-11 15:01:07,483 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-11 15:01:07,486 - config_routes - INFO - Đã đăng ký blueprint cho cấu hình
+2025-03-11 15:01:07,487 - main - INFO - Đã đăng ký blueprint cho cấu hình
+2025-03-11 15:01:07,498 - bot_api - INFO - Đã đăng ký blueprint cho API Bot
+2025-03-11 15:01:07,498 - main - INFO - Đã đăng ký blueprint cho API Bot
+2025-03-11 15:01:07,510 - main - INFO - Background tasks not auto-started. Use API to start them manually.

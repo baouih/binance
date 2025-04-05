@@ -1,0 +1,45 @@
+2025-03-16 11:35:15,066 - SimpleLiveTest - ERROR - Lỗi khi kết nối đến Binance API: BinanceAPI.__init__() got an unexpected keyword argument 'is_testnet'
+2025-03-16 11:38:43,506 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-16 11:38:43,506 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-16 11:38:43,506 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-16 11:38:43,507 - SimpleLiveTest - INFO - Đã sử dụng BinanceAPI từ module binance_api
+2025-03-16 11:38:43,507 - SimpleLiveTest - INFO - Đã kết nối thành công đến Binance Testnet API
+2025-03-16 11:38:43,507 - SimpleLiveTest - WARNING - Không thể lấy thông tin tài khoản, phương thức không được hỗ trợ
+2025-03-16 11:38:43,507 - SimpleLiveTest - INFO - Số dư khả dụng trên tài khoản Testnet: 10000.0 USDT
+2025-03-16 11:38:43,507 - SimpleLiveTest - INFO - Đã khởi tạo SimpleLiveTest với số dư ban đầu 10000.0 USDT
+2025-03-16 11:38:43,508 - SimpleLiveTest - INFO - Bắt đầu chạy thử nghiệm trong 10 phút...
+2025-03-16 11:38:43,508 - SimpleLiveTest - INFO - Kiểm tra điều kiện giao dịch...
+2025-03-16 11:38:43,508 - SimpleLiveTest - INFO - Không phải thời điểm giao dịch tối ưu, bỏ qua
+2025-03-16 11:38:43,508 - SimpleLiveTest - INFO - Kiểm tra các vị thế đang mở...
+2025-03-16 11:38:43,696 - binance_api - INFO - Tìm thấy 4 vị thế đang mở
+2025-03-16 11:38:43,697 - SimpleLiveTest - WARNING - Không thể lấy thông tin tài khoản, phương thức không được hỗ trợ
+2025-03-16 11:38:43,697 - SimpleLiveTest - INFO - 
+===== BÁO CÁO KIỂM THỬ LIVE MULTI-COIN =====
+
+Thời gian hiện tại: 2025-03-16 11:38:43
+Số dư ban đầu: 10000.00 USDT
+Số dư hiện tại: 10000.00 USDT
+Lợi nhuận: 0.00 USDT (0.00%)
+Số giao dịch: 0
+Thắng/Thua: 0/0
+Tỷ lệ thắng: 0.00%
+
+THỐNG KÊ THEO COIN:
+-----------------
+
+THỐNG KÊ THEO PHIÊN:
+-------------------
+
+DANH SÁCH GIAO DỊCH:
+------------------
+
+PHIÊN GIAO DỊCH TỐI ƯU:
+---------------------
+London Open: 15:00 - 17:00, Hướng: SHORT, Win Rate (Backtest): 95.00%
+New York Open: 20:30 - 22:30, Hướng: SHORT, Win Rate (Backtest): 90.00%
+Major News Events: 21:30 - 22:00, Hướng: SHORT, Win Rate (Backtest): 80.00%
+Daily Candle Close: 06:30 - 07:30, Hướng: LONG, Win Rate (Backtest): 75.00%
+London/NY Close: 03:00 - 05:00, Hướng: BOTH, Win Rate (Backtest): 70.00%
+
+
+2025-03-16 11:38:43,698 - SimpleLiveTest - INFO - Đợi 60 giây trước khi kiểm tra lại...

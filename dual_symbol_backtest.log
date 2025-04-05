@@ -1,0 +1,24 @@
+2025-03-19 11:52:05,830 - simple_backtest - INFO - === BẮT ĐẦU BACKTEST ĐƠN GIẢN ===
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Số lượng symbols: 1
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Khung thời gian: 1d
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Khoảng thời gian: 1mo
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Số dư ban đầu: $10000
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Mức rủi ro: low
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-19 11:52:05,831 - simple_backtest - INFO - Đòn bẩy: 3x
+2025-03-19 11:52:05,831 - simple_backtest - INFO - 
+Bắt đầu backtest BTC-USD,ETH-USD
+[                       0%                       ][*********************100%***********************]  2 of 2 completed
+2025-03-19 11:52:06,082 - simple_backtest - INFO - Đã tải 29 dòng dữ liệu cho BTC-USD,ETH-USD
+2025-03-19 11:52:06,095 - simple_backtest - ERROR - Lỗi khi backtest BTC-USD,ETH-USD: cannot convert the series to <class 'float'>
+2025-03-19 11:52:06,095 - simple_backtest - INFO - 
+=== KẾT QUẢ BACKTEST ===
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Số lượng giao dịch: 0
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-19 11:52:06,095 - simple_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-19 11:52:06,095 - simple_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+YF.download() has changed argument auto_adjust default to True

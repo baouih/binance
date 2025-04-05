@@ -1,0 +1,22 @@
+2025-03-15 16:43:46,782 - three_month_test - INFO - Khởi tạo backtest cho 1 cặp tiền, khung thời gian 1h, thời gian 90 ngày
+2025-03-15 16:43:46,782 - three_month_test - INFO - Bắt đầu backtest cho BTCUSDT
+2025-03-15 16:43:46,783 - three_month_test - INFO - Tải dữ liệu BTCUSDT từ 2024-12-15 đến 2025-03-15
+2025-03-15 16:43:46,783 - three_month_test - INFO - Đang tải dữ liệu từ data/BTCUSDT_1h_data.csv
+2025-03-15 16:43:46,796 - three_month_test - INFO - Đã tải 2127 nến cho BTCUSDT
+2025-03-15 16:43:46,796 - three_month_test - INFO - Bắt đầu backtest chiến lược multi_risk với risk_level=0.1
+2025-03-15 16:43:46,796 - multi_risk_strategy - INFO - Khởi tạo MultiRiskStrategy với risk_level=0.1, lookback_period=14
+2025-03-15 16:43:47,028 - multi_risk_strategy - INFO - Đã tạo 378 tín hiệu giao dịch
+2025-03-15 16:43:47,079 - three_month_test - INFO - Kết quả backtest chiến lược multi_risk (risk=0.1): P/L: -7.91%, Win Rate: 43.70%, Trades: 373, Max DD: 19.01%
+2025-03-15 16:43:47,080 - three_month_test - INFO - Bắt đầu backtest chiến lược multi_risk với risk_level=0.15
+2025-03-15 16:43:47,080 - multi_risk_strategy - INFO - Khởi tạo MultiRiskStrategy với risk_level=0.15, lookback_period=14
+2025-03-15 16:43:47,337 - multi_risk_strategy - INFO - Đã tạo 378 tín hiệu giao dịch
+2025-03-15 16:43:47,386 - three_month_test - INFO - Kết quả backtest chiến lược multi_risk (risk=0.15): P/L: -41.81%, Win Rate: 38.01%, Trades: 371, Max DD: 42.68%
+2025-03-15 16:43:47,386 - three_month_test - INFO - Bắt đầu backtest chiến lược multi_risk với risk_level=0.2
+2025-03-15 16:43:47,386 - multi_risk_strategy - INFO - Khởi tạo MultiRiskStrategy với risk_level=0.2, lookback_period=14
+2025-03-15 16:43:47,635 - multi_risk_strategy - INFO - Đã tạo 378 tín hiệu giao dịch
+2025-03-15 16:43:47,681 - three_month_test - INFO - Kết quả backtest chiến lược multi_risk (risk=0.2): P/L: -72.71%, Win Rate: 26.88%, Trades: 372, Max DD: 73.01%
+2025-03-15 16:43:47,681 - three_month_test - INFO - Bắt đầu backtest chiến lược multi_risk với risk_level=0.25
+2025-03-15 16:43:47,681 - multi_risk_strategy - INFO - Khởi tạo MultiRiskStrategy với risk_level=0.25, lookback_period=14
+2025-03-15 16:43:47,948 - multi_risk_strategy - INFO - Đã tạo 378 tín hiệu giao dịch
+2025-03-15 16:43:48,001 - three_month_test - INFO - Kết quả backtest chiến lược multi_risk (risk=0.25): P/L: -87.50%, Win Rate: 20.32%, Trades: 374, Max DD: 87.86%
+2025-03-15 16:43:48,002 - three_month_test - INFO - Bắt đầu backtest chiến lược sideways với risk_level=0.1

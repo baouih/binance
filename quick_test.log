@@ -1,0 +1,41 @@
+2025-03-01 15:41:59,785 - quick_test - INFO - Đã tải dữ liệu: 564 candles từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:42:01,988 - quick_test - INFO - Đã tạo biểu đồ: test_charts/btc_quick_test.png
+2025-03-01 15:42:01,991 - quick_test - INFO - Đã tạo báo cáo: test_results/btc_quick_report.html
+2025-03-06 17:51:37,111 - quick_test - INFO - === BẮT ĐẦU CHẠY KIỂM THỬ NHANH CHO BTCUSDT ===
+2025-03-06 17:51:37,112 - quick_test - INFO - Chạy backtest với mức rủi ro 0.5%
+2025-03-06 17:51:37,113 - quick_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 0.5% trên dữ liệu 14 ngày
+2025-03-06 17:51:37,113 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:51:39,114 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/BTCUSDT_1h_risk0_5_quick_results.json
+2025-03-06 17:51:39,616 - quick_test - INFO - Chạy backtest với mức rủi ro 1.0%
+2025-03-06 17:51:39,617 - quick_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 1.0% trên dữ liệu 14 ngày
+2025-03-06 17:51:39,617 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:51:41,617 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/BTCUSDT_1h_risk1_0_quick_results.json
+2025-03-06 17:51:42,118 - quick_test - INFO - Chạy backtest với mức rủi ro 1.5%
+2025-03-06 17:51:42,118 - quick_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 1.5% trên dữ liệu 14 ngày
+2025-03-06 17:51:42,118 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:51:44,119 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/BTCUSDT_1h_risk1_5_quick_results.json
+2025-03-06 17:51:44,619 - quick_test - INFO - Chạy backtest với mức rủi ro 2.0%
+2025-03-06 17:51:44,619 - quick_test - INFO - Chạy backtest cho BTCUSDT với mức rủi ro 2.0% trên dữ liệu 14 ngày
+2025-03-06 17:51:44,619 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:51:46,620 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/BTCUSDT_1h_risk2_0_quick_results.json
+2025-03-06 17:57:44,587 - quick_test - INFO - === BẮT ĐẦU CHẠY KIỂM THỬ NHANH CHO ETHUSDT ===
+2025-03-06 17:57:44,588 - quick_test - INFO - Chạy backtest với mức rủi ro 0.5%
+2025-03-06 17:57:44,588 - quick_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 0.5% trên dữ liệu 14 ngày
+2025-03-06 17:57:44,589 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:57:46,589 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/ETHUSDT_1h_risk0_5_quick_results.json
+2025-03-06 17:57:47,090 - quick_test - INFO - Chạy backtest với mức rủi ro 1.0%
+2025-03-06 17:57:47,090 - quick_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 1.0% trên dữ liệu 14 ngày
+2025-03-06 17:57:47,090 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:57:49,091 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/ETHUSDT_1h_risk1_0_quick_results.json
+2025-03-06 17:57:49,591 - quick_test - INFO - Chạy backtest với mức rủi ro 1.5%
+2025-03-06 17:57:49,591 - quick_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 1.5% trên dữ liệu 14 ngày
+2025-03-06 17:57:49,591 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:57:51,592 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/ETHUSDT_1h_risk1_5_quick_results.json
+2025-03-06 17:57:52,092 - quick_test - INFO - Chạy backtest với mức rủi ro 2.0%
+2025-03-06 17:57:52,092 - quick_test - INFO - Chạy backtest cho ETHUSDT với mức rủi ro 2.0% trên dữ liệu 14 ngày
+2025-03-06 17:57:52,092 - quick_test - INFO - Khoảng thời gian: 2025-02-20 đến 2025-03-06
+2025-03-06 17:57:54,093 - quick_test - INFO - Đã lưu kết quả backtest vào backtest_results/ETHUSDT_1h_risk2_0_quick_results.json
+2025-03-09 15:07:13,501 - quick_test_strategy - INFO - Đang tạo dữ liệu test...
+2025-03-09 15:07:56,324 - quick_test_strategy - INFO - Đang tạo dữ liệu test...
+2025-03-09 15:07:58,321 - quick_test_strategy - INFO - Đã tạo xong dữ liệu test
+2025-03-09 15:07:58,322 - quick_test_strategy - INFO - Đã tạo báo cáo markdown tại test_results/quick_test_report.md

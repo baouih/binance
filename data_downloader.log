@@ -1,0 +1,200 @@
+2025-03-09 17:47:20,956 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 17:47:20,956 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 17:47:20,956 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 17:47:21,125 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 17:47:21,125 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 17:47:21,125 - data_downloader - INFO - Khởi tạo DataDownloader, testnet=True
+2025-03-09 17:47:21,125 - data_downloader - INFO - Tải dữ liệu lịch sử cho BTCUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,125 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,126 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,126 - data_downloader - INFO - Tải dữ liệu lịch sử cho BTCUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,126 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,126 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,127 - data_downloader - INFO - Tải dữ liệu lịch sử cho ETHUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,127 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,127 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,127 - data_downloader - INFO - Tải dữ liệu lịch sử cho ETHUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,127 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,128 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,128 - data_downloader - INFO - Tải dữ liệu lịch sử cho BNBUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,128 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,128 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,128 - data_downloader - INFO - Tải dữ liệu lịch sử cho BNBUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,128 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,128 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,129 - data_downloader - INFO - Tải dữ liệu lịch sử cho SOLUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,129 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,129 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,129 - data_downloader - INFO - Tải dữ liệu lịch sử cho SOLUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,129 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,129 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,129 - data_downloader - INFO - Tải dữ liệu lịch sử cho ADAUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,130 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,130 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:47:21,130 - data_downloader - INFO - Tải dữ liệu lịch sử cho ADAUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:47:21,130 - data_downloader - ERROR - Lỗi khi tải dữ liệu lịch sử: 'BinanceAPI' object has no attribute 'get_historical_klines'
+2025-03-09 17:47:21,130 - data_downloader - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/data_downloader.py", line 185, in download_historical_data
+    klines = self.api.get_historical_klines(symbol, binance_interval, start_str, end_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BinanceAPI' object has no attribute 'get_historical_klines'
+
+2025-03-09 17:50:13,583 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 17:50:13,583 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 17:50:13,583 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 17:50:13,984 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 17:50:13,984 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 17:50:13,985 - data_downloader - INFO - Sử dụng BinanceAPI từ app
+2025-03-09 17:50:14,685 - data_downloader - INFO - Đã khởi tạo Binance Client, testnet=True
+2025-03-09 17:50:14,685 - data_downloader - INFO - Khởi tạo DataDownloader, testnet=True
+2025-03-09 17:50:14,685 - data_downloader - INFO - Tải dữ liệu lịch sử cho BTCUSDT 1h từ 07 Feb, 2025 đến 09 Mar, 2025
+2025-03-09 17:50:15,018 - data_downloader - INFO - Đã tải 720 nến cho BTCUSDT 1h
+2025-03-09 17:50:15,026 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BTCUSDT 1h vào real_data/BTCUSDT_1h_historical_data.csv
+2025-03-09 17:50:23,594 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 17:50:23,595 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 17:50:23,595 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 17:50:23,994 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 17:50:23,994 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 17:50:23,994 - data_downloader - INFO - Sử dụng BinanceAPI từ app
+2025-03-09 17:50:24,610 - data_downloader - INFO - Đã khởi tạo Binance Client, testnet=True
+2025-03-09 17:50:24,611 - data_downloader - INFO - Khởi tạo DataDownloader, testnet=True
+2025-03-09 17:50:24,620 - data_downloader - INFO - Đã tải 720 nến từ real_data/BTCUSDT_1h_historical_data.csv
+2025-03-09 17:50:24,620 - data_downloader - INFO - Tải dữ liệu lịch sử cho BTCUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:24,814 - data_downloader - INFO - Đã tải 540 nến cho BTCUSDT 4h
+2025-03-09 17:50:24,823 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BTCUSDT 4h vào real_data/BTCUSDT_4h_historical_data.csv
+2025-03-09 17:50:24,823 - data_downloader - INFO - Tải dữ liệu lịch sử cho BTCUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:24,978 - data_downloader - INFO - Đã tải 90 nến cho BTCUSDT 1d
+2025-03-09 17:50:24,980 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BTCUSDT 1d vào real_data/BTCUSDT_1d_historical_data.csv
+2025-03-09 17:50:24,980 - data_downloader - INFO - Tải dữ liệu lịch sử cho ETHUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:25,735 - data_downloader - INFO - Đã tải 1000 nến cho ETHUSDT 1h
+2025-03-09 17:50:25,747 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ETHUSDT 1h vào real_data/ETHUSDT_1h_historical_data.csv
+2025-03-09 17:50:25,748 - data_downloader - INFO - Tải dữ liệu lịch sử cho ETHUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:26,069 - data_downloader - INFO - Đã tải 540 nến cho ETHUSDT 4h
+2025-03-09 17:50:26,076 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ETHUSDT 4h vào real_data/ETHUSDT_4h_historical_data.csv
+2025-03-09 17:50:26,077 - data_downloader - INFO - Tải dữ liệu lịch sử cho ETHUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:26,230 - data_downloader - INFO - Đã tải 90 nến cho ETHUSDT 1d
+2025-03-09 17:50:26,232 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ETHUSDT 1d vào real_data/ETHUSDT_1d_historical_data.csv
+2025-03-09 17:50:26,233 - data_downloader - INFO - Tải dữ liệu lịch sử cho BNBUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:26,842 - data_downloader - INFO - Đã tải 1000 nến cho BNBUSDT 1h
+2025-03-09 17:50:26,856 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BNBUSDT 1h vào real_data/BNBUSDT_1h_historical_data.csv
+2025-03-09 17:50:26,856 - data_downloader - INFO - Tải dữ liệu lịch sử cho BNBUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:27,472 - data_downloader - INFO - Đã tải 540 nến cho BNBUSDT 4h
+2025-03-09 17:50:27,480 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BNBUSDT 4h vào real_data/BNBUSDT_4h_historical_data.csv
+2025-03-09 17:50:27,480 - data_downloader - INFO - Tải dữ liệu lịch sử cho BNBUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:27,634 - data_downloader - INFO - Đã tải 90 nến cho BNBUSDT 1d
+2025-03-09 17:50:27,636 - data_downloader - INFO - Đã lưu dữ liệu lịch sử BNBUSDT 1d vào real_data/BNBUSDT_1d_historical_data.csv
+2025-03-09 17:50:27,636 - data_downloader - INFO - Tải dữ liệu lịch sử cho SOLUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:27,959 - data_downloader - INFO - Đã tải 1000 nến cho SOLUSDT 1h
+2025-03-09 17:50:27,971 - data_downloader - INFO - Đã lưu dữ liệu lịch sử SOLUSDT 1h vào real_data/SOLUSDT_1h_historical_data.csv
+2025-03-09 17:50:27,971 - data_downloader - INFO - Tải dữ liệu lịch sử cho SOLUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:28,158 - data_downloader - INFO - Đã tải 540 nến cho SOLUSDT 4h
+2025-03-09 17:50:28,165 - data_downloader - INFO - Đã lưu dữ liệu lịch sử SOLUSDT 4h vào real_data/SOLUSDT_4h_historical_data.csv
+2025-03-09 17:50:28,166 - data_downloader - INFO - Tải dữ liệu lịch sử cho SOLUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:28,323 - data_downloader - INFO - Đã tải 90 nến cho SOLUSDT 1d
+2025-03-09 17:50:28,325 - data_downloader - INFO - Đã lưu dữ liệu lịch sử SOLUSDT 1d vào real_data/SOLUSDT_1d_historical_data.csv
+2025-03-09 17:50:28,325 - data_downloader - INFO - Tải dữ liệu lịch sử cho ADAUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:28,645 - data_downloader - INFO - Đã tải 1000 nến cho ADAUSDT 1h
+2025-03-09 17:50:28,655 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ADAUSDT 1h vào real_data/ADAUSDT_1h_historical_data.csv
+2025-03-09 17:50:28,655 - data_downloader - INFO - Tải dữ liệu lịch sử cho ADAUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:29,269 - data_downloader - INFO - Đã tải 540 nến cho ADAUSDT 4h
+2025-03-09 17:50:29,274 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ADAUSDT 4h vào real_data/ADAUSDT_4h_historical_data.csv
+2025-03-09 17:50:29,275 - data_downloader - INFO - Tải dữ liệu lịch sử cho ADAUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:29,714 - data_downloader - INFO - Đã tải 90 nến cho ADAUSDT 1d
+2025-03-09 17:50:29,715 - data_downloader - INFO - Đã lưu dữ liệu lịch sử ADAUSDT 1d vào real_data/ADAUSDT_1d_historical_data.csv
+2025-03-09 17:50:29,716 - data_downloader - INFO - Tải dữ liệu lịch sử cho XRPUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:30,328 - data_downloader - INFO - Đã tải 1000 nến cho XRPUSDT 1h
+2025-03-09 17:50:30,341 - data_downloader - INFO - Đã lưu dữ liệu lịch sử XRPUSDT 1h vào real_data/XRPUSDT_1h_historical_data.csv
+2025-03-09 17:50:30,342 - data_downloader - INFO - Tải dữ liệu lịch sử cho XRPUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:32,151 - data_downloader - INFO - Đã tải 540 nến cho XRPUSDT 4h
+2025-03-09 17:50:32,159 - data_downloader - INFO - Đã lưu dữ liệu lịch sử XRPUSDT 4h vào real_data/XRPUSDT_4h_historical_data.csv
+2025-03-09 17:50:32,160 - data_downloader - INFO - Tải dữ liệu lịch sử cho XRPUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:32,601 - data_downloader - INFO - Đã tải 90 nến cho XRPUSDT 1d
+2025-03-09 17:50:32,604 - data_downloader - INFO - Đã lưu dữ liệu lịch sử XRPUSDT 1d vào real_data/XRPUSDT_1d_historical_data.csv
+2025-03-09 17:50:32,604 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOGEUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:33,223 - data_downloader - INFO - Đã tải 1000 nến cho DOGEUSDT 1h
+2025-03-09 17:50:33,236 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOGEUSDT 1h vào real_data/DOGEUSDT_1h_historical_data.csv
+2025-03-09 17:50:33,237 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOGEUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:49,529 - binance_api - WARNING - Không thể tải cấu hình tài khoản, sử dụng cấu hình mặc định: [Errno 2] No such file or directory: '../account_config.json'
+2025-03-09 17:50:49,529 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-03-09 17:50:49,529 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-03-09 17:50:49,938 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://fapi.binance.com/fapi/v1/ping
+2025-03-09 17:50:49,938 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-03-09 17:50:49,939 - data_downloader - INFO - Sử dụng BinanceAPI từ app
+2025-03-09 17:50:50,528 - data_downloader - INFO - Đã khởi tạo Binance Client, testnet=True
+2025-03-09 17:50:50,529 - data_downloader - INFO - Khởi tạo DataDownloader, testnet=True
+2025-03-09 17:50:50,537 - data_downloader - INFO - Đã tải 1000 nến từ real_data/DOGEUSDT_1h_historical_data.csv
+2025-03-09 17:50:50,537 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOGEUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:50,733 - data_downloader - INFO - Đã tải 540 nến cho DOGEUSDT 4h
+2025-03-09 17:50:50,741 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOGEUSDT 4h vào real_data/DOGEUSDT_4h_historical_data.csv
+2025-03-09 17:50:50,741 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOGEUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:51,182 - data_downloader - INFO - Đã tải 90 nến cho DOGEUSDT 1d
+2025-03-09 17:50:51,183 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOGEUSDT 1d vào real_data/DOGEUSDT_1d_historical_data.csv
+2025-03-09 17:50:51,184 - data_downloader - INFO - Tải dữ liệu lịch sử cho MATICUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:51,355 - data_downloader - ERROR - Không thể tải dữ liệu cho MATICUSDT 1h
+2025-03-09 17:50:51,355 - data_downloader - INFO - Tải dữ liệu lịch sử cho MATICUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:51,803 - data_downloader - ERROR - Không thể tải dữ liệu cho MATICUSDT 4h
+2025-03-09 17:50:51,803 - data_downloader - INFO - Tải dữ liệu lịch sử cho MATICUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:51,952 - data_downloader - ERROR - Không thể tải dữ liệu cho MATICUSDT 1d
+2025-03-09 17:50:51,952 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOTUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:54,134 - data_downloader - INFO - Đã tải 1000 nến cho DOTUSDT 1h
+2025-03-09 17:50:54,146 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOTUSDT 1h vào real_data/DOTUSDT_1h_historical_data.csv
+2025-03-09 17:50:54,147 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOTUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:54,335 - data_downloader - INFO - Đã tải 540 nến cho DOTUSDT 4h
+2025-03-09 17:50:54,342 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOTUSDT 4h vào real_data/DOTUSDT_4h_historical_data.csv
+2025-03-09 17:50:54,342 - data_downloader - INFO - Tải dữ liệu lịch sử cho DOTUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:54,778 - data_downloader - INFO - Đã tải 90 nến cho DOTUSDT 1d
+2025-03-09 17:50:54,780 - data_downloader - INFO - Đã lưu dữ liệu lịch sử DOTUSDT 1d vào real_data/DOTUSDT_1d_historical_data.csv
+2025-03-09 17:50:54,781 - data_downloader - INFO - Tải dữ liệu lịch sử cho LTCUSDT 1h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:54,971 - data_downloader - INFO - Đã tải 1000 nến cho LTCUSDT 1h
+2025-03-09 17:50:54,983 - data_downloader - INFO - Đã lưu dữ liệu lịch sử LTCUSDT 1h vào real_data/LTCUSDT_1h_historical_data.csv
+2025-03-09 17:50:54,984 - data_downloader - INFO - Tải dữ liệu lịch sử cho LTCUSDT 4h từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:55,586 - data_downloader - INFO - Đã tải 540 nến cho LTCUSDT 4h
+2025-03-09 17:50:55,591 - data_downloader - INFO - Đã lưu dữ liệu lịch sử LTCUSDT 4h vào real_data/LTCUSDT_4h_historical_data.csv
+2025-03-09 17:50:55,591 - data_downloader - INFO - Tải dữ liệu lịch sử cho LTCUSDT 1d từ 09 Dec, 2024 đến 09 Mar, 2025
+2025-03-09 17:50:55,746 - data_downloader - INFO - Đã tải 90 nến cho LTCUSDT 1d
+2025-03-09 17:50:55,748 - data_downloader - INFO - Đã lưu dữ liệu lịch sử LTCUSDT 1d vào real_data/LTCUSDT_1d_historical_data.csv

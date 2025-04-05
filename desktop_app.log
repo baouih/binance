@@ -1,0 +1,21 @@
+2025-03-13 01:43:20,844 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-13 01:43:20,846 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-13 01:43:20,848 - enhanced_trading_gui - INFO - Đã import thành công các module từ dự án
+2025-03-13 01:43:20,853 - auto_updater - INFO - Phiên bản hiện tại: 1.0.0
+2025-03-13 04:02:21,507 - enhanced_trading_gui - INFO - Đã import thành công module cấu hình
+2025-03-13 04:02:25,315 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-13 04:02:25,316 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-13 04:02:25,318 - enhanced_trading_gui - INFO - Đã import thành công các module từ dự án
+2025-03-13 04:02:25,323 - auto_updater - INFO - Phiên bản hiện tại: 1.0.0
+2025-03-13 04:02:26,146 - auto_updater - ERROR - Lỗi khi kiểm tra cập nhật: 500
+2025-03-13 04:02:26,147 - desktop_app - INFO - Không có bản cập nhật mới
+2025-03-27 15:49:41,950 - enhanced_trading_gui - INFO - Đã import thành công module cấu hình
+2025-03-27 15:49:42,854 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-27 15:49:42,855 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-27 15:49:42,862 - enhanced_trading_gui - INFO - Đã import thành công các module từ dự án
+2025-03-27 15:49:42,870 - auto_updater - INFO - Phiên bản hiện tại: 1.0.0
+2025-03-30 01:26:50,511 - enhanced_trading_gui - INFO - Đã import thành công module cấu hình
+2025-03-30 01:26:51,352 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-30 01:26:51,357 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-30 01:26:51,364 - enhanced_trading_gui - INFO - Đã import thành công các module từ dự án
+2025-03-30 01:26:51,371 - auto_updater - INFO - Phiên bản hiện tại: 1.0.0

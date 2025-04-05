@@ -1,0 +1,215 @@
+2025-03-09 06:02:26,782 - __main__ - INFO - Khởi động price_monitor.py
+2025-03-09 06:02:26,791 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 06:02:26,791 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 06:02:26,792 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 06:02:26,957 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 06:02:26,957 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 06:02:26,957 - __main__ - INFO - Đã khởi tạo API Binance
+2025-03-09 06:02:26,957 - __main__ - INFO - Bắt đầu giám sát giá cho 12 symbols
+2025-03-09 06:02:26,957 - prices_cache - INFO - Lấy giá BTCUSDT từ cache: 86004.91
+2025-03-09 06:02:27,319 - price_validator - INFO - Giá BTCUSDT từ các nguồn: Futures=None, Spot=85963.87, Other=86001.0, Cache=86004.91
+2025-03-09 06:02:27,319 - prices_cache - INFO - Đã lưu cache giá cho 3 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:27,320 - prices_cache - INFO - Lấy giá ETHUSDT từ cache: 2170.5
+2025-03-09 06:02:27,686 - price_validator - INFO - Giá ETHUSDT từ các nguồn: Futures=None, Spot=2179.71, Other=2181.75, Cache=2170.5
+2025-03-09 06:02:27,687 - prices_cache - INFO - Đã lưu cache giá cho 3 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:27,687 - prices_cache - INFO - Lấy giá BNBUSDT từ cache: 595.75
+2025-03-09 06:02:28,047 - price_validator - INFO - Giá BNBUSDT từ các nguồn: Futures=None, Spot=586.12, Other=586.5, Cache=595.75
+2025-03-09 06:02:28,048 - prices_cache - INFO - Đã lưu cache giá cho 3 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:28,048 - prices_cache - WARNING - Không tìm thấy giá cho SOLUSDT trong cache
+2025-03-09 06:02:28,371 - price_validator - INFO - Giá SOLUSDT từ các nguồn: Futures=None, Spot=138.51, Other=None, Cache=None
+2025-03-09 06:02:28,371 - prices_cache - INFO - Đã lưu cache giá cho 4 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:28,371 - prices_cache - WARNING - Không tìm thấy giá cho ADAUSDT trong cache
+2025-03-09 06:02:28,719 - price_validator - INFO - Giá ADAUSDT từ các nguồn: Futures=None, Spot=0.805, Other=None, Cache=None
+2025-03-09 06:02:28,720 - prices_cache - INFO - Đã lưu cache giá cho 5 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:28,720 - prices_cache - WARNING - Không tìm thấy giá cho DOGEUSDT trong cache
+2025-03-09 06:02:29,041 - price_validator - INFO - Giá DOGEUSDT từ các nguồn: Futures=None, Spot=0.18998, Other=None, Cache=None
+2025-03-09 06:02:29,041 - prices_cache - INFO - Đã lưu cache giá cho 6 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:29,041 - prices_cache - WARNING - Không tìm thấy giá cho LTCUSDT trong cache
+2025-03-09 06:02:29,372 - price_validator - INFO - Giá LTCUSDT từ các nguồn: Futures=None, Spot=100.6, Other=None, Cache=None
+2025-03-09 06:02:29,372 - prices_cache - INFO - Đã lưu cache giá cho 7 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:29,372 - prices_cache - WARNING - Không tìm thấy giá cho DOTUSDT trong cache
+2025-03-09 06:02:29,698 - price_validator - INFO - Giá DOTUSDT từ các nguồn: Futures=None, Spot=4.311, Other=None, Cache=None
+2025-03-09 06:02:29,698 - prices_cache - INFO - Đã lưu cache giá cho 8 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:29,698 - prices_cache - WARNING - Không tìm thấy giá cho XRPUSDT trong cache
+2025-03-09 06:02:30,023 - price_validator - INFO - Giá XRPUSDT từ các nguồn: Futures=None, Spot=2.3252, Other=None, Cache=None
+2025-03-09 06:02:30,023 - prices_cache - INFO - Đã lưu cache giá cho 9 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:30,024 - prices_cache - WARNING - Không tìm thấy giá cho AVAXUSDT trong cache
+2025-03-09 06:02:30,340 - price_validator - INFO - Giá AVAXUSDT từ các nguồn: Futures=None, Spot=20.14, Other=None, Cache=None
+2025-03-09 06:02:30,340 - prices_cache - INFO - Đã lưu cache giá cho 10 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:30,340 - prices_cache - WARNING - Không tìm thấy giá cho LINKUSDT trong cache
+2025-03-09 06:02:30,703 - price_validator - INFO - Giá LINKUSDT từ các nguồn: Futures=None, Spot=15.18, Other=None, Cache=None
+2025-03-09 06:02:30,704 - prices_cache - INFO - Đã lưu cache giá cho 11 symbols vào symbol_prices_cache.json
+2025-03-09 06:02:30,704 - prices_cache - WARNING - Không tìm thấy giá cho ATOMUSDT trong cache
+2025-03-09 06:02:31,027 - price_validator - INFO - Giá ATOMUSDT từ các nguồn: Futures=None, Spot=4.073, Other=None, Cache=None
+2025-03-09 06:02:31,028 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:05,688 - __main__ - INFO - Đã tìm thấy và tích hợp price_monitor
+2025-03-09 06:11:05,690 - __main__ - INFO - Đã tìm thấy và tích hợp prices_cache
+2025-03-09 06:11:05,690 - __main__ - INFO - Kiểm tra module price_integration
+2025-03-09 06:11:05,690 - __main__ - INFO - price_validator có sẵn: True
+2025-03-09 06:11:05,690 - __main__ - INFO - price_monitor có sẵn: True
+2025-03-09 06:11:05,691 - __main__ - INFO - prices_cache có sẵn: True
+2025-03-09 06:11:05,692 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 06:11:05,692 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 06:11:05,693 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 06:11:05,693 - __main__ - INFO - Kiểm tra giá BTC
+2025-03-09 06:11:05,693 - prices_cache - INFO - Lấy giá BTCUSDT từ cache: 85921.48
+2025-03-09 06:11:06,049 - price_validator - INFO - Giá BTCUSDT từ các nguồn: Futures=None, Spot=85870.0, Other=85876.0, Cache=85921.48
+2025-03-09 06:11:06,050 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:06,050 - __main__ - INFO - Giá xác thực BTCUSDT: 85870.0, Đáng tin cậy: True
+2025-03-09 06:11:06,050 - __main__ - INFO - Khởi động price_monitor
+2025-03-09 06:11:06,050 - price_monitor - INFO - Bắt đầu giám sát giá cho 12 symbols
+2025-03-09 06:11:06,050 - prices_cache - INFO - Lấy giá BTCUSDT từ cache: 85870.0
+2025-03-09 06:11:06,412 - price_validator - INFO - Giá BTCUSDT từ các nguồn: Futures=None, Spot=85870.01, Other=85876.0, Cache=85870.0
+2025-03-09 06:11:06,413 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:06,413 - prices_cache - INFO - Lấy giá ETHUSDT từ cache: 2179.71
+2025-03-09 06:11:06,769 - price_validator - INFO - Giá ETHUSDT từ các nguồn: Futures=None, Spot=2173.6, Other=2177.02, Cache=2179.71
+2025-03-09 06:11:06,769 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:06,769 - prices_cache - INFO - Lấy giá BNBUSDT từ cache: 586.12
+2025-03-09 06:11:08,264 - price_validator - INFO - Giá BNBUSDT từ các nguồn: Futures=None, Spot=584.21, Other=584.74, Cache=586.12
+2025-03-09 06:11:08,265 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:08,265 - prices_cache - INFO - Lấy giá SOLUSDT từ cache: 138.51
+2025-03-09 06:11:08,588 - price_validator - INFO - Giá SOLUSDT từ các nguồn: Futures=None, Spot=137.97, Other=None, Cache=138.51
+2025-03-09 06:11:08,589 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:08,589 - prices_cache - INFO - Lấy giá ADAUSDT từ cache: 0.805
+2025-03-09 06:11:08,903 - price_validator - INFO - Giá ADAUSDT từ các nguồn: Futures=None, Spot=0.8054, Other=None, Cache=0.805
+2025-03-09 06:11:08,904 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:08,904 - prices_cache - INFO - Lấy giá DOGEUSDT từ cache: 0.18998
+2025-03-09 06:11:09,224 - price_validator - INFO - Giá DOGEUSDT từ các nguồn: Futures=None, Spot=0.18928, Other=None, Cache=0.18998
+2025-03-09 06:11:09,225 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:09,225 - prices_cache - INFO - Lấy giá LTCUSDT từ cache: 100.6
+2025-03-09 06:11:09,553 - price_validator - INFO - Giá LTCUSDT từ các nguồn: Futures=None, Spot=100.26, Other=None, Cache=100.6
+2025-03-09 06:11:09,554 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:09,554 - prices_cache - INFO - Lấy giá DOTUSDT từ cache: 4.311
+2025-03-09 06:11:09,875 - price_validator - INFO - Giá DOTUSDT từ các nguồn: Futures=None, Spot=4.308, Other=None, Cache=4.311
+2025-03-09 06:11:09,875 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:09,876 - prices_cache - INFO - Lấy giá XRPUSDT từ cache: 2.3252
+2025-03-09 06:11:10,197 - price_validator - INFO - Giá XRPUSDT từ các nguồn: Futures=None, Spot=2.3157, Other=None, Cache=2.3252
+2025-03-09 06:11:10,197 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:10,197 - prices_cache - INFO - Lấy giá AVAXUSDT từ cache: 20.14
+2025-03-09 06:11:10,516 - price_validator - INFO - Giá AVAXUSDT từ các nguồn: Futures=None, Spot=20.11, Other=None, Cache=20.14
+2025-03-09 06:11:10,517 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:10,517 - prices_cache - INFO - Lấy giá LINKUSDT từ cache: 15.18
+2025-03-09 06:11:10,842 - price_validator - INFO - Giá LINKUSDT từ các nguồn: Futures=None, Spot=15.16, Other=None, Cache=15.18
+2025-03-09 06:11:10,842 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:10,843 - prices_cache - INFO - Lấy giá ATOMUSDT từ cache: 4.073
+2025-03-09 06:11:11,159 - price_validator - INFO - Giá ATOMUSDT từ các nguồn: Futures=None, Spot=4.066, Other=None, Cache=4.073
+2025-03-09 06:11:11,164 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:11,165 - __main__ - INFO - Đã khởi động price_monitor
+2025-03-09 06:11:11,165 - __main__ - INFO - Dừng price_monitor
+2025-03-09 06:11:11,165 - price_monitor - INFO - Đã dừng giám sát giá
+2025-03-09 06:11:12,165 - __main__ - INFO - Đã dừng price_monitor
+2025-03-09 06:11:55,586 - __main__ - INFO - Đã tìm thấy và tích hợp price_monitor
+2025-03-09 06:11:55,587 - __main__ - INFO - Đã tìm thấy và tích hợp prices_cache
+2025-03-09 06:11:55,587 - __main__ - INFO - Kiểm tra module price_integration
+2025-03-09 06:11:55,587 - __main__ - INFO - price_validator có sẵn: True
+2025-03-09 06:11:55,587 - __main__ - INFO - price_monitor có sẵn: True
+2025-03-09 06:11:55,587 - __main__ - INFO - prices_cache có sẵn: True
+2025-03-09 06:11:55,588 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 06:11:55,589 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 06:11:55,589 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 06:11:55,589 - __main__ - INFO - === Kiểm tra giá tất cả các cặp tiền ===
+2025-03-09 06:11:55,589 - prices_cache - INFO - Lấy giá BTCUSDT từ cache: 85870.01
+2025-03-09 06:11:55,944 - price_validator - INFO - Giá BTCUSDT từ các nguồn: Futures=None, Spot=85862.15, Other=85876.0, Cache=85870.01
+2025-03-09 06:11:55,945 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:55,945 - __main__ - INFO - Giá xác thực BTCUSDT: 85862.15, Đáng tin cậy: True
+2025-03-09 06:11:55,945 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:55,945 - prices_cache - INFO - Lấy giá ETHUSDT từ cache: 2173.6
+2025-03-09 06:11:56,287 - price_validator - INFO - Giá ETHUSDT từ các nguồn: Futures=None, Spot=2173.42, Other=None, Cache=2173.6
+2025-03-09 06:11:56,287 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:56,287 - __main__ - INFO - Giá xác thực ETHUSDT: 2173.42, Đáng tin cậy: True
+2025-03-09 06:11:56,288 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:56,288 - prices_cache - INFO - Lấy giá BNBUSDT từ cache: 584.21
+2025-03-09 06:11:56,913 - price_validator - INFO - Giá BNBUSDT từ các nguồn: Futures=None, Spot=584.29, Other=None, Cache=584.21
+2025-03-09 06:11:56,913 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:56,913 - __main__ - INFO - Giá xác thực BNBUSDT: 584.29, Đáng tin cậy: True
+2025-03-09 06:11:56,914 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:56,914 - prices_cache - INFO - Lấy giá SOLUSDT từ cache: 137.97
+2025-03-09 06:11:57,232 - price_validator - INFO - Giá SOLUSDT từ các nguồn: Futures=None, Spot=138.02, Other=None, Cache=137.97
+2025-03-09 06:11:57,232 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,233 - __main__ - INFO - Giá xác thực SOLUSDT: 138.02, Đáng tin cậy: True
+2025-03-09 06:11:57,233 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,233 - prices_cache - INFO - Lấy giá ADAUSDT từ cache: 0.8054
+2025-03-09 06:11:57,549 - price_validator - INFO - Giá ADAUSDT từ các nguồn: Futures=None, Spot=0.8045, Other=None, Cache=0.8054
+2025-03-09 06:11:57,549 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,549 - __main__ - INFO - Giá xác thực ADAUSDT: 0.8045, Đáng tin cậy: True
+2025-03-09 06:11:57,550 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,550 - prices_cache - INFO - Lấy giá DOGEUSDT từ cache: 0.18928
+2025-03-09 06:11:57,876 - price_validator - INFO - Giá DOGEUSDT từ các nguồn: Futures=None, Spot=0.18927, Other=None, Cache=0.18928
+2025-03-09 06:11:57,877 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,877 - __main__ - INFO - Giá xác thực DOGEUSDT: 0.18927, Đáng tin cậy: True
+2025-03-09 06:11:57,878 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:57,878 - prices_cache - INFO - Lấy giá LTCUSDT từ cache: 100.26
+2025-03-09 06:11:58,201 - price_validator - INFO - Giá LTCUSDT từ các nguồn: Futures=None, Spot=100.28, Other=None, Cache=100.26
+2025-03-09 06:11:58,202 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,202 - __main__ - INFO - Giá xác thực LTCUSDT: 100.28, Đáng tin cậy: True
+2025-03-09 06:11:58,202 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,202 - prices_cache - INFO - Lấy giá DOTUSDT từ cache: 4.308
+2025-03-09 06:11:58,516 - price_validator - INFO - Giá DOTUSDT từ các nguồn: Futures=None, Spot=4.307, Other=None, Cache=4.308
+2025-03-09 06:11:58,516 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,517 - __main__ - INFO - Giá xác thực DOTUSDT: 4.307, Đáng tin cậy: True
+2025-03-09 06:11:58,517 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,517 - prices_cache - INFO - Lấy giá XRPUSDT từ cache: 2.3157
+2025-03-09 06:11:58,834 - price_validator - INFO - Giá XRPUSDT từ các nguồn: Futures=None, Spot=2.3154, Other=None, Cache=2.3157
+2025-03-09 06:11:58,834 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,834 - __main__ - INFO - Giá xác thực XRPUSDT: 2.3154, Đáng tin cậy: True
+2025-03-09 06:11:58,835 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:58,835 - prices_cache - INFO - Lấy giá AVAXUSDT từ cache: 20.11
+2025-03-09 06:11:59,154 - price_validator - INFO - Giá AVAXUSDT từ các nguồn: Futures=None, Spot=20.09, Other=None, Cache=20.11
+2025-03-09 06:11:59,154 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,154 - __main__ - INFO - Giá xác thực AVAXUSDT: 20.09, Đáng tin cậy: True
+2025-03-09 06:11:59,155 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,155 - prices_cache - INFO - Lấy giá LINKUSDT từ cache: 15.16
+2025-03-09 06:11:59,471 - price_validator - INFO - Giá LINKUSDT từ các nguồn: Futures=None, Spot=15.15, Other=None, Cache=15.16
+2025-03-09 06:11:59,471 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,471 - __main__ - INFO - Giá xác thực LINKUSDT: 15.15, Đáng tin cậy: True
+2025-03-09 06:11:59,472 - prices_cache - INFO - Đã lưu cache giá cho 12 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,472 - prices_cache - WARNING - Không tìm thấy giá cho MATICUSDT trong cache
+2025-03-09 06:11:59,796 - price_validator - INFO - Giá MATICUSDT từ các nguồn: Futures=None, Spot=0.3794, Other=None, Cache=None
+2025-03-09 06:11:59,796 - prices_cache - INFO - Đã lưu cache giá cho 13 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,796 - __main__ - INFO - Giá xác thực MATICUSDT: 0.3794, Đáng tin cậy: True
+2025-03-09 06:11:59,797 - prices_cache - INFO - Đã lưu cache giá cho 13 symbols vào symbol_prices_cache.json
+2025-03-09 06:11:59,797 - prices_cache - WARNING - Không tìm thấy giá cho UNIUSDT trong cache
+2025-03-09 06:12:00,113 - price_validator - INFO - Giá UNIUSDT từ các nguồn: Futures=None, Spot=7.041, Other=None, Cache=None
+2025-03-09 06:12:00,114 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:00,114 - __main__ - INFO - Giá xác thực UNIUSDT: 7.041, Đáng tin cậy: True
+2025-03-09 06:12:00,114 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:00,114 - __main__ - INFO - === Khởi động price_monitor ===
+2025-03-09 06:12:00,114 - price_monitor - INFO - Bắt đầu giám sát giá cho 12 symbols
+2025-03-09 06:12:00,115 - prices_cache - INFO - Lấy giá BTCUSDT từ cache: 85862.15
+2025-03-09 06:12:00,462 - price_validator - INFO - Giá BTCUSDT từ các nguồn: Futures=None, Spot=85862.16, Other=None, Cache=85862.15
+2025-03-09 06:12:00,462 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:00,462 - prices_cache - INFO - Lấy giá ETHUSDT từ cache: 2173.42
+2025-03-09 06:12:00,807 - price_validator - INFO - Giá ETHUSDT từ các nguồn: Futures=None, Spot=2173.69, Other=None, Cache=2173.42
+2025-03-09 06:12:00,807 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:00,807 - prices_cache - INFO - Lấy giá BNBUSDT từ cache: 584.29
+2025-03-09 06:12:01,143 - price_validator - INFO - Giá BNBUSDT từ các nguồn: Futures=None, Spot=584.38, Other=None, Cache=584.29
+2025-03-09 06:12:01,143 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:01,143 - prices_cache - INFO - Lấy giá SOLUSDT từ cache: 138.02
+2025-03-09 06:12:01,459 - price_validator - INFO - Giá SOLUSDT từ các nguồn: Futures=None, Spot=138.01, Other=None, Cache=138.02
+2025-03-09 06:12:01,459 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:01,459 - prices_cache - INFO - Lấy giá ADAUSDT từ cache: 0.8045
+2025-03-09 06:12:01,772 - price_validator - INFO - Giá ADAUSDT từ các nguồn: Futures=None, Spot=0.8046, Other=None, Cache=0.8045
+2025-03-09 06:12:01,772 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:01,773 - prices_cache - INFO - Lấy giá DOGEUSDT từ cache: 0.18927
+2025-03-09 06:12:02,090 - price_validator - INFO - Giá DOGEUSDT từ các nguồn: Futures=None, Spot=0.18928, Other=None, Cache=0.18927
+2025-03-09 06:12:02,090 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:02,090 - prices_cache - INFO - Lấy giá LTCUSDT từ cache: 100.28
+2025-03-09 06:12:02,440 - price_validator - INFO - Giá LTCUSDT từ các nguồn: Futures=None, Spot=100.29, Other=None, Cache=100.28
+2025-03-09 06:12:02,440 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:02,440 - prices_cache - INFO - Lấy giá DOTUSDT từ cache: 4.307
+2025-03-09 06:12:02,759 - price_validator - INFO - Giá DOTUSDT từ các nguồn: Futures=None, Spot=4.307, Other=None, Cache=4.307
+2025-03-09 06:12:02,760 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:02,760 - prices_cache - INFO - Lấy giá XRPUSDT từ cache: 2.3154
+2025-03-09 06:12:03,070 - price_validator - INFO - Giá XRPUSDT từ các nguồn: Futures=None, Spot=2.3158, Other=None, Cache=2.3154
+2025-03-09 06:12:03,071 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:03,071 - prices_cache - INFO - Lấy giá AVAXUSDT từ cache: 20.09
+2025-03-09 06:12:03,390 - price_validator - INFO - Giá AVAXUSDT từ các nguồn: Futures=None, Spot=20.09, Other=None, Cache=20.09
+2025-03-09 06:12:03,391 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:03,391 - prices_cache - INFO - Lấy giá LINKUSDT từ cache: 15.15
+2025-03-09 06:12:03,707 - price_validator - INFO - Giá LINKUSDT từ các nguồn: Futures=None, Spot=15.14, Other=None, Cache=15.15
+2025-03-09 06:12:03,708 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:03,708 - prices_cache - INFO - Lấy giá ATOMUSDT từ cache: 4.066
+2025-03-09 06:12:04,028 - price_validator - INFO - Giá ATOMUSDT từ các nguồn: Futures=None, Spot=4.064, Other=None, Cache=4.066
+2025-03-09 06:12:04,028 - prices_cache - INFO - Đã lưu cache giá cho 14 symbols vào symbol_prices_cache.json
+2025-03-09 06:12:04,029 - __main__ - INFO - Đã khởi động price_monitor
+2025-03-09 06:12:04,029 - __main__ - INFO - Đợi 5 giây để price_monitor hoạt động...

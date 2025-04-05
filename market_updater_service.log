@@ -1,0 +1,233 @@
+2025-03-05 06:26:40,606 - market_updater_service - INFO - Bắt đầu dịch vụ cập nhật dữ liệu thị trường
+2025-03-05 06:26:40,607 - market_updater_service - INFO - Đang chạy cập nhật dữ liệu thị trường...
+2025-03-05 06:26:41,485 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-05 06:26:41,485 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-05 06:26:41,485 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-05 06:26:41,486 - market_updater - INFO - Đã kết nối tới Binance API (testnet)
+2025-03-05 06:26:41,486 - data_processor - INFO - Đã khởi tạo DataProcessor, sử dụng cache dir: data/cache
+2025-03-05 06:26:41,486 - multi_timeframe - INFO - Khởi tạo Bộ phân tích đa khung thời gian với các khung: ['1m', '5m', '15m', '1h', '4h', '1d']
+2025-03-05 06:26:41,486 - composite_indicator - INFO - Khởi tạo Chỉ báo tổng hợp với các chỉ báo: ['rsi', 'macd', 'ema_cross', 'bbands', 'volume_trend']
+2025-03-05 06:26:41,487 - composite_indicator - INFO - Trọng số ban đầu: {'rsi': 0.2, 'macd': 0.2, 'ema_cross': 0.2, 'bbands': 0.2, 'volume_trend': 0.2}
+2025-03-05 06:26:41,487 - liquidity_analyzer - INFO - Khởi tạo Bộ phân tích thanh khoản
+2025-03-05 06:26:41,487 - market_updater - INFO - Đã khởi tạo các thành phần phân tích thị trường
+2025-03-05 06:26:41,487 - market_updater - INFO - Bắt đầu cập nhật phân tích thị trường cho 14 cặp giao dịch
+2025-03-05 06:26:41,487 - market_updater - INFO - Đang cập nhật phân tích thị trường cho BTCUSDT (1h)
+2025-03-05 06:26:41,696 - market_updater - INFO - Giá hiện tại BTCUSDT: 87249.5
+2025-03-05 06:26:42,123 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 1m
+2025-03-05 06:26:42,816 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 5m
+2025-03-05 06:26:42,992 - data_processor - INFO - Đã lấy và xử lý 672 candlesticks cho BTCUSDT 15m
+2025-03-05 06:26:43,143 - data_processor - INFO - Đã lấy và xử lý 168 candlesticks cho BTCUSDT 1h
+2025-03-05 06:26:43,297 - data_processor - INFO - Đã lấy và xử lý 42 candlesticks cho BTCUSDT 4h
+2025-03-05 06:26:43,451 - data_processor - INFO - Đã lấy và xử lý 7 candlesticks cho BTCUSDT 1d
+2025-03-05 06:26:43,602 - data_processor - INFO - Đã lấy và xử lý 14 candlesticks cho BTCUSDT 1d
+2025-03-05 06:26:43,909 - data_processor - INFO - Đã lấy và xử lý 720 candlesticks cho BTCUSDT 1h
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Điểm rsi: -0.32
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Điểm bbands: 0.10
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Điểm volume_trend: 0.20
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Điểm tổng hợp: 0.07 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 7.1%
+2025-03-05 06:26:43,910 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': 0.2, 'macd': 0.2, 'ema_cross': 0.2, 'bbands': 0.2, 'volume_trend': 0.2}
+2025-03-05 06:26:44,056 - liquidity_analyzer - INFO - Phân tích thanh khoản BTCUSDT: Giá = 86932.45, Áp lực thị trường = SELL, Tỷ lệ bid/ask = 0.63
+2025-03-05 06:26:44,056 - liquidity_analyzer - INFO - Số vùng thanh khoản cao: 5, Số vùng liquidity grab: 3
+2025-03-05 06:26:44,056 - market_regime_detector - INFO - Khởi tạo MarketRegimeDetector
+2025-03-05 06:26:44,058 - market_regime_detector - INFO - Phát hiện chế độ thị trường: ranging (volatility=1.45, trend_strength=0.44)
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm rsi: -0.32
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm bbands: 0.10
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm volume_trend: 0.20
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm tổng hợp: 0.07 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 7.1%
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19525004525590386), 'macd': np.float64(0.19376680130996227), 'ema_cross': np.float64(0.24527443203792693), 'bbands': np.float64(0.17930015304738248), 'volume_trend': np.float64(0.18640856834882447)}
+2025-03-05 06:26:44,059 - composite_indicator - INFO - Điểm rsi: -0.34
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Điểm bbands: 0.17
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Điểm tổng hợp: 0.03 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 3.1%
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19623136455800846), 'macd': np.float64(0.19429471999077824), 'ema_cross': np.float64(0.24594268353263068), 'bbands': np.float64(0.18153364610443606), 'volume_trend': np.float64(0.18199758581414668)}
+2025-03-05 06:26:44,060 - composite_indicator - INFO - Điểm rsi: -0.27
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm bbands: 0.20
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm tổng hợp: 0.05 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 5.3%
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19567935647973791), 'macd': np.float64(0.1947143344002862), 'ema_cross': np.float64(0.24647384101302053), 'bbands': np.float64(0.18320656416745043), 'volume_trend': np.float64(0.17992590393950497)}
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm rsi: -0.34
+2025-03-05 06:26:44,061 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Điểm bbands: 0.13
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Điểm tổng hợp: 0.02 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 2.1%
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.196369026918068), 'macd': np.float64(0.19494502958570867), 'ema_cross': np.float64(0.24676586023507427), 'bbands': np.float64(0.1832616004509553), 'volume_trend': np.float64(0.17865848281019378)}
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Điểm rsi: -0.26
+2025-03-05 06:26:44,062 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm bbands: -0.04
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm tổng hợp: 0.00 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.0%
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20331917070632113), 'macd': np.float64(0.20254833846303424), 'ema_cross': np.float64(0.2563903018519421), 'bbands': np.float64(0.15314117164530416), 'volume_trend': np.float64(0.18460101733339832)}
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm rsi: -0.31
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm macd: 0.70
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm bbands: -0.80
+2025-03-05 06:26:44,063 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:26:44,064 - composite_indicator - INFO - Điểm tổng hợp: -0.06 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 5.9%
+2025-03-05 06:26:44,064 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19992290556455536), 'macd': np.float64(0.2034663569668103), 'ema_cross': np.float64(0.2520822121712694), 'bbands': np.float64(0.16374956742596883), 'volume_trend': np.float64(0.18077895787139606)}
+2025-03-05 06:26:44,064 - composite_indicator - INFO - Khuyến nghị: CHỜ ĐỢI - Không có tín hiệu rõ ràng, tiếp tục theo dõi thị trường.
+2025-03-05 06:26:44,064 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1h từ cache
+2025-03-05 06:26:44,064 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1m từ cache
+2025-03-05 06:26:44,065 - data_processor - INFO - Lấy dữ liệu BTCUSDT 5m từ cache
+2025-03-05 06:26:44,498 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 15m
+2025-03-05 06:26:44,499 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1h từ cache
+2025-03-05 06:26:44,894 - data_processor - INFO - Đã lấy và xử lý 180 candlesticks cho BTCUSDT 4h
+2025-03-05 06:26:45,281 - data_processor - INFO - Đã lấy và xử lý 30 candlesticks cho BTCUSDT 1d
+2025-03-05 06:26:45,282 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1d từ cache
+2025-03-05 06:26:45,603 - market_updater - INFO - Đã lưu phân tích BTCUSDT vào market_analysis.json
+2025-03-05 06:26:45,604 - market_updater - INFO - Đã lưu phân tích BTCUSDT vào market_analysis_btcusdt.json
+2025-03-05 06:26:45,606 - market_updater - INFO - Đã lưu khuyến nghị BTCUSDT vào recommendation_btcusdt.json
+2025-03-05 06:26:45,606 - market_updater - INFO - Đã cập nhật phân tích thị trường cho BTCUSDT
+2025-03-05 06:26:45,606 - market_updater - INFO - Cập nhật BTCUSDT: Thành công (4.12s)
+2025-03-05 06:26:46,606 - market_updater - INFO - Đang cập nhật phân tích thị trường cho ETHUSDT (1h)
+2025-03-05 06:26:47,001 - market_updater - INFO - Giá hiện tại ETHUSDT: 2160.15
+2025-03-05 06:26:49,355 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho ETHUSDT 1m
+2025-03-05 06:26:50,029 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho ETHUSDT 5m
+2025-03-05 06:26:50,597 - data_processor - INFO - Đã lấy và xử lý 672 candlesticks cho ETHUSDT 15m
+2025-03-05 06:29:33,741 - market_updater_service - INFO - Bắt đầu dịch vụ cập nhật dữ liệu thị trường
+2025-03-05 06:29:33,741 - market_updater_service - INFO - Đang chạy cập nhật dữ liệu thị trường...
+2025-03-05 06:29:34,642 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-05 06:29:34,643 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-05 06:29:34,643 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-05 06:29:34,643 - market_updater - INFO - Đã kết nối tới Binance API (testnet)
+2025-03-05 06:29:34,643 - data_processor - INFO - Đã khởi tạo DataProcessor, sử dụng cache dir: data/cache
+2025-03-05 06:29:34,644 - multi_timeframe - INFO - Khởi tạo Bộ phân tích đa khung thời gian với các khung: ['1m', '5m', '15m', '1h', '4h', '1d']
+2025-03-05 06:29:34,644 - composite_indicator - INFO - Khởi tạo Chỉ báo tổng hợp với các chỉ báo: ['rsi', 'macd', 'ema_cross', 'bbands', 'volume_trend']
+2025-03-05 06:29:34,644 - composite_indicator - INFO - Trọng số ban đầu: {'rsi': 0.2, 'macd': 0.2, 'ema_cross': 0.2, 'bbands': 0.2, 'volume_trend': 0.2}
+2025-03-05 06:29:34,644 - liquidity_analyzer - INFO - Khởi tạo Bộ phân tích thanh khoản
+2025-03-05 06:29:34,644 - market_updater - INFO - Đã khởi tạo các thành phần phân tích thị trường
+2025-03-05 06:29:34,644 - market_updater - INFO - Bắt đầu cập nhật phân tích thị trường cho 14 cặp giao dịch
+2025-03-05 06:29:34,644 - market_updater - INFO - Đang cập nhật phân tích thị trường cho BTCUSDT (1h)
+2025-03-05 06:29:34,844 - market_updater - INFO - Giá hiện tại BTCUSDT: 86716.9
+2025-03-05 06:29:35,146 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 1m
+2025-03-05 06:29:35,808 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 5m
+2025-03-05 06:29:35,982 - data_processor - INFO - Đã lấy và xử lý 672 candlesticks cho BTCUSDT 15m
+2025-03-05 06:29:36,127 - data_processor - INFO - Đã lấy và xử lý 168 candlesticks cho BTCUSDT 1h
+2025-03-05 06:29:36,279 - data_processor - INFO - Đã lấy và xử lý 42 candlesticks cho BTCUSDT 4h
+2025-03-05 06:29:36,678 - data_processor - INFO - Đã lấy và xử lý 7 candlesticks cho BTCUSDT 1d
+2025-03-05 06:29:36,827 - data_processor - INFO - Đã lấy và xử lý 14 candlesticks cho BTCUSDT 1d
+2025-03-05 06:29:37,397 - data_processor - INFO - Đã lấy và xử lý 720 candlesticks cho BTCUSDT 1h
+2025-03-05 06:29:37,399 - composite_indicator - INFO - Điểm rsi: -0.28
+2025-03-05 06:29:37,399 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,399 - composite_indicator - INFO - Điểm bbands: 0.21
+2025-03-05 06:29:37,399 - composite_indicator - INFO - Điểm volume_trend: -0.20
+2025-03-05 06:29:37,400 - composite_indicator - INFO - Điểm tổng hợp: 0.01 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.7%
+2025-03-05 06:29:37,400 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': 0.2, 'macd': 0.2, 'ema_cross': 0.2, 'bbands': 0.2, 'volume_trend': 0.2}
+2025-03-05 06:29:37,809 - liquidity_analyzer - INFO - Phân tích thanh khoản BTCUSDT: Giá = 86978.45, Áp lực thị trường = NEUTRAL, Tỷ lệ bid/ask = 1.00
+2025-03-05 06:29:37,810 - liquidity_analyzer - INFO - Số vùng thanh khoản cao: 4, Số vùng liquidity grab: 3
+2025-03-05 06:29:37,811 - market_regime_detector - INFO - Khởi tạo MarketRegimeDetector
+2025-03-05 06:29:37,815 - market_regime_detector - INFO - Phát hiện chế độ thị trường: ranging (volatility=1.46, trend_strength=0.44)
+2025-03-05 06:29:37,817 - composite_indicator - INFO - Điểm rsi: -0.28
+2025-03-05 06:29:37,819 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,820 - composite_indicator - INFO - Điểm bbands: 0.21
+2025-03-05 06:29:37,820 - composite_indicator - INFO - Điểm volume_trend: -0.20
+2025-03-05 06:29:37,820 - composite_indicator - INFO - Điểm tổng hợp: 0.01 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.7%
+2025-03-05 06:29:37,820 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.1915792123072995), 'macd': np.float64(0.1927505037746327), 'ema_cross': np.float64(0.24398797946156042), 'bbands': np.float64(0.1862514400657215), 'volume_trend': np.float64(0.1854308643907859)}
+2025-03-05 06:29:37,821 - composite_indicator - INFO - Điểm rsi: -0.34
+2025-03-05 06:29:37,823 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,823 - composite_indicator - INFO - Điểm bbands: 0.17
+2025-03-05 06:29:37,823 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:37,823 - composite_indicator - INFO - Điểm tổng hợp: 0.03 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 3.4%
+2025-03-05 06:29:37,823 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19376975423434134), 'macd': np.float64(0.19361230481676295), 'ema_cross': np.float64(0.245078866856662), 'bbands': np.float64(0.18618071261830388), 'volume_trend': np.float64(0.18135836147392986)}
+2025-03-05 06:29:37,824 - composite_indicator - INFO - Điểm rsi: -0.27
+2025-03-05 06:29:37,824 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,824 - composite_indicator - INFO - Điểm bbands: 0.20
+2025-03-05 06:29:37,824 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:37,824 - composite_indicator - INFO - Điểm tổng hợp: 0.06 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 5.5%
+2025-03-05 06:29:37,825 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19382900455351465), 'macd': np.float64(0.1941998611198445), 'ema_cross': np.float64(0.24582260901246142), 'bbands': np.float64(0.18669802073508254), 'volume_trend': np.float64(0.17945050457909684)}
+2025-03-05 06:29:37,825 - composite_indicator - INFO - Điểm rsi: -0.34
+2025-03-05 06:29:37,825 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,825 - composite_indicator - INFO - Điểm bbands: 0.13
+2025-03-05 06:29:37,825 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:37,826 - composite_indicator - INFO - Điểm tổng hợp: 0.02 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 2.2%
+2025-03-05 06:29:37,827 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19488475140314837), 'macd': np.float64(0.19453225802599183), 'ema_cross': np.float64(0.2462433645898631), 'bbands': np.float64(0.18605943001793582), 'volume_trend': np.float64(0.17828019596306086)}
+2025-03-05 06:29:37,827 - composite_indicator - INFO - Điểm rsi: -0.26
+2025-03-05 06:29:37,827 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:37,827 - composite_indicator - INFO - Điểm bbands: -0.04
+2025-03-05 06:29:37,828 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:37,828 - composite_indicator - INFO - Điểm tổng hợp: 0.00 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.1%
+2025-03-05 06:29:37,828 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20202092213567124), 'macd': np.float64(0.20217690164735505), 'ema_cross': np.float64(0.25592012866753805), 'bbands': np.float64(0.15561955490880827), 'volume_trend': np.float64(0.1842624926406274)}
+2025-03-05 06:29:37,829 - composite_indicator - INFO - Điểm rsi: -0.31
+2025-03-05 06:29:37,830 - composite_indicator - INFO - Điểm macd: 0.70
+2025-03-05 06:29:37,830 - composite_indicator - INFO - Điểm bbands: -0.80
+2025-03-05 06:29:37,831 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:37,831 - composite_indicator - INFO - Điểm tổng hợp: -0.06 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 6.2%
+2025-03-05 06:29:37,831 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.19883375363790715), 'macd': np.float64(0.20315182271036314), 'ema_cross': np.float64(0.2516925237119544), 'bbands': np.float64(0.16582240436348808), 'volume_trend': np.float64(0.18049949557628725)}
+2025-03-05 06:29:37,832 - composite_indicator - INFO - Khuyến nghị: CHỜ ĐỢI - Không có tín hiệu rõ ràng, tiếp tục theo dõi thị trường.
+2025-03-05 06:29:37,832 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1h từ cache
+2025-03-05 06:29:37,832 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1m từ cache
+2025-03-05 06:29:37,833 - data_processor - INFO - Lấy dữ liệu BTCUSDT 5m từ cache
+2025-03-05 06:29:38,012 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho BTCUSDT 15m
+2025-03-05 06:29:38,013 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1h từ cache
+2025-03-05 06:29:38,162 - data_processor - INFO - Đã lấy và xử lý 180 candlesticks cho BTCUSDT 4h
+2025-03-05 06:29:38,560 - data_processor - INFO - Đã lấy và xử lý 30 candlesticks cho BTCUSDT 1d
+2025-03-05 06:29:38,561 - data_processor - INFO - Lấy dữ liệu BTCUSDT 1d từ cache
+2025-03-05 06:29:38,754 - market_updater - INFO - Đã lưu phân tích BTCUSDT vào market_analysis.json
+2025-03-05 06:29:38,755 - market_updater - INFO - Đã lưu phân tích BTCUSDT vào market_analysis_btcusdt.json
+2025-03-05 06:29:38,757 - market_updater - INFO - Đã lưu khuyến nghị BTCUSDT vào recommendation_btcusdt.json
+2025-03-05 06:29:38,757 - market_updater - INFO - Đã cập nhật phân tích thị trường cho BTCUSDT
+2025-03-05 06:29:38,757 - market_updater - INFO - Cập nhật BTCUSDT: Thành công (4.11s)
+2025-03-05 06:29:39,757 - market_updater - INFO - Đang cập nhật phân tích thị trường cho ETHUSDT (1h)
+2025-03-05 06:29:39,891 - market_updater - INFO - Giá hiện tại ETHUSDT: 2158.68
+2025-03-05 06:29:40,561 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho ETHUSDT 1m
+2025-03-05 06:29:41,260 - data_processor - INFO - Đã lấy và xử lý 1000 candlesticks cho ETHUSDT 5m
+2025-03-05 06:29:41,818 - data_processor - INFO - Đã lấy và xử lý 672 candlesticks cho ETHUSDT 15m
+2025-03-05 06:29:41,974 - data_processor - INFO - Đã lấy và xử lý 168 candlesticks cho ETHUSDT 1h
+2025-03-05 06:29:42,364 - data_processor - INFO - Đã lấy và xử lý 42 candlesticks cho ETHUSDT 4h
+2025-03-05 06:29:42,757 - data_processor - INFO - Đã lấy và xử lý 7 candlesticks cho ETHUSDT 1d
+2025-03-05 06:29:43,149 - data_processor - INFO - Đã lấy và xử lý 14 candlesticks cho ETHUSDT 1d
+2025-03-05 06:29:43,456 - data_processor - INFO - Đã lấy và xử lý 720 candlesticks cho ETHUSDT 1h
+2025-03-05 06:29:43,457 - composite_indicator - INFO - Điểm rsi: -0.33
+2025-03-05 06:29:43,457 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,457 - composite_indicator - INFO - Điểm bbands: 0.16
+2025-03-05 06:29:43,457 - composite_indicator - INFO - Điểm volume_trend: -0.20
+2025-03-05 06:29:43,457 - composite_indicator - INFO - Điểm tổng hợp: -0.02 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 2.0%
+2025-03-05 06:29:43,458 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.2033652893232588), 'macd': np.float64(0.20689614544336468), 'ema_cross': np.float64(0.2570138452712605), 'bbands': np.float64(0.1470322167536304), 'volume_trend': np.float64(0.18569250320848568)}
+2025-03-05 06:29:43,602 - liquidity_analyzer - INFO - Phân tích thanh khoản ETHUSDT: Giá = 2169.42, Áp lực thị trường = SELL, Tỷ lệ bid/ask = 0.79
+2025-03-05 06:29:43,602 - liquidity_analyzer - INFO - Số vùng thanh khoản cao: 2, Số vùng liquidity grab: 2
+2025-03-05 06:29:43,602 - market_regime_detector - INFO - Khởi tạo MarketRegimeDetector
+2025-03-05 06:29:43,605 - market_regime_detector - INFO - Phát hiện chế độ thị trường: volatile (volatility=3.30, trend_strength=0.28)
+2025-03-05 06:29:43,605 - composite_indicator - INFO - Điểm rsi: -0.33
+2025-03-05 06:29:43,605 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,606 - composite_indicator - INFO - Điểm bbands: 0.16
+2025-03-05 06:29:43,606 - composite_indicator - INFO - Điểm volume_trend: -0.20
+2025-03-05 06:29:43,606 - composite_indicator - INFO - Điểm tổng hợp: -0.03 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 2.6%
+2025-03-05 06:29:43,606 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20227714484479795), 'macd': np.float64(0.20510593586649847), 'ema_cross': np.float64(0.25531859236493587), 'bbands': np.float64(0.15176681647191442), 'volume_trend': np.float64(0.1855315104518534)}
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Điểm rsi: -0.24
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Điểm bbands: 0.10
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Điểm tổng hợp: 0.04 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 3.9%
+2025-03-05 06:29:43,607 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20124424262455914), 'macd': np.float64(0.20427454744456022), 'ema_cross': np.float64(0.25470641826005014), 'bbands': np.float64(0.1553673448505542), 'volume_trend': np.float64(0.18440744682027632)}
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Điểm rsi: -0.27
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Điểm bbands: -0.04
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Điểm tổng hợp: 0.00 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.1%
+2025-03-05 06:29:43,608 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20432102068862454), 'macd': np.float64(0.2073476558700409), 'ema_cross': np.float64(0.25889037622820094), 'bbands': np.float64(0.14256916655386848), 'volume_trend': np.float64(0.18687178065926505)}
+2025-03-05 06:29:43,609 - composite_indicator - INFO - Điểm rsi: -0.26
+2025-03-05 06:29:43,609 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,609 - composite_indicator - INFO - Điểm bbands: 0.09
+2025-03-05 06:29:43,609 - composite_indicator - INFO - Điểm volume_trend: -0.75
+2025-03-05 06:29:43,609 - composite_indicator - INFO - Điểm tổng hợp: -0.16 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 15.8%
+2025-03-05 06:29:43,610 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.20576155055725967), 'macd': np.float64(0.20885103800403582), 'ema_cross': np.float64(0.26106379750504477), 'bbands': np.float64(0.1314340921907816), 'volume_trend': np.float64(0.19288952174287818)}
+2025-03-05 06:29:43,610 - composite_indicator - INFO - Điểm rsi: -0.14
+2025-03-05 06:29:43,610 - composite_indicator - INFO - Điểm macd: 0.30
+2025-03-05 06:29:43,610 - composite_indicator - INFO - Điểm bbands: -0.00
+2025-03-05 06:29:43,610 - composite_indicator - INFO - Điểm volume_trend: -0.20
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Điểm tổng hợp: -0.01 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.8%
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.207239956375814), 'macd': np.float64(0.21108067125979438), 'ema_cross': np.float64(0.2641047859843433), 'bbands': np.float64(0.1220087198679314), 'volume_trend': np.float64(0.19556586651211688)}
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Điểm rsi: -0.22
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Điểm macd: 0.70
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Điểm bbands: -0.80
+2025-03-05 06:29:43,611 - composite_indicator - INFO - Điểm volume_trend: 0.00
+2025-03-05 06:29:43,612 - composite_indicator - INFO - Điểm tổng hợp: 0.01 -> KHÔNG HÀNH ĐỘNG với độ tin cậy 0.6%
+2025-03-05 06:29:43,612 - composite_indicator - INFO - Đã cập nhật trọng số dựa trên hiệu suất: {'rsi': np.float64(0.2047581481774419), 'macd': np.float64(0.2109722979111953), 'ema_cross': np.float64(0.26138160803156946), 'bbands': np.float64(0.1300944303538951), 'volume_trend': np.float64(0.1927935155258983)}
+2025-03-05 06:29:43,612 - composite_indicator - INFO - Khuyến nghị: CHỜ ĐỢI - Không có tín hiệu rõ ràng, tiếp tục theo dõi thị trường.
+2025-03-05 06:29:43,612 - data_processor - INFO - Lấy dữ liệu ETHUSDT 1h từ cache
+2025-03-05 06:29:43,612 - data_processor - INFO - Lấy dữ liệu ETHUSDT 1m từ cache
+2025-03-05 06:29:43,613 - data_processor - INFO - Lấy dữ liệu ETHUSDT 5m từ cache
+2025-03-05 10:18:26,779 - market_updater_service - INFO - Bắt đầu dịch vụ cập nhật dữ liệu thị trường
+2025-03-05 10:18:26,783 - market_updater_service - INFO - Dịch vụ cập nhật dữ liệu thị trường đã đang chạy

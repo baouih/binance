@@ -1,0 +1,187 @@
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Bắt đầu chạy 36 bài test trên 3 coin...
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Danh sách coin: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Khung thời gian: ['1h', '4h', '1d']
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Mức rủi ro: [10.0, 15.0, 20.0, 30.0]
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Test 1/36: BTCUSDT 1h với mức rủi ro 10.0%
+2025-03-09 14:33:00,816 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1h --risk 10.0
+2025-03-09 14:33:00,817 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1h_risk10_results.json
+2025-03-09 14:33:00,817 - multi_coin_test - INFO - Tiến độ: 1/36 (2.8%)
+2025-03-09 14:33:00,817 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,817 - multi_coin_test - INFO - Test 2/36: BTCUSDT 1h với mức rủi ro 15.0%
+2025-03-09 14:33:00,817 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1h --risk 15.0
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1h_risk15_results.json
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Tiến độ: 2/36 (5.6%)
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Test 3/36: BTCUSDT 1h với mức rủi ro 20.0%
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1h --risk 20.0
+2025-03-09 14:33:00,818 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1h_risk20_results.json
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Tiến độ: 3/36 (8.3%)
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Test 4/36: BTCUSDT 1h với mức rủi ro 30.0%
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1h --risk 30.0
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1h_risk30_results.json
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Tiến độ: 4/36 (11.1%)
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,819 - multi_coin_test - INFO - Test 5/36: BTCUSDT 4h với mức rủi ro 10.0%
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 4h --risk 10.0
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_4h_risk10_results.json
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Tiến độ: 5/36 (13.9%)
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Test 6/36: BTCUSDT 4h với mức rủi ro 15.0%
+2025-03-09 14:33:00,820 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 4h --risk 15.0
+2025-03-09 14:33:00,821 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_4h_risk15_results.json
+2025-03-09 14:33:00,821 - multi_coin_test - INFO - Tiến độ: 6/36 (16.7%)
+2025-03-09 14:33:00,821 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,821 - multi_coin_test - INFO - Test 7/36: BTCUSDT 4h với mức rủi ro 20.0%
+2025-03-09 14:33:00,821 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 4h --risk 20.0
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_4h_risk20_results.json
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Tiến độ: 7/36 (19.4%)
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Test 8/36: BTCUSDT 4h với mức rủi ro 30.0%
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 4h --risk 30.0
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_4h_risk30_results.json
+2025-03-09 14:33:00,822 - multi_coin_test - INFO - Tiến độ: 8/36 (22.2%)
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Test 9/36: BTCUSDT 1d với mức rủi ro 10.0%
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1d --risk 10.0
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1d_risk10_results.json
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Tiến độ: 9/36 (25.0%)
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Test 10/36: BTCUSDT 1d với mức rủi ro 15.0%
+2025-03-09 14:33:00,823 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1d --risk 15.0
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1d_risk15_results.json
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Tiến độ: 10/36 (27.8%)
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Test 11/36: BTCUSDT 1d với mức rủi ro 20.0%
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1d --risk 20.0
+2025-03-09 14:33:00,824 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1d_risk20_results.json
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Tiến độ: 11/36 (30.6%)
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Test 12/36: BTCUSDT 1d với mức rủi ro 30.0%
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BTCUSDT --interval 1d --risk 30.0
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BTCUSDT_1d_risk30_results.json
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Tiến độ: 12/36 (33.3%)
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Test 13/36: ETHUSDT 1h với mức rủi ro 10.0%
+2025-03-09 14:33:00,825 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1h --risk 10.0
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1h_risk10_results.json
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Tiến độ: 13/36 (36.1%)
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Test 14/36: ETHUSDT 1h với mức rủi ro 15.0%
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1h --risk 15.0
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1h_risk15_results.json
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Tiến độ: 14/36 (38.9%)
+2025-03-09 14:33:00,826 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Test 15/36: ETHUSDT 1h với mức rủi ro 20.0%
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1h --risk 20.0
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1h_risk20_results.json
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Tiến độ: 15/36 (41.7%)
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Test 16/36: ETHUSDT 1h với mức rủi ro 30.0%
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1h --risk 30.0
+2025-03-09 14:33:00,827 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1h_risk30_results.json
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Tiến độ: 16/36 (44.4%)
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Test 17/36: ETHUSDT 4h với mức rủi ro 10.0%
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 4h --risk 10.0
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_4h_risk10_results.json
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Tiến độ: 17/36 (47.2%)
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Test 18/36: ETHUSDT 4h với mức rủi ro 15.0%
+2025-03-09 14:33:00,828 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 4h --risk 15.0
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_4h_risk15_results.json
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Tiến độ: 18/36 (50.0%)
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Test 19/36: ETHUSDT 4h với mức rủi ro 20.0%
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 4h --risk 20.0
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_4h_risk20_results.json
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Tiến độ: 19/36 (52.8%)
+2025-03-09 14:33:00,829 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Test 20/36: ETHUSDT 4h với mức rủi ro 30.0%
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 4h --risk 30.0
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_4h_risk30_results.json
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Tiến độ: 20/36 (55.6%)
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Test 21/36: ETHUSDT 1d với mức rủi ro 10.0%
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1d --risk 10.0
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1d_risk10_results.json
+2025-03-09 14:33:00,830 - multi_coin_test - INFO - Tiến độ: 21/36 (58.3%)
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Test 22/36: ETHUSDT 1d với mức rủi ro 15.0%
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1d --risk 15.0
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1d_risk15_results.json
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Tiến độ: 22/36 (61.1%)
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Test 23/36: ETHUSDT 1d với mức rủi ro 20.0%
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1d --risk 20.0
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1d_risk20_results.json
+2025-03-09 14:33:00,831 - multi_coin_test - INFO - Tiến độ: 23/36 (63.9%)
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Test 24/36: ETHUSDT 1d với mức rủi ro 30.0%
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol ETHUSDT --interval 1d --risk 30.0
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/ETHUSDT_1d_risk30_results.json
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Tiến độ: 24/36 (66.7%)
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Test 25/36: BNBUSDT 1h với mức rủi ro 10.0%
+2025-03-09 14:33:00,832 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1h --risk 10.0
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1h_risk10_results.json
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Tiến độ: 25/36 (69.4%)
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Test 26/36: BNBUSDT 1h với mức rủi ro 15.0%
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1h --risk 15.0
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1h_risk15_results.json
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Tiến độ: 26/36 (72.2%)
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Test 27/36: BNBUSDT 1h với mức rủi ro 20.0%
+2025-03-09 14:33:00,833 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1h --risk 20.0
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1h_risk20_results.json
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Tiến độ: 27/36 (75.0%)
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Test 28/36: BNBUSDT 1h với mức rủi ro 30.0%
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1h --risk 30.0
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1h_risk30_results.json
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Tiến độ: 28/36 (77.8%)
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Test 29/36: BNBUSDT 4h với mức rủi ro 10.0%
+2025-03-09 14:33:00,834 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 4h --risk 10.0
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_4h_risk10_results.json
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Tiến độ: 29/36 (80.6%)
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Test 30/36: BNBUSDT 4h với mức rủi ro 15.0%
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 4h --risk 15.0
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_4h_risk15_results.json
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Tiến độ: 30/36 (83.3%)
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,835 - multi_coin_test - INFO - Test 31/36: BNBUSDT 4h với mức rủi ro 20.0%
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 4h --risk 20.0
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_4h_risk20_results.json
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Tiến độ: 31/36 (86.1%)
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Test 32/36: BNBUSDT 4h với mức rủi ro 30.0%
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 4h --risk 30.0
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_4h_risk30_results.json
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Tiến độ: 32/36 (88.9%)
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,836 - multi_coin_test - INFO - Test 33/36: BNBUSDT 1d với mức rủi ro 10.0%
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1d --risk 10.0
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1d_risk10_results.json
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Tiến độ: 33/36 (91.7%)
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Test 34/36: BNBUSDT 1d với mức rủi ro 15.0%
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1d --risk 15.0
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1d_risk15_results.json
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Tiến độ: 34/36 (94.4%)
+2025-03-09 14:33:00,837 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Test 35/36: BNBUSDT 1d với mức rủi ro 20.0%
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1d --risk 20.0
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1d_risk20_results.json
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Tiến độ: 35/36 (97.2%)
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Test 36/36: BNBUSDT 1d với mức rủi ro 30.0%
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Chạy lệnh: python backtest.py --symbol BNBUSDT --interval 1d --risk 30.0
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Đã lưu kết quả vào backtest_results/BNBUSDT_1d_risk30_results.json
+2025-03-09 14:33:00,838 - multi_coin_test - INFO - Tiến độ: 36/36 (100.0%)
+2025-03-09 14:33:00,839 - multi_coin_test - INFO - Thời gian còn lại: 0:00:00
+2025-03-09 14:33:00,840 - multi_coin_test - INFO - Đã hoàn thành tất cả các test và lưu kết quả vào backtest_results/multi_coin_adaptive_test_results.json
+2025-03-09 14:33:00,842 - multi_coin_test - INFO - Đã tạo báo cáo chi tiết tại risk_analysis/multi_coin_risk_report.md
+2025-03-09 14:33:00,842 - multi_coin_test - INFO - Hoàn thành!

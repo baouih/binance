@@ -1,0 +1,379 @@
+2025-03-18 06:01:31,657 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:01:31,657 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:01:31,657 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:01:31,657 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:01:31,657 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 06:01:31,657 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 06:01:33,886 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:01:34,328 - integrated_system - ERROR - Lỗi khi tải dữ liệu: 'tuple' object has no attribute 'lower'
+2025-03-18 06:01:34,328 - backtest_3month - ERROR - Không thể tải dữ liệu cho BTC-USD
+2025-03-18 06:05:50,958 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:05:50,958 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:05:50,958 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:05:50,959 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:05:50,959 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 06:05:50,959 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 06:05:52,433 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:05:52,708 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:05:52,708 - backtest_3month - ERROR - Lỗi khi backtest BTC-USD: 'close'
+2025-03-18 06:07:52,851 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:07:52,852 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:07:52,852 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:07:52,852 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:07:52,852 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 06:07:52,852 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 06:07:54,321 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:07:54,547 - integrated_system - WARNING - Thiếu các cột dữ liệu: ['open', 'high', 'low', 'close', 'volume']
+2025-03-18 06:07:54,547 - integrated_system - INFO - Các cột hiện có: ["('close', 'btc-usd')", "('high', 'btc-usd')", "('low', 'btc-usd')", "('open', 'btc-usd')", "('volume', 'btc-usd')"]
+2025-03-18 06:07:54,547 - integrated_system - INFO - Danh sách cột (dạng string): ["('close', 'btc-usd')", "('high', 'btc-usd')", "('low', 'btc-usd')", "('open', 'btc-usd')", "('volume', 'btc-usd')"]
+2025-03-18 06:07:54,548 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:07:54,548 - backtest_3month - ERROR - Lỗi khi backtest BTC-USD: 'close'
+2025-03-18 06:11:11,467 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:11:11,579 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:11:11,579 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:11:11,579 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:11:11,579 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 06:11:11,579 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 06:11:13,002 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:11:13,291 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:11:13,292 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:11:13,994 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_061113.png
+2025-03-18 06:11:13,996 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:11:14,020 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:11:14,020 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:11:14,447 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_061114.png
+2025-03-18 06:11:14,453 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:11:14,454 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:11:14,772 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_061114.png
+2025-03-18 06:11:14,773 - backtest_3month - ERROR - Lỗi khi backtest BTC-USD: Object of type Timestamp is not JSON serializable
+2025-03-18 06:29:19,778 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:29:19,779 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:29:19,780 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:29:19,780 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:29:19,780 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 06:29:19,780 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 06:29:21,340 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:29:21,607 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:29:21,608 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:29:22,312 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_062921.png
+2025-03-18 06:29:22,315 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:29:22,356 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:29:22,356 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:29:22,933 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_062922.png
+2025-03-18 06:29:22,939 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:29:22,941 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:29:23,319 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_062923.png
+2025-03-18 06:29:23,320 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_062923.json
+2025-03-18 06:29:23,919 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_062923.png
+2025-03-18 06:29:23,921 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:29:23,971 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:29:23,971 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:29:24,572 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_062924.png
+2025-03-18 06:29:24,578 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:29:24,579 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:29:24,893 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_062924.png
+2025-03-18 06:29:24,894 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_062924.json
+2025-03-18 06:29:25,424 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_062925.png
+2025-03-18 06:29:25,426 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:29:25,461 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:29:25,462 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:30:34,212 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:30:34,214 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:30:34,214 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:30:34,214 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:30:35,924 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:30:36,172 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:30:36,173 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-18 06:30:36,901 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_063036.png
+2025-03-18 06:30:36,908 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:30:36,909 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:30:37,254 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_063037.png
+2025-03-18 06:30:37,255 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_063037.json
+2025-03-18 06:31:37,470 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 06:31:37,471 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 06:31:37,471 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 06:31:37,471 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 06:31:39,279 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 06:31:39,528 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 06:31:39,529 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 06:31:40,351 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_063139.png
+2025-03-18 06:31:40,357 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:31:40,358 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 06:31:40,778 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_063140.png
+2025-03-18 06:31:40,779 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_063140.json
+2025-03-18 09:10:32,318 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 09:10:32,319 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 09:10:32,319 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 09:10:32,319 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 09:10:32,319 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 09:10:32,319 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (1mo, 1d)
+2025-03-18 09:10:33,917 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 1mo)
+2025-03-18 09:10:34,187 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 09:10:34,187 - integrated_system - INFO - Đã tải 29 dòng dữ liệu cho BTC-USD
+2025-03-18 09:10:34,194 - backtest_3month - INFO - Đã lưu kết quả backtest tại backtest_results/backtest_BTC-USD_1mo_20250318_091034.json
+2025-03-18 09:10:34,735 - backtest_3month - INFO - Đã lưu biểu đồ backtest tại backtest_charts/backtest_BTC-USD_1mo_20250318_091034.png
+2025-03-18 09:10:34,735 - backtest_3month - INFO - Kết quả BTC-USD: P/L=$0.00 (0.00%), Win Rate=0.0%, Trades=0
+2025-03-18 09:10:34,735 - backtest_3month - INFO - Đã lưu báo cáo tổng hợp tại backtest_results/summary_1mo_20250318_091034.json
+2025-03-18 09:10:35,010 - backtest_3month - INFO - Đã lưu biểu đồ tổng hợp tại backtest_charts/summary_1mo_20250318_091034.png
+2025-03-18 09:37:23,888 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 09:37:23,891 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 09:37:23,891 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 09:37:23,891 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 09:37:23,891 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 09:37:25,292 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 09:37:25,520 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 09:37:25,521 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 09:37:26,438 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_093726.png
+2025-03-18 09:37:26,445 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:37:26,446 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:37:26,833 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_093726.png
+2025-03-18 09:37:26,834 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_093726.json
+2025-03-18 09:37:26,834 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: neutral (Độ tin cậy: 0.00)
+2025-03-18 09:43:49,832 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 09:43:49,834 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 09:43:49,834 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 09:43:49,835 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 09:43:49,835 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 09:43:51,204 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 09:43:51,437 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 09:43:51,442 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 09:43:52,624 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_094351.png
+2025-03-18 09:43:52,637 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:43:52,638 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:43:53,229 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_094352.png
+2025-03-18 09:43:53,230 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_094353.json
+2025-03-18 09:43:53,230 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 09:44:56,822 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 09:44:56,830 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 09:44:56,830 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 09:44:56,831 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 09:44:56,831 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-18 09:44:57,854 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 09:44:58,109 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 09:44:58,110 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 09:44:59,010 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_094458.png
+2025-03-18 09:44:59,017 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:44:59,018 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:44:59,414 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_094459.png
+2025-03-18 09:44:59,415 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_094459.json
+2025-03-18 09:44:59,415 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 09:44:59,415 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 09:44:59,447 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 09:44:59,447 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 09:45:00,086 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_094459.png
+2025-03-18 09:45:00,092 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:45:00,094 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 09:45:00,497 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_094500.png
+2025-03-18 09:45:00,498 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_094500.json
+2025-03-18 09:45:00,498 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 09:45:00,498 - integrated_system - INFO - Đã tạo thông số giao dịch cho BTC-USD
+2025-03-18 15:16:47,883 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 15:16:47,884 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 15:16:47,884 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 15:16:47,884 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 15:16:47,884 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 15:16:47,884 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-18 15:16:49,266 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 15:16:49,765 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:16:49,765 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 15:16:50,649 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_151650.png
+2025-03-18 15:16:50,652 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:16:50,652 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 15:16:50,693 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:16:50,693 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 15:16:51,199 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_151650.png
+2025-03-18 15:16:51,205 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:16:51,206 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:16:51,548 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_151651.png
+2025-03-18 15:16:51,549 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_151651.json
+2025-03-18 15:16:51,549 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:16:51,549 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-18 15:16:51,549 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-18 15:16:51,592 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:16:51,593 - integrated_system - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-18 15:18:03,029 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 15:18:03,029 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 15:18:03,029 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 15:18:03,029 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 15:18:03,029 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 15:18:03,029 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (1mo, 1d)
+2025-03-18 15:18:03,225 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 1mo)
+2025-03-18 15:18:03,421 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:18:03,421 - integrated_system - INFO - Đã tải 29 dòng dữ liệu cho BTC-USD
+2025-03-18 15:18:03,426 - backtest_3month - INFO - Đã lưu kết quả backtest tại backtest_results/backtest_BTC-USD_1mo_20250318_151803.json
+2025-03-18 15:18:03,694 - backtest_3month - INFO - Đã lưu biểu đồ backtest tại backtest_charts/backtest_BTC-USD_1mo_20250318_151803.png
+2025-03-18 15:18:03,694 - backtest_3month - INFO - Kết quả BTC-USD: P/L=$0.00 (0.00%), Win Rate=0.0%, Trades=0
+2025-03-18 15:18:03,694 - backtest_3month - INFO - Đã lưu báo cáo tổng hợp tại backtest_results/summary_1mo_20250318_151803.json
+2025-03-18 15:18:03,910 - backtest_3month - INFO - Đã lưu biểu đồ tổng hợp tại backtest_charts/summary_1mo_20250318_151803.png
+2025-03-18 15:21:40,793 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 15:21:40,793 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 15:21:40,793 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 15:21:40,793 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 15:21:40,793 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 15:21:40,793 - backtest_3month - INFO - Bắt đầu backtest ETH-USD (1mo, 1d)
+2025-03-18 15:21:41,041 - integrated_system - INFO - Đang tải dữ liệu ETH-USD (1d, 1mo)
+2025-03-18 15:21:41,449 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:21:41,449 - integrated_system - INFO - Đã tải 29 dòng dữ liệu cho ETH-USD
+2025-03-18 15:21:41,455 - backtest_3month - INFO - Đã lưu kết quả backtest tại backtest_results/backtest_ETH-USD_1mo_20250318_152141.json
+2025-03-18 15:21:41,792 - backtest_3month - INFO - Đã lưu biểu đồ backtest tại backtest_charts/backtest_ETH-USD_1mo_20250318_152141.png
+2025-03-18 15:21:41,792 - backtest_3month - INFO - Kết quả ETH-USD: P/L=$0.00 (0.00%), Win Rate=0.0%, Trades=0
+2025-03-18 15:21:41,792 - backtest_3month - INFO - Bắt đầu backtest SOL-USD (1mo, 1d)
+2025-03-18 15:21:41,792 - integrated_system - INFO - Đang tải dữ liệu SOL-USD (1d, 1mo)
+2025-03-18 15:21:42,116 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:21:42,116 - integrated_system - INFO - Đã tải 29 dòng dữ liệu cho SOL-USD
+2025-03-18 15:21:42,123 - backtest_3month - INFO - Đã lưu kết quả backtest tại backtest_results/backtest_SOL-USD_1mo_20250318_152142.json
+2025-03-18 15:21:42,418 - backtest_3month - INFO - Đã lưu biểu đồ backtest tại backtest_charts/backtest_SOL-USD_1mo_20250318_152142.png
+2025-03-18 15:21:42,418 - backtest_3month - INFO - Kết quả SOL-USD: P/L=$0.00 (0.00%), Win Rate=0.0%, Trades=0
+2025-03-18 15:21:42,419 - backtest_3month - INFO - Đã lưu báo cáo tổng hợp tại backtest_results/summary_1mo_20250318_152142.json
+2025-03-18 15:21:42,652 - backtest_3month - INFO - Đã lưu biểu đồ tổng hợp tại backtest_charts/summary_1mo_20250318_152142.png
+2025-03-18 15:24:13,680 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-18 15:24:13,680 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-18 15:24:13,680 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-18 15:24:13,680 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-18 15:24:13,680 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-18 15:24:13,680 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (2mo, 1d)
+2025-03-18 15:24:13,879 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:14,901 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:14,901 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:15,342 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152415.png
+2025-03-18 15:24:15,344 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:24:15,344 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:15,614 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:15,614 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:16,060 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152415.png
+2025-03-18 15:24:16,065 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:16,066 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:16,372 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152416.png
+2025-03-18 15:24:16,373 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152416.json
+2025-03-18 15:24:16,373 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:24:16,373 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-18 15:24:16,373 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:16,642 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:16,642 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:17,060 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152416.png
+2025-03-18 15:24:17,066 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:17,067 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:17,391 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152417.png
+2025-03-18 15:24:17,392 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152417.json
+2025-03-18 15:24:17,392 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:24:17,392 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:17,668 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:17,669 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:18,090 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152417.png
+2025-03-18 15:24:18,095 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:18,097 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:18,369 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152418.png
+2025-03-18 15:24:18,369 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152418.json
+2025-03-18 15:24:18,370 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:24:18,370 - integrated_system - INFO - Đã tạo thông số giao dịch cho BTC-USD
+2025-03-18 15:24:18,370 - backtest_3month - INFO - Mở vị thế: buy tại 95773.38, TP: 97297.62, SL: 76540.75
+2025-03-18 15:24:18,371 - backtest_3month - INFO - TP đạt: buy từ 95773.38 đến 97297.62, lợi nhuận: $159.15
+2025-03-18 15:24:18,779 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152418.png
+2025-03-18 15:24:18,781 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:24:18,781 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:19,057 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:19,058 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:19,469 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152419.png
+2025-03-18 15:24:19,474 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:19,475 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:19,749 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152419.png
+2025-03-18 15:24:19,750 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152419.json
+2025-03-18 15:24:19,750 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:24:19,750 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-18 15:24:19,750 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:20,027 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:20,027 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:20,453 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152420.png
+2025-03-18 15:24:20,458 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:20,459 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:20,750 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152420.png
+2025-03-18 15:24:20,751 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152420.json
+2025-03-18 15:24:20,751 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:24:20,751 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:21,028 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:21,028 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:21,456 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152421.png
+2025-03-18 15:24:21,461 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:21,463 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:21,798 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152421.png
+2025-03-18 15:24:21,799 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152421.json
+2025-03-18 15:24:21,799 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:24:21,799 - integrated_system - INFO - Đã tạo thông số giao dịch cho BTC-USD
+2025-03-18 15:24:21,800 - backtest_3month - INFO - Mở vị thế: buy tại 96635.61, TP: 97297.62, SL: 76540.75
+2025-03-18 15:24:21,800 - backtest_3month - INFO - TP đạt: buy từ 96635.61 đến 97297.62, lợi nhuận: $69.60
+2025-03-18 15:24:22,236 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152421.png
+2025-03-18 15:24:22,238 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-18 15:24:22,238 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:22,506 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:22,507 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-18 15:24:22,931 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250318_152422.png
+2025-03-18 15:24:22,936 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:22,938 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-18 15:24:23,214 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250318_152423.png
+2025-03-18 15:24:23,214 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250318_152423.json
+2025-03-18 15:24:23,214 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-18 15:24:23,214 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-18 15:24:23,215 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 2mo)
+2025-03-18 15:24:23,491 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-18 15:24:23,491 - integrated_system - INFO - Đã tải 60 dòng dữ liệu cho BTC-USD
+2025-03-19 00:28:01,022 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-19 00:28:01,235 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-19 00:28:01,236 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-19 00:28:01,236 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-19 00:28:01,236 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-19 00:28:01,236 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (15d, 1d)
+2025-03-19 00:28:02,437 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 15d)
+2025-03-19 00:28:02,733 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:28:02,734 - integrated_system - INFO - Đã tải 14 dòng dữ liệu cho BTC-USD
+2025-03-19 00:28:02,742 - backtest_3month - INFO - Đã lưu kết quả backtest tại backtest_results/backtest_BTC-USD_15d_20250319_002802.json
+2025-03-19 00:28:03,330 - backtest_3month - INFO - Đã lưu biểu đồ backtest tại backtest_charts/backtest_BTC-USD_15d_20250319_002803.png
+2025-03-19 00:28:03,330 - backtest_3month - INFO - Kết quả BTC-USD: P/L=$0.00 (0.00%), Win Rate=0.0%, Trades=0
+2025-03-19 00:28:03,330 - backtest_3month - INFO - Đã lưu báo cáo tổng hợp tại backtest_results/summary_15d_20250319_002803.json
+2025-03-19 00:28:03,558 - backtest_3month - INFO - Đã lưu biểu đồ tổng hợp tại backtest_charts/summary_15d_20250319_002803.png
+2025-03-19 00:50:20,948 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-19 00:50:21,071 - sideways_optimizer - INFO - Đã tải RSI Divergence Detector
+2025-03-19 00:50:21,072 - sideways_optimizer - INFO - Đã khởi tạo Sideways Market Optimizer
+2025-03-19 00:50:21,072 - integrated_system - INFO - Đã khởi tạo Integrated Sideways Trader
+2025-03-19 00:50:21,072 - backtest_3month - INFO - Đã khởi tạo Backtest Engine
+2025-03-19 00:50:21,072 - backtest_3month - INFO - Bắt đầu backtest BTC-USD (3mo, 1d)
+2025-03-19 00:50:21,753 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-19 00:50:22,678 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:50:22,678 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-19 00:50:23,260 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250319_005022.png
+2025-03-19 00:50:23,263 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-19 00:50:23,263 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-19 00:50:23,542 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:50:23,542 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-19 00:50:23,968 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250319_005023.png
+2025-03-19 00:50:23,973 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:23,975 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:24,271 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250319_005024.png
+2025-03-19 00:50:24,274 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250319_005024.json
+2025-03-19 00:50:24,274 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-19 00:50:24,274 - integrated_system - INFO - Bắt đầu lấy thông số giao dịch cho BTC-USD
+2025-03-19 00:50:24,274 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-19 00:50:24,550 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:50:24,550 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-19 00:50:24,976 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250319_005024.png
+2025-03-19 00:50:24,981 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:24,982 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:25,308 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250319_005025.png
+2025-03-19 00:50:25,309 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250319_005025.json
+2025-03-19 00:50:25,309 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-19 00:50:25,309 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-19 00:50:25,576 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:50:25,577 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD
+2025-03-19 00:50:26,012 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250319_005025.png
+2025-03-19 00:50:26,017 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:26,019 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-19 00:50:26,301 - rsi_divergence - INFO - Đã lưu biểu đồ phân kỳ: charts/rsi_divergence_bullish_BTC-USD_20250319_005026.png
+2025-03-19 00:50:26,527 - integrated_system - INFO - Đã lưu báo cáo phân tích thị trường tại reports/market_analysis_BTC-USD_20250319_005026.json
+2025-03-19 00:50:26,527 - integrated_system - INFO - Đã tạo tín hiệu giao dịch: buy (Độ tin cậy: 0.90)
+2025-03-19 00:50:26,527 - integrated_system - INFO - Đã tạo thông số giao dịch cho BTC-USD
+2025-03-19 00:50:26,527 - backtest_3month - INFO - Mở vị thế: buy tại 104408.07, TP: 98189.85, SL: 78082.38
+2025-03-19 00:50:26,528 - backtest_3month - INFO - TP đạt: buy từ 104408.07 đến 98189.85, lợi nhuận: $-595.57
+2025-03-19 00:50:27,016 - sideways_optimizer - INFO - Đã lưu biểu đồ phát hiện thị trường đi ngang: charts/sideways_detection_BTC-USD_20250319_005026.png
+2025-03-19 00:50:27,018 - integrated_system - INFO - Bắt đầu lấy tín hiệu giao dịch cho BTC-USD
+2025-03-19 00:50:27,018 - integrated_system - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-19 00:50:27,285 - integrated_system - INFO - Dữ liệu có cấu trúc MultiIndex, đang xử lý...
+2025-03-19 00:50:27,286 - integrated_system - INFO - Đã tải 90 dòng dữ liệu cho BTC-USD

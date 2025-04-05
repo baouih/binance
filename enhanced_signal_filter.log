@@ -1,0 +1,55 @@
+2025-03-16 04:58:45,934 - enhanced_signal_filter - INFO - Đã tải cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 04:58:45,934 - enhanced_signal_filter - INFO - Khởi tạo EnhancedSignalFilter với cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 04:58:45,934 - enhanced_signal_filter - INFO - Đánh giá tín hiệu LONG BTCUSDT trên 4h, kết quả: CHẤP NHẬN (score: 0.84)
+2025-03-16 04:59:53,037 - improved_win_rate - INFO - Đã tải cấu hình từ configs/improved_win_rate_config.json
+2025-03-16 04:59:53,038 - enhanced_signal_filter - INFO - Đã tải cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 04:59:53,038 - enhanced_signal_filter - INFO - Khởi tạo EnhancedSignalFilter với cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 04:59:53,038 - improved_win_rate - INFO - Khởi tạo ImprovedWinRateAdapter
+2025-03-16 04:59:53,038 - enhanced_signal_filter - INFO - Đánh giá tín hiệu LONG BTCUSDT trên 4h, kết quả: CHẤP NHẬN (score: 0.84)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Điều chỉnh SL/TP cho LONG BTCUSDT: SL_ATR=2.00, TP_ATR=3.68 (Chế độ: trending)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Tín hiệu LONG BTCUSDT được chấp nhận (score: 0.84)
+2025-03-16 04:59:53,039 - enhanced_signal_filter - INFO - Đánh giá tín hiệu SHORT ETHUSDT trên 1h, kết quả: TỪ CHỐI (score: 0.52)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Tín hiệu SHORT ETHUSDT bị từ chối (score: 0.52)
+2025-03-16 04:59:53,039 - enhanced_signal_filter - INFO - Đánh giá tín hiệu LONG SOLUSDT trên 1d, kết quả: CHẤP NHẬN (score: 0.96)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Điều chỉnh SL/TP cho LONG SOLUSDT: SL_ATR=2.00, TP_ATR=3.68 (Chế độ: trending)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Tín hiệu LONG SOLUSDT được chấp nhận (score: 0.96)
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Cập nhật kết quả giao dịch: LONG BTCUSDT, Kết quả: THẮNG, PnL: 400.00, Win Rate: 100.00%
+2025-03-16 04:59:53,039 - improved_win_rate - INFO - Cập nhật kết quả giao dịch: LONG SOLUSDT, Kết quả: THUA, PnL: -60.00, Win Rate: 50.00%
+2025-03-16 05:03:04,344 - win_rate_integration - INFO - Thiết lập bộ cải thiện tỷ lệ thắng...
+2025-03-16 05:03:04,344 - enhanced_signal_filter - INFO - Đã tải cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 05:03:04,345 - enhanced_signal_filter - INFO - Khởi tạo EnhancedSignalFilter với cấu hình từ configs/enhanced_filter_config.json
+2025-03-16 05:03:04,345 - improved_win_rate - INFO - Đã tải cấu hình từ configs/improved_win_rate_config.json
+2025-03-16 05:03:04,345 - improved_win_rate - INFO - Khởi tạo ImprovedWinRateAdapter
+2025-03-16 05:03:04,345 - win_rate_integration - INFO - Đã khởi tạo thành công bộ cải thiện tỷ lệ thắng
+2025-03-16 05:03:04,345 - win_rate_integration - INFO - === KIỂM TRA CẢI THIỆN WIN RATE ===
+2025-03-16 05:03:04,345 - win_rate_integration - INFO - Tín hiệu #1: LONG BTCUSDT (4h)
+2025-03-16 05:03:04,345 - enhanced_signal_filter - INFO - Đánh giá tín hiệu LONG BTCUSDT trên 4h, kết quả: CHẤP NHẬN (score: 0.84)
+2025-03-16 05:03:04,345 - improved_win_rate - INFO - Điều chỉnh SL/TP cho LONG BTCUSDT: SL_ATR=2.00, TP_ATR=3.68 (Chế độ: trending)
+2025-03-16 05:03:04,346 - improved_win_rate - INFO - Tín hiệu LONG BTCUSDT được chấp nhận (score: 0.84)
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   Kết quả: NÊN GIAO DỊCH
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   Tham số điều chỉnh:
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   - SL ATR: 2.00
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   - TP ATR: 3.68
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   - Retry Count: 3
+2025-03-16 05:03:04,346 - win_rate_integration - INFO - Tín hiệu #2: SHORT ETHUSDT (1h)
+2025-03-16 05:03:04,346 - enhanced_signal_filter - INFO - Đánh giá tín hiệu SHORT ETHUSDT trên 1h, kết quả: TỪ CHỐI (score: 0.52)
+2025-03-16 05:03:04,346 - improved_win_rate - INFO - Tín hiệu SHORT ETHUSDT bị từ chối (score: 0.52)
+2025-03-16 05:03:04,346 - win_rate_integration - INFO -   Kết quả: BỎ QUA
+2025-03-16 05:03:04,346 - win_rate_integration - INFO - Tín hiệu #3: LONG SOLUSDT (1d)
+2025-03-16 05:03:04,346 - enhanced_signal_filter - INFO - Đánh giá tín hiệu LONG SOLUSDT trên 1d, kết quả: CHẤP NHẬN (score: 0.96)
+2025-03-16 05:03:04,347 - improved_win_rate - INFO - Điều chỉnh SL/TP cho LONG SOLUSDT: SL_ATR=2.00, TP_ATR=3.68 (Chế độ: trending)
+2025-03-16 05:03:04,347 - improved_win_rate - INFO - Tín hiệu LONG SOLUSDT được chấp nhận (score: 0.96)
+2025-03-16 05:03:04,347 - win_rate_integration - INFO -   Kết quả: NÊN GIAO DỊCH
+2025-03-16 05:03:04,347 - win_rate_integration - INFO -   Tham số điều chỉnh:
+2025-03-16 05:03:04,347 - win_rate_integration - INFO -   - SL ATR: 2.00
+2025-03-16 05:03:04,347 - win_rate_integration - INFO -   - TP ATR: 3.68
+2025-03-16 05:03:04,347 - win_rate_integration - INFO -   - Retry Count: 3
+2025-03-16 05:03:04,347 - win_rate_integration - INFO - Mô phỏng kết quả giao dịch:
+2025-03-16 05:03:04,347 - improved_win_rate - INFO - Cập nhật kết quả giao dịch: LONG BTCUSDT, Kết quả: THẮNG, PnL: 400.00, Win Rate: 100.00%
+2025-03-16 05:03:04,347 - improved_win_rate - INFO - Cập nhật kết quả giao dịch: LONG SOLUSDT, Kết quả: THUA, PnL: -60.00, Win Rate: 50.00%
+2025-03-16 05:03:04,347 - win_rate_integration - INFO - Thống kê hiệu suất:
+2025-03-16 05:03:04,347 - win_rate_integration - INFO - Tổng số tín hiệu: 3
+2025-03-16 05:03:04,348 - win_rate_integration - INFO - Tín hiệu được chấp nhận: 2
+2025-03-16 05:03:04,348 - win_rate_integration - INFO - Tín hiệu bị từ chối: 1
+2025-03-16 05:03:04,348 - win_rate_integration - INFO - Tỷ lệ lọc: 33.3%
+2025-03-16 05:03:04,348 - win_rate_integration - INFO - Win rate: 50.0%

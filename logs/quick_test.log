@@ -1,0 +1,22 @@
+2025-03-07 11:40:14,170 - quick_test - INFO - Đã đăng ký vị thế TEST_normal_test_normal_1741347614_1741347614 - long TEST_normal tại 53665.66773247812
+2025-03-07 11:40:14,171 - quick_test - INFO - Đã kích hoạt trailing stop cho TEST_normal_test_normal_1741347614_1741347614 tại 54054.54
+2025-03-07 11:40:14,171 - quick_test - INFO - Kích hoạt trailing stop: TEST_normal_test_normal_1741347614_1741347614 - Bảo toàn 1.53% lợi nhuận
+2025-03-07 11:40:14,171 - quick_test - INFO - Đóng vị thế TEST_normal_test_normal_1741347614_1741347614 qua trailing_stop: 0.15% lợi nhuận
+2025-03-07 11:40:15,084 - quick_test - INFO - Đã đăng ký vị thế TEST_flash_crash_test_flash_crash_1741347615_1741347615 - long TEST_flash_crash tại 32954.076160000004
+2025-03-07 11:40:15,878 - quick_test - INFO - Đã đăng ký vị thế TEST_price_spike_test_price_spike_1741347615_1741347615 - long TEST_price_spike tại 66550.00000000001
+2025-03-07 11:40:16,668 - quick_test - INFO - Đã đăng ký vị thế TEST_sideways_test_sideways_1741347616_1741347616 - long TEST_sideways tại 50305.7690719257
+2025-03-07 11:40:17,531 - quick_test - INFO - Đã đăng ký vị thế TEST_high_volatility_test_high_volatility_1741347617_1741347617 - long TEST_high_volatility tại 63118.41416434752
+2025-03-07 11:40:17,532 - quick_test - INFO - Đã kích hoạt trailing stop cho TEST_high_volatility_test_high_volatility_1741347617_1741347617 tại 63513.52
+2025-03-07 11:40:17,532 - quick_test - INFO - Kích hoạt trailing stop: TEST_high_volatility_test_high_volatility_1741347617_1741347617 - Bảo toàn 0.72% lợi nhuận
+2025-03-07 11:40:17,533 - quick_test - INFO - Đóng vị thế TEST_high_volatility_test_high_volatility_1741347617_1741347617 qua trailing_stop: 0.56% lợi nhuận
+2025-03-07 11:41:46,601 - quick_test - INFO - Đã đăng ký vị thế TEST_normal_test_normal_1741347706_1741347706 - long TEST_normal tại 54611.41638467271
+2025-03-07 11:41:46,602 - quick_test - INFO - Đã kích hoạt trailing stop cho TEST_normal_test_normal_1741347706_1741347706 tại 55047.61
+2025-03-07 11:41:46,602 - quick_test - INFO - Kích hoạt trailing stop: TEST_normal_test_normal_1741347706_1741347706 - Bảo toàn 1.45% lợi nhuận
+2025-03-07 11:41:46,602 - quick_test - INFO - Đóng vị thế TEST_normal_test_normal_1741347706_1741347706 qua trailing_stop: -0.15% lợi nhuận
+2025-03-07 11:41:47,548 - quick_test - INFO - Đã đăng ký vị thế TEST_flash_crash_test_flash_crash_1741347707_1741347707 - long TEST_flash_crash tại 32954.076160000004
+2025-03-07 11:41:48,388 - quick_test - INFO - Đã đăng ký vị thế TEST_price_spike_test_price_spike_1741347708_1741347708 - long TEST_price_spike tại 66550.00000000001
+2025-03-07 11:41:49,317 - quick_test - INFO - Đã đăng ký vị thế TEST_sideways_test_sideways_1741347709_1741347709 - long TEST_sideways tại 51000.0
+2025-03-07 11:41:50,202 - quick_test - INFO - Đã đăng ký vị thế TEST_high_volatility_test_high_volatility_1741347710_1741347710 - long TEST_high_volatility tại 70603.35888595354
+2025-03-07 11:41:50,202 - quick_test - INFO - Đã kích hoạt trailing stop cho TEST_high_volatility_test_high_volatility_1741347710_1741347710 tại 71507.64
+2025-03-07 11:41:50,202 - quick_test - INFO - Kích hoạt trailing stop: TEST_high_volatility_test_high_volatility_1741347710_1741347710 - Bảo toàn 0.81% lợi nhuận
+2025-03-07 11:41:50,203 - quick_test - INFO - Đóng vị thế TEST_high_volatility_test_high_volatility_1741347710_1741347710 qua trailing_stop: 0.98% lợi nhuận

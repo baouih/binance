@@ -1,0 +1,38 @@
+2025-03-09 15:51:18,265 - high_risk_entry_tester - WARNING - Không tìm thấy file cấu hình configs/high_risk_entry_config.json, sử dụng cấu hình mặc định
+2025-03-09 15:51:18,266 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_entry_config.json
+2025-03-09 15:51:18,266 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:51:18,266 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:51:18,267 - high_risk_entry_tester - INFO - Đã khởi tạo HighRiskEntryTester với 4 khung thời gian và 5 cặp tiền
+2025-03-09 15:51:18,267 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_entry_config.json
+2025-03-09 15:51:18,267 - high_risk_entry_tester - INFO - Đã lưu cấu hình vào configs/high_risk_entry_config.json
+2025-03-09 15:51:18,268 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/BTCUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:51:18,571 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/BTCUSDT_1h_30d.csv
+2025-03-09 15:51:18,756 - high_risk_entry_tester - INFO - BTCUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:51:18,849 - high_risk_entry_tester - INFO - BTCUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:51:18,920 - high_risk_entry_tester - INFO - BTCUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:51:19,013 - high_risk_entry_tester - INFO - BTCUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:51:19,013 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/ETHUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:51:19,359 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/ETHUSDT_1h_30d.csv
+2025-03-09 15:51:19,515 - high_risk_entry_tester - INFO - ETHUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:51:19,609 - high_risk_entry_tester - INFO - ETHUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:51:19,691 - high_risk_entry_tester - INFO - ETHUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:51:19,772 - high_risk_entry_tester - INFO - ETHUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:51:19,772 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/BNBUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:51:20,077 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/BNBUSDT_1h_30d.csv
+2025-03-09 15:51:20,228 - high_risk_entry_tester - INFO - BNBUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:51:20,326 - high_risk_entry_tester - INFO - BNBUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:51:20,419 - high_risk_entry_tester - INFO - BNBUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:51:20,494 - high_risk_entry_tester - INFO - BNBUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:51:20,494 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/SOLUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:51:20,770 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/SOLUSDT_1h_30d.csv
+2025-03-09 15:51:20,918 - high_risk_entry_tester - INFO - SOLUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:51:21,006 - high_risk_entry_tester - INFO - SOLUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:51:21,082 - high_risk_entry_tester - INFO - SOLUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:51:21,145 - high_risk_entry_tester - INFO - SOLUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:51:21,146 - high_risk_entry_tester - WARNING - Không tìm thấy file dữ liệu test_data/LINKUSDT_1h_30d.csv, tạo dữ liệu mẫu để kiểm tra
+2025-03-09 15:51:21,468 - high_risk_entry_tester - INFO - Đã tạo và lưu dữ liệu mẫu vào test_data/LINKUSDT_1h_30d.csv
+2025-03-09 15:51:21,625 - high_risk_entry_tester - INFO - LINKUSDT - London Open (SHORT) - Không có lệnh
+2025-03-09 15:51:21,732 - high_risk_entry_tester - INFO - LINKUSDT - New York Open (SHORT) - Không có lệnh
+2025-03-09 15:51:21,826 - high_risk_entry_tester - INFO - LINKUSDT - Daily Candle Close (LONG) - 1 lệnh - Win: 0.00% - Avg P/L: -7.00% (-1.00R)
+2025-03-09 15:51:21,928 - high_risk_entry_tester - INFO - LINKUSDT - Major News Events (SHORT) - Không có lệnh
+2025-03-09 15:51:21,929 - high_risk_entry_tester - INFO - Đã lưu kết quả vào high_risk_results/high_risk_entry_test_20250309_155121.json

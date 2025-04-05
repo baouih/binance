@@ -1,0 +1,42 @@
+2025-03-06 13:21:18,467 - market_regime_analyzer - INFO - Tìm thấy 26 file kết quả trong backtest_results
+2025-03-06 13:21:18,493 - market_regime_analyzer - ERROR - Lỗi khi tải file backtest_results/adaptive_backtest_20250301_175350.json: Expecting value: line 6 column 27 (char 127)
+2025-03-06 13:21:18,495 - market_regime_analyzer - ERROR - Lỗi khi tải file backtest_results/adaptive_backtest_BTCUSDT_1h_20250301_175604.json: Expecting value: line 6 column 27 (char 126)
+2025-03-06 13:21:18,543 - market_regime_analyzer - INFO - Đã tải 24 kết quả thỏa mãn điều kiện
+2025-03-06 13:21:18,545 - market_regime_analyzer - WARNING - Không có chế độ nào có giao dịch để tạo biểu đồ
+2025-03-06 13:21:18,545 - market_regime_analyzer - WARNING - Không có chế độ nào có giao dịch để tạo báo cáo
+2025-03-06 13:21:18,545 - market_regime_analyzer - ERROR - Không thể tạo báo cáo do thiếu dữ liệu
+2025-03-06 13:31:17,503 - regime_analyzer - INFO - === BẮT ĐẦU PHÂN TÍCH MARKET REGIME CHO BTCUSDT 1h ===
+2025-03-06 13:31:17,503 - regime_analyzer - INFO - 
+--- Phân tích cho khoảng thời gian: Tháng_3_năm_2025 ---
+2025-03-06 13:33:35,144 - regime_analyzer - INFO - === BẮT ĐẦU PHÂN TÍCH MARKET REGIME CHO BTCUSDT 1h ===
+2025-03-06 13:33:35,145 - regime_analyzer - INFO - 
+--- Phân tích cho khoảng thời gian: Tháng_3_năm_2025 ---
+2025-03-06 13:33:35,145 - adaptive_backtester - INFO - === CHẠY BACKTEST THÍCH ỨNG ===
+2025-03-06 13:33:35,146 - adaptive_backtester - INFO - Symbol: BTCUSDT
+2025-03-06 13:33:35,146 - adaptive_backtester - INFO - Interval: 1h
+2025-03-06 13:33:35,146 - adaptive_backtester - INFO - Số dư ban đầu: $10000.0
+2025-03-06 13:33:35,146 - adaptive_backtester - INFO - Đòn bẩy: 3x
+2025-03-06 13:33:35,146 - adaptive_backtester - INFO - Rủi ro: 1.0%
+2025-03-06 13:33:35,147 - adaptive_backtester - INFO - Trailing Stop: Bật
+2025-03-06 13:33:35,196 - adaptive_backtester - INFO - Đã tải 2160 candles từ 2024-12-01 08:29:53.835133 đến 2025-03-01 07:29:53.835133
+2025-03-06 13:33:35,196 - adaptive_backtester - INFO - Bắt đầu backtest...
+2025-03-06 13:33:35,258 - adaptive_backtester - INFO - Mở vị thế MUA tại 2024-12-05 13:29:53.835133: $76828.82, Số lượng: 0.030378, SL: $70903.51, TP: $88679.42, Chế độ: volatile
+2025-03-06 13:33:35,424 - adaptive_backtester - INFO - Đóng vị thế BUY tại 2024-12-05 18:29:53.835133: $82529.45, PnL: 22.26%, $515.89, Lý do: Stop Loss
+2025-03-06 13:37:44,978 - regime_analyzer - INFO - === BẮT ĐẦU PHÂN TÍCH MARKET REGIME CHO BTCUSDT 1h ===
+2025-03-06 13:37:44,979 - regime_analyzer - INFO - 
+--- Phân tích cho khoảng thời gian: Tháng_3_năm_2025 ---
+2025-03-06 13:37:44,979 - adaptive_backtester - INFO - === CHẠY BACKTEST THÍCH ỨNG ===
+2025-03-06 13:37:44,979 - adaptive_backtester - INFO - Symbol: BTCUSDT
+2025-03-06 13:37:44,979 - adaptive_backtester - INFO - Interval: 1h
+2025-03-06 13:37:44,979 - adaptive_backtester - INFO - Số dư ban đầu: $10000.0
+2025-03-06 13:37:44,980 - adaptive_backtester - INFO - Đòn bẩy: 3x
+2025-03-06 13:37:44,980 - adaptive_backtester - INFO - Rủi ro: 1.0%
+2025-03-06 13:37:44,980 - adaptive_backtester - INFO - Trailing Stop: Bật
+2025-03-06 13:37:45,012 - adaptive_backtester - INFO - Đã tải 2160 candles từ 2024-12-01 08:29:53.835133 đến 2025-03-01 07:29:53.835133
+2025-03-06 13:37:45,012 - adaptive_backtester - INFO - Bắt đầu backtest...
+2025-03-06 13:37:45,062 - adaptive_backtester - INFO - Mở vị thế MUA tại 2024-12-05 13:29:53.835133: $76828.82, Số lượng: 0.030378, SL: $70903.51, TP: $88679.42, Chế độ: volatile
+2025-03-06 13:37:45,157 - adaptive_backtester - INFO - Đóng vị thế BUY tại 2024-12-05 18:29:53.835133: $82529.45, PnL: 22.26%, $515.89, Lý do: Stop Loss
+2025-03-06 13:37:53,558 - adaptive_backtester - INFO - Mở vị thế BÁN tại 2025-01-10 12:29:53.835133: $3835347065451159.00, Số lượng: 0.000000, SL: $4043980604236579.50, TP: $3418079987880318.00, Chế độ: volatile
+2025-03-06 13:37:53,665 - adaptive_backtester - INFO - Đóng vị thế SELL tại 2025-01-10 15:29:53.835133: $4092358122250459.00, PnL: -20.10%, $-704.93, Lý do: Stop Loss
+2025-03-06 13:37:54,339 - adaptive_backtester - INFO - Mở vị thế MUA tại 2025-01-13 21:29:53.835133: $12112459929490438.00, Số lượng: 0.000000, SL: $11482340882351086.00, TP: $14002817070908494.00, Chế độ: trending
+2025-03-06 13:37:54,488 - adaptive_backtester - INFO - Đóng vị thế BUY tại 2025-01-14 03:29:53.835133: $13074686353039216.00, PnL: 23.83%, $1339.55, Lý do: Stop Loss

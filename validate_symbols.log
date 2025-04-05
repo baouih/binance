@@ -1,0 +1,23 @@
+2025-03-07 01:36:14,588 - validate_symbols - ERROR - Lỗi import module: cannot import name 'OrderFlowIndicators' from 'order_flow_indicators' (/home/runner/workspace/order_flow_indicators.py)
+2025-03-07 01:36:14,589 - validate_symbols - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/validate_all_symbols.py", line 36, in <module>
+    from order_flow_indicators import OrderFlowIndicators
+ImportError: cannot import name 'OrderFlowIndicators' from 'order_flow_indicators' (/home/runner/workspace/order_flow_indicators.py)
+
+2025-03-07 05:05:11,168 - validate_symbols - ERROR - Lỗi import module: cannot import name 'OrderFlowIndicators' from 'order_flow_indicators' (/home/runner/workspace/order_flow_indicators.py)
+2025-03-07 05:05:11,169 - validate_symbols - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/validate_all_symbols.py", line 36, in <module>
+    from order_flow_indicators import OrderFlowIndicators
+ImportError: cannot import name 'OrderFlowIndicators' from 'order_flow_indicators' (/home/runner/workspace/order_flow_indicators.py)
+
+2025-03-07 05:14:07,538 - auto_test_all_coins - INFO - Bắt đầu quá trình kiểm tra tự động các đồng coin
+2025-03-07 05:14:07,538 - auto_test_all_coins - INFO - Đang kiểm tra các module...
+2025-03-07 05:14:07,539 - partial_take_profit_manager - INFO - Đã tải cấu hình từ: data/partial_take_profit
+2025-03-07 05:14:07,539 - validate_symbols - INFO - Bắt đầu quá trình kiểm tra tất cả các cặp tiền...
+2025-03-07 05:14:07,539 - validate_symbols - INFO - Đang tìm các cặp tiền có đủ 3 tháng dữ liệu...
+2025-03-07 05:14:07,560 - validate_symbols - INFO - Tìm thấy 0 cặp tiền có đủ dữ liệu: []
+2025-03-07 05:14:07,561 - validate_symbols - WARNING - Không tìm thấy cặp tiền nào để kiểm tra
+2025-03-07 05:14:07,561 - auto_test_all_coins - INFO - Đã xác nhận 0/0 cặp tiền đạt yêu cầu
+2025-03-07 05:14:07,561 - auto_test_all_coins - INFO - Đang tìm các cặp tiền có đủ 3 tháng dữ liệu...
+2025-03-07 05:14:07,567 - auto_test_all_coins - INFO - Tìm thấy 0 cặp tiền có đủ dữ liệu: []
+2025-03-07 05:14:07,567 - auto_test_all_coins - WARNING - Không tìm thấy cặp tiền nào để kiểm tra

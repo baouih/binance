@@ -1,0 +1,63 @@
+2025-02-28 17:40:11,026 - binance_api - INFO - Khóa API Binance đã được cấu hình
+2025-02-28 17:40:11,026 - binance_api - INFO - Đang khởi tạo BinanceAPI trong chế độ live
+2025-02-28 17:40:11,545 - binance_api - INFO - Kết nối Binance API thành công qua endpoint: https://testnet.binancefuture.com/fapi/v1/ping
+2025-02-28 17:40:11,546 - binance_api - INFO - BinanceAPI đã được khởi tạo và kết nối thành công: True
+2025-02-28 17:40:11,549 - data_processor - INFO - DataProcessor initialized in live mode with ML features
+2025-02-28 17:40:11,549 - app.composite_indicator - INFO - Khởi tạo CompositeIndicator với 9 chỉ báo: ['rsi', 'macd', 'ema_cross', 'bbands', 'volume_trend', 'adx', 'stochastic', 'obv', 'atr']
+2025-02-28 17:40:11,549 - advanced_ml_optimizer - INFO - Khởi tạo AdvancedMLOptimizer với 2 loại mô hình cơ sở
+2025-02-28 17:40:11,549 - advanced_ml_optimizer - INFO - Mô hình riêng cho mỗi chế độ thị trường: True
+2025-02-28 17:40:11,550 - advanced_ml_optimizer - INFO - Sử dụng lựa chọn tính năng tự động: True
+2025-02-28 17:40:11,550 - advanced_ml_optimizer - INFO - Sử dụng kỹ thuật ensemble: True
+2025-02-28 17:40:11,550 - live_trading - INFO - Đang nạp mô hình từ: models/ml_models_20250228_173146.pkl
+2025-02-28 17:40:11,590 - advanced_ml_optimizer - INFO - Đã tải mô hình từ models/ml_models_20250228_173146.pkl
+2025-02-28 17:40:11,590 - advanced_ml_optimizer - INFO - Số lượng mô hình: 3
+2025-02-28 17:40:11,590 - live_trading - INFO - Đã nạp mô hình thành công với 3 mô hình
+2025-02-28 17:40:11,591 - live_trading - INFO - Khởi tạo bot giao dịch: ['BTCUSDT'], timeframes=['1h'], live_mode=False
+2025-02-28 17:40:11,591 - live_trading - INFO - Đang lấy dữ liệu huấn luyện cho BTCUSDT trong 30 ngày
+2025-02-28 17:40:12,035 - data_processor - INFO - Detected market regime: neutral
+2025-02-28 17:40:12,069 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-02-28 17:40:12,069 - data_processor - INFO - Price: 83814.90 (-0.16% change)
+2025-02-28 17:40:12,069 - data_processor - INFO - Trend: Downtrend
+2025-02-28 17:40:12,069 - data_processor - INFO - RSI: 42.07 (Neutral)
+2025-02-28 17:40:12,069 - data_processor - INFO - MACD: -1420.11 (Signal: -1744.45)
+2025-02-28 17:40:12,069 - data_processor - INFO - Volume: 3.35x average
+2025-02-28 17:40:12,069 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-02-28 17:40:12,070 - data_processor - INFO - ===========================
+2025-02-28 17:40:12,070 - data_processor - INFO - Processed 720 samples with indicators
+2025-02-28 17:40:12,074 - advanced_ml_optimizer - INFO - Đã cắt X từ 720 xuống 719 để khớp với y
+2025-02-28 17:40:12,074 - advanced_ml_optimizer - INFO - Kích thước cuối cùng: X = 719, y = 719
+2025-02-28 17:40:12,074 - live_trading - INFO - Điều chỉnh kích thước: X = 719, y = 719
+2025-02-28 17:40:12,074 - live_trading - INFO - Huấn luyện mô hình cho BTCUSDT với 719 mẫu, phân phối lớp: (array([-1.,  0.,  1.]), array([306, 108, 305]))
+2025-02-28 17:40:12,075 - market_regime_detector - INFO - Chế độ thị trường thay đổi từ neutral sang volatile
+/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/feature_selection/_univariate_selection.py:111: UserWarning: Features [9] are constant.
+  warnings.warn("Features %s are constant." % constant_features_idx, UserWarning)
+/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/sklearn/feature_selection/_univariate_selection.py:112: RuntimeWarning: invalid value encountered in divide
+  f = msb / msw
+2025-02-28 17:40:12,100 - advanced_ml_optimizer - INFO - Đã chọn 20/90 tính năng cho volatile
+2025-02-28 17:40:12,297 - advanced_ml_optimizer - INFO - Đã đào tạo random_forest_volatile: Accuracy=0.5069, F1=0.4981, Thời gian=0.18s
+2025-02-28 17:40:15,779 - advanced_ml_optimizer - INFO - Đã đào tạo gradient_boosting_volatile: Accuracy=0.4722, F1=0.4479, Thời gian=3.46s
+2025-02-28 17:40:15,784 - advanced_ml_optimizer - INFO - Đào tạo mô hình tổng hợp...
+2025-02-28 17:40:15,999 - advanced_ml_optimizer - INFO - Đã đào tạo ensemble_volatile: Accuracy=0.4583, F1=0.4340
+2025-02-28 17:40:16,273 - advanced_ml_optimizer - INFO - Đã lưu mô hình vào models/ml_models_20250228_174015.pkl/ml_models_20250228_174015.pkl
+2025-02-28 17:40:16,274 - live_trading - INFO - Đã lưu mô hình vào models/ml_models_20250228_174015.pkl/ml_models_20250228_174015.pkl
+2025-02-28 17:40:16,274 - live_trading - INFO - Bắt đầu chạy bot giao dịch SIMULATION
+2025-02-28 17:40:16,813 - data_processor - INFO - Detected market regime: neutral
+2025-02-28 17:40:16,857 - data_processor - INFO - 
+=== Latest Market Analysis ===
+2025-02-28 17:40:16,857 - data_processor - INFO - Price: 83821.00 (-0.16% change)
+2025-02-28 17:40:16,857 - data_processor - INFO - Trend: Downtrend
+2025-02-28 17:40:16,857 - data_processor - INFO - RSI: 42.09 (Neutral)
+2025-02-28 17:40:16,858 - data_processor - INFO - MACD: -1419.62 (Signal: -1744.35)
+2025-02-28 17:40:16,858 - data_processor - INFO - Volume: 3.31x average
+2025-02-28 17:40:16,858 - data_processor - INFO - Market Regime: neutral - Thị trường trung tính - không có xu hướng rõ ràng hoặc đặc điểm nổi bật.
+2025-02-28 17:40:16,858 - data_processor - INFO - ===========================
+2025-02-28 17:40:16,858 - data_processor - INFO - Processed 168 samples with indicators
+2025-02-28 17:40:16,865 - advanced_ml_optimizer - INFO - Sử dụng mô hình random_forest với F1 score 1.0
+2025-02-28 17:40:16,989 - binance_api - INFO - Lấy giá giao dịch từ Coinbase: 83797.76 USD
+2025-02-28 17:40:16,989 - live_trading - INFO - Tín hiệu: BTCUSDT - neutral (Confidence: 0.58, Regime: volatile)
+2025-02-28 17:40:16,989 - live_trading - INFO - --------------------------------------------------
+2025-02-28 17:40:16,989 - live_trading - INFO - Trạng thái bot (2025-02-28T17:40:16.989918)
+2025-02-28 17:40:16,989 - live_trading - INFO - Số vị thế đang mở: 0
+2025-02-28 17:40:16,990 - live_trading - INFO - --------------------------------------------------
+2025-02-28 17:40:16,990 - live_trading - INFO - Đang chờ 300 giây đến lần kiểm tra tiếp theo...

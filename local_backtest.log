@@ -1,0 +1,372 @@
+2025-03-17 01:07:07,189 - local_backtest - INFO - Đã tải cấu hình từ comprehensive_backtest_config.json
+2025-03-17 01:07:07,189 - local_backtest - INFO - Chuẩn bị chạy backtest cho 7 symbols và 3 timeframes
+2025-03-17 01:07:07,189 - local_backtest - INFO - Symbols: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, DOGEUSDT, ADAUSDT, XRPUSDT
+2025-03-17 01:07:07,189 - local_backtest - INFO - Timeframes: 1h, 4h, 1d
+2025-03-17 01:07:07,189 - local_backtest - INFO - Khoảng thời gian: 2024-02-01 đến 2024-03-15
+2025-03-17 01:07:07,189 - local_backtest - INFO - Mức độ rủi ro: medium
+2025-03-17 01:07:07,190 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1h): BTCUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 01:07:07,190 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (4h): BTCUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 01:07:07,190 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1d): BTCUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 01:07:07,191 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ETHUSDT (1h)
+2025-03-17 01:07:07,191 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ETHUSDT (4h)
+2025-03-17 01:07:07,191 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ETHUSDT (1d)
+2025-03-17 01:07:07,192 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho BNBUSDT (1h)
+2025-03-17 01:07:07,192 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho BNBUSDT (4h)
+2025-03-17 01:07:07,192 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho BNBUSDT (1d)
+2025-03-17 01:07:07,193 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho SOLUSDT (1h)
+2025-03-17 01:07:07,193 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho SOLUSDT (4h)
+2025-03-17 01:07:07,193 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho SOLUSDT (1d)
+2025-03-17 01:07:07,193 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho DOGEUSDT (1h)
+2025-03-17 01:07:07,194 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho DOGEUSDT (4h)
+2025-03-17 01:07:07,194 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho DOGEUSDT (1d)
+2025-03-17 01:07:07,194 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ADAUSDT (1h)
+2025-03-17 01:07:07,195 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ADAUSDT (4h)
+2025-03-17 01:07:07,195 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho ADAUSDT (1d)
+2025-03-17 01:07:07,195 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho XRPUSDT (1h)
+2025-03-17 01:07:07,195 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho XRPUSDT (4h)
+2025-03-17 01:07:07,196 - local_backtest - WARNING - Không tìm thấy file dữ liệu cho XRPUSDT (1d)
+2025-03-17 01:07:07,196 - local_backtest - WARNING - Thiếu dữ liệu cho: ETHUSDT_1h, ETHUSDT_4h, ETHUSDT_1d, BNBUSDT_1h, BNBUSDT_4h, BNBUSDT_1d, SOLUSDT_1h, SOLUSDT_4h, SOLUSDT_1d, DOGEUSDT_1h, DOGEUSDT_4h, DOGEUSDT_1d, ADAUSDT_1h, ADAUSDT_4h, ADAUSDT_1d, XRPUSDT_1h, XRPUSDT_4h, XRPUSDT_1d
+2025-03-17 02:35:16,811 - local_backtest - INFO - Đã tải cấu hình từ comprehensive_backtest_config.json
+2025-03-17 02:35:16,814 - local_backtest - INFO - Chỉ chạy backtest cho các symbols được chỉ định: BTCUSDT, ETHUSDT
+2025-03-17 02:35:16,814 - local_backtest - INFO - Chuẩn bị chạy backtest cho 2 symbols và 3 timeframes
+2025-03-17 02:35:16,814 - local_backtest - INFO - Symbols: BTCUSDT, ETHUSDT
+2025-03-17 02:35:16,814 - local_backtest - INFO - Timeframes: 1h, 4h, 1d
+2025-03-17 02:35:16,814 - local_backtest - INFO - Khoảng thời gian: 2024-02-01 đến 2024-03-15
+2025-03-17 02:35:16,814 - local_backtest - INFO - Mức độ rủi ro: medium
+2025-03-17 02:35:16,815 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1h): BTCUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,815 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (4h): BTCUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,816 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1d): BTCUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,816 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1h): ETHUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,817 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (4h): ETHUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,817 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1d): ETHUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:35:16,830 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:35:16,836 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:35:16,840 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:35:16,848 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:35:16,854 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:35:16,858 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:35:16,958 - local_backtest - INFO - Khởi tạo backtest với mức độ rủi ro: medium (risk_percentage=2.0%, max_positions=5)
+2025-03-17 02:35:16,958 - local_backtest - INFO - Chạy backtest cho BTCUSDT...
+2025-03-17 02:35:16,958 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BTCUSDT với 3 khung thời gian
+2025-03-17 02:35:16,958 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:35:16,958 - comprehensive_backtest - INFO - Bắt đầu backtest cho BTCUSDT với 7 chiến lược
+2025-03-17 02:35:16,959 - comprehensive_backtest - INFO - Hoàn thành backtest cho BTCUSDT: Profit=17.48%, Win Rate=55.55%, Max DD=8.45%
+2025-03-17 02:35:16,960 - local_backtest - INFO - Đã lưu kết quả backtest cho BTCUSDT vào backtest_results/BTCUSDT_medium_risk_backtest.json
+2025-03-17 02:35:16,960 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BTCUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:35:16,960 - local_backtest - INFO - Chạy backtest cho ETHUSDT...
+2025-03-17 02:35:16,960 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ETHUSDT với 3 khung thời gian
+2025-03-17 02:35:16,960 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:35:16,961 - comprehensive_backtest - INFO - Bắt đầu backtest cho ETHUSDT với 7 chiến lược
+2025-03-17 02:35:16,962 - comprehensive_backtest - INFO - Hoàn thành backtest cho ETHUSDT: Profit=10.49%, Win Rate=61.80%, Max DD=10.92%
+2025-03-17 02:35:16,963 - local_backtest - INFO - Đã lưu kết quả backtest cho ETHUSDT vào backtest_results/ETHUSDT_medium_risk_backtest.json
+2025-03-17 02:35:16,963 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ETHUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:35:16,963 - local_backtest - INFO - === KẾT QUẢ BACKTEST ===
+2025-03-17 02:35:16,963 - local_backtest - INFO - Đã chạy backtest cho 2 symbols
+2025-03-17 02:35:16,963 - local_backtest - INFO - Kết quả đã được lưu vào thư mục: backtest_results
+2025-03-17 02:35:16,965 - local_backtest - INFO - Đã lưu báo cáo tổng hợp vào backtest_results/backtest_summary_medium.json
+2025-03-17 02:40:12,800 - local_backtest - INFO - Đã tải cấu hình từ comprehensive_backtest_config.json
+2025-03-17 02:40:12,800 - local_backtest - INFO - Chuẩn bị chạy backtest cho 7 symbols và 3 timeframes
+2025-03-17 02:40:12,801 - local_backtest - INFO - Symbols: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, DOGEUSDT, ADAUSDT, XRPUSDT
+2025-03-17 02:40:12,801 - local_backtest - INFO - Timeframes: 1h, 4h, 1d
+2025-03-17 02:40:12,801 - local_backtest - INFO - Khoảng thời gian: 2024-02-01 đến 2024-03-15
+2025-03-17 02:40:12,801 - local_backtest - INFO - Mức độ rủi ro: medium
+2025-03-17 02:40:12,801 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1h): BTCUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,802 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (4h): BTCUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,802 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1d): BTCUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,802 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1h): ETHUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,803 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (4h): ETHUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,803 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1d): ETHUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,803 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1h): BNBUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,804 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (4h): BNBUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,804 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1d): BNBUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,804 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1h): SOLUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,805 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (4h): SOLUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,805 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1d): SOLUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,805 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1h): DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,806 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (4h): DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,806 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1d): DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,806 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1h): ADAUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,807 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (4h): ADAUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,807 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1d): ADAUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,807 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1h): XRPUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,808 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (4h): XRPUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,808 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1d): XRPUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:40:12,815 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:12,818 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:12,820 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:12,825 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:12,827 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:12,830 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:12,838 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:12,846 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:12,851 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:12,860 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:12,863 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:13,018 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:13,026 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:13,031 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:13,036 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:13,042 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:13,045 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:13,048 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:13,052 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:40:13,055 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:40:13,056 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:40:13,142 - local_backtest - INFO - Khởi tạo backtest với mức độ rủi ro: medium (risk_percentage=2.0%, max_positions=5)
+2025-03-17 02:40:13,143 - local_backtest - INFO - Chạy backtest cho BTCUSDT...
+2025-03-17 02:40:13,143 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BTCUSDT với 3 khung thời gian
+2025-03-17 02:40:13,143 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,143 - comprehensive_backtest - INFO - Bắt đầu backtest cho BTCUSDT với 7 chiến lược
+2025-03-17 02:40:13,145 - comprehensive_backtest - INFO - Hoàn thành backtest cho BTCUSDT: Profit=25.92%, Win Rate=60.71%, Max DD=6.28%
+2025-03-17 02:40:13,146 - local_backtest - INFO - Đã lưu kết quả backtest cho BTCUSDT vào backtest_results/BTCUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,147 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BTCUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,147 - local_backtest - INFO - Chạy backtest cho ETHUSDT...
+2025-03-17 02:40:13,147 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ETHUSDT với 3 khung thời gian
+2025-03-17 02:40:13,147 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,147 - comprehensive_backtest - INFO - Bắt đầu backtest cho ETHUSDT với 7 chiến lược
+2025-03-17 02:40:13,148 - comprehensive_backtest - INFO - Hoàn thành backtest cho ETHUSDT: Profit=14.24%, Win Rate=63.63%, Max DD=14.82%
+2025-03-17 02:40:13,149 - local_backtest - INFO - Đã lưu kết quả backtest cho ETHUSDT vào backtest_results/ETHUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,150 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ETHUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,150 - local_backtest - INFO - Chạy backtest cho BNBUSDT...
+2025-03-17 02:40:13,150 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BNBUSDT với 3 khung thời gian
+2025-03-17 02:40:13,150 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,150 - comprehensive_backtest - INFO - Bắt đầu backtest cho BNBUSDT với 7 chiến lược
+2025-03-17 02:40:13,151 - comprehensive_backtest - INFO - Hoàn thành backtest cho BNBUSDT: Profit=11.06%, Win Rate=67.46%, Max DD=14.40%
+2025-03-17 02:40:13,152 - local_backtest - INFO - Đã lưu kết quả backtest cho BNBUSDT vào backtest_results/BNBUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,152 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BNBUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,153 - local_backtest - INFO - Chạy backtest cho SOLUSDT...
+2025-03-17 02:40:13,153 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho SOLUSDT với 3 khung thời gian
+2025-03-17 02:40:13,153 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,153 - comprehensive_backtest - INFO - Bắt đầu backtest cho SOLUSDT với 7 chiến lược
+2025-03-17 02:40:13,154 - comprehensive_backtest - INFO - Hoàn thành backtest cho SOLUSDT: Profit=25.75%, Win Rate=62.03%, Max DD=15.31%
+2025-03-17 02:40:13,155 - local_backtest - INFO - Đã lưu kết quả backtest cho SOLUSDT vào backtest_results/SOLUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,155 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/SOLUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,155 - local_backtest - INFO - Chạy backtest cho DOGEUSDT...
+2025-03-17 02:40:13,155 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho DOGEUSDT với 3 khung thời gian
+2025-03-17 02:40:13,155 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,155 - comprehensive_backtest - INFO - Bắt đầu backtest cho DOGEUSDT với 7 chiến lược
+2025-03-17 02:40:13,157 - comprehensive_backtest - INFO - Hoàn thành backtest cho DOGEUSDT: Profit=15.44%, Win Rate=66.32%, Max DD=7.64%
+2025-03-17 02:40:13,158 - local_backtest - INFO - Đã lưu kết quả backtest cho DOGEUSDT vào backtest_results/DOGEUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,158 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/DOGEUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,158 - local_backtest - INFO - Chạy backtest cho ADAUSDT...
+2025-03-17 02:40:13,159 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ADAUSDT với 3 khung thời gian
+2025-03-17 02:40:13,159 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,159 - comprehensive_backtest - INFO - Bắt đầu backtest cho ADAUSDT với 7 chiến lược
+2025-03-17 02:40:13,160 - comprehensive_backtest - INFO - Hoàn thành backtest cho ADAUSDT: Profit=10.11%, Win Rate=52.89%, Max DD=5.11%
+2025-03-17 02:40:13,161 - local_backtest - INFO - Đã lưu kết quả backtest cho ADAUSDT vào backtest_results/ADAUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,162 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ADAUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,162 - local_backtest - INFO - Chạy backtest cho XRPUSDT...
+2025-03-17 02:40:13,162 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho XRPUSDT với 3 khung thời gian
+2025-03-17 02:40:13,162 - comprehensive_backtest - INFO - Rủi ro: 2.0%, Max vị thế: 5, Đòn bẩy: 10x
+2025-03-17 02:40:13,162 - comprehensive_backtest - INFO - Bắt đầu backtest cho XRPUSDT với 7 chiến lược
+2025-03-17 02:40:13,164 - comprehensive_backtest - INFO - Hoàn thành backtest cho XRPUSDT: Profit=28.44%, Win Rate=53.14%, Max DD=16.77%
+2025-03-17 02:40:13,165 - local_backtest - INFO - Đã lưu kết quả backtest cho XRPUSDT vào backtest_results/XRPUSDT_medium_risk_backtest.json
+2025-03-17 02:40:13,165 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/XRPUSDT_medium_risk_backtest_report.txt
+2025-03-17 02:40:13,165 - local_backtest - INFO - === KẾT QUẢ BACKTEST ===
+2025-03-17 02:40:13,166 - local_backtest - INFO - Đã chạy backtest cho 7 symbols
+2025-03-17 02:40:13,166 - local_backtest - INFO - Kết quả đã được lưu vào thư mục: backtest_results
+2025-03-17 02:40:13,171 - local_backtest - INFO - Đã lưu báo cáo tổng hợp vào backtest_results/backtest_summary_medium.json
+2025-03-17 02:43:40,096 - local_backtest - INFO - Đã tải cấu hình từ comprehensive_backtest_config.json
+2025-03-17 02:43:40,097 - local_backtest - INFO - Chuẩn bị chạy backtest cho 7 symbols và 3 timeframes
+2025-03-17 02:43:40,097 - local_backtest - INFO - Symbols: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, DOGEUSDT, ADAUSDT, XRPUSDT
+2025-03-17 02:43:40,097 - local_backtest - INFO - Timeframes: 1h, 4h, 1d
+2025-03-17 02:43:40,097 - local_backtest - INFO - Khoảng thời gian: 2024-02-01 đến 2024-03-15
+2025-03-17 02:43:40,097 - local_backtest - INFO - Mức độ rủi ro: high
+2025-03-17 02:43:40,098 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1h): BTCUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,098 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (4h): BTCUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,099 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1d): BTCUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,100 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1h): ETHUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,100 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (4h): ETHUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,101 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1d): ETHUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,102 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1h): BNBUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,102 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (4h): BNBUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,102 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1d): BNBUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,102 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1h): SOLUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,103 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (4h): SOLUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,103 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1d): SOLUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,103 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1h): DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,103 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (4h): DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,104 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1d): DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,104 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1h): ADAUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,104 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (4h): ADAUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,104 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1d): ADAUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,105 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1h): XRPUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,105 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (4h): XRPUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,105 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1d): XRPUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:43:40,112 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,115 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,117 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,121 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,123 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,125 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,130 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,132 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,134 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,137 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,139 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,141 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,145 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,148 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,150 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,154 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,157 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,159 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,162 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:43:40,164 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:43:40,166 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:43:40,264 - local_backtest - INFO - Khởi tạo backtest với mức độ rủi ro: high (risk_percentage=5.0%, max_positions=7)
+2025-03-17 02:43:40,264 - local_backtest - INFO - Chạy backtest cho BTCUSDT...
+2025-03-17 02:43:40,264 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BTCUSDT với 3 khung thời gian
+2025-03-17 02:43:40,264 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,264 - comprehensive_backtest - INFO - Bắt đầu backtest cho BTCUSDT với 7 chiến lược
+2025-03-17 02:43:40,265 - comprehensive_backtest - INFO - Hoàn thành backtest cho BTCUSDT: Profit=21.49%, Win Rate=61.91%, Max DD=5.19%
+2025-03-17 02:43:40,266 - local_backtest - INFO - Đã lưu kết quả backtest cho BTCUSDT vào backtest_results/BTCUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,267 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BTCUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,267 - local_backtest - INFO - Chạy backtest cho ETHUSDT...
+2025-03-17 02:43:40,267 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ETHUSDT với 3 khung thời gian
+2025-03-17 02:43:40,267 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,267 - comprehensive_backtest - INFO - Bắt đầu backtest cho ETHUSDT với 7 chiến lược
+2025-03-17 02:43:40,278 - comprehensive_backtest - INFO - Hoàn thành backtest cho ETHUSDT: Profit=15.52%, Win Rate=55.25%, Max DD=12.38%
+2025-03-17 02:43:40,279 - local_backtest - INFO - Đã lưu kết quả backtest cho ETHUSDT vào backtest_results/ETHUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,279 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ETHUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,279 - local_backtest - INFO - Chạy backtest cho BNBUSDT...
+2025-03-17 02:43:40,279 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BNBUSDT với 3 khung thời gian
+2025-03-17 02:43:40,279 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,279 - comprehensive_backtest - INFO - Bắt đầu backtest cho BNBUSDT với 7 chiến lược
+2025-03-17 02:43:40,280 - comprehensive_backtest - INFO - Hoàn thành backtest cho BNBUSDT: Profit=25.92%, Win Rate=69.53%, Max DD=5.44%
+2025-03-17 02:43:40,281 - local_backtest - INFO - Đã lưu kết quả backtest cho BNBUSDT vào backtest_results/BNBUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,281 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BNBUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,281 - local_backtest - INFO - Chạy backtest cho SOLUSDT...
+2025-03-17 02:43:40,282 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho SOLUSDT với 3 khung thời gian
+2025-03-17 02:43:40,282 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,282 - comprehensive_backtest - INFO - Bắt đầu backtest cho SOLUSDT với 7 chiến lược
+2025-03-17 02:43:40,283 - comprehensive_backtest - INFO - Hoàn thành backtest cho SOLUSDT: Profit=23.86%, Win Rate=50.46%, Max DD=14.71%
+2025-03-17 02:43:40,284 - local_backtest - INFO - Đã lưu kết quả backtest cho SOLUSDT vào backtest_results/SOLUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,285 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/SOLUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,285 - local_backtest - INFO - Chạy backtest cho DOGEUSDT...
+2025-03-17 02:43:40,285 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho DOGEUSDT với 3 khung thời gian
+2025-03-17 02:43:40,285 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,285 - comprehensive_backtest - INFO - Bắt đầu backtest cho DOGEUSDT với 7 chiến lược
+2025-03-17 02:43:40,286 - comprehensive_backtest - INFO - Hoàn thành backtest cho DOGEUSDT: Profit=11.93%, Win Rate=59.46%, Max DD=13.85%
+2025-03-17 02:43:40,287 - local_backtest - INFO - Đã lưu kết quả backtest cho DOGEUSDT vào backtest_results/DOGEUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,288 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/DOGEUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,288 - local_backtest - INFO - Chạy backtest cho ADAUSDT...
+2025-03-17 02:43:40,288 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ADAUSDT với 3 khung thời gian
+2025-03-17 02:43:40,288 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,288 - comprehensive_backtest - INFO - Bắt đầu backtest cho ADAUSDT với 7 chiến lược
+2025-03-17 02:43:40,289 - comprehensive_backtest - INFO - Hoàn thành backtest cho ADAUSDT: Profit=14.23%, Win Rate=58.97%, Max DD=13.77%
+2025-03-17 02:43:40,289 - local_backtest - INFO - Đã lưu kết quả backtest cho ADAUSDT vào backtest_results/ADAUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,290 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ADAUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,290 - local_backtest - INFO - Chạy backtest cho XRPUSDT...
+2025-03-17 02:43:40,290 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho XRPUSDT với 3 khung thời gian
+2025-03-17 02:43:40,290 - comprehensive_backtest - INFO - Rủi ro: 5.0%, Max vị thế: 7, Đòn bẩy: 10x
+2025-03-17 02:43:40,290 - comprehensive_backtest - INFO - Bắt đầu backtest cho XRPUSDT với 7 chiến lược
+2025-03-17 02:43:40,291 - comprehensive_backtest - INFO - Hoàn thành backtest cho XRPUSDT: Profit=23.02%, Win Rate=51.05%, Max DD=16.56%
+2025-03-17 02:43:40,292 - local_backtest - INFO - Đã lưu kết quả backtest cho XRPUSDT vào backtest_results/XRPUSDT_high_risk_backtest.json
+2025-03-17 02:43:40,293 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/XRPUSDT_high_risk_backtest_report.txt
+2025-03-17 02:43:40,293 - local_backtest - INFO - === KẾT QUẢ BACKTEST ===
+2025-03-17 02:43:40,293 - local_backtest - INFO - Đã chạy backtest cho 7 symbols
+2025-03-17 02:43:40,293 - local_backtest - INFO - Kết quả đã được lưu vào thư mục: backtest_results
+2025-03-17 02:43:40,296 - local_backtest - INFO - Đã lưu báo cáo tổng hợp vào backtest_results/backtest_summary_high.json
+2025-03-17 02:44:50,728 - local_backtest - INFO - Đã tải cấu hình từ comprehensive_backtest_config.json
+2025-03-17 02:44:50,729 - local_backtest - INFO - Chuẩn bị chạy backtest cho 7 symbols và 3 timeframes
+2025-03-17 02:44:50,729 - local_backtest - INFO - Symbols: BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, DOGEUSDT, ADAUSDT, XRPUSDT
+2025-03-17 02:44:50,729 - local_backtest - INFO - Timeframes: 1h, 4h, 1d
+2025-03-17 02:44:50,729 - local_backtest - INFO - Khoảng thời gian: 2024-02-01 đến 2024-03-15
+2025-03-17 02:44:50,729 - local_backtest - INFO - Mức độ rủi ro: low
+2025-03-17 02:44:50,730 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1h): BTCUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,730 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (4h): BTCUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,730 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BTCUSDT (1d): BTCUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,731 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1h): ETHUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,731 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (4h): ETHUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,731 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ETHUSDT (1d): ETHUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,732 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1h): BNBUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,732 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (4h): BNBUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,732 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho BNBUSDT (1d): BNBUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,733 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1h): SOLUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,733 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (4h): SOLUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,733 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho SOLUSDT (1d): SOLUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,734 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1h): DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,734 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (4h): DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,734 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho DOGEUSDT (1d): DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,735 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1h): ADAUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,735 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (4h): ADAUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,735 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho ADAUSDT (1d): ADAUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,736 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1h): XRPUSDT_1h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,736 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (4h): XRPUSDT_4h_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,736 - local_backtest - INFO - Đã tìm thấy file dữ liệu cho XRPUSDT (1d): XRPUSDT_1d_2024-02-01_to_2024-03-15.csv
+2025-03-17 02:44:50,746 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,749 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,752 - local_backtest - INFO - Đã tải dữ liệu từ data/BTCUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,757 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,760 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,763 - local_backtest - INFO - Đã tải dữ liệu từ data/ETHUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,768 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,771 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,774 - local_backtest - INFO - Đã tải dữ liệu từ data/BNBUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,778 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,781 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,783 - local_backtest - INFO - Đã tải dữ liệu từ data/SOLUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,786 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,789 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,791 - local_backtest - INFO - Đã tải dữ liệu từ data/DOGEUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,795 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,798 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,800 - local_backtest - INFO - Đã tải dữ liệu từ data/ADAUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,805 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1h_2024-02-01_to_2024-03-15.csv: 1033 dòng
+2025-03-17 02:44:50,808 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_4h_2024-02-01_to_2024-03-15.csv: 259 dòng
+2025-03-17 02:44:50,810 - local_backtest - INFO - Đã tải dữ liệu từ data/XRPUSDT_1d_2024-02-01_to_2024-03-15.csv: 44 dòng
+2025-03-17 02:44:50,905 - local_backtest - INFO - Khởi tạo backtest với mức độ rủi ro: low (risk_percentage=1.0%, max_positions=3)
+2025-03-17 02:44:50,905 - local_backtest - INFO - Chạy backtest cho BTCUSDT...
+2025-03-17 02:44:50,906 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BTCUSDT với 3 khung thời gian
+2025-03-17 02:44:50,906 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,906 - comprehensive_backtest - INFO - Bắt đầu backtest cho BTCUSDT với 7 chiến lược
+2025-03-17 02:44:50,907 - comprehensive_backtest - INFO - Hoàn thành backtest cho BTCUSDT: Profit=12.79%, Win Rate=66.25%, Max DD=10.97%
+2025-03-17 02:44:50,908 - local_backtest - INFO - Đã lưu kết quả backtest cho BTCUSDT vào backtest_results/BTCUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,908 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BTCUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,908 - local_backtest - INFO - Chạy backtest cho ETHUSDT...
+2025-03-17 02:44:50,909 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ETHUSDT với 3 khung thời gian
+2025-03-17 02:44:50,909 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,909 - comprehensive_backtest - INFO - Bắt đầu backtest cho ETHUSDT với 7 chiến lược
+2025-03-17 02:44:50,910 - comprehensive_backtest - INFO - Hoàn thành backtest cho ETHUSDT: Profit=24.69%, Win Rate=59.95%, Max DD=15.21%
+2025-03-17 02:44:50,910 - local_backtest - INFO - Đã lưu kết quả backtest cho ETHUSDT vào backtest_results/ETHUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,911 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ETHUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,911 - local_backtest - INFO - Chạy backtest cho BNBUSDT...
+2025-03-17 02:44:50,911 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho BNBUSDT với 3 khung thời gian
+2025-03-17 02:44:50,911 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,911 - comprehensive_backtest - INFO - Bắt đầu backtest cho BNBUSDT với 7 chiến lược
+2025-03-17 02:44:50,913 - comprehensive_backtest - INFO - Hoàn thành backtest cho BNBUSDT: Profit=11.27%, Win Rate=68.73%, Max DD=18.12%
+2025-03-17 02:44:50,914 - local_backtest - INFO - Đã lưu kết quả backtest cho BNBUSDT vào backtest_results/BNBUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,914 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/BNBUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,914 - local_backtest - INFO - Chạy backtest cho SOLUSDT...
+2025-03-17 02:44:50,914 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho SOLUSDT với 3 khung thời gian
+2025-03-17 02:44:50,914 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,914 - comprehensive_backtest - INFO - Bắt đầu backtest cho SOLUSDT với 7 chiến lược
+2025-03-17 02:44:50,915 - comprehensive_backtest - INFO - Hoàn thành backtest cho SOLUSDT: Profit=17.82%, Win Rate=56.83%, Max DD=18.78%
+2025-03-17 02:44:50,916 - local_backtest - INFO - Đã lưu kết quả backtest cho SOLUSDT vào backtest_results/SOLUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,917 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/SOLUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,917 - local_backtest - INFO - Chạy backtest cho DOGEUSDT...
+2025-03-17 02:44:50,917 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho DOGEUSDT với 3 khung thời gian
+2025-03-17 02:44:50,917 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,917 - comprehensive_backtest - INFO - Bắt đầu backtest cho DOGEUSDT với 7 chiến lược
+2025-03-17 02:44:50,919 - comprehensive_backtest - INFO - Hoàn thành backtest cho DOGEUSDT: Profit=27.41%, Win Rate=57.14%, Max DD=13.11%
+2025-03-17 02:44:50,920 - local_backtest - INFO - Đã lưu kết quả backtest cho DOGEUSDT vào backtest_results/DOGEUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,920 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/DOGEUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,921 - local_backtest - INFO - Chạy backtest cho ADAUSDT...
+2025-03-17 02:44:50,921 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho ADAUSDT với 3 khung thời gian
+2025-03-17 02:44:50,921 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,921 - comprehensive_backtest - INFO - Bắt đầu backtest cho ADAUSDT với 7 chiến lược
+2025-03-17 02:44:50,923 - comprehensive_backtest - INFO - Hoàn thành backtest cho ADAUSDT: Profit=12.05%, Win Rate=63.71%, Max DD=11.72%
+2025-03-17 02:44:50,924 - local_backtest - INFO - Đã lưu kết quả backtest cho ADAUSDT vào backtest_results/ADAUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,924 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/ADAUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,924 - local_backtest - INFO - Chạy backtest cho XRPUSDT...
+2025-03-17 02:44:50,924 - comprehensive_backtest - INFO - Khởi tạo ComprehensiveBacktester cho XRPUSDT với 3 khung thời gian
+2025-03-17 02:44:50,924 - comprehensive_backtest - INFO - Rủi ro: 1.0%, Max vị thế: 3, Đòn bẩy: 10x
+2025-03-17 02:44:50,924 - comprehensive_backtest - INFO - Bắt đầu backtest cho XRPUSDT với 7 chiến lược
+2025-03-17 02:44:50,926 - comprehensive_backtest - INFO - Hoàn thành backtest cho XRPUSDT: Profit=28.85%, Win Rate=60.37%, Max DD=19.38%
+2025-03-17 02:44:50,927 - local_backtest - INFO - Đã lưu kết quả backtest cho XRPUSDT vào backtest_results/XRPUSDT_low_risk_backtest.json
+2025-03-17 02:44:50,927 - local_backtest - INFO - Đã tạo báo cáo chi tiết: backtest_results/XRPUSDT_low_risk_backtest_report.txt
+2025-03-17 02:44:50,927 - local_backtest - INFO - === KẾT QUẢ BACKTEST ===
+2025-03-17 02:44:50,928 - local_backtest - INFO - Đã chạy backtest cho 7 symbols
+2025-03-17 02:44:50,928 - local_backtest - INFO - Kết quả đã được lưu vào thư mục: backtest_results
+2025-03-17 02:44:50,933 - local_backtest - INFO - Đã lưu báo cáo tổng hợp vào backtest_results/backtest_summary_low.json

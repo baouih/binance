@@ -1,0 +1,327 @@
+2025-03-27 14:28:29,384 - comprehensive_backtest - INFO - Bắt đầu backtest toàn diện lúc: 2025-03-27 14:28:29.384251
+2025-03-27 14:28:29,384 - comprehensive_backtest - INFO - Bắt đầu test với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:29,386 - comprehensive_backtest - INFO - Test symbol BTC-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:29,386 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:29,386 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:29,386 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:29,387 - adaptive_backtest - INFO - 
+Bắt đầu backtest BTC-USD
+2025-03-27 14:28:29,390 - comprehensive_backtest - INFO - Test symbol ETH-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:29,391 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:29,391 - comprehensive_backtest - INFO - Test symbol SOL-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:29,391 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:29,392 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:29,392 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:29,392 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:29,392 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:29,392 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:29,393 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:29,393 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:29,393 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:29,394 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:29,394 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:29,394 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:29,395 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:29,395 - adaptive_backtest - INFO - 
+Bắt đầu backtest ETH-USD
+2025-03-27 14:28:29,395 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:29,396 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:29,396 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:29,396 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:29,396 - adaptive_backtest - INFO - 
+Bắt đầu backtest SOL-USD
+2025-03-27 14:28:29,908 - adaptive_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:29,908 - adaptive_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:29,909 - adaptive_backtest - INFO - Tải dữ liệu SOLUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:30,419 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho SOL-USD
+2025-03-27 14:28:30,435 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho ETH-USD
+2025-03-27 14:28:30,442 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho BTC-USD
+2025-03-27 14:28:30,488 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:30,499 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:30,501 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:30,539 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,549 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,560 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:30,573 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:30,593 - adaptive_backtest - ERROR - Lỗi khi backtest SOL-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:30,603 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:30,603 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:30,603 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:30,604 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:30,604 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:30,604 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:30,604 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:30,604 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:30,600 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:30,603 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:30,610 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:30,611 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/SOL-USD/adaptive_backtest_report_20250327_142830.txt
+2025-03-27 14:28:30,612 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:30,634 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,625 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/SOL-USD/adaptive_backtest_data_20250327_142830.json
+2025-03-27 14:28:30,635 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,625 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,637 - comprehensive_backtest - INFO - Test symbol BNB-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:30,637 - comprehensive_backtest - INFO - Hoàn thành test SOL-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:30,657 - adaptive_backtest - ERROR - Lỗi khi backtest ETH-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:30,657 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:30,658 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:30,660 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:30,660 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:30,660 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:30,660 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:30,671 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:30,671 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:30,678 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:30,678 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:30,679 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:30,680 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:30,672 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:30,682 - adaptive_backtest - INFO - 
+Bắt đầu backtest BNB-USD
+2025-03-27 14:28:30,683 - adaptive_backtest - INFO - Tải dữ liệu BNBUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:30,688 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/ETH-USD/adaptive_backtest_report_20250327_142830.txt
+2025-03-27 14:28:30,688 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/ETH-USD/adaptive_backtest_data_20250327_142830.json
+2025-03-27 14:28:30,688 - comprehensive_backtest - INFO - Test symbol DOGE-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:30,690 - comprehensive_backtest - INFO - Hoàn thành test ETH-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:30,698 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:30,699 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:30,702 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:30,703 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:30,704 - adaptive_backtest - ERROR - Lỗi khi backtest BTC-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:30,704 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:30,705 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:30,704 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:30,706 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:30,706 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:30,707 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:30,707 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:30,707 - adaptive_backtest - INFO - 
+Bắt đầu backtest DOGE-USD
+2025-03-27 14:28:30,707 - adaptive_backtest - INFO - Tải dữ liệu DOGEUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:30,706 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/BTC-USD/adaptive_backtest_report_20250327_142830.txt
+2025-03-27 14:28:30,709 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/BTC-USD/adaptive_backtest_data_20250327_142830.json
+2025-03-27 14:28:30,709 - comprehensive_backtest - INFO - Test symbol ADA-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:30,709 - comprehensive_backtest - INFO - Hoàn thành test BTC-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - 
+Bắt đầu backtest ADA-USD
+2025-03-27 14:28:30,710 - adaptive_backtest - INFO - Tải dữ liệu ADAUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:31,160 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho BNB-USD
+2025-03-27 14:28:31,178 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho ADA-USD
+2025-03-27 14:28:31,195 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:31,210 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:31,221 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:31,231 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,234 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,239 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:31,256 - adaptive_backtest - ERROR - Lỗi khi backtest BNB-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:31,261 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:31,262 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:31,263 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:31,263 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:31,265 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:31,265 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:31,273 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,274 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,274 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:31,285 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:31,285 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:31,285 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:31,304 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho DOGE-USD
+2025-03-27 14:28:31,314 - adaptive_backtest - ERROR - Lỗi khi backtest ADA-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:31,316 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:31,317 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:31,317 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:31,317 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:31,318 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:31,318 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/BNB-USD/adaptive_backtest_report_20250327_142831.txt
+2025-03-27 14:28:31,320 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:31,320 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/BNB-USD/adaptive_backtest_data_20250327_142831.json
+2025-03-27 14:28:31,323 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:31,336 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:31,337 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:31,337 - comprehensive_backtest - INFO - Test symbol XRP-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:31,339 - comprehensive_backtest - INFO - Hoàn thành test BNB-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:31,346 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:31,350 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:31,351 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/ADA-USD/adaptive_backtest_report_20250327_142831.txt
+2025-03-27 14:28:31,353 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:31,353 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:31,354 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:31,354 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/ADA-USD/adaptive_backtest_data_20250327_142831.json
+2025-03-27 14:28:31,354 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:31,365 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,366 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:31,366 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,366 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:31,367 - comprehensive_backtest - INFO - Test symbol DOT-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:31,367 - comprehensive_backtest - INFO - Hoàn thành test ADA-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:31,385 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:31,395 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:31,395 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:31,396 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:31,396 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:31,396 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:31,394 - adaptive_backtest - ERROR - Lỗi khi backtest DOGE-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:31,396 - adaptive_backtest - INFO - 
+Bắt đầu backtest XRP-USD
+2025-03-27 14:28:31,398 - adaptive_backtest - INFO - Tải dữ liệu XRPUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:31,397 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:31,400 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:31,397 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:31,401 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:31,402 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/DOGE-USD/adaptive_backtest_report_20250327_142831.txt
+2025-03-27 14:28:31,403 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:31,403 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/DOGE-USD/adaptive_backtest_data_20250327_142831.json
+2025-03-27 14:28:31,404 - comprehensive_backtest - INFO - Test symbol AVAX-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:31,404 - comprehensive_backtest - INFO - Hoàn thành test DOGE-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:31,403 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:31,405 - adaptive_backtest - INFO - 
+Bắt đầu backtest AVAX-USD
+2025-03-27 14:28:31,406 - adaptive_backtest - INFO - Tải dữ liệu AVAXUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:31,408 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:31,408 - adaptive_backtest - INFO - 
+Bắt đầu backtest DOT-USD
+2025-03-27 14:28:31,409 - adaptive_backtest - INFO - Tải dữ liệu DOTUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:31,866 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho XRP-USD
+2025-03-27 14:28:31,880 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho AVAX-USD
+2025-03-27 14:28:31,899 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:31,919 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:31,928 - adaptive_backtest - INFO - Đã tải 181 dòng dữ liệu cho DOT-USD
+2025-03-27 14:28:31,929 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:31,943 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:31,957 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,960 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:31,980 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:31,985 - sideways_detector - INFO - Đã tính ATR volatility cho 168 dòng dữ liệu
+2025-03-27 14:28:32,000 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:32,022 - sideways_detector - INFO - Đã tính chỉ báo ADX thành công
+2025-03-27 14:28:32,035 - sideways_detector - INFO - Áp dụng phát hiện thị trường đi ngang với ADX
+2025-03-27 14:28:32,044 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:32,051 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:32,051 - adaptive_backtest - ERROR - Lỗi khi backtest XRP-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:32,046 - sideways_detector - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:32,058 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:32,059 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:32,059 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:32,059 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:32,060 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:32,060 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:32,060 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:32,060 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:32,062 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/XRP-USD/adaptive_backtest_report_20250327_142832.txt
+2025-03-27 14:28:32,062 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/XRP-USD/adaptive_backtest_data_20250327_142832.json
+2025-03-27 14:28:32,062 - comprehensive_backtest - INFO - Test symbol MATIC-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:28:32,062 - comprehensive_backtest - INFO - Hoàn thành test XRP-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:32,062 - adaptive_backtest - INFO - === BẮT ĐẦU BACKTEST CHIẾN LƯỢC THÍCH ỨNG ===
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Số lượng symbols: 1
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Khung thời gian: 1d
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Số dư ban đầu: $10000.0
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Mức rủi ro: low
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Đòn bẩy: 3x
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Nguồn dữ liệu: Binance
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - 
+Bắt đầu backtest MATIC-USD
+2025-03-27 14:28:32,063 - adaptive_backtest - INFO - Tải dữ liệu MATICUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:28:32,065 - adaptive_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:28:32,110 - adaptive_backtest - ERROR - Lỗi khi backtest DOT-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:32,112 - adaptive_backtest - ERROR - Lỗi khi backtest AVAX-USD: invalid literal for int() with base 10: 'e9'
+2025-03-27 14:28:32,113 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:32,113 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:32,114 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:32,114 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:32,115 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:32,117 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:32,265 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:32,117 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:32,266 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:32,266 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:32,267 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:32,268 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/AVAX-USD/adaptive_backtest_report_20250327_142832.txt
+2025-03-27 14:28:32,277 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/AVAX-USD/adaptive_backtest_data_20250327_142832.json
+2025-03-27 14:28:32,428 - comprehensive_backtest - INFO - Hoàn thành test AVAX-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:32,430 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/DOT-USD/adaptive_backtest_report_20250327_142832.txt
+2025-03-27 14:28:32,430 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/DOT-USD/adaptive_backtest_data_20250327_142832.json
+2025-03-27 14:28:32,430 - comprehensive_backtest - INFO - Hoàn thành test DOT-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}
+2025-03-27 14:28:32,549 - adaptive_backtest - INFO - Đã tải 0 dòng dữ liệu cho MATIC-USD
+2025-03-27 14:28:32,550 - adaptive_backtest - WARNING - Không đủ dữ liệu cho MATIC-USD, bỏ qua
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - 
+=== KẾT QUẢ BACKTEST THÍCH ỨNG ===
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Số lượng giao dịch: 0
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Giao dịch thắng/thua: 0/0
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Tỷ lệ thắng: 0.00%
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Số dư cuối cùng: $10000.00
+2025-03-27 14:28:32,550 - adaptive_backtest - INFO - Tổng lợi nhuận: $0.00 (0.00%)
+2025-03-27 14:28:32,551 - adaptive_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-27 14:28:32,551 - adaptive_backtest - INFO - Đã lưu báo cáo: comprehensive_test_results/MATIC-USD/adaptive_backtest_report_20250327_142832.txt
+2025-03-27 14:28:32,552 - adaptive_backtest - INFO - Đã lưu dữ liệu JSON: comprehensive_test_results/MATIC-USD/adaptive_backtest_data_20250327_142832.json
+2025-03-27 14:28:32,554 - comprehensive_backtest - INFO - Hoàn thành test MATIC-USD với cấu hình: {'period': '6mo', 'timeframe': '1d', 'initial_balance': 10000.0, 'use_binance': True}

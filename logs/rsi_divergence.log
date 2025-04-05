@@ -1,0 +1,82 @@
+2025-03-17 14:11:48,816 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:11:48,816 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-17 14:11:49,420 - test_rsi_divergence - ERROR - Lỗi khi tải dữ liệu: 'tuple' object has no attribute 'lower'
+2025-03-17 14:11:49,421 - test_rsi_divergence - ERROR - Không thể tiếp tục do thiếu dữ liệu
+2025-03-17 14:11:49,421 - test_rsi_divergence - INFO - Kiểm thử hoàn tất
+2025-03-17 14:14:50,975 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:14:50,975 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-17 14:14:51,214 - test_rsi_divergence - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-17 14:14:51,214 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-17 14:14:51,215 - test_rsi_divergence - ERROR - Lỗi trong quá trình kiểm thử: 'close'
+2025-03-17 14:17:03,376 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:17:03,376 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-17 14:17:03,739 - test_rsi_divergence - INFO - Các cột trong DataFrame: [('Close', 'BTC-USD'), ('High', 'BTC-USD'), ('Low', 'BTC-USD'), ('Open', 'BTC-USD'), ('Volume', 'BTC-USD')]
+2025-03-17 14:17:03,768 - test_rsi_divergence - INFO - Các dòng đầu tiên: 
+Price               Close           High  ...           Open       Volume
+Ticker            BTC-USD        BTC-USD  ...        BTC-USD      BTC-USD
+Date                                      ...                            
+2024-12-17  106140.601562  108268.445312  ...  106030.687500  68589364868
+2024-12-18  100041.539062  106470.609375  ...  106147.296875  93865656139
+
+[2 rows x 5 columns]
+2025-03-17 14:17:03,776 - test_rsi_divergence - INFO - Các cột sau khi đổi tên: [('close', 'BTC-USD'), ('high', 'BTC-USD'), ('low', 'BTC-USD'), ('open', 'BTC-USD'), ('volume', 'BTC-USD')]
+2025-03-17 14:17:03,777 - test_rsi_divergence - INFO - Đã tải 91 dòng dữ liệu cho BTC-USD
+2025-03-17 14:17:03,777 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-17 14:17:03,777 - test_rsi_divergence - ERROR - Lỗi trong quá trình kiểm thử: 'tuple' object has no attribute 'lower'
+2025-03-17 14:24:26,188 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:24:26,190 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 3mo)
+2025-03-17 14:31:01,531 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:31:01,534 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 1mo)
+2025-03-17 14:31:01,763 - test_rsi_divergence - INFO - Các cột trong DataFrame: [('Close', 'BTC-USD'), ('High', 'BTC-USD'), ('Low', 'BTC-USD'), ('Open', 'BTC-USD'), ('Volume', 'BTC-USD')]
+2025-03-17 14:31:01,774 - test_rsi_divergence - INFO - Các dòng đầu tiên: 
+Price              Close          High           Low          Open       Volume
+Ticker           BTC-USD       BTC-USD       BTC-USD       BTC-USD      BTC-USD
+Date                                                                           
+2025-02-17  95773.382812  97032.234375  95243.546875  96179.007812  27336550690
+2025-02-18  95539.546875  96695.375000  93388.835938  95773.812500  37325720482
+2025-03-17 14:31:01,776 - test_rsi_divergence - INFO - Các cột sau khi đổi tên: [('close', 'BTC-USD'), ('high', 'BTC-USD'), ('low', 'BTC-USD'), ('open', 'BTC-USD'), ('volume', 'BTC-USD')]
+2025-03-17 14:31:01,776 - test_rsi_divergence - INFO - Đã tải 29 dòng dữ liệu cho BTC-USD
+2025-03-17 14:31:01,776 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-17 14:31:01,777 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:01,779 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:01,780 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:01,782 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:01,786 - test_rsi_divergence - INFO - Kiểm thử hoàn tất
+2025-03-17 14:31:52,129 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:31:52,134 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 6mo)
+2025-03-17 14:31:52,401 - test_rsi_divergence - INFO - Các cột trong DataFrame: [('Close', 'BTC-USD'), ('High', 'BTC-USD'), ('Low', 'BTC-USD'), ('Open', 'BTC-USD'), ('Volume', 'BTC-USD')]
+2025-03-17 14:31:52,412 - test_rsi_divergence - INFO - Các dòng đầu tiên: 
+Price              Close          High           Low          Open       Volume
+Ticker           BTC-USD       BTC-USD       BTC-USD       BTC-USD      BTC-USD
+Date                                                                           
+2024-09-17  60308.539062  61316.089844  57628.070312  58192.507812  38075570118
+2024-09-18  61649.679688  61664.066406  59218.253906  60309.000000  40990702891
+2025-03-17 14:31:52,416 - test_rsi_divergence - INFO - Các cột sau khi đổi tên: [('close', 'BTC-USD'), ('high', 'BTC-USD'), ('low', 'BTC-USD'), ('open', 'BTC-USD'), ('volume', 'BTC-USD')]
+2025-03-17 14:31:52,416 - test_rsi_divergence - INFO - Đã tải 182 dòng dữ liệu cho BTC-USD
+2025-03-17 14:31:52,416 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-17 14:31:52,417 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:52,419 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-17 14:31:52,419 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:52,422 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:52,423 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-17 14:31:52,424 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:31:52,426 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:38:37,740 - test_rsi_divergence - INFO - Bắt đầu kiểm thử RSI Divergence Detector
+2025-03-17 14:38:37,746 - test_rsi_divergence - INFO - Đang tải dữ liệu BTC-USD (1d, 6mo)
+2025-03-17 14:38:38,632 - test_rsi_divergence - INFO - Các cột trong DataFrame: [('Close', 'BTC-USD'), ('High', 'BTC-USD'), ('Low', 'BTC-USD'), ('Open', 'BTC-USD'), ('Volume', 'BTC-USD')]
+2025-03-17 14:38:38,643 - test_rsi_divergence - INFO - Các dòng đầu tiên: 
+Price              Close          High           Low          Open       Volume
+Ticker           BTC-USD       BTC-USD       BTC-USD       BTC-USD      BTC-USD
+Date                                                                           
+2024-09-17  60308.539062  61316.089844  57628.070312  58192.507812  38075570118
+2024-09-18  61649.679688  61664.066406  59218.253906  60309.000000  40990702891
+2025-03-17 14:38:38,644 - test_rsi_divergence - INFO - Các cột sau khi đổi tên: [('close', 'BTC-USD'), ('high', 'BTC-USD'), ('low', 'BTC-USD'), ('open', 'BTC-USD'), ('volume', 'BTC-USD')]
+2025-03-17 14:38:38,645 - test_rsi_divergence - INFO - Đã tải 182 dòng dữ liệu cho BTC-USD
+2025-03-17 14:38:38,645 - rsi_divergence - INFO - Đã khởi tạo RSI Divergence Detector (RSI period: 14, window: 30)
+2025-03-17 14:38:38,646 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:38:38,647 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-17 14:38:38,648 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:38:38,649 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:38:38,650 - rsi_divergence - INFO - Đã phát hiện phân kỳ tăng với độ tin cậy 1.00
+2025-03-17 14:38:38,651 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')
+2025-03-17 14:38:38,653 - rsi_divergence - INFO - Đã tính RSI và thêm vào DataFrame. Cột RSI: ('rsi', '')

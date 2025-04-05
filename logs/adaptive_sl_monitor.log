@@ -1,0 +1,55 @@
+2025-03-09 05:03:21,667 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:21,667 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:21,668 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:21,668 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:21,668 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:21,668 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:21,668 - adaptive_stop_loss_manager - INFO - Bắt đầu theo dõi và cập nhật stop loss (interval=300s)
+2025-03-09 05:03:21,669 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 05:03:21,669 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:21,838 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:21,839 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 05:03:21,839 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 05:03:21,839 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:21,998 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:22,004 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:22,174 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:22,179 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:22,339 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:22,345 - adaptive_stop_loss_manager - INFO - Cập nhật SL/TP cho ETHUSDT (BUY): SL=4.47% (2083.77), TP=6.71% (2327.80)
+2025-03-09 05:03:22,345 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:22,345 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:22,345 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:22,503 - adaptive_stop_loss_manager - INFO - Đã hủy các lệnh cũ của ETHUSDT để cập nhật mới
+2025-03-09 05:03:23,655 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&quantity=0.124&stopPrice=2083.7653354456156&closePosition=true&timestamp=1741496603503&signature=dd0d73ee8acfae7f348302c5125c7f0b152ff10fd1ea874b8fa06dce4a894a65
+2025-03-09 05:03:23,803 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&quantity=0.124&stopPrice=2327.8019968315766&closePosition=true&timestamp=1741496603655&signature=ef020b0983bd78dd9e8f2cc83a0116a0a51f501d24f8f7d68728634823badeb8
+2025-03-09 05:03:23,803 - adaptive_stop_loss_manager - INFO - Đã cập nhật thành công SL/TP cho ETHUSDT trên Binance
+2025-03-09 05:03:23,804 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:23,961 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:23,966 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:24,124 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:24,129 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:24,291 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:24,296 - adaptive_stop_loss_manager - INFO - Cập nhật SL/TP cho BNBUSDT (BUY): SL=1.50% (591.36), TP=2.25% (613.88)
+2025-03-09 05:03:24,297 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:24,297 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:24,297 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:24,458 - adaptive_stop_loss_manager - INFO - Đã hủy các lệnh cũ của BNBUSDT để cập nhật mới
+2025-03-09 05:03:25,608 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&quantity=0.45&stopPrice=591.3628083333006&closePosition=true&timestamp=1741496605458&signature=e1f937f36aab5d5e8acee23c7e29059144af59be8eecc0715f4d6a5559709d01
+2025-03-09 05:03:25,757 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&quantity=0.45&stopPrice=613.8766208332993&closePosition=true&timestamp=1741496605609&signature=4a21f2dae00cc0f747f11eae20b4c4d791ed4f00a86eb6b3e9e1af6182c156a3
+2025-03-09 05:03:25,757 - adaptive_stop_loss_manager - INFO - Đã cập nhật thành công SL/TP cho BNBUSDT trên Binance
+2025-03-09 05:03:25,758 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:25,920 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:25,925 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:26,085 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:26,090 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:03:26,245 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:03:26,250 - adaptive_stop_loss_manager - INFO - Cập nhật SL/TP cho BTCUSDT (BUY): SL=3.15% (83392.06), TP=4.72% (90162.65)
+2025-03-09 05:03:26,250 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:03:26,250 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:03:26,250 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:03:26,413 - adaptive_stop_loss_manager - INFO - Đã hủy các lệnh cũ của BTCUSDT để cập nhật mới
+2025-03-09 05:03:27,564 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&quantity=0.003&stopPrice=83392.06398185737&closePosition=true&timestamp=1741496607413&signature=36624a4f3c73154f1450c26f0963523553cebf7a12c63b7746c97c92ee34fc4c
+2025-03-09 05:03:27,712 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&quantity=0.003&stopPrice=90162.65402721397&closePosition=true&timestamp=1741496607564&signature=e63e9e250dc66bf9737c316667a905ee457709c50fad81be68728b16882d6130
+2025-03-09 05:03:27,712 - adaptive_stop_loss_manager - INFO - Đã cập nhật thành công SL/TP cho BTCUSDT trên Binance
+2025-03-09 05:03:27,712 - adaptive_stop_loss_manager - INFO - Đã cập nhật SL/TP cho 3 vị thế

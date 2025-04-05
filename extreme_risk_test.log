@@ -1,0 +1,124 @@
+2025-03-09 14:09:47,499 - extreme_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro cực cao cho BTCUSDT 1h (90 ngày)
+2025-03-09 14:09:47,499 - extreme_risk_test - INFO - Các mức rủi ro: [10.0, 20.0, 30.0, 40.0, 50.0]
+2025-03-09 14:09:47,500 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 10.0%
+2025-03-09 14:09:47,500 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 20.0%
+2025-03-09 14:09:47,501 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 30.0%
+2025-03-09 14:09:47,501 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 40.0%
+2025-03-09 14:09:47,502 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 50.0%
+2025-03-09 14:09:48,731 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro cực cao: risk_analysis/charts/BTCUSDT_1h_extreme_risk_performance.png
+2025-03-09 14:09:48,918 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích tỷ lệ lợi nhuận/rủi ro: risk_analysis/charts/BTCUSDT_1h_extreme_risk_reward_ratio.png
+2025-03-09 14:09:48,918 - extreme_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro cực cao cho BTCUSDT 1h
+2025-03-09 14:09:48,918 - extreme_risk_test - INFO - Kết quả được lưu trong thư mục: high_risk_results
+2025-03-09 14:09:48,918 - extreme_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/charts
+2025-03-09 16:33:17,940 - extreme_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro cực cao cho BTCUSDT 1h (15 ngày)
+2025-03-09 16:33:17,940 - extreme_risk_test - INFO - Các mức rủi ro: [10.0, 20.0, 30.0, 40.0, 50.0]
+2025-03-09 16:33:17,941 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 10.0%
+2025-03-09 16:33:17,943 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 20.0%
+2025-03-09 16:33:17,943 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 30.0%
+2025-03-09 16:33:17,944 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 40.0%
+2025-03-09 16:33:17,949 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BTCUSDT 1h với mức rủi ro 50.0%
+2025-03-09 16:33:18,819 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro cực cao: risk_analysis/charts/BTCUSDT_1h_extreme_risk_performance.png
+2025-03-09 16:33:19,056 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích tỷ lệ lợi nhuận/rủi ro: risk_analysis/charts/BTCUSDT_1h_extreme_risk_reward_ratio.png
+2025-03-09 16:33:19,056 - extreme_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro cực cao cho BTCUSDT 1h
+2025-03-09 16:33:19,056 - extreme_risk_test - INFO - Kết quả được lưu trong thư mục: high_risk_results
+2025-03-09 16:33:19,057 - extreme_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/charts
+2025-03-09 16:33:53,368 - extreme_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro cực cao cho ETHUSDT 1h (15 ngày)
+2025-03-09 16:33:53,368 - extreme_risk_test - INFO - Các mức rủi ro: [10.0, 20.0, 30.0, 40.0, 50.0]
+2025-03-09 16:33:53,369 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho ETHUSDT 1h với mức rủi ro 10.0%
+2025-03-09 16:33:53,370 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho ETHUSDT 1h với mức rủi ro 20.0%
+2025-03-09 16:33:53,370 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho ETHUSDT 1h với mức rủi ro 30.0%
+2025-03-09 16:33:53,371 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho ETHUSDT 1h với mức rủi ro 40.0%
+2025-03-09 16:33:53,371 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho ETHUSDT 1h với mức rủi ro 50.0%
+2025-03-09 16:33:54,239 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro cực cao: risk_analysis/charts/ETHUSDT_1h_extreme_risk_performance.png
+2025-03-09 16:33:54,444 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích tỷ lệ lợi nhuận/rủi ro: risk_analysis/charts/ETHUSDT_1h_extreme_risk_reward_ratio.png
+2025-03-09 16:33:54,444 - extreme_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro cực cao cho ETHUSDT 1h
+2025-03-09 16:33:54,444 - extreme_risk_test - INFO - Kết quả được lưu trong thư mục: high_risk_results
+2025-03-09 16:33:54,444 - extreme_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/charts
+2025-03-09 16:34:08,797 - extreme_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro cực cao cho SOLUSDT 1h (15 ngày)
+2025-03-09 16:34:08,797 - extreme_risk_test - INFO - Các mức rủi ro: [10.0, 20.0, 30.0, 40.0, 50.0]
+2025-03-09 16:34:08,798 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho SOLUSDT 1h với mức rủi ro 10.0%
+2025-03-09 16:34:08,799 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho SOLUSDT 1h với mức rủi ro 20.0%
+2025-03-09 16:34:08,799 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho SOLUSDT 1h với mức rủi ro 30.0%
+2025-03-09 16:34:08,800 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho SOLUSDT 1h với mức rủi ro 40.0%
+2025-03-09 16:34:08,800 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho SOLUSDT 1h với mức rủi ro 50.0%
+2025-03-09 16:34:09,647 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro cực cao: risk_analysis/charts/SOLUSDT_1h_extreme_risk_performance.png
+2025-03-09 16:34:09,879 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích tỷ lệ lợi nhuận/rủi ro: risk_analysis/charts/SOLUSDT_1h_extreme_risk_reward_ratio.png
+2025-03-09 16:34:09,879 - extreme_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro cực cao cho SOLUSDT 1h
+2025-03-09 16:34:09,879 - extreme_risk_test - INFO - Kết quả được lưu trong thư mục: high_risk_results
+2025-03-09 16:34:09,880 - extreme_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/charts
+2025-03-09 16:34:16,586 - extreme_risk_test - INFO - Bắt đầu chạy backtest mức rủi ro cực cao cho BNBUSDT 1h (15 ngày)
+2025-03-09 16:34:16,586 - extreme_risk_test - INFO - Các mức rủi ro: [10.0, 20.0, 30.0, 40.0, 50.0]
+2025-03-09 16:34:16,587 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BNBUSDT 1h với mức rủi ro 10.0%
+2025-03-09 16:34:16,588 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BNBUSDT 1h với mức rủi ro 20.0%
+2025-03-09 16:34:16,588 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BNBUSDT 1h với mức rủi ro 30.0%
+2025-03-09 16:34:16,589 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BNBUSDT 1h với mức rủi ro 40.0%
+2025-03-09 16:34:16,589 - extreme_risk_test - INFO - Đã tạo kết quả mô phỏng cho BNBUSDT 1h với mức rủi ro 50.0%
+2025-03-09 16:34:17,356 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích mức rủi ro cực cao: risk_analysis/charts/BNBUSDT_1h_extreme_risk_performance.png
+2025-03-09 16:34:17,560 - extreme_risk_test - INFO - Đã tạo biểu đồ phân tích tỷ lệ lợi nhuận/rủi ro: risk_analysis/charts/BNBUSDT_1h_extreme_risk_reward_ratio.png
+2025-03-09 16:34:17,560 - extreme_risk_test - INFO - Đã hoàn thành phân tích mức rủi ro cực cao cho BNBUSDT 1h
+2025-03-09 16:34:17,560 - extreme_risk_test - INFO - Kết quả được lưu trong thư mục: high_risk_results
+2025-03-09 16:34:17,560 - extreme_risk_test - INFO - Biểu đồ được lưu trong thư mục: risk_analysis/charts
+2025-03-15 11:12:13,944 - risk_test - INFO - Sử dụng mức rủi ro: extreme_risk (20.0%)
+2025-03-15 11:12:13,945 - risk_test - INFO - Khởi tạo Backtest Engine cho BTCUSDT với balance=10000, leverage=5
+2025-03-15 11:12:13,945 - risk_test - INFO - Khởi tạo AdaptiveStrategy với periods=10/20/50
+2025-03-15 11:12:13,945 - risk_test - INFO - Bắt đầu chạy backtest cho BTCUSDT với strategy=AdaptiveStrategy
+2025-03-15 11:12:13,953 - risk_test - INFO - Đã tính xong các chỉ báo cho AdaptiveStrategy
+2025-03-15 11:12:13,970 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96503.63 với size=0.103623, SL=95345.59, TP=98530.21, Market=RANGING
+2025-03-15 11:12:13,971 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95345.59 với lý do SL, PnL=-120.00 (-1.20%), Balance=9880.00
+2025-03-15 11:12:13,977 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96144.61 với size=0.102762, SL=97298.35, TP=94125.57, Market=RANGING
+2025-03-15 11:12:13,977 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95337.00 với lý do TP1, PnL=20.75 (0.84%), Balance=9900.75, Còn lại: 75%
+2025-03-15 11:12:13,977 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94529.38 với lý do TP2, PnL=41.50 (1.68%), Balance=9942.24, Còn lại: 67%
+2025-03-15 11:12:13,978 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94125.57 với lý do TP3, PnL=51.87 (2.10%), Balance=9994.11, Còn lại: 50%
+2025-03-15 11:12:13,979 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97298.35 với lý do SL, PnL=-29.64 (-1.20%), Balance=9964.47
+2025-03-15 11:12:13,983 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97306.78 với size=0.102403, SL=96139.10, TP=99350.22, Market=RANGING
+2025-03-15 11:12:13,984 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98124.16 với lý do TP1, PnL=20.93 (0.84%), Balance=9985.40, Còn lại: 75%
+2025-03-15 11:12:13,984 - risk_test - INFO - Chốt lời 33% vị thế LONG BTCUSDT tại 98941.53 với lý do TP2, PnL=41.85 (1.68%), Balance=10027.25, Còn lại: 67%
+2025-03-15 11:12:13,985 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96139.10 với lý do SL, PnL=-59.79 (-1.20%), Balance=9967.46
+2025-03-15 11:12:13,990 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 97383.33 với size=0.102353, SL=98551.93, TP=95338.28, Market=RANGING
+2025-03-15 11:12:13,995 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 96565.31 với lý do TP1, PnL=20.93 (0.84%), Balance=9988.40, Còn lại: 75%
+2025-03-15 11:12:13,996 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 95747.29 với lý do TP2, PnL=41.86 (1.68%), Balance=10030.26, Còn lại: 67%
+2025-03-15 11:12:13,996 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 95338.28 với lý do TP3, PnL=52.33 (2.10%), Balance=10082.59, Còn lại: 50%
+2025-03-15 11:12:13,999 - risk_test - INFO - Đóng vị thế BTCUSDT tại 98551.93 với lý do SL, PnL=-29.90 (-1.20%), Balance=10052.69
+2025-03-15 11:12:14,001 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96336.07 với size=0.104350, SL=97492.10, TP=94313.01, Market=RANGING
+2025-03-15 11:12:14,001 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95526.85 với lý do TP1, PnL=21.11 (0.84%), Balance=10073.80, Còn lại: 75%
+2025-03-15 11:12:14,002 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94717.62 với lý do TP2, PnL=42.22 (1.68%), Balance=10116.02, Còn lại: 67%
+2025-03-15 11:12:14,002 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94313.01 với lý do TP3, PnL=52.78 (2.10%), Balance=10168.79, Còn lại: 50%
+2025-03-15 11:12:14,006 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97492.10 với lý do SL, PnL=-30.16 (-1.20%), Balance=10138.64
+2025-03-15 11:12:14,009 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 95962.27 với size=0.105652, SL=94810.72, TP=97977.48, Market=RANGING
+2025-03-15 11:12:14,011 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94810.72 với lý do SL, PnL=-121.66 (-1.20%), Balance=10016.97
+2025-03-15 11:12:14,016 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96222.14 với size=0.104103, SL=97376.81, TP=94201.48, Market=RANGING
+2025-03-15 11:12:14,018 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95413.87 với lý do TP1, PnL=21.04 (0.84%), Balance=10038.01, Còn lại: 75%
+2025-03-15 11:12:14,019 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94605.61 với lý do TP2, PnL=42.07 (1.68%), Balance=10080.08, Còn lại: 67%
+2025-03-15 11:12:14,019 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94201.48 với lý do TP3, PnL=52.59 (2.10%), Balance=10132.67, Còn lại: 50%
+2025-03-15 11:12:14,019 - risk_test - INFO - Đóng vị thế BTCUSDT tại 97376.81 với lý do SL, PnL=-30.05 (-1.20%), Balance=10102.62
+2025-03-15 11:12:14,034 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 97600.54 với size=0.103510, SL=96136.53, TP=100528.56, Market=BULL
+2025-03-15 11:12:14,044 - risk_test - INFO - Chốt lời 25% vị thế LONG BTCUSDT tại 98771.75 với lý do TP1, PnL=30.31 (1.20%), Balance=10132.92, Còn lại: 75%
+2025-03-15 11:12:14,046 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96136.53 với lý do SL, PnL=-113.65 (-1.50%), Balance=10019.27
+2025-03-15 11:12:14,059 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 95465.0 với size=0.104952, SL=96896.97, TP=92601.05, Market=BEAR
+2025-03-15 11:12:14,061 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 94319.42 với lý do TP1, PnL=30.06 (1.20%), Balance=10049.33, Còn lại: 75%
+2025-03-15 11:12:14,061 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 93173.84 với lý do TP2, PnL=60.12 (2.40%), Balance=10109.44, Còn lại: 67%
+2025-03-15 11:12:14,064 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 92601.05 với lý do TP3, PnL=75.14 (3.00%), Balance=10184.59, Còn lại: 50%
+2025-03-15 11:12:14,064 - risk_test - INFO - Đóng vị thế BTCUSDT tại 96896.97 với lý do SL, PnL=-37.57 (-1.50%), Balance=10147.02
+2025-03-15 11:12:14,092 - risk_test - INFO - Mở vị thế LONG BTCUSDT tại 96579.99 với size=0.105063, SL=95421.03, TP=98608.17, Market=RANGING
+2025-03-15 11:12:14,094 - risk_test - INFO - Đóng vị thế BTCUSDT tại 95421.03 với lý do SL, PnL=-121.76 (-1.20%), Balance=10025.25
+2025-03-15 11:12:14,098 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 96414.0 với size=0.103981, SL=97570.97, TP=94389.31, Market=RANGING
+2025-03-15 11:12:14,105 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 95604.12 với lý do TP1, PnL=21.05 (0.84%), Balance=10046.31, Còn lại: 75%
+2025-03-15 11:12:14,110 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 94794.24 với lý do TP2, PnL=42.11 (1.68%), Balance=10088.41, Còn lại: 67%
+2025-03-15 11:12:14,110 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 94389.31 với lý do TP3, PnL=52.63 (2.10%), Balance=10141.04, Còn lại: 50%
+2025-03-15 11:12:14,120 - risk_test - INFO - Đã kích hoạt Trailing Stop cho BTCUSDT tại 94630.66 với stop=94914.55
+2025-03-15 11:12:14,121 - risk_test - INFO - Cập nhật Trailing Stop BTCUSDT xuống 94565.72
+2025-03-15 11:12:14,123 - risk_test - INFO - Đóng vị thế BTCUSDT tại 94605.39 với lý do TRAILING_STOP, PnL=47.02 (1.88%), Balance=10188.06
+2025-03-15 11:12:14,134 - risk_test - INFO - Đang xử lý candle 500/582 (85.9%), ngày 2025-02-26 09:00:00, giá 89116.02. Thời gian còn lại: 0:00:00.029686
+2025-03-15 11:12:14,136 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 87590.69 với size=0.116314, SL=88904.55, TP=84962.97, Market=BEAR
+2025-03-15 11:12:14,137 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 86539.60 với lý do TP1, PnL=30.56 (1.20%), Balance=10218.62, Còn lại: 75%
+2025-03-15 11:12:14,137 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 85488.51 với lý do TP2, PnL=61.13 (2.40%), Balance=10279.75, Còn lại: 67%
+2025-03-15 11:12:14,138 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 84962.97 với lý do TP3, PnL=76.41 (3.00%), Balance=10356.16, Còn lại: 50%
+2025-03-15 11:12:14,138 - risk_test - INFO - Đóng vị thế BTCUSDT tại 88904.55 với lý do SL, PnL=-38.21 (-1.50%), Balance=10317.96
+2025-03-15 11:12:14,146 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 84124.0 với size=0.122652, SL=85385.86, TP=81600.28, Market=BEAR
+2025-03-15 11:12:14,147 - risk_test - INFO - Chốt lời 25% vị thế SHORT BTCUSDT tại 83114.51 với lý do TP1, PnL=30.95 (1.20%), Balance=10348.91, Còn lại: 75%
+2025-03-15 11:12:14,148 - risk_test - INFO - Chốt lời 33% vị thế SHORT BTCUSDT tại 82105.02 với lý do TP2, PnL=61.91 (2.40%), Balance=10410.82, Còn lại: 67%
+2025-03-15 11:12:14,148 - risk_test - INFO - Chốt lời 50% vị thế SHORT BTCUSDT tại 81600.28 với lý do TP3, PnL=77.38 (3.00%), Balance=10488.20, Còn lại: 50%
+2025-03-15 11:12:14,151 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85385.86 với lý do SL, PnL=-38.69 (-1.50%), Balance=10449.51
+2025-03-15 11:12:14,163 - risk_test - INFO - Mở vị thế SHORT BTCUSDT tại 85306.99 với size=0.122493, SL=86586.59, TP=82747.78, Market=BEAR
+2025-03-15 11:12:14,164 - risk_test - INFO - Đóng vị thế BTCUSDT tại 85306.99 với lý do FINAL, PnL=0.00 (0.00%), Balance=10449.51
+2025-03-15 11:12:14,164 - risk_test - INFO - Hoàn thành backtest cho BTCUSDT trong 0:00:00.210374

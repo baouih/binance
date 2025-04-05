@@ -1,0 +1,23 @@
+2025-03-09 15:39:50,250 - time_based_trading_system - WARNING - Không tìm thấy file cấu hình configs/time_based_trading_config.json, sử dụng cấu hình mặc định
+2025-03-09 15:39:50,251 - time_based_trading_system - INFO - Đã lưu cấu hình vào configs/time_based_trading_config.json
+2025-03-09 15:39:50,251 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:39:50,251 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:39:50,252 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:39:50,252 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:50,252 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 15:39:50,252 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 15:39:50,252 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 15:39:50,252 - time_based_trading_system - INFO - Đã khởi tạo TimeBasedTradingSystem với timezone UTC+7
+2025-03-09 15:39:50,253 - time_based_trading_system - INFO - Đã bắt đầu hệ thống giao dịch dựa trên thời gian tối ưu (kiểm tra mỗi 1 phút)
+2025-03-09 15:39:50,253 - telegram_notifier - INFO - Bỏ qua tin nhắn vì thông báo Telegram bị tắt
+2025-03-09 15:55:36,785 - time_based_trading_system - INFO - Đã tải cấu hình từ configs/time_based_trading_config.json
+2025-03-09 15:55:36,788 - time_optimized_strategy - INFO - Đã tải cấu hình từ configs/time_optimized_strategy_config.json
+2025-03-09 15:55:36,788 - time_optimized_strategy - INFO - Đã khởi tạo TimeOptimizedStrategy với timezone UTC+7
+2025-03-09 15:55:36,788 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:55:36,788 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:55:36,789 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 15:55:36,789 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 15:55:36,789 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 15:55:36,789 - time_based_trading_system - INFO - Đã khởi tạo TimeBasedTradingSystem với timezone UTC+7
+2025-03-09 15:55:36,790 - time_based_trading_system - INFO - Đã bắt đầu hệ thống giao dịch dựa trên thời gian tối ưu (kiểm tra mỗi 1 phút)
+2025-03-09 15:55:37,348 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}

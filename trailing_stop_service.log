@@ -1,0 +1,20 @@
+2025-03-11 15:01:14,817 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-11 15:01:14,819 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-11 15:01:14,819 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-11 15:01:14,822 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-11 15:01:14,823 - position_trailing_stop - INFO - Đã tải 0 vị thế từ active_positions.json
+2025-03-11 15:01:14,823 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-11 15:01:14,823 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-11 15:01:15,309 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-11 15:01:15,309 - binance_api - INFO - Không có vị thế active từ account API
+2025-03-11 15:01:15,309 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-11 15:01:15,310 - position_trailing_stop - INFO - Đã lưu 0 vị thế vào active_positions.json
+2025-03-11 15:01:15,310 - position_trailing_stop - INFO - Bắt đầu dịch vụ giám sát trailing stop với chu kỳ 60 giây
+2025-03-11 15:01:15,310 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-11 15:01:15,310 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-11 15:01:15,473 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-11 15:01:15,473 - binance_api - INFO - Không có vị thế active từ account API
+2025-03-11 15:01:15,473 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-11 15:01:15,474 - position_trailing_stop - INFO - Đã lưu 0 vị thế vào active_positions.json
+2025-03-11 15:01:15,474 - position_trailing_stop - INFO - Không có vị thế nào đang mở
+[Tue 11 Mar 2025 03:01:15 PM UTC] ✅ Dịch vụ Trailing Stop đang chạy bình thường

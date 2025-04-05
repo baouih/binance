@@ -1,0 +1,142 @@
+Thu 06 Mar 2025 03:28:26 AM UTC - Đang tự động khởi động hệ thống tích hợp...
+Đang khởi động hệ thống tích hợp quản lý rủi ro và trailing stop...
+Kiểm tra và tắt các dịch vụ cũ...
+Đồng bộ hóa SL/TP với Binance trước khi khởi động dịch vụ...
+Sun 09 Mar 2025 05:06:44 AM UTC - Đang tự động khởi động hệ thống tích hợp...
+Đang khởi động hệ thống tích hợp quản lý rủi ro và trailing stop...
+Kiểm tra và tắt các dịch vụ cũ...
+Đồng bộ hóa SL/TP với Binance trước khi khởi động dịch vụ...
+2025-03-09 05:06:44,703 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:06:44,703 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:06:44,704 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:06:44,704 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 05:06:44,704 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 05:06:44,704 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 05:06:44,704 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 05:06:44,705 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 05:06:44,705 - position_trailing_stop - INFO - Đã tải 3 vị thế từ active_positions.json
+2025-03-09 05:06:44,705 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 05:06:44,705 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 05:06:44,902 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 05:06:44,903 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 05:06:44,903 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 05:06:44,904 - position_trailing_stop - INFO - Đã lưu 3 vị thế vào active_positions.json
+2025-03-09 05:06:44,904 - integrated_risk_system - INFO - Đã tạo cấu hình tích hợp mặc định
+2025-03-09 05:06:45,086 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho ETHUSDT: 'stop_loss'
+2025-03-09 05:06:45,086 - leverage_risk_manager - INFO - Đề xuất take profit cho ETHUSDT LONG: 2399.52 (R:R 2.0:1, Thị trường: None)
+2025-03-09 05:06:45,087 - leverage_risk_manager - INFO - Đang theo dõi vị thế ETHUSDT LONG tại 2181.38
+2025-03-09 05:06:45,087 - integrated_risk_system - INFO - Đã thêm vị thế mới ETHUSDT từ Binance
+2025-03-09 05:06:45,087 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho BNBUSDT: 'stop_loss'
+2025-03-09 05:06:45,087 - leverage_risk_manager - INFO - Đề xuất take profit cho BNBUSDT LONG: 660.41 (R:R 2.0:1, Thị trường: None)
+2025-03-09 05:06:45,087 - leverage_risk_manager - INFO - Đang theo dõi vị thế BNBUSDT LONG tại 600.3683333333
+2025-03-09 05:06:45,087 - integrated_risk_system - INFO - Đã thêm vị thế mới BNBUSDT từ Binance
+2025-03-09 05:06:45,087 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho BTCUSDT: 'stop_loss'
+2025-03-09 05:06:45,087 - leverage_risk_manager - INFO - Đề xuất take profit cho BTCUSDT LONG: 94710.33 (R:R 2.0:1, Thị trường: None)
+2025-03-09 05:06:45,087 - leverage_risk_manager - INFO - Đang theo dõi vị thế BTCUSDT LONG tại 86100.3
+2025-03-09 05:06:45,087 - integrated_risk_system - INFO - Đã thêm vị thế mới BTCUSDT từ Binance
+2025-03-09 05:06:45,088 - position_trailing_stop - INFO - Đã lưu 3 vị thế vào active_positions.json
+2025-03-09 05:06:45,887 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2072.311&closePosition=True&timeInForce=GTC&timestamp=1741496805735&signature=5aa268d5346c526bf02020b529d684345ae08fd65becc72657bd2c012f511548
+2025-03-09 05:06:45,887 - binance_api - INFO - Đã đặt stop loss cho ETHUSDT LONG tại giá 2072.311: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2072.311&closePosition=True&timeInForce=GTC&timestamp=1741496805735&signature=5aa268d5346c526bf02020b529d684345ae08fd65becc72657bd2c012f511548'}
+2025-03-09 05:06:45,887 - integrated_risk_system - ERROR - Lỗi khi đặt Stop Loss cho ETHUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2072.311&closePosition=True&timeInForce=GTC&timestamp=1741496805735&signature=5aa268d5346c526bf02020b529d684345ae08fd65becc72657bd2c012f511548'}
+2025-03-09 05:06:46,329 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2399.52&closePosition=True&timeInForce=GTC&timestamp=1741496805887&signature=5182d680577015eb9d411c21eba0ca3186d9fc550637124baf606f130987958b
+2025-03-09 05:06:46,329 - binance_api - INFO - Đã đặt take profit cho ETHUSDT LONG tại giá 2399.52: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2399.52&closePosition=True&timeInForce=GTC&timestamp=1741496805887&signature=5182d680577015eb9d411c21eba0ca3186d9fc550637124baf606f130987958b'}
+2025-03-09 05:06:46,329 - integrated_risk_system - ERROR - Lỗi khi đặt Take Profit cho ETHUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2399.52&closePosition=True&timeInForce=GTC&timestamp=1741496805887&signature=5182d680577015eb9d411c21eba0ca3186d9fc550637124baf606f130987958b'}
+2025-03-09 05:06:46,330 - integrated_risk_system - ERROR - Không thể đồng bộ SL/TP cho ETHUSDT với Binance: ['Lỗi đặt SL: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2072.311&closePosition=True&timeInForce=GTC&timestamp=1741496805735&signature=5aa268d5346c526bf02020b529d684345ae08fd65becc72657bd2c012f511548', 'Lỗi đặt TP: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2399.52&closePosition=True&timeInForce=GTC&timestamp=1741496805887&signature=5182d680577015eb9d411c21eba0ca3186d9fc550637124baf606f130987958b']
+2025-03-09 05:06:46,636 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=570.349916666635&closePosition=True&timeInForce=GTC&timestamp=1741496806485&signature=a95032848c285b69380fb6cdbbaaedcf3a36b73e2ba6a8b9db1ea2c92e73eb36
+2025-03-09 05:06:46,636 - binance_api - INFO - Đã đặt stop loss cho BNBUSDT LONG tại giá 570.349916666635: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=570.349916666635&closePosition=True&timeInForce=GTC&timestamp=1741496806485&signature=a95032848c285b69380fb6cdbbaaedcf3a36b73e2ba6a8b9db1ea2c92e73eb36'}
+2025-03-09 05:06:46,636 - integrated_risk_system - ERROR - Lỗi khi đặt Stop Loss cho BNBUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=570.349916666635&closePosition=True&timeInForce=GTC&timestamp=1741496806485&signature=a95032848c285b69380fb6cdbbaaedcf3a36b73e2ba6a8b9db1ea2c92e73eb36'}
+2025-03-09 05:06:46,785 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=660.41&closePosition=True&timeInForce=GTC&timestamp=1741496806636&signature=5d8d93fe99028e855df841237588028b8079420386e6bdc5533c187ccda6a529
+2025-03-09 05:06:46,785 - binance_api - INFO - Đã đặt take profit cho BNBUSDT LONG tại giá 660.41: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=660.41&closePosition=True&timeInForce=GTC&timestamp=1741496806636&signature=5d8d93fe99028e855df841237588028b8079420386e6bdc5533c187ccda6a529'}
+2025-03-09 05:06:46,785 - integrated_risk_system - ERROR - Lỗi khi đặt Take Profit cho BNBUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=660.41&closePosition=True&timeInForce=GTC&timestamp=1741496806636&signature=5d8d93fe99028e855df841237588028b8079420386e6bdc5533c187ccda6a529'}
+2025-03-09 05:06:46,786 - integrated_risk_system - ERROR - Không thể đồng bộ SL/TP cho BNBUSDT với Binance: ['Lỗi đặt SL: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=570.349916666635&closePosition=True&timeInForce=GTC&timestamp=1741496806485&signature=a95032848c285b69380fb6cdbbaaedcf3a36b73e2ba6a8b9db1ea2c92e73eb36', 'Lỗi đặt TP: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=660.41&closePosition=True&timeInForce=GTC&timestamp=1741496806636&signature=5d8d93fe99028e855df841237588028b8079420386e6bdc5533c187ccda6a529']
+2025-03-09 05:06:47,367 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=81795.285&closePosition=True&timeInForce=GTC&timestamp=1741496807213&signature=105a41de6124c8f612ea5a17a31ff95ef91a0f9f25fe28f16010ac464b55a6f2
+2025-03-09 05:06:47,367 - binance_api - INFO - Đã đặt stop loss cho BTCUSDT LONG tại giá 81795.285: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=81795.285&closePosition=True&timeInForce=GTC&timestamp=1741496807213&signature=105a41de6124c8f612ea5a17a31ff95ef91a0f9f25fe28f16010ac464b55a6f2'}
+2025-03-09 05:06:47,367 - integrated_risk_system - ERROR - Lỗi khi đặt Stop Loss cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=81795.285&closePosition=True&timeInForce=GTC&timestamp=1741496807213&signature=105a41de6124c8f612ea5a17a31ff95ef91a0f9f25fe28f16010ac464b55a6f2'}
+2025-03-09 05:06:47,521 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=94710.33&closePosition=True&timeInForce=GTC&timestamp=1741496807367&signature=4763651f0c24d2533808a6ed1f87ef56ab84b66f9169c561a1b0524be2086a5c
+2025-03-09 05:06:47,521 - binance_api - INFO - Đã đặt take profit cho BTCUSDT LONG tại giá 94710.33: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=94710.33&closePosition=True&timeInForce=GTC&timestamp=1741496807367&signature=4763651f0c24d2533808a6ed1f87ef56ab84b66f9169c561a1b0524be2086a5c'}
+2025-03-09 05:06:47,521 - integrated_risk_system - ERROR - Lỗi khi đặt Take Profit cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=94710.33&closePosition=True&timeInForce=GTC&timestamp=1741496807367&signature=4763651f0c24d2533808a6ed1f87ef56ab84b66f9169c561a1b0524be2086a5c'}
+2025-03-09 05:06:47,522 - integrated_risk_system - ERROR - Không thể đồng bộ SL/TP cho BTCUSDT với Binance: ['Lỗi đặt SL: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=81795.285&closePosition=True&timeInForce=GTC&timestamp=1741496807213&signature=105a41de6124c8f612ea5a17a31ff95ef91a0f9f25fe28f16010ac464b55a6f2', 'Lỗi đặt TP: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=94710.33&closePosition=True&timeInForce=GTC&timestamp=1741496807367&signature=4763651f0c24d2533808a6ed1f87ef56ab84b66f9169c561a1b0524be2086a5c']
+2025-03-09 05:06:48,104 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/openOrders?symbol=ETHUSDT&timestamp=1741496807671&signature=849795d9b158be21363d3bebbcde36379262ab916a9efd54c4f9aac172e76006
+2025-03-09 05:06:48,255 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/openOrders?symbol=BNBUSDT&timestamp=1741496808104&signature=b6966ec300a41c489089365d3405e6f7cd0aab15d8c7967813e9892b9ed124a1
+2025-03-09 05:06:48,690 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/openOrders?symbol=BTCUSDT&timestamp=1741496808256&signature=ff9d88d6287c0dcaf4e03d1839c3043abb715b07b89231a9c95a44d865a2e1cc
+Đồng bộ hóa SL/TP với Binance...
+Kết quả đồng bộ: {'synchronized': 0, 'errors': 3}
+
+Vị thế sau khi đồng bộ:
+
+=== DANH SÁCH VỊ THẾ ĐANG MỞ ===
+Traceback (most recent call last):
+  File "/home/runner/workspace/integrated_risk_trailing_system.py", line 794, in <module>
+    main()
+  File "/home/runner/workspace/integrated_risk_trailing_system.py", line 782, in main
+    system.check_positions()
+  File "/home/runner/workspace/integrated_risk_trailing_system.py", line 731, in check_positions
+    order_type = order.get("type", "")
+                 ^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+⚠️ Cảnh báo: Có lỗi khi đồng bộ SL/TP với Binance, nhưng tiếp tục khởi động dịch vụ...
+Khởi động hệ thống tích hợp...
+Đã khởi động hệ thống tích hợp với PID 3630
+Dịch vụ đang chạy.
+Log được lưu tại: integrated_system.log
+Sun 09 Mar 2025 11:40:46 AM UTC - Đang tự động khởi động hệ thống tích hợp...
+Đang khởi động hệ thống tích hợp quản lý rủi ro và trailing stop...
+Kiểm tra và tắt các dịch vụ cũ...
+Đồng bộ hóa SL/TP với Binance trước khi khởi động dịch vụ...
+2025-03-09 11:40:50,416 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:40:50,417 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:40:50,417 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:40:50,419 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 11:40:50,420 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 11:40:50,420 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 11:40:50,420 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 11:40:50,420 - leverage_risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_config.json
+2025-03-09 11:40:50,421 - position_trailing_stop - INFO - Đã tải 0 vị thế từ active_positions.json
+2025-03-09 11:40:50,421 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 11:40:50,421 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 11:40:50,610 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 11:40:50,610 - binance_api - INFO - Đã lấy 1 vị thế active từ account API
+2025-03-09 11:40:50,610 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 11:40:50,610 - position_trailing_stop - INFO - Phát hiện vị thế mới từ sàn: BTCUSDT LONG
+2025-03-09 11:40:51,058 - leverage_risk_manager - ERROR - Lỗi khi tính toán biến động cho BTCUSDT: 'volatility_adjustment'
+2025-03-09 11:40:51,058 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho BTCUSDT: 'stop_loss'
+2025-03-09 11:40:51,058 - leverage_risk_manager - INFO - Đề xuất take profit cho BTCUSDT LONG: 94685.05 (R:R 2.0:1, Thị trường: None)
+2025-03-09 11:40:51,058 - leverage_risk_manager - INFO - Đang theo dõi vị thế BTCUSDT LONG tại 86077.32222222
+2025-03-09 11:40:51,061 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:51,253 - leverage_risk_manager - ERROR - Lỗi khi tính toán stop loss động cho BTCUSDT: 'stop_loss'
+2025-03-09 11:40:51,253 - leverage_risk_manager - INFO - Đề xuất take profit cho BTCUSDT LONG: 94685.05 (R:R 2.0:1, Thị trường: None)
+2025-03-09 11:40:51,253 - leverage_risk_manager - INFO - Đang theo dõi vị thế BTCUSDT LONG tại 86077.32222222
+2025-03-09 11:40:51,253 - integrated_risk_system - INFO - Đã thêm vị thế mới BTCUSDT từ Binance
+2025-03-09 11:40:51,254 - position_trailing_stop - INFO - Đã lưu 1 vị thế vào active_positions.json
+2025-03-09 11:40:51,833 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520451404&signature=da499a9494672df277eed9b1f0e42cdcfff6cf3a9b7acffd9377bbaadeadfd96
+2025-03-09 11:40:51,833 - binance_api - INFO - Đã đặt stop loss cho BTCUSDT LONG tại giá 81773.456111109: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520451404&signature=da499a9494672df277eed9b1f0e42cdcfff6cf3a9b7acffd9377bbaadeadfd96'}
+2025-03-09 11:40:51,833 - integrated_risk_system - ERROR - Lỗi khi đặt Stop Loss cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520451404&signature=da499a9494672df277eed9b1f0e42cdcfff6cf3a9b7acffd9377bbaadeadfd96'}
+2025-03-09 11:40:52,266 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520451833&signature=613435dbf40682e5bce6e314d86efe351671cb6b9e2b06ee0e66dfb43e501d1c
+2025-03-09 11:40:52,267 - binance_api - INFO - Đã đặt take profit cho BTCUSDT LONG tại giá 94685.05: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520451833&signature=613435dbf40682e5bce6e314d86efe351671cb6b9e2b06ee0e66dfb43e501d1c'}
+2025-03-09 11:40:52,267 - integrated_risk_system - ERROR - Lỗi khi đặt Take Profit cho BTCUSDT: {'error': '400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520451833&signature=613435dbf40682e5bce6e314d86efe351671cb6b9e2b06ee0e66dfb43e501d1c'}
+2025-03-09 11:40:52,267 - integrated_risk_system - ERROR - Không thể đồng bộ SL/TP cho BTCUSDT với Binance: ['Lỗi đặt SL: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=81773.456111109&timeInForce=GTC&timestamp=1741520451404&signature=da499a9494672df277eed9b1f0e42cdcfff6cf3a9b7acffd9377bbaadeadfd96', 'Lỗi đặt TP: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&reduceOnly=true&workingType=MARK_PRICE&stopPrice=94685.05&timeInForce=GTC&timestamp=1741520451833&signature=613435dbf40682e5bce6e314d86efe351671cb6b9e2b06ee0e66dfb43e501d1c']
+Đồng bộ hóa SL/TP với Binance...
+Kết quả đồng bộ: {'synchronized': 0, 'errors': 1}
+
+Vị thế sau khi đồng bộ:
+
+=== DANH SÁCH VỊ THẾ ĐANG MỞ ===
+Symbol: BTCUSDT
+  Hướng: LONG
+  Giá vào: 86077.32222222
+  Giá hiện tại: 84901.9
+  Số lượng: 0.009
+  Đòn bẩy: 5x
+  Stop Loss: 81773.456111109
+  Take Profit: 94685.05
+  Trailing Stop: Chưa kích hoạt (N/A)
+  SL trên Binance: Không (N/A)
+  TP trên Binance: Không (N/A)
+  Đồng bộ với Binance: False
+  Unrealized P/L: -6.83%
+
+✅ Đồng bộ SL/TP với Binance thành công!
+Khởi động hệ thống tích hợp...
+Đã khởi động hệ thống tích hợp với PID 546
+Dịch vụ đang chạy.
+Log được lưu tại: integrated_system.log

@@ -1,0 +1,44 @@
+2025-03-12 10:04:39,567 - market_notifier_check - WARNING - File PID không tồn tại
+2025-03-12 10:04:39,568 - market_notifier_check - WARNING - File log của market_notifier không tồn tại
+2025-03-12 10:17:04,003 - market_notifier_check - WARNING - File PID không tồn tại
+2025-03-12 10:17:04,003 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:16:18.061414
+2025-03-12 10:17:04,003 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-12 10:19:20,049 - market_notifier_check - INFO - Đã đọc PID 24930 từ file
+2025-03-12 10:19:20,049 - market_notifier_check - WARNING - Process với PID 24930 không tồn tại
+2025-03-12 10:19:20,050 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:19:09.652400
+2025-03-12 10:19:20,050 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-12 10:23:19,024 - market_notifier_check - INFO - Đã đọc PID 25485 từ file
+2025-03-12 10:23:19,024 - market_notifier_check - WARNING - Process với PID 25485 không tồn tại
+2025-03-12 10:23:19,024 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:22:54.960383
+2025-03-12 10:23:19,025 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-12 10:30:39,905 - market_notifier_check - INFO - Đã đọc PID 26108 từ file
+2025-03-12 10:30:39,905 - market_notifier_check - WARNING - Process với PID 26108 không tồn tại
+2025-03-12 10:30:39,905 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:22:54.960383
+2025-03-12 10:48:41,170 - market_notifier_check - INFO - Đã đọc PID 26108 từ file
+2025-03-12 10:48:41,170 - market_notifier_check - WARNING - Process với PID 26108 không tồn tại
+2025-03-12 10:48:41,171 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:22:54.960383
+2025-03-12 11:01:34,497 - market_notifier_check - INFO - Đã đọc PID 26108 từ file
+2025-03-12 11:01:34,498 - market_notifier_check - WARNING - Process với PID 26108 không tồn tại
+2025-03-12 11:01:34,498 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:22:54.960383
+2025-03-12 11:10:25,494 - market_notifier_check - INFO - Đã đọc PID 26108 từ file
+2025-03-12 11:10:25,494 - market_notifier_check - WARNING - Process với PID 26108 không tồn tại
+2025-03-12 11:10:25,495 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 10:22:54.960383
+2025-03-12 11:59:29,569 - market_notifier_check - INFO - Đã đọc PID 587 từ file
+2025-03-12 11:59:29,570 - market_notifier_check - WARNING - Process với PID 587 không tồn tại
+2025-03-12 11:59:29,570 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-12 11:59:14.049667
+2025-03-12 11:59:29,571 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-28 16:19:57,088 - market_notifier_check - INFO - Đã đọc PID 4150 từ file
+2025-03-28 16:19:57,089 - market_notifier_check - WARNING - Process với PID 4150 không tồn tại
+2025-03-28 16:19:57,089 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-13 04:25:41.552154
+2025-03-28 16:23:19,528 - market_notifier_check - INFO - Đã đọc PID 4150 từ file
+2025-03-28 16:23:19,528 - market_notifier_check - WARNING - Process với PID 4150 không tồn tại
+2025-03-28 16:23:19,529 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-28 16:23:13.560056
+2025-03-28 16:23:19,529 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-28 16:23:58,632 - market_notifier_check - INFO - Đã đọc PID 4150 từ file
+2025-03-28 16:23:58,633 - market_notifier_check - WARNING - Process với PID 4150 không tồn tại
+2025-03-28 16:23:58,633 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-28 16:23:13.560056
+2025-03-28 16:23:58,633 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy
+2025-03-28 16:24:11,085 - market_notifier_check - INFO - Đã đọc PID 4888 từ file
+2025-03-28 16:24:11,086 - market_notifier_check - WARNING - Process với PID 4888 không tồn tại
+2025-03-28 16:24:11,087 - market_notifier_check - INFO - File log được cập nhật lần cuối vào: 2025-03-28 16:24:04.910050
+2025-03-28 16:24:11,087 - market_notifier_check - WARNING - PID check thất bại nhưng log file có hoạt động gần đây, dịch vụ có thể vẫn đang chạy

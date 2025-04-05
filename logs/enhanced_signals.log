@@ -1,0 +1,95 @@
+2025-03-07 13:29:05,235 - enhanced_signal_test - INFO - Bắt đầu kiểm thử toàn diện EnhancedSignalGenerator
+2025-03-07 13:29:05,235 - enhanced_signals - INFO - Đã khởi tạo EnhancedSignalGenerator với cấu hình: {'sma_short': 20, 'sma_medium': 50, 'sma_long': 200, 'rsi_period': 14, 'rsi_overbought': 70, 'rsi_oversold': 30, 'stoch_k_period': 14, 'stoch_k_smooth': 3, 'stoch_d_period': 3, 'stoch_overbought': 80, 'stoch_oversold': 20, 'bb_period': 20, 'bb_std_dev': 2.0, 'atr_period': 14, 'min_candles_between_signals': 10, 'high_volatility_multiplier': 2.0, 'trend_lookback_period': 50, 'trend_strength_threshold': 0.3}
+2025-03-07 13:29:05,235 - enhanced_signal_test - INFO - Kiểm thử kịch bản: uptrend
+2025-03-07 13:29:05,235 - enhanced_signal_test - INFO - Tạo dữ liệu test cho kịch bản uptrend với 1000 nến
+2025-03-07 13:29:05,246 - enhanced_signal_test - INFO - Đã tạo xong dữ liệu test, kích thước: (1000, 5)
+2025-03-07 13:29:05,247 - enhanced_signals - INFO - Bắt đầu xử lý dữ liệu và tạo tín hiệu...
+2025-03-07 13:29:05,248 - enhanced_signals - INFO - Tính toán các chỉ báo cho việc tạo tín hiệu...
+2025-03-07 13:29:05,264 - enhanced_signals - INFO - Đã hoàn thành tính toán các chỉ báo
+2025-03-07 13:29:05,265 - enhanced_signals - INFO - Phát hiện điều kiện thị trường...
+2025-03-07 13:29:06,003 - enhanced_signals - INFO - Điều kiện thị trường uptrend: 950 (95.00%)
+2025-03-07 13:29:06,005 - enhanced_signals - INFO - Điều kiện thị trường neutral: 50 (5.00%)
+2025-03-07 13:29:06,006 - enhanced_signals - INFO - Tạo các tín hiệu giao dịch cơ bản...
+2025-03-07 13:29:06,015 - enhanced_signals - INFO - Tín hiệu sma_cross_up: 0 (0.00%)
+2025-03-07 13:29:06,015 - enhanced_signals - INFO - Tín hiệu sma_cross_down: 0 (0.00%)
+2025-03-07 13:29:06,015 - enhanced_signals - INFO - Tín hiệu price_cross_sma_up: 0 (0.00%)
+2025-03-07 13:29:06,015 - enhanced_signals - INFO - Tín hiệu price_cross_sma_down: 0 (0.00%)
+2025-03-07 13:29:06,015 - enhanced_signals - INFO - Tín hiệu rsi_buy: 0 (0.00%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu rsi_sell: 19 (1.90%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu stoch_buy: 0 (0.00%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu stoch_sell: 177 (17.70%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu mean_rev_buy: 0 (0.00%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu mean_rev_sell: 5 (0.50%)
+2025-03-07 13:29:06,016 - enhanced_signals - INFO - Tín hiệu bb_buy: 0 (0.00%)
+2025-03-07 13:29:06,017 - enhanced_signals - INFO - Tín hiệu bb_sell: 921 (92.10%)
+2025-03-07 13:29:06,017 - enhanced_signals - INFO - Áp dụng các bộ lọc tín hiệu...
+2025-03-07 13:29:06,042 - enhanced_signals - INFO - Sau khi lọc: 0 tín hiệu mua (0.00%)
+2025-03-07 13:29:06,045 - enhanced_signals - INFO - Sau khi lọc: 0 tín hiệu bán (0.00%)
+2025-03-07 13:29:06,046 - enhanced_signals - INFO - Tính toán kích thước vị thế động...
+2025-03-07 13:29:06,053 - enhanced_signals - INFO - Kích thước vị thế trung bình: nan
+2025-03-07 13:29:06,053 - enhanced_signals - INFO - Kích thước vị thế nhỏ nhất: nan
+2025-03-07 13:29:06,053 - enhanced_signals - INFO - Kích thước vị thế lớn nhất: nan
+2025-03-07 13:29:06,053 - enhanced_signals - INFO - Tính toán take profit và stop loss động...
+2025-03-07 13:29:06,066 - enhanced_signals - INFO - Tỷ lệ risk-reward trung bình cho giao dịch mua: nan
+2025-03-07 13:29:06,066 - enhanced_signals - INFO - Tỷ lệ risk-reward trung bình cho giao dịch bán: nan
+2025-03-07 13:29:08,904 - enhanced_signals - INFO - Đã lưu biểu đồ phân tích tín hiệu: signal_analysis/signal_analysis_20250307_132906.png
+2025-03-07 13:29:08,906 - enhanced_signals - INFO - Hoàn thành xử lý dữ liệu và tạo tín hiệu
+2025-03-07 13:29:08,908 - enhanced_signal_test - INFO - Đánh giá tín hiệu giao dịch cho kịch bản uptrend
+2025-03-07 13:29:08,912 - enhanced_signal_test - INFO - Thực hiện backtest đơn giản...
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Đánh giá tín hiệu cho uptrend:
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Tổng số nến: 1000
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Tín hiệu mua: 0 (0.00%)
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Tín hiệu bán: 0 (0.00%)
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Tín hiệu xung đột: 0
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Khoảng cách trung bình giữa các tín hiệu: 0.00 giờ
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Kết quả backtest:
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Tổng số giao dịch: 0
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Lợi nhuận: 0.00%
+2025-03-07 13:29:09,980 - enhanced_signal_test - INFO - Win rate: 0.00%
+2025-03-07 13:29:09,981 - enhanced_signal_test - INFO - Profit factor: inf
+2025-03-07 13:29:09,981 - enhanced_signal_test - INFO - Max drawdown: 0.00%
+2025-03-07 14:05:54,472 - multi_coin_test - INFO - Bắt đầu kiểm thử đa coin cho giai đoạn 90 ngày
+2025-03-07 14:05:54,473 - enhanced_signals - INFO - Đã khởi tạo EnhancedSignalGenerator với cấu hình: {'sma_short': 20, 'sma_medium': 50, 'sma_long': 200, 'rsi_period': 14, 'rsi_overbought': 70, 'rsi_oversold': 30, 'stoch_k_period': 14, 'stoch_k_smooth': 3, 'stoch_d_period': 3, 'stoch_overbought': 80, 'stoch_oversold': 20, 'bb_period': 20, 'bb_std_dev': 2.0, 'atr_period': 14, 'min_candles_between_signals': 10, 'high_volatility_multiplier': 2.0, 'trend_lookback_period': 50, 'trend_strength_threshold': 0.3}
+2025-03-07 14:05:54,473 - multi_coin_test - INFO - Kiểm thử BTC/USDT trên khung thời gian 1h
+2025-03-07 14:05:54,473 - multi_coin_test - INFO - Đang lấy dữ liệu lịch sử cho BTC/USDT trên khung thời gian 1h
+2025-03-07 14:05:57,769 - multi_coin_test - INFO - Đã lấy thành công 1500 nến cho BTC/USDT (1h)
+2025-03-07 14:05:57,800 - enhanced_signals - INFO - Bắt đầu xử lý dữ liệu và tạo tín hiệu...
+2025-03-07 14:05:57,800 - enhanced_signals - INFO - Tính toán các chỉ báo cho việc tạo tín hiệu...
+2025-03-07 14:05:57,814 - enhanced_signals - INFO - Đã hoàn thành tính toán các chỉ báo
+2025-03-07 14:05:57,814 - enhanced_signals - INFO - Phát hiện điều kiện thị trường...
+2025-03-07 14:05:58,790 - enhanced_signals - INFO - Điều kiện thị trường sideway: 566 (37.73%)
+2025-03-07 14:05:58,790 - enhanced_signals - INFO - Điều kiện thị trường downtrend: 469 (31.27%)
+2025-03-07 14:05:58,790 - enhanced_signals - INFO - Điều kiện thị trường uptrend: 415 (27.67%)
+2025-03-07 14:05:58,791 - enhanced_signals - INFO - Điều kiện thị trường neutral: 50 (3.33%)
+2025-03-07 14:05:58,791 - enhanced_signals - INFO - Tạo các tín hiệu giao dịch cơ bản...
+2025-03-07 14:05:58,798 - enhanced_signals - INFO - Tín hiệu sma_cross_up: 18 (1.20%)
+2025-03-07 14:05:58,798 - enhanced_signals - INFO - Tín hiệu sma_cross_down: 19 (1.27%)
+2025-03-07 14:05:58,799 - enhanced_signals - INFO - Tín hiệu price_cross_sma_up: 81 (5.40%)
+2025-03-07 14:05:58,799 - enhanced_signals - INFO - Tín hiệu price_cross_sma_down: 81 (5.40%)
+2025-03-07 14:05:58,799 - enhanced_signals - INFO - Tín hiệu rsi_buy: 52 (3.47%)
+2025-03-07 14:05:58,799 - enhanced_signals - INFO - Tín hiệu rsi_sell: 64 (4.27%)
+2025-03-07 14:05:58,799 - enhanced_signals - INFO - Tín hiệu stoch_buy: 45 (3.00%)
+2025-03-07 14:05:58,800 - enhanced_signals - INFO - Tín hiệu stoch_sell: 48 (3.20%)
+2025-03-07 14:05:58,800 - enhanced_signals - INFO - Tín hiệu mean_rev_buy: 9 (0.60%)
+2025-03-07 14:05:58,800 - enhanced_signals - INFO - Tín hiệu mean_rev_sell: 13 (0.87%)
+2025-03-07 14:05:58,800 - enhanced_signals - INFO - Tín hiệu bb_buy: 142 (9.47%)
+2025-03-07 14:05:58,801 - enhanced_signals - INFO - Tín hiệu bb_sell: 92 (6.13%)
+2025-03-07 14:05:58,801 - enhanced_signals - INFO - Áp dụng các bộ lọc tín hiệu...
+2025-03-07 14:05:58,843 - enhanced_signals - INFO - Sau khi lọc: 66 tín hiệu mua (4.40%)
+2025-03-07 14:05:58,843 - enhanced_signals - INFO - Sau khi lọc: 58 tín hiệu bán (3.87%)
+2025-03-07 14:05:58,843 - enhanced_signals - INFO - Tính toán kích thước vị thế động...
+2025-03-07 14:05:58,850 - enhanced_signals - INFO - Kích thước vị thế trung bình: 0.01
+2025-03-07 14:05:58,850 - enhanced_signals - INFO - Kích thước vị thế nhỏ nhất: 0.01
+2025-03-07 14:05:58,850 - enhanced_signals - INFO - Kích thước vị thế lớn nhất: 0.02
+2025-03-07 14:05:58,850 - enhanced_signals - INFO - Tính toán take profit và stop loss động...
+2025-03-07 14:05:58,862 - enhanced_signals - INFO - Tỷ lệ risk-reward trung bình cho giao dịch mua: 1.65
+2025-03-07 14:05:58,862 - enhanced_signals - INFO - Tỷ lệ risk-reward trung bình cho giao dịch bán: 1.71
+2025-03-07 14:05:59,953 - enhanced_signals - INFO - Đã lưu biểu đồ phân tích tín hiệu: signal_analysis/signal_analysis_20250307_140558.png
+2025-03-07 14:06:01,188 - enhanced_signals - INFO - Đã lưu biểu đồ chi tiết tín hiệu: signal_analysis/signal_details_20250307_140558.png
+2025-03-07 14:06:01,189 - enhanced_signals - INFO - Hoàn thành xử lý dữ liệu và tạo tín hiệu
+2025-03-07 14:06:01,189 - multi_coin_test - INFO - Chạy backtest cho BTC/USDT (1h)
+2025-03-07 14:06:01,562 - multi_coin_test - INFO - Kết quả backtest cho BTC/USDT (1h):
+2025-03-07 14:06:01,563 - multi_coin_test - INFO - Tổng số giao dịch: 84
+2025-03-07 14:06:01,564 - multi_coin_test - INFO - Win rate: 41.67%
+2025-03-07 14:06:01,565 - multi_coin_test - INFO - Lợi nhuận: 0.03%
+2025-03-07 14:06:01,567 - multi_coin_test - INFO - Max drawdown: 0.12%

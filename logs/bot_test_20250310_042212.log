@@ -1,0 +1,11 @@
+2025-03-10 04:22:12,228 - bot_test - INFO - ===== BẮT ĐẦU KIỂM TRA BOT =====
+2025-03-10 04:22:12,228 - bot_test - INFO - Mức độ rủi ro: 20
+2025-03-10 04:22:12,228 - bot_test - INFO - Thời gian chạy: 30 giây (0.5 phút)
+2025-03-10 04:22:12,229 - bot_test - INFO - Thời gian bắt đầu: 2025-03-10 04:22:12
+2025-03-10 04:22:12,229 - bot_test - INFO - Thời gian kết thúc dự kiến: 2025-03-10 04:22:42
+2025-03-10 04:22:12,229 - bot_test - INFO - Khởi động bot với lệnh: /home/runner/workspace/.pythonlibs/bin/python bot_startup.py --test-mode --risk-level 20
+2025-03-10 04:22:12,229 - bot_test - INFO - Bot đã khởi động với PID: 18852
+2025-03-10 04:22:12,229 - bot_test - INFO - Chờ bot khởi động...
+2025-03-10 04:22:17,230 - bot_test - ERROR - Bot khởi động thất bại với mã trạng thái: 2
+2025-03-10 04:22:17,230 - bot_test - ERROR - Lỗi khi khởi động bot: Không thể khởi động bot
+2025-03-10 04:22:17,230 - bot_test - ERROR - Lỗi không xử lý được: Không thể khởi động bot

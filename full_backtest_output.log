@@ -1,0 +1,41 @@
+2025-03-19 11:34:52,667 - simple_backtest - INFO - === BẮT ĐẦU BACKTEST ĐƠN GIẢN ===
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Số lượng symbols: 1
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Khung thời gian: 1d
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Khoảng thời gian: 6mo
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Số dư ban đầu: $10000
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Mức rủi ro: low
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Rủi ro/Giao dịch: 3.0%
+2025-03-19 11:34:52,667 - simple_backtest - INFO - Đòn bẩy: 3x
+2025-03-19 11:34:52,668 - simple_backtest - INFO - 
+Bắt đầu backtest BTC-USD
+[*********************100%***********************]  1 of 1 completed
+2025-03-19 11:34:52,977 - simple_backtest - INFO - Đã tải 182 dòng dữ liệu cho BTC-USD
+/home/runner/workspace/simple_backtest.py:114: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  curr_price = float(data['Close'].iloc[i])
+/home/runner/workspace/simple_backtest.py:115: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  prev_price = float(data['Close'].iloc[i-1])
+/home/runner/workspace/simple_backtest.py:116: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  prev_prev_price = float(data['Close'].iloc[i-2])
+/home/runner/workspace/simple_backtest.py:119: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  ma20 = float(data['Close'].iloc[i-20:i].mean())
+2025-03-19 11:34:53,059 - simple_backtest - INFO - Tín hiệu LONG cho BTC-USD tại 2024-10-12 00:00:00, giá $63193.02
+2025-03-19 11:34:53,059 - simple_backtest - INFO - Stop Loss: $60237.43, Take Profit: $71074.60
+2025-03-19 11:34:53,059 - simple_backtest - INFO - Kích thước vị thế: 0.1015, Đòn bẩy: 3x
+/home/runner/workspace/simple_backtest.py:164: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  curr_price_j = float(data['Close'].iloc[j])
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Kết quả: take_profit tại 2024-10-29 00:00:00, giá $71074.60
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Lợi nhuận: $2400.00 (37.42%)
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Số dư mới: $12400.00
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Kết quả BTC-USD: 1 giao dịch, Lợi nhuận: $2400.00, Tỷ lệ thắng: 100.00%
+2025-03-19 11:34:53,078 - simple_backtest - INFO - 
+=== KẾT QUẢ BACKTEST ===
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Số lượng giao dịch: 1
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Giao dịch thắng/thua: 1/0
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Tỷ lệ thắng: 100.00%
+2025-03-19 11:34:53,078 - simple_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-19 11:34:53,079 - simple_backtest - INFO - Số dư cuối cùng: $12400.00
+2025-03-19 11:34:53,080 - simple_backtest - INFO - Tổng lợi nhuận: $2400.00 (24.00%)
+2025-03-19 11:34:53,080 - simple_backtest - INFO - 
+=== CHI TIẾT TỪNG SYMBOL ===
+2025-03-19 11:34:53,080 - simple_backtest - INFO - BTC-USD: 1 giao dịch, Lợi nhuận: $2400.00, Tỷ lệ thắng: 100.00%
+YF.download() has changed argument auto_adjust default to True

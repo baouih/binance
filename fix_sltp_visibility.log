@@ -1,0 +1,126 @@
+2025-03-09 08:21:12,120 - fix_visible_sltp - INFO - ===== BẮT ĐẦU SỬA LỆNH SL/TP KHÔNG HIỂN THỊ =====
+2025-03-09 08:21:12,121 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:21:12,121 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:21:12,121 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:21:12,122 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:21:12,122 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:21:12,300 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:21:12,301 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:21:12,301 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:21:12,301 - fix_visible_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 08:21:12,301 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế ETHUSDT LONG ====
+2025-03-09 08:21:12,455 - fix_visible_sltp - INFO - Hủy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 08:21:12,893 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513548881&timestamp=1741508472456&signature=df82526f9c5601ff915a1b438b12d1377d3016213dd108cd16ddf6d631c08d01
+2025-03-09 08:21:12,893 - fix_visible_sltp - INFO - Đã hủy lệnh STOP_MARKET #1513548881
+2025-03-09 08:21:13,805 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513673044&timestamp=1741508473393&signature=3451a71665f752f8f0b1e60d64c615cd309b4ed28d2e87d36f22d4366cb00446
+2025-03-09 08:21:13,805 - fix_visible_sltp - INFO - Đã hủy lệnh STOP_MARKET #1513673044
+2025-03-09 08:21:14,458 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513667845&timestamp=1741508474305&signature=faea0ffd65c7ed6719e8e4ae19f799e865412e96853e929fd692821a8198eae7
+2025-03-09 08:21:14,458 - fix_visible_sltp - INFO - Đã hủy lệnh STOP_MARKET #1513667845
+2025-03-09 08:21:15,389 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513667848&timestamp=1741508474959&signature=a20710a8252a616fc767d9e83bb6dc35b2bd301cfafa9e840985d335073c3f01
+2025-03-09 08:21:15,389 - fix_visible_sltp - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #1513667848
+2025-03-09 08:21:16,325 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513673064&timestamp=1741508475890&signature=bf5e33281afb67bbecd9856e9065f3aa7766aba8477702f2badb72519eb094f3
+2025-03-09 08:21:16,325 - fix_visible_sltp - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #1513673064
+2025-03-09 08:21:17,255 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513548895&timestamp=1741508476826&signature=e77b8643cebc5291800a1e27aaf8016399095d5b3fae8d9ded580660f6d4b46e
+2025-03-09 08:21:17,255 - fix_visible_sltp - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #1513548895
+2025-03-09 08:21:17,912 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2137.75&closePosition=True&timestamp=1741508477755&signature=2f6552ba3f44f4f29c52204d349a2579e2bc0652b4d03d640d8898c817f23ec2
+2025-03-09 08:21:17,912 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho ETHUSDT tại giá 2137.75 với closePosition=True
+2025-03-09 08:21:18,567 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2137.75&closePosition=True&timestamp=1741508478413&signature=954a6ef244aac20eab104fbb898db7ce81e1b58a3e9eee31623c6db86e5f6e0d
+2025-03-09 08:21:18,567 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho ETHUSDT tại giá 2137.75 với closePosition=True
+2025-03-09 08:21:19,227 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2137.75&closePosition=True&timestamp=1741508479067&signature=0aad6c6b14a8066a43f7d3838ecfebe3a4a1f35858c2fb89b1e84d0703e06e26
+2025-03-09 08:21:19,227 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho ETHUSDT tại giá 2137.75 với closePosition=True
+2025-03-09 08:21:19,873 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2246.82&closePosition=True&timestamp=1741508479727&signature=3c402908e84d56c46af1405a1cfbed007cdd87b61d405929f3ae362e2cccac28
+2025-03-09 08:21:19,873 - fix_visible_sltp - INFO - Đã tạo lại lệnh TP cho ETHUSDT tại giá 2246.82 với closePosition=True
+2025-03-09 08:21:20,526 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2246.82&closePosition=True&timestamp=1741508480374&signature=8d1aab77176eeecf97ff945ce5f35472ef3142e92239458d168927bb658cf18e
+2025-03-09 08:21:20,526 - fix_visible_sltp - INFO - Đã tạo lại lệnh TP cho ETHUSDT tại giá 2246.82 với closePosition=True
+2025-03-09 08:21:21,173 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2246.82&closePosition=True&timestamp=1741508481026&signature=b5ad58f435c878d1b760c1a9c662ac02f35d961920e408a1b13df9f79c7fb171
+2025-03-09 08:21:21,173 - fix_visible_sltp - INFO - Đã tạo lại lệnh TP cho ETHUSDT tại giá 2246.82 với closePosition=True
+2025-03-09 08:21:21,674 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế BNBUSDT LONG ====
+2025-03-09 08:21:21,824 - fix_visible_sltp - INFO - Hủy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 08:21:21,966 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BNBUSDT&orderId=481746146&timestamp=1741508481824&signature=68a4e6f33941204221fb7a9371494d88e9accbd813ed4f2fd79e871948cfb6d8
+2025-03-09 08:21:21,967 - fix_visible_sltp - INFO - Đã hủy lệnh STOP_MARKET #481746146
+2025-03-09 08:22:20,512 - fix_visible_sltp - INFO - ===== BẮT ĐẦU SỬA LỆNH SL/TP KHÔNG HIỂN THỊ =====
+2025-03-09 08:22:20,513 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:22:20,513 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:22:20,513 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:22:20,514 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:22:20,514 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:22:20,697 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:22:20,698 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:22:20,698 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:22:20,698 - fix_visible_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 08:22:20,698 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế ETHUSDT LONG ====
+2025-03-09 08:22:20,855 - fix_visible_sltp - INFO - Hủy tất cả lệnh đang mở cho ETHUSDT
+2025-03-09 08:22:21,293 - fix_visible_sltp - INFO - Đã hủy tất cả lệnh cho ETHUSDT
+2025-03-09 08:22:22,445 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2137.75&closePosition=True&timestamp=1741508542293&signature=519907493db3954819c260e36514ad4e4e89dda5b98e0864fba2adc55832e08b
+2025-03-09 08:22:22,446 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho ETHUSDT tại giá 2137.75 với closePosition=True
+2025-03-09 08:22:23,098 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2246.82&closePosition=True&timestamp=1741508542946&signature=b3188c046610c3f0e17e00691263557396f5e34fdba90355f4f7c0394d937e05
+2025-03-09 08:22:23,098 - fix_visible_sltp - INFO - Đã tạo lại lệnh TP cho ETHUSDT tại giá 2246.82 với closePosition=True
+2025-03-09 08:22:23,599 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế BNBUSDT LONG ====
+2025-03-09 08:22:23,758 - fix_visible_sltp - INFO - Hủy tất cả lệnh đang mở cho BNBUSDT
+2025-03-09 08:22:24,196 - fix_visible_sltp - INFO - Đã hủy tất cả lệnh cho BNBUSDT
+2025-03-09 08:22:25,350 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=588.36&closePosition=True&timestamp=1741508545196&signature=933c0f04ef5b51bd918485fde16286df0cd7dd1f74254781ed090967dfd6d57c
+2025-03-09 08:22:25,350 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho BNBUSDT tại giá 588.36 với closePosition=True
+2025-03-09 08:22:26,279 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=618.38&closePosition=True&timestamp=1741508545850&signature=532b0ffa805aeee84546a723e14e693127f17d5403729532a7f48ea8ff1198ec
+2025-03-09 08:22:26,279 - fix_visible_sltp - INFO - Đã tạo lại lệnh TP cho BNBUSDT tại giá 618.38 với closePosition=True
+2025-03-09 08:22:26,779 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế BTCUSDT LONG ====
+2025-03-09 08:22:26,932 - fix_visible_sltp - INFO - Hủy tất cả lệnh đang mở cho BTCUSDT
+2025-03-09 08:22:27,085 - fix_visible_sltp - INFO - Đã hủy tất cả lệnh cho BTCUSDT
+2025-03-09 08:22:28,526 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=83377.61&closePosition=True&timestamp=1741508548085&signature=af46bc96953c6101c32c61e5b731ecff85ca020d3ae141511f734f444942e82e
+2025-03-09 08:22:28,527 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho BTCUSDT tại giá 83377.61 với closePosition=True
+2025-03-09 08:22:29,480 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=84355.78&closePosition=True&timestamp=1741508549027&signature=fa69fc500b0669a76b936ea5999592c208c9bd92223ef34404889db9f5777c10
+2025-03-09 08:22:29,480 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho BTCUSDT tại giá 84355.78 với closePosition=True
+2025-03-09 08:22:30,136 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=83127.93&closePosition=True&timestamp=1741508549981&signature=c98e5714e331fddc8dfc8f585448588d76e957b93c206b8e778ddf50457fb3d7
+2025-03-09 08:22:30,137 - fix_visible_sltp - INFO - Đã tạo lại lệnh SL cho BTCUSDT tại giá 83127.93 với closePosition=True
+2025-03-09 08:24:57,245 - fix_visible_sltp - INFO - ===== BẮT ĐẦU SỬA LỆNH SL/TP KHÔNG HIỂN THỊ =====
+2025-03-09 08:24:57,246 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:24:57,247 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:24:57,247 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:24:57,247 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:24:57,247 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:24:57,431 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:24:57,432 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:24:57,432 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:24:57,432 - fix_visible_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 08:24:57,432 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế ETHUSDT LONG ====
+2025-03-09 08:24:57,867 - fix_visible_sltp - WARNING - ETHUSDT không có lệnh SL/TP nào, tạo mới!
+2025-03-09 08:24:57,868 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:24:57,868 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:24:58,044 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:24:58,045 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:24:58,045 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:24:58,192 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=STOP_MARKET&stopPrice=2137.75&closePosition=true&timestamp=1741508698045&signature=5156a3a4df0bddf21817a3ff6d2848b804703ad55c02eabbdce0097f29c158c1
+2025-03-09 08:24:58,192 - fix_visible_sltp - INFO - Đã tạo lệnh SL mới cho ETHUSDT tại giá 2137.75 với closePosition=True
+2025-03-09 08:24:59,129 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=ETHUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=2246.82&closePosition=true&timestamp=1741508698693&signature=3a4eb9ffb6e5f8630a4392bc31582ab3d0571c7086680fc2c9c36a5065090cb0
+2025-03-09 08:24:59,129 - fix_visible_sltp - INFO - Đã tạo lệnh TP mới cho ETHUSDT tại giá 2246.82 với closePosition=True
+2025-03-09 08:24:59,629 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế BNBUSDT LONG ====
+2025-03-09 08:24:59,784 - fix_visible_sltp - WARNING - BNBUSDT không có lệnh SL/TP nào, tạo mới!
+2025-03-09 08:24:59,784 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:24:59,785 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:25:00,234 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:25:00,234 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:25:00,234 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:25:00,383 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=STOP_MARKET&stopPrice=588.36&closePosition=true&timestamp=1741508700235&signature=43446f703ca8a3bd3c439dffd20a32d326014e88e724f9917b491f8752e18f30
+2025-03-09 08:25:00,383 - fix_visible_sltp - INFO - Đã tạo lệnh SL mới cho BNBUSDT tại giá 588.36 với closePosition=True
+2025-03-09 08:25:01,036 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BNBUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=618.38&closePosition=true&timestamp=1741508700884&signature=315d588208de70b5d686fd31e0143d68e8447d1cd7837df32baea422ba068db1
+2025-03-09 08:25:01,036 - fix_visible_sltp - INFO - Đã tạo lệnh TP mới cho BNBUSDT tại giá 618.38 với closePosition=True
+2025-03-09 08:25:01,536 - fix_visible_sltp - INFO - 
+==== Đang sửa lệnh cho vị thế BTCUSDT LONG ====
+2025-03-09 08:25:01,688 - fix_visible_sltp - WARNING - BTCUSDT không có lệnh SL/TP nào, tạo mới!
+2025-03-09 08:25:01,688 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:25:01,688 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:25:01,848 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:25:01,848 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:25:01,848 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:25:02,000 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=STOP_MARKET&stopPrice=84355.78&closePosition=true&timestamp=1741508701848&signature=97241745f747ffb5ac475ec9dc56f6047a63985b9fd03d867c2e89101abf78bd
+2025-03-09 08:25:02,001 - fix_visible_sltp - INFO - Đã tạo lệnh SL mới cho BTCUSDT tại giá 84355.78 với closePosition=True
+2025-03-09 08:25:02,653 - binance_api - ERROR - API request error: 400 Client Error: Bad Request for url: https://testnet.binancefuture.com/fapi/v1/order?symbol=BTCUSDT&side=SELL&type=TAKE_PROFIT_MARKET&stopPrice=88659.64&closePosition=true&timestamp=1741508702501&signature=0b71573c52c6fd81ea4c3b989726896621e9fe3c15572a292ad9f39d0e35df49
+2025-03-09 08:25:02,654 - fix_visible_sltp - INFO - Đã tạo lệnh TP mới cho BTCUSDT tại giá 88659.64 với closePosition=True
+2025-03-09 08:25:03,154 - fix_visible_sltp - INFO - 
+===== KẾT THÚC: Đã sửa 3/3 vị thế =====

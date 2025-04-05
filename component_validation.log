@@ -1,0 +1,168 @@
+2025-03-10 13:44:46,403 - component_validation - INFO - ========== BẮT ĐẦU KIỂM TRA TOÀN DIỆN ==========
+2025-03-10 13:44:46,419 - component_validation - INFO - ===== KIỂM TRA CÁC FILE CẦN THIẾT =====
+2025-03-10 13:44:46,419 - component_validation - INFO - Giao diện chính: ✅ TỒN TẠI
+2025-03-10 13:44:46,419 - component_validation - INFO - Entry point: ✅ TỒN TẠI
+2025-03-10 13:44:46,419 - component_validation - INFO - Đóng gói exe: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - Phân tích thị trường: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - Quản lý vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - Quản lý rủi ro: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - Cập nhật tự động: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - Cấu hình môi trường mẫu: ✅ TỒN TẠI
+2025-03-10 13:44:46,420 - component_validation - INFO - ===== KIỂM TRA THÀNH PHẦN GIAO DIỆN =====
+2025-03-10 13:44:46,421 - component_validation - INFO - Khởi tạo UI: ✅ TỒN TẠI
+2025-03-10 13:44:46,421 - component_validation - INFO - Tab Tổng quan: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,421 - component_validation - INFO - Tab Giao dịch: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,421 - component_validation - INFO - Tab Quản lý vị thế: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,421 - component_validation - INFO - Tab Phân tích thị trường: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,421 - component_validation - INFO - Tab Cài đặt: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,422 - component_validation - INFO - Cập nhật thị trường: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,422 - component_validation - INFO - Mở vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Đóng vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Cập nhật SL/TP: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,422 - component_validation - INFO - Phân tích kỹ thuật: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Cấu hình API: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Cấu hình Telegram: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Cấu hình rủi ro: ✅ TỒN TẠI
+2025-03-10 13:44:46,422 - component_validation - INFO - Kiểm tra cập nhật: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,422 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG API =====
+2025-03-10 13:44:46,427 - component_validation - INFO - Kết nối Binance API: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Lấy dữ liệu thị trường: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Lấy dữ liệu lịch sử: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Lấy thông tin tài khoản: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Mở vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Đóng vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Cập nhật SL/TP: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Lấy danh sách vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Tính toán chỉ báo kỹ thuật: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - Phân tích cơ hội giao dịch: ✅ TỒN TẠI
+2025-03-10 13:44:46,427 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG CẬP NHẬT TỰ ĐỘNG =====
+2025-03-10 13:44:46,428 - component_validation - INFO - Kiểm tra phiên bản: ✅ TỒN TẠI
+2025-03-10 13:44:46,428 - component_validation - INFO - Tải bản cập nhật: ✅ TỒN TẠI
+2025-03-10 13:44:46,428 - component_validation - INFO - Cài đặt cập nhật: ✅ TỒN TẠI
+2025-03-10 13:44:46,428 - component_validation - INFO - Khởi động sau cập nhật: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,429 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG ĐÓNG GÓI EXE =====
+2025-03-10 13:44:46,432 - component_validation - INFO - PyInstaller config: ✅ TỒN TẠI
+2025-03-10 13:44:46,432 - component_validation - INFO - Icon included: ✅ TỒN TẠI
+2025-03-10 13:44:46,432 - component_validation - INFO - Include resources: ✅ TỒN TẠI
+2025-03-10 13:44:46,432 - component_validation - INFO - One-file option: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,432 - component_validation - INFO - Splash screen: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:46,432 - component_validation - INFO - ===== KIỂM TRA TÍCH HỢP TELEGRAM =====
+2025-03-10 13:44:46,435 - component_validation - INFO - Cấu hình Telegram được tìm thấy trong .env.example
+2025-03-10 13:44:46,435 - component_validation - INFO - Gửi thông báo: ✅ TỒN TẠI
+2025-03-10 13:44:46,436 - component_validation - INFO - Định dạng tin nhắn: ✅ TỒN TẠI
+2025-03-10 13:44:46,436 - component_validation - INFO - Thông báo vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - Thông báo cơ hội: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - Thông báo lỗi: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - ===== KIỂM TRA TÀI LIỆU HƯỚNG DẪN =====
+2025-03-10 13:44:46,437 - component_validation - INFO - README desktop: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - Hướng dẫn sử dụng: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - Hướng dẫn exe: ✅ TỒN TẠI
+2025-03-10 13:44:46,437 - component_validation - INFO - README telegram: ✅ TỒN TẠI
+2025-03-10 13:44:46,438 - component_validation - INFO - ========== KẾT QUẢ KIỂM TRA TOÀN DIỆN ==========
+2025-03-10 13:44:46,438 - component_validation - INFO - required_files: 8/8 (100.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - gui_components: 7/15 (46.7%)
+2025-03-10 13:44:46,438 - component_validation - INFO - api_functions: 10/10 (100.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - auto_update: 3/4 (75.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - exe_packaging: 3/5 (60.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - telegram: 5/5 (100.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - documentation: 4/4 (100.0%)
+2025-03-10 13:44:46,438 - component_validation - INFO - Tổng thể: 40/51 (78.4%)
+2025-03-10 13:44:46,438 - component_validation - INFO - ========== CÁC MỤC CẦN BỔ SUNG ==========
+2025-03-10 13:44:46,438 - component_validation - INFO - ❌ gui_components: Tab Tổng quan
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Tab Giao dịch
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Tab Quản lý vị thế
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Tab Phân tích thị trường
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Tab Cài đặt
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Cập nhật thị trường
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Cập nhật SL/TP
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ gui_components: Kiểm tra cập nhật
+2025-03-10 13:44:46,439 - component_validation - INFO - ❌ auto_update: Khởi động sau cập nhật
+2025-03-10 13:44:46,440 - component_validation - INFO - ❌ exe_packaging: One-file option
+2025-03-10 13:44:46,440 - component_validation - INFO - ❌ exe_packaging: Splash screen
+2025-03-10 13:44:46,447 - component_validation - INFO - Đã lưu kết quả kiểm tra vào component_validation_result.json
+2025-03-10 13:44:46,447 - component_validation - INFO - Đã lưu lịch sử kiểm tra vào component_validation_history.json
+2025-03-10 13:44:46,447 - component_validation - WARNING - ⚠️⚠️⚠️ KIỂM TRA KHÔNG ĐẠT: Cần bổ sung một số thành phần ⚠️⚠️⚠️
+2025-03-10 13:44:53,043 - component_validation - INFO - ========== BẮT ĐẦU KIỂM TRA TOÀN DIỆN ==========
+2025-03-10 13:44:53,044 - component_validation - INFO - ===== KIỂM TRA CÁC FILE CẦN THIẾT =====
+2025-03-10 13:44:53,046 - component_validation - INFO - Giao diện chính: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Entry point: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Đóng gói exe: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Phân tích thị trường: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Quản lý vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Quản lý rủi ro: ✅ TỒN TẠI
+2025-03-10 13:44:53,046 - component_validation - INFO - Cập nhật tự động: ✅ TỒN TẠI
+2025-03-10 13:44:53,047 - component_validation - INFO - Cấu hình môi trường mẫu: ✅ TỒN TẠI
+2025-03-10 13:44:53,047 - component_validation - INFO - ===== KIỂM TRA THÀNH PHẦN GIAO DIỆN =====
+2025-03-10 13:44:53,047 - component_validation - INFO - Khởi tạo UI: ✅ TỒN TẠI
+2025-03-10 13:44:53,048 - component_validation - INFO - Tab Tổng quan: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Tab Giao dịch: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Tab Quản lý vị thế: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Tab Phân tích thị trường: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Tab Cài đặt: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Cập nhật thị trường: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Mở vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,048 - component_validation - INFO - Đóng vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,048 - component_validation - INFO - Cập nhật SL/TP: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,048 - component_validation - INFO - Phân tích kỹ thuật: ✅ TỒN TẠI
+2025-03-10 13:44:53,049 - component_validation - INFO - Cấu hình API: ✅ TỒN TẠI
+2025-03-10 13:44:53,049 - component_validation - INFO - Cấu hình Telegram: ✅ TỒN TẠI
+2025-03-10 13:44:53,049 - component_validation - INFO - Cấu hình rủi ro: ✅ TỒN TẠI
+2025-03-10 13:44:53,049 - component_validation - INFO - Kiểm tra cập nhật: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,049 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG API =====
+2025-03-10 13:44:53,050 - component_validation - INFO - Kết nối Binance API: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Lấy dữ liệu thị trường: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Lấy dữ liệu lịch sử: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Lấy thông tin tài khoản: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Mở vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Đóng vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Cập nhật SL/TP: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Lấy danh sách vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Tính toán chỉ báo kỹ thuật: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - Phân tích cơ hội giao dịch: ✅ TỒN TẠI
+2025-03-10 13:44:53,050 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG CẬP NHẬT TỰ ĐỘNG =====
+2025-03-10 13:44:53,051 - component_validation - INFO - Kiểm tra phiên bản: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - Tải bản cập nhật: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - Cài đặt cập nhật: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - Khởi động sau cập nhật: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,051 - component_validation - INFO - ===== KIỂM TRA CHỨC NĂNG ĐÓNG GÓI EXE =====
+2025-03-10 13:44:53,051 - component_validation - INFO - PyInstaller config: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - Icon included: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - Include resources: ✅ TỒN TẠI
+2025-03-10 13:44:53,051 - component_validation - INFO - One-file option: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,052 - component_validation - INFO - Splash screen: ❌ KHÔNG TÌM THẤY
+2025-03-10 13:44:53,052 - component_validation - INFO - ===== KIỂM TRA TÍCH HỢP TELEGRAM =====
+2025-03-10 13:44:53,055 - component_validation - INFO - Cấu hình Telegram được tìm thấy trong .env.example
+2025-03-10 13:44:53,055 - component_validation - INFO - Gửi thông báo: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Định dạng tin nhắn: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Thông báo vị thế: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Thông báo cơ hội: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Thông báo lỗi: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - ===== KIỂM TRA TÀI LIỆU HƯỚNG DẪN =====
+2025-03-10 13:44:53,055 - component_validation - INFO - README desktop: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Hướng dẫn sử dụng: ✅ TỒN TẠI
+2025-03-10 13:44:53,055 - component_validation - INFO - Hướng dẫn exe: ✅ TỒN TẠI
+2025-03-10 13:44:53,056 - component_validation - INFO - README telegram: ✅ TỒN TẠI
+2025-03-10 13:44:53,056 - component_validation - INFO - ========== KẾT QUẢ KIỂM TRA TOÀN DIỆN ==========
+2025-03-10 13:44:53,056 - component_validation - INFO - required_files: 8/8 (100.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - gui_components: 7/15 (46.7%)
+2025-03-10 13:44:53,056 - component_validation - INFO - api_functions: 10/10 (100.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - auto_update: 3/4 (75.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - exe_packaging: 3/5 (60.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - telegram: 5/5 (100.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - documentation: 4/4 (100.0%)
+2025-03-10 13:44:53,056 - component_validation - INFO - Tổng thể: 40/51 (78.4%)
+2025-03-10 13:44:53,056 - component_validation - INFO - ========== CÁC MỤC CẦN BỔ SUNG ==========
+2025-03-10 13:44:53,056 - component_validation - INFO - ❌ gui_components: Tab Tổng quan
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Tab Giao dịch
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Tab Quản lý vị thế
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Tab Phân tích thị trường
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Tab Cài đặt
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Cập nhật thị trường
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Cập nhật SL/TP
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ gui_components: Kiểm tra cập nhật
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ auto_update: Khởi động sau cập nhật
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ exe_packaging: One-file option
+2025-03-10 13:44:53,057 - component_validation - INFO - ❌ exe_packaging: Splash screen
+2025-03-10 13:44:53,065 - component_validation - INFO - Đã lưu kết quả kiểm tra vào component_validation_result.json
+2025-03-10 13:44:53,065 - component_validation - INFO - Đã lưu lịch sử kiểm tra vào component_validation_history.json
+2025-03-10 13:44:53,065 - component_validation - WARNING - ⚠️⚠️⚠️ KIỂM TRA KHÔNG ĐẠT: Cần bổ sung một số thành phần ⚠️⚠️⚠️

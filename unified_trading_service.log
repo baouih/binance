@@ -1,0 +1,22 @@
+2025-03-13 04:25:40,516 - unified_service - INFO - ===== Khởi động dịch vụ hợp nhất =====
+2025-03-13 04:25:40,517 - unified_service - INFO - Đã lưu PID 2856 vào unified_trading_service.pid
+2025-03-13 04:25:40,665 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:25:40,665 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:25:40,665 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Auto SLTP với chu kỳ 30 giây
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Trailing Stop với chu kỳ 15 giây
+2025-03-13 04:25:40,666 - unified_service - INFO - Đã kích hoạt dịch vụ Market Monitor với chu kỳ 60 giây
+2025-03-13 04:25:41,291 - position_manager - INFO - Đã import thành công thư viện Binance
+2025-03-13 04:25:41,291 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-13 04:25:41,292 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-13 04:25:41,292 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-13 04:25:41,292 - unified_service - INFO - Đã khởi tạo Binance API client với chế độ: testnet
+2025-03-13 04:25:41,641 - position_manager - INFO - Thời gian máy chủ Binance: 2025-03-13 04:25:41.569000
+2025-03-13 04:25:41,643 - position_manager - INFO - Đã kết nối thành công với Binance API
+2025-03-13 04:25:41,643 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:25:41,643 - unified_service - INFO - Đã khởi tạo Position Manager
+2025-03-13 04:25:41,823 - unified_service - INFO - Không có vị thế nào đang hoạt động
+2025-03-13 04:25:41,824 - unified_service - INFO - Quét cơ hội giao dịch ban đầu khi khởi động...
+2025-03-13 04:25:41,825 - unified_service - INFO - Đang quét cơ hội giao dịch...
+2025-03-13 04:25:42,204 - market_analyzer - INFO - Đã import thành công các thư viện phân tích

@@ -1,0 +1,209 @@
+[
+    {
+        "timestamp": "2025-03-06 08:32:24",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 94982.3,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "Kh\u00f4ng c\u00f3 \u0111i\u1ec3m long (\u0111i\u1ec3m: 0)",
+                "importance": "high"
+            },
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (0)",
+                "importance": "medium"
+            },
+            {
+                "category": "technical_indicators",
+                "reason": "Kh\u00f4ng c\u00f3 \u0111i\u1ec3m v\u00e0o cho long",
+                "importance": "high"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (36.15%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 08:32:31",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 95336.5,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m short qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (36.15%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 08:45:14",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 93019.6,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (37.10%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 08:45:20",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 93579.4,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m short qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (37.10%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 09:12:45",
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "price": 90090.0,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (8.12%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 09:12:47",
+        "symbol": "BTCUSDT",
+        "timeframe": "15m",
+        "price": 91326.5,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (22.68%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 09:12:50",
+        "symbol": "BTCUSDT",
+        "timeframe": "4h",
+        "price": 92199.9,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (19.99%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-06 09:13:01",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 90000.0,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "\u0110i\u1ec3m long qu\u00e1 th\u1ea5p (25)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Bi\u1ebfn \u0111\u1ed9ng qu\u00e1 cao (32.51%)",
+                "importance": "medium"
+            },
+            {
+                "category": "volatility",
+                "reason": "Kh\u00f4ng \u0111\u1ee7 l\u00fd do v\u00e0o l\u1ec7nh trong th\u1ecb tr\u01b0\u1eddng bi\u1ebfn \u0111\u1ed9ng cao",
+                "importance": "medium"
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-03-09 04:07:44",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "price": 85764.1,
+        "reasons": [
+            {
+                "category": "technical_indicators",
+                "reason": "L\u1ed7i khi ph\u00e2n t\u00edch: Kh\u00f4ng \u0111\u1ee7 d\u1eef li\u1ec7u",
+                "importance": "high"
+            }
+        ]
+    }
+]

@@ -1,0 +1,182 @@
+2025-03-01 14:55:05,161 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:05,162 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:55:07,413 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:07,419 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:55:09,465 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:09,466 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:55:11,312 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:11,313 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:55:13,256 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:13,257 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:55:15,220 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:55:15,222 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:16,404 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:16,408 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:18,447 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:18,448 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:20,009 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:20,009 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:21,697 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:21,698 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:23,689 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:23,690 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:25,328 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:25,329 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:26,895 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:26,896 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+
+2025-03-01 14:58:46,907 - enhanced_backtest - ERROR - Lỗi khi import modules: No module named 'binance_api'
+2025-03-01 14:58:46,909 - enhanced_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 49, in <module>
+    from order_execution import OrderExecutionFactory
+ImportError: cannot import name 'OrderExecutionFactory' from 'order_execution' (/home/runner/workspace/order_execution.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/enhanced_backtest.py", line 53, in <module>
+    from binance_api import BinanceAPI
+ModuleNotFoundError: No module named 'binance_api'
+

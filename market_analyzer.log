@@ -1,0 +1,64 @@
+2025-03-12 01:50:31,403 - market_analyzer - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 01:50:31,403 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 01:50:31,403 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 01:50:31,898 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 01:50:32,069 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 01:50:32,508 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 01:50:32.434000
+2025-03-12 01:50:32,508 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 01:50:32,509 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 01:50:32,509 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 01:50:33,000 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 01:50:33,001 - market_analyzer - INFO - Đã khởi tạo Market Analyzer Activator
+2025-03-12 01:50:33,001 - market_analyzer - INFO - Bắt đầu phân tích thị trường...
+2025-03-12 01:50:33,001 - enhanced_binance_api - ERROR - Lỗi khi lấy thông tin ticker 24h: 'Client' object has no attribute 'futures_ticker_24hr'
+2025-03-12 01:50:33,001 - enhanced_binance_api - WARNING - Không lấy được thông tin ticker 24h
+2025-03-12 01:50:33,001 - market_analysis_system - WARNING - Không lấy được tổng quan thị trường
+2025-03-12 01:50:33,001 - market_analyzer - WARNING - Không thể phân tích thị trường
+2025-03-12 05:55:05,594 - market_analyzer - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 05:55:05,594 - market_analyzer - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 05:55:05,595 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 05:55:05,595 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 05:55:05,595 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 05:55:05,595 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 05:55:06,088 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 05:55:06,088 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 05:55:06,257 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 05:55:06,257 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 05:55:06,409 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 05:55:06.336000
+2025-03-12 05:55:06,409 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 05:55:06.336000
+2025-03-12 05:55:06,410 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 05:55:06,410 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 05:55:06,410 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 05:55:06,410 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 05:55:06,410 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 05:55:06,410 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 05:55:06,897 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 05:55:06,897 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 05:55:06,897 - market_analyzer - INFO - Đã khởi tạo Market Analyzer Activator
+2025-03-12 05:55:06,897 - market_analyzer - INFO - Đã khởi tạo Market Analyzer Activator
+2025-03-12 05:55:06,897 - market_analyzer - INFO - Bắt đầu phân tích thị trường...
+2025-03-12 05:55:06,897 - market_analyzer - INFO - Bắt đầu phân tích thị trường...
+2025-03-12 05:55:09,065 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:09,065 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:09,066 - market_analysis_system - INFO - Đã lưu kết quả phân tích thị trường vào market_overview.json
+2025-03-12 05:55:09,066 - market_analysis_system - INFO - Đã lưu kết quả phân tích thị trường vào market_overview.json
+2025-03-12 05:55:09,066 - market_analyzer - INFO - Đã phân tích thị trường: BTC = $81,643.70
+2025-03-12 05:55:09,066 - market_analyzer - INFO - Đã phân tích thị trường: BTC = $81,643.70
+2025-03-12 05:55:09,067 - market_analysis_system - INFO - Đang quét cơ hội cho BTCUSDT...
+2025-03-12 05:55:09,067 - market_analysis_system - INFO - Đang quét cơ hội cho BTCUSDT...
+2025-03-12 05:55:09,570 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:09,570 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:09,571 - market_analysis_system - INFO - Đang quét cơ hội cho ETHUSDT...
+2025-03-12 05:55:09,571 - market_analysis_system - INFO - Đang quét cơ hội cho ETHUSDT...
+2025-03-12 05:55:10,546 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:10,546 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:10,546 - market_analysis_system - INFO - Đang quét cơ hội cho BNBUSDT...
+2025-03-12 05:55:10,546 - market_analysis_system - INFO - Đang quét cơ hội cho BNBUSDT...
+2025-03-12 05:55:12,097 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:12,097 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 05:55:12,097 - market_analysis_system - INFO - Đang quét cơ hội cho ADAUSDT...
+2025-03-12 05:55:12,097 - market_analysis_system - INFO - Đang quét cơ hội cho ADAUSDT...
+2025-03-12 05:55:13,087 - market_analysis_system - INFO - Đã lưu kết quả phân tích vào market_analysis_adausdt.json
+2025-03-12 05:55:13,087 - market_analysis_system - INFO - Đã lưu kết quả phân tích vào market_analysis_adausdt.json
+2025-03-12 05:55:13,087 - market_analysis_system - INFO - Đang quét cơ hội cho SOLUSDT...
+2025-03-12 05:55:13,087 - market_analysis_system - INFO - Đang quét cơ hội cho SOLUSDT...

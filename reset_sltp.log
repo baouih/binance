@@ -1,0 +1,91 @@
+2025-03-09 07:48:20,419 - reset_sltp - INFO - Bắt đầu reset SL/TP cho tất cả các vị thế...
+2025-03-09 07:48:20,420 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:48:20,420 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:48:20,420 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:48:20,592 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:48:20,592 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:48:20,592 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:48:20,592 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:48:20,592 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:48:20,592 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:48:20,592 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:48:20,592 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:48:20,759 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:48:21,533 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:48:21,533 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:48:21,533 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:48:21,533 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:48:21,697 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:48:21,697 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:48:21,697 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:48:21,697 - reset_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 07:48:21,698 - reset_sltp - INFO - Đang reset SL/TP cho ETHUSDT với số lượng 0.124
+2025-03-09 07:48:21,698 - auto_sltp_manager - WARNING - Không tìm thấy vị thế ETHUSDT đang mở
+2025-03-09 07:48:21,698 - reset_sltp - ERROR - Không thể thiết lập lại SL/TP cho ETHUSDT
+2025-03-09 07:48:22,698 - reset_sltp - INFO - Đang reset SL/TP cho BNBUSDT với số lượng 0.45
+2025-03-09 07:48:22,698 - auto_sltp_manager - WARNING - Không tìm thấy vị thế BNBUSDT đang mở
+2025-03-09 07:48:22,698 - reset_sltp - ERROR - Không thể thiết lập lại SL/TP cho BNBUSDT
+2025-03-09 07:48:23,698 - reset_sltp - INFO - Đang reset SL/TP cho BTCUSDT với số lượng 0.009
+2025-03-09 07:48:23,699 - auto_sltp_manager - WARNING - Không tìm thấy vị thế BTCUSDT đang mở
+2025-03-09 07:48:23,699 - reset_sltp - ERROR - Không thể thiết lập lại SL/TP cho BTCUSDT
+2025-03-09 07:48:24,699 - reset_sltp - INFO - Hoàn thành: đã reset 0/3 vị thế
+2025-03-09 07:48:48,119 - reset_sltp - INFO - Bắt đầu reset SL/TP cho tất cả các vị thế...
+2025-03-09 07:48:48,119 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 07:48:48,119 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 07:48:48,120 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 07:48:48,286 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 07:48:48,286 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 07:48:48,287 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 07:48:48,287 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 07:48:48,287 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 07:48:48,287 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 07:48:48,287 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 07:48:48,287 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:48:48,458 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:48:49,251 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:48:49,251 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 07:48:49,252 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 07:48:49,252 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 07:48:49,427 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 07:48:49,428 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 07:48:49,428 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 07:48:49,428 - reset_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 07:48:49,428 - reset_sltp - INFO - Đang reset SL/TP cho ETHUSDT với số lượng 0.124
+2025-03-09 07:48:49,579 - auto_sltp_manager - INFO - Tìm thấy 2 lệnh SL và 2 lệnh TP cho ETHUSDT
+2025-03-09 07:48:49,731 - auto_sltp_manager - INFO - Tìm thấy 2 lệnh SL và 2 lệnh TP cho ETHUSDT
+2025-03-09 07:48:49,880 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513548881&timestamp=1741506529731&signature=528f13032f6a39277cba0752a1de917b194dfa55496071941e56fec5c927565f
+2025-03-09 07:48:49,880 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #1513548881 cho ETHUSDT
+2025-03-09 07:48:50,029 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513667845&timestamp=1741506529880&signature=646d2c78748bd1edfc42b8eb0537ad24b6a7804d7496cc2f911252207377862b
+2025-03-09 07:48:50,029 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #1513667845 cho ETHUSDT
+2025-03-09 07:48:50,466 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513667848&timestamp=1741506530029&signature=cd49d1e757d878b8089dea7c83315468401fd9d51e06b214e392a02ed1cb31e1
+2025-03-09 07:48:50,467 - auto_sltp_manager - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #1513667848 cho ETHUSDT
+2025-03-09 07:48:50,617 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=ETHUSDT&orderId=1513548895&timestamp=1741506530467&signature=b54ac038e50591e244944aaa55c21ccff1ee859b5f9e82fb64bd9f8b71f769da
+2025-03-09 07:48:50,617 - auto_sltp_manager - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #1513548895 cho ETHUSDT
+2025-03-09 07:48:50,769 - auto_sltp_manager - INFO - Đã đặt SL cho ETHUSDT LONG tại giá 2137.75, số lượng 0.124
+2025-03-09 07:48:51,198 - auto_sltp_manager - INFO - Đã đặt TP cho ETHUSDT LONG tại giá 2246.82, số lượng 0.124
+2025-03-09 07:48:51,967 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:48:51,968 - sltp_telegram_integration - INFO - Đã gửi thông báo thiết lập SL/TP cho ETHUSDT tới Telegram
+2025-03-09 07:48:51,968 - reset_sltp - INFO - Đã thiết lập lại SL/TP cho ETHUSDT thành công
+2025-03-09 07:48:52,968 - reset_sltp - INFO - Đang reset SL/TP cho BNBUSDT với số lượng 0.45
+2025-03-09 07:48:53,121 - auto_sltp_manager - INFO - Tìm thấy 2 lệnh SL và 2 lệnh TP cho BNBUSDT
+2025-03-09 07:48:53,564 - auto_sltp_manager - INFO - Tìm thấy 2 lệnh SL và 2 lệnh TP cho BNBUSDT
+2025-03-09 07:48:53,715 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BNBUSDT&orderId=481746146&timestamp=1741506533564&signature=065e16c69d8d24d289218c9dc348a9344ef5bc6cb888fb877353d903d3d87af5
+2025-03-09 07:48:53,715 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #481746146 cho BNBUSDT
+2025-03-09 07:48:53,866 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BNBUSDT&orderId=481745889&timestamp=1741506533715&signature=e895d0ace1fff5f68e39d9d84da488bd8b06ef2db5f329041ec2984bfad05c0f
+2025-03-09 07:48:53,866 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #481745889 cho BNBUSDT
+2025-03-09 07:48:54,017 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BNBUSDT&orderId=481745890&timestamp=1741506533866&signature=a670d8798102d5e25da3d8d0d09b67a858ba10ac3ada6d88c9824bd747ddcb60
+2025-03-09 07:48:54,017 - auto_sltp_manager - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #481745890 cho BNBUSDT
+2025-03-09 07:48:54,458 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BNBUSDT&orderId=481746147&timestamp=1741506534017&signature=94222ca84829d332578544b7a988fd883da7232ce5c654a210afb1214bf418c8
+2025-03-09 07:48:54,458 - auto_sltp_manager - INFO - Đã hủy lệnh TAKE_PROFIT_MARKET #481746147 cho BNBUSDT
+2025-03-09 07:48:54,613 - auto_sltp_manager - INFO - Đã đặt SL cho BNBUSDT LONG tại giá 588.36, số lượng 0.45
+2025-03-09 07:48:54,765 - auto_sltp_manager - INFO - Đã đặt TP cho BNBUSDT LONG tại giá 618.38, số lượng 0.45
+2025-03-09 07:48:55,585 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 07:48:55,585 - sltp_telegram_integration - INFO - Đã gửi thông báo thiết lập SL/TP cho BNBUSDT tới Telegram
+2025-03-09 07:48:55,585 - reset_sltp - INFO - Đã thiết lập lại SL/TP cho BNBUSDT thành công
+2025-03-09 07:48:56,586 - reset_sltp - INFO - Đang reset SL/TP cho BTCUSDT với số lượng 0.009
+2025-03-09 07:48:56,737 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 07:48:57,164 - auto_sltp_manager - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 07:48:57,595 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BTCUSDT&orderId=4110627605&timestamp=1741506537164&signature=808b9018218ab5bcb0ba72d0030d8ebb7849bdd24f023bb7eec6468abf1fa274
+2025-03-09 07:48:57,595 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #4110627605 cho BTCUSDT
+2025-03-09 07:48:58,020 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/order?symbol=BTCUSDT&orderId=4110627931&timestamp=1741506537595&signature=afd8ca19cfbfb3884ae76821d04cfa3006bb6178a85565d69aadc3c5eff97f2d
+2025-03-09 07:48:58,020 - auto_sltp_manager - INFO - Đã hủy lệnh STOP_MARKET #4110627931 cho BTCUSDT

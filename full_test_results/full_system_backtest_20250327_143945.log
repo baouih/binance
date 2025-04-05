@@ -1,0 +1,86 @@
+2025-03-27 14:39:45,152 - full_system_backtest - INFO - Bắt đầu backtest toàn diện hệ thống lúc: 2025-03-27 14:39:45.152433
+2025-03-27 14:39:45,503 - full_system_backtest - INFO - Trạng thái hệ thống Binance: {'status': 0, 'msg': 'normal'}
+2025-03-27 14:39:45,855 - full_system_backtest - INFO - Kết nối với Binance API thành công.
+2025-03-27 14:39:45,855 - full_system_backtest - INFO - BẮT ĐẦU BACKTEST TOÀN DIỆN HỆ THỐNG
+2025-03-27 14:39:45,855 - full_system_backtest - INFO - Số lượng symbols: 10
+2025-03-27 14:39:45,856 - full_system_backtest - INFO - Số lượng timeframes: 3
+2025-03-27 14:39:45,856 - full_system_backtest - INFO - Số lượng chiến thuật: 5
+2025-03-27 14:39:45,856 - full_system_backtest - INFO - Tổng số cấu hình cần test: 30
+2025-03-27 14:39:45,856 - full_system_backtest - INFO - Test symbol BTC-USD với 6mo dữ liệu trên khung 1h
+2025-03-27 14:39:46,155 - full_system_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1h, 180 ngày)
+2025-03-27 14:39:48,155 - full_system_backtest - INFO - Đã tải 4321 dòng dữ liệu
+2025-03-27 14:39:48,366 - full_system_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:39:49,238 - full_system_backtest - INFO - Đã phát hiện 97 tín hiệu phân kỳ RSI
+2025-03-27 14:39:49,751 - full_system_backtest - INFO - Đã tạo 529 tín hiệu cho chiến thuật ma_crossover (BTC-USD, 1h)
+2025-03-27 14:39:49,754 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật sideways_market (BTC-USD, 1h)
+2025-03-27 14:39:49,763 - full_system_backtest - INFO - Đã tạo 97 tín hiệu cho chiến thuật rsi_divergence (BTC-USD, 1h)
+2025-03-27 14:39:49,940 - full_system_backtest - INFO - Đã tạo 159 tín hiệu cho chiến thuật bollinger_breakout (BTC-USD, 1h)
+2025-03-27 14:39:49,943 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật multi_timeframe (BTC-USD, 1h)
+2025-03-27 14:39:49,944 - full_system_backtest - INFO - Đã lọc từ 785 xuống còn 296 tín hiệu
+2025-03-27 14:39:49,964 - full_system_backtest - INFO - Đã áp dụng quản lý rủi ro cho 296 tín hiệu
+2025-03-27 14:39:50,501 - full_system_backtest - INFO - 
+=== KẾT QUẢ BACKTEST TỔNG THỂ ===
+2025-03-27 14:39:50,501 - full_system_backtest - INFO - Số giao dịch: 233
+2025-03-27 14:39:50,501 - full_system_backtest - INFO - Giao dịch thắng/thua: 165/68
+2025-03-27 14:39:50,501 - full_system_backtest - INFO - Tỷ lệ thắng: 70.82%
+2025-03-27 14:39:50,502 - full_system_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:39:50,502 - full_system_backtest - INFO - Số dư cuối cùng: $11035.95
+2025-03-27 14:39:50,502 - full_system_backtest - INFO - Tổng lợi nhuận: $1035.95 (10.36%)
+2025-03-27 14:39:50,502 - full_system_backtest - INFO - Drawdown tối đa: $79.83 (0.77%)
+2025-03-27 14:39:50,517 - full_system_backtest - INFO - Hoàn thành test cho BTC-USD (1h, 6mo)
+2025-03-27 14:39:50,517 - full_system_backtest - INFO - Tổng giao dịch: 233, Win rate: 70.82%, Lợi nhuận: 10.36%
+2025-03-27 14:39:50,519 - full_system_backtest - INFO - Test symbol BTC-USD với 6mo dữ liệu trên khung 4h
+2025-03-27 14:39:50,682 - full_system_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (4h, 180 ngày)
+2025-03-27 14:39:51,157 - full_system_backtest - INFO - Đã tải 1081 dòng dữ liệu
+2025-03-27 14:39:51,224 - full_system_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:39:51,397 - full_system_backtest - INFO - Đã phát hiện 16 tín hiệu phân kỳ RSI
+2025-03-27 14:39:51,529 - full_system_backtest - INFO - Đã tạo 116 tín hiệu cho chiến thuật ma_crossover (BTC-USD, 4h)
+2025-03-27 14:39:51,531 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật sideways_market (BTC-USD, 4h)
+2025-03-27 14:39:51,533 - full_system_backtest - INFO - Đã tạo 16 tín hiệu cho chiến thuật rsi_divergence (BTC-USD, 4h)
+2025-03-27 14:39:51,578 - full_system_backtest - INFO - Đã tạo 32 tín hiệu cho chiến thuật bollinger_breakout (BTC-USD, 4h)
+2025-03-27 14:39:51,579 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật multi_timeframe (BTC-USD, 4h)
+2025-03-27 14:39:51,580 - full_system_backtest - INFO - Đã lọc từ 164 xuống còn 113 tín hiệu
+2025-03-27 14:39:51,591 - full_system_backtest - INFO - Đã áp dụng quản lý rủi ro cho 113 tín hiệu
+2025-03-27 14:39:51,706 - full_system_backtest - INFO - 
+=== KẾT QUẢ BACKTEST TỔNG THỂ ===
+2025-03-27 14:39:51,706 - full_system_backtest - INFO - Số giao dịch: 98
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Giao dịch thắng/thua: 70/28
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Tỷ lệ thắng: 71.43%
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Số dư ban đầu: $10000.00
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Số dư cuối cùng: $10247.66
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Tổng lợi nhuận: $247.66 (2.48%)
+2025-03-27 14:39:51,707 - full_system_backtest - INFO - Drawdown tối đa: $155.16 (1.51%)
+2025-03-27 14:39:51,715 - full_system_backtest - INFO - Hoàn thành test cho BTC-USD (4h, 6mo)
+2025-03-27 14:39:51,715 - full_system_backtest - INFO - Tổng giao dịch: 98, Win rate: 71.43%, Lợi nhuận: 2.48%
+2025-03-27 14:39:51,716 - full_system_backtest - INFO - Test symbol BTC-USD với 6mo dữ liệu trên khung 1d
+2025-03-27 14:39:51,871 - full_system_backtest - INFO - Tải dữ liệu BTCUSDT từ Binance (1d, 180 ngày)
+2025-03-27 14:39:52,185 - full_system_backtest - INFO - Đã tải 181 dòng dữ liệu
+2025-03-27 14:39:52,208 - full_system_backtest - INFO - Đã phát hiện 0 giai đoạn thị trường đi ngang
+2025-03-27 14:39:52,210 - full_system_backtest - INFO - Đã phát hiện 0 tín hiệu phân kỳ RSI
+2025-03-27 14:39:52,215 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật ma_crossover (BTC-USD, 1d)
+2025-03-27 14:39:52,216 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật sideways_market (BTC-USD, 1d)
+2025-03-27 14:39:52,217 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật rsi_divergence (BTC-USD, 1d)
+2025-03-27 14:39:52,219 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật bollinger_breakout (BTC-USD, 1d)
+2025-03-27 14:39:52,220 - full_system_backtest - INFO - Đã tạo 0 tín hiệu cho chiến thuật multi_timeframe (BTC-USD, 1d)
+2025-03-27 14:39:52,220 - full_system_backtest - INFO - Đã lọc từ 0 xuống còn 0 tín hiệu
+2025-03-27 14:39:52,220 - full_system_backtest - INFO - Đã áp dụng quản lý rủi ro cho 0 tín hiệu
+2025-03-27 14:39:52,220 - full_system_backtest - ERROR - Lỗi khi mô phỏng giao dịch: index -1 is out of bounds for axis 0 with size 0
+2025-03-27 14:39:52,467 - full_system_backtest - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/full_system_backtest.py", line 828, in simulate_trades
+    last_date = data.index[-1]
+                ~~~~~~~~~~^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 5389, in __getitem__
+    return getitem(key)
+           ^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/arrays/datetimelike.py", line 381, in __getitem__
+    result = cast("Union[Self, DTScalarOrNaT]", super().__getitem__(key))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/arrays/_mixins.py", line 284, in __getitem__
+    result = self._ndarray[key]
+             ~~~~~~~~~~~~~^^^^^
+IndexError: index -1 is out of bounds for axis 0 with size 0
+
+2025-03-27 14:39:52,468 - full_system_backtest - INFO - Hoàn thành test cho BTC-USD (1d, 6mo)
+2025-03-27 14:39:52,468 - full_system_backtest - INFO - Tổng giao dịch: 0, Win rate: 0.00%, Lợi nhuận: 0.00%
+2025-03-27 14:39:52,469 - full_system_backtest - INFO - Test symbol ETH-USD với 6mo dữ liệu trên khung 1h
+2025-03-27 14:39:52,667 - full_system_backtest - INFO - Tải dữ liệu ETHUSDT từ Binance (1h, 180 ngày)

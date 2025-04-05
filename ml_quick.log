@@ -1,0 +1,18 @@
+2025-03-01 15:43:52,900 - ml_quick - INFO - Đã tải dữ liệu: 564 candles từ 2025-02-05 13:00:00 đến 2025-03-01 00:00:00
+2025-03-01 15:43:53,154 - ml_quick - INFO - Accuracy: 0.1068
+2025-03-01 15:43:53,156 - ml_quick - INFO - Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00        92
+           1       0.11      1.00      0.19        11
+
+    accuracy                           0.11       103
+   macro avg       0.05      0.50      0.10       103
+weighted avg       0.01      0.11      0.02       103
+
+2025-03-01 15:43:53,876 - ml_quick - INFO - Đã tạo biểu đồ dự đoán: test_charts/btc_ml_prediction.png
+2025-03-01 15:43:54,286 - ml_quick - INFO - Đã tạo biểu đồ tầm quan trọng: test_charts/btc_feature_importance.png
+2025-03-01 15:43:54,388 - ml_quick - INFO - Đã lưu mô hình: models/btc_trend_prediction.joblib
+2025-03-01 15:43:54,423 - ml_quick - INFO - Dự đoán xu hướng 24h tới: Tăng
+2025-03-01 15:43:54,423 - ml_quick - INFO - Xác suất Tăng: 0.9600, Xác suất Giảm: 0.0400
+2025-03-01 15:43:54,426 - ml_quick - INFO - Đã tạo báo cáo ML: test_results/btc_ml_report.html

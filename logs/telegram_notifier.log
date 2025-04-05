@@ -1,0 +1,1359 @@
+2025-03-09 03:30:09,102 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:30:09,103 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 03:30:09,103 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:30:09,116 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:32:43,790 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:32:43,791 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 03:32:43,791 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:32:43,807 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:22,514 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:22,514 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 03:35:22,514 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:22,529 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:56,887 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:56,888 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:35:56,901 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram_notification_config.json
+2025-03-09 03:37:05,928 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:05,928 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:05,929 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:05,929 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:05,941 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:05,941 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:16,435 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:16,435 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:16,436 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:16,436 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:16,449 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:16,449 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:26,853 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:26,853 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:26,854 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:26,854 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:26,866 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:26,866 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:43,617 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:43,617 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:43,617 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:43,617 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:37:43,631 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:37:43,631 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:09,246 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:38:09,246 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:09,249 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:38:09,249 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:09,262 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:38:09,262 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:14,136 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:38:14,136 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:14,696 - telegram_notifier - INFO - Kết nối thành công đến bot Telegram: Bin
+2025-03-09 03:38:21,576 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:38:21,576 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:38:22,426 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 03:39:07,607 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:39:07,607 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:39:08,372 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 03:48:20,196 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:20,196 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:48:20,724 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:20,724 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:48:20,746 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:20,746 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:48:21,481 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 03:48:34,870 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:34,870 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:48:35,178 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:35,178 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:48:35,197 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:48:35,198 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:50:59,600 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:50:59,600 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:50:59,861 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:50:59,861 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:50:59,879 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:50:59,879 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:15,447 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:15,447 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:15,711 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:15,711 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:15,730 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:15,730 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:26,253 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:26,253 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:26,517 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:26,517 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:51:26,537 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:51:26,537 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:52:54,119 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:52:54,119 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:52:54,447 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:52:54,447 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:52:54,466 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:52:54,466 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:16,648 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:16,648 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:16,951 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:16,951 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:16,973 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:16,973 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:34,537 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:34,537 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:34,839 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:34,839 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:53:34,861 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:53:34,862 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:59:22,560 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:59:22,561 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:59:22,838 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:59:22,839 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:59:22,857 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 03:59:22,857 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 03:59:23,596 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 04:01:09,858 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:01:09,858 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:01:10,134 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:01:10,134 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:01:10,156 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:01:10,156 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:23,345 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:23,345 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:23,633 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:23,634 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:23,651 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:23,652 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:28,943 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:28,944 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:29,248 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:29,248 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:02:29,266 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:02:29,267 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:04:19,998 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:04:19,998 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:04:20,816 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:28,268 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:07:28,269 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:07:29,094 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:30,851 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:32,622 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:43,714 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:07:43,714 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:08:14,789 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:08:14,790 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:08:15,599 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:10:58,829 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:10:58,829 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:10:59,085 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:10:59,085 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:10:59,102 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:10:59,102 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:10:59,869 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 04:13:24,215 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:13:24,215 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:13:24,215 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:13:24,216 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:13:24,234 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:13:24,234 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:02,217 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:02,217 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:02,217 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:02,218 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:02,236 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:02,238 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:48,477 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:48,477 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:48,477 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:48,478 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:48,496 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:48,496 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:58,338 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:58,338 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:58,339 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:58,339 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:14:58,358 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:14:58,358 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:12,159 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:12,159 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:12,159 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:12,159 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:12,179 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:12,179 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:30,099 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:30,100 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:30,100 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:30,100 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:30,127 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:30,129 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:42,499 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:42,500 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:42,545 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:42,546 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:16:11,408 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:16:11,408 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:16:11,409 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:16:11,409 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:16:11,430 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:16:11,430 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:28,463 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:28,465 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:28,465 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:28,465 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:28,493 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:28,494 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:29,245 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 04:41:31,142 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:31,142 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:31,142 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:31,142 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:41:31,161 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:41:31,161 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:42:18,706 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:42:18,706 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:42:18,707 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:42:18,707 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:42:18,727 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:42:18,727 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:50:29,677 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:50:29,677 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:50:29,677 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:50:29,677 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:50:29,697 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:50:29,700 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:50:30,432 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 04:51:53,544 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:51:53,544 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:51:59,995 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:51:59,995 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:52:10,771 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:52:10,771 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:52:10,772 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:52:10,772 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:52:10,792 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:52:10,795 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:53:09,203 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:53:09,203 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:53:09,204 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:53:09,204 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:53:09,222 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:53:09,223 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:59:34,207 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:59:34,208 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:59:34,208 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:59:34,208 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:59:34,229 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:59:34,231 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:59:34,962 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 05:01:24,536 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:01:24,536 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:01:24,536 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:01:24,537 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:01:24,558 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:01:24,558 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:03:21,734 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:03:21,734 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:03:26,564 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:03:26,564 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:05:10,406 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:05:10,406 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:05:10,407 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:05:10,407 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:05:10,430 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:05:10,430 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:07:16,591 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:07:16,591 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:07:16,591 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:07:16,592 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:07:16,610 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:07:16,611 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:10:52,790 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:10:52,790 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:10:52,791 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:10:52,791 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:10:52,812 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:10:52,812 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:13:41,106 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:13:41,108 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:13:41,108 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:13:41,108 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:13:41,126 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:13:41,126 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,679 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,680 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,680 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,680 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,702 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,702 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,969 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,970 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,970 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,970 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:14:47,996 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:14:47,996 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:15:29,372 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:15:29,372 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:15:29,373 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:15:29,373 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:15:29,392 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:15:29,392 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,612 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,612 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,612 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,613 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,633 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,633 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,863 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,863 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,864 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,864 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:16:45,884 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:16:45,884 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:17:36,834 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:17:36,835 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:17:36,835 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:17:36,836 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:17:36,872 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:17:36,873 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:20:40,358 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:20:40,358 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:20:40,358 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:20:40,359 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:20:40,379 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:20:40,379 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:22:38,945 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:22:38,945 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:22:38,946 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:22:38,946 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:22:38,967 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:22:38,969 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:24:28,325 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:24:28,325 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:24:28,325 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:24:28,326 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:24:28,345 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:24:28,345 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:28:57,706 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:28:57,706 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:28:57,706 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:28:57,706 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:28:57,733 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:28:57,733 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:35:42,365 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:35:42,365 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:35:42,366 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:35:42,366 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:35:42,387 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:35:42,388 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:35:43,140 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 05:42:52,285 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:42:52,286 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:42:52,286 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:42:52,286 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:42:52,306 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:42:52,306 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:42:53,041 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 05:47:28,997 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:47:28,997 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:47:28,997 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:47:28,998 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:47:29,016 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:47:29,017 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:54:56,378 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:54:56,378 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:54:56,378 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:54:56,378 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:54:56,397 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 05:54:56,397 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 05:54:57,130 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 06:01:03,823 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:01:03,823 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:01:03,823 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:01:03,823 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:01:03,845 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:01:03,845 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:01:04,575 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 06:02:41,592 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:02:41,592 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:02:41,592 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:02:41,593 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:02:41,616 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:02:41,616 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:04:53,941 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:04:53,941 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:04:53,942 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:04:53,942 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:04:53,961 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:04:53,962 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:14:25,320 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:14:25,322 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:14:25,322 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:14:25,323 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:14:25,343 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:14:25,345 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:14:26,080 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 06:21:35,894 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:21:35,896 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:21:35,898 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:21:35,900 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:21:35,930 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:21:35,930 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:21:36,677 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 06:25:42,271 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:25:42,271 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:25:42,271 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:25:42,271 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:25:42,295 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:25:42,295 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:29:21,197 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:29:21,200 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:29:21,200 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:29:21,200 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:29:21,230 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:29:21,230 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:51:16,655 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:51:16,656 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:51:16,656 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:51:16,656 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:51:16,688 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:51:16,689 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:51:17,438 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 06:59:19,034 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:59:19,034 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:59:19,034 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:59:19,034 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:59:19,060 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 06:59:19,061 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 06:59:19,797 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 07:04:36,229 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:04:36,229 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:04:36,229 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:04:36,229 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:04:36,249 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:04:36,250 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:04:36,981 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 07:08:05,702 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:08:05,703 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:08:05,703 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:08:05,703 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:08:05,724 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:08:05,724 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:10:30,823 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:10:30,823 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:10:30,823 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:10:30,823 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:10:30,850 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:10:30,850 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:13:39,816 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:13:39,816 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:13:39,816 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:13:39,817 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:13:39,843 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:13:39,846 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:15:18,110 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:15:18,110 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:15:18,110 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:15:18,111 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:15:18,136 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:15:18,138 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:20:06,362 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:20:06,364 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:20:06,365 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:20:06,366 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:20:06,394 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:20:06,395 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:24:17,042 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:24:17,042 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:24:17,042 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:24:17,044 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:24:17,075 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:24:17,077 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:27:16,975 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:27:16,975 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:27:16,976 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:27:16,976 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:27:16,999 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:27:16,999 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:28:55,123 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:28:55,123 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:28:55,123 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:28:55,123 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:28:55,149 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:28:55,151 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:35:40,073 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:35:40,073 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:35:40,075 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:35:40,075 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:35:40,098 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:35:40,098 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:35:41,133 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 07:37:45,340 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:37:45,341 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:37:45,341 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:37:45,341 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:37:45,367 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:37:45,368 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:43:56,534 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:43:56,534 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:43:56,535 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:43:56,535 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:43:56,559 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:43:56,559 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:43:57,310 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 07:46:56,996 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:46:56,996 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:46:56,997 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:46:56,997 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:46:57,020 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:46:57,022 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:54:16,355 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:54:16,356 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:54:16,356 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:54:16,357 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:54:16,381 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:54:16,382 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:54:17,154 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 07:55:50,834 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:55:50,835 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:55:50,836 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:55:50,837 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 07:55:50,863 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 07:55:50,867 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:03:39,934 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:03:39,936 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:03:39,937 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:03:39,937 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:03:39,975 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:03:39,977 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:03:40,722 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 08:06:39,295 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:06:39,296 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:06:39,296 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:06:39,296 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:06:39,326 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:06:39,327 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:11:12,315 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:11:12,315 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:11:12,315 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:11:12,315 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:11:12,336 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:11:12,340 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:14:43,160 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:14:43,161 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:14:43,161 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:14:43,161 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:14:43,186 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:14:43,186 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:18:11,569 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:18:11,571 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:18:11,572 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:18:11,572 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:18:11,612 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:18:11,612 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:19:46,110 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:19:46,110 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:19:46,111 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:19:46,111 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:19:46,141 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:19:46,142 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:23:10,505 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:23:10,505 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:23:10,506 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:23:10,506 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:23:10,528 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:23:10,531 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:26:22,148 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:26:22,148 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:26:22,148 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:26:22,149 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:26:22,168 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:26:22,170 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:27:17,415 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:27:17,415 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:27:17,415 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:27:17,415 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:27:17,437 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:27:17,439 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:28:43,572 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:28:43,572 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:28:43,572 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:28:43,573 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:28:43,595 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:28:43,595 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:13,234 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:13,235 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:13,236 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:13,236 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:13,258 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:13,259 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:49,605 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:49,606 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:49,606 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:49,606 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:29:49,629 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:29:49,629 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:33:51,008 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:33:51,008 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:33:51,009 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:33:51,009 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:33:51,034 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:33:51,038 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:37:18,742 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:37:18,743 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:37:18,744 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:37:18,744 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:37:18,775 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:37:18,775 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:41:19,678 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:41:19,680 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:41:19,680 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:41:19,680 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:41:19,713 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:41:19,714 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:43:52,169 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:43:52,169 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:43:52,170 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:43:52,170 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:43:52,196 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:43:52,199 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:46:19,220 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:46:19,221 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:46:19,221 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:46:19,221 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:46:19,246 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:46:19,251 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:47:11,701 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:47:11,701 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:47:11,702 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:47:11,702 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:47:11,728 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:47:11,728 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:49:47,683 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:49:47,684 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:49:47,684 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:49:47,684 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:49:47,725 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:49:47,728 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:53:11,177 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:53:11,177 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:53:11,178 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:53:11,178 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:53:11,207 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:53:11,207 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:55:39,434 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:55:39,434 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:55:39,434 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:55:39,434 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:55:39,459 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:55:39,459 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:59:18,932 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:59:18,932 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:59:18,933 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:59:18,933 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 08:59:18,958 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 08:59:18,958 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 09:02:22,969 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 09:02:22,969 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 09:02:22,970 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 09:02:22,970 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 09:02:22,996 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 09:02:22,997 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 10:57:52,708 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 10:57:52,709 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 10:57:52,709 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 10:57:52,709 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 10:57:52,735 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 10:57:52,736 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 10:57:53,477 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 11:02:51,459 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:02:51,459 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:02:51,460 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:02:51,460 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:02:51,485 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:02:51,485 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:09:04,652 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:09:04,653 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:09:04,653 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:09:04,653 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:09:04,681 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:09:04,682 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:09:05,441 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 11:41:16,164 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:41:16,166 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:41:16,167 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:41:16,167 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:41:16,223 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:41:16,223 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:41:16,971 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 11:44:35,113 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:44:35,114 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:44:35,114 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:44:35,115 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:44:35,141 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:44:35,141 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:46:23,539 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:46:23,539 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:46:23,539 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:46:23,539 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:46:23,560 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:46:23,561 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:47:21,213 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:47:21,213 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:49:24,728 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:49:24,730 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:49:24,730 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:49:24,730 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:49:24,759 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:49:24,759 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:16,910 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:16,910 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:16,910 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:16,910 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:16,931 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:16,931 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:17,662 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,768 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,769 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:31,794 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:31,794 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:35,068 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:35,068 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:48,961 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:48,961 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:48,961 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:48,961 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 11:55:48,980 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 11:55:48,980 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:02:13,220 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:02:13,220 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:02:13,220 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:02:13,220 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:02:13,241 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:02:13,243 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:02:14,005 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 12:30:08,054 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:30:08,056 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:30:08,057 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:30:08,057 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:30:08,085 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:30:08,085 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:30:08,840 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 12:31:10,235 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:31:10,235 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:31:10,235 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:31:10,235 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:31:10,261 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:31:10,261 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:33:43,630 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:33:43,630 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:33:43,631 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:33:43,631 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:33:43,657 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:33:43,657 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:34:37,039 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:34:37,039 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:35:57,117 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:35:57,117 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:35:57,117 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:35:57,117 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:35:57,135 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:35:57,136 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:36:17,667 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:36:17,667 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:37:13,339 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:37:13,339 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:37:13,340 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:37:13,340 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:37:13,403 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:37:13,403 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:37:20,216 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:37:20,216 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:38:05,796 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:38:05,796 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:38:05,797 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:38:05,797 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:38:05,827 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:38:05,828 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:39:57,277 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:39:57,277 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:39:57,277 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:39:57,278 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:39:57,301 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:39:57,301 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:59:33,999 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:59:34,001 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:59:34,001 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:59:34,002 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:59:34,031 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 12:59:34,031 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 12:59:34,782 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 13:02:23,191 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:02:23,192 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:02:23,192 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:02:23,193 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:02:23,229 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:02:23,230 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:03:13,765 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:03:13,765 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:03:13,766 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:03:13,766 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:03:13,801 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:03:13,801 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:08:21,707 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:08:21,707 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:08:21,708 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:08:21,708 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:08:21,738 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:08:21,739 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:08:22,470 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 13:09:07,241 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:07,242 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:09:07,243 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:07,243 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:09:07,266 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:07,266 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:09:46,399 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:46,399 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:09:46,399 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:46,400 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:09:46,427 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:09:46,427 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:08,581 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:08,581 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:08,581 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:08,581 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:08,611 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:08,617 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:19,871 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:19,871 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:20,813 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:10:43,196 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:43,196 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:43,196 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:43,196 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:10:43,216 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:10:43,216 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:04,493 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:04,493 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:04,494 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:04,494 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:04,515 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:04,516 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:23,004 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:23,004 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:23,005 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:23,005 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:11:23,021 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:11:23,024 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:12:37,829 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:12:43,658 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:12:43,658 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:12:43,698 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:12:43,698 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:12:44,505 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:13:03,481 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:13:03,482 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:13:04,431 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:13:13,982 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:13:13,982 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:13:14,839 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:13:29,070 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:13:29,070 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:13:29,952 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:13:41,808 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:13:41,808 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:13:42,612 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:19:37,084 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:19:37,086 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:19:37,087 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:19:37,087 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:19:37,116 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:19:37,116 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:19:38,375 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:28:08,542 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:28:08,542 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:28:08,543 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:28:08,543 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:28:08,565 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:28:08,565 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:28:09,536 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:38:35,618 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:38:35,618 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:38:35,618 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:38:35,618 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:38:35,650 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:38:35,651 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:38:36,605 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 13:39:15,682 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:39:15,682 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:39:15,682 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:39:15,682 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:39:15,705 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:39:15,705 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:01:23,530 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:01:23,532 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:01:23,532 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:01:23,533 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:01:23,558 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:01:23,558 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:01:24,606 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 14:20:32,550 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:20:32,550 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:20:32,551 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:20:32,551 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:20:32,572 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:20:32,572 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:20:33,569 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 14:23:33,838 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:23:33,838 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:23:33,839 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:23:33,839 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:23:33,861 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:23:33,861 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:34:35,813 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:34:35,813 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:34:35,816 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:34:35,816 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:34:35,839 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:34:35,840 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:34:36,854 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 14:56:37,690 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:56:37,690 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:56:37,690 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:56:37,690 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:56:37,718 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 14:56:37,722 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 14:56:38,783 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 15:08:19,825 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:08:19,826 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:08:19,826 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:08:19,826 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:08:19,847 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:08:19,847 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:08:20,859 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 15:13:47,425 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:13:47,425 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:13:47,426 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:13:47,426 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:13:47,446 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:13:47,448 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:13:48,479 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 15:17:15,915 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:17:15,915 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:17:15,915 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:17:15,916 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:17:15,938 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:17:15,938 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:15,699 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:39:15,699 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:15,700 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:39:15,700 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:15,721 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:39:15,722 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:16,720 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 15:39:50,252 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:39:50,252 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:39:50,253 - telegram_notifier - INFO - Bỏ qua tin nhắn vì thông báo Telegram bị tắt
+2025-03-09 15:49:18,633 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:49:18,633 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:49:18,634 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:49:18,634 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:49:18,653 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:49:18,653 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:49:19,651 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 15:49:45,239 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:49:45,239 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:49:45,240 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:49:45,240 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:49:45,260 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:49:45,261 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:51:33,504 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:51:33,504 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:55:36,788 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:55:36,788 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:55:37,348 - telegram_notifier - ERROR - Lỗi khi gửi thông báo Telegram: {"ok":false,"error_code":404,"description":"Not Found"}
+2025-03-09 15:56:06,864 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:56:06,864 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:56:06,864 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 15:56:06,864 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:56:06,886 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 15:56:06,886 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 15:56:07,888 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:02:40,728 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:02:40,728 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:02:40,728 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:02:40,728 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:02:40,750 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:02:40,751 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:02:41,999 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:08:21,503 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:08:21,504 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:08:21,504 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:08:21,504 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:08:21,526 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:08:21,526 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:08:23,323 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:10:55,851 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:10:55,851 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:10:55,852 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:10:55,852 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:10:55,870 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:10:55,870 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:13:19,541 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:13:19,541 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:13:19,542 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:13:19,542 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:13:19,564 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:13:19,567 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:19:03,406 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:19:03,406 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:19:03,406 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:19:03,406 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:19:03,435 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:19:03,435 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:19:04,485 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:32:45,245 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:32:45,245 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:32:45,246 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:32:45,246 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:32:45,268 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:32:45,274 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:32:46,387 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:34:43,979 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:34:43,980 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:34:43,980 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:34:43,980 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:34:44,013 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:34:44,014 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:40:37,902 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:40:37,902 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:40:37,902 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:40:37,903 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:40:37,931 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:40:37,931 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:40:38,974 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:50:22,521 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:50:22,521 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:50:22,522 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:50:22,522 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:50:22,548 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:50:22,548 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:50:23,546 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 16:54:45,869 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:54:45,869 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:54:45,870 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 16:54:45,870 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 16:54:45,895 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 16:54:45,896 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:01:17,089 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:01:17,089 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:01:17,090 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:01:17,090 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:01:17,111 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:01:17,111 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:01:18,095 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 17:35:10,368 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:35:10,368 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:35:10,368 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:35:10,368 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:35:10,388 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:35:10,388 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:35:11,332 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 17:46:14,362 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:46:14,362 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:46:14,363 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:46:14,363 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:46:14,385 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:46:14,389 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:46:15,340 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 17:49:53,424 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:49:53,424 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:49:53,425 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:49:53,425 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:49:53,446 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:49:53,447 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:52:10,756 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:52:10,756 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:52:10,756 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:52:10,757 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:52:10,780 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:52:10,780 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:54:58,056 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:54:58,056 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:54:58,056 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:54:58,056 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:54:58,077 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:54:58,079 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:57:51,739 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:57:51,740 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:57:51,742 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:57:51,742 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:57:51,783 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:57:51,784 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:58:44,794 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:58:44,794 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:58:44,795 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 17:58:44,795 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 17:58:44,817 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 17:58:44,817 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:02:33,310 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:02:33,311 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:02:33,311 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:02:33,311 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:02:33,337 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:02:33,338 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:05:41,170 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:05:41,170 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:05:41,170 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:05:41,170 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:05:41,189 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:05:41,189 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:09:15,750 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:09:15,751 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:09:15,751 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:09:15,751 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:09:15,772 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:09:15,773 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:12:14,157 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:12:14,157 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:12:14,158 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:12:14,158 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:12:14,180 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:12:14,181 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:15:59,217 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:15:59,218 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:15:59,218 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:15:59,218 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:15:59,237 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:15:59,238 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:17:30,445 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:17:30,445 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:17:30,445 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 18:17:30,445 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 18:17:30,466 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 18:17:30,466 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:13:22,115 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:13:22,120 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:13:22,121 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:13:22,121 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:13:22,192 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:13:22,192 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:13:23,231 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 23:16:19,957 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:16:19,958 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:16:19,959 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:16:19,960 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:16:19,982 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:16:19,985 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:06,932 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:18:06,932 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:06,932 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:18:06,932 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:06,951 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:18:06,951 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:27,635 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:18:27,635 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:27,636 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:18:27,636 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:18:27,656 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:18:27,656 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:19:02,555 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:19:02,555 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:19:02,556 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:19:02,556 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:19:02,577 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:19:02,578 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:20:06,708 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:20:06,708 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:20:06,709 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:20:06,709 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:20:06,730 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:20:06,730 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:26:16,851 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:26:16,853 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:26:16,855 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:26:16,856 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:26:16,878 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:26:16,878 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:26:17,821 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 23:28:12,231 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:28:12,231 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:28:12,232 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:28:12,232 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:28:12,258 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:28:12,258 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:29:49,027 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:29:49,028 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:29:49,029 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:29:49,029 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:29:49,049 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:29:49,049 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:33:00,427 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:33:00,427 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:33:00,428 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:33:00,429 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:33:00,451 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:33:00,451 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:39:42,029 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:39:42,030 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:39:42,031 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:39:42,031 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:39:42,055 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:39:42,059 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:39:43,075 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 23:40:13,028 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:40:13,029 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:40:13,029 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:40:13,029 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:40:13,054 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:40:13,054 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:45:20,730 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:45:20,731 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:45:20,732 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:45:20,732 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:45:20,757 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:45:20,758 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:45:21,705 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 23:51:37,949 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:51:37,949 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:51:37,950 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:51:37,950 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:51:37,974 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:51:37,974 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:51:39,188 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 23:53:51,562 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:53:51,563 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:53:51,564 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:53:51,564 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:53:51,587 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:53:51,593 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:56:29,825 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:56:29,826 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:56:29,826 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-09 23:56:29,826 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 23:56:29,848 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 23:56:29,848 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:01:11,368 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:01:11,368 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:01:11,369 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:01:11,369 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:01:11,395 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:01:11,396 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:03:02,243 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:03:02,243 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:03:02,244 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:03:02,244 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:03:02,264 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:03:02,265 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:06:17,768 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:06:17,768 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:06:17,769 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:06:17,769 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:06:17,787 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:06:17,789 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:10:14,142 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:10:14,142 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:10:14,142 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:10:14,142 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:10:14,163 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:10:14,163 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:14:47,346 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:14:47,347 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:14:47,347 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:14:47,347 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:14:47,368 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:14:47,370 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:18:39,970 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:18:39,971 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:18:39,971 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:18:39,971 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:18:39,990 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:18:39,993 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:25:06,542 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:25:06,542 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:25:06,542 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:25:06,542 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:25:06,567 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:25:06,567 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:25:07,495 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-10 00:28:04,995 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:28:04,996 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:28:04,996 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:28:04,996 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:28:05,014 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:28:05,014 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:32:45,090 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:32:45,090 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:32:45,091 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:32:45,091 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:32:45,111 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:32:45,111 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:35:45,546 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:35:45,546 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:35:45,546 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:35:45,546 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:35:45,566 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:35:45,568 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:40:39,340 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:40:39,340 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:40:39,340 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:40:39,340 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:40:39,358 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:40:39,359 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:52:37,944 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:52:37,944 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:52:37,945 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:52:37,945 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:52:37,964 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:52:37,965 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:52:38,942 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-10 00:55:50,351 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:55:50,351 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:55:50,352 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 00:55:50,352 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 00:55:50,373 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 00:55:50,373 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:00:51,162 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:00:51,163 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:00:51,163 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 01:00:51,163 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:00:51,182 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:00:51,182 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:00:52,126 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-10 01:03:06,857 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:03:06,857 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:03:06,857 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 01:03:06,857 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:03:06,879 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:03:06,879 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:47:50,236 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:47:50,236 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:47:50,237 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 01:47:50,237 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:47:50,258 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 01:47:50,258 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 01:47:51,217 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-10 02:02:25,135 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:02:25,135 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:02:25,135 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 02:02:25,135 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:02:25,154 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:02:25,154 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:02:26,096 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-10 02:04:36,103 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:04:36,103 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:04:36,103 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 02:04:36,103 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:04:36,129 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:04:36,129 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:08:28,807 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:08:28,807 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:08:28,807 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 02:08:28,807 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:08:28,826 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:08:28,826 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:14:30,376 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:14:30,376 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:14:30,376 - telegram_notifier - WARNING - Token hoặc chat_id không hợp lệ, thông báo Telegram bị tắt
+2025-03-10 02:14:30,377 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:14:30,396 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-10 02:14:30,399 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-10 02:14:31,336 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công

@@ -1,0 +1,438 @@
+2025-03-09 04:04:19,997 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:04:19,998 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:04:19,998 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:04:19,998 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:04:19,998 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:04:19,998 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:04:19,999 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:04:20,001 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:04:20,001 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:04:20,001 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:04:20,001 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:04:20,001 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:04:20,001 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:04:20,001 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:04:20,001 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:04:20,029 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:04:20,029 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:04:20,029 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:04:20,029 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:04:20,029 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 04:04:20,029 - detailed_notifications - INFO - Đang gửi thông báo trạng thái hệ thống
+2025-03-09 04:04:20,030 - detailed_notifications - ERROR - Lỗi khi lấy thông tin bộ nhớ: No module named 'psutil'
+2025-03-09 04:04:20,030 - detailed_notifications - ERROR - Lỗi khi lấy thông tin CPU: No module named 'psutil'
+2025-03-09 04:04:20,816 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:04:20,818 - detailed_notifications - INFO - Đã gửi thông báo trạng thái hệ thống
+2025-03-09 04:04:20,818 - detailed_notifications - INFO - Bỏ qua thông báo phân tích tất cả các cặp do đang trong thời gian chờ
+2025-03-09 04:04:20,818 - detailed_notifications - INFO - Đã gửi các thông báo test
+2025-03-09 04:07:28,268 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:07:28,268 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:07:28,269 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:07:28,269 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:07:28,269 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:07:28,269 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:07:28,269 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:07:28,272 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:07:28,272 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:07:28,273 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:07:28,273 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:07:28,273 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:07:28,273 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:07:28,273 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:07:28,273 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:07:28,314 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:07:28,315 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:07:28,315 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:07:28,315 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:07:28,315 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 04:07:28,315 - detailed_notifications - INFO - Đang gửi thông báo phân tích tất cả các cặp
+2025-03-09 04:07:29,094 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:29,094 - detailed_notifications - INFO - Đã gửi thông báo phân tích cho nhóm ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'SOLUSDT']
+2025-03-09 04:07:30,851 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:30,852 - detailed_notifications - INFO - Đã gửi thông báo phân tích cho nhóm ['DOGEUSDT', 'XRPUSDT', 'LINKUSDT', 'AVAXUSDT', 'DOTUSDT']
+2025-03-09 04:07:32,622 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:07:32,622 - detailed_notifications - INFO - Đã gửi thông báo phân tích cho nhóm ['MATICUSDT', 'LTCUSDT', 'ATOMUSDT', 'UNIUSDT']
+2025-03-09 04:07:33,623 - detailed_notifications - INFO - Đã gửi thông báo phân tích tất cả các cặp
+2025-03-09 04:07:43,713 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:07:43,714 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:07:43,714 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:07:43,714 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:07:43,714 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:07:43,715 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:07:43,715 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:07:43,717 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:07:43,718 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:07:43,718 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:07:43,718 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:07:43,718 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:07:43,719 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:07:43,719 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:07:43,719 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:07:43,754 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:07:43,754 - market_analysis_system - INFO - Đã tải 8 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:07:43,754 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:07:43,754 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:07:43,755 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 04:07:43,755 - detailed_notifications - INFO - Đang gửi thông báo lý do không giao dịch cho BTCUSDT (1h, long)
+2025-03-09 04:07:43,755 - no_trade_reasons_analyzer - INFO - Phân tích lý do không giao dịch LONG cho BTCUSDT
+2025-03-09 04:07:43,755 - market_analysis_system - INFO - Đang phân tích BTCUSDT trên khung 1h...
+2025-03-09 04:07:43,925 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/klines?symbol=BTCUSDT&interval=1h&limit=200
+2025-03-09 04:07:43,926 - market_analysis_system - WARNING - Không đủ dữ liệu để phân tích BTCUSDT
+2025-03-09 04:07:43,926 - market_analysis_system - INFO - Đang kiểm tra điều kiện giao dịch cho BTCUSDT 1h long
+2025-03-09 04:07:43,926 - market_analysis_system - INFO - Đang phân tích BTCUSDT trên khung 1h...
+2025-03-09 04:07:44,073 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/klines?symbol=BTCUSDT&interval=1h&limit=200
+2025-03-09 04:07:44,073 - market_analysis_system - WARNING - Không đủ dữ liệu để phân tích BTCUSDT
+2025-03-09 04:07:44,224 - market_analysis_system - INFO - Đã lưu 9 bản ghi lý do không giao dịch vào logs/no_trade_reasons.log
+2025-03-09 04:07:44,224 - market_analysis_system - INFO - Đã ghi log 1 lý do không giao dịch cho BTCUSDT
+2025-03-09 04:07:44,224 - market_analysis_system - INFO - Đang phân tích thị trường toàn cầu...
+2025-03-09 04:07:44,372 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/klines?symbol=BTCUSDT&interval=1d&limit=30
+2025-03-09 04:07:44,677 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/klines?symbol=BTCUSDT&interval=1h&limit=30
+2025-03-09 04:07:44,677 - market_analysis_system - ERROR - Lỗi khi tính tương quan: could not convert string to float: 'r'
+2025-03-09 04:07:44,677 - market_analysis_system - ERROR - Lỗi khi xác định xu hướng: could not convert string to float: 'r'
+2025-03-09 04:07:44,677 - market_analysis_system - ERROR - Lỗi khi phát hiện chế độ thị trường: could not convert string to float: 'r'
+2025-03-09 04:07:44,678 - market_analysis_system - INFO - Đã lưu dữ liệu chế độ thị trường vào data/market_regime_data.json
+2025-03-09 04:07:44,678 - market_analysis_system - INFO - Đã phân tích thị trường toàn cầu, chế độ: unknown
+2025-03-09 04:07:44,678 - detailed_notifications - ERROR - Lỗi khi gửi thông báo lý do không giao dịch: 'price'
+2025-03-09 04:07:45,178 - detailed_notifications - INFO - Bỏ qua thông báo lý do không giao dịch cho ETHUSDT do đang trong thời gian chờ
+2025-03-09 04:07:45,679 - detailed_notifications - INFO - Bỏ qua thông báo lý do không giao dịch cho BNBUSDT do đang trong thời gian chờ
+2025-03-09 04:07:46,179 - detailed_notifications - INFO - Bỏ qua thông báo lý do không giao dịch cho SOLUSDT do đang trong thời gian chờ
+2025-03-09 04:08:14,789 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:08:14,789 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:08:14,790 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:08:14,790 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:08:14,790 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:08:14,790 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:08:14,791 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:08:14,793 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:08:14,793 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:08:14,793 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:08:14,794 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:08:14,794 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:08:14,794 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:08:14,794 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:08:14,794 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:08:14,824 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:08:14,824 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:08:14,824 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:08:14,824 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:08:14,825 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 04:08:14,825 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-09 04:08:15,599 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 04:08:15,600 - detailed_notifications - INFO - Đã gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-09 04:15:42,499 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:42,499 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:42,500 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:42,500 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:15:42,500 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:15:42,500 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:15:42,500 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:15:42,504 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:15:42,505 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:15:42,505 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:15:42,505 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:15:42,505 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:15:42,505 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:15:42,505 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:15:42,506 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:15:42,540 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:15:42,540 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:15:42,541 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:15:42,541 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:15:42,541 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 04:15:42,541 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 04:15:42,542 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 04:15:42,542 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 04:15:42,542 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 04:15:42,545 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 04:15:42,545 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 04:15:42,545 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 04:15:42,545 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 04:15:42,545 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 04:15:42,546 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 04:15:42,546 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 13 cặp tiền điện tử
+2025-03-09 04:15:42,546 - auto_market_notifier - INFO - Gửi thông báo thử nghiệm cho BTCUSDT
+2025-03-09 04:15:42,546 - auto_market_notifier - INFO - Đang gửi phân tích thị trường cho BTCUSDT
+2025-03-09 04:15:42,546 - market_analysis_system - INFO - Đang phân tích BTCUSDT trên khung 1h...
+2025-03-09 04:15:42,722 - binance_api - ERROR - API request error: 404 Client Error: Not Found for url: https://testnet.binancefuture.com/fapi/v2/klines?symbol=BTCUSDT&interval=1h&limit=200
+2025-03-09 04:15:42,722 - market_analysis_system - WARNING - Không đủ dữ liệu để phân tích BTCUSDT
+2025-03-09 04:15:42,722 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-09 04:15:42,722 - detailed_notifications - ERROR - Lỗi khi xử lý thông báo phân tích thị trường: 'str' object has no attribute 'get'
+2025-03-09 04:15:42,723 - auto_market_notifier - INFO - Đã gửi phân tích thị trường thành công cho BTCUSDT
+2025-03-09 13:12:43,652 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-09 13:12:43,658 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:12:43,658 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:12:43,658 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 13:12:43,658 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 13:12:43,659 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 13:12:43,659 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 13:12:43,662 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 13:12:43,663 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 13:12:43,663 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 13:12:43,663 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 13:12:43,663 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 13:12:43,663 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 13:12:43,663 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 13:12:43,663 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 13:12:43,694 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 13:12:43,694 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 13:12:43,695 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 13:12:43,695 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 13:12:43,695 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-09 13:12:43,695 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-09 13:12:43,695 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 13:12:43,695 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 13:12:43,695 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 13:12:43,697 - market_analysis_system - INFO - Đã tải 49 bản ghi phân tích từ reports/market_analysis_results.json
+2025-03-09 13:12:43,698 - market_analysis_system - INFO - Đã tải 9 bản ghi lý do không giao dịch từ logs/no_trade_reasons.log
+2025-03-09 13:12:43,698 - market_analysis_system - INFO - Đã tải dữ liệu chế độ thị trường từ data/market_regime_data.json
+2025-03-09 13:12:43,698 - market_analysis_system - INFO - Đã khởi tạo hệ thống phân tích thị trường
+2025-03-09 13:12:43,698 - telegram_notifier - INFO - Telegram notifications đã được kích hoạt
+2025-03-09 13:12:43,698 - telegram_notifier - INFO - Đã tải cấu hình thông báo từ telegram_config.json
+2025-03-09 13:12:43,699 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 13 cặp tiền điện tử
+2025-03-09 13:12:43,699 - auto_market_notifier - INFO - Bắt đầu bộ lập lịch thông báo tự động
+2025-03-09 13:12:43,699 - auto_market_notifier - INFO - Đã bắt đầu hệ thống thông báo thị trường tự động
+2025-03-09 13:12:43,701 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho BTCUSDT vào lúc 20:44
+2025-03-09 13:12:43,703 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ETHUSDT vào lúc 19:22
+2025-03-09 13:12:43,706 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho BNBUSDT vào lúc 09:04
+2025-03-09 13:12:43,706 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho SOLUSDT vào lúc 16:17
+2025-03-09 13:12:43,706 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ADAUSDT vào lúc 21:44
+2025-03-09 13:12:43,706 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho DOGEUSDT vào lúc 14:48
+2025-03-09 13:12:43,707 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho MATICUSDT vào lúc 20:42
+2025-03-09 13:12:43,707 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho LINKUSDT vào lúc 01:00
+2025-03-09 13:12:43,708 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho DOTUSDT vào lúc 12:19
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho LTCUSDT vào lúc 04:24
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho AVAXUSDT vào lúc 00:45
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho XRPUSDT vào lúc 18:33
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho NEARUSDT vào lúc 18:27
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 06:16
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 12:56
+2025-03-09 13:12:43,709 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 18:47
+2025-03-09 13:12:43,710 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 23:28
+2025-03-09 13:12:43,710 - auto_market_notifier - INFO - Đã lập lịch cập nhật quan trọng về thị trường vào lúc 08:30 và 20:30
+2025-03-09 13:12:43,710 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho BTCUSDT vào lúc 11:09
+2025-03-09 13:12:43,714 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho ETHUSDT vào lúc 23:17
+2025-03-09 13:12:43,714 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho BNBUSDT vào lúc 06:00
+2025-03-09 13:12:43,715 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho SOLUSDT vào lúc 23:01
+2025-03-09 13:12:43,715 - auto_market_notifier - INFO - Đã cấu hình tất cả các lịch trình thông báo tự động
+2025-03-09 13:12:44,505 - telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-12 07:23:05,150 - root - INFO - Khởi động hệ thống thông báo tự động trực tiếp
+2025-03-12 07:23:05,153 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 07:23:05,153 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:23:05,153 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:05,154 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:05,650 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:05,823 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:05,976 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:05.901000
+2025-03-12 07:23:05,976 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:05,977 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:05,977 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:06,471 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:06,635 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:07,073 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:07
+2025-03-12 07:23:07,073 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:07,073 - no_trade_reasons_analyzer - INFO - Đã tạo thư mục: reports/no_trade_analysis
+2025-03-12 07:23:07,074 - no_trade_reasons_analyzer - INFO - Đã tạo thư mục: charts/no_trade_analysis
+2025-03-12 07:23:07,074 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 07:23:07,074 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:07,074 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:07,554 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:07,711 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:07,860 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:07.787000
+2025-03-12 07:23:07,860 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:07,860 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:23:07,861 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 16 cặp tiền điện tử
+2025-03-12 07:23:07,861 - auto_market_notifier - INFO - Bắt đầu bộ lập lịch thông báo tự động
+2025-03-12 07:23:07,861 - auto_market_notifier - INFO - Đã bắt đầu hệ thống thông báo thị trường tự động
+2025-03-12 07:23:07,862 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho BTCUSDT vào lúc 09:50
+2025-03-12 07:23:07,864 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ETHUSDT vào lúc 23:44
+2025-03-12 07:23:07,864 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho BNBUSDT vào lúc 05:18
+2025-03-12 07:23:07,864 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho SOLUSDT vào lúc 16:59
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ADAUSDT vào lúc 02:59
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho DOGEUSDT vào lúc 09:00
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho MATICUSDT vào lúc 09:20
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho LINKUSDT vào lúc 13:48
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho DOTUSDT vào lúc 23:04
+2025-03-12 07:23:07,865 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho LTCUSDT vào lúc 15:20
+2025-03-12 07:23:07,866 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho AVAXUSDT vào lúc 15:43
+2025-03-12 07:23:07,866 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho XRPUSDT vào lúc 16:57
+2025-03-12 07:23:07,866 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho NEARUSDT vào lúc 04:49
+2025-03-12 07:23:07,866 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ATOMUSDT vào lúc 16:00
+2025-03-12 07:23:07,866 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho UNIUSDT vào lúc 23:33
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch phân tích hàng ngày cho ICPUSDT vào lúc 00:26
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 06:32
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 12:03
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 18:24
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch phân tích đa cặp tiền điện tử vào lúc 23:30
+2025-03-12 07:23:07,867 - auto_market_notifier - INFO - Đã lập lịch cập nhật quan trọng về thị trường vào lúc 08:30 và 20:30
+2025-03-12 07:23:07,868 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho BTCUSDT vào lúc 01:29
+2025-03-12 07:23:07,868 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho ETHUSDT vào lúc 17:16
+2025-03-12 07:23:07,868 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho BNBUSDT vào lúc 17:28
+2025-03-12 07:23:07,868 - auto_market_notifier - INFO - Đã lập lịch gửi lý do không giao dịch cho SOLUSDT vào lúc 08:10
+2025-03-12 07:23:07,868 - auto_market_notifier - INFO - Đã cấu hình tất cả các lịch trình thông báo tự động
+2025-03-12 07:23:08,639 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 07:23:08,640 - auto_market_notifier - INFO - Gửi thông báo thử nghiệm cho BTCUSDT
+2025-03-12 07:23:08,640 - auto_market_notifier - INFO - Đang gửi phân tích thị trường cho BTCUSDT
+2025-03-12 07:23:10,173 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 07:23:10,173 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 07:23:10,933 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 07:23:10,934 - detailed_notifications - INFO - Đã gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 07:23:10,934 - auto_market_notifier - INFO - Đã gửi phân tích thị trường thành công cho BTCUSDT
+2025-03-12 07:23:22,733 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 07:23:22,734 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:23:22,734 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:22,734 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:23,215 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:23,381 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:23,822 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:23.749000
+2025-03-12 07:23:23,823 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:23,823 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:23,823 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:24,303 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:24,466 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:24,893 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:24.821000
+2025-03-12 07:23:24,894 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:24,894 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 07:23:24,894 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:23:24,894 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:23:25,667 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:23:25,826 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:23:26,272 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:23:26.194000
+2025-03-12 07:23:26,272 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:23:26,272 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:23:26,272 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 16 cặp tiền điện tử
+2025-03-12 07:23:26,272 - auto_market_notifier - INFO - Đang gửi phân tích đa cặp tiền điện tử: ['SOLUSDT', 'ATOMUSDT', 'MATICUSDT', 'LTCUSDT']
+2025-03-12 07:23:26,273 - auto_market_notifier - ERROR - Lỗi khi gửi phân tích đa cặp tiền điện tử: 'DetailedTradeNotifications' object has no attribute 'send_multi_symbol_analysis'
+2025-03-12 07:24:02,268 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 07:24:02,268 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:24:02,269 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:02,269 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:02,770 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:02,933 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:03,082 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:03.008000
+2025-03-12 07:24:03,082 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:03,082 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:03,082 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:03,569 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:03,741 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:04,180 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:04.105000
+2025-03-12 07:24:04,181 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:04,181 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 07:24:04,181 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:04,181 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:04,671 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:04,837 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:04,988 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:04.912000
+2025-03-12 07:24:04,988 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:04,988 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:24:04,989 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 16 cặp tiền điện tử
+2025-03-12 07:24:04,989 - auto_market_notifier - INFO - Đang gửi phân tích đa cặp tiền điện tử: ['ADAUSDT', 'LTCUSDT', 'ICPUSDT', 'NEARUSDT']
+2025-03-12 07:24:04,989 - detailed_notifications - INFO - Đang gửi phân tích đa symbol: ['ADAUSDT', 'LTCUSDT', 'ICPUSDT', 'NEARUSDT']
+2025-03-12 07:24:06,271 - market_analysis_system - INFO - Đã lưu kết quả phân tích vào market_analysis_adausdt.json
+2025-03-12 07:24:07,553 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 07:24:07,987 - enhanced_binance_api - WARNING - Không lấy được giá của ICPUSDT
+2025-03-12 07:24:07,987 - market_analysis_system - WARNING - Không lấy được giá hiện tại của ICPUSDT
+2025-03-12 07:24:08,890 - market_analysis_system - INFO - Đã lưu kết quả phân tích vào market_analysis_icpusdt.json
+2025-03-12 07:24:09,859 - market_analysis_system - INFO - Đã lưu kết quả phân tích vào market_analysis_nearusdt.json
+2025-03-12 07:24:10,622 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 07:24:10,623 - detailed_notifications - INFO - Đã gửi phân tích đa symbol (ADAUSDT, LTCUSDT, ICPUSDT, NEARUSDT) thành công
+2025-03-12 07:24:10,623 - auto_market_notifier - INFO - Đã gửi phân tích đa cặp tiền điện tử thành công
+2025-03-12 07:24:20,571 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 07:24:20,571 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:24:20,571 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:20,571 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:21,066 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:21,229 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:21,662 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:21.589000
+2025-03-12 07:24:21,662 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:21,663 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:21,663 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:22,142 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:22,299 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:22,728 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:22.656000
+2025-03-12 07:24:22,728 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:22,728 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 07:24:22,729 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 07:24:22,729 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 07:24:23,240 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 07:24:23,699 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 07:24:24,134 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 07:24:24.060000
+2025-03-12 07:24:24,134 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 07:24:24,134 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 07:24:24,134 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 16 cặp tiền điện tử
+2025-03-12 07:24:24,135 - auto_market_notifier - INFO - Đang gửi phân tích thị trường cho BTCUSDT
+2025-03-12 07:24:25,690 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 07:24:25,690 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 07:24:26,444 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 07:24:26,444 - detailed_notifications - INFO - Đã gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 07:24:26,444 - auto_market_notifier - INFO - Đã gửi phân tích thị trường thành công cho BTCUSDT
+2025-03-12 08:38:38,396 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 08:38:38,397 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 08:38:38,399 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:38:38,399 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:38:38,902 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:38:39,070 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:38:39,508 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:38:39.433000
+2025-03-12 08:38:39,508 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:38:39,508 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:38:39,508 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:38:40,030 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:38:40,193 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:38:40,626 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:38:40.552000
+2025-03-12 08:38:40,626 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:38:40,626 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 08:38:53,577 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 08:38:53,578 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 08:38:53,578 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:38:53,578 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:38:54,062 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:38:54,520 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:38:54,964 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:38:54.890000
+2025-03-12 08:38:54,964 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:38:54,964 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:38:54,964 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:38:55,456 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:38:55,619 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:38:56,057 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:38:55.984000
+2025-03-12 08:38:56,058 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:38:56,058 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 08:38:56,058 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 08:38:56,817 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 08:38:56,818 - detailed_notifications - INFO - Đã gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 08:38:56,818 - detailed_notifications - INFO - Gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:38:56,818 - detailed_notifications - INFO - Đang gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:38:57,585 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 08:38:57,586 - detailed_notifications - INFO - Đã gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:39:07,564 - detailed_notifications - INFO - Đã tải cấu hình thông báo từ configs/telegram/telegram_notification_config.json
+2025-03-12 08:39:07,564 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 08:39:07,565 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:39:07,565 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:39:08,043 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:39:08,498 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:39:08,649 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:39:08.578000
+2025-03-12 08:39:08,649 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:39:08,650 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:39:08,650 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:39:09,132 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:39:09,300 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:39:09,449 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:39:09.378000
+2025-03-12 08:39:09,449 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:39:09,449 - detailed_notifications - INFO - Đã khởi tạo hệ thống thông báo chi tiết
+2025-03-12 08:39:09,449 - market_analysis_system - INFO - Đã tải cấu hình từ configs/market_analysis_config.json
+2025-03-12 08:39:09,449 - enhanced_binance_api - INFO - Đã tìm thấy API key và secret trong biến môi trường
+2025-03-12 08:39:09,925 - enhanced_binance_api - INFO - Đã khởi tạo Binance TestNet Client
+2025-03-12 08:39:10,125 - enhanced_binance_api - INFO - Kết nối đến Binance Futures TestNet thành công
+2025-03-12 08:39:10,274 - enhanced_binance_api - INFO - Thời gian máy chủ Binance: 2025-03-12 08:39:10.203000
+2025-03-12 08:39:10,274 - market_analysis_system - INFO - Đã khởi tạo Market Analysis System
+2025-03-12 08:39:10,275 - telegram_notifier - INFO - Telegram Notifier đã được kích hoạt
+2025-03-12 08:39:10,275 - auto_market_notifier - INFO - Khởi tạo Auto Market Notifier với 16 cặp tiền điện tử
+2025-03-12 08:39:10,275 - auto_market_notifier - INFO - Gửi thông báo thử nghiệm cho BTCUSDT
+2025-03-12 08:39:10,275 - auto_market_notifier - INFO - Đang gửi phân tích thị trường cho BTCUSDT
+2025-03-12 08:39:11,840 - market_analysis_system - ERROR - Lỗi khi lưu kết quả phân tích: Object of type Timestamp is not JSON serializable
+2025-03-12 08:39:11,840 - detailed_notifications - INFO - Đang gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 08:39:12,598 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 08:39:12,599 - detailed_notifications - INFO - Đã gửi thông báo phân tích thị trường cho BTCUSDT
+2025-03-12 08:39:12,599 - detailed_notifications - INFO - Gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:39:12,599 - detailed_notifications - INFO - Đang gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:39:13,369 - telegram_notifier - INFO - Đã gửi tin nhắn Telegram thành công
+2025-03-12 08:39:13,369 - detailed_notifications - INFO - Đã gửi thông báo quyết định giao dịch cho BTCUSDT
+2025-03-12 08:39:13,370 - auto_market_notifier - INFO - Đã gửi phân tích thị trường thành công cho BTCUSDT

@@ -1,0 +1,62 @@
+2025-03-10 13:44:58,892 - desktop_validation - INFO - Đã import dotenv
+2025-03-10 13:45:01,583 - market_analyzer - INFO - Đã import thành công các thư viện phân tích
+2025-03-10 13:45:01,592 - position_manager - ERROR - Lỗi khi import thư viện Binance: cannot import name 'ORDER_TYPE_STOP_MARKET' from 'binance.enums' (/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/binance/enums.py)
+2025-03-10 13:45:01,600 - desktop_validation - INFO - Đã import thành công các module
+2025-03-10 13:45:01,602 - desktop_validation - INFO - Đã khởi tạo Desktop App Validator
+2025-03-10 13:45:01,602 - desktop_validation - INFO - ===== BẮT ĐẦU KIỂM TRA TOÀN DIỆN =====
+2025-03-10 13:45:02,363 - market_analyzer - INFO - Thời gian máy chủ Binance: 2025-03-10 13:45:02.288000
+2025-03-10 13:45:02,364 - market_analyzer - INFO - Đã kết nối thành công với Binance API
+2025-03-10 13:45:02,364 - market_analyzer - INFO - Đã khởi tạo Market Analyzer
+2025-03-10 13:45:02,364 - position_manager - ERROR - Lỗi không xác định khi kết nối tới Binance API: 'Client' object has no attribute 'ping'
+2025-03-10 13:45:02,365 - position_manager - ERROR - Traceback (most recent call last):
+  File "/home/runner/workspace/position_manager.py", line 180, in _create_client
+    client.ping()
+    ^^^^^^^^^^^
+AttributeError: 'Client' object has no attribute 'ping'
+
+2025-03-10 13:45:02,366 - position_manager - INFO - Đã khởi tạo Position Manager
+2025-03-10 13:45:02,366 - risk_manager - INFO - Đã tải cấu hình rủi ro từ risk_configs/desktop_risk_config.json
+2025-03-10 13:45:02,366 - risk_manager - INFO - Đã khởi tạo Risk Manager
+2025-03-10 13:45:02,366 - auto_updater - INFO - Phiên bản hiện tại: 1.0.0
+2025-03-10 13:45:02,366 - desktop_validation - INFO - Đã khởi tạo các thành phần
+2025-03-10 13:45:02,366 - desktop_validation - INFO - Kiểm tra kết nối API...
+2025-03-10 13:45:02,664 - desktop_validation - INFO - Server time: {'serverTime': 1741614302590}
+2025-03-10 13:45:02,664 - desktop_validation - INFO - ✅ Kết nối API thành công
+2025-03-10 13:45:02,664 - desktop_validation - INFO - Kiểm tra lấy dữ liệu thị trường...
+2025-03-10 13:45:04,744 - desktop_validation - INFO - Số lượng cặp giao dịch: 10
+2025-03-10 13:45:04,744 - desktop_validation - INFO - Dữ liệu 1: BTCUSDT - Giá: 82700.1 - Thay đổi 24h: -1.848%
+2025-03-10 13:45:04,744 - desktop_validation - INFO - Dữ liệu 2: ETHUSDT - Giá: 2105.5 - Thay đổi 24h: -1.424%
+2025-03-10 13:45:04,744 - desktop_validation - INFO - Dữ liệu 3: BNBUSDT - Giá: 561.48 - Thay đổi 24h: -2.328%
+2025-03-10 13:45:04,901 - desktop_validation - INFO - Số dòng dữ liệu lịch sử: 10
+2025-03-10 13:45:04,901 - desktop_validation - INFO - ✅ Lấy dữ liệu thị trường thành công
+2025-03-10 13:45:04,901 - desktop_validation - INFO - Kiểm tra chức năng quản lý vị thế...
+2025-03-10 13:45:04,902 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-10 13:45:04,902 - desktop_validation - ERROR - Lỗi khi lấy số dư tài khoản: Chưa kết nối với Binance API
+2025-03-10 13:45:04,902 - desktop_validation - INFO - Kiểm tra chức năng quản lý rủi ro...
+2025-03-10 13:45:04,902 - risk_manager - ERROR - Giá hiện tại không hợp lệ: 0
+2025-03-10 13:45:04,902 - desktop_validation - INFO - Kích thước vị thế được tính toán: 0.001 BTC
+2025-03-10 13:45:04,902 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-10 13:45:04,902 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-10 13:45:04,902 - desktop_validation - INFO - Vị thế hợp lệ: True, Lý do: Vị thế hợp lệ
+2025-03-10 13:45:04,903 - position_manager - ERROR - Chưa kết nối với Binance API
+2025-03-10 13:45:04,903 - desktop_validation - INFO - Mức độ rủi ro hiện tại: Thấp
+2025-03-10 13:45:04,903 - desktop_validation - INFO - Số lượng vị thế: 0/5
+2025-03-10 13:45:04,903 - desktop_validation - INFO - ✅ Kiểm tra quản lý rủi ro thành công
+2025-03-10 13:45:04,903 - desktop_validation - INFO - Kiểm tra chức năng phân tích kỹ thuật...
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Tín hiệu tổng hợp: Bán
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Độ mạnh: Trung bình
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Xu hướng ngắn hạn: Giảm
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Xu hướng trung hạn: Giảm
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Xu hướng dài hạn: Sideway
+2025-03-10 13:45:05,073 - desktop_validation - INFO - Chỉ báo RSI: 63.80640559280019 - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo MACD: -340.4638624392246 - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo Bollinger Bands: Upper: 83766.66, Lower: 80619.23 - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo SMA20: 82192.9425 - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo SMA50: 84171.3744 - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo SMA200: nan - Tín hiệu: Trung lập
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo Khối lượng: 142.54132 - Tín hiệu: Trung bình
+2025-03-10 13:45:05,074 - desktop_validation - INFO - Chỉ báo Biến động: 34.41% - Tín hiệu: Cao
+2025-03-10 13:45:07,708 - desktop_validation - INFO - Số lượng cơ hội giao dịch: 0
+2025-03-10 13:45:07,708 - desktop_validation - INFO - ✅ Kiểm tra phân tích kỹ thuật thành công
+2025-03-10 13:45:07,709 - desktop_validation - INFO - Kiểm tra chức năng cập nhật tự động...
+2025-03-10 13:45:07,722 - desktop_validation - INFO - Phiên bản hiện tại: 1.0.0

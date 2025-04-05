@@ -1,0 +1,47 @@
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo SimpleStrategy với fast_period=10, slow_period=20
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo AdaptiveStrategy với periods=10/20/50
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo SimpleStrategy với fast_period=10, slow_period=20
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo AdaptiveStrategy với periods=10/20/50
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo CombinedStrategy với periods=10/20/50
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Khởi tạo Backtest Engine cho BTCUSDT với balance=10000, leverage=5
+2025-03-15 08:08:06,937 - backtest_detailed - INFO - Bắt đầu chạy backtest cho BTCUSDT với strategy=SimpleStrategy
+2025-03-15 08:08:06,940 - backtest_detailed - INFO - Đã tính xong các chỉ báo cho SimpleStrategy
+2025-03-15 08:08:06,944 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 98614.41 với size=0.050703, SL=97135.19, TP=101572.84
+2025-03-15 08:08:06,945 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 97135.19 với lý do SL, PnL=-75.00 (-1.50%), Balance=9925.00
+2025-03-15 08:08:06,946 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 95942.24 với size=0.051724, SL=97381.37, TP=93063.97
+2025-03-15 08:08:06,947 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 93063.97 với lý do TP, PnL=148.88 (3.00%), Balance=10073.88
+2025-03-15 08:08:06,949 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 97102.32 với size=0.051872, SL=95645.79, TP=100015.39
+2025-03-15 08:08:06,950 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 95645.79 với lý do SL, PnL=-75.55 (-1.50%), Balance=9998.32
+2025-03-15 08:08:06,952 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 96718.35 với size=0.051688, SL=98169.13, TP=93816.80
+2025-03-15 08:08:06,952 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 98169.13 với lý do SL, PnL=-74.99 (-1.50%), Balance=9923.33
+2025-03-15 08:08:06,955 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 96503.63 với size=0.051414, SL=95056.08, TP=99398.74
+2025-03-15 08:08:06,956 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 95056.08 với lý do SL, PnL=-74.43 (-1.50%), Balance=9848.91
+2025-03-15 08:08:06,958 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 96144.61 với size=0.051219, SL=97586.78, TP=93260.27
+2025-03-15 08:08:06,959 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 93260.27 với lý do TP, PnL=147.73 (3.00%), Balance=9996.64
+2025-03-15 08:08:06,959 - backtest_detailed - INFO - Đang xử lý candle 100/582, ngày 2025-02-09 17:00:00, giá 96212.62
+2025-03-15 08:08:06,961 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 97306.78 với size=0.051367, SL=95847.18, TP=100225.98
+2025-03-15 08:08:06,962 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 95847.18 với lý do SL, PnL=-74.97 (-1.50%), Balance=9921.67
+2025-03-15 08:08:06,964 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 97383.33 với size=0.050941, SL=98844.08, TP=94461.83
+2025-03-15 08:08:06,967 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 94461.83 với lý do TP, PnL=148.83 (3.00%), Balance=10070.49
+2025-03-15 08:08:06,968 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 96336.07 với size=0.052268, SL=97781.11, TP=93445.99
+2025-03-15 08:08:06,969 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 93445.99 với lý do TP, PnL=151.06 (3.00%), Balance=10221.55
+2025-03-15 08:08:06,972 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 95962.27 với size=0.053258, SL=94522.84, TP=98841.14
+2025-03-15 08:08:06,973 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 94522.84 với lý do SL, PnL=-76.66 (-1.50%), Balance=10144.89
+2025-03-15 08:08:06,977 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 96222.14 với size=0.052716, SL=97665.47, TP=93335.48
+2025-03-15 08:08:06,979 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 93335.48 với lý do TP, PnL=152.17 (3.00%), Balance=10297.06
+2025-03-15 08:08:06,980 - backtest_detailed - INFO - Đang xử lý candle 200/582, ngày 2025-02-13 21:00:00, giá 96448.37
+2025-03-15 08:08:06,981 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 96718.44 với size=0.053232, SL=95267.66, TP=99619.99
+2025-03-15 08:08:06,990 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 95267.66 với lý do SL, PnL=-77.23 (-1.50%), Balance=10219.83
+2025-03-15 08:08:06,992 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 97597.26 với size=0.052357, SL=99061.22, TP=94669.34
+2025-03-15 08:08:06,999 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 99061.22 với lý do SL, PnL=-76.65 (-1.50%), Balance=10143.18
+2025-03-15 08:08:07,005 - backtest_detailed - INFO - Đang xử lý candle 300/582, ngày 2025-02-18 01:00:00, giá 96300.25
+2025-03-15 08:08:07,006 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 96070.81 với size=0.052790, SL=94629.75, TP=98952.93
+2025-03-15 08:08:07,007 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 94629.75 với lý do SL, PnL=-76.07 (-1.50%), Balance=10067.11
+2025-03-15 08:08:07,008 - backtest_detailed - INFO - Mở vị thế SHORT BTCUSDT tại 95465.0 với size=0.052727, SL=96896.97, TP=92601.05
+2025-03-15 08:08:07,010 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 96896.97 với lý do SL, PnL=-75.50 (-1.50%), Balance=9991.61
+2025-03-15 08:08:07,013 - backtest_detailed - INFO - Mở vị thế LONG BTCUSDT tại 95289.91 với size=0.052427, SL=93860.56, TP=98148.61
+2025-03-15 08:08:07,020 - backtest_detailed - INFO - Đã kích hoạt Trailing Stop cho BTCUSDT tại 97218.02 với stop=96731.93
+2025-03-15 08:08:07,022 - backtest_detailed - INFO - Cập nhật Trailing Stop BTCUSDT lên 96881.88
+2025-03-15 08:08:07,023 - backtest_detailed - INFO - Cập nhật Trailing Stop BTCUSDT lên 96941.23
+2025-03-15 08:08:07,023 - backtest_detailed - INFO - Cập nhật Trailing Stop BTCUSDT lên 97001.31
+2025-03-15 08:08:07,024 - backtest_detailed - INFO - Đóng vị thế BTCUSDT tại 96966.00 với lý do TRAILING_STOP, PnL=87.87 (1.76%), Balance=10079.48

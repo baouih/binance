@@ -1,0 +1,72 @@
+2025-03-09 08:03:17,135 - check_sltp - INFO - Bắt đầu kiểm tra trạng thái SL/TP cho tất cả các vị thế...
+2025-03-09 08:03:17,137 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:03:17,138 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:03:17,139 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:03:17,363 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 08:03:17,363 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 08:03:17,363 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 08:03:17,363 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 08:03:17,364 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 08:03:17,365 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 08:03:17,365 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 08:03:17,365 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:03:17,543 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:03:18,425 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:03:18,425 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 08:03:18,425 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:03:18,425 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:03:18,592 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:03:18,592 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:03:18,592 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:03:18,593 - check_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 08:03:18,593 - check_sltp - INFO - Kiểm tra SL/TP cho ETHUSDT với số lượng 0.124, đòn bẩy 5.0x
+2025-03-09 08:03:18,743 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 08:03:18,743 - check_sltp - INFO - Vị thế ETHUSDT có đủ SL và TP
+2025-03-09 08:03:18,743 - check_sltp - INFO - Kiểm tra SL/TP cho BNBUSDT với số lượng 0.45, đòn bẩy 5.0x
+2025-03-09 08:03:18,893 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 08:03:18,894 - check_sltp - INFO - Vị thế BNBUSDT có đủ SL và TP
+2025-03-09 08:03:18,894 - check_sltp - INFO - Kiểm tra SL/TP cho BTCUSDT với số lượng 0.009, đòn bẩy 5.0x
+2025-03-09 08:03:19,048 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 08:03:19,048 - check_sltp - INFO - Vị thế BTCUSDT có đủ SL và TP
+2025-03-09 08:03:19,048 - check_sltp - INFO - === KẾT QUẢ KIỂM TRA SL/TP ===
+2025-03-09 08:03:19,048 - check_sltp - INFO - Tổng số vị thế: 3
+2025-03-09 08:03:19,048 - check_sltp - INFO - Số vị thế cần thiết lập lại SL/TP: 0
+2025-03-09 08:03:19,048 - check_sltp - INFO - ETHUSDT: SL ✅ (3), TP ✅ (3)
+2025-03-09 08:03:19,048 - check_sltp - INFO - BNBUSDT: SL ✅ (3), TP ✅ (3)
+2025-03-09 08:03:19,048 - check_sltp - INFO - BTCUSDT: SL ✅ (3), TP ✅ (3)
+2025-03-09 08:04:23,923 - check_sltp - INFO - Bắt đầu kiểm tra trạng thái SL/TP cho tất cả các vị thế...
+2025-03-09 08:04:23,924 - binance_api - INFO - Đã tải cấu hình tài khoản từ account_config.json, chế độ API: testnet, loại tài khoản: futures
+2025-03-09 08:04:23,924 - binance_api - INFO - Kết nối đến môi trường TESTNET Binance
+2025-03-09 08:04:23,925 - binance_api - INFO - Sử dụng endpoints Binance Futures Testnet
+2025-03-09 08:04:24,200 - binance_api_fixes - INFO - Tài khoản đang ở chế độ hedge mode: True
+2025-03-09 08:04:24,200 - binance_api_fixes - INFO - Đã áp dụng các bản vá lỗi vào BinanceAPI
+2025-03-09 08:04:24,200 - auto_sltp_manager - INFO - Đã tải cấu hình từ configs/sltp_config.json
+2025-03-09 08:04:24,200 - auto_sltp_manager - INFO - Khởi tạo Auto SL/TP Manager: SL=2.0%, TP=3.0%
+2025-03-09 08:04:24,200 - advanced_telegram_notifier - INFO - Đã tải cấu hình từ configs/telegram_config.json
+2025-03-09 08:04:24,201 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_BOT_TOKEN từ biến môi trường
+2025-03-09 08:04:24,201 - advanced_telegram_notifier - INFO - Sử dụng TELEGRAM_CHAT_ID từ biến môi trường
+2025-03-09 08:04:24,201 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:24,383 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:25,188 - advanced_telegram_notifier - INFO - Đã gửi thông báo Telegram thành công
+2025-03-09 08:04:25,189 - sltp_telegram_integration - INFO - Đã gửi thông báo khởi động tới Telegram
+2025-03-09 08:04:25,189 - binance_api - INFO - Thử lấy thông tin vị thế từ account API
+2025-03-09 08:04:25,189 - binance_api - INFO - Gửi yêu cầu đến Binance Testnet Futures API
+2025-03-09 08:04:25,636 - binance_api - INFO - Đã lấy thành công dữ liệu từ Testnet Futures API
+2025-03-09 08:04:25,638 - binance_api - INFO - Đã lấy 3 vị thế active từ account API
+2025-03-09 08:04:25,638 - binance_api - INFO - Đã lấy thông tin vị thế từ account API
+2025-03-09 08:04:25,639 - check_sltp - INFO - Đã tìm thấy 3 vị thế đang mở
+2025-03-09 08:04:25,639 - check_sltp - INFO - Kiểm tra SL/TP cho ETHUSDT với số lượng 0.124, đòn bẩy 5.0x
+2025-03-09 08:04:25,789 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho ETHUSDT
+2025-03-09 08:04:25,789 - check_sltp - INFO - Vị thế ETHUSDT có đủ SL và TP
+2025-03-09 08:04:25,789 - check_sltp - INFO - Kiểm tra SL/TP cho BNBUSDT với số lượng 0.45, đòn bẩy 5.0x
+2025-03-09 08:04:25,947 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BNBUSDT
+2025-03-09 08:04:25,947 - check_sltp - INFO - Vị thế BNBUSDT có đủ SL và TP
+2025-03-09 08:04:25,947 - check_sltp - INFO - Kiểm tra SL/TP cho BTCUSDT với số lượng 0.009, đòn bẩy 5.0x
+2025-03-09 08:04:26,102 - check_sltp - INFO - Tìm thấy 3 lệnh SL và 3 lệnh TP cho BTCUSDT
+2025-03-09 08:04:26,102 - check_sltp - INFO - Vị thế BTCUSDT có đủ SL và TP
+2025-03-09 08:04:26,102 - check_sltp - INFO - === KẾT QUẢ KIỂM TRA SL/TP ===
+2025-03-09 08:04:26,103 - check_sltp - INFO - Tổng số vị thế: 3
+2025-03-09 08:04:26,103 - check_sltp - INFO - Số vị thế cần thiết lập lại SL/TP: 0
+2025-03-09 08:04:26,103 - check_sltp - INFO - ETHUSDT: SL ✅ (3), TP ✅ (3)
+2025-03-09 08:04:26,103 - check_sltp - INFO - BNBUSDT: SL ✅ (3), TP ✅ (3)
+2025-03-09 08:04:26,103 - check_sltp - INFO - BTCUSDT: SL ✅ (3), TP ✅ (3)
